@@ -9,4 +9,4 @@
 
 ## About Livewire - lara 
 Dasar Sirus Lite
-Laravel 10 + LiveWire + Breeze + Admin Flowbite CSS
+Laravel 10 + LiveWire + Breeze + Admin Flowbite CSS + DBOracle10g
