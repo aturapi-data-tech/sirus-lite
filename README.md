@@ -7,6 +7,6 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## About Livewire - lara 
+## SIRus-Lite 
 Dasar Sirus Lite
 Laravel 10 + LiveWire + Breeze + Admin Flowbite CSS + DBOracle10g
