@@ -8,5 +8,5 @@
 </p>
 
 ## About Livewire - lara 
-
+Dasar Sirus Lite
 Laravel 10 + LiveWire + Breeze + Admin Flowbite CSS
