@@ -25,7 +25,7 @@
 
 
                         {{-- search --}}
-                        <div class="relative pointer-events-auto dark:bg-slate-900 md:w-1/2">
+                        <div class="relative pointer-events-auto md:w-1/2">
                             <div class="absolute inset-y-0 left-0 flex items-center p-5 pl-3 pointer-events-none">
                                 <svg width="24" height="24" fill="none" aria-hidden="true"
                                     class="flex-none mr-3">

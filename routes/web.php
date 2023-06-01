@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Livewire\MasterLevelSatu\MasterLevelSatu;
 use App\Http\Livewire\MasterLevelDua\MasterLevelDua;
+use App\Http\Livewire\PendaftaranMandiriPasienPoli\PendaftaranMandiriPasienPoli;
 
 
 
@@ -38,9 +39,13 @@ Route::middleware('auth')->group(function () {
 // Route::resource('posts', Post::class)
 //     ->only(['index', 'store'])
 //     ->middleware(['auth', 'verified']);
+
+
 Route::get('posts', PostTable::class)->middleware('auth')->name('posts');
 Route::get('masterlevelsatu', MasterLevelSatu::class)->middleware('auth')->name('MasterLevelSatu');
 Route::get('masterleveldua', MasterLevelDua::class)->middleware('auth')->name('MasterLevelDua');
+
+Route::get('pendaftaranMandiriPasienPoli', PendaftaranMandiriPasienPoli::class)->name('pendaftaranMandiriPasienPoli');
 
 
 // Life Cycle Hook
