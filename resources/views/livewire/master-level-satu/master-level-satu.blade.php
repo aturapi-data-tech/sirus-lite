@@ -1,11 +1,5 @@
 <div>
 
-
-
-
-
-
-    {{-- If your happiness depends on money, you will never be happy with yourself. --}}
     <div class="px-4 pt-6">
         <div
             class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
@@ -17,9 +11,6 @@
                 <div class="">
 
 
-
-
-
                     {{-- text --}}
                     <div class="mb-5">
                         <h3 class="text-3xl font-bold text-gray-900 dark:text-white">{{ $myTitle }}</h3>
@@ -29,12 +20,7 @@
 
 
 
-
-
-
                     <div class="md:flex md:justify-between">
-
-
 
 
 
@@ -57,9 +43,6 @@
 
 
 
-
-
-
                         {{-- two button --}}
                         <div class="flex justify-between mt-2 md:mt-0">
                             <x-primary-button wire:click="create()" class="flex justify-center flex-auto">
@@ -71,10 +54,6 @@
                                 </svg>
                                 Tambah Data {{ $myProgram }}
                             </x-primary-button>
-
-
-
-
 
 
 
@@ -94,7 +73,7 @@
                                 <x-slot name="content">
 
                                     @foreach ($myLimitPerPages as $myLimitPerPage)
-                                        <x-dropdown-link wire:click="changeLimitPerPage({{ $myLimitPerPage }})">
+                                        <x-dropdown-link wire:click="setLimitPerPage({{ $myLimitPerPage }})">
                                             {{ __($myLimitPerPage) }}
                                         </x-dropdown-link>
                                     @endforeach
@@ -109,23 +88,13 @@
 
 
 
-
                     @if ($isOpen)
                         @include('livewire.master-level-satu.create')
                     @endif
-                    @if ($tampilIsOpen)
-                        @include('livewire.master-level-satu.tampil')
-                    @endif
-
-
-
 
 
 
                 </div>
-
-
-
 
 
 
@@ -139,14 +108,15 @@
                                         class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                         <tr>
                                             <th scope="col" class="w-2/12 px-4 py-3">
-                                                @if ($sortField == 'id')
-                                                    <x-sort-link :active=true wire:click.prevent="sortBy('id')"
+                                                @if ($sortField == 'province_id')
+                                                    <x-sort-link :active=true wire:click.prevent="sortBy('province_id')"
                                                         role="button" href="#">
                                                         Kode Provinsi
                                                     </x-sort-link>
                                                 @else
-                                                    <x-sort-link :active=false wire:click.prevent="sortBy('id')"
-                                                        role="button" href="#">
+                                                    <x-sort-link :active=false
+                                                        wire:click.prevent="sortBy('province_id')" role="button"
+                                                        href="#">
                                                         Kode Provinsi
                                                     </x-sort-link>
                                                 @endif
@@ -156,15 +126,17 @@
                                                 @if ($sortField == 'name')
                                                     <x-sort-link :active=true wire:click.prevent="sortBy('name')"
                                                         role="button" href="#">
-                                                        Nama Provinsi
+                                                        Nama Kota
                                                     </x-sort-link>
                                                 @else
                                                     <x-sort-link :active=false wire:click.prevent="sortBy('name')"
                                                         role="button" href="#">
-                                                        Nama Provinsi
+                                                        Nama Kota
                                                     </x-sort-link>
                                                 @endif
                                             </th>
+
+
 
 
                                             <th scope="col" class="w-8 px-4 py-3 text-center">Action
@@ -182,18 +154,9 @@
                                                 <td class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-blue-700">
                                                     {{ $province->name }}</td>
 
+
                                                 <td
                                                     class="flex items-center justify-center px-4 py-3 group-hover:bg-gray-100 group-hover:text-blue-700">
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -240,19 +203,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
                                                     {{-- Dropdown Action menu from Breeze off --}}
                                                     {{-- <div class="">
                                                         <x-dropdown align="right" width="48">
@@ -294,23 +244,14 @@
 
 
 
-
-
-
                                                 </td>
                                             </tr>
                                         @endforeach
 
 
 
-
                                     </tbody>
                                 </table>
-
-
-
-
-
 
 
 
@@ -321,11 +262,13 @@
                                     </div>
                                 @endif
                                 {{-- no data found end --}}
+
+
+
                             </div>
                         </div>
                     </div>
                 </div>
-
 
 
 
@@ -335,11 +278,6 @@
                     {{ $provinces->links('vendor.livewire.tailwind') }}
                 </div>
                 <!-- Pagination end -->
-
-
-
-
-
 
 
 
@@ -374,7 +312,7 @@
 
 
 
-    {{-- push start --}}
+    {{-- push start ///////////////////////////////// --}}
     @push('scripts')
         {{-- script start --}}
         <script src="{{ url('assets/js/jquery.min.js') }}"></script>
@@ -470,24 +408,6 @@
                 const dropdown = new Dropdown($targetEl, $triggerEl, options);
 
                 dropdown.show();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
             });
         </script>

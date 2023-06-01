@@ -91,9 +91,7 @@
                     @if ($isOpen)
                         @include('livewire.master-level-dua.create')
                     @endif
-                    @if ($tampilIsOpen)
-                        @include('livewire.master-level-dua.tampil')
-                    @endif
+
 
 
 
