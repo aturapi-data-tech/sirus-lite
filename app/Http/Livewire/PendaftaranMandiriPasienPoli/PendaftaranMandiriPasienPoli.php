@@ -5,6 +5,9 @@ namespace App\Http\Livewire\PendaftaranMandiriPasienPoli;
 use Livewire\Component;
 use App\Models\Regency;
 use App\Models\Province;
+
+use App\Models\Pasien;
+
 use Livewire\WithPagination;
 
 class PendaftaranMandiriPasienPoli extends Component
@@ -12,6 +15,18 @@ class PendaftaranMandiriPasienPoli extends Component
     use WithPagination;
 
     //  table data////////////////
+    public $regNo;
+    public $dataPasien = [
+        "regNo" => "",
+        "regName" => "",
+        "sex" => "",
+        "birthDate" => "",
+        "thn" => "",
+        "birthPlace" => "",
+        "maritalStatus" => "",
+        "address" => ""
+    ];
+
     public $name, $regency_id, $province_id, $province_name;
 
 
@@ -218,7 +233,7 @@ class PendaftaranMandiriPasienPoli extends Component
     // Find data from table start////////////////
     private function findData($value)
     {
-        $findData = Regency::findOrFail($value);
+        $findData = Pasien::find($value);
         return $findData;
     }
     // Find data from table end////////////////
@@ -226,15 +241,23 @@ class PendaftaranMandiriPasienPoli extends Component
 
 
     // show edit record start////////////////
-    public function edit($id)
+    public function cariDataPasien($id)
     {
-        $this->openModalEdit();
 
-        $regency = $this->findData($id);
-        $this->regency_id = $id;
-        $this->name = $regency->name;
-        $this->province_id = $regency->province_id;
-        $this->province_name = $regency->province->name;
+        $pasien = $this->findData($id);
+        if ($pasien) {
+            $this->dataPasien["regNo"] = $pasien->reg_no;
+            $this->dataPasien["regName"] = $pasien->reg_name;
+        } else {
+            $this->emit('toastr-error', "Data Pasien dgn No Reg " . $id . " tidak ditemukan.");
+        }
+
+    }
+
+    public function updatedRegNo(): void
+    {
+        $this->cariDataPasien($this->regNo);
+
     }
     // show edit record end////////////////
 
@@ -272,7 +295,7 @@ class PendaftaranMandiriPasienPoli extends Component
         return view(
             'livewire.pendaftaran-mandiri-pasien-poli.pendaftaran-mandiri-pasien-poli',
             [
-                'regencys' => Regency::with('province')
+                'pasiens' => Regency::with('province')
                     ->select('regencies.id as id', 'regencies.name as name', 'provinces.name as province_name')
                     ->join('provinces', 'provinces.id', 'regencies.province_id')
                     ->where('regencies.name', 'like', '%' . $this->search . '%')

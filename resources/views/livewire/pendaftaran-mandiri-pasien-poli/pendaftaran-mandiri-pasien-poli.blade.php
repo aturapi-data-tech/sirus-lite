@@ -20,7 +20,7 @@
 
 
 
-
+                    {{-- steper start --}}
                     <div class="flex items-center justify-center w-full mb-4 p-">
 
                         <ol
@@ -54,7 +54,7 @@
                         </ol>
 
                     </div>
-
+                    {{-- steper end --}}
 
 
 
@@ -63,12 +63,11 @@
 
 
 
-                        {{-- search --}}
+                        {{-- search by noReg --}}
                         <div class="ml-2 md:w-full">
-                            <x-input-label for="province_id" :value="__('No_Registrasi')" class="mb-2" />
-                            <x-text-input id="simpleSearch" name="namesimpleSearch" type="text" class="p-2 "
-                                autofocus autocomplete="simpleSearch" placeholder="Cari Data"
-                                wire:model.lazy="search" />
+                            <x-input-label for="regNo" :value="__('No_Registrasi')" class="mb-2" />
+                            <x-text-input id="regNo" name="regNo" type="text" class="p-2 " autofocus
+                                autocomplete="regNo" placeholder="No Registrasi" wire:model.lazy="regNo" />
 
                         </div>
 
@@ -80,36 +79,31 @@
                                     <div class="inline-flex items-center justify-between m-2 md:w-full">
                                         <x-input-label for="province_id" :value="__('No_Registrasi')" class="w-1/4 mb-2 mr-2" />
                                         <x-text-input id="simpleSearch" :disabled=true name="namesimpleSearch"
-                                            type="text" class="p-2 " autofocus autocomplete="simpleSearch"
-                                            placeholder="Cari Data" wire:model.lazy="search" />
+                                            type="text" class="p-2 " wire:model="dataPasien.regNo" />
 
                                     </div>
                                     <div class="inline-flex justify-between m-2 md:w-full">
                                         <x-input-label for="province_id" :value="__('Pasien')" class="w-1/4 mb-2 mr-2" />
                                         <x-text-input id="simpleSearch" :disabled=true name="namesimpleSearch"
-                                            type="text" class="p-2 " autofocus autocomplete="simpleSearch"
-                                            placeholder="Cari Data" wire:model.lazy="search" />
+                                            type="text" class="p-2 " wire:model="dataPasien.regName" />
 
                                     </div>
                                     <div class="inline-flex justify-between m-2 md:w-full">
                                         <x-input-label for="province_id" :value="__('L/P')" class="w-1/4 mb-2 mr-2" />
                                         <x-text-input id="simpleSearch" :disabled=true name="namesimpleSearch"
-                                            type="text" class="p-2 " autofocus autocomplete="simpleSearch"
-                                            placeholder="Cari Data" wire:model.lazy="search" />
+                                            type="text" class="p-2 " />
 
                                     </div>
                                     <div class="inline-flex justify-between m-2 md:w-full">
                                         <x-input-label for="province_id" :value="__('Tgl_Lahir')" class="w-1/4 mb-2 mr-2" />
                                         <x-text-input id="simpleSearch" :disabled=true name="namesimpleSearch"
-                                            type="text" class="p-2 " autofocus autocomplete="simpleSearch"
-                                            placeholder="Cari Data" wire:model.lazy="search" />
+                                            type="text" class="p-2 " />
 
                                     </div>
                                     <div class="inline-flex justify-between m-2 md:w-full">
                                         <x-input-label for="province_id" :value="__('Usia')" class="w-1/4 mb-2 mr-2" />
                                         <x-text-input id="simpleSearch" :disabled=true name="namesimpleSearch"
-                                            type="text" class="p-2 " autofocus autocomplete="simpleSearch"
-                                            placeholder="Cari Data" wire:model.lazy="search" />
+                                            type="text" class="p-2 " />
 
                                     </div>
                                 </div>
@@ -121,22 +115,20 @@
                                     <div class="inline-flex justify-between m-2 md:w-full">
                                         <x-input-label for="province_id" :value="__('Tempat_lahir')" class="w-1/4 mb-2 mr-2" />
                                         <x-text-input id="simpleSearch" :disabled=true name="namesimpleSearch"
-                                            type="text" class="p-2 " autofocus autocomplete="simpleSearch"
-                                            placeholder="Cari Data" wire:model.lazy="search" />
+                                            type="text" class="p-2 " />
 
                                     </div>
                                     <div class="inline-flex justify-between m-2 md:w-full">
                                         <x-input-label for="province_id" :value="__('Status')" class="w-1/4 mb-2 mr-2" />
                                         <x-text-input id="simpleSearch" :disabled=true name="namesimpleSearch"
-                                            type="text" class="p-2 " autofocus autocomplete="simpleSearch"
-                                            placeholder="Cari Data" wire:model.lazy="search" />
+                                            type="text" class="p-2 " />
 
                                     </div>
                                     <div class="inline-flex justify-between m-2 md:w-full">
                                         <x-input-label for="province_id" :value="__('Alamat')" class="w-1/4 mb-2 mr-2" />
                                         <textarea id="description"
                                             class="shadow-sm bg-gray-100 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                            name="description" placeholder="This is a placeholder" required rows="6" disabled></textarea>
+                                            name="description" required rows="7" disabled></textarea>
 
                                     </div>
 
@@ -151,7 +143,7 @@
 
 
 
-                        <div id="pendaftaranStepDua" name="pendaftaranStepDua" class="">
+                        <div id="pendaftaranStepDua" name="pendaftaranStepDua" class="hidden">
 
                             <div class="flex items-start justify-center p-5">
                                 <div class="w-1/2 ">
@@ -165,8 +157,7 @@
 
 
                                         <x-text-input id="simpleSearch" :disabled=true name="namesimpleSearch"
-                                            type="text" class="p-2 " autofocus autocomplete="simpleSearch"
-                                            placeholder="Cari Data" wire:model.lazy="search" />
+                                            type="text" class="p-2 " />
 
                                     </div>
 
@@ -180,8 +171,7 @@
 
 
                                         <x-text-input id="simpleSearch" :disabled=true name="namesimpleSearch"
-                                            type="text" class="p-2 " autofocus autocomplete="simpleSearch"
-                                            placeholder="Cari Data" wire:model.lazy="search" />
+                                            type="text" class="p-2 " />
 
                                     </div>
 
@@ -189,14 +179,11 @@
                                         <x-input-label for="province_id" :value="__('Umum/BPJS')"
                                             class="w-1/3 mb-2 mr-2 " />
                                         <x-text-input id="simpleSearch" :disabled=true name="namesimpleSearch"
-                                            type="text" class="p-2 mr-2 sm:w-1/3 " autofocus
-                                            autocomplete="simpleSearch" placeholder="Cari Data"
-                                            wire:model.lazy="search" />
+                                            type="text" class="p-2 mr-2 sm:w-1/3 " />
 
 
                                         <x-text-input id="simpleSearch" :disabled=true name="namesimpleSearch"
-                                            type="text" class="p-2 " autofocus autocomplete="simpleSearch"
-                                            placeholder="Cari Data" wire:model.lazy="search" />
+                                            type="text" class="p-2 " />
 
                                     </div>
                                 </div>
@@ -212,7 +199,7 @@
 
 
 
-                        <div id="pendaftaranStepTiga" name="pendaftaranStepTiga" class="">
+                        <div id="pendaftaranStepTiga" name="pendaftaranStepTiga" class="hidden">
 
 
                             <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
