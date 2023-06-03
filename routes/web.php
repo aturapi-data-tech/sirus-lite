@@ -45,7 +45,7 @@ Route::get('posts', PostTable::class)->middleware('auth')->name('posts');
 Route::get('masterlevelsatu', MasterLevelSatu::class)->middleware('auth')->name('MasterLevelSatu');
 Route::get('masterleveldua', MasterLevelDua::class)->middleware('auth')->name('MasterLevelDua');
 
-Route::get('pendaftaranMandiriPasienPoli', PendaftaranMandiriPasienPoli::class)->name('pendaftaranMandiriPasienPoli');
+Route::get('pendaftaranMandiriPasienPoli', PendaftaranMandiriPasienPoli::class)->middleware('auth')->name('pendaftaranMandiriPasienPoli');
 
 
 // Life Cycle Hook

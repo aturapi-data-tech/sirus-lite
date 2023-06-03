@@ -1,3 +1,17 @@
+@php
+    $classStepActiveSatu = $steperStatus == 1 ? '' : 'hidden';
+    $classStepActiveDua = $steperStatus == 2 ? '' : 'hidden';
+    $classStepActiveTiga = $steperStatus == 3 ? '' : 'hidden';
+    
+    $classpendaftaranStepSatu = $steperStatus >= 1 ? "flex md:w-full items-center text-blue-600 dark:text-blue-500  sm:after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-200 after:border-1 after:hidden sm:after:inline-block after:mx-6 xl:after:mx-10 dark:after:border-gray-700" : "flex md:w-full items-center after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-200 after:border-1 after:hidden sm:after:inline-block after:mx-6 xl:after:mx-10 dark:after:border-gray-700";
+    
+    $classpendaftaranStepDua = $steperStatus >= 2 ? "flex md:w-full items-center text-blue-600 dark:text-blue-500  sm:after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-200 after:border-1 after:hidden sm:after:inline-block after:mx-6 xl:after:mx-10 dark:after:border-gray-700" : "flex md:w-full items-center after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-200 after:border-1 after:hidden sm:after:inline-block after:mx-6 xl:after:mx-10 dark:after:border-gray-700";
+    
+    $classpendaftaranStepTiga = $steperStatus >= 3 ? "flex md:w-full items-center text-blue-600 dark:text-blue-500  sm:after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-200 after:border-1 after:hidden sm:after:inline-block after:mx-6 xl:after:mx-10 dark:after:border-gray-700" : "flex md:w-full items-center after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-200 after:border-1 after:hidden sm:after:inline-block after:mx-6 xl:after:mx-10 dark:after:border-gray-700";
+    
+@endphp
+
+
 <div>
 
     <div class="px-4 pt-6">
@@ -23,33 +37,60 @@
                     {{-- steper start --}}
                     <div class="flex items-center justify-center w-full mb-4 p-">
 
+
+
+
+
                         <ol
                             class="flex items-center w-full text-sm font-medium text-center text-gray-500 dark:text-gray-400 sm:text-base">
-                            <li
-                                class="flex md:w-full items-center text-blue-600 dark:text-blue-500 sm:after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-200 after:border-1 after:hidden sm:after:inline-block after:mx-6 xl:after:mx-10 dark:after:border-gray-700">
+                            <li class="{{ $classpendaftaranStepSatu }}">
                                 <span
                                     class="flex items-center after:content-['/'] sm:after:hidden after:mx-2 after:text-gray-200 dark:after:text-gray-500">
-                                    <svg aria-hidden="true" class="w-4 h-4 mr-2 sm:w-5 sm:h-5" fill="currentColor"
-                                        viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                        <path fill-rule="evenodd"
-                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                            clip-rule="evenodd"></path>
-                                    </svg>
+
+                                    @if ($steperStatus >= 1)
+                                        <svg aria-hidden="true" class="w-4 h-4 mr-2 sm:w-5 sm:h-5" fill="currentColor"
+                                            viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                            <path fill-rule="evenodd"
+                                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                                clip-rule="evenodd"></path>
+                                        </svg>
+                                    @endif
+
                                     <span class="">1</span>
                                     <span class="hidden sm:inline-flex sm:ml-2">Registrasi</span>
                                 </span>
                             </li>
-                            <li
-                                class="flex md:w-full items-center after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-200 after:border-1 after:hidden sm:after:inline-block after:mx-6 xl:after:mx-10 dark:after:border-gray-700">
+                            <li class="{{ $classpendaftaranStepDua }}">
                                 <span
                                     class="flex items-center after:content-['/'] sm:after:hidden after:mx-2 after:text-gray-200 dark:after:text-gray-500">
+
+                                    @if ($steperStatus >= 2)
+                                        <svg aria-hidden="true" class="w-4 h-4 mr-2 sm:w-5 sm:h-5" fill="currentColor"
+                                            viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                            <path fill-rule="evenodd"
+                                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                                clip-rule="evenodd"></path>
+                                        </svg>
+                                    @endif
+
                                     <span class="mr-2">2</span>
                                     Pilih <span class="hidden sm:inline-flex sm:ml-2">Poli</span>
                                 </span>
                             </li>
-                            <li class="flex items-center">
-                                <span class="mr-2">3</span>
-                                Konfirmasi
+                            <li class="{{ $classpendaftaranStepTiga }}">
+                                <span
+                                    class="flex items-center after:content-['/'] sm:after:hidden after:mx-2 after:text-gray-200 dark:after:text-gray-500">
+                                    @if ($steperStatus >= 3)
+                                        <svg aria-hidden="true" class="w-4 h-4 mr-2 sm:w-5 sm:h-5" fill="currentColor"
+                                            viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                            <path fill-rule="evenodd"
+                                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                                clip-rule="evenodd"></path>
+                                        </svg>
+                                    @endif
+
+                                    <span class="mr-2">3</span>
+                                    Konfirmasi
                             </li>
                         </ol>
 
@@ -63,47 +104,49 @@
 
 
 
-                        {{-- search by noReg --}}
-                        <div class="ml-2 md:w-full">
-                            <x-input-label for="regNo" :value="__('No_Registrasi')" class="mb-2" />
-                            <x-text-input id="regNo" name="regNo" type="text" class="p-2 " autofocus
-                                autocomplete="regNo" placeholder="No Registrasi" wire:model.lazy="regNo" />
-
-                        </div>
 
 
+                        <div id="pendaftaranStepSatu" name="pendaftaranStepSatu" class="{{ $classStepActiveSatu }}">
 
-                        <div id="pendaftaranStepSatu" name="pendaftaranStepSatu" class="">
+                            {{-- search by noReg --}}
+                            <div class="ml-2 md:w-full">
+                                <x-input-label for="regNo" :value="__('No_Registrasi')" class="mb-2" />
+                                <x-text-input id="regNo" name="regNo" type="text" class="p-2 " autofocus
+                                    autocomplete="regNo" placeholder="No Registrasi" wire:model.lazy="regNo" />
+
+                            </div>
+                            {{-- search by noReg --}}
+
                             <div class="inline-flex">
                                 <div class="w-1/2 p-2">
                                     <div class="inline-flex items-center justify-between m-2 md:w-full">
-                                        <x-input-label for="province_id" :value="__('No_Registrasi')" class="w-1/4 mb-2 mr-2" />
-                                        <x-text-input id="simpleSearch" :disabled=true name="namesimpleSearch"
-                                            type="text" class="p-2 " wire:model="dataPasien.regNo" />
+                                        <x-input-label :value="__('No_Registrasi')" class="w-1/4 mb-2 mr-2" />
+                                        <x-text-input :disabled=true type="text" class="p-2 "
+                                            wire:model="dataPasien.regNo" />
 
                                     </div>
                                     <div class="inline-flex justify-between m-2 md:w-full">
-                                        <x-input-label for="province_id" :value="__('Pasien')" class="w-1/4 mb-2 mr-2" />
-                                        <x-text-input id="simpleSearch" :disabled=true name="namesimpleSearch"
-                                            type="text" class="p-2 " wire:model="dataPasien.regName" />
+                                        <x-input-label :value="__('Pasien')" class="w-1/4 mb-2 mr-2" />
+                                        <x-text-input :disabled=true type="text" class="p-2 "
+                                            wire:model="dataPasien.regName" />
 
                                     </div>
                                     <div class="inline-flex justify-between m-2 md:w-full">
-                                        <x-input-label for="province_id" :value="__('L/P')" class="w-1/4 mb-2 mr-2" />
-                                        <x-text-input id="simpleSearch" :disabled=true name="namesimpleSearch"
-                                            type="text" class="p-2 " />
+                                        <x-input-label :value="__('L/P')" class="w-1/4 mb-2 mr-2" />
+                                        <x-text-input :disabled=true type="text" class="p-2 "
+                                            wire:model="dataPasien.sex" />
 
                                     </div>
                                     <div class="inline-flex justify-between m-2 md:w-full">
-                                        <x-input-label for="province_id" :value="__('Tgl_Lahir')" class="w-1/4 mb-2 mr-2" />
-                                        <x-text-input id="simpleSearch" :disabled=true name="namesimpleSearch"
-                                            type="text" class="p-2 " />
+                                        <x-input-label :value="__('Tgl_Lahir')" class="w-1/4 mb-2 mr-2" />
+                                        <x-text-input :disabled=true type="text" class="p-2 "
+                                            wire:model="dataPasien.birthDate" />
 
                                     </div>
                                     <div class="inline-flex justify-between m-2 md:w-full">
-                                        <x-input-label for="province_id" :value="__('Usia')" class="w-1/4 mb-2 mr-2" />
-                                        <x-text-input id="simpleSearch" :disabled=true name="namesimpleSearch"
-                                            type="text" class="p-2 " />
+                                        <x-input-label :value="__('Usia')" class="w-1/4 mb-2 mr-2" />
+                                        <x-text-input :disabled=true type="text" class="p-2 "
+                                            wire:model="dataPasien.thn" />
 
                                     </div>
                                 </div>
@@ -113,22 +156,22 @@
 
                                 <div class="w-1/2 p-2">
                                     <div class="inline-flex justify-between m-2 md:w-full">
-                                        <x-input-label for="province_id" :value="__('Tempat_lahir')" class="w-1/4 mb-2 mr-2" />
-                                        <x-text-input id="simpleSearch" :disabled=true name="namesimpleSearch"
-                                            type="text" class="p-2 " />
+                                        <x-input-label :value="__('Tempat_lahir')" class="w-1/4 mb-2 mr-2" />
+                                        <x-text-input :disabled=true type="text" class="p-2 "
+                                            wire:model="dataPasien.birthPlace" />
 
                                     </div>
                                     <div class="inline-flex justify-between m-2 md:w-full">
-                                        <x-input-label for="province_id" :value="__('Status')" class="w-1/4 mb-2 mr-2" />
-                                        <x-text-input id="simpleSearch" :disabled=true name="namesimpleSearch"
-                                            type="text" class="p-2 " />
+                                        <x-input-label :value="__('Status')" class="w-1/4 mb-2 mr-2" />
+                                        <x-text-input :disabled=true type="text" class="p-2 "
+                                            wire:model="dataPasien.maritalStatus" />
 
                                     </div>
                                     <div class="inline-flex justify-between m-2 md:w-full">
-                                        <x-input-label for="province_id" :value="__('Alamat')" class="w-1/4 mb-2 mr-2" />
-                                        <textarea id="description"
+                                        <x-input-label :value="__('Alamat')" class="w-1/4 mb-2 mr-2" />
+                                        <textarea
                                             class="shadow-sm bg-gray-100 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                            name="description" required rows="7" disabled></textarea>
+                                            required rows="7" disabled wire:model="dataPasien.address"></textarea>
 
                                     </div>
 
@@ -137,13 +180,13 @@
 
 
                             <div class="flex justify-end">
-                                <x-primary-button>Proses</x-primary-button>
+                                <x-primary-button wire:click="counterSteper">Proses</x-primary-button>
                             </div>
                         </div>
 
 
 
-                        <div id="pendaftaranStepDua" name="pendaftaranStepDua" class="hidden">
+                        <div id="pendaftaranStepDua" name="pendaftaranStepDua" class="{{ $classStepActiveDua }}">
 
                             <div class="flex items-start justify-center p-5">
                                 <div class="w-1/2 ">
@@ -199,7 +242,7 @@
 
 
 
-                        <div id="pendaftaranStepTiga" name="pendaftaranStepTiga" class="hidden">
+                        <div id="pendaftaranStepTiga" name="pendaftaranStepTiga" class="{{ $classStepActiveTiga }}">
 
 
                             <div class="relative overflow-x-auto shadow-md sm:rounded-lg">

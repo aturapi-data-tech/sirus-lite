@@ -26,42 +26,7 @@ class PendaftaranMandiriPasienPoli extends Component
         "maritalStatus" => "",
         "address" => ""
     ];
-
-    public $name, $regency_id, $province_id, $province_name;
-
-
-    // limit record per page -resetExcept////////////////
-    public $limitPerPage = 5;
-
-
-    //  table LOV////////////////
-    public $proviceLov = [];
-    public $provinceLovStatus = 0;
-
-
-    //  modal status////////////////
-    public $isOpen = 0;
-    public $isOpenMode = 'insert';
-    public $tampilIsOpen = 0;
-
-
-    // search logic -resetExcept////////////////
-    public $search;
-    protected $queryString = [
-        'search' => ['except' => '', 'as' => 'cariData'],
-        'page' => ['except' => 1, 'as' => 'p'],
-    ];
-
-
-    // sort logic -resetExcept////////////////
-    public $sortField = 'regencies.id';
-    public $sortAsc = true;
-
-
-    // listener from blade////////////////
-    protected $listeners = [
-        'confirm_remove_record_regency' => 'delete',
-    ];
+    public $steperStatus = 1;
 
 
 
@@ -78,155 +43,11 @@ class PendaftaranMandiriPasienPoli extends Component
     private function resetInputFields(): void
     {
         $this->reset([
-            'name',
-            'regency_id',
-            'province_id',
-            'province_name',
-            'proviceLov',
-            'provinceLovStatus',
-            'isOpen',
-            'tampilIsOpen',
-            'isOpenMode'
+            'dataPasien'
         ]);
 
     }
 
-
-
-
-    // open and close modal start////////////////
-    private function openModal(): void
-    {
-        $this->resetInputFields();
-        $this->isOpen = true;
-        $this->isOpenMode = 'insert';
-    }
-    private function openModalEdit(): void
-    {
-        $this->resetInputFields();
-        $this->isOpen = true;
-        $this->isOpenMode = 'update';
-    }
-
-    private function openModalTampil(): void
-    {
-        $this->resetInputFields();
-        $this->isOpen = true;
-        $this->isOpenMode = 'tampil';
-    }
-
-    public function closeModal(): void
-    {
-        $this->resetInputFields();
-    }
-    // open and close modal end////////////////
-
-
-
-
-    // setLimitPerpage////////////////
-    public function setLimitPerPage($value)
-    {
-        $this->limitPerPage = $value;
-    }
-
-
-
-
-    // resert page pagination when coloumn search change ////////////////
-    public function updatedSearch(): void
-    {
-        $this->resetPage();
-
-    }
-
-
-
-
-    // logic ordering record (shotby)////////////////
-    public function sortBy($field)
-    {
-        if ($this->sortField === $field) {
-            $this->sortAsc = !$this->sortAsc;
-        } else {
-            $this->sortAsc = true;
-        }
-
-        $this->sortField = $field;
-    }
-
-
-
-
-    // logic LOV start////////////////
-    public function updatedProvinceid()
-    {
-        // check LOV by id 
-        $province = Province::select('id', 'name')
-            ->where('id', '=', $this->province_id)->first();
-        if ($province) {
-            $this->province_id = $province->id;
-            $this->province_name = $province->name;
-            $this->provinceLovStatus = false;
-        } else {
-            // if there is no id found and check (min 3 char on search)
-            if (strlen($this->province_id) < 3) {
-                $this->proviceLov = [];
-            } else {
-                $this->proviceLov = Province::where('name', 'like', '%' . $this->province_id . '%')
-                    ->orderBy('name', 'asc')->get();
-            }
-            $this->provinceLovStatus = true;
-            $this->province_name = '';
-        }
-    }
-    // /////////////////////
-    // LOV selected start
-    public function setMyProvinceLov($id, $name)
-    {
-        $this->province_id = $id;
-        $this->province_name = $name;
-        $this->provinceLovStatus = 0;
-    }
-    // LOV selected end
-    // /////////////////////
-
-    // logic LOV end
-
-
-
-    // is going to insert data////////////////
-    public function create()
-    {
-        $this->openModal();
-    }
-
-
-
-    // insert record start////////////////
-    public function store()
-    {
-        $this->validate([
-            'name' => 'required',
-            'province_id' => 'required|exists:provinces,id'
-        ]);
-
-        Regency::updateOrCreate(['id' => $this->regency_id], [
-            'name' => $this->name,
-            'province_id' => $this->province_id
-        ]);
-
-        session()->flash(
-            'message',
-            $this->regency_id ? 'Regency Updated Successfully.' : 'Regency Created Successfully.'
-        );
-
-        $this->closeModal();
-        $this->resetInputFields();
-        $this->emit('toastr-success', "Data " . $this->name . " berhasil disimpan.");
-
-    }
-    // insert record end////////////////
 
 
 
@@ -238,9 +59,22 @@ class PendaftaranMandiriPasienPoli extends Component
     }
     // Find data from table end////////////////
 
+    // add SteperStatus number
+    public function counterSteper()
+    {
+
+        if ($this->dataPasien["regNo"] !== "") {
+            $this->steperStatus++;
+            $this->emit('toastr-error', "Data Pasien dgn No Reg " . $this->steperStatus . " tidak ditemukan.");
+        } else {
+            $this->emit('toastr-error', "Data Pasien tidak ditemukan, tempelkan kartu pasien anda ke mesin pemindai.");
+        }
+
+    }
 
 
-    // show edit record start////////////////
+
+    // logic stepper 1 start///// cari data pasien if not resert///////////
     public function cariDataPasien($id)
     {
 
@@ -248,7 +82,15 @@ class PendaftaranMandiriPasienPoli extends Component
         if ($pasien) {
             $this->dataPasien["regNo"] = $pasien->reg_no;
             $this->dataPasien["regName"] = $pasien->reg_name;
+            $this->dataPasien["sex"] = $pasien->sex;
+            $this->dataPasien["birthDate"] = $pasien->birth_date;
+            $this->dataPasien["thn"] = $pasien->thn;
+            $this->dataPasien["birthPlace"] = $pasien->birth_place;
+            $this->dataPasien["maritalStatus"] = $pasien->marital_status;
+            $this->dataPasien["address"] = $pasien->address;
+
         } else {
+            $this->resetInputFields();
             $this->emit('toastr-error', "Data Pasien dgn No Reg " . $id . " tidak ditemukan.");
         }
 
@@ -259,33 +101,8 @@ class PendaftaranMandiriPasienPoli extends Component
         $this->cariDataPasien($this->regNo);
 
     }
-    // show edit record end////////////////
+    // logic stepper 1 end////////////////
 
-
-
-    // tampil record start////////////////
-    public function tampil($id)
-    {
-        $this->openModalTampil();
-
-        $regency = $this->findData($id);
-        $this->regency_id = $id;
-        $this->name = $regency->name;
-        $this->province_id = $regency->province_id;
-        $this->province_name = $regency->province->name;
-
-    }
-    // tampil record end////////////////
-
-
-
-    // delete record start////////////////
-    public function delete($id, $name)
-    {
-        Regency::find($id)->delete();
-        $this->emit('toastr-success', "Hapus data " . $name . " berhasil.");
-    }
-    // delete record end////////////////
 
 
 
@@ -295,17 +112,9 @@ class PendaftaranMandiriPasienPoli extends Component
         return view(
             'livewire.pendaftaran-mandiri-pasien-poli.pendaftaran-mandiri-pasien-poli',
             [
-                'pasiens' => Regency::with('province')
-                    ->select('regencies.id as id', 'regencies.name as name', 'provinces.name as province_name')
-                    ->join('provinces', 'provinces.id', 'regencies.province_id')
-                    ->where('regencies.name', 'like', '%' . $this->search . '%')
-                    ->orWhere('provinces.name', 'like', '%' . $this->search . '%')
-                    ->orderBy($this->sortField, $this->sortAsc ? 'asc' : 'desc')
-                    ->paginate($this->limitPerPage),
-                'myTitle' => 'Pendaftaran Poli Mandiri',
+                'myTitle' => 'Pendaftaran Mandiri',
                 'mySnipt' => 'Pasien dapat mendaftar secara mandiri pada setiap poli',
-                'myProgram' => 'Kota',
-                'myLimitPerPages' => [5, 10, 15, 20, 100]
+                'myProgram' => 'Poli',
             ]
         );
     }
