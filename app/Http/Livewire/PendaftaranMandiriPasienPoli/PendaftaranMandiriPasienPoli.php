@@ -3,10 +3,12 @@
 namespace App\Http\Livewire\PendaftaranMandiriPasienPoli;
 
 use Livewire\Component;
-use App\Models\Regency;
-use App\Models\Province;
+
 
 use App\Models\Pasien;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 
 use Livewire\WithPagination;
 
@@ -26,7 +28,30 @@ class PendaftaranMandiriPasienPoli extends Component
         "maritalStatus" => "",
         "address" => ""
     ];
+    public $dataJadwalPoli;
+    public $klaimType = "UM";
+    public $hariIni = 1;
+
     public $steperStatus = 1;
+
+    public $dataDaftarPasienPoli = [
+        "regNo" => "",
+        "regName" => "",
+        "sex" => "",
+        "birthDate" => "",
+        "thn" => "",
+        "birthPlace" => "",
+        "maritalStatus" => "",
+        "address" => "",
+        "drId" => "",
+        "drName" => "",
+        "poliId" => "",
+        "poliDesc" => "",
+        "klaimId" => "",
+        "klaimDesc" => "",
+        "rjDate" => "",
+
+    ];
 
 
 
@@ -57,6 +82,42 @@ class PendaftaranMandiriPasienPoli extends Component
         $findData = Pasien::find($value);
         return $findData;
     }
+
+    private function findDataJadwalPoli($value)
+    {
+        // $findData = MasterJadwalPoli::select(
+        //     'scmst_scpolis.dr_id as dr_id',
+        //     'rsmst_doctors.dr_name as dr_name',
+        //     'scmst_scpolis.sc_poli_ket as sc_poli_ket',
+        //     'scmst_scpolis.poli_id as poli_id',
+        //     'rsmst_polis.poli_desc as poli_desc',
+
+        // )
+        //     ->Join('rsmst_doctors', 'rsmst_doctors.dr_id', 'scmst_scpolis.dr_id')
+        //     ->Join('rsmst_polis', 'rsmst_polis.poli_id', 'scmst_scpolis.poli_id')
+        //     ->Where('day_id', $value)
+        //     ->Where('sc_poli_status_', 1)
+        //     ->orderBy('scmst_scpolis.no_urut', 'ASC')
+        //     ->orderBy('scmst_scpolis.poli_id', 'ASC')
+        //     ->get();
+        $sql = "select a.dr_id as dr_id,
+            b.dr_name as dr_name,
+            nvl(a.sc_poli_ket,'-') as sc_poli_ket,
+            a.poli_id as poli_id,
+            c.poli_desc as poli_desc 
+
+            from scmst_scpolis a, rsmst_doctors b,rsmst_polis c
+            where day_id='$value'
+            and sc_poli_status_=1
+            and a.dr_id=b.dr_id
+            and a.poli_id=c.poli_id
+            order by a.no_urut,a.poli_id";
+
+        $findData = DB::select($sql);
+        return $findData;
+    }
+
+
     // Find data from table end////////////////
 
     // add SteperStatus number
@@ -64,8 +125,13 @@ class PendaftaranMandiriPasienPoli extends Component
     {
 
         if ($this->dataPasien["regNo"] !== "") {
-            $this->steperStatus++;
-            $this->emit('toastr-error', "Data Pasien dgn No Reg " . $this->steperStatus . " tidak ditemukan.");
+
+            if ($this->steperStatus == 1) {
+                $this->steperStatus++;
+                $this->hariIni = 1;
+                $this->cariDataJadwalPoli($this->hariIni);
+            }
+
         } else {
             $this->emit('toastr-error', "Data Pasien tidak ditemukan, tempelkan kartu pasien anda ke mesin pemindai.");
         }
@@ -74,8 +140,8 @@ class PendaftaranMandiriPasienPoli extends Component
 
 
 
-    // logic stepper 1 start///// cari data pasien if not resert///////////
-    public function cariDataPasien($id)
+    // logic stepper 1 start///// cari data pasien / Jadwal Poli if not resert///////////
+    private function cariDataPasien($id)
     {
 
         $pasien = $this->findData($id);
@@ -96,6 +162,13 @@ class PendaftaranMandiriPasienPoli extends Component
 
     }
 
+    private function cariDataJadwalPoli($day): void
+    {
+
+        $jadwalPoli = $this->findDataJadwalPoli($day);
+        $this->dataJadwalPoli = $jadwalPoli;
+    }
+
     public function updatedRegNo(): void
     {
         $this->cariDataPasien($this->regNo);
@@ -103,12 +176,37 @@ class PendaftaranMandiriPasienPoli extends Component
     }
     // logic stepper 1 end////////////////
 
+    // logic stepper 2 start////////////////
+    private function updateDataDaftarPasien()
+    {
+        $this->dataDaftarPasienPoli["regNo"] = $this->dataPasien["regNo"];
+        $this->dataDaftarPasienPoli["regName"] = $this->dataPasien["regName"];
+        $this->dataDaftarPasienPoli["sex"] = $this->dataPasien["sex"];
+        $this->dataDaftarPasienPoli["birthDate"] = $this->dataPasien["birthDate"];
+        $this->dataDaftarPasienPoli["thn"] = $this->dataPasien["thn"];
+        $this->dataDaftarPasienPoli["birthPlace"] = $this->dataPasien["birthPlace"];
+        $this->dataDaftarPasienPoli["maritalStatus"] = $this->dataPasien["maritalStatus"];
+        $this->dataDaftarPasienPoli["address"] = $this->dataPasien["address"];
+    }
+
+    public function setDataPoli($poliId, $poliDesc, $drId, $drName, $klaimType)
+    {
+        $this->updateDataDaftarPasien();
+        $this->dataDaftarPasienPoli["poliId"] = $poliId;
+        $this->dataDaftarPasienPoli["poliDesc"] = $poliDesc;
+        $this->dataDaftarPasienPoli["drId"] = $drId;
+        $this->dataDaftarPasienPoli["drName"] = $drName;
+        $this->dataDaftarPasienPoli["klaimId"] = $klaimType;
+        $this->steperStatus++;
+    }
 
 
 
     // select data start////////////////
     public function render()
     {
+
+        $this->cariDataJadwalPoli($this->hariIni);
         return view(
             'livewire.pendaftaran-mandiri-pasien-poli.pendaftaran-mandiri-pasien-poli',
             [

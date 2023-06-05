@@ -20,7 +20,6 @@
             <!-- Card header -->
 
 
-
             <div class="w-full mb-1">
                 <div class="">
 
@@ -188,56 +187,74 @@
 
                         <div id="pendaftaranStepDua" name="pendaftaranStepDua" class="{{ $classStepActiveDua }}">
 
-                            <div class="flex items-start justify-center p-5">
-                                <div class="w-1/2 ">
+                            <div
+                                class="flex items-center justify-start mb-2 border border-gray-200 rounded dark:border-gray-700">
 
-                                    <div class="inline-flex items-center justify-between m-2 md:w-full">
-                                        <x-input-label for="province_id" :value="__('Pasien')" class="w-1/3 mb-2 mr-2 " />
-                                        <x-text-input id="simpleSearch" :disabled=true name="namesimpleSearch"
-                                            type="text" class="p-2 mr-2 sm:w-1/3 " autofocus
-                                            autocomplete="simpleSearch" placeholder="Cari Data"
-                                            wire:model.lazy="search" />
+                                <h5
+                                    class="m-2 text-2xl font-bold tracking-tight text-center text-gray-800 dark:text-white dark:bg-gray-700">
+                                    {{ $dataPasien['regNo'] . ' / ' . $dataPasien['regName'] . ' / ' . $dataPasien['address'] }}
+                                </h5>
+                            </div>
 
 
-                                        <x-text-input id="simpleSearch" :disabled=true name="namesimpleSearch"
-                                            type="text" class="p-2 " />
+                            <div
+                                class="flex items-center justify-center pl-4 border border-gray-200 rounded dark:border-gray-700">
+
+
+
+                                <input id="klaimTypeUM" type="radio" wire:model="klaimType"
+                                    wire:click="$set('klaimType','UM')" value="UM"
+                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                <label for="klaimTypeUM"
+                                    class="py-4 ml-2 mr-12 text-2xl font-medium text-gray-900 dark:text-gray-300">UMUM</label>
+
+
+                                <input id="klaimTypeJM" type="radio" wire:model="klaimType"
+                                    wire:click="$set('klaimType','JM')" value="JM"
+                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                <label for="klaimTypeJM"
+                                    class="py-4 ml-2 mr-12 text-2xl font-medium text-gray-900 dark:text-gray-300">BPJS</label>
+                            </div>
+
+
+
+                            <div class="flex flex-wrap ">
+
+
+                                @foreach ($dataJadwalPoli as $j)
+                                    <div class="w-full pt-2 pr-2 md:basis-1/3 ">
+                                        <a wire:click.prefent="setDataPoli('{{ $j->poli_id }}','{{ $j->poli_desc }}','{{ $j->dr_id }}','{{ $j->dr_name }}','{{ $klaimType }}')"
+                                            class="block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-blue-100 dark:bg-gray-700 dark:border-gray-700 dark:hover:bg-gray-700 ">
+                                            <h5
+                                                class="mb-2 text-2xl font-bold tracking-tight text-gray-800 dark:text-white">
+                                                {{ $j->poli_desc }}
+                                            </h5>
+                                            <p class="font-bold text-blue-700 dark:text-gray-400">
+                                                {{ $j->dr_name }}
+                                            </p>
+                                            <p class="font-normal text-gray-700 dark:text-gray-400">
+                                                {{ $j->sc_poli_ket }}
+                                            </p>
+                                            <p class="font-semibold text-red-500 dark:text-gray-400">
+                                                @if ($klaimType == 'UM')
+                                                    Klaim UMUM
+                                                @else
+                                                    Klaim BPJS
+                                                @endif
+                                            </p>
+                                        </a>
+
 
                                     </div>
-
-                                    <div class="inline-flex items-center justify-between m-2 md:w-full">
-                                        <x-input-label for="province_id" :value="__('Poli')"
-                                            class="w-1/3 mb-2 mr-2 " />
-                                        <x-text-input id="simpleSearch" :disabled=true name="namesimpleSearch"
-                                            type="text" class="p-2 mr-2 sm:w-1/3 " autofocus
-                                            autocomplete="simpleSearch" placeholder="Cari Data"
-                                            wire:model.lazy="search" />
+                                @endforeach
 
 
-                                        <x-text-input id="simpleSearch" :disabled=true name="namesimpleSearch"
-                                            type="text" class="p-2 " />
-
-                                    </div>
-
-                                    <div class="inline-flex items-center justify-between m-2 md:w-full">
-                                        <x-input-label for="province_id" :value="__('Umum/BPJS')"
-                                            class="w-1/3 mb-2 mr-2 " />
-                                        <x-text-input id="simpleSearch" :disabled=true name="namesimpleSearch"
-                                            type="text" class="p-2 mr-2 sm:w-1/3 " />
-
-
-                                        <x-text-input id="simpleSearch" :disabled=true name="namesimpleSearch"
-                                            type="text" class="p-2 " />
-
-                                    </div>
-                                </div>
 
 
                             </div>
 
 
-                            <div class="flex justify-end">
-                                <x-primary-button>Proses</x-primary-button>
-                            </div>
+
                         </div>
 
 
@@ -275,14 +292,14 @@
                                                 No Reg
                                             </th>
                                             <td class="px-6 py-4 ">
-                                                0000000Z
+                                                {{ $dataDaftarPasienPoli['regNo'] }}
                                             </td>
                                             <td
                                                 class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                                 Dokter
                                             </td>
                                             <td class="px-6 py-4">
-                                                dr. Patrix Star
+                                                {{ $dataDaftarPasienPoli['drName'] }}
                                             </td>
 
                                         </tr>
@@ -292,14 +309,14 @@
                                                 Pasien
                                             </th>
                                             <td class="px-6 py-4">
-                                                Nuur Wahid Anshary
+                                                {{ $dataDaftarPasienPoli['regName'] }}
                                             </td>
                                             <td
                                                 class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                                 Poli
                                             </td>
                                             <td class="px-6 py-4">
-                                                Poli Umum
+                                                {{ $dataDaftarPasienPoli['poliDesc'] }}
                                             </td>
 
                                         </tr>
@@ -309,14 +326,14 @@
                                                 L/P
                                             </th>
                                             <td class="px-6 py-4">
-                                                L
+                                                {{ $dataDaftarPasienPoli['sex'] }}
                                             </td>
                                             <td
                                                 class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                                 Klaim
                                             </td>
                                             <td class="px-6 py-4">
-                                                UMUM
+                                                {{ $dataDaftarPasienPoli['klaimId'] }}
                                             </td>
 
                                         </tr>
@@ -326,7 +343,7 @@
                                                 Tgl Lahir
                                             </th>
                                             <td class="px-6 py-4">
-                                                12/11/1989
+                                                {{ $dataDaftarPasienPoli['birthDate'] }}
                                             </td>
                                             <td class="px-6 py-4">
 
@@ -342,7 +359,7 @@
                                                 Usia
                                             </th>
                                             <td class="px-6 py-4">
-                                                33
+                                                {{ $dataDaftarPasienPoli['thn'] }}
                                             </td>
                                             <td class="px-6 py-4">
 
@@ -358,7 +375,7 @@
                                                 Tempat Lahir
                                             </th>
                                             <td class="px-6 py-4">
-                                                TULUNGAGUNG
+                                                {{ $dataDaftarPasienPoli['birthPlace'] }}
                                             </td>
                                             <td class="px-6 py-4">
 
@@ -374,7 +391,7 @@
                                                 Status
                                             </th>
                                             <td class="px-6 py-4">
-                                                Menikah
+                                                {{ $dataDaftarPasienPoli['maritalStatus'] }}
                                             </td>
                                             <td class="px-6 py-4">
 
@@ -390,7 +407,7 @@
                                                 Alamat
                                             </th>
                                             <td class="px-6 py-4">
-                                                Pulosari-Ngunut
+                                                {{ $dataDaftarPasienPoli['address'] }}
                                             </td>
                                             <td class="px-6 py-4">
 
