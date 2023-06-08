@@ -34,10 +34,7 @@
 
 
                     {{-- steper start --}}
-                    <div class="flex items-center justify-center w-full mb-4 p-">
-
-
-
+                    <div class="flex items-center justify-center mb-4">
 
 
                         <ol
@@ -197,23 +194,26 @@
                             </div>
 
 
-                            <div
-                                class="flex items-center justify-center pl-4 border border-gray-200 rounded dark:border-gray-700">
+                            <div class="flex items-center justify-center">
 
 
 
-                                <input id="klaimTypeUM" type="radio" wire:model="klaimType"
-                                    wire:click="$set('klaimType','UM')" value="UM"
-                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                <label for="klaimTypeUM"
-                                    class="py-4 ml-2 mr-12 text-2xl font-medium text-gray-900 dark:text-gray-300">UMUM</label>
 
+                                <div
+                                    class="flex items-center w-1/3 pl-4 mr-4 border border-gray-200 rounded dark:border-gray-700 hover:bg-gray-100">
+                                    <input id="klaimTypeUM" type="radio" value="UM" wire:model="klaimType"
+                                        class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                    <label for="klaimTypeUM"
+                                        class="w-full py-4 pr-4 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">UMUM</label>
+                                </div>
+                                <div
+                                    class="flex items-center w-1/3 pl-4 border border-gray-200 rounded dark:border-gray-700 hover:bg-gray-100">
+                                    <input id="klaimTypeJM" type="radio" value="JM" wire:model="klaimType"
+                                        class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                    <label for="klaimTypeJM"
+                                        class="w-full py-4 pr-4 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">BPJS</label>
+                                </div>
 
-                                <input id="klaimTypeJM" type="radio" wire:model="klaimType"
-                                    wire:click="$set('klaimType','JM')" value="JM"
-                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                <label for="klaimTypeJM"
-                                    class="py-4 ml-2 mr-12 text-2xl font-medium text-gray-900 dark:text-gray-300">BPJS</label>
                             </div>
 
 
@@ -426,7 +426,7 @@
 
 
                             <div class="flex justify-end pt-4">
-                                <x-primary-button>Proses</x-primary-button>
+                                <x-primary-button wire:click="rjNoMax">Proses</x-primary-button>
                             </div>
                         </div>
 

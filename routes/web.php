@@ -47,6 +47,8 @@ Route::get('masterleveldua', MasterLevelDua::class)->middleware('auth')->name('M
 
 Route::get('pendaftaranMandiriPasienPoli', PendaftaranMandiriPasienPoli::class)->middleware('auth')->name('pendaftaranMandiriPasienPoli');
 
+Route::view('/cetak-tiket', 'livewire.pendaftaran-mandiri-pasien-poli.cetak-tiket');
+
 
 // Life Cycle Hook
 Route::get('/list', function () {

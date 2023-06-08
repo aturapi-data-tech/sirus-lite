@@ -3,14 +3,13 @@
 namespace App\Http\Livewire\PendaftaranMandiriPasienPoli;
 
 use Livewire\Component;
-
-
 use App\Models\Pasien;
-
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
-
+use Carbon\Carbon;
 use Livewire\WithPagination;
+
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\App;
 
 class PendaftaranMandiriPasienPoli extends Component
 {
@@ -50,6 +49,16 @@ class PendaftaranMandiriPasienPoli extends Component
         "klaimId" => "",
         "klaimDesc" => "",
         "rjDate" => "",
+        "rjNo" => "",
+        "shift" => "",
+        "noAntrian" => "",
+        "noBooking" => "",
+        "slCodeFrom" => "02",
+        "passStatus" => "O",
+        "rjStatus" => "A",
+        "txnStatus" => "A",
+
+
 
     ];
 
@@ -128,7 +137,16 @@ class PendaftaranMandiriPasienPoli extends Component
 
             if ($this->steperStatus == 1) {
                 $this->steperStatus++;
-                $this->hariIni = 1;
+
+                // cariHariIni
+                $hariIniHariApa = strtoupper(Carbon::now()->isoFormat('dddd'));
+                $sql = "select day_id 
+                from scmst_scdays
+                where day_desc=:dayDesc";
+                $findDataHariIni = DB::scalar($sql, ["dayDesc" => $hariIniHariApa]);
+                $this->hariIni = $findDataHariIni;
+
+
                 $this->cariDataJadwalPoli($this->hariIni);
             }
 
@@ -177,7 +195,7 @@ class PendaftaranMandiriPasienPoli extends Component
     // logic stepper 1 end////////////////
 
     // logic stepper 2 start////////////////
-    private function updateDataDaftarPasien()
+    private function updateDataDaftarPasien(): void
     {
         $this->dataDaftarPasienPoli["regNo"] = $this->dataPasien["regNo"];
         $this->dataDaftarPasienPoli["regName"] = $this->dataPasien["regName"];
@@ -189,16 +207,110 @@ class PendaftaranMandiriPasienPoli extends Component
         $this->dataDaftarPasienPoli["address"] = $this->dataPasien["address"];
     }
 
-    public function setDataPoli($poliId, $poliDesc, $drId, $drName, $klaimType)
+    public function setDataPoli($poliId, $poliDesc, $drId, $drName, $klaimType): void
     {
         $this->updateDataDaftarPasien();
+
         $this->dataDaftarPasienPoli["poliId"] = $poliId;
         $this->dataDaftarPasienPoli["poliDesc"] = $poliDesc;
         $this->dataDaftarPasienPoli["drId"] = $drId;
         $this->dataDaftarPasienPoli["drName"] = $drName;
         $this->dataDaftarPasienPoli["klaimId"] = $klaimType;
+
         $this->steperStatus++;
     }
+    // logic stepper 2 end////////////////
+
+    public function rjNoMax()
+    {
+        // SetTanggal
+        $this->dataDaftarPasienPoli["rjDate"] = Carbon::now();
+
+        //SetNoBooking
+        $this->dataDaftarPasienPoli["noBooking"] = Carbon::now()->format('YmdHis') . 'RS';
+
+        // rjNoMax
+        $sql = "select nvl(max(rj_no)+1,1) rjno_max from rstxn_rjhdrs";
+        $findDataRjNo = DB::scalar($sql);
+        $this->dataDaftarPasienPoli["rjNo"] = $findDataRjNo;
+
+        // noUrutAntrian
+        $sql = "select count(*) no_antrian 
+		from rstxn_rjhdrs 
+        where dr_id=:drId
+        and to_char(rj_date,'ddmmyyyy')=:tgl";
+        $findDataNoUrut = DB::scalar($sql, ["tgl" => "06062023", "drId" => $this->dataDaftarPasienPoli["drId"]]);
+
+        if ($findDataNoUrut == 0) {
+            $noAntrian = 4;
+        } else if ($findDataNoUrut == 1) {
+            $noAntrian = 5;
+        } else if ($findDataNoUrut == 2) {
+            $noAntrian = 6;
+        } else if ($findDataNoUrut > 2) {
+            $noAntrian = $findDataNoUrut + 3 + 1;
+        }
+        $this->dataDaftarPasienPoli["noAntrian"] = $noAntrian;
+
+
+
+        $rjNo = $this->dataDaftarPasienPoli["slCodeFrom"];
+
+
+
+
+
+
+
+        $this->emit('toastr-error', "Data Pasien tidak ditemukan, tempelkan kartu pasien anda ke mesin pemindai.");
+
+        $data = [
+            'dataDaftarPasienPoli' => $this->dataDaftarPasienPoli
+
+        ];
+
+        $pdfContent = PDF::loadView('livewire.pendaftaran-mandiri-pasien-poli.cetak-tiket', $data)->output();
+        return response()->streamDownload(
+            fn() => print($pdfContent),
+            "filename.pdf"
+        );
+
+
+
+
+
+        // DB::table('rstxn_rjhdrs')->insert([
+        //     'rj_no' => $this->dataDaftarPasienPoli["rjNo"],
+        //     'reg_no' => $this->dataDaftarPasienPoli["regNo"],
+        //     'rj_date' => $this->dataDaftarPasienPoli["rjDate"],
+        //     'sl_codefrom' => $this->dataDaftarPasienPoli["slCodeFrom"],
+        //     'pass_status' => $this->dataDaftarPasienPoli["passStatus"],
+        //     'klaim_id' => $this->dataDaftarPasienPoli["klaimId"],
+        //     'poli_id' => $this->dataDaftarPasienPoli["poliId"],
+        //     'dr_id' => $this->dataDaftarPasienPoli["drId"],
+        //     'shift' => $this->dataDaftarPasienPoli["shift"],
+        //     'rj_status' => $this->dataDaftarPasienPoli["rjStatus"],
+        //     'txn_status' => $this->dataDaftarPasienPoli["txnStatus"],
+        //     'no_antrian' => $this->dataDaftarPasienPoli["noAntrian"],
+        //     'nobooking' => $this->dataDaftarPasienPoli["noBooking"]
+
+        // ]);
+
+
+    }
+    // logic stepper 2 end////////////////
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -207,6 +319,8 @@ class PendaftaranMandiriPasienPoli extends Component
     {
 
         $this->cariDataJadwalPoli($this->hariIni);
+
+
         return view(
             'livewire.pendaftaran-mandiri-pasien-poli.pendaftaran-mandiri-pasien-poli',
             [
