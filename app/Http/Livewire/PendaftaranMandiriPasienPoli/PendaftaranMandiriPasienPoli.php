@@ -77,7 +77,12 @@ class PendaftaranMandiriPasienPoli extends Component
     private function resetInputFields(): void
     {
         $this->reset([
-            'dataPasien'
+            'dataPasien',
+            'dataDaftarPasienPoli',
+            'steperStatus',
+            'klaimType',
+            'regNo',
+
         ]);
 
     }
@@ -225,6 +230,8 @@ class PendaftaranMandiriPasienPoli extends Component
     {
         // SetTanggal
         $this->dataDaftarPasienPoli["rjDate"] = Carbon::now();
+        $tglNoantrian = Carbon::now()->format('dmY');
+
 
         //SetNoBooking
         $this->dataDaftarPasienPoli["noBooking"] = Carbon::now()->format('YmdHis') . 'RS';
@@ -239,7 +246,7 @@ class PendaftaranMandiriPasienPoli extends Component
 		from rstxn_rjhdrs 
         where dr_id=:drId
         and to_char(rj_date,'ddmmyyyy')=:tgl";
-        $findDataNoUrut = DB::scalar($sql, ["tgl" => "06062023", "drId" => $this->dataDaftarPasienPoli["drId"]]);
+        $findDataNoUrut = DB::scalar($sql, ["tgl" => $tglNoantrian, "drId" => $this->dataDaftarPasienPoli["drId"]]);
 
         if ($findDataNoUrut == 0) {
             $noAntrian = 4;
@@ -250,52 +257,45 @@ class PendaftaranMandiriPasienPoli extends Component
         } else if ($findDataNoUrut > 2) {
             $noAntrian = $findDataNoUrut + 3 + 1;
         }
+
         $this->dataDaftarPasienPoli["noAntrian"] = $noAntrian;
 
 
 
-        $rjNo = $this->dataDaftarPasienPoli["slCodeFrom"];
+        // insert into table transaksi
+        DB::table('rstxn_rjhdrs')->insert([
+            'rj_no' => $this->dataDaftarPasienPoli["rjNo"],
+            'reg_no' => $this->dataDaftarPasienPoli["regNo"],
+            'rj_date' => $this->dataDaftarPasienPoli["rjDate"],
+            'sl_codefrom' => $this->dataDaftarPasienPoli["slCodeFrom"],
+            'pass_status' => $this->dataDaftarPasienPoli["passStatus"],
+            'klaim_id' => $this->dataDaftarPasienPoli["klaimId"],
+            'poli_id' => $this->dataDaftarPasienPoli["poliId"],
+            'dr_id' => $this->dataDaftarPasienPoli["drId"],
+            'shift' => $this->dataDaftarPasienPoli["shift"],
+            'rj_status' => $this->dataDaftarPasienPoli["rjStatus"],
+            'txn_status' => $this->dataDaftarPasienPoli["txnStatus"],
+            'no_antrian' => $this->dataDaftarPasienPoli["noAntrian"],
+            'nobooking' => $this->dataDaftarPasienPoli["noBooking"]
+
+        ]);
 
 
-
-
-
-
-
-        $this->emit('toastr-error', "Data Pasien tidak ditemukan, tempelkan kartu pasien anda ke mesin pemindai.");
-
+        // cetak PDF
         $data = [
             'dataDaftarPasienPoli' => $this->dataDaftarPasienPoli
 
         ];
 
         $pdfContent = PDF::loadView('livewire.pendaftaran-mandiri-pasien-poli.cetak-tiket', $data)->output();
+
+        $this->resetInputFields();
+        $this->emit('toastr-success', "Data sudah tersimpan.");
+
         return response()->streamDownload(
             fn() => print($pdfContent),
             "filename.pdf"
         );
-
-
-
-
-
-        // DB::table('rstxn_rjhdrs')->insert([
-        //     'rj_no' => $this->dataDaftarPasienPoli["rjNo"],
-        //     'reg_no' => $this->dataDaftarPasienPoli["regNo"],
-        //     'rj_date' => $this->dataDaftarPasienPoli["rjDate"],
-        //     'sl_codefrom' => $this->dataDaftarPasienPoli["slCodeFrom"],
-        //     'pass_status' => $this->dataDaftarPasienPoli["passStatus"],
-        //     'klaim_id' => $this->dataDaftarPasienPoli["klaimId"],
-        //     'poli_id' => $this->dataDaftarPasienPoli["poliId"],
-        //     'dr_id' => $this->dataDaftarPasienPoli["drId"],
-        //     'shift' => $this->dataDaftarPasienPoli["shift"],
-        //     'rj_status' => $this->dataDaftarPasienPoli["rjStatus"],
-        //     'txn_status' => $this->dataDaftarPasienPoli["txnStatus"],
-        //     'no_antrian' => $this->dataDaftarPasienPoli["noAntrian"],
-        //     'nobooking' => $this->dataDaftarPasienPoli["noBooking"]
-
-        // ]);
-
 
     }
     // logic stepper 2 end////////////////

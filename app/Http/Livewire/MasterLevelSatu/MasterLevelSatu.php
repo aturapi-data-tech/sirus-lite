@@ -145,10 +145,16 @@ class MasterLevelSatu extends Component
     // insert record start////////////////
     public function store()
     {
+
+        $customErrorMessages = [
+            'name.required' => 'Nama tidak boleh kosong',
+            'province_id.required' => 'Kode tidak boleh kosong'
+        ];
+
         $this->validate([
             'name' => 'required',
             'province_id' => 'required'
-        ]);
+        ], $customErrorMessages);
 
         Province::updateOrCreate(['id' => $this->province_id], [
             'name' => $this->name
