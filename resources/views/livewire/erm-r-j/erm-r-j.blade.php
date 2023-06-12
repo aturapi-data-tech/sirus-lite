@@ -132,7 +132,7 @@
                     </div>
 
 
-                    @if ($isOpen)
+                    @if ($isOpen == false)
                         @include('livewire.erm-r-j.create')
                     @endif
 
@@ -396,7 +396,7 @@
         {{-- script start --}}
         <script src="{{ url('assets/js/jquery.min.js') }}"></script>
         <script src="{{ url('assets/plugins/toastr/toastr.min.js') }}"></script>
-        {{-- <script src="{{ url('assets/flowbite/dist/datepicker.js') }}"></script> --}}
+        <script src="{{ url('assets/flowbite/dist/datepicker.js') }}"></script>
 
         {{-- script end --}}
 
