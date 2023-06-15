@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Livewire\MasterLevelSatu\MasterLevelSatu;
 use App\Http\Livewire\MasterLevelDua\MasterLevelDua;
+use App\Http\Livewire\MasterPasien\MasterPasien;
 use App\Http\Livewire\PendaftaranMandiriPasienPoli\PendaftaranMandiriPasienPoli;
 use App\Http\Livewire\ErmRJ\ErmRJ;
 
@@ -51,6 +52,7 @@ Route::view('/cetak-tiket', 'livewire.pendaftaran-mandiri-pasien-poli.cetak-tike
 
 
 Route::get('ermRJ', ErmRJ::class)->middleware('auth')->name('ermRJ');
+Route::get('masterPasien', MasterPasien::class)->middleware('auth')->name('MasterPasien');
 
 
 // Life Cycle Hook

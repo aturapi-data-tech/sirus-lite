@@ -39,10 +39,169 @@ class ErmRJ extends Component
         "passStatus" => "O",
         "rjStatus" => "A",
         "txnStatus" => "A",
-
-
-
     ];
+
+    public $screeningQuestions = [
+        [
+            "sc_seq" => "1",
+            "sc_desc" => "Apakah Pasien Merasa Sesak Nafas?",
+            "active_status" => "1",
+            "sc_score" => 1,
+            "sc_option" =>
+            [
+                [
+                    "option_label" => "YA",
+                    "option_value" => 1,
+                    "option_score" => 10
+                ],
+                [
+                    "option_label" => "TIDAK",
+                    "option_value" => 0,
+                    "option_score" => 0
+                ]
+            ],
+
+
+        ],
+        [
+            "sc_seq" => "1",
+            "sc_desc" => "Apakah Pasien Merasa Sesak Nafas?",
+            "active_status" => "1",
+            "sc_score" => 1,
+            "sc_option" =>
+            [
+                [
+                    "option_label" => "YA",
+                    "option_value" => 1,
+                    "option_score" => 10
+                ],
+                [
+                    "option_label" => "TIDAK",
+                    "option_value" => 0,
+                    "option_score" => 0
+                ]
+            ],
+
+
+        ],
+        [
+            "sc_seq" => "2",
+            "sc_desc" => "Apakah Pasien Beresiko Jatuh?",
+            "active_status" => "1",
+            "sc_score" => 1,
+            "sc_option" =>
+            [
+                [
+                    "option_label" => "YA",
+                    "option_value" => 1,
+                    "option_score" => 10
+                ],
+                [
+                    "option_label" => "TIDAK",
+                    "option_value" => 0,
+                    "option_score" => 0
+                ]
+            ],
+
+
+        ],
+        [
+            "sc_seq" => "2",
+            "sc_desc" => "Apakah Pasien Nyeri Pada Dada?",
+            "active_status" => "1",
+            "sc_score" => 1,
+            "sc_option" =>
+            [
+                [
+                    "option_label" => "YA",
+                    "option_value" => 1,
+                    "option_score" => 10
+                ],
+                [
+                    "option_label" => "TIDAK",
+                    "option_value" => 0,
+                    "option_score" => 0
+                ]
+            ],
+
+
+        ],
+        [
+            "sc_seq" => "2",
+            "sc_desc" => "Apakah Pasien Batuk Selama 2 Minggu Terakhir?",
+            "active_status" => "1",
+            "sc_score" => 1,
+            "sc_option" =>
+            [
+                [
+                    "option_label" => "YA",
+                    "option_value" => 1,
+                    "option_score" => 10
+                ],
+                [
+                    "option_label" => "TIDAK",
+                    "option_value" => 0,
+                    "option_score" => 0
+                ]
+            ],
+
+
+        ],
+        [
+            "sc_seq" => "2",
+            "sc_desc" => "Tingkat Nyeri Pasien",
+            "active_status" => "1",
+            "sc_score" => 1,
+            "sc_image" => "pain_scale_level.jpg",
+            "sc_option" =>
+            [
+                [
+                    "option_label" => "1 (Tidak Nyeri)",
+                    "option_value" => 1,
+                    "option_score" => 0
+                ],
+                [
+                    "option_label" => "2-3 (Sedikit Nyeri)",
+                    "option_value" => 23,
+                    "option_score" => 10
+                ],
+                [
+                    "option_label" => "4-7 (Nyeri)",
+                    "option_value" => 47,
+                    "option_score" => 50
+                ],
+                [
+                    "option_label" => "8-10 (Sangat Nyeri)",
+                    "option_value" => 810,
+                    "option_score" => 100
+                ],
+
+            ],
+
+
+        ],
+    ];
+    public $screeningKesimpulan = [
+        [
+            "sck_id" => "1",
+            "sck_label" => "SESUAI ANTRIAN",
+            "sck_value" => "1",
+            "sck_score" => "1",
+        ],
+        [
+            "sck_id" => "2",
+            "sck_label" => "DISEGERAKAN",
+            "sck_value" => "2",
+            "sck_score" => "2",
+        ],
+        [
+            "sck_id" => "3",
+            "sck_label" => "IGD",
+            "sck_value" => "3",
+            "sck_score" => "3",
+        ],
+    ];
+
     public $ermStatusRef = 'A';
     public $rjDateRef = '';
 

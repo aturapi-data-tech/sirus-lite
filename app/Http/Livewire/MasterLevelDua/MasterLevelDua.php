@@ -15,6 +15,7 @@ class MasterLevelDua extends Component
     public $name, $regency_id, $province_id, $province_name;
 
 
+
     // limit record per page -resetExcept////////////////
     public $limitPerPage = 5;
 
@@ -22,6 +23,7 @@ class MasterLevelDua extends Component
     //  table LOV////////////////
     public $proviceLov = [];
     public $provinceLovStatus = 0;
+
 
 
     //  modal status////////////////
@@ -67,8 +69,10 @@ class MasterLevelDua extends Component
             'regency_id',
             'province_id',
             'province_name',
+
             'proviceLov',
             'provinceLovStatus',
+
             'isOpen',
             'tampilIsOpen',
             'isOpenMode'
