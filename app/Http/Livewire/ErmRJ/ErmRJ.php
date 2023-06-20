@@ -5,7 +5,6 @@ namespace App\Http\Livewire\ErmRJ;
 use Illuminate\Support\Facades\DB;
 
 use Livewire\Component;
-use App\Models\Province;
 use Livewire\WithPagination;
 use Carbon\Carbon;
 
@@ -15,38 +14,23 @@ class ErmRJ extends Component
 
     //  table data////////////////
     public $name, $province_id;
+
+    // variable pasien dan screening di gabung pada collect data screening
     public $dataPasienPoli = [
         "regNo" => "",
         "regName" => "",
         "sex" => "",
-        "birthDate" => "",
-        "thn" => "",
-        "birthPlace" => "",
-        "maritalStatus" => "",
         "address" => "",
-        "drId" => "",
-        "drName" => "",
-        "poliId" => "",
-        "poliDesc" => "",
-        "klaimId" => "",
-        "klaimDesc" => "",
         "rjDate" => "",
         "rjNo" => "",
-        "shift" => "",
-        "noAntrian" => "",
-        "noBooking" => "",
-        "slCodeFrom" => "02",
-        "passStatus" => "O",
-        "rjStatus" => "A",
-        "txnStatus" => "A",
     ];
-
     public $screeningQuestions = [
         [
             "sc_seq" => "1",
-            "sc_desc" => "Apakah Pasien Merasa Sesak Nafas?",
+            "sc_desc" => "Apakah Pasien Sadar?",
             "active_status" => "1",
-            "sc_score" => 1,
+            "sc_score" => 0,
+            "sc_value" => 0,
             "sc_option" =>
             [
                 [
@@ -67,7 +51,8 @@ class ErmRJ extends Component
             "sc_seq" => "1",
             "sc_desc" => "Apakah Pasien Merasa Sesak Nafas?",
             "active_status" => "1",
-            "sc_score" => 1,
+            "sc_score" => 0,
+            "sc_value" => 0,
             "sc_option" =>
             [
                 [
@@ -88,7 +73,8 @@ class ErmRJ extends Component
             "sc_seq" => "2",
             "sc_desc" => "Apakah Pasien Beresiko Jatuh?",
             "active_status" => "1",
-            "sc_score" => 1,
+            "sc_score" => 0,
+            "sc_value" => 0,
             "sc_option" =>
             [
                 [
@@ -109,7 +95,8 @@ class ErmRJ extends Component
             "sc_seq" => "2",
             "sc_desc" => "Apakah Pasien Nyeri Pada Dada?",
             "active_status" => "1",
-            "sc_score" => 1,
+            "sc_score" => 0,
+            "sc_value" => 0,
             "sc_option" =>
             [
                 [
@@ -130,7 +117,8 @@ class ErmRJ extends Component
             "sc_seq" => "2",
             "sc_desc" => "Apakah Pasien Batuk Selama 2 Minggu Terakhir?",
             "active_status" => "1",
-            "sc_score" => 1,
+            "sc_score" => 0,
+            "sc_value" => 0,
             "sc_option" =>
             [
                 [
@@ -151,18 +139,19 @@ class ErmRJ extends Component
             "sc_seq" => "2",
             "sc_desc" => "Tingkat Nyeri Pasien",
             "active_status" => "1",
-            "sc_score" => 1,
+            "sc_score" => 0,
+            "sc_value" => 0,
             "sc_image" => "pain_scale_level.jpg",
             "sc_option" =>
             [
                 [
-                    "option_label" => "1 (Tidak Nyeri)",
-                    "option_value" => 1,
+                    "option_label" => "0 (Tidak Nyeri)",
+                    "option_value" => 0,
                     "option_score" => 0
                 ],
                 [
-                    "option_label" => "2-3 (Sedikit Nyeri)",
-                    "option_value" => 23,
+                    "option_label" => "1-3 (Sedikit Nyeri)",
+                    "option_value" => 13,
                     "option_score" => 10
                 ],
                 [
@@ -182,33 +171,41 @@ class ErmRJ extends Component
         ],
     ];
     public $screeningKesimpulan = [
+        "sck_value" => 1,
+        "sck_score" => 1,
+        "sck_option" =>
         [
-            "sck_id" => "1",
-            "sck_label" => "SESUAI ANTRIAN",
-            "sck_value" => "1",
-            "sck_score" => "1",
-        ],
-        [
-            "sck_id" => "2",
-            "sck_label" => "DISEGERAKAN",
-            "sck_value" => "2",
-            "sck_score" => "2",
-        ],
-        [
-            "sck_id" => "3",
-            "sck_label" => "IGD",
-            "sck_value" => "3",
-            "sck_score" => "3",
-        ],
+            [
+                "option_id" => "1",
+                "option_label" => "SESUAI ANTRIAN",
+                "option_value" => 1,
+                "option_score" => 1,
+            ],
+            [
+                "option_id" => "2",
+                "option_label" => "DISEGERAKAN",
+                "option_value" => 2,
+                "option_score" => 2,
+            ],
+            [
+                "option_id" => "3",
+                "option_label" => "IGD",
+                "option_value" => 3,
+                "option_score" => 3,
+            ],
+        ]
     ];
+    public $collectDataScreening = [];
+    //////////////////////////////////////////////////////////////////////
 
+    // Ref on top bar
     public $ermStatusRef = 'A';
     public $rjDateRef = '';
 
 
 
     // limit record per page -resetExcept////////////////
-    public $limitPerPage = 5;
+    public $limitPerPage = 10;
 
 
 
@@ -253,14 +250,16 @@ class ErmRJ extends Component
 
 
         $this->reset([
-            'name',
-            'province_id',
+            // 'name',
+            // 'province_id',
+            // 'dataPasienPoli',
+            // 'screeningQuestions',
+            // 'screeningKesimpulan',
 
             'isOpen',
             'tampilIsOpen',
             'isOpenMode'
         ]);
-
     }
 
 
@@ -309,7 +308,6 @@ class ErmRJ extends Component
     public function updatedSearch(): void
     {
         $this->resetPage();
-
     }
 
 
@@ -337,40 +335,13 @@ class ErmRJ extends Component
 
 
 
-    // insert record start////////////////
-    public function store()
-    {
-
-        $customErrorMessages = [
-            'name.required' => 'Nama tidak boleh kosong',
-            'province_id.required' => 'Kode tidak boleh kosong'
-        ];
-
-        $this->validate([
-            'name' => 'required',
-            'province_id' => 'required'
-        ], $customErrorMessages);
-
-        Province::updateOrCreate(['id' => $this->province_id], [
-            'name' => $this->name
-        ]);
-
-
-        $this->closeModal();
-        $this->resetInputFields();
-        $this->emit('toastr-success', "Data " . $this->name . " berhasil disimpan.");
-
-    }
-    // insert record end////////////////
-
-
-
     // Find data from table start////////////////
     private function findData($value)
     {
         $findData = DB::table('rsview_rjkasir')
             ->select(
                 'rj_no',
+                'rj_date',
                 'reg_no',
                 'reg_name',
                 'sex',
@@ -387,47 +358,116 @@ class ErmRJ extends Component
             )
             ->where('rj_no', '=', $value)
             ->first();
+
         return $findData;
     }
     // Find data from table end////////////////
 
 
 
-    // show edit record start////////////////
-    public function edit($id)
+    // //////////////////////////////////////////////////////////////////
+    // screening logic///////////////////////////////////////////////////
+    // //////////////////////////////////////////////////////////////////
+
+    // updateDataScreening
+    private function updateDataScreening($id, $value): void
     {
-        $this->openModalEdit();
-
-        $province = $this->findData($id);
-        $this->province_id = $id;
-        $this->name = $province->name;
-
+        DB::table('rstxn_rjhdrs')
+            ->where('rj_no', $id)
+            ->update(['erm_screening' => $value]);
     }
-    // show edit record end////////////////
-
-
 
     // tampil record start////////////////
     public function tampil($id)
     {
-        $this->openModalTampil();
-
+        // /////////////Bentuk array pasien dan screening start////
         $dataPasienPoli = $this->findData($id);
-        $this->dataPasienPoli['regNo'] = $dataPasienPoli->reg_no;
-        $this->dataPasienPoli['regName'] = $dataPasienPoli->reg_name;
 
+        $screening = DB::table('rstxn_rjhdrs')
+            ->select('erm_screening')
+            ->where('rj_no', '=', $id)
+            ->first();
+
+        if ($screening->erm_screening == null) {
+            $this->collectDataScreening = [
+                "pasien" => $this->dataPasienPoli,
+                "screening" => $this->screeningQuestions,
+                "kesimpulan" => $this->screeningKesimpulan
+            ];
+        } else {
+
+            $this->collectDataScreening = json_decode($screening->erm_screening, true);
+        }
+        // /////////////Bentuk array pasien dan screening end////
+
+        $this->collectDataScreening['pasien']['regNo'] = $dataPasienPoli->reg_no;
+        $this->collectDataScreening['pasien']['regName'] = $dataPasienPoli->reg_name;
+        $this->collectDataScreening['pasien']['sex'] = $dataPasienPoli->sex;
+        $this->collectDataScreening['pasien']['address'] = $dataPasienPoli->address;
+        $this->collectDataScreening['pasien']['rjDate'] = $dataPasienPoli->rj_date;
+        $this->collectDataScreening['pasien']['rjNo'] = $dataPasienPoli->rj_no;
+
+        // update data Screening//////////////////
+        $rjNO = $this->collectDataScreening['pasien']["rjNo"];
+        $collectDataScreening = json_encode($this->collectDataScreening, true);
+        $this->updateDataScreening($rjNO, $collectDataScreening);
+        // //////////////////////////////////////
+
+        $this->openModalTampil();
     }
     // tampil record end////////////////
 
-
-
-    // delete record start////////////////
-    public function delete($id, $name)
+    // /prosesDataScreening/////////////
+    public function prosesDataScreening($label, $value, $score, $key)
     {
-        Province::find($id)->delete();
-        $this->emit('toastr-success', "Hapus data " . $name . " berhasil.");
+
+        $collection = collect($this->collectDataScreening);
+        // update collectDataScreening
+        if (
+            collect($collection['screening'])->where('sc_desc', $label)->contains('sc_desc', $label)
+        ) {
+
+            $this->collectDataScreening['screening'][$key]['sc_value'] = $value;
+            $this->collectDataScreening['screening'][$key]['sc_score'] = $score;
+        }
+
+        // update data Screening//////////////////
+        $rjNO = $this->collectDataScreening['pasien']["rjNo"];
+        $collectDataScreening = json_encode($this->collectDataScreening, true);
+        $this->updateDataScreening($rjNO, $collectDataScreening);
+        // //////////////////////////////////////
+
+
+        $this->emit('toastr-success', "$label Score : $score");
     }
-    // delete record end////////////////
+    // /prosesDataScreening/////////////
+    // /prosesDataKesimpulan/////////////
+    public function prosesDataKesimpulan($value, $label)
+    {
+
+        // update collectDataKesimpulan
+        $this->collectDataScreening['kesimpulan']['sck_value'] = $value;
+
+
+        // update data Screening//////////////////
+        $rjNO = $this->collectDataScreening['pasien']["rjNo"];
+        $collectDataScreening = json_encode($this->collectDataScreening, true);
+        $this->updateDataScreening($rjNO, $collectDataScreening);
+        // //////////////////////////////////////
+        $this->emit('toastr-success', "Kesimpulan: $label");
+    }
+    // /prosesDataKesimpulan/////////////
+
+    // //////////////////////////////////////////////////////////////////
+    // screening logic///////////////////////////////////////////////////
+    // //////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
 
 
 
@@ -443,8 +483,6 @@ class ErmRJ extends Component
     // select data start////////////////
     public function render()
     {
-
-
 
         return view(
             'livewire.erm-r-j.erm-r-j',

@@ -48,61 +48,42 @@
                             <div id="divDataPasien" class="mr-4 basis-1/2">
                                 <div>
                                     <div class="flex items-center">
-                                        <x-input-label for="reg_no" :value="__('Pasien')" class="basis-1/3" />
+                                        <x-input-label :value="__('Pasien')" class="basis-1/3" />
                                         <x-text-input class="block sm:w-[100px] mt-1" required autofocus
-                                            autocomplete="reg_no" :disabled=$disabledProperty
-                                            wire:model="dataPasienPoli.regNo" />
-                                        <x-text-input class="block mt-1 ml-2" required autofocus autocomplete="reg_name"
-                                            :disabled=$disabledProperty wire:model="dataPasienPoli.regName" />
+                                            :disabled=$disabledProperty
+                                            wire:model="collectDataScreening.pasien.regNo" />
+                                        <x-text-input class="block mt-1 ml-2" required autofocus
+                                            :disabled=$disabledProperty
+                                            wire:model="collectDataScreening.pasien.regName" />
                                     </div>
-                                    @error('reg_no')
-                                        <span class="text-red-500">{{ $message }}</span>
-                                    @enderror
-                                    @error('reg_name')
-                                        <span class="text-red-500">{{ $message }}</span>
-                                    @enderror
+
                                 </div>
 
                                 <div>
                                     <div class="flex items-center">
-                                        <x-input-label for="reg_no" :value="__('Tgl_Lahir')" class="basis-1/3" />
-                                        <x-text-input class="block mt-1" required autofocus autocomplete="reg_name"
-                                            :disabled=$disabledProperty wire:model="dataPasienPoli.regName" />
+                                        <x-input-label :value="__('Tgl_Lahir')" class="basis-1/3" />
+                                        <x-text-input class="block mt-1" required autofocus :disabled=$disabledProperty
+                                            wire:model="collectDataScreening.pasien.regName" />
                                     </div>
-                                    @error('reg_no')
-                                        <span class="text-red-500">{{ $message }}</span>
-                                    @enderror
-                                    @error('reg_name')
-                                        <span class="text-red-500">{{ $message }}</span>
-                                    @enderror
+
                                 </div>
 
                                 <div>
                                     <div class="flex items-center">
-                                        <x-input-label for="reg_no" :value="__('Jenis_Kelamin')" class="basis-1/3" />
-                                        <x-text-input class="block mt-1" required autofocus autocomplete="reg_name"
-                                            :disabled=$disabledProperty wire:model="dataPasienPoli.regName" />
+                                        <x-input-label :value="__('Jenis_Kelamin')" class="basis-1/3" />
+                                        <x-text-input class="block mt-1" required autofocus :disabled=$disabledProperty
+                                            wire:model="collectDataScreening.pasien.sex" />
                                     </div>
-                                    @error('reg_no')
-                                        <span class="text-red-500">{{ $message }}</span>
-                                    @enderror
-                                    @error('reg_name')
-                                        <span class="text-red-500">{{ $message }}</span>
-                                    @enderror
+
                                 </div>
 
                                 <div>
                                     <div class="flex items-center">
-                                        <x-input-label for="reg_no" :value="__('Alamat')" class="basis-1/3" />
-                                        <x-text-input class="block mt-1" required autofocus autocomplete="reg_name"
-                                            :disabled=$disabledProperty wire:model="dataPasienPoli.regName" />
+                                        <x-input-label :value="__('Alamat')" class="basis-1/3" />
+                                        <x-text-input class="block mt-1" required autofocus :disabled=$disabledProperty
+                                            wire:model="collectDataScreening.pasien.address" />
                                     </div>
-                                    @error('reg_no')
-                                        <span class="text-red-500">{{ $message }}</span>
-                                    @enderror
-                                    @error('reg_name')
-                                        <span class="text-red-500">{{ $message }}</span>
-                                    @enderror
+
                                 </div>
                             </div>
 
@@ -112,44 +93,29 @@
 
                                 <div>
                                     <div class="flex items-center">
-                                        <x-input-label for="reg_no" :value="__('Tgl_Datang')" class="basis-1/3" />
-                                        <x-text-input class="block mt-1" required autofocus autocomplete="reg_name"
-                                            :disabled=$disabledProperty wire:model="dataPasienPoli.regName" />
+                                        <x-input-label :value="__('Tgl_Datang')" class="basis-1/3" />
+                                        <x-text-input class="block mt-1" required autofocus :disabled=$disabledProperty
+                                            wire:model="collectDataScreening.pasien.rjDate" />
                                     </div>
-                                    @error('reg_no')
-                                        <span class="text-red-500">{{ $message }}</span>
-                                    @enderror
-                                    @error('reg_name')
-                                        <span class="text-red-500">{{ $message }}</span>
-                                    @enderror
+
                                 </div>
 
                                 <div>
                                     <div class="flex items-center">
-                                        <x-input-label for="reg_no" :value="__('Jam_Datang')" class="basis-1/3" />
-                                        <x-text-input class="block mt-1" required autofocus autocomplete="reg_name"
-                                            :disabled=$disabledProperty wire:model="dataPasienPoli.regName" />
+                                        <x-input-label :value="__('Jam_Datang')" class="basis-1/3" />
+                                        <x-text-input class="block mt-1" required autofocus :disabled=$disabledProperty
+                                            wire:model="collectDataScreening.pasien.rjDate" />
                                     </div>
-                                    @error('reg_no')
-                                        <span class="text-red-500">{{ $message }}</span>
-                                    @enderror
-                                    @error('reg_name')
-                                        <span class="text-red-500">{{ $message }}</span>
-                                    @enderror
+
                                 </div>
 
                                 <div>
                                     <div class="flex items-center">
-                                        <x-input-label for="reg_no" :value="__('Asal_Rujukan')" class="basis-1/3" />
-                                        <x-text-input class="block mt-1" required autofocus autocomplete="reg_name"
-                                            :disabled=$disabledProperty wire:model="dataPasienPoli.regName" />
+                                        <x-input-label :value="__('Asal_Rujukan')" class="basis-1/3" />
+                                        <x-text-input class="block mt-1" required autofocus :disabled=$disabledProperty
+                                            wire:model="collectDataScreening.pasien.regName" />
                                     </div>
-                                    @error('reg_no')
-                                        <span class="text-red-500">{{ $message }}</span>
-                                    @enderror
-                                    @error('reg_name')
-                                        <span class="text-red-500">{{ $message }}</span>
-                                    @enderror
+
                                 </div>
                             </div>
 
@@ -157,74 +123,11 @@
                     </x-border-form>
 
                     {{-- --------------------------------------------------------------- --}}
-                    <x-border-form :title="__('Screening Pasien')" :align="__('start')">
-                        <div id="divScreeningPasien" class="flex flex-col w-full ">
-
-                            @foreach ($screeningQuestions as $sQ)
-                                <div>
-                                    @if (isset($sQ['sc_image']))
-                                        <div class="flex justify-center">
-                                            <img src="pain_scale_level.jpg" class="object-fill h-auto w-1/2 ...">
-                                        </div>
-                                    @endif
-                                    <div class="flex items-center mt-2">
-                                        {{-- image pain scale level --}}
-
-                                        <x-input-label for="reg_no" class="basis-1/3" :value="$sQ['sc_desc']" />
-                                        {{-- @dd($sQ['sc_option']) --}}
-                                        @foreach ($sQ['sc_option'] as $sCO)
-                                            <div
-                                                class="flex items-center pl-4 mr-4 border border-gray-200 rounded dark:border-gray-700 hover:bg-gray-100">
-
-                                                <input id="{{ $sCO['option_label'] }}" type="radio"
-                                                    value="{{ $sCO['option_value'] }}" wire:model="klaimType"
-                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-
-                                                <label for="{{ $sCO['option_label'] }}"
-                                                    class="w-full py-3 pr-4 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-                                                    {{ $sCO['option_label'] }}
-                                                </label>
-                                            </div>
-                                        @endforeach
-
-                                    </div>
-                                    @error('reg_no')
-                                        <span class="text-red-500">{{ $message }}</span>
-                                    @enderror
-                                    @error('reg_name')
-                                        <span class="text-red-500">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            @endforeach
+                    @include('livewire.erm-r-j.create-screening-pasien')
+                    {{-- --------------------------------------------------------------- --}}
+                    @include('livewire.erm-r-j.create-screening-kesimpulan')
 
 
-                        </div>
-                        {{-- --------------------------------------------------------------- --}}
-                    </x-border-form>
-
-
-                    <x-border-form :title="__('Kesimpulan')" :align="__('center')">
-                        <div id="divKesimpulan" class="">
-                            <div>
-                                <div class="flex items-center mt-2">
-                                    @foreach ($screeningKesimpulan as $scK)
-                                        <div
-                                            class="flex items-center pl-4 mr-4 border border-gray-200 rounded basis-full dark:border-gray-700 hover:bg-gray-100">
-                                            <input id="{{ $scK['sck_label'] }}" type="radio"
-                                                value="{{ $scK['sck_value'] }}" wire:model="klaimType"
-                                                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                            <label for="{{ $scK['sck_label'] }}"
-                                                class="w-full py-3 pr-4 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-                                                {{ $scK['sck_label'] }}
-                                            </label>
-                                        </div>
-                                    @endforeach
-
-                                </div>
-
-                            </div>
-                        </div>
-                    </x-border-form>
 
 
                 </div>
