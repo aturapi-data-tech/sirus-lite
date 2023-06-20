@@ -7,8 +7,6 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\DB;
 
-use function PHPSTORM_META\map;
-
 class MasterPasien extends Component
 {
     use WithPagination;
@@ -174,21 +172,39 @@ class MasterPasien extends Component
             'rel_id',
             'rel_desc',
             'edu_id',
+            'edu_desc',
             'job_id',
+            'job_name',
             'kk',
             'nyonya',
             'no_kk',
             'address',
             'des_id',
+            'des_name',
             'rt',
             'rw',
             'kec_id',
+            'kec_name',
             'kab_id',
+            'kab_name',
             'prop_id',
+            'prop_name',
             'phone',
 
+            'desLov',
+            'desLovStatus',
+            'kecLov',
+            'kecLovStatus',
+            'kabLov',
+            'kabLovStatus',
+            'propLov',
+            'propLovStatus',
             'relLov',
             'relLovStatus',
+            'eduLov',
+            'eduLovStatus',
+            'jobLov',
+            'jobLovStatus',
             'isOpen',
             'tampilIsOpen',
             'isOpenMode'
@@ -299,9 +315,9 @@ class MasterPasien extends Component
                 'kab_id' => 'required',
                 'prop_id' => 'required',
                 'phone' => 'required'
-            ],
-            $this->customErrorMessage()
+            ]
         );
+
 
         Pasien::updateOrCreate(['reg_no' => $this->reg_no], [
             'reg_name' => $this->reg_name,
@@ -311,7 +327,7 @@ class MasterPasien extends Component
             'thn' => $this->thn,
             'bln' => $this->bln,
             'hari' => $this->hari,
-            'birth_date' => $this->birth_date,
+            'birth_date' => DB::raw("to_date( '" . $this->birth_date . "', 'DD/MM/YYYY')"),
             'birth_place' => $this->birth_place,
             'blood' => $this->blood,
             'marital_status' => $this->marital_status,
@@ -374,7 +390,52 @@ class MasterPasien extends Component
     // Find data from table start////////////////
     private function findData($value)
     {
-        $findData = Pasien::findOrFail($value);
+        $findData = DB::table('rsmst_pasiens')
+            ->select(
+                'reg_no',
+                'reg_name',
+                'nik_bpjs',
+                'nokartu_bpjs',
+                'sex',
+                'thn',
+                'bln',
+                'hari',
+                DB::raw("to_char(birth_date, 'DD/MM/YYYY') as birth_date"),
+                'birth_place',
+                'blood',
+                'marital_status',
+                'kk',
+                'nyonya',
+                'no_kk',
+                'address',
+                'rt',
+                'rw',
+                'phone',
+                'des_name',
+                'kec_name',
+                'kab_name',
+                'prop_name',
+                'rel_desc',
+                'edu_desc',
+                'job_name',
+                'rsmst_desas.des_id',
+                'rsmst_kecamatans.kec_id',
+                'rsmst_kabupatens.kab_id',
+                'rsmst_propinsis.prop_id',
+                'rsmst_religions.rel_id',
+                'rsmst_educations.edu_id',
+                'rsmst_jobs.job_id'
+            )
+            ->join('rsmst_desas', 'rsmst_desas.des_id', 'rsmst_pasiens.des_id')
+            ->join('rsmst_kecamatans', 'rsmst_kecamatans.kec_id', 'rsmst_pasiens.kec_id')
+            ->join('rsmst_kabupatens', 'rsmst_kabupatens.kab_id', 'rsmst_pasiens.kab_id')
+            ->join('rsmst_propinsis', 'rsmst_propinsis.prop_id', 'rsmst_pasiens.prop_id')
+            ->join('rsmst_religions', 'rsmst_religions.rel_id', 'rsmst_pasiens.rel_id')
+            ->join('rsmst_educations', 'rsmst_educations.edu_id', 'rsmst_pasiens.edu_id')
+            ->join('rsmst_jobs', 'rsmst_jobs.job_id', 'rsmst_pasiens.job_id')
+
+
+            ->where('reg_no', $value)->first();
         return $findData;
     }
     // Find data from table end////////////////
@@ -387,6 +448,7 @@ class MasterPasien extends Component
         $this->openModalEdit();
 
         $pasien = $this->findData($id);
+
         $this->reg_no = $id;
         $this->reg_name = $pasien->reg_name;
         $this->nik_bpjs = $pasien->nik_bpjs;
@@ -402,15 +464,23 @@ class MasterPasien extends Component
         $this->rel_id = $pasien->rel_id;
         $this->rel_desc = $pasien->rel_desc;
         $this->edu_id = $pasien->edu_id;
+        $this->edu_desc = $pasien->edu_desc;
         $this->job_id = $pasien->job_id;
+        $this->job_name = $pasien->job_name;
         $this->kk = $pasien->kk;
         $this->nyonya = $pasien->nyonya;
         $this->no_kk = $pasien->no_kk;
         $this->address = $pasien->address;
         $this->des_id = $pasien->des_id;
+        $this->des_name = $pasien->des_name;
+        $this->rt = $pasien->rt;
+        $this->rw = $pasien->rw;
         $this->kec_id = $pasien->kec_id;
+        $this->kec_name = $pasien->kec_name;
         $this->kab_id = $pasien->kab_id;
+        $this->kab_name = $pasien->kab_name;
         $this->prop_id = $pasien->prop_id;
+        $this->prop_name = $pasien->prop_name;
         $this->phone = $pasien->phone;
     }
     // show edit record end////////////////
@@ -424,31 +494,31 @@ class MasterPasien extends Component
 
         $pasien = $this->findData($id);
         $this->reg_no = $id;
-        $this->reg_name = $pasien->reg_name;
-        $this->nik_bpjs = $pasien->nik_bpjs;
-        $this->nokartu_bpjs = $pasien->nokartu_bpjs;
-        $this->sex = $pasien->sex;
-        $this->thn = $pasien->thn;
-        $this->bln = $pasien->bln;
-        $this->hari = $pasien->hari;
-        $this->birth_date = $pasien->birth_date;
-        $this->birth_place = $pasien->birth_place;
-        $this->blood = $pasien->blood;
-        $this->marital_status = $pasien->marital_status;
-        $this->rel_id = $pasien->rel_id;
-        $this->rel_desc = $pasien->rel_desc;
-        $this->edu_id = $pasien->edu_id;
-        $this->job_id = $pasien->job_id;
-        $this->kk = $pasien->kk;
-        $this->nyonya = $pasien->nyonya;
-        $this->no_kk = $pasien->no_kk;
-        $this->address = $pasien->address;
-        $this->des_id = $pasien->des_id;
-        $this->kec_id = $pasien->kec_id;
-        $this->kab_id = $pasien->kab_id;
-        $this->prop_id = $pasien->prop_id;
-        $this->phone = $pasien->phone;
-        $this->emit('toastr-success', "Data " . $this->reg_name . " berhasil disimpan.");
+        // $this->reg_name = $pasien->reg_name;
+        // $this->nik_bpjs = $pasien->nik_bpjs;
+        // $this->nokartu_bpjs = $pasien->nokartu_bpjs;
+        // $this->sex = $pasien->sex;
+        // $this->thn = $pasien->thn;
+        // $this->bln = $pasien->bln;
+        // $this->hari = $pasien->hari;
+        // $this->birth_date = $pasien->birth_date;
+        // $this->birth_place = $pasien->birth_place;
+        // $this->blood = $pasien->blood;
+        // $this->marital_status = $pasien->marital_status;
+        // $this->rel_id = $pasien->rel_id;
+        // $this->rel_desc = $pasien->rel_desc;
+        // $this->edu_id = $pasien->edu_id;
+        // $this->job_id = $pasien->job_id;
+        // $this->kk = $pasien->kk;
+        // $this->nyonya = $pasien->nyonya;
+        // $this->no_kk = $pasien->no_kk;
+        // $this->address = $pasien->address;
+        // $this->des_id = $pasien->des_id;
+        // $this->kec_id = $pasien->kec_id;
+        // $this->kab_id = $pasien->kab_id;
+        // $this->prop_id = $pasien->prop_id;
+        // $this->phone = $pasien->phone;
+        // $this->emit('toastr-success', "Data " . $this->reg_name . " berhasil disimpan.");
     }
     // tampil record end////////////////
 
@@ -830,10 +900,13 @@ class MasterPasien extends Component
                     ->join('rsmst_religions', 'rsmst_religions.rel_id', 'rsmst_pasiens.rel_id')
                     ->join('rsmst_educations', 'rsmst_educations.edu_id', 'rsmst_pasiens.edu_id')
                     ->join('rsmst_jobs', 'rsmst_jobs.job_id', 'rsmst_pasiens.job_id')
-                    ->where('reg_name', 'like', '%' . $this->search . '%')
-                    ->orWhere('reg_no', 'like', '%' . $this->search . '%')
-                    ->orWhere('address', 'like', '%' . $this->search . '%')
-                    ->orWhere('birth_place', 'like', '%' . $this->search . '%')
+
+
+                    // ->where('reg_name', 'like', '%' . $this->search . '%')
+                    // ->orWhere('reg_no', 'like', '%' . $this->search . '%')
+                    // ->orWhere('address', 'like', '%' . $this->search . '%')
+                    // ->orWhere('birth_place', 'like', '%' . $this->search . '%')
+
                     ->orderBy($this->sortField, $this->sortAsc ? 'asc' : 'desc')
                     ->paginate($this->limitPerPage),
                 'myTitle' => 'Master Pasien',

@@ -405,7 +405,7 @@
                 let cfn = confirm('Apakah anda ingin menghapus data ini ' + name + '?');
 
                 if (cfn) {
-                    window.livewire.emit('confirm_remove_record_poli', key, name);
+                    window.livewire.emit('confirm_remove_record_pasien', key, name);
                 }
             });
 

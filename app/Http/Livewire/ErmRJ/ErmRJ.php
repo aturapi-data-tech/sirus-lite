@@ -296,7 +296,7 @@ class ErmRJ extends Component
 
 
     // setLimitPerpage////////////////
-    public function setLimitPerPage($value)
+    public function setLimitPerPage($value): void
     {
         $this->limitPerPage = $value;
     }
@@ -314,7 +314,7 @@ class ErmRJ extends Component
 
 
     // logic ordering record (shotby)////////////////
-    public function sortBy($field)
+    public function sortBy($field): void
     {
         if ($this->sortField === $field) {
             $this->sortAsc = !$this->sortAsc;

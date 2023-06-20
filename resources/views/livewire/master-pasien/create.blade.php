@@ -47,11 +47,11 @@
                     <div>
 
                         <div class="mb-1">
-                            {{-- Form Baris Pertama --}}
+                            {{-- Pembungkus --}}
                             <div class="form-baris-1">
                                 <div class="grid gap-6 md:grid-cols-2">
                                     {{-- Form Kanan --}}
-                                    <div class="form-kanan">
+                                    <div class="form-kiri">
                                         {{-- Reg. NO --}}
                                         <div class="mb-2">
                                             <x-input-label for="reg_no" class="ml-1" :value="__('No. Registrasi  :')" />
@@ -73,29 +73,7 @@
                                                 <span class="text-red-500">{{ $message }}</span>
                                             @enderror
                                         </div>
-                                    </div>
 
-                                    <div class="form-kiri">
-                                        {{-- Alamat --}}
-                                        <div class="mb-2">
-                                            <x-input-label for="reg_no" class="ml-1" :value="__('Alamat  :')" />
-                                            <textarea :disabled=$disabledProperty wire:model='address' style="height: 119px;"
-                                                class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                                placeholder="Masukkan Alamat.."></textarea>
-                                            @error('address')
-                                                <span class="text-red-500">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            {{-- Form Baris Pertama End --}}
-
-                            {{-- Form Baris 2 --}}
-                            <div class="form-baris-2">
-                                <div class="grid gap-6 md:grid-cols-2">
-                                    {{-- Form Kiri --}}
-                                    <div class="form-kiri">
                                         {{-- JKN --}}
                                         <div class="mb-2">
                                             <x-input-label for="nokartu_bpjs" class="ml-1" :value="__('JKN :')" />
@@ -113,8 +91,150 @@
                                             <x-input-label for="nik_bpjs" class="ml-1" :value="__('NIK :')" />
                                             <x-text-input class="block" :value="old('nik_bpjs')" required autofocus
                                                 autocomplete="nik_bpjs" :disabled=$disabledProperty
-                                                wire:model="nik_bpjs" placeholder="Masukkan NIK" />
+                                                wire:model="nik_bpjs" placeholder="Masukkan NIK" tabindex="4" />
                                             @error('nik_bpjs')
+                                                <span class="text-red-500">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+
+                                        {{-- Jenis Kelamin --}}
+                                        <div class="mb-2">
+                                            <x-input-label for="sex" class="ml-1" :value="__('Jenis Kelamin :')" />
+                                            <div class="grid gap-2 md:grid-cols-2">
+                                                <div
+                                                    class="flex items-center py-2 pl-4 border border-gray-300 rounded-lg dark:border-gray-700">
+                                                    <input id="sexL" type="radio" wire:model='sex' tabindex="5"
+                                                        value="L"
+                                                        class="w-4 h-4 text-blue-600 bg-gray-100 border border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                                    <label for="sexL"
+                                                        class="w-full pb-1 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Laki-laki</label>
+                                                </div>
+                                                <div
+                                                    class="flex items-center py-2 pl-4 border border-gray-300 rounded-lg dark:border-gray-700">
+                                                    <input id="sexP" type="radio" value="P" wire:model='sex'
+                                                        tabindex="6"
+                                                        class="w-4 h-4 text-blue-600 bg-gray-100 border border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                                    <label for="sexP"
+                                                        class="w-full pb-1 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Perempuan</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {{-- Usia --}}
+                                        <div class="grid gap-3 md:grid-cols-3">
+                                            <div class="mb-2">
+                                                <div class="flex">
+                                                    <x-input-label class="ml-1" :value="__('Usia:')" />
+                                                    <x-input-label for="thn" class="ml-20" :value="__('Tahun')" />
+                                                </div>
+                                                <x-text-input class="block" :value="old('thn')" required autofocus
+                                                    autocomplete="thn" :disabled=$disabledProperty wire:model="thn"
+                                                    placeholder="Tahun" tabindex="7" />
+                                                @error('thn')
+                                                    <span class="text-red-500">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+                                            <div class="mb-2">
+                                                <x-input-label for="bln" class="flex justify-end mr-2"
+                                                    :value="__('Bulan')" />
+                                                <x-text-input class="block" :value="old('bln')" required autofocus
+                                                    autocomplete="bln" :disabled=$disabledProperty wire:model="bln"
+                                                    placeholder="Bulan" tabindex="8" />
+                                                @error('bln')
+                                                    <span class="text-red-500">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+                                            <div class="mb-2">
+                                                <x-input-label for="hari" class="flex justify-end mr-2"
+                                                    :value="__('Hari')" />
+                                                <x-text-input class="block" :value="old('hari')" required autofocus
+                                                    autocomplete="hari" :disabled=$disabledProperty wire:model="hari"
+                                                    placeholder="Hari" tabindex="9" />
+                                                @error('hari')
+                                                    <span class="text-red-500">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+                                        </div>
+
+                                        {{-- Tgl. Lahir --}}
+                                        <div class="mb-2">
+                                            <x-input-label for="birth_date" class="ml-1" :value="__('Tgl. Lahir :')" />
+                                            <x-text-input class="block" :value="old('birth_date')" required autofocus
+                                                autocomplete="birth_date" :disabled=$disabledProperty tabindex="10"
+                                                wire:model="birth_date" />
+                                            @error('birth_date')
+                                                <span class="text-red-500">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+
+                                        {{-- Tempat Lahir --}}
+                                        <div class="mb-2">
+                                            <x-input-label for="birth_place" class="ml-1" :value="__('Tempat Lahir :')" />
+                                            <x-text-input class="block" :value="old('birth_place')" required autofocus
+                                                autocomplete="birth_place" :disabled=$disabledProperty tabindex="11"
+                                                wire:model="birth_place" placeholder="Masukkan Tempat Lahir" />
+                                            @error('birth_place')
+                                                <span class="text-red-500">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+
+                                        {{-- Gol. Darah --}}
+                                        <div class="grid gap-6 md:grid-cols-2">
+                                            {{-- Gol. Darah --}}
+                                            <div class="mb-2">
+                                                <x-input-label for="blood" class="ml-1" :value="__('Gol. Darah :')" />
+                                                <x-text-input class="block" :value="old('blood')" required autofocus
+                                                    placeholder="Gol. Darah" autocomplete="blood" tabindex="12"
+                                                    :disabled=$disabledProperty wire:model="blood" />
+                                                @error('blood')
+                                                    <span class="text-red-500">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+
+
+                                            {{-- Marital Status --}}
+                                            <div class="mb-2">
+                                                <x-input-label for="marital_status" class="ml-1"
+                                                    :value="__('Status :')" />
+                                                <x-text-input class="block" :value="old('marital_status')" required autofocus
+                                                    autocomplete="marital_status" :disabled=$disabledProperty
+                                                    tabindex="13" placeholder="Status"
+                                                    wire:model="marital_status" />
+                                                @error('marital_status')
+                                                    <span class="text-red-500">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+                                        </div>
+
+                                        {{-- Kepala Keluarga --}}
+                                        <div class="mb-2">
+                                            <x-input-label for="kk" class="ml-1" :value="__('Kepala Keluarga :')" />
+                                            <x-text-input class="block" :value="old('kk')" required autofocus
+                                                placeholder="Masukkan Nama Kepala Keluarga" autocomplete="kk"
+                                                tabindex="14" :disabled=$disabledProperty wire:model="kk" />
+                                            @error('kk')
+                                                <span class="text-red-500">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+
+                                        {{-- Nyonya --}}
+                                        <div class="mb-2">
+                                            <x-input-label for="nyonya" class="ml-1" :value="__('Ibu Keluarga :')" />
+                                            <x-text-input class="block" :value="old('nyonya')" required autofocus
+                                                tabindex="15" autocomplete="nyonya" :disabled=$disabledProperty
+                                                wire:model="nyonya" placeholder="Masukkan Nama Ibu Keluarga" />
+                                            @error('nyonya')
+                                                <span class="text-red-500">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+
+                                        {{-- No. KK --}}
+                                        <div class="mb-2">
+                                            <x-input-label for="no_kk" class="ml-1" :value="__('No. KK :')" />
+                                            <x-text-input class="block" :value="old('no_kk')" required autofocus
+                                                tabindex="16" autocomplete="no_kk" :disabled=$disabledProperty
+                                                wire:model="no_kk" placeholder="Masukkan No. KK" />
+                                            @error('no_kk')
                                                 <span class="text-red-500">{{ $message }}</span>
                                             @enderror
                                         </div>
@@ -124,13 +244,25 @@
 
                                     {{-- Form Kanan --}}
                                     <div class="form-kanan">
+                                        {{-- Alamat --}}
+                                        <div class="mb-2">
+                                            <x-input-label for="reg_no" class="ml-1" :value="__('Alamat  :')" />
+                                            <textarea wire:model='address' style="height: 119px;" tabindex="17"
+                                                class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                                placeholder="Masukkan Alamat.."></textarea>
+                                            @error('address')
+                                                <span class="text-red-500">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+
                                         {{-- Desa --}}
                                         <div class="mb-2">
                                             <x-input-label for="des_id" class="ml-1" :value="__('Desa :')" />
                                             <div class="flex">
                                                 <x-text-input class="block sm:w-[100px]" :value="old('des_id')" required
-                                                    autofocus autocomplete="des_id" :disabled=$disabledProperty
-                                                    wire:model="des_id" placeholder="Kode Desa" />
+                                                    tabindex="18" autofocus autocomplete="des_id"
+                                                    :disabled=$disabledProperty wire:model="des_id"
+                                                    placeholder="Kode Desa" />
                                                 <x-text-input class="block ml-2" :value="old('des_name')" required autofocus
                                                     autocomplete="des_name" :disabled=true wire:model="des_name"
                                                     placeholder="Nama Desa" />
@@ -151,7 +283,7 @@
                                                 <x-input-label for="rt" class="ml-1" :value="__('RT :')" />
                                                 <x-text-input class="block" :value="old('rt')" required autofocus
                                                     autocomplete="rt" :disabled=$disabledProperty wire:model="rt"
-                                                    placeholder="RT" tabindex="2" />
+                                                    placeholder="RT" tabindex="19" />
                                                 @error('rt')
                                                     <span class="text-red-500">{{ $message }}</span>
                                                 @enderror
@@ -160,93 +292,21 @@
                                                 <x-input-label for="rw" class="ml-1" :value="__('RW :')" />
                                                 <x-text-input class="block" :value="old('rw')" required autofocus
                                                     autocomplete="rw" :disabled=$disabledProperty wire:model="rw"
-                                                    placeholder="RW" tabindex="2" />
+                                                    placeholder="RW" tabindex="20" />
                                                 @error('rw')
                                                     <span class="text-red-500">{{ $message }}</span>
                                                 @enderror
                                             </div>
                                         </div>
-                                    </div>
-                                    {{-- End Form Kanan --}}
-                                </div>
-                            </div>
-                            {{-- End Form Baris 2 --}}
 
-                            {{-- Form Baris 3 --}}
-                            <div class="form-baris-3">
-                                <div class="grid gap-6 md:grid-cols-2">
-                                    {{-- Form Kiri --}}
-                                    <div class="form-kiri">
-                                        {{-- Jenis Kelamin --}}
-                                        <div class="mb-2">
-                                            <x-input-label for="sex" class="ml-1" :value="__('Jenis Kelamin :')" />
-                                            <div class="grid gap-2 md:grid-cols-2">
-                                                <div
-                                                    class="flex items-center py-2 pl-4 border border-gray-300 rounded-lg dark:border-gray-700">
-                                                    <input id="sexL" type="radio" name="sex"
-                                                        value="L"
-                                                        class="w-4 h-4 text-blue-600 bg-gray-100 border border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                                    <label for="sexL"
-                                                        class="w-full pb-1 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Laki-laki</label>
-                                                </div>
-                                                <div
-                                                    class="flex items-center py-2 pl-4 border border-gray-300 rounded-lg dark:border-gray-700">
-                                                    <input id="sexP" type="radio" name="sex"
-                                                        value="P"
-                                                        class="w-4 h-4 text-blue-600 bg-gray-100 border border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                                    <label for="sexP"
-                                                        class="w-full pb-1 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Perempuan</label>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {{-- Usia --}}
-                                        <div class="grid gap-3 md:grid-cols-3">
-                                            <div class="mb-2">
-                                                <div class="flex">
-                                                    <x-input-label class="ml-1" :value="__('Usia:')" />
-                                                    <x-input-label for="thn" class="ml-12" :value="__('Tahun')" />
-                                                </div>
-                                                <x-text-input class="block" :value="old('thn')" required autofocus
-                                                    autocomplete="thn" :disabled=$disabledProperty wire:model="thn"
-                                                    placeholder="Tahun" tabindex="2" />
-                                                @error('thn')
-                                                    <span class="text-red-500">{{ $message }}</span>
-                                                @enderror
-                                            </div>
-                                            <div class="mb-2">
-                                                <x-input-label for="bln" class="flex justify-end mr-2"
-                                                    :value="__('Bulan')" />
-                                                <x-text-input class="block" :value="old('bln')" required autofocus
-                                                    autocomplete="bln" :disabled=$disabledProperty wire:model="bln"
-                                                    placeholder="Bulan" tabindex="2" />
-                                                @error('bln')
-                                                    <span class="text-red-500">{{ $message }}</span>
-                                                @enderror
-                                            </div>
-                                            <div class="mb-2">
-                                                <x-input-label for="hari" class="flex justify-end mr-2"
-                                                    :value="__('Hari')" />
-                                                <x-text-input class="block" :value="old('hari')" required autofocus
-                                                    autocomplete="hari" :disabled=$disabledProperty wire:model="hari"
-                                                    placeholder="Hari" tabindex="2" />
-                                                @error('hari')
-                                                    <span class="text-red-500">{{ $message }}</span>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                    </div>
-                                    {{-- End Form Kiri --}}
-
-                                    {{-- Form Kanan --}}
-                                    <div class="form-kanan">
                                         {{-- Kecamatan --}}
                                         <div class="mb-2">
                                             <x-input-label for="kec_id" class="ml-1" :value="__('Kecamatan :')" />
                                             <div class="flex">
                                                 <x-text-input class="block sm:w-[100px]" :value="old('kec_id')" required
                                                     autofocus autocomplete="kec_id" :disabled=$disabledProperty
-                                                    wire:model="kec_id" placeholder="Kode Kecamatan" />
+                                                    tabindex="21" wire:model="kec_id"
+                                                    placeholder="Kode Kecamatan" />
                                                 <x-text-input class="block ml-2" :value="old('kec_name')" required autofocus
                                                     autocomplete="kec_name" :disabled=true wire:model="kec_name"
                                                     placeholder="Nama Kecamatan" />
@@ -267,7 +327,8 @@
                                             <div class="flex">
                                                 <x-text-input class="block sm:w-[100px]" :value="old('kab_id')" required
                                                     autofocus autocomplete="kab_id" :disabled=$disabledProperty
-                                                    placeholder="Kode Kabupaten" wire:model="kab_id" />
+                                                    tabindex="22" placeholder="Kode Kabupaten"
+                                                    wire:model="kab_id" />
                                                 <x-text-input class="block ml-2" :value="old('kab_name')" required autofocus
                                                     autocomplete="kab_name" :disabled=true wire:model="kab_name"
                                                     placeholder="Nama Kabupaten" />
@@ -276,63 +337,20 @@
                                                 <span class="text-red-500">{{ $message }}</span>
                                             @enderror
 
-                                            {{-- <x-text-input class="block" :value="old('kab_id')" required autofocus
-                                                autocomplete="kab_id" :disabled=$disabledProperty wire:model="kab_id"
-                                                id placeholder="Masukkan Kabupaten" tabindex="2" />
-                                            @error('kab_id')
-                                                <span class="text-red-500">{{ $message }}</span>
-                                            @enderror --}}
-
                                             {{-- LOV --}}
                                             <div class="mt-2">
                                                 @include('livewire.master-pasien.list-of-value-kabupaten')
                                             </div>
                                         </div>
-                                    </div>
-                                    {{-- End Form Kanan --}}
-                                </div>
-                            </div>
-                            {{-- End Form Baris 3 --}}
 
-
-                            {{-- Form Baris 4 --}}
-                            <div class="form-baris-4">
-                                <div class="grid gap-6 md:grid-cols-2">
-                                    {{-- Form Kiri --}}
-                                    <div class="form-kiri">
-                                        {{-- Tgl. Lahir --}}
-                                        <div class="mb-2">
-                                            <x-input-label for="birth_date" class="ml-1" :value="__('Tgl. Lahir :')" />
-                                            <x-text-input class="block" :value="old('birth_date')" required autofocus
-                                                autocomplete="birth_date" :disabled=$disabledProperty
-                                                wire:model="birth_date" />
-                                            @error('birth_date')
-                                                <span class="text-red-500">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-
-                                        {{-- Tempat Lahir --}}
-                                        <div class="mb-2">
-                                            <x-input-label for="birth_place" class="ml-1" :value="__('Tempat Lahir :')" />
-                                            <x-text-input class="block" :value="old('birth_place')" required autofocus
-                                                autocomplete="birth_place" :disabled=$disabledProperty
-                                                wire:model="birth_place" placeholder="Masukkan Tempat Lahir" />
-                                            @error('birth_place')
-                                                <span class="text-red-500">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                    {{-- End Form Kiri --}}
-
-                                    {{-- Form Kanan --}}
-                                    <div class="form-kanan">
                                         {{-- Provinsi --}}
                                         <div class="mb-2">
                                             <x-input-label for="prop_id" class="ml-1" :value="__('Provinsi :')" />
                                             <div class="flex">
                                                 <x-text-input class="block sm:w-[100px]" :value="old('prop_id')" required
                                                     autofocus autocomplete="prop_id" :disabled=$disabledProperty
-                                                    placeholder="Kode Provinsi" wire:model="prop_id" />
+                                                    tabindex="23" placeholder="Kode Provinsi"
+                                                    wire:model="prop_id" />
                                                 <x-text-input class="block ml-2" :value="old('prop_name')" required autofocus
                                                     autocomplete="prop_name" :disabled=true wire:model="prop_name"
                                                     placeholder="Nama Provinsi" />
@@ -353,7 +371,7 @@
                                             <div class="flex">
                                                 <x-text-input class="block sm:w-[100px]" :value="old('rel_id')" required
                                                     autofocus autocomplete="rel_id" :disabled=$disabledProperty
-                                                    wire:model="rel_id" placeholder="Kode Agama" />
+                                                    tabindex="24" wire:model="rel_id" placeholder="Kode Agama" />
                                                 <x-text-input class="block ml-2" :value="old('rel_desc')" required autofocus
                                                     autocomplete="rel_desc" :disabled=true wire:model="rel_desc"
                                                     placeholder="Nama Agama" />
@@ -367,59 +385,6 @@
                                                 @include('livewire.master-pasien.list-of-value-rel')
                                             </div>
                                         </div>
-                                    </div>
-                                    {{-- End Form Kanan --}}
-                                </div>
-                            </div>
-                            {{-- End Form Baris 4 --}}
-
-                            {{-- Form Baris 5 --}}
-                            <div class="form-baris-5">
-                                <div class="grid gap-6 md:grid-cols-2">
-                                    {{-- Form Kiri --}}
-                                    <div class="form-kiri">
-
-                                        <div class="grid gap-6 md:grid-cols-2">
-                                            {{-- Gol. Darah --}}
-                                            <div class="mb-2">
-                                                <x-input-label for="blood" class="ml-1" :value="__('Gol. Darah :')" />
-                                                <x-text-input class="block" :value="old('blood')" required autofocus
-                                                    placeholder="Gol. Darah" autocomplete="blood"
-                                                    :disabled=$disabledProperty wire:model="blood" />
-                                                @error('blood')
-                                                    <span class="text-red-500">{{ $message }}</span>
-                                                @enderror
-                                            </div>
-
-
-                                            {{-- Marital Status --}}
-                                            <div class="mb-2">
-                                                <x-input-label for="marital_status" class="ml-1"
-                                                    :value="__('Status :')" />
-                                                <x-text-input class="block" :value="old('marital_status')" required autofocus
-                                                    autocomplete="marital_status" :disabled=$disabledProperty
-                                                    placeholder="Status" wire:model="marital_status" />
-                                                @error('marital_status')
-                                                    <span class="text-red-500">{{ $message }}</span>
-                                                @enderror
-                                            </div>
-                                        </div>
-
-                                        {{-- Kepala Keluarga --}}
-                                        <div class="mb-2">
-                                            <x-input-label for="kk" class="ml-1" :value="__('Kepala Keluarga :')" />
-                                            <x-text-input class="block" :value="old('kk')" required autofocus
-                                                placeholder="Masukkan Nama Kepala Keluarga" autocomplete="kk"
-                                                :disabled=$disabledProperty wire:model="kk" />
-                                            @error('kk')
-                                                <span class="text-red-500">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                    {{-- End Form Kiri --}}
-
-                                    {{-- Form Kanan --}}
-                                    <div class="form-kanan">
 
                                         {{-- Pendidikan --}}
                                         <div class="mb-2">
@@ -427,7 +392,8 @@
                                             <div class="flex">
                                                 <x-text-input class="block sm:w-[100px]" :value="old('edu_id')" required
                                                     autofocus autocomplete="edu_id" :disabled=$disabledProperty
-                                                    wire:model="edu_id" placeholder="Kode Pendidikan" />
+                                                    tabindex="25" wire:model="edu_id"
+                                                    placeholder="Kode Pendidikan" />
                                                 <x-text-input class="block ml-2" :value="old('edu_desc')" required autofocus
                                                     autocomplete="edu_desc" :disabled=true wire:model="edu_desc"
                                                     placeholder="Nama Pendidikan" />
@@ -448,7 +414,8 @@
                                             <div class="flex">
                                                 <x-text-input class="block sm:w-[100px]" :value="old('job_id')" required
                                                     autofocus autocomplete="job_id" :disabled=$disabledProperty
-                                                    wire:model="job_id" placeholder="Kode Pekerjaan" />
+                                                    tabindex="26" wire:model="job_id"
+                                                    placeholder="Kode Pekerjaan" />
                                                 <x-text-input class="block ml-2" :value="old('job_name')" required autofocus
                                                     placeholder="Nama Pekerjaan" autocomplete="job_name"
                                                     :disabled=true wire:model="job_name" />
@@ -462,63 +429,22 @@
                                                 @include('livewire.master-pasien.list-of-value-job')
                                             </div>
                                         </div>
-                                    </div>
-                                    {{-- End Form Kanan --}}
-
-                                </div>
-                            </div>
-                            {{-- End Form Baris 5 --}}
-
-
-                            {{-- Form Baris 6 --}}
-                            <div class="form-baris-6">
-                                <div class="grid gap-6 md:grid-cols-2">
-                                    {{-- Form Kiri --}}
-                                    <div class="form-kiri">
-                                        {{-- Nyonya --}}
-                                        <div class="mb-2">
-                                            <x-input-label for="nyonya" class="ml-1" :value="__('Ibu Keluarga :')" />
-                                            <x-text-input class="block" :value="old('nyonya')" required autofocus
-                                                autocomplete="nyonya" :disabled=$disabledProperty wire:model="nyonya"
-                                                placeholder="Masukkan Nama Ibu Keluarga" />
-                                            @error('nyonya')
-                                                <span class="text-red-500">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-
-                                        {{-- No. KK --}}
-                                        <div class="mb-2">
-                                            <x-input-label for="no_kk" class="ml-1" :value="__('No. KK :')" />
-                                            <x-text-input class="block" :value="old('no_kk')" required autofocus
-                                                autocomplete="no_kk" :disabled=$disabledProperty wire:model="no_kk"
-                                                placeholder="Masukkan No. KK" />
-                                            @error('no_kk')
-                                                <span class="text-red-500">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                    {{-- End Form Kiri --}}
-
-
-                                    {{-- Form Kanan --}}
-                                    <div class="form-kanan">
-
 
                                         {{-- Phone --}}
                                         <div class="mb-2">
                                             <x-input-label for="phone" class="ml-1" :value="__('No. Telepon :')" />
                                             <x-text-input class="block" :value="old('phone')" required autofocus
                                                 autocomplete="phone" :disabled=$disabledProperty wire:model="phone" id
-                                                placeholder="Masukkan No. Telepon" tabindex="2" />
+                                                placeholder="Masukkan No. Telepon" tabindex="27" />
                                             @error('phone')
                                                 <span class="text-red-500">{{ $message }}</span>
                                             @enderror
                                         </div>
+
                                     </div>
                                     {{-- End Form Kanan --}}
                                 </div>
                             </div>
-                            {{-- End Form Baris 6 --}}
 
                         </div>
 
