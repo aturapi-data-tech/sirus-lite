@@ -445,8 +445,6 @@ class MasterPasien extends Component
     // show edit record start////////////////
     public function edit($id)
     {
-        $this->openModalEdit();
-
         $pasien = $this->findData($id);
 
         $this->reg_no = $id;
@@ -482,6 +480,8 @@ class MasterPasien extends Component
         $this->prop_id = $pasien->prop_id;
         $this->prop_name = $pasien->prop_name;
         $this->phone = $pasien->phone;
+
+        $this->openModalEdit();
     }
     // show edit record end////////////////
 
@@ -490,35 +490,43 @@ class MasterPasien extends Component
     // tampil record start////////////////
     public function tampil($id)
     {
-        $this->openModalTampil();
-
         $pasien = $this->findData($id);
+
         $this->reg_no = $id;
-        // $this->reg_name = $pasien->reg_name;
-        // $this->nik_bpjs = $pasien->nik_bpjs;
-        // $this->nokartu_bpjs = $pasien->nokartu_bpjs;
-        // $this->sex = $pasien->sex;
-        // $this->thn = $pasien->thn;
-        // $this->bln = $pasien->bln;
-        // $this->hari = $pasien->hari;
-        // $this->birth_date = $pasien->birth_date;
-        // $this->birth_place = $pasien->birth_place;
-        // $this->blood = $pasien->blood;
-        // $this->marital_status = $pasien->marital_status;
-        // $this->rel_id = $pasien->rel_id;
-        // $this->rel_desc = $pasien->rel_desc;
-        // $this->edu_id = $pasien->edu_id;
-        // $this->job_id = $pasien->job_id;
-        // $this->kk = $pasien->kk;
-        // $this->nyonya = $pasien->nyonya;
-        // $this->no_kk = $pasien->no_kk;
-        // $this->address = $pasien->address;
-        // $this->des_id = $pasien->des_id;
-        // $this->kec_id = $pasien->kec_id;
-        // $this->kab_id = $pasien->kab_id;
-        // $this->prop_id = $pasien->prop_id;
-        // $this->phone = $pasien->phone;
-        // $this->emit('toastr-success', "Data " . $this->reg_name . " berhasil disimpan.");
+        $this->reg_name = $pasien->reg_name;
+        $this->nik_bpjs = $pasien->nik_bpjs;
+        $this->nokartu_bpjs = $pasien->nokartu_bpjs;
+        $this->sex = $pasien->sex;
+        $this->thn = $pasien->thn;
+        $this->bln = $pasien->bln;
+        $this->hari = $pasien->hari;
+        $this->birth_date = $pasien->birth_date;
+        $this->birth_place = $pasien->birth_place;
+        $this->blood = $pasien->blood;
+        $this->marital_status = $pasien->marital_status;
+        $this->rel_id = $pasien->rel_id;
+        $this->rel_desc = $pasien->rel_desc;
+        $this->edu_id = $pasien->edu_id;
+        $this->edu_desc = $pasien->edu_desc;
+        $this->job_id = $pasien->job_id;
+        $this->job_name = $pasien->job_name;
+        $this->kk = $pasien->kk;
+        $this->nyonya = $pasien->nyonya;
+        $this->no_kk = $pasien->no_kk;
+        $this->address = $pasien->address;
+        $this->des_id = $pasien->des_id;
+        $this->des_name = $pasien->des_name;
+        $this->rt = $pasien->rt;
+        $this->rw = $pasien->rw;
+        $this->kec_id = $pasien->kec_id;
+        $this->kec_name = $pasien->kec_name;
+        $this->kab_id = $pasien->kab_id;
+        $this->kab_name = $pasien->kab_name;
+        $this->prop_id = $pasien->prop_id;
+        $this->prop_name = $pasien->prop_name;
+        $this->phone = $pasien->phone;
+
+        $this->openModalTampil();
     }
     // tampil record end////////////////
 
