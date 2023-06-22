@@ -132,7 +132,7 @@
                     </div>
 
 
-                    @if ($isOpen == 0)
+                    @if ($isOpen)
                         @include('livewire.erm-r-j.create')
                     @endif
 

@@ -1,5 +1,5 @@
 @php
-    $disabledProperty = $isOpenMode === 'tampil' ? false : false;
+    $disabledProperty = $isOpenMode === 'tampil' ? true : false;
 @endphp
 
 <x-border-form :title="__('Tanda Vital')" :align="__('start')" class="m-1">
