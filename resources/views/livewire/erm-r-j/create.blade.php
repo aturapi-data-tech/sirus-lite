@@ -127,7 +127,14 @@
                     {{-- --------------------------------------------------------------- --}}
                     @include('livewire.erm-r-j.create-screening-kesimpulan')
 
-
+                    <div class="flex ">
+                        {{-- --------------------------------------------------------------- --}}
+                        @include('livewire.erm-r-j.create-tanda-vital-pasien')
+                        {{-- --------------------------------------------------------------- --}}
+                        @include('livewire.erm-r-j.create-antropometri-pasien')
+                        {{-- --------------------------------------------------------------- --}}
+                        @include('livewire.erm-r-j.create-fungsional-pasien')
+                    </div>
 
 
                 </div>

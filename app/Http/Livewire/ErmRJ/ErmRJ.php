@@ -222,6 +222,113 @@ class ErmRJ extends Component
     ];
     public $collectDataScreening = [];
     //////////////////////////////////////////////////////////////////////
+    public $dataTandaVital = [
+        [
+            "tv_seq" => "1",
+            "tv_label" => "Tekanan Darah",
+            "tv_mou" => "mmHg",
+            "tv_value" => 0
+        ],
+        [
+            "tv_seq" => "2",
+            "tv_label" => "Frekuensi Nadi",
+            "tv_mou" => "x/menit",
+            "tv_value" => 0
+        ],
+        [
+            "tv_seq" => "3",
+            "tv_label" => "Suhu",
+            "tv_mou" => "C",
+            "tv_value" => 0
+        ],
+        [
+            "tv_seq" => "4",
+            "tv_label" => "Frekuansi Nafas",
+            "tv_mou" => "x/menit",
+            "tv_value" => 0
+        ],
+        [
+            "tv_seq" => "5",
+            "tv_label" => "Skor Nyeri",
+            "tv_mou" => "",
+            "tv_value" => 0
+        ],
+        [
+            "tv_seq" => "6",
+            "tv_label" => "Skor Jatuh",
+            "tv_mou" => "",
+            "tv_value" => 0
+        ],
+    ];
+    public $dataAntropometri = [
+        [
+            "ap_seq" => "1",
+            "ap_label" => "Berat Badan",
+            "ap_mou" => "Kg",
+            "ap_value" => 0
+        ],
+        [
+            "ap_seq" => "2",
+            "ap_label" => "Tinggi Badan",
+            "ap_mou" => "Cm",
+            "ap_value" => 0
+        ],
+        [
+            "ap_seq" => "3",
+            "ap_label" => "Lingkar Kepala",
+            "ap_mou" => "Cm",
+            "ap_value" => 0
+        ],
+        [
+            "ap_seq" => "4",
+            "ap_label" => "IMT",
+            "ap_mou" => "",
+            "ap_value" => 0
+        ],
+        [
+            "ap_seq" => "5",
+            "ap_label" => "Lingkar Lengan Atas",
+            "ap_mou" => "Cm",
+            "ap_value" => 0
+        ],
+    ];
+    public $dataFungsional = [
+        [
+            "fu_seq" => "1",
+            "fu_label" => "Alat Bantu",
+            "fu_mou" => "",
+            "fu_value" => "-"
+        ],
+        [
+            "fu_seq" => "2",
+            "fu_label" => "Prothesa",
+            "fu_mou" => "",
+            "fu_value" => "-"
+        ],
+        [
+            "fu_seq" => "3",
+            "fu_label" => "Cacat Tubuh",
+            "fu_mou" => "",
+            "fu_value" => "-"
+        ],
+        [
+            "fu_seq" => "4",
+            "fu_label" => "ADL",
+            "fu_mou" => "",
+            "fu_value" => "-"
+        ],
+        [
+            "fu_seq" => "5",
+            "fu_label" => "Riwayat",
+            "fu_mou" => "",
+            "fu_value" => "-"
+        ],
+    ];
+
+
+    public $collectDataTandaVital = [];
+
+    //////////////////////////////////////////////////////////////////////
 
     // Ref on top bar
     public $ermStatusRef = 'A';
