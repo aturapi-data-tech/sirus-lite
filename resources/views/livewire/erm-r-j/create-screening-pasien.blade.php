@@ -12,27 +12,34 @@
                     {{-- image pain scale level --}}
 
                     <x-input-label class="basis-1/3" :value="$sQ['sc_desc']" />
-                    {{-- @dd($sQ['sc_option']) --}}
-                    @foreach ($sQ['sc_option'] as $sCO)
-                        <div
-                            class="flex items-center pl-4 mr-4 border border-gray-200 rounded dark:border-gray-700 hover:bg-gray-100">
 
-                            <input id="{{ $sCO['option_label'] }}" type="radio" value="{{ $sCO['option_value'] }}"
-                                wire:click="prosesDataScreening(
+
+                    @isset($sQ['sc_option'])
+                        @foreach ($sQ['sc_option'] as $sCO)
+                            @php
+                                $radioPropertyColor = $sCO['option_value'] == 1 ? 'bg-green-100' : ($sCO['option_value'] == 2 ? 'bg-yellow-100' : ($sCO['option_value'] == 3 ? 'bg-red-100' : 'bg-grey-100'));
+                            @endphp
+
+                            <div
+                                class="flex items-center pl-4 mr-4 {{ $radioPropertyColor }} border border-gray-200 rounded  dark:border-gray-700 hover:bg-gray-100">
+
+                                <input id="{{ $sCO['option_label'] }}" type="radio" value="{{ $sCO['option_value'] }}"
+                                    wire:click="prosesDataScreening(
                                 '{{ $sQ['sc_desc'] }}',
                                 {{ $sCO['option_value'] }},
                                 {{ $sCO['option_score'] }},
                                 {{ $key }},
                                 )"
-                                wire:model="collectDataScreening.screening.{{ $key }}.sc_value"
-                                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                    wire:model="collectDataScreening.screening.{{ $key }}.sc_value"
+                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
 
-                            <label for="{{ $sCO['option_label'] }}"
-                                class="w-full py-3 pr-4 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-                                {{ $sCO['option_label'] }}
-                            </label>
-                        </div>
-                    @endforeach
+                                <label for="{{ $sCO['option_label'] }}"
+                                    class="w-full py-3 pr-4 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                                    {{ $sCO['option_label'] }}
+                                </label>
+                            </div>
+                        @endforeach
+                    @endisset
 
                 </div>
 

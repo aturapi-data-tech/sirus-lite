@@ -29,107 +29,132 @@ class ErmRJ extends Component
             "sc_seq" => "1",
             "sc_desc" => "Apakah Pasien Sadar?",
             "active_status" => "1",
-            "sc_score" => 0,
-            "sc_value" => 0,
+            "sc_score" => 1,
+            "sc_value" => 1,
             "sc_option" =>
             [
                 [
-                    "option_label" => "YA",
+                    "option_label" => "Sadar Penuh",
                     "option_value" => 1,
-                    "option_score" => 10
+                    "option_score" => 1
                 ],
                 [
-                    "option_label" => "TIDAK",
-                    "option_value" => 0,
-                    "option_score" => 0
+                    "option_label" => "Tampak (Mengantuk / Gelisah / Bicara Tida Jelas)",
+                    "option_value" => 2,
+                    "option_score" => 2
+                ],
+                [
+                    "option_label" => "Tidak Sadar",
+                    "option_value" => 3,
+                    "option_score" => 3
                 ]
             ],
 
 
         ],
         [
-            "sc_seq" => "1",
+            "sc_seq" => "2",
             "sc_desc" => "Apakah Pasien Merasa Sesak Nafas?",
             "active_status" => "1",
-            "sc_score" => 0,
-            "sc_value" => 0,
+            "sc_score" => 1,
+            "sc_value" => 1,
             "sc_option" =>
             [
                 [
-                    "option_label" => "YA",
+                    "option_label" => "Nafas Normal",
                     "option_value" => 1,
-                    "option_score" => 10
+                    "option_score" => 1
                 ],
                 [
-                    "option_label" => "TIDAK",
-                    "option_value" => 0,
-                    "option_score" => 0
+                    "option_label" => "Tampak (Sesak)",
+                    "option_value" => 2,
+                    "option_score" => 2
+                ],
+                [
+                    "option_label" => "Tidak Bernafas",
+                    "option_value" => 3,
+                    "option_score" => 3
                 ]
             ],
 
 
         ],
         [
-            "sc_seq" => "2",
+            "sc_seq" => "3",
             "sc_desc" => "Apakah Pasien Beresiko Jatuh?",
             "active_status" => "1",
-            "sc_score" => 0,
-            "sc_value" => 0,
+            "sc_score" => 1,
+            "sc_value" => 1,
             "sc_option" =>
             [
                 [
-                    "option_label" => "YA",
+                    "option_label" => "Resiko Rendah",
                     "option_value" => 1,
-                    "option_score" => 10
+                    "option_score" => 1
                 ],
                 [
-                    "option_label" => "TIDAK",
-                    "option_value" => 0,
-                    "option_score" => 0
+                    "option_label" => "Resiko (Sedang)",
+                    "option_value" => 2,
+                    "option_score" => 2
+                ],
+                [
+                    "option_label" => "Resiko Tinggi",
+                    "option_value" => 3,
+                    "option_score" => 3
                 ]
             ],
 
 
         ],
         [
-            "sc_seq" => "2",
+            "sc_seq" => "4",
             "sc_desc" => "Apakah Pasien Nyeri Pada Dada?",
             "active_status" => "1",
-            "sc_score" => 0,
-            "sc_value" => 0,
+            "sc_score" => 1,
+            "sc_value" => 1,
             "sc_option" =>
             [
                 [
-                    "option_label" => "YA",
+                    "option_label" => "Tidak Ada",
                     "option_value" => 1,
-                    "option_score" => 10
+                    "option_score" => 1
                 ],
                 [
-                    "option_label" => "TIDAK",
-                    "option_value" => 0,
-                    "option_score" => 0
+                    "option_label" => "Ada (Tingkat Rendah)",
+                    "option_value" => 2,
+                    "option_score" => 2
+                ],
+                [
+                    "option_label" => "Nyeri Dada Kiri Tembis Punggung",
+                    "option_value" => 3,
+                    "option_score" => 3
                 ]
             ],
 
 
         ],
         [
-            "sc_seq" => "2",
-            "sc_desc" => "Apakah Pasien Batuk Selama 2 Minggu Terakhir?",
+            "sc_seq" => "5",
+            "sc_desc" => "Apakah Pasien Batuk?",
             "active_status" => "1",
-            "sc_score" => 0,
-            "sc_value" => 0,
+            "sc_score" => 1,
+            "sc_value" => 1,
             "sc_option" =>
             [
                 [
-                    "option_label" => "YA",
+                    "option_label" => "Tidak Ada",
                     "option_value" => 1,
-                    "option_score" => 10
+                    "option_score" => 1
                 ],
                 [
-                    "option_label" => "TIDAK",
-                    "option_value" => 0,
-                    "option_score" => 0
+                    "option_label" => "Batuk < 2 Minggu",
+                    "option_value" => 2,
+                    "option_score" => 2
+                ],
+                [
+                    "option_label" => "Batuk > 2 Minggu",
+                    "option_value" => 3,
+                    "option_score" => 3
                 ]
             ],
 
@@ -151,18 +176,18 @@ class ErmRJ extends Component
                 ],
                 [
                     "option_label" => "1-3 (Sedikit Nyeri)",
-                    "option_value" => 13,
-                    "option_score" => 10
+                    "option_value" => 1,
+                    "option_score" => 1
                 ],
                 [
                     "option_label" => "4-7 (Nyeri)",
-                    "option_value" => 47,
-                    "option_score" => 50
+                    "option_value" => 2,
+                    "option_score" => 2
                 ],
                 [
                     "option_label" => "8-10 (Sangat Nyeri)",
-                    "option_value" => 810,
-                    "option_score" => 100
+                    "option_value" => 3,
+                    "option_score" => 3
                 ],
 
             ],
@@ -377,6 +402,7 @@ class ErmRJ extends Component
             ->update(['erm_screening' => $value]);
     }
 
+
     // tampil record start////////////////
     public function tampil($id)
     {
@@ -434,13 +460,30 @@ class ErmRJ extends Component
         // update data Screening//////////////////
         $rjNO = $this->collectDataScreening['pasien']["rjNo"];
         $collectDataScreening = json_encode($this->collectDataScreening, true);
+
+        // update kesimpulan dari screening otomatis
+        $KesimpulanDariScreening = $this->updateDataKesimpulanDariScreening() == 1 ? 'Sesuai Antrian' : ($this->updateDataKesimpulanDariScreening() == 2 ? 'Disegerakan' : 'IGD');
+
         $this->updateDataScreening($rjNO, $collectDataScreening);
         // //////////////////////////////////////
 
 
-        $this->emit('toastr-success', "$label Score : $score");
+        $this->emit('toastr-success', "$label Kesimpulan : $KesimpulanDariScreening");
     }
     // /prosesDataScreening/////////////
+
+    ////////////////////////////////////
+    // updateDataKesimpulan dari Screening
+    private function updateDataKesimpulanDariScreening()
+    {
+        $KesimpulanDariScreening = collect($this->collectDataScreening['screening'])
+            ->pluck('sc_score')
+            ->max();
+        $this->collectDataScreening['kesimpulan']['sck_value'] = $KesimpulanDariScreening != 0 ? $KesimpulanDariScreening : 1;
+
+        return ($KesimpulanDariScreening);
+    }
+
     // /prosesDataKesimpulan/////////////
     public function prosesDataKesimpulan($value, $label)
     {
@@ -457,6 +500,8 @@ class ErmRJ extends Component
         $this->emit('toastr-success', "Kesimpulan: $label");
     }
     // /prosesDataKesimpulan/////////////
+    ////////////////////////////////////
+
 
     // //////////////////////////////////////////////////////////////////
     // screening logic///////////////////////////////////////////////////
