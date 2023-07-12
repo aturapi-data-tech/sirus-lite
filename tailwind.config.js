@@ -10,6 +10,15 @@ module.exports = {
     ],
 
     theme: {
+        colors: {
+            transparent: 'transparent',
+            current: 'currentColor',
+            'white': '#ffffff',
+            'midnight': '#000000',
+            'primary': '#157547',
+            'secondary': '#a1cd3a',
+            'danger': '#ff0000ff',
+          },
         extend: {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],

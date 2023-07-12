@@ -1,6 +1,6 @@
 {{-- SideBar --}}
-{{-- <aside id="sidebar"
-    class="fixed top-0 left-0 z-20 flex flex-col flex-shrink-0 hidden w-64 h-full pt-16 font-normal duration-75 lg:flex transition-width"
+<aside id="sidebar"
+    class="fixed top-0 left-0 z-20 flex flex-col flex-shrink-0 hidden w-64 h-full pt-20 font-normal duration-75 transition-width"
     aria-label="Sidebar">
     <div
         class="relative flex flex-col flex-1 min-h-0 pt-0 bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700">
@@ -9,7 +9,7 @@
                 <ul class="pb-2 space-y-2">
                     <li>
 
-                        <form action="#" method="GET" class="lg:hidden">
+                        <form action="#" method="GET" class="">
                             <label for="mobile-search" class="sr-only">Search</label>
                             <div class="relative">
                                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -285,6 +285,6 @@
             </div>
         </div>
     </div>
-</aside> --}}
+</aside>
 {{-- SideBar Transparant --}}
 <div class="fixed inset-0 z-10 hidden bg-gray-900/50 dark:bg-gray-900/90" id="sidebarBackdrop"></div>

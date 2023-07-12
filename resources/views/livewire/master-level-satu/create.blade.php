@@ -11,6 +11,8 @@
             <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
         </div>
 
+
+
         <!-- This element is to trick the browser into centering the modal contents. -->
         <span class="hidden sm:inline-block sm:align-middle sm:h-screen"></span>​
 
@@ -21,7 +23,7 @@
             <div
                 class="sticky top-0 flex items-start justify-between p-4 bg-white border-b rounded-t dark:border-gray-600">
 
-                <h3 class="text-2xl font-semibold text-gray-900 dark:text-white">
+                <h3 class="text-2xl font-semibold text-midnight dark:text-white">
                     {{ $myTitle }}
                 </h3>
 
@@ -37,7 +39,6 @@
 
             </div>
 
-
             <form>
 
                 <div class="px-4 pt-5 pb-4 bg-white sm:p-6 sm:pb-4">
@@ -45,18 +46,18 @@
 
 
                     <div>
-                        <x-input-label for="province_id" :value="__('Nama Provinsi')" />
-                        <div class="flex">
-                            <x-text-input class="block sm:w-[100px] mt-1" :value="old('province_id')" required autofocus
-                                autocomplete="province_id" :disabled=$disabledProperty wire:model="province_id" />
-                            <x-text-input class="block mt-1 ml-2" :value="old('name')" required autofocus
-                                autocomplete="name" :disabled=$disabledProperty wire:model="name" />
+                        <x-input-label for="province_id" :value="__('Nama Provinsi')" :required=true />
+                        <div class="flex mb-2">
+                            <x-text-input placeholder="Kode" class="sm:w-[100px] mt-1" :disabled=$disabledProperty
+                                wire:model="province_id" />
+                            <x-text-input placeholder="Nama Provinsi" class="mt-1 ml-2" :disabled=$disabledProperty
+                                wire:model="name" />
                         </div>
                         @error('province_id')
-                            <span class="text-red-500">{{ $message }}</span>
+                            <x-input-error :messages=$message />
                         @enderror
                         @error('name')
-                            <span class="text-red-500">{{ $message }}</span>
+                            <x-input-error :messages=$message />
                         @enderror
                     </div>
 

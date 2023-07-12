@@ -248,6 +248,18 @@ class ErmRJ extends Component
             "tv_value" => 0
         ],
         [
+            "tv_seq" => "4",
+            "tv_label" => "Saturasi Oksigen",
+            "tv_mou" => "%",
+            "tv_value" => 0
+        ],
+        [
+            "tv_seq" => "4",
+            "tv_label" => "GDA",
+            "tv_mou" => "mg/dl",
+            "tv_value" => 0
+        ],
+        [
             "tv_seq" => "5",
             "tv_label" => "Skor Nyeri",
             "tv_mou" => "",

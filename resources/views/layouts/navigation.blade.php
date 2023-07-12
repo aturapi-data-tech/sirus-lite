@@ -9,7 +9,7 @@
             <div class="flex items-center justify-start">
 
                 <button id="toggleSidebarMobile" aria-expanded="true" aria-controls="sidebar"
-                    class="p-2 text-gray-600 rounded cursor-pointer lg:hidden hover:text-gray-900 hover:bg-gray-100 focus:bg-gray-100 dark:focus:bg-gray-700 focus:ring-2 focus:ring-gray-100 dark:focus:ring-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                    class="p-2 text-gray-600 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 focus:bg-gray-100 dark:focus:bg-gray-700 focus:ring-2 focus:ring-gray-100 dark:focus:ring-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
                     <svg id="toggleSidebarMobileHamburger" class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"
                         xmlns="http://www.w3.org/2000/svg">
                         <path fill-rule="evenodd"
@@ -26,9 +26,9 @@
 
 
                 <a href="{{ route('dashboard') }}" class="flex ml-2 md:mr-24">
-                    <x-application-logo class="block w-auto text-gray-800 fill-current h-9 dark:text-gray-200" />
+                    <x-application-logo class="block w-auto h-16 text-gray-800 fill-current dark:text-gray-200" />
                     <span class="self-center pl-2 text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white">
-                        SIRus
+                        {{-- SIRus --}}
                     </span>
                 </a>
 
