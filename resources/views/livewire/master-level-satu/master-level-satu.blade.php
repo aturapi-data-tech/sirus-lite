@@ -33,7 +33,7 @@
                                     </svg>
                                 </div>
                                 <x-text-input type="text" class="pl-10 p-2.5" placeholder="Cari Data"
-                                    wire:model.lazy="search" />
+                                    wire:model.lazy="search" autofocus />
                             </div>
 
                         </div>

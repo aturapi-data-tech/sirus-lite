@@ -11,23 +11,25 @@
             <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
         </div>
 
+
+
         <!-- This element is to trick the browser into centering the modal contents. -->
         <span class="hidden sm:inline-block sm:align-middle sm:h-screen"></span>​
 
-        {{-- Modals --}}
+
         <div class="inline-block overflow-auto text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:max-h-[35rem] sm:my-8 sm:align-middle sm:w-11/12"
             role="dialog" aria-modal="true" aria-labelledby="modal-headline">
 
             <div
-                class="sticky top-0 flex items-start justify-between p-4 bg-white border-b rounded-t dark:border-gray-600">
+                class="sticky top-0 flex items-start justify-between p-4 bg-opacity-75 border-b rounded-t bg-primary dark:border-gray-600">
 
-                <h3 class="text-2xl font-semibold text-gray-900 dark:text-white">
+                <h3 class="text-2xl font-semibold text-white dark:text-white">
                     {{ $myTitle }}
                 </h3>
 
                 {{-- Close Modal --}}
                 <button wire:click="closeModal()"
-                    class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white">
+                    class="text-gray-400 bg-gray-50 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                         <path fill-rule="evenodd"
                             d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
@@ -37,423 +39,495 @@
 
             </div>
 
-
             <form>
 
-                <div class="px-4 pt-5 pb-4 bg-white sm:p-6 sm:pb-4">
+                <div class="px-4 bg-white ">
+                    <div class="absolute right-4 top-16">
+                        <x-check-box :valueunchecked="__('0')" :valuechecked="__('1')" :label="__('Pasien Tidak Dikenal')" />
+                    </div>
 
-
-
-                    <div>
-
-                        <div class="mb-1">
-                            {{-- Pembungkus --}}
-                            <div class="form-baris-1">
-                                <div class="grid gap-6 md:grid-cols-2">
-                                    {{-- Form Kanan --}}
-                                    <div class="form-kiri">
-                                        {{-- Reg. NO --}}
-                                        <div class="mb-2">
-                                            <x-input-label for="reg_no" class="ml-1" :value="__('No. Registrasi  :')" />
-                                            <x-text-input class="block mr-1" :value="old('reg_no')" autofocus
-                                                autocomplete="reg_no" :disabled=$disabledProperty wire:model="reg_no"
-                                                placeholder="Masukkan No. Registrasi" tabindex="1" />
-                                            @error('reg_no')
-                                                <span class="text-red-500">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-
-                                        {{-- Reg. Name --}}
-                                        <div class="mb-2">
-                                            <x-input-label for="reg_name" class="ml-1" :value="__('Nama :')" />
-                                            <x-text-input class="block" :value="old('reg_name')" required autofocus
-                                                autocomplete="reg_name" :disabled=$disabledProperty
-                                                wire:model="reg_name" placeholder="Masukkan Nama" tabindex="2" />
-                                            @error('reg_name')
-                                                <span class="text-red-500">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-
-                                        {{-- JKN --}}
-                                        <div class="mb-2">
-                                            <x-input-label for="nokartu_bpjs" class="ml-1" :value="__('JKN :')" />
-                                            <x-text-input class="block" :value="old('nokartu_bpjs')" required autofocus
-                                                autocomplete="nokartu_bpjs" :disabled=$disabledProperty
-                                                wire:model="nokartu_bpjs" placeholder="Masukkan No. JKN"
-                                                tabindex="3" />
-                                            @error('nokartu_bpjs')
-                                                <span class="text-red-500">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-
-                                        {{-- NIK --}}
-                                        <div class="mb-2">
-                                            <x-input-label for="nik_bpjs" class="ml-1" :value="__('NIK :')" />
-                                            <x-text-input class="block" :value="old('nik_bpjs')" required autofocus
-                                                autocomplete="nik_bpjs" :disabled=$disabledProperty
-                                                wire:model="nik_bpjs" placeholder="Masukkan NIK" tabindex="4" />
-                                            @error('nik_bpjs')
-                                                <span class="text-red-500">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-
-                                        {{-- Jenis Kelamin --}}
-                                        <div class="mb-2">
-                                            <x-input-label for="sex" class="ml-1" :value="__('Jenis Kelamin :')" />
-                                            <div class="grid gap-2 md:grid-cols-2">
-                                                <div
-                                                    class="flex items-center py-2 pl-4 border border-gray-300 rounded-lg dark:border-gray-700">
-                                                    <input id="sexL" type="radio" wire:model='sex' tabindex="5"
-                                                        value="L"
-                                                        class="w-4 h-4 text-blue-600 bg-gray-100 border border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                                    <label for="sexL"
-                                                        class="w-full pb-1 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Laki-laki</label>
-                                                </div>
-                                                <div
-                                                    class="flex items-center py-2 pl-4 border border-gray-300 rounded-lg dark:border-gray-700">
-                                                    <input id="sexP" type="radio" value="P" wire:model='sex'
-                                                        tabindex="6"
-                                                        class="w-4 h-4 text-blue-600 bg-gray-100 border border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                                    <label for="sexP"
-                                                        class="w-full pb-1 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Perempuan</label>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {{-- Usia --}}
-                                        <div class="grid gap-3 md:grid-cols-3">
-                                            <div class="mb-2">
-                                                <div class="flex">
-                                                    <x-input-label class="ml-1" :value="__('Usia:')" />
-                                                    <x-input-label for="thn" class="ml-20" :value="__('Tahun')" />
-                                                </div>
-                                                <x-text-input class="block" :value="old('thn')" required autofocus
-                                                    autocomplete="thn" :disabled=$disabledProperty wire:model="thn"
-                                                    placeholder="Tahun" tabindex="7" />
-                                                @error('thn')
-                                                    <span class="text-red-500">{{ $message }}</span>
-                                                @enderror
-                                            </div>
-                                            <div class="mb-2">
-                                                <x-input-label for="bln" class="flex justify-end mr-2"
-                                                    :value="__('Bulan')" />
-                                                <x-text-input class="block" :value="old('bln')" required autofocus
-                                                    autocomplete="bln" :disabled=$disabledProperty wire:model="bln"
-                                                    placeholder="Bulan" tabindex="8" />
-                                                @error('bln')
-                                                    <span class="text-red-500">{{ $message }}</span>
-                                                @enderror
-                                            </div>
-                                            <div class="mb-2">
-                                                <x-input-label for="hari" class="flex justify-end mr-2"
-                                                    :value="__('Hari')" />
-                                                <x-text-input class="block" :value="old('hari')" required autofocus
-                                                    autocomplete="hari" :disabled=$disabledProperty wire:model="hari"
-                                                    placeholder="Hari" tabindex="9" />
-                                                @error('hari')
-                                                    <span class="text-red-500">{{ $message }}</span>
-                                                @enderror
-                                            </div>
-                                        </div>
-
-                                        {{-- Tgl. Lahir --}}
-                                        <div class="mb-2">
-                                            <x-input-label for="birth_date" class="ml-1" :value="__('Tgl. Lahir :')" />
-                                            <x-text-input class="block" :value="old('birth_date')" required autofocus
-                                                autocomplete="birth_date" :disabled=$disabledProperty tabindex="10"
-                                                wire:model="birth_date" />
-                                            @error('birth_date')
-                                                <span class="text-red-500">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-
-                                        {{-- Tempat Lahir --}}
-                                        <div class="mb-2">
-                                            <x-input-label for="birth_place" class="ml-1" :value="__('Tempat Lahir :')" />
-                                            <x-text-input class="block" :value="old('birth_place')" required autofocus
-                                                autocomplete="birth_place" :disabled=$disabledProperty tabindex="11"
-                                                wire:model="birth_place" placeholder="Masukkan Tempat Lahir" />
-                                            @error('birth_place')
-                                                <span class="text-red-500">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-
-                                        {{-- Gol. Darah --}}
-                                        <div class="grid gap-6 md:grid-cols-2">
-                                            {{-- Gol. Darah --}}
-                                            <div class="mb-2">
-                                                <x-input-label for="blood" class="ml-1" :value="__('Gol. Darah :')" />
-                                                <x-text-input class="block" :value="old('blood')" required autofocus
-                                                    placeholder="Gol. Darah" autocomplete="blood" tabindex="12"
-                                                    :disabled=$disabledProperty wire:model="blood" />
-                                                @error('blood')
-                                                    <span class="text-red-500">{{ $message }}</span>
-                                                @enderror
-                                            </div>
-
-
-                                            {{-- Marital Status --}}
-                                            <div class="mb-2">
-                                                <x-input-label for="marital_status" class="ml-1"
-                                                    :value="__('Status :')" />
-                                                <x-text-input class="block" :value="old('marital_status')" required autofocus
-                                                    autocomplete="marital_status" :disabled=$disabledProperty
-                                                    tabindex="13" placeholder="Status"
-                                                    wire:model="marital_status" />
-                                                @error('marital_status')
-                                                    <span class="text-red-500">{{ $message }}</span>
-                                                @enderror
-                                            </div>
-                                        </div>
-
-                                        {{-- Kepala Keluarga --}}
-                                        <div class="mb-2">
-                                            <x-input-label for="kk" class="ml-1" :value="__('Kepala Keluarga :')" />
-                                            <x-text-input class="block" :value="old('kk')" required autofocus
-                                                placeholder="Masukkan Nama Kepala Keluarga" autocomplete="kk"
-                                                tabindex="14" :disabled=$disabledProperty wire:model="kk" />
-                                            @error('kk')
-                                                <span class="text-red-500">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-
-                                        {{-- Nyonya --}}
-                                        <div class="mb-2">
-                                            <x-input-label for="nyonya" class="ml-1" :value="__('Ibu Keluarga :')" />
-                                            <x-text-input class="block" :value="old('nyonya')" required autofocus
-                                                tabindex="15" autocomplete="nyonya" :disabled=$disabledProperty
-                                                wire:model="nyonya" placeholder="Masukkan Nama Ibu Keluarga" />
-                                            @error('nyonya')
-                                                <span class="text-red-500">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-
-                                        {{-- No. KK --}}
-                                        <div class="mb-2">
-                                            <x-input-label for="no_kk" class="ml-1" :value="__('No. KK :')" />
-                                            <x-text-input class="block" :value="old('no_kk')" required autofocus
-                                                tabindex="16" autocomplete="no_kk" :disabled=$disabledProperty
-                                                wire:model="no_kk" placeholder="Masukkan No. KK" />
-                                            @error('no_kk')
-                                                <span class="text-red-500">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-
-                                    </div>
-                                    {{-- End Form Kiri --}}
-
-                                    {{-- Form Kanan --}}
-                                    <div class="form-kanan">
-                                        {{-- Alamat --}}
-                                        <div class="mb-2">
-                                            <x-input-label for="reg_no" class="ml-1" :value="__('Alamat  :')" />
-                                            <textarea wire:model='address' style="height: 119px;" tabindex="17"
-                                                class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                                placeholder="Masukkan Alamat.."></textarea>
-                                            @error('address')
-                                                <span class="text-red-500">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-
-                                        {{-- Desa --}}
-                                        <div class="mb-2">
-                                            <x-input-label for="des_id" class="ml-1" :value="__('Desa :')" />
-                                            <div class="flex">
-                                                <x-text-input class="block sm:w-[100px]" :value="old('des_id')" required
-                                                    tabindex="18" autofocus autocomplete="des_id"
-                                                    :disabled=$disabledProperty wire:model="des_id"
-                                                    placeholder="Kode Desa" />
-                                                <x-text-input class="block ml-2" :value="old('des_name')" required autofocus
-                                                    autocomplete="des_name" :disabled=true wire:model="des_name"
-                                                    placeholder="Nama Desa" />
-                                            </div>
-                                            @error('des_id')
-                                                <span class="text-red-500">{{ $message }}</span>
-                                            @enderror
-
-                                            {{-- LOV --}}
-                                            <div class="mt-2">
-                                                @include('livewire.master-pasien.list-of-value-desa')
-                                            </div>
-                                        </div>
-
-                                        {{-- RT / RW --}}
-                                        <div class="grid gap-6 md:grid-cols-2">
-                                            <div class="mb-2">
-                                                <x-input-label for="rt" class="ml-1" :value="__('RT :')" />
-                                                <x-text-input class="block" :value="old('rt')" required autofocus
-                                                    autocomplete="rt" :disabled=$disabledProperty wire:model="rt"
-                                                    placeholder="RT" tabindex="19" />
-                                                @error('rt')
-                                                    <span class="text-red-500">{{ $message }}</span>
-                                                @enderror
-                                            </div>
-                                            <div class="mb-2">
-                                                <x-input-label for="rw" class="ml-1" :value="__('RW :')" />
-                                                <x-text-input class="block" :value="old('rw')" required autofocus
-                                                    autocomplete="rw" :disabled=$disabledProperty wire:model="rw"
-                                                    placeholder="RW" tabindex="20" />
-                                                @error('rw')
-                                                    <span class="text-red-500">{{ $message }}</span>
-                                                @enderror
-                                            </div>
-                                        </div>
-
-                                        {{-- Kecamatan --}}
-                                        <div class="mb-2">
-                                            <x-input-label for="kec_id" class="ml-1" :value="__('Kecamatan :')" />
-                                            <div class="flex">
-                                                <x-text-input class="block sm:w-[100px]" :value="old('kec_id')" required
-                                                    autofocus autocomplete="kec_id" :disabled=$disabledProperty
-                                                    tabindex="21" wire:model="kec_id"
-                                                    placeholder="Kode Kecamatan" />
-                                                <x-text-input class="block ml-2" :value="old('kec_name')" required autofocus
-                                                    autocomplete="kec_name" :disabled=true wire:model="kec_name"
-                                                    placeholder="Nama Kecamatan" />
-                                            </div>
-                                            @error('kec_id')
-                                                <span class="text-red-500">{{ $message }}</span>
-                                            @enderror
-
-                                            {{-- LOV --}}
-                                            <div class="mt-2">
-                                                @include('livewire.master-pasien.list-of-value-kecamatan')
-                                            </div>
-                                        </div>
-
-                                        {{-- Kabupaten --}}
-                                        <div class="mb-2">
-                                            <x-input-label for="kab_id" class="ml-1" :value="__('Kabupaten :')" />
-                                            <div class="flex">
-                                                <x-text-input class="block sm:w-[100px]" :value="old('kab_id')" required
-                                                    autofocus autocomplete="kab_id" :disabled=$disabledProperty
-                                                    tabindex="22" placeholder="Kode Kabupaten"
-                                                    wire:model="kab_id" />
-                                                <x-text-input class="block ml-2" :value="old('kab_name')" required autofocus
-                                                    autocomplete="kab_name" :disabled=true wire:model="kab_name"
-                                                    placeholder="Nama Kabupaten" />
-                                            </div>
-                                            @error('kab_id')
-                                                <span class="text-red-500">{{ $message }}</span>
-                                            @enderror
-
-                                            {{-- LOV --}}
-                                            <div class="mt-2">
-                                                @include('livewire.master-pasien.list-of-value-kabupaten')
-                                            </div>
-                                        </div>
-
-                                        {{-- Provinsi --}}
-                                        <div class="mb-2">
-                                            <x-input-label for="prop_id" class="ml-1" :value="__('Provinsi :')" />
-                                            <div class="flex">
-                                                <x-text-input class="block sm:w-[100px]" :value="old('prop_id')" required
-                                                    autofocus autocomplete="prop_id" :disabled=$disabledProperty
-                                                    tabindex="23" placeholder="Kode Provinsi"
-                                                    wire:model="prop_id" />
-                                                <x-text-input class="block ml-2" :value="old('prop_name')" required autofocus
-                                                    autocomplete="prop_name" :disabled=true wire:model="prop_name"
-                                                    placeholder="Nama Provinsi" />
-                                            </div>
-                                            @error('prop_id')
-                                                <span class="text-red-500">{{ $message }}</span>
-                                            @enderror
-
-                                            {{-- LOV --}}
-                                            <div class="mt-2">
-                                                @include('livewire.master-pasien.list-of-value-provinsi')
-                                            </div>
-                                        </div>
-
-                                        {{-- Agama --}}
-                                        <div class="mb-2">
-                                            <x-input-label for="rel_id" :value="__('Agama   :')" />
-                                            <div class="flex">
-                                                <x-text-input class="block sm:w-[100px]" :value="old('rel_id')" required
-                                                    autofocus autocomplete="rel_id" :disabled=$disabledProperty
-                                                    tabindex="24" wire:model="rel_id" placeholder="Kode Agama" />
-                                                <x-text-input class="block ml-2" :value="old('rel_desc')" required autofocus
-                                                    autocomplete="rel_desc" :disabled=true wire:model="rel_desc"
-                                                    placeholder="Nama Agama" />
-                                            </div>
-                                            @error('rel_id')
-                                                <span class="text-red-500">{{ $message }}</span>
-                                            @enderror
-
-                                            {{-- LOV --}}
-                                            <div class="mt-2">
-                                                @include('livewire.master-pasien.list-of-value-rel')
-                                            </div>
-                                        </div>
-
-                                        {{-- Pendidikan --}}
-                                        <div class="mb-2">
-                                            <x-input-label for="edu_id" class="ml-1" :value="__('Pendidikan :')" />
-                                            <div class="flex">
-                                                <x-text-input class="block sm:w-[100px]" :value="old('edu_id')" required
-                                                    autofocus autocomplete="edu_id" :disabled=$disabledProperty
-                                                    tabindex="25" wire:model="edu_id"
-                                                    placeholder="Kode Pendidikan" />
-                                                <x-text-input class="block ml-2" :value="old('edu_desc')" required autofocus
-                                                    autocomplete="edu_desc" :disabled=true wire:model="edu_desc"
-                                                    placeholder="Nama Pendidikan" />
-                                            </div>
-                                            @error('edu_id')
-                                                <span class="text-red-500">{{ $message }}</span>
-                                            @enderror
-
-                                            {{-- LOV --}}
-                                            <div class="mt-2">
-                                                @include('livewire.master-pasien.list-of-value-edu')
-                                            </div>
-                                        </div>
-
-                                        {{-- Pekerjaan --}}
-                                        <div class="mb-2">
-                                            <x-input-label for="job_id" class="ml-1" :value="__('Pekerjaan :')" />
-                                            <div class="flex">
-                                                <x-text-input class="block sm:w-[100px]" :value="old('job_id')" required
-                                                    autofocus autocomplete="job_id" :disabled=$disabledProperty
-                                                    tabindex="26" wire:model="job_id"
-                                                    placeholder="Kode Pekerjaan" />
-                                                <x-text-input class="block ml-2" :value="old('job_name')" required autofocus
-                                                    placeholder="Nama Pekerjaan" autocomplete="job_name"
-                                                    :disabled=true wire:model="job_name" />
-                                            </div>
-                                            @error('job_id')
-                                                <span class="text-red-500">{{ $message }}</span>
-                                            @enderror
-
-                                            {{-- LOV --}}
-                                            <div class="mt-2">
-                                                @include('livewire.master-pasien.list-of-value-job')
-                                            </div>
-                                        </div>
-
-                                        {{-- Phone --}}
-                                        <div class="mb-2">
-                                            <x-input-label for="phone" class="ml-1" :value="__('No. Telepon :')" />
-                                            <x-text-input class="block" :value="old('phone')" required autofocus
-                                                autocomplete="phone" :disabled=$disabledProperty wire:model="phone" id
-                                                placeholder="Masukkan No. Telepon" tabindex="27" />
-                                            @error('phone')
-                                                <span class="text-red-500">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-
-                                    </div>
-                                    {{-- End Form Kanan --}}
+                    <x-border-form :title="__('Identitas Pasien')" :align="__('start')">
+                        <div>
+                            <x-input-label for="regName" :value="__('Nama Pasien')" :required=true />
+                            <div class="flex items-center mb-2">
+                                <x-text-input placeholder="Gelar depan" class="mt-1 ml-2 sm:w-1/4"
+                                    :disabled=$disabledProperty wire:model="dataPasien.pasien.gelarDepan" />
+                                <x-text-input id="regName" placeholder="Nama" class="mt-1 ml-2 sm:w-3/4"
+                                    :disabled=$disabledProperty wire:model="dataPasien.pasien.regName" />
+                                <x-text-input placeholder="Gelar Belakang" class="mt-1 ml-2 sm:w-1/4"
+                                    :disabled=$disabledProperty wire:model="dataPasien.pasien.gelarBelakang" />
+                                <span> {{ ' / ' }}</span>
+                                <x-text-input placeholder="Nama Panggilan" class="mt-1 ml-2 sm:w-1/4"
+                                    :disabled=$disabledProperty wire:model="dataPasien.pasien.namaPanggilan" />
+                            </div>
+                            {{-- Error Message Start --}}
+                            <div class="flex items-center mb-2">
+                                <div class="mt-1 ml-2 truncate sm:w-1/4">
+                                    @error('dataPasien.pasien.gelarDepan')
+                                        <x-input-error :messages=$message />
+                                    @enderror
+                                </div>
+                                <div class="mt-1 ml-2 truncate sm:w-3/4">
+                                    @error('dataPasien.pasien.regName')
+                                        <x-input-error :messages=$message />
+                                    @enderror
+                                </div>
+                                <div class="mt-1 ml-2 truncate sm:w-1/4">
+                                    @error('dataPasien.pasien.gelarBelakang')
+                                        <x-input-error :messages=$message />
+                                    @enderror
+                                </div>
+                                <div class="mt-1 ml-2 truncate sm:w-1/4">
+                                    @error('dataPasien.pasien.namaPanggilan')
+                                        <x-input-error :messages=$message />
+                                    @enderror
                                 </div>
                             </div>
-
+                            {{-- Error Message End --}}
                         </div>
 
+                        <div>
+                            <x-input-label for="tempatLahir" :value="__('Tempat Tanggal Lahir')" :required=false />
+                            <div class="flex items-center mb-2">
+                                <x-text-input id="tempatLahir" placeholder="Tempat Lahir" class="mt-1 ml-2 sm:w-1/4"
+                                    :disabled=$disabledProperty wire:model="dataPasien.pasien.tempatLahir" />
+                                <x-text-input placeholder="Tgl Lahir [dd/mm/yyyy]" class="mt-1 ml-2 sm:w-3/4"
+                                    :disabled=$disabledProperty wire:model="dataPasien.pasien.tglLahir" />
+
+                                <span> {{ ' / ' }}</span>
+                                <x-text-input placeholder="Umur Thn" class="mt-1 ml-2 sm:w-1/4"
+                                    :disabled=$disabledProperty wire:model="dataPasien.pasien.thn" />
+                                <x-text-input placeholder="Umur Bln" class="mt-1 ml-2 sm:w-1/4"
+                                    :disabled=$disabledProperty wire:model="dataPasien.pasien.bln" />
+                                <x-text-input placeholder="Umur Hari" class="mt-1 ml-2 sm:w-1/4"
+                                    :disabled=$disabledProperty wire:model="dataPasien.pasien.hari" />
+                            </div>
+                            {{-- Error Message Start --}}
+                            <div class="flex items-center mb-2">
+                                <div class="mt-1 ml-2 truncate sm:w-1/4">
+                                    @error('dataPasien.pasien.tempatLahir')
+                                        <x-input-error :messages=$message />
+                                    @enderror
+                                </div>
+                                <div class="mt-1 ml-2 truncate sm:w-3/4">
+                                    @error('dataPasien.pasien.tglLahir')
+                                        <x-input-error :messages=$message />
+                                    @enderror
+                                </div>
+                                <div class="mt-1 ml-2 truncate sm:w-1/4">
+                                    @error('dataPasien.pasien.thn')
+                                        <x-input-error :messages=$message />
+                                    @enderror
+                                </div>
+                                <div class="mt-1 ml-2 truncate sm:w-1/4">
+                                    @error('dataPasien.pasien.bln')
+                                        <x-input-error :messages=$message />
+                                    @enderror
+                                </div>
+                                <div class="mt-1 ml-2 truncate sm:w-1/4">
+                                    @error('dataPasien.pasien.hari')
+                                        <x-input-error :messages=$message />
+                                    @enderror
+                                </div>
+                            </div>
+                            {{-- Error Message End --}}
+                        </div>
+
+                        <x-border-form :title="__('Sosial')" :align="__('start')" :bgcolor="__('bg-gray-50')">
+                            <div class="flex items-center">
+                                <x-input-label for="JenisKelamin" :value="__('Jenis Kelamin')" :required=false class="sm:w-1/5" />
+                                <x-input-label for="Agama" :value="__('Agama')" :required=false class="sm:w-1/5" />
+                                <x-input-label for="SPerkawinan" :value="__('Status Perkawinan')" :required=false class="sm:w-1/5" />
+                                <x-input-label for="Pendidikan" :value="__('Pendidikan')" :required=false class="sm:w-1/5" />
+                                <x-input-label for="Pekerjaan" :value="__('Pekerjaan')" :required=false class="sm:w-1/5" />
+                            </div>
+
+                            <div class="flex items-center mb-2">
+                                <x-text-input id="JenisKelamin" placeholder="Jenis Kelamin" class="mt-1 ml-2 sm:w-1/5"
+                                    :disabled=$disabledProperty
+                                    wire:model="dataPasien.pasien.jenisKelamin.jenisKelaminId" />
+                                <x-text-input id="Agama" placeholder="Agama" class="mt-1 ml-2 sm:w-1/5"
+                                    :disabled=$disabledProperty wire:model="dataPasien.pasien.agama.agamaId" />
+                                <x-text-input id="SPerkawinan" placeholder="Status Perkawinan"
+                                    class="mt-1 ml-2 sm:w-1/5" :disabled=$disabledProperty
+                                    wire:model="dataPasien.pasien.statusPerkawinan.statusPerkawinanId" />
+                                <x-text-input id="Pendidikan" placeholder="Pendidikan" class="mt-1 ml-2 sm:w-1/5"
+                                    :disabled=$disabledProperty
+                                    wire:model="dataPasien.pasien.pendidikan.pendidikanId" />
+                                <x-text-input id="Pekerjaan" placeholder="Pekerjaan" class="mt-1 ml-2 sm:w-1/5"
+                                    :disabled=$disabledProperty wire:model="dataPasien.pasien.pekerjaan.pekerjaanId" />
+                            </div>
+                            {{-- Error Message Start --}}
+                            <div class="flex items-center mb-2">
+                                <div class="mt-1 ml-2 truncate sm:w-1/5">
+                                    @error('dataPasien.pasien.jenisKelamin.jenisKelaminId')
+                                        <x-input-error :messages=$message />
+                                    @enderror
+                                </div>
+                                <div class="mt-1 ml-2 truncate sm:w-1/5">
+                                    @error('dataPasien.pasien.agama.agamaId')
+                                        <x-input-error :messages=$message />
+                                    @enderror
+                                </div>
+                                <div class="mt-1 ml-2 truncate sm:w-1/5">
+                                    @error('dataPasien.pasien.statusPerkawinan.statusPerkawinanId')
+                                        <x-input-error :messages=$message />
+                                    @enderror
+                                </div>
+                                <div class="mt-1 ml-2 truncate sm:w-1/5">
+                                    @error('dataPasien.pasien.pendidikan.pendidikanId')
+                                        <x-input-error :messages=$message />
+                                    @enderror
+                                </div>
+                                <div class="mt-1 ml-2 truncate sm:w-1/5">
+                                    @error('dataPasien.pasien.pekerjaan.pekerjaanId')
+                                        <x-input-error :messages=$message />
+                                    @enderror
+                                </div>
+                            </div>
+                            {{-- Error Message End --}}
+                        </x-border-form>
+
+
+                        <x-border-form :title="__('Budaya')" :align="__('start')" :bgcolor="__('bg-gray-50')">
+                            <div>
+                                <div class="flex items-center mb-2">
+                                    <x-input-label for="GolonganDarah" :value="__('Golongan Darah')" :required=false
+                                        class="sm:w-1/4" />
+                                    <x-input-label for="Kewarganegaraan" :value="__('Kewarganegaraan')" :required=true
+                                        class="sm:w-3/4" />
+                                    <x-input-label for="Suku" :value="__('Suku')" :required=true
+                                        class="sm:w-1/4" />
+                                    <x-input-label for="Bahasa" :value="__('Bahasa')" :required=true
+                                        class="sm:w-1/4" />
+                                    <x-input-label for="Status" :value="__('Status')" :required=true
+                                        class="sm:w-1/4" />
+                                </div>
+                                <div class="flex items-center mb-2">
+                                    <x-text-input id="GolonganDarah" placeholder="Golongan Darah"
+                                        class="mt-1 ml-2 sm:w-1/4" :disabled=$disabledProperty
+                                        wire:model="dataPasien.pasien.golonganDarah.golonganDarahId" />
+                                    <x-text-input id="Kewarganegaraan" placeholder="Kewarganegaraan"
+                                        class="mt-1 ml-2 sm:w-3/4" :disabled=$disabledProperty
+                                        wire:model="dataPasien.pasien.kewarganegaraan" />
+                                    <x-text-input id="Suku" placeholder="Suku" class="mt-1 ml-2 sm:w-1/4"
+                                        :disabled=$disabledProperty wire:model="dataPasien.pasien.suku" />
+                                    <x-text-input id="Bahasa" placeholder="Bahasa yang digunakan"
+                                        class="mt-1 ml-2 sm:w-1/4" :disabled=$disabledProperty
+                                        wire:model="dataPasien.pasien.bahasa" />
+                                    <x-text-input id="Status" placeholder="Status" class="mt-1 ml-2 sm:w-1/4"
+                                        :disabled=$disabledProperty wire:model="dataPasien.pasien.status.statusId" />
+                                </div>
+                                {{-- Error Message Start --}}
+                                <div class="flex items-center mb-2">
+                                    <div class="mt-1 ml-2 truncate sm:w-1/4">
+                                        @error('dataPasien.pasien.golonganDarah.golonganDarahId')
+                                            <x-input-error :messages=$message />
+                                        @enderror
+                                    </div>
+                                    <div class="mt-1 ml-2 truncate sm:w-3/4">
+                                        @error('dataPasien.pasien.kewarganegaraan.kewarganegaraanId')
+                                            <x-input-error :messages=$message />
+                                        @enderror
+                                    </div>
+                                    <div class="mt-1 ml-2 truncate sm:w-1/4">
+                                        @error('dataPasien.pasien.suku')
+                                            <x-input-error :messages=$message />
+                                        @enderror
+                                    </div>
+                                    <div class="mt-1 ml-2 truncate sm:w-1/4">
+                                        @error('dataPasien.pasien.bahasa')
+                                            <x-input-error :messages=$message />
+                                        @enderror
+                                    </div>
+                                    <div class="mt-1 ml-2 truncate sm:w-1/4">
+                                        @error('dataPasien.pasien.status.statusId')
+                                            <x-input-error :messages=$message />
+                                        @enderror
+                                    </div>
+                                </div>
+                                {{-- Error Message End --}}
+                            </div>
+                        </x-border-form>
+                    </x-border-form>
+
+                    <div id="AlamatIdentitas" class="inline-flex">
+                        <x-border-form :title="__('Alamat Domisil')" :align="__('start')" :bgcolor="__('bg-red-50')" class="mr-2">
+                            <div>
+                                <x-input-label for="AlamatDomisil" :value="__('Alamat')" :required=false />
+                                <div class="flex items-center mb-2">
+                                    <x-text-input id="AlamatDomisil" placeholder="Alamat" class="mt-1 ml-2"
+                                        :disabled=$disabledProperty wire:model="dataPasien.pasien.domisil.alamat" />
+                                </div>
+                                @error('dataPasien.pasien.domisil.alamat')
+                                    <x-input-error :messages=$message />
+                                @enderror
+                            </div>
+                            <div>
+                                <x-input-label for="rtrwDomisil" :value="__('RT/RW')" :required=false />
+                                <div class="flex items-center mb-2">
+                                    <x-text-input id="rtrwDomisil" placeholder="RT" class="mt-1 ml-2 sm:w-1/3"
+                                        :disabled=$disabledProperty wire:model="dataPasien.pasien.domisil.rt" />
+                                    <x-text-input placeholder="RW" class="mt-1 ml-2 sm:w-1/3"
+                                        :disabled=$disabledProperty wire:model="dataPasien.pasien.domisil.rw" />
+                                    <x-text-input placeholder="Kode Pos" class="mt-1 ml-2 sm:w-1/3"
+                                        :disabled=$disabledProperty wire:model="dataPasien.pasien.domisil.kodepos" />
+                                </div>
+                                {{-- Error Message Start --}}
+                                <div class="flex items-center mb-2">
+                                    <div class="mt-1 ml-2 truncate sm:w-1/3">
+                                        @error('dataPasien.pasien.domisil.rt')
+                                            <x-input-error :messages=$message />
+                                        @enderror
+                                    </div>
+                                    <div class="mt-1 ml-2 truncate sm:w-1/3">
+                                        @error('dataPasien.pasien.domisil.rw')
+                                            <x-input-error :messages=$message />
+                                        @enderror
+                                    </div>
+                                    <div class="mt-1 ml-2 truncate sm:w-1/3">
+                                        @error('dataPasien.pasien.domisil.kodepos')
+                                            <x-input-error :messages=$message />
+                                        @enderror
+                                    </div>
+
+                                </div>
+                                {{-- Error Message End --}}
+                            </div>
+                            <div>
+                                <x-input-label for="DesaDomisil" :value="__('Desa')" :required=false />
+                                <div class="flex items-center mb-2">
+                                    <x-text-input id="DesaDomisil" placeholder="Desa" class="mt-1 ml-2"
+                                        :disabled=$disabledProperty wire:model="dataPasien.pasien.domisil.desa" />
+                                </div>
+                                @error('dataPasien.pasien.domisil.desa')
+                                    <x-input-error :messages=$message />
+                                @enderror
+                            </div>
+                            <div>
+                                <x-input-label for="KecamatanDomisil" :value="__('Kecamatan')" :required=false />
+                                <div class="flex items-center mb-2">
+                                    <x-text-input id="KecamatanDomisil" placeholder="Kecamatan" class="mt-1 ml-2"
+                                        :disabled=$disabledProperty wire:model="dataPasien.pasien.domisil.kecamatan" />
+                                </div>
+                                @error('dataPasien.pasien.domisil.kecamatan')
+                                    <x-input-error :messages=$message />
+                                @enderror
+                            </div>
+                            <div>
+                                <x-input-label for="KotaDomisil" :value="__('Kota')" :required=false />
+                                <div class="flex items-center mb-2">
+                                    <x-text-input placeholder="Kota" class="mt-1 ml-2" :disabled=$disabledProperty
+                                        wire:model="dataPasien.pasien.domisil.kota" />
+                                </div>
+                                @error('dataPasien.pasien.domisil.kota')
+                                    <x-input-error :messages=$message />
+                                @enderror
+                            </div>
+                            <div>
+                                <x-input-label for="PropinsiDomisil" :value="__('Propinsi')" :required=false />
+                                <div class="flex items-center mb-2">
+                                    <x-text-input id="PropinsiDomisil" placeholder="Propinsi" class="mt-1 ml-2"
+                                        :disabled=$disabledProperty wire:model="dataPasien.pasien.domisil.propinsi" />
+                                </div>
+                                @error('dataPasien.pasien.domisil.propinsi')
+                                    <x-input-error :messages=$message />
+                                @enderror
+                            </div>
+                        </x-border-form>
+
+                        <x-border-form :title="__('Identitas')" :align="__('start')" :bgcolor="__('bg-gray-50')" class="">
+                            <div class="flex justify-end">
+                                <x-check-box :valueunchecked="__('0')" :valuechecked="__('1')" :label="__('Sama dgn Domisil')" />
+                            </div>
+                            <div class="grid grid-cols-2">
+                                {{-- grid 1 Identitas --}}
+                                <div>
+                                    <div>
+                                        <x-input-label for="nikidentitas" :value="__('NIK')" :required=false />
+                                        <div class="flex items-center mb-2">
+                                            <x-text-input id="nikidentitas" placeholder="NIK" class="mt-1 ml-2"
+                                                :disabled=$disabledProperty
+                                                wire:model="dataPasien.pasien.identitas.nik" />
+                                        </div>
+                                        @error('dataPasien.pasien.identitas.nik')
+                                            <x-input-error :messages=$message />
+                                        @enderror
+                                    </div>
+                                    <div>
+                                        <x-input-label for="idBpjsidentitas" :value="__('Id BPJS')" :required=false />
+                                        <div class="flex items-center mb-2">
+                                            <x-text-input id="idBpjsidentitas" placeholder="Id BPJS"
+                                                class="mt-1 ml-2" :disabled=$disabledProperty
+                                                wire:model="dataPasien.pasien.identitas.idbpjs" />
+                                        </div>
+                                        @error('dataPasien.pasien.identitas.idbpjs')
+                                            <x-input-error :messages=$message />
+                                        @enderror
+                                    </div>
+                                    <div>
+                                        <x-input-label for="pasporidentitas" :value="__('Paspor')" :required=false />
+                                        <div class="flex items-center mb-2">
+                                            <x-text-input id="pasporidentitas" placeholder="Paspor [untuk WNA / WNI]"
+                                                class="mt-1 ml-2" :disabled=$disabledProperty
+                                                wire:model="dataPasien.pasien.identitas.paspor" />
+                                        </div>
+                                        @error('dataPasien.pasien.identitas.paspor')
+                                            <x-input-error :messages=$message />
+                                        @enderror
+                                    </div>
+                                    <div>
+                                        <x-input-label for="Alamatidentitas" :value="__('Alamat')" :required=false />
+                                        <div class="flex items-center mb-2">
+                                            <x-text-input id="Alamatidentitas" placeholder="Alamat" class="mt-1 ml-2"
+                                                :disabled=$disabledProperty
+                                                wire:model="dataPasien.pasien.identitas.alamat" />
+                                        </div>
+                                        @error('dataPasien.pasien.identitas.alamat')
+                                            <x-input-error :messages=$message />
+                                        @enderror
+                                    </div>
+                                    <div>
+                                        <x-input-label for="rtrwidentitas" :value="__('RT/RW')" :required=false />
+                                        <div class="flex items-center mb-2">
+                                            <x-text-input id="rtrwidentitas" placeholder="RT"
+                                                class="mt-1 ml-2 sm:w-1/3" :disabled=$disabledProperty
+                                                wire:model="dataPasien.pasien.identitas.rt" />
+                                            <x-text-input placeholder="RW" class="mt-1 ml-2 sm:w-1/3"
+                                                :disabled=$disabledProperty
+                                                wire:model="dataPasien.pasien.identitas.rw" />
+                                            <x-text-input placeholder="Kode Pos" class="mt-1 ml-2 sm:w-1/3"
+                                                :disabled=$disabledProperty
+                                                wire:model="dataPasien.pasien.identitas.kodepos" />
+                                        </div>
+                                        {{-- Error Message Start --}}
+                                        <div class="flex items-center mb-2">
+                                            <div class="mt-1 ml-2 truncate sm:w-1/3">
+                                                @error('dataPasien.pasien.identitas.rt')
+                                                    <x-input-error :messages=$message />
+                                                @enderror
+                                            </div>
+                                            <div class="mt-1 ml-2 truncate sm:w-1/3">
+                                                @error('dataPasien.pasien.identitas.rw')
+                                                    <x-input-error :messages=$message />
+                                                @enderror
+                                            </div>
+                                            <div class="mt-1 ml-2 truncate sm:w-1/3">
+                                                @error('dataPasien.pasien.identitas.kodepos')
+                                                    <x-input-error :messages=$message />
+                                                @enderror
+                                            </div>
+
+                                        </div>
+                                        {{-- Error Message End --}}
+                                    </div>
+                                </div>
+                                {{-- grid 2 Identitas --}}
+                                <div>
+                                    <div>
+                                        <x-input-label for="Desaidentitas" :value="__('Desa')" :required=false />
+                                        <div class="flex items-center mb-2">
+                                            <x-text-input id="Desaidentitas" placeholder="Desa" class="mt-1 ml-2"
+                                                :disabled=$disabledProperty
+                                                wire:model="dataPasien.pasien.identitas.desa" />
+                                        </div>
+                                        @error('dataPasien.pasien.identitas.desa')
+                                            <x-input-error :messages=$message />
+                                        @enderror
+                                    </div>
+                                    <div>
+                                        <x-input-label for="Kecamatanidentitas" :value="__('Kecamatan')" :required=false />
+                                        <div class="flex items-center mb-2">
+                                            <x-text-input id="Kecamatanidentitas" placeholder="Kecamatan"
+                                                class="mt-1 ml-2" :disabled=$disabledProperty
+                                                wire:model="dataPasien.pasien.identitas.kecamatan" />
+                                        </div>
+                                        @error('dataPasien.pasien.identitas.kecamatan')
+                                            <x-input-error :messages=$message />
+                                        @enderror
+                                    </div>
+                                    <div>
+                                        <x-input-label for="Kotaidentitas" :value="__('Kota')" :required=false />
+                                        <div class="flex items-center mb-2">
+                                            <x-text-input placeholder="Kota" class="mt-1 ml-2"
+                                                :disabled=$disabledProperty
+                                                wire:model="dataPasien.pasien.identitas.kota" />
+                                        </div>
+                                        @error('dataPasien.pasien.identitas.kota')
+                                            <x-input-error :messages=$message />
+                                        @enderror
+                                    </div>
+                                    <div>
+                                        <x-input-label for="Propinsiidentitas" :value="__('Propinsi')" :required=false />
+                                        <div class="flex items-center mb-2">
+                                            <x-text-input id="Propinsiidentitas" placeholder="Propinsi"
+                                                class="mt-1 ml-2" :disabled=$disabledProperty
+                                                wire:model="dataPasien.pasien.identitas.propinsi" />
+                                        </div>
+                                        @error('dataPasien.pasien.identitas.propinsi')
+                                            <x-input-error :messages=$message />
+                                        @enderror
+                                    </div>
+                                    <div>
+                                        <x-input-label for="negaraidentitas" :value="__('Negara')" :required=false />
+                                        <div class="flex items-center mb-2">
+                                            <x-text-input id="negaraidentitas" placeholder="Negara [isi dgn ID]"
+                                                class="mt-1 ml-2" :disabled=$disabledProperty
+                                                wire:model="dataPasien.pasien.identitas.negara" />
+                                        </div>
+                                        @error('dataPasien.pasien.identitas.negara')
+                                            <x-input-error :messages=$message />
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+                        </x-border-form>
                     </div>
+
+                    <x-border-form :title="__('Kontak')" :align="__('start')">
+                        <div>
+                            <x-input-label for="province_id" :value="__('No HP')" :required=false />
+                            <div class="flex items-center mb-2">
+                                <x-text-input placeholder="No HP" class="mt-1 ml-2" :disabled=$disabledProperty
+                                    wire:model="name" />
+                            </div>
+                            @error('province_id')
+                                <x-input-error :messages=$message />
+                            @enderror
+                        </div>
+                    </x-border-form>
+
+                    <x-border-form :title="__('Keluarga')" :align="__('start')">
+                        <div>
+                            <x-input-label for="province_id" :value="__('Nama Ayah')" :required=false />
+                            <div class="flex items-center mb-2">
+                                <x-text-input placeholder="Nama Ayah" class="mt-1 ml-2" :disabled=$disabledProperty
+                                    wire:model="name" />
+                                <x-text-input placeholder="No Telp. Ayah" class="mt-1 ml-2"
+                                    :disabled=$disabledProperty wire:model="name" />
+                            </div>
+                            @error('province_id')
+                                <x-input-error :messages=$message />
+                            @enderror
+                        </div>
+                        <div>
+                            <x-input-label for="province_id" :value="__('Nama Ibu')" :required=false />
+                            <div class="flex items-center mb-2">
+                                <x-text-input placeholder="Nama Ibu" class="mt-1 ml-2" :disabled=$disabledProperty
+                                    wire:model="name" />
+                                <x-text-input placeholder="No Telp. Ibu" class="mt-1 ml-2" :disabled=$disabledProperty
+                                    wire:model="name" />
+                            </div>
+                            @error('province_id')
+                                <x-input-error :messages=$message />
+                            @enderror
+                        </div>
+                    </x-border-form>
 
                 </div>
 
-                <div
-                    class="sticky bottom-0 px-4 py-3 border-t border-gray-200 rounded-b bg-gray-50 dark:border-gray-600 sm:px-6 sm:flex sm:flex-row-reverse">
+
+                <div class="sticky bottom-0 px-4 py-3 bg-gray-50 sm:px-6 sm:flex sm:flex-row-reverse">
                     @if ($isOpenMode !== 'tampil')
                         <x-green-button wire:click.prevent="store()" type="button">Simpan</x-green-button>
                     @endif

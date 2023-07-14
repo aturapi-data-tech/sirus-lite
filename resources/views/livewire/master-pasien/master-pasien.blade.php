@@ -1,40 +1,43 @@
 <div>
-    <div class="px-4 pt-6">
-        <div
-            class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+
+
+
+    <div class="px-1 pt-7">
+        <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
             <!-- Card header -->
             <div class="w-full mb-1">
-                <div class="">
 
-                    {{-- text --}}
-                    <div class="mb-5">
-                        <h3 class="text-3xl font-bold text-gray-900 dark:text-white">{{ $myTitle }}</h3>
+                <div id="TopBarMenuMaster" class="">
+
+                    {{-- text Title --}}
+                    <div class="mb-2">
+                        <h3 class="text-2xl font-bold text-midnight dark:text-white">{{ $myTitle }}</h3>
                         <span class="text-base font-normal text-gray-500 dark:text-gray-400">{{ $mySnipt }}</span>
                     </div>
-                    {{-- end text --}}
+                    {{-- end text Title --}}
 
 
-
+                    {{-- Tools --}}
                     <div class="md:flex md:justify-between">
 
                         {{-- search --}}
-                        <div class="relative pointer-events-auto md:w-1/2">
-                            <div class="absolute inset-y-0 left-0 flex items-center p-5 pl-3 pointer-events-none">
-                                <svg width="24" height="24" fill="none" aria-hidden="true"
-                                    class="flex-none mr-3">
-                                    <path d="m19 19-3.5-3.5" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round"></path>
-                                    <circle cx="11" cy="11" r="6" stroke="currentColor"
-                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></circle>
-                                </svg>
+                        <div class="md:w-1/2">
+                            <label for="mobile-search" class="sr-only">Search</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                    <svg class="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd"
+                                            d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <x-text-input type="text" class="pl-10 p-2.5" placeholder="Cari Data"
+                                    wire:model.lazy="search" autofocus />
                             </div>
-                            <x-text-input id="simpleSearch" name="namesimpleSearch" type="text" class="p-2 pl-10"
-                                autofocus autocomplete="simpleSearch" placeholder="Cari Data"
-                                wire:model.lazy="search" />
+
                         </div>
                         {{-- end search --}}
-
-
 
                         {{-- two button --}}
                         <div class="flex justify-between mt-2 md:mt-0">
@@ -75,10 +78,8 @@
                         </div>
                         {{-- end two button --}}
 
-
-
                     </div>
-
+                    {{-- End Tools --}}
 
 
                     @if ($isOpen)
@@ -96,117 +97,152 @@
                     <div class="overflow-x-auto rounded-lg">
                         <div class="inline-block min-w-full align-middle">
                             <div class="overflow-hidden shadow sm:rounded-lg">
-
-                                {{-- Table Data --}}
                                 <table class="w-full text-sm text-left text-gray-500 table-auto dark:text-gray-400">
                                     <thead
-                                        class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                        class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
                                         <tr>
-                                            <th scope="col" class="w-2/12 px-4 py-3">
-
-                                                {{-- No.Reg --}}
-                                                @if ($sortField == 'reg_no')
-                                                    <x-sort-link :active=true wire:click.prevent="sortBy('reg_no')"
-                                                        role="button" href="#">
-                                                        No. Registrasi
-                                                    </x-sort-link>
-                                                @else
-                                                    <x-sort-link :active=false wire:click.prevent="sortBy('reg_no')"
-                                                        role="button" href="#">
-                                                        No. Registrasi
-                                                    </x-sort-link>
-                                                @endif
-                                            </th>
-
-                                            {{-- Reg. Name --}}
                                             <th scope="col" class="px-4 py-3">
 
-                                                @if ($sortField == 'reg_name')
+                                                @if ($sortField == 'name')
                                                     <x-sort-link :active=true wire:click.prevent="sortBy('reg_name')"
                                                         role="button" href="#">
-                                                        Nama
+                                                        No Identitas
                                                     </x-sort-link>
                                                 @else
                                                     <x-sort-link :active=false wire:click.prevent="sortBy('reg_name')"
                                                         role="button" href="#">
-                                                        Nama
+                                                        No Identitas
                                                     </x-sort-link>
                                                 @endif
                                             </th>
 
-                                            {{-- NIK BPJS --}}
-                                            <th scope="col" class="px-4 py-3">
-
-                                                @if ($sortField == 'prop_name')
-                                                    <x-sort-link :active=true wire:click.prevent="sortBy('prop_name')"
+                                            <th scope="col" class="px-4 py-3 ">
+                                                @if ($sortField == 'reg_no')
+                                                    <x-sort-link :active=true wire:click.prevent="sortBy('reg_no')"
                                                         role="button" href="#">
-                                                        NIK
+                                                        Pasien
                                                     </x-sort-link>
                                                 @else
-                                                    <x-sort-link :active=false wire:click.prevent="sortBy('prop_name')"
+                                                    <x-sort-link :active=false wire:click.prevent="sortBy('reg_no')"
                                                         role="button" href="#">
-                                                        NIK
+                                                        Pasien
                                                     </x-sort-link>
                                                 @endif
                                             </th>
-                                            {{-- Alamat --}}
+
                                             <th scope="col" class="px-4 py-3">
 
-                                                @if ($sortField == 'prop_name')
-                                                    <x-sort-link :active=true wire:click.prevent="sortBy('prop_name')"
+                                                @if ($sortField == 'name')
+                                                    <x-sort-link :active=true wire:click.prevent="sortBy('reg_name')"
                                                         role="button" href="#">
-                                                        Tgl. Lahir
+                                                        Status
                                                     </x-sort-link>
                                                 @else
-                                                    <x-sort-link :active=false wire:click.prevent="sortBy('prop_name')"
+                                                    <x-sort-link :active=false wire:click.prevent="sortBy('reg_name')"
                                                         role="button" href="#">
-                                                        Tgl. Lahir
+                                                        Status
                                                     </x-sort-link>
                                                 @endif
                                             </th>
-                                            {{-- Alamat --}}
+
                                             <th scope="col" class="px-4 py-3">
 
-                                                @if ($sortField == 'prop_name')
-                                                    <x-sort-link :active=true wire:click.prevent="sortBy('prop_name')"
+                                                @if ($sortField == 'name')
+                                                    <x-sort-link :active=true wire:click.prevent="sortBy('reg_name')"
                                                         role="button" href="#">
-                                                        Alamat
+                                                        No. Hp
                                                     </x-sort-link>
                                                 @else
-                                                    <x-sort-link :active=false wire:click.prevent="sortBy('prop_name')"
+                                                    <x-sort-link :active=false wire:click.prevent="sortBy('reg_name')"
                                                         role="button" href="#">
-                                                        Alamat
+                                                        No. Hp
                                                     </x-sort-link>
                                                 @endif
                                             </th>
+
+                                            <th scope="col" class="px-4 py-3">
+
+                                                @if ($sortField == 'name')
+                                                    <x-sort-link :active=true wire:click.prevent="sortBy('reg_name')"
+                                                        role="button" href="#">
+                                                        Tgl. Daftar
+                                                    </x-sort-link>
+                                                @else
+                                                    <x-sort-link :active=false wire:click.prevent="sortBy('reg_name')"
+                                                        role="button" href="#">
+                                                        Tgl. Daftar
+                                                    </x-sort-link>
+                                                @endif
+                                            </th>
+
+
+
 
                                             <th scope="col" class="w-8 px-4 py-3 text-center">Action
                                             </th>
                                         </tr>
                                     </thead>
-
                                     <tbody class="bg-white dark:bg-gray-800">
+
+
                                         @foreach ($pasiens as $p)
                                             <tr class="border-b group dark:border-gray-700">
-                                                <th scope="row"
-                                                    class="px-4 py-3 font-medium text-gray-900 group-hover:bg-gray-100 group-hover:text-blue-700 whitespace-nowrap dark:text-white">
-                                                    {{ $p->reg_no }}</th>
                                                 <td
-                                                    class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-blue-700">
-                                                    {{ $p->reg_name }}</td>
+                                                    class="px-4 py-3 font-normal group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
+                                                    <div class="pl-0">
+                                                        <div class="text-gray-700 ">
+                                                            {{ 'BPJS: ' . $p->nokartu_bpjs }}
+                                                        </div>
+                                                        <div class=" text-primary">
+                                                            {{ 'NIK: ' . $p->nik_bpjs }}
+                                                        </div>
+                                                    </div>
+                                                </td>
+
                                                 <td
-                                                    class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-blue-700">
-                                                    {{ $p->nik_bpjs }}</td>
+                                                    class="px-4 py-3 font-medium group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
+                                                    {{-- <img class="w-10 h-10 rounded-full " src="profile-picture-1.jpg"
+                                                        alt="Jese image"> --}}
+                                                    <div class="pl-0">
+                                                        <div class="font-semibold text-gray-700 ">
+                                                            {{ $p->reg_no }}</div>
+                                                        <div class="font-semibold text-primary">
+                                                            {{ $p->reg_name . ' / (' . $p->sex . ')' . ' / ' . $p->thn }}
+                                                        </div>
+                                                        <div class="font-normal text-gray-700">
+                                                            {{ $p->address }}
+                                                        </div>
+                                                    </div>
+                                                </td>
+
                                                 <td
-                                                    class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-blue-700">
-                                                    {{ $p->birth_date }}</td>
+                                                    class="px-4 py-3 font-normal group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
+                                                    <div class="pl-0">
+                                                        <div class="text-gray-700 ">
+                                                            {{ 'Gol. Darah: ' . $p->blood }}
+                                                        </div>
+                                                        <div class="text-gray-700 ">
+                                                            {{ 'Status Menikah: ' . $p->marital_status }}
+                                                        </div>
+                                                        <div class=" text-primary">
+                                                            {{ 'Hidup / Aktif' }}
+                                                        </div>
+                                                    </div>
+                                                </td>
+
                                                 <td
-                                                    class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-blue-700">
-                                                    {{ $p->address }}</td>
+                                                    class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
+                                                    {{ $p->phone }}
+                                                </td>
+
+                                                <td
+                                                    class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
+                                                    {{ $p->reg_date }}
+                                                </td>
 
 
                                                 <td
-                                                    class="flex items-center justify-center px-4 py-3 group-hover:bg-gray-100 group-hover:text-blue-700">
+                                                    class="flex items-center justify-center px-4 py-3 group-hover:bg-gray-50 group-hover:text-blue-700">
 
 
 
@@ -254,48 +290,10 @@
 
 
 
-                                                    {{-- Dropdown Action menu from Breeze off --}}
-                                                    {{-- <div class="">
-                                                        <x-dropdown align="right" width="48">
-                                                            <x-slot name="trigger">
-
-                                                                <x-light-button>
-                                                                    <svg class="w-5 h-5" aria-hidden="true"
-                                                                        fill="currentColor" viewbox="0 0 20 20"
-                                                                        xmlns="http://www.w3.org/2000/svg">
-                                                                        <path
-                                                                            d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
-                                                                    </svg>
-                                                                </x-light-button>
-
-                                                            </x-slot>
-
-                                                            <x-slot name="content">
-
-
-                                                                <x-dropdown-link
-                                                                    wire:click="tampil({{ $province->id }})">
-                                                                    {{ __('Tampil | ' . $province->name) }}
-                                                                </x-dropdown-link>
-                                                                <x-dropdown-link
-                                                                    wire:click="edit({{ $province->id }})">
-                                                                    {{ __('Ubah') }}
-                                                                </x-dropdown-link>
-                                                                <x-dropdown-link
-                                                                    wire:click="$emit('confirm_remove_record', {{ $province->id }}, '{{ $province->name }}')">
-                                                                    {{ __('Hapus') }}
-                                                                </x-dropdown-link>
-
-
-                                                            </x-slot>
-
-                                                        </x-dropdown>
-                                                    </div> --}}
-                                                    {{-- Dropdown Action menu from Breeze --}}
-
 
 
                                                 </td>
+
                                             </tr>
                                         @endforeach
 
@@ -325,7 +323,7 @@
 
                 <!-- Pagination start -->
                 <div class="flex items-center justify-end pt-3 sm:pt-6">
-                    {{-- {{ $provinces->links() }} --}}
+                    {{-- {{ $pasienss->links() }} --}}
                     {{ $pasiens->links('vendor.livewire.tailwind') }}
                 </div>
                 <!-- Pagination end -->
@@ -405,7 +403,7 @@
                 let cfn = confirm('Apakah anda ingin menghapus data ini ' + name + '?');
 
                 if (cfn) {
-                    window.livewire.emit('confirm_remove_record_pasien', key, name);
+                    window.livewire.emit('confirm_remove_record_pasiens', key, name);
                 }
             });
 

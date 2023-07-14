@@ -52,6 +52,8 @@ Route::view('/cetak-tiket', 'livewire.pendaftaran-mandiri-pasien-poli.cetak-tike
 
 
 Route::get('ermRJ', ErmRJ::class)->middleware('auth')->name('ermRJ');
+
+
 Route::get('masterPasien', MasterPasien::class)->middleware('auth')->name('MasterPasien');
 
 
