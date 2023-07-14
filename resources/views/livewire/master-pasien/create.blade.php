@@ -42,7 +42,7 @@
             <form>
 
                 <div class="px-4 bg-white ">
-                    <div class="absolute right-4 top-16">
+                    <div class="absolute right-4 top-16 -z-10">
                         <x-check-box :valueunchecked="__('0')" :valuechecked="__('1')" :label="__('Pasien Tidak Dikenal')" />
                     </div>
 
@@ -251,8 +251,8 @@
                         </x-border-form>
                     </x-border-form>
 
-                    <div id="AlamatIdentitas" class="inline-flex">
-                        <x-border-form :title="__('Alamat Domisil')" :align="__('start')" :bgcolor="__('bg-red-50')" class="mr-2">
+                    <div id="AlamatIdentitas" class="inline-flex ">
+                        <x-border-form :title="__('Alamat Domisil')" :align="__('start')" :bgcolor="__('bg-red-100')" class="mr-2">
                             <div>
                                 <x-input-label for="AlamatDomisil" :value="__('Alamat')" :required=false />
                                 <div class="flex items-center mb-2">
@@ -484,41 +484,103 @@
                         </x-border-form>
                     </div>
 
-                    <x-border-form :title="__('Kontak')" :align="__('start')">
+                    <x-border-form :title="__('Kontak')" :align="__('start')" :bgcolor="__('bg-gray-50')">
                         <div>
-                            <x-input-label for="province_id" :value="__('No HP')" :required=false />
+                            <x-input-label for="nohpPasien" :value="__('No HP Pasien')" :required=false />
                             <div class="flex items-center mb-2">
-                                <x-text-input placeholder="No HP" class="mt-1 ml-2" :disabled=$disabledProperty
-                                    wire:model="name" />
+                                <x-text-input placeholder="No HP" class="w-16 mt-1 ml-2" :disabled=$disabledProperty
+                                    wire:model="dataPasien.pasien.kontak.kodenegara" />
+                                <x-text-input id="nohpPasien" placeholder="No HP" class="mt-1 ml-2 "
+                                    :disabled=$disabledProperty
+                                    wire:model="dataPasien.pasien.kontak.nomerTelponSelulerPasien" />
                             </div>
-                            @error('province_id')
+                            @error('dataPasien.pasien.kontak.nomerTelponSelulerPasien')
+                                <x-input-error :messages=$message />
+                            @enderror
+
+                            <x-input-label for="nohpTelponLain" :value="__('No Lain')" :required=false />
+                            <div class="flex items-center mb-2">
+                                <x-text-input placeholder="No HP" class="w-16 mt-1 ml-2" :disabled=$disabledProperty
+                                    wire:model="dataPasien.pasien.kontak.kodenegara" />
+                                <x-text-input id="nohpTelponLain" placeholder="No HP" class="mt-1 ml-2 "
+                                    :disabled=$disabledProperty
+                                    wire:model="dataPasien.pasien.kontak.nomerTelponLain" />
+                            </div>
+                            @error('dataPasien.pasien.kontak.nomerTelponLain')
                                 <x-input-error :messages=$message />
                             @enderror
                         </div>
                     </x-border-form>
 
-                    <x-border-form :title="__('Keluarga')" :align="__('start')">
-                        <div>
-                            <x-input-label for="province_id" :value="__('Nama Ayah')" :required=false />
+                    <x-border-form :title="__('Hubungan')" :align="__('start')" :bgcolor="__('bg-gray-50')">
+                        <x-border-form :title="__('')" :align="__('start')" :bgcolor="__('bg-yellow-100')" class="mb-8 sm:-mt-8">
+                            {{-- PenanggungJawab --}}
+                            <x-input-label for="PenanggungJawab" :value="__('Penanggung Jawab')" :required=false />
+                            {{-- nomerTelponSelulerPenanggungJawab --}}
                             <div class="flex items-center mb-2">
-                                <x-text-input placeholder="Nama Ayah" class="mt-1 ml-2" :disabled=$disabledProperty
-                                    wire:model="name" />
-                                <x-text-input placeholder="No Telp. Ayah" class="mt-1 ml-2"
-                                    :disabled=$disabledProperty wire:model="name" />
+                                <x-text-input id="PenanggungJawab" placeholder="Nama Penanggung Jawab"
+                                    class="mt-1 ml-2" :disabled=$disabledProperty
+                                    wire:model="dataPasien.pasien.hubungan.namaPenanggungJawab" />
+                                <x-text-input placeholder="No HP" class="w-16 mt-1 ml-2" :disabled=$disabledProperty
+                                    wire:model="dataPasien.pasien.hubungan.kodenegaraPenanggungJawab" />
+                                <x-text-input id="nohpTelponLain" placeholder="No HP" class="mt-1 ml-2 "
+                                    :disabled=$disabledProperty
+                                    wire:model="dataPasien.pasien.hubungan.nomerTelponSelulerPenanggungJawab" />
                             </div>
-                            @error('province_id')
+                            @error('dataPasien.pasien.hubungan.nomerTelponSelulerPenanggungJawab')
+                                <x-input-error :messages=$message />
+                            @enderror
+                            @error('dataPasien.pasien.hubungan.nomerTelponSelulerPenanggungJawab')
+                                <x-input-error :messages=$message />
+                            @enderror
+                            {{-- HungungandgnPasien --}}
+                            <x-input-label for="HungungandgnPasien" :value="__('Hungungan dgn Pasien')" :required=false />
+                            <x-text-input id="HungungandgnPasien" placeholder="Nama Penanggung Jawab"
+                                class="mt-1 ml-2" :disabled=$disabledProperty
+                                wire:model="dataPasien.pasien.hubungan.hubunganDgnPasien.hubunganDgnPasienId" />
+                            @error('dataPasien.pasien.hubungan.namaPenanggungJawab')
+                                <x-input-error :messages=$message />
+                            @enderror
+                        </x-border-form>
+
+                        <div>
+                            {{-- Ayah --}}
+                            <x-input-label for="Ayah" :value="__('Nama Ayah')" :required=false />
+                            {{-- nomerTelponSelulerAyah --}}
+                            <div class="flex items-center mb-2">
+                                <x-text-input id="Ayah" placeholder="Nama Ayah" class="mt-1 ml-2"
+                                    :disabled=$disabledProperty wire:model="dataPasien.pasien.hubungan.namaAyah" />
+                                <x-text-input placeholder="No HP" class="w-16 mt-1 ml-2" :disabled=$disabledProperty
+                                    wire:model="dataPasien.pasien.hubungan.kodenegaraAyah" />
+                                <x-text-input id="nohpTelponLain" placeholder="No HP" class="mt-1 ml-2 "
+                                    :disabled=$disabledProperty
+                                    wire:model="dataPasien.pasien.hubungan.nomerTelponSelulerAyah" />
+                            </div>
+                            @error('dataPasien.pasien.hubungan.nomerTelponSelulerAyah')
+                                <x-input-error :messages=$message />
+                            @enderror
+                            @error('dataPasien.pasien.hubungan.nomerTelponSelulerAyah')
                                 <x-input-error :messages=$message />
                             @enderror
                         </div>
+
                         <div>
-                            <x-input-label for="province_id" :value="__('Nama Ibu')" :required=false />
+                            {{-- Ibu --}}
+                            <x-input-label for="Ibu" :value="__('Nama Ibu')" :required=false />
+                            {{-- nomerTelponSelulerIbu --}}
                             <div class="flex items-center mb-2">
-                                <x-text-input placeholder="Nama Ibu" class="mt-1 ml-2" :disabled=$disabledProperty
-                                    wire:model="name" />
-                                <x-text-input placeholder="No Telp. Ibu" class="mt-1 ml-2" :disabled=$disabledProperty
-                                    wire:model="name" />
+                                <x-text-input id="Ibu" placeholder="Nama Ibu" class="mt-1 ml-2"
+                                    :disabled=$disabledProperty wire:model="dataPasien.pasien.hubungan.namaIbu" />
+                                <x-text-input placeholder="No HP" class="w-16 mt-1 ml-2" :disabled=$disabledProperty
+                                    wire:model="dataPasien.pasien.hubungan.kodenegaraIbu" />
+                                <x-text-input id="nohpTelponLain" placeholder="No HP" class="mt-1 ml-2 "
+                                    :disabled=$disabledProperty
+                                    wire:model="dataPasien.pasien.hubungan.nomerTelponSelulerIbu" />
                             </div>
-                            @error('province_id')
+                            @error('dataPasien.pasien.hubungan.nomerTelponSelulerIbu')
+                                <x-input-error :messages=$message />
+                            @enderror
+                            @error('dataPasien.pasien.hubungan.nomerTelponSelulerIbu')
                                 <x-input-error :messages=$message />
                             @enderror
                         </div>

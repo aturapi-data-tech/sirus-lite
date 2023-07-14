@@ -10,7 +10,7 @@
 @endphp
 <div class="pt-4">
     <h2 class="w-full {{ $alignAttribute }}" style="line-height: 0.1">
-        <span class="px-3 text-base font-medium bg-white text-primary dark:text-gray-300">
+        <span class="px-3 text-base font-medium bg-transparent text-primary dark:text-gray-300">
             {{ $title }}
         </span>
     </h2>

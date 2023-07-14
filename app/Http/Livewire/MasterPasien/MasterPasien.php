@@ -164,14 +164,14 @@ class MasterPasien extends Component
             ],
             "hubungan" => [
                 "namaAyah" => "", //
-                "kodenegara" => "62", //+(62) Indonesia 
+                "kodenegaraAyah" => "62", //+(62) Indonesia 
                 "nomerTelponSelulerAyah" => "", //+(kode negara) no telp
                 "namaIbu" => "", //
-                "kodenegara" => "62", //+(62) Indonesia 
+                "kodenegaraIbu" => "62", //+(62) Indonesia 
                 "nomerTelponSelulerIbu" => "", //+(kode negara) no telp
 
                 "namaPenanggungJawab" => "", // di isi untuk pasien (Tidak dikenal / Hal Lain)
-                "kodenegara" => "62", //+(62) Indonesia 
+                "kodenegaraPenanggungJawab" => "62", //+(62) Indonesia 
                 "nomerTelponSelulerPenanggungJawab" => "", //+(kode negara) no telp
                 "hubunganDgnPasien" => [
                     "hubunganDgnPasienId" => 5, //Default 5 Kerabat / Saudara
