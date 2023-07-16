@@ -28,8 +28,8 @@ class MasterPasien extends Component
             "bln" => "",
             "hari" => "",
             "jenisKelamin" => [ //harus diisi (saveid)
-                "jenisKelaminId" => "",
-                "jenisKelaminDesc" => "",
+                "jenisKelaminId" => 1,
+                "jenisKelaminDesc" => "Laki-laki",
                 "jenisKelaminOptions" => [
                     ["jenisKelaminId" => 0, "jenisKelaminDesc" => "Tidak diketaui"],
                     ["jenisKelaminId" => 1, "jenisKelaminDesc" => "Laki-laki"],
@@ -39,8 +39,8 @@ class MasterPasien extends Component
                 ],
             ],
             "agama" => [ //harus diisi (save id+nama)
-                "agamaId" => "",
-                "agamaDesc" => "",
+                "agamaId" => "1",
+                "agamaDesc" => "Islam",
                 "agamaOptions" => [
                     ["agamaId" => 1, "agamaDesc" => "Islam"],
                     ["agamaId" => 2, "agamaDesc" => "Kristen (Protestan)"],
@@ -53,8 +53,8 @@ class MasterPasien extends Component
                 ],
             ],
             "statusPerkawinan" => [ //harus diisi (save id)
-                "statusPerkawinanId" => "",
-                "statusPerkawinanDesc" => "",
+                "statusPerkawinanId" => "1",
+                "statusPerkawinanDesc" => "Belum Kawin",
                 "statusPerkawinanOptions" => [
                     ["statusPerkawinanId" => 1, "statusPerkawinanDesc" => "Belum Kawin"],
                     ["statusPerkawinanId" => 2, "statusPerkawinanDesc" => "Kawin"],
@@ -63,8 +63,8 @@ class MasterPasien extends Component
                 ],
             ],
             "pendidikan" =>  [ //harus diisi (save id)
-                "pendidikanId" => "",
-                "pendidikanDesc" => "",
+                "pendidikanId" => "3",
+                "pendidikanDesc" => "SLTA Sederajat",
                 "pendidikanOptions" => [
                     ["pendidikanId" => 0, "pendidikanDesc" => "Tidak Sekolah"],
                     ["pendidikanId" => 1, "pendidikanDesc" => "SD"],
@@ -78,8 +78,8 @@ class MasterPasien extends Component
                 ],
             ],
             "pekerjaan" => [ //harus diisi (save id)
-                "pekerjaanId" => "",
-                "pekerjaanDesc" => "",
+                "pekerjaanId" => "4",
+                "pekerjaanDesc" => "Pegawai Swasta/ Wiraswasta",
                 "pekerjaanOptions" => [
                     ["pekerjaanId" => 0, "pekerjaanDesc" => "Tidak Bekerja"],
                     ["pekerjaanId" => 1, "pekerjaanDesc" => "PNS"],
@@ -90,8 +90,8 @@ class MasterPasien extends Component
                 ],
             ],
             "golonganDarah" => [ //harus diisi (save id+nama) (default Tidak Tahu)
-                "golonganDarahId" => "",
-                "golonganDarahDesc" => "",
+                "golonganDarahId" => "13",
+                "golonganDarahDesc" => "Tidak Tahu",
                 "golonganDarahOptions" => [
                     ["golonganDarahId" => 1, "golonganDarahDesc" => "A"],
                     ["golonganDarahId" => 2, "golonganDarahDesc" => "B"],
@@ -115,9 +115,9 @@ class MasterPasien extends Component
             "suku" => 'Jawa', //Free text (defult Jawa)
             "bahasa" => 'Indonesia / Jawa', //Free text (defult Indonesia / Jawa)
             "status" => [
-                "statusId" => "",
-                "statusDesc" => "",
-                "statusOption" => [
+                "statusId" => "1",
+                "statusDesc" => "Aktif / Hidup",
+                "statusOptions" => [
                     ["statusId" => 0, "statusDesc" => "Tidak Aktif / Batal"],
                     ["statusId" => 1, "statusDesc" => "Aktif / Hidup"],
                     ["statusId" => 2, "statusDesc" => "Meninggal"],
@@ -128,10 +128,10 @@ class MasterPasien extends Component
                 "rt" => "", //harus diisi
                 "rw" => "", //harus diisi
                 "kodepos" => "", //harus diisi
-                "desa" => "", //harus diisi (Kode data Kemendagri)
-                "kecamatan" => "", //harus diisi (Kode data Kemendagri)
-                "kota" => "", //harus diisi (Kode data Kemendagri)
-                "propinsi" => "", //harus diisi (Kode data Kemendagri)
+                "desaId" => "", //harus diisi (Kode data Kemendagri)
+                "kecamatanId" => "", //harus diisi (Kode data Kemendagri)
+                "kotaId" => "", //harus diisi (Kode data Kemendagri)
+                "propinsiId" => "", //harus diisi (Kode data Kemendagri)
                 "desaName" => "", //harus diisi (Kode data Kemendagri)
                 "kecamatanName" => "", //harus diisi (Kode data Kemendagri)
                 "kotaName" => "", //harus diisi (Kode data Kemendagri)
@@ -147,10 +147,10 @@ class MasterPasien extends Component
                 "rt" => "", //harus diisi
                 "rw" => "", //harus diisi
                 "kodepos" => "", //harus diisi
-                "desa" => "", //harus diisi (Kode data Kemendagri)
-                "kecamatan" => "", //harus diisi (Kode data Kemendagri)
-                "kota" => "", //harus diisi (Kode data Kemendagri)
-                "propinsi" => "", //harus diisi (Kode data Kemendagri)
+                "desaId" => "", //harus diisi (Kode data Kemendagri)
+                "kecamatanId" => "", //harus diisi (Kode data Kemendagri)
+                "kotaId" => "", //harus diisi (Kode data Kemendagri)
+                "propinsiId" => "", //harus diisi (Kode data Kemendagri)
                 "desaName" => "", //harus diisi (Kode data Kemendagri)
                 "kecamatanName" => "", //harus diisi (Kode data Kemendagri)
                 "kotaName" => "", //harus diisi (Kode data Kemendagri)
@@ -191,9 +191,42 @@ class MasterPasien extends Component
     ];
 
     // limit record per page -resetExcept////////////////
-    public $limitPerPage = 5;
+    public $limitPerPage = 10;
 
+    //  table LOV////////////////
+    public $jenisKelaminLov = [];
+    public $jenisKelaminLovStatus = 0;
+    public $jenisKelaminLovSearch = '';
 
+    public $agamaLov = [];
+    public $agamaLovStatus = 0;
+    public $agamaLovSearch = '';
+
+    public $statusPerkawinanLov = [];
+    public $statusPerkawinanLovStatus = 0;
+    public $statusPerkawinanLovSearch = '';
+
+    public $pendidikanLov = [];
+    public $pendidikanLovStatus = 0;
+    public $pendidikanLovSearch = '';
+
+    public $pekerjaanLov = [];
+    public $pekerjaanLovStatus = 0;
+    public $pekerjaanLovSearch = '';
+
+    public $golonganDarahLov = [];
+    public $golonganDarahLovStatus = 0;
+    public $golonganDarahLovSearch = '';
+
+    public $statusLov = [];
+    public $statusLovStatus = 0;
+    public $statusLovSearch = '';
+
+    public $hubunganDgnPasienLov = [];
+    public $hubunganDgnPasienLovStatus = 0;
+    public $hubunganDgnPasienLovSearch = '';
+
+    //  table LOV////////////////
 
     //  modal status////////////////
     public $isOpen = 0;
@@ -305,6 +338,400 @@ class MasterPasien extends Component
 
         $this->sortField = $field;
     }
+
+
+    // logic LOV start////////////////
+    // jenis kelamin LOV
+    // nested
+    // Datapasien->Pasien->Jeniskelamin->Jeniskelaminid
+
+    // /////////Jeniskelamin////////////
+    public function clickJeniskelaminlov()
+    {
+        $this->jenisKelaminLovStatus = true;
+        $this->jenisKelaminLov = $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminOptions'];
+    }
+    public function updatedJeniskelaminlovsearch()
+    {
+        // Variable Search
+        $search = $this->jenisKelaminLovSearch;
+
+        // check LOV by id 
+        $Jeniskelamin = collect($this->dataPasien['pasien']['jenisKelamin']['jenisKelaminOptions'])
+            ->where('jenisKelaminId', '=', $search)
+            ->first();
+
+        if ($Jeniskelamin) {
+            $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminId'] = $Jeniskelamin['jenisKelaminId'];
+            $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] = $Jeniskelamin['jenisKelaminDesc'];
+            $this->jenisKelaminLovStatus = false;
+            $this->jenisKelaminLovSearch = '';
+        } else {
+            // if there is no id found and check (min 3 char on search)
+            if (strlen($search) < 3) {
+                $this->jenisKelaminLov = $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminOptions'];
+            } else {
+                $this->jenisKelaminLov = collect($this->dataPasien['pasien']['jenisKelamin']['jenisKelaminOptions'])
+                    ->filter(function ($item) use ($search) {
+                        return false !== stristr($item['jenisKelaminDesc'], $search);
+                    });
+            }
+            $this->jenisKelaminLovStatus = true;
+            $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminId'] = '';
+            $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] = '';
+        }
+    }
+    // /////////////////////
+    // LOV selected start
+    public function setMyjenisKelaminLov($id, $name)
+    {
+        $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminId'] = $id;
+        $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] = $name;
+        $this->jenisKelaminLovStatus = false;
+        $this->jenisKelaminLovSearch = '';
+    }
+    // LOV selected end
+    // /////////////////////
+
+
+    // /////////Agama////////////
+    public function clickagamalov()
+    {
+        $this->agamaLovStatus = true;
+        $this->agamaLov = $this->dataPasien['pasien']['agama']['agamaOptions'];
+    }
+    public function updatedagamalovsearch()
+    {
+        // Variable Search
+        $search = $this->agamaLovSearch;
+
+        // check LOV by id 
+        $agama = collect($this->dataPasien['pasien']['agama']['agamaOptions'])
+            ->where('agamaId', '=', $search)
+            ->first();
+
+        if ($agama) {
+            $this->dataPasien['pasien']['agama']['agamaId'] = $agama['agamaId'];
+            $this->dataPasien['pasien']['agama']['agamaDesc'] = $agama['agamaDesc'];
+            $this->agamaLovStatus = false;
+            $this->agamaLovSearch = '';
+        } else {
+            // if there is no id found and check (min 3 char on search)
+            if (strlen($search) < 3) {
+                $this->agamaLov = $this->dataPasien['pasien']['agama']['agamaOptions'];
+            } else {
+                $this->agamaLov = collect($this->dataPasien['pasien']['agama']['agamaOptions'])
+                    ->filter(function ($item) use ($search) {
+                        return false !== stristr($item['agamaDesc'], $search);
+                    });
+            }
+            $this->agamaLovStatus = true;
+            $this->dataPasien['pasien']['agama']['agamaId'] = '';
+            $this->dataPasien['pasien']['agama']['agamaDesc'] = '';
+        }
+    }
+    // /////////////////////
+    // LOV selected start
+    public function setMyagamaLov($id, $name)
+    {
+        $this->dataPasien['pasien']['agama']['agamaId'] = $id;
+        $this->dataPasien['pasien']['agama']['agamaDesc'] = $name;
+        $this->agamaLovStatus = false;
+        $this->agamaLovSearch = '';
+    }
+    // LOV selected end
+    // /////////////////////
+
+    // /////////statusPerkawinan////////////
+    public function clickstatusPerkawinanlov()
+    {
+        $this->statusPerkawinanLovStatus = true;
+        $this->statusPerkawinanLov = $this->dataPasien['pasien']['statusPerkawinan']['statusPerkawinanOptions'];
+    }
+    public function updatedstatusPerkawinanlovsearch()
+    {
+        // Variable Search
+        $search = $this->statusPerkawinanLovSearch;
+
+        // check LOV by id 
+        $statusPerkawinan = collect($this->dataPasien['pasien']['statusPerkawinan']['statusPerkawinanOptions'])
+            ->where('statusPerkawinanId', '=', $search)
+            ->first();
+
+        if ($statusPerkawinan) {
+            $this->dataPasien['pasien']['statusPerkawinan']['statusPerkawinanId'] = $statusPerkawinan['statusPerkawinanId'];
+            $this->dataPasien['pasien']['statusPerkawinan']['statusPerkawinanDesc'] = $statusPerkawinan['statusPerkawinanDesc'];
+            $this->statusPerkawinanLovStatus = false;
+            $this->statusPerkawinanLovSearch = '';
+        } else {
+            // if there is no id found and check (min 3 char on search)
+            if (strlen($search) < 3) {
+                $this->statusPerkawinanLov = $this->dataPasien['pasien']['statusPerkawinan']['statusPerkawinanOptions'];
+            } else {
+                $this->statusPerkawinanLov = collect($this->dataPasien['pasien']['statusPerkawinan']['statusPerkawinanOptions'])
+                    ->filter(function ($item) use ($search) {
+                        return false !== stristr($item['statusPerkawinanDesc'], $search);
+                    });
+            }
+            $this->statusPerkawinanLovStatus = true;
+            $this->dataPasien['pasien']['statusPerkawinan']['statusPerkawinanId'] = '';
+            $this->dataPasien['pasien']['statusPerkawinan']['statusPerkawinanDesc'] = '';
+        }
+    }
+    // /////////////////////
+    // LOV selected start
+    public function setMystatusPerkawinanLov($id, $name)
+    {
+        $this->dataPasien['pasien']['statusPerkawinan']['statusPerkawinanId'] = $id;
+        $this->dataPasien['pasien']['statusPerkawinan']['statusPerkawinanDesc'] = $name;
+        $this->statusPerkawinanLovStatus = false;
+        $this->statusPerkawinanLovSearch = '';
+    }
+    // LOV selected end
+    // /////////////////////
+
+    // /////////pendidikan////////////
+    public function clickpendidikanlov()
+    {
+        $this->pendidikanLovStatus = true;
+        $this->pendidikanLov = $this->dataPasien['pasien']['pendidikan']['pendidikanOptions'];
+    }
+    public function updatedpendidikanlovsearch()
+    {
+        // Variable Search
+        $search = $this->pendidikanLovSearch;
+
+        // check LOV by id 
+        $pendidikan = collect($this->dataPasien['pasien']['pendidikan']['pendidikanOptions'])
+            ->where('pendidikanId', '=', $search)
+            ->first();
+
+        if ($pendidikan) {
+            $this->dataPasien['pasien']['pendidikan']['pendidikanId'] = $pendidikan['pendidikanId'];
+            $this->dataPasien['pasien']['pendidikan']['pendidikanDesc'] = $pendidikan['pendidikanDesc'];
+            $this->pendidikanLovStatus = false;
+            $this->pendidikanLovSearch = '';
+        } else {
+            // if there is no id found and check (min 3 char on search)
+            if (strlen($search) < 3) {
+                $this->pendidikanLov = $this->dataPasien['pasien']['pendidikan']['pendidikanOptions'];
+            } else {
+                $this->pendidikanLov = collect($this->dataPasien['pasien']['pendidikan']['pendidikanOptions'])
+                    ->filter(function ($item) use ($search) {
+                        return false !== stristr($item['pendidikanDesc'], $search);
+                    });
+            }
+            $this->pendidikanLovStatus = true;
+            $this->dataPasien['pasien']['pendidikan']['pendidikanId'] = '';
+            $this->dataPasien['pasien']['pendidikan']['pendidikanDesc'] = '';
+        }
+    }
+    // /////////////////////
+    // LOV selected start
+    public function setMypendidikanLov($id, $name)
+    {
+        $this->dataPasien['pasien']['pendidikan']['pendidikanId'] = $id;
+        $this->dataPasien['pasien']['pendidikan']['pendidikanDesc'] = $name;
+        $this->pendidikanLovStatus = false;
+        $this->pendidikanLovSearch = '';
+    }
+    // LOV selected end
+    // /////////////////////
+
+    // /////////pekerjaan////////////
+    public function clickpekerjaanlov()
+    {
+        $this->pekerjaanLovStatus = true;
+        $this->pekerjaanLov = $this->dataPasien['pasien']['pekerjaan']['pekerjaanOptions'];
+    }
+    public function updatedpekerjaanlovsearch()
+    {
+        // Variable Search
+        $search = $this->pekerjaanLovSearch;
+
+        // check LOV by id 
+        $pekerjaan = collect($this->dataPasien['pasien']['pekerjaan']['pekerjaanOptions'])
+            ->where('pekerjaanId', '=', $search)
+            ->first();
+
+        if ($pekerjaan) {
+            $this->dataPasien['pasien']['pekerjaan']['pekerjaanId'] = $pekerjaan['pekerjaanId'];
+            $this->dataPasien['pasien']['pekerjaan']['pekerjaanDesc'] = $pekerjaan['pekerjaanDesc'];
+            $this->pekerjaanLovStatus = false;
+            $this->pekerjaanLovSearch = '';
+        } else {
+            // if there is no id found and check (min 3 char on search)
+            if (strlen($search) < 3) {
+                $this->pekerjaanLov = $this->dataPasien['pasien']['pekerjaan']['pekerjaanOptions'];
+            } else {
+                $this->pekerjaanLov = collect($this->dataPasien['pasien']['pekerjaan']['pekerjaanOptions'])
+                    ->filter(function ($item) use ($search) {
+                        return false !== stristr($item['pekerjaanDesc'], $search);
+                    });
+            }
+            $this->pekerjaanLovStatus = true;
+            $this->dataPasien['pasien']['pekerjaan']['pekerjaanId'] = '';
+            $this->dataPasien['pasien']['pekerjaan']['pekerjaanDesc'] = '';
+        }
+    }
+    // /////////////////////
+    // LOV selected start
+    public function setMypekerjaanLov($id, $name)
+    {
+        $this->dataPasien['pasien']['pekerjaan']['pekerjaanId'] = $id;
+        $this->dataPasien['pasien']['pekerjaan']['pekerjaanDesc'] = $name;
+        $this->pekerjaanLovStatus = false;
+        $this->pekerjaanLovSearch = '';
+    }
+    // LOV selected end
+    // /////////////////////
+
+    // /////////golonganDarah////////////
+    public function clickgolonganDarahlov()
+    {
+        $this->golonganDarahLovStatus = true;
+        $this->golonganDarahLov = $this->dataPasien['pasien']['golonganDarah']['golonganDarahOptions'];
+    }
+    public function updatedgolonganDarahlovsearch()
+    {
+        // Variable Search
+        $search = $this->golonganDarahLovSearch;
+
+        // check LOV by id 
+        $golonganDarah = collect($this->dataPasien['pasien']['golonganDarah']['golonganDarahOptions'])
+            ->where('golonganDarahId', '=', $search)
+            ->first();
+
+        if ($golonganDarah) {
+            $this->dataPasien['pasien']['golonganDarah']['golonganDarahId'] = $golonganDarah['golonganDarahId'];
+            $this->dataPasien['pasien']['golonganDarah']['golonganDarahDesc'] = $golonganDarah['golonganDarahDesc'];
+            $this->golonganDarahLovStatus = false;
+            $this->golonganDarahLovSearch = '';
+        } else {
+            // if there is no id found and check (min 3 char on search)
+            if (strlen($search) < 3) {
+                $this->golonganDarahLov = $this->dataPasien['pasien']['golonganDarah']['golonganDarahOptions'];
+            } else {
+                $this->golonganDarahLov = collect($this->dataPasien['pasien']['golonganDarah']['golonganDarahOptions'])
+                    ->filter(function ($item) use ($search) {
+                        return false !== stristr($item['golonganDarahDesc'], $search);
+                    });
+            }
+            $this->golonganDarahLovStatus = true;
+            $this->dataPasien['pasien']['golonganDarah']['golonganDarahId'] = '';
+            $this->dataPasien['pasien']['golonganDarah']['golonganDarahDesc'] = '';
+        }
+    }
+    // /////////////////////
+    // LOV selected start
+    public function setMygolonganDarahLov($id, $name)
+    {
+        $this->dataPasien['pasien']['golonganDarah']['golonganDarahId'] = $id;
+        $this->dataPasien['pasien']['golonganDarah']['golonganDarahDesc'] = $name;
+        $this->golonganDarahLovStatus = false;
+        $this->golonganDarahLovSearch = '';
+    }
+    // LOV selected end
+    // /////////////////////
+
+    // /////////status////////////
+    public function clickstatuslov()
+    {
+        $this->statusLovStatus = true;
+        $this->statusLov = $this->dataPasien['pasien']['status']['statusOptions'];
+    }
+    public function updatedstatuslovsearch()
+    {
+        // Variable Search
+        $search = $this->statusLovSearch;
+
+        // check LOV by id 
+        $status = collect($this->dataPasien['pasien']['status']['statusOptions'])
+            ->where('statusId', '=', $search)
+            ->first();
+
+        if ($status) {
+            $this->dataPasien['pasien']['status']['statusId'] = $status['statusId'];
+            $this->dataPasien['pasien']['status']['statusDesc'] = $status['statusDesc'];
+            $this->statusLovStatus = false;
+            $this->statusLovSearch = '';
+        } else {
+            // if there is no id found and check (min 3 char on search)
+            if (strlen($search) < 3) {
+                $this->statusLov = $this->dataPasien['pasien']['status']['statusOptions'];
+            } else {
+                $this->statusLov = collect($this->dataPasien['pasien']['status']['statusOptions'])
+                    ->filter(function ($item) use ($search) {
+                        return false !== stristr($item['statusDesc'], $search);
+                    });
+            }
+            $this->statusLovStatus = true;
+            $this->dataPasien['pasien']['status']['statusId'] = '';
+            $this->dataPasien['pasien']['status']['statusDesc'] = '';
+        }
+    }
+    // /////////////////////
+    // LOV selected start
+    public function setMystatusLov($id, $name)
+    {
+        $this->dataPasien['pasien']['status']['statusId'] = $id;
+        $this->dataPasien['pasien']['status']['statusDesc'] = $name;
+        $this->statusLovStatus = false;
+        $this->statusLovSearch = '';
+    }
+    // LOV selected end
+    // /////////////////////
+
+    // /////////hubunganDgnPasien////////////
+    public function clickhubunganDgnPasienlov()
+    {
+        $this->hubunganDgnPasienLovStatus = true;
+        $this->hubunganDgnPasienLov = $this->dataPasien['pasien']['hubungan']['hubunganDgnPasien']['hubunganDgnPasienOptions'];
+    }
+    public function updatedhubunganDgnPasienlovsearch()
+    {
+        // Variable Search
+        $search = $this->hubunganDgnPasienLovSearch;
+
+        // check LOV by id 
+        $hubunganDgnPasien = collect($this->dataPasien['pasien']['hubungan']['hubunganDgnPasien']['hubunganDgnPasienOptions'])
+            ->where('hubunganDgnPasienId', '=', $search)
+            ->first();
+
+        if ($hubunganDgnPasien) {
+            $this->dataPasien['pasien']['hubungan']['hubunganDgnPasien']['hubunganDgnPasienId'] = $hubunganDgnPasien['hubunganDgnPasienId'];
+            $this->dataPasien['pasien']['hubungan']['hubunganDgnPasien']['hubunganDgnPasienDesc'] = $hubunganDgnPasien['hubunganDgnPasienDesc'];
+            $this->hubunganDgnPasienLovStatus = false;
+            $this->hubunganDgnPasienLovSearch = '';
+        } else {
+            // if there is no id found and check (min 3 char on search)
+            if (strlen($search) < 3) {
+                $this->hubunganDgnPasienLov = $this->dataPasien['pasien']['hubungan']['hubunganDgnPasien']['hubunganDgnPasienOptions'];
+            } else {
+                $this->hubunganDgnPasienLov = collect($this->dataPasien['pasien']['hubungan']['hubunganDgnPasien']['hubunganDgnPasienOptions'])
+                    ->filter(function ($item) use ($search) {
+                        return false !== stristr($item['hubunganDgnPasienDesc'], $search);
+                    });
+            }
+            $this->hubunganDgnPasienLovStatus = true;
+            $this->dataPasien['pasien']['hubungan']['hubunganDgnPasien']['hubunganDgnPasienId'] = '';
+            $this->dataPasien['pasien']['hubungan']['hubunganDgnPasien']['hubunganDgnPasienDesc'] = '';
+        }
+    }
+    // /////////////////////
+    // LOV selected start
+    public function setMyhubunganDgnPasienLov($id, $name)
+    {
+        $this->dataPasien['pasien']['hubungan']['hubunganDgnPasien']['hubunganDgnPasienId'] = $id;
+        $this->dataPasien['pasien']['hubungan']['hubunganDgnPasien']['hubunganDgnPasienDesc'] = $name;
+        $this->hubunganDgnPasienLovStatus = false;
+        $this->hubunganDgnPasienLovSearch = '';
+    }
+    // LOV selected end
+    // /////////////////////
+
+    // logic LOV end
+
 
 
 
