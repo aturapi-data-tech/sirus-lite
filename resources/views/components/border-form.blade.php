@@ -8,14 +8,14 @@
         $alignAttribute = 'text-end';
     }
 @endphp
-<div class="pt-4">
-    <h2 class="w-full {{ $alignAttribute }}" style="line-height: 0.1">
+<div
+    {{ $attributes->merge(['class' => 'my-4 border-t border-b border-l border-r ' . $bordercolor . ' ' . $bgcolor . ' dark:border-gray-600 rounded-md']) }}>
+    <h2 class="w-full {{ $alignAttribute }}">
         <span class="px-3 text-base font-medium bg-transparent text-primary dark:text-gray-300">
             {{ $title }}
         </span>
     </h2>
-    <div
-        {{ $attributes->merge(['class' => 'px-5 pt-4 pb-5 border-t border-b border-l border-r ' . $bordercolor . ' ' . $bgcolor . ' dark:border-gray-600 rounded-md']) }}>
+    <div class='px-5 pt-4'>
         {{ $slot }}
     </div>
 </div>

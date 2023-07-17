@@ -63,6 +63,7 @@
                             {{-- Error Message Start --}}
                             <div class="flex items-center mb-2">
                                 <div class="mt-1 ml-2 truncate sm:w-1/4">
+
                                     @error('dataPasien.pasien.gelarDepan')
                                         <x-input-error :messages=$message />
                                     @enderror
@@ -368,9 +369,7 @@
                         </x-border-form>
                     </x-border-form>
 
-                    <div id="AlamatIdentitas" class="inline-flex ">
-
-
+                    <div id="AlamatIdentitas" class="flex ">
                         <x-border-form :title="__('Identitas')" :align="__('start')" :bgcolor="__('bg-gray-50')" class="mr-2">
 
                             <div class="grid grid-cols-2">
@@ -423,32 +422,34 @@
                                     <div>
                                         <x-input-label for="rtrwidentitas" :value="__('RT/RW')" :required=false />
                                         <div class="flex items-center mb-2">
+
                                             <x-text-input id="rtrwidentitas" placeholder="RT"
                                                 class="mt-1 ml-2 sm:w-1/3" :disabled=$disabledProperty
-                                                wire:model="dataPasien.pasien.identitas.rt" />
+                                                wire:model="dataPasien.pasien.identitas.rt" :errorshas="__($errors->has('dataPasien.pasien.identitas.rt'))" />
+
                                             <x-text-input placeholder="RW" class="mt-1 ml-2 sm:w-1/3"
-                                                :disabled=$disabledProperty
-                                                wire:model="dataPasien.pasien.identitas.rw" />
+                                                :disabled=$disabledProperty wire:model="dataPasien.pasien.identitas.rw"
+                                                :errorshas="__($errors->has('dataPasien.pasien.identitas.rw'))" />
                                             <x-text-input placeholder="Kode Pos" class="mt-1 ml-2 sm:w-1/3"
                                                 :disabled=$disabledProperty
-                                                wire:model="dataPasien.pasien.identitas.kodepos" />
+                                                wire:model="dataPasien.pasien.identitas.kodepos" :errorshas="__($errors->has('dataPasien.pasien.identitas.kodepos'))" />
                                         </div>
                                         {{-- Error Message Start --}}
                                         <div class="flex items-center mb-2">
                                             <div class="mt-1 ml-2 truncate sm:w-1/3">
-                                                @error('dataPasien.pasien.identitas.rt')
+                                                {{-- @error('dataPasien.pasien.identitas.rt')
                                                     <x-input-error :messages=$message />
-                                                @enderror
+                                                @enderror --}}
                                             </div>
                                             <div class="mt-1 ml-2 truncate sm:w-1/3">
-                                                @error('dataPasien.pasien.identitas.rw')
+                                                {{-- @error('dataPasien.pasien.identitas.rw')
                                                     <x-input-error :messages=$message />
-                                                @enderror
+                                                @enderror --}}
                                             </div>
                                             <div class="mt-1 ml-2 truncate sm:w-1/3">
-                                                @error('dataPasien.pasien.identitas.kodepos')
+                                                {{-- @error('dataPasien.pasien.identitas.kodepos')
                                                     <x-input-error :messages=$message />
-                                                @enderror
+                                                @enderror --}}
                                             </div>
 
                                         </div>
@@ -560,7 +561,8 @@
 
                         <x-border-form :title="__('Alamat Domisil')" :align="__('start')" :bgcolor="__('bg-gray-50')" class="">
                             <div class="flex justify-end mb-6">
-                                <x-check-box :valueunchecked="__('0')" :valuechecked="__('1')" :label="__('Sama dgn Identitas')" />
+                                <x-check-box value='1' :label="__('Sama dgn Identitas')"
+                                    wire:model="dataPasien.pasien.domisil.samadgnidentitas" />
                             </div>
 
                             <div>
@@ -586,19 +588,19 @@
                                 {{-- Error Message Start --}}
                                 <div class="flex items-center mb-2">
                                     <div class="mt-1 ml-2 truncate sm:w-1/3">
-                                        @error('dataPasien.pasien.domisil.rt')
+                                        {{-- @error('dataPasien.pasien.domisil.rt')
                                             <x-input-error :messages=$message />
-                                        @enderror
+                                        @enderror --}}
                                     </div>
                                     <div class="mt-1 ml-2 truncate sm:w-1/3">
-                                        @error('dataPasien.pasien.domisil.rw')
+                                        {{-- @error('dataPasien.pasien.domisil.rw')
                                             <x-input-error :messages=$message />
-                                        @enderror
+                                        @enderror --}}
                                     </div>
                                     <div class="mt-1 ml-2 truncate sm:w-1/3">
-                                        @error('dataPasien.pasien.domisil.kodepos')
+                                        {{-- @error('dataPasien.pasien.domisil.kodepos')
                                             <x-input-error :messages=$message />
-                                        @enderror
+                                        @enderror --}}
                                     </div>
 
                                 </div>
@@ -700,7 +702,6 @@
 
                         </x-border-form>
 
-
                     </div>
 
                     <x-border-form :title="__('Kontak')" :align="__('start')" :bgcolor="__('bg-gray-50')">
@@ -732,7 +733,8 @@
                     </x-border-form>
 
                     <x-border-form :title="__('Hubungan')" :align="__('start')" :bgcolor="__('bg-gray-50')">
-                        <x-border-form :title="__('')" :align="__('start')" :bgcolor="__('bg-yellow-100')" class="mb-8 sm:-mt-8">
+
+                        <x-border-form :title="__('Penanggung Jawab')" :align="__('start')" :bgcolor="__('bg-yellow-100')">
                             {{-- PenanggungJawab --}}
                             <x-input-label for="PenanggungJawab" :value="__('Penanggung Jawab')" :required=false />
                             {{-- nomerTelponSelulerPenanggungJawab --}}
@@ -756,7 +758,7 @@
                             {{-- HungungandgnPHubasien --}}
                             <x-input-label for="HungungandgnPasien" :value="__('Hungungan dgn Pasien')" :required=false />
 
-                            <div class="mt-1 sm:w-1/2">
+                            <div class="mt-1 mb-2 sm:w-1/2">
                                 <div class="flex ">
                                     <x-text-input placeholder="hubunganDgnPasien"
                                         class="sm:rounded-none sm:rounded-l-lg" :disabled=true
