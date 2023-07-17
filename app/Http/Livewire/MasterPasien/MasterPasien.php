@@ -130,12 +130,12 @@ class MasterPasien extends Component
                 "kodepos" => "", //harus diisi
                 "desaId" => "", //harus diisi (Kode data Kemendagri)
                 "kecamatanId" => "", //harus diisi (Kode data Kemendagri)
-                "kotaId" => "", //harus diisi (Kode data Kemendagri)
-                "propinsiId" => "", //harus diisi (Kode data Kemendagri)
+                "kotaId" => "3504", //harus diisi (Kode data Kemendagri)
+                "propinsiId" => "35", //harus diisi (Kode data Kemendagri)
                 "desaName" => "", //harus diisi (Kode data Kemendagri)
                 "kecamatanName" => "", //harus diisi (Kode data Kemendagri)
-                "kotaName" => "", //harus diisi (Kode data Kemendagri)
-                "propinsiName" => "" //harus diisi (Kode data Kemendagri)
+                "kotaName" => "TULUNGAGUNG", //harus diisi (Kode data Kemendagri)
+                "propinsiName" => "JAWA TIMUR", //harus diisi (Kode data Kemendagri)
 
             ],
             "identitas" => [
@@ -149,12 +149,12 @@ class MasterPasien extends Component
                 "kodepos" => "", //harus diisi
                 "desaId" => "", //harus diisi (Kode data Kemendagri)
                 "kecamatanId" => "", //harus diisi (Kode data Kemendagri)
-                "kotaId" => "", //harus diisi (Kode data Kemendagri)
-                "propinsiId" => "", //harus diisi (Kode data Kemendagri)
+                "kotaId" => "3504", //harus diisi (Kode data Kemendagri)
+                "propinsiId" => "35", //harus diisi (Kode data Kemendagri)
                 "desaName" => "", //harus diisi (Kode data Kemendagri)
                 "kecamatanName" => "", //harus diisi (Kode data Kemendagri)
-                "kotaName" => "", //harus diisi (Kode data Kemendagri)
-                "propinsiName" => "", //harus diisi (Kode data Kemendagri)
+                "kotaName" => "TULUNGAGUNG", //harus diisi (Kode data Kemendagri)
+                "propinsiName" => "JAWA TIMUR", //harus diisi (Kode data Kemendagri)
                 "negara" => "ID" //harus diisi (ISO 3166) ID 	IDN 	360 	ISO 3166-2:ID 	.id
             ],
             "kontak" => [
@@ -225,6 +225,22 @@ class MasterPasien extends Component
     public $hubunganDgnPasienLov = [];
     public $hubunganDgnPasienLovStatus = 0;
     public $hubunganDgnPasienLovSearch = '';
+
+    public $desaIdentitasLov = [];
+    public $desaIdentitasLovStatus = 0;
+    public $desaIdentitasLovSearch = '';
+
+    public $kotaIdentitasLov = [];
+    public $kotaIdentitasLovStatus = 0;
+    public $kotaIdentitasLovSearch = '';
+
+    public $desaDomisilLov = [];
+    public $desaDomisilLovStatus = 0;
+    public $desaDomisilLovSearch = '';
+
+    public $kotaDomisilLov = [];
+    public $kotaDomisilLovStatus = 0;
+    public $kotaDomisilLovSearch = '';
 
     //  table LOV////////////////
 
@@ -730,6 +746,407 @@ class MasterPasien extends Component
     // LOV selected end
     // /////////////////////
 
+    // /////////desaIdentitas////////////
+    public function clickdesaIdentitaslov()
+    {
+        $this->desaIdentitasLovStatus = true;
+        $this->desaIdentitasLov = [];
+    }
+    public function updatedDesaidentitaslovsearch()
+    {
+        // Variable Search
+        $search = $this->desaIdentitasLovSearch;
+
+        // check LOV by id 
+        $desaIdentitas = DB::table('rsmst_desas')
+            ->select(
+                'rsmst_desas.des_id  as des_id',
+                'rsmst_kecamatans.kec_id  as kec_id',
+                'rsmst_kabupatens.kab_id  as kab_id',
+                'rsmst_propinsis.prop_id  as prop_id',
+                'des_name  as des_name',
+                'kec_name  as kec_name',
+                'kab_name  as kab_name',
+                'prop_name  as prop_name',
+
+            )->join('rsmst_kecamatans', 'rsmst_kecamatans.kec_id', 'rsmst_desas.kec_id')
+            ->join('rsmst_kabupatens', 'rsmst_kabupatens.kab_id', 'rsmst_kecamatans.kab_id')
+            ->join('rsmst_propinsis', 'rsmst_propinsis.prop_id', 'rsmst_kabupatens.prop_id')
+            ->where(DB::raw("to_char(rsmst_desas.des_id)"), $search)
+            ->first();
+
+
+        if ($desaIdentitas) {
+            $this->dataPasien['pasien']['identitas']['desaId'] = $desaIdentitas->des_id;
+            $this->dataPasien['pasien']['identitas']['desaName'] = $desaIdentitas->des_name;
+            $this->dataPasien['pasien']['identitas']['kecamatanId'] = $desaIdentitas->kec_id;
+            $this->dataPasien['pasien']['identitas']['kecamatanName'] = $desaIdentitas->kec_name;
+            $this->dataPasien['pasien']['identitas']['kotaId'] = $desaIdentitas->kab_id;
+            $this->dataPasien['pasien']['identitas']['kotaName'] = $desaIdentitas->kab_name;
+            $this->dataPasien['pasien']['identitas']['propinsiId'] = $desaIdentitas->prop_id;
+            $this->dataPasien['pasien']['identitas']['propinsiName'] = $desaIdentitas->prop_name;
+            $this->desaIdentitasLovStatus = false;
+            $this->desaIdentitasLovSearch = '';
+        } else {
+            // if there is no id found and check (min 3 char on search)
+            if (strlen($search) < 3) {
+                $this->desaIdentitasLov = [];
+            } else {
+                $this->desaIdentitasLov = DB::table('rsmst_desas')
+                    ->select(
+                        'rsmst_desas.des_id  as des_id',
+                        'rsmst_kecamatans.kec_id  as kec_id',
+                        'rsmst_kabupatens.kab_id  as kab_id',
+                        'rsmst_propinsis.prop_id  as prop_id',
+                        'des_name  as des_name',
+                        'kec_name  as kec_name',
+                        'kab_name  as kab_name',
+                        'prop_name  as prop_name',
+
+                    )->join('rsmst_kecamatans', 'rsmst_kecamatans.kec_id', 'rsmst_desas.kec_id')
+                    ->join('rsmst_kabupatens', 'rsmst_kabupatens.kab_id', 'rsmst_kecamatans.kab_id')
+                    ->join('rsmst_propinsis', 'rsmst_propinsis.prop_id', 'rsmst_kabupatens.prop_id')
+                    ->where('rsmst_kabupatens.kab_id', $this->dataPasien['pasien']['identitas']['kotaId'])
+                    ->where('rsmst_propinsis.prop_id', $this->dataPasien['pasien']['identitas']['propinsiId'])
+                    ->where(
+                        function ($q) use ($search) {
+                            $q->Where(
+                                DB::raw("replace(upper('ds'||des_name),' ','')"),
+                                'like',
+                                '%' . str_replace(' ', '', strtoupper($search)) . '%'
+                            )
+                                ->OrWhere(
+                                    DB::raw("replace(upper('kec'||kec_name),' ','')"),
+                                    'like',
+                                    '%' . str_replace(' ', '', strtoupper($search)) . '%'
+                                );
+                        }
+                    )
+                    ->orderBy('prop_name')
+                    ->orderBy('kab_name')
+                    ->orderBy('kec_name')
+                    ->orderBy('des_name')
+                    ->limit(30)->get();
+            }
+            $this->desaIdentitasLovStatus = true;
+            $this->dataPasien['pasien']['identitas']['desaId'] = '';
+            $this->dataPasien['pasien']['identitas']['desaName'] = '';
+            $this->dataPasien['pasien']['identitas']['kecamatanId'] = '';
+            $this->dataPasien['pasien']['identitas']['kecamatanName'] = '';
+        }
+    }
+    // /////////////////////
+    // LOV selected start
+    public function setMydesaIdentitasLov($desaId, $desaName, $kecId, $kecName)
+    {
+        $this->dataPasien['pasien']['identitas']['desaId'] = $desaId;
+        $this->dataPasien['pasien']['identitas']['desaName'] = $desaName;
+        $this->dataPasien['pasien']['identitas']['kecamatanId'] = $kecId;
+        $this->dataPasien['pasien']['identitas']['kecamatanName'] = $kecName;
+        $this->desaIdentitasLovStatus = false;
+        $this->desaIdentitasLovSearch = '';
+    }
+    // LOV selected end
+    // /////////////////////
+
+    // /////////kotaIdentitas////////////
+    public function clickkotaIdentitaslov()
+    {
+        $this->kotaIdentitasLovStatus = true;
+        $this->kotaIdentitasLov = [];
+    }
+    public function updatedkotaidentitaslovsearch()
+    {
+        // Variable Search
+        $search = $this->kotaIdentitasLovSearch;
+
+        // check LOV by id 
+        $kotaIdentitas = DB::table('rsmst_kabupatens')
+            ->select(
+
+                'rsmst_kabupatens.kab_id  as kab_id',
+                'rsmst_propinsis.prop_id  as prop_id',
+                'kab_name  as kab_name',
+                'prop_name  as prop_name',
+
+            )
+            ->join('rsmst_propinsis', 'rsmst_propinsis.prop_id', 'rsmst_kabupatens.prop_id')
+            ->where(DB::raw("to_char(rsmst_kabupatens.kab_id)"), $search)
+            ->first();
+
+
+        if ($kotaIdentitas) {
+            $this->dataPasien['pasien']['identitas']['desaId'] = '';
+            $this->dataPasien['pasien']['identitas']['desaName'] = '';
+            $this->dataPasien['pasien']['identitas']['kecamatanId'] = '';
+            $this->dataPasien['pasien']['identitas']['kecamatanName'] = '';
+            $this->dataPasien['pasien']['identitas']['kotaId'] = $kotaIdentitas->kab_id;
+            $this->dataPasien['pasien']['identitas']['kotaName'] = $kotaIdentitas->kab_name;
+            $this->dataPasien['pasien']['identitas']['propinsiId'] = $kotaIdentitas->prop_id;
+            $this->dataPasien['pasien']['identitas']['propinsiName'] = $kotaIdentitas->prop_name;
+            $this->kotaIdentitasLovStatus = false;
+            $this->kotaIdentitasLovSearch = '';
+        } else {
+            // if there is no id found and check (min 3 char on search)
+            if (strlen($search) < 3) {
+                $this->kotaIdentitasLov = [];
+            } else {
+                $this->kotaIdentitasLov = DB::table('rsmst_kabupatens')
+                    ->select(
+                        'rsmst_kabupatens.kab_id  as kab_id',
+                        'rsmst_propinsis.prop_id  as prop_id',
+                        'kab_name  as kab_name',
+                        'prop_name  as prop_name',
+                    )
+                    ->join('rsmst_propinsis', 'rsmst_propinsis.prop_id', 'rsmst_kabupatens.prop_id')
+                    ->where(
+                        function ($q) use ($search) {
+                            $q->Where(
+                                DB::raw("replace(upper('kab'||kab_name),' ','')"),
+                                'like',
+                                '%' . str_replace(' ', '', strtoupper($search)) . '%'
+                            )
+                                ->OrWhere(
+                                    DB::raw("replace(upper('prop'||prop_name),' ','')"),
+                                    'like',
+                                    '%' . str_replace(' ', '', strtoupper($search)) . '%'
+                                );
+                        }
+                    )
+                    ->orderBy('prop_name')
+                    ->orderBy('kab_name')
+                    ->limit(30)->get();
+            }
+            $this->kotaIdentitasLovStatus = true;
+            $this->dataPasien['pasien']['identitas']['desaId'] = '';
+            $this->dataPasien['pasien']['identitas']['desaName'] = '';
+            $this->dataPasien['pasien']['identitas']['kecamatanId'] = '';
+            $this->dataPasien['pasien']['identitas']['kecamatanName'] = '';
+            $this->dataPasien['pasien']['identitas']['kotaId'] = '';
+            $this->dataPasien['pasien']['identitas']['kotaName'] = '';
+            $this->dataPasien['pasien']['identitas']['propinsiId'] = '';
+            $this->dataPasien['pasien']['identitas']['propinsiName'] = '';
+        }
+    }
+    // /////////////////////
+    // LOV selected start
+    public function setMykotaIdentitasLov($kotaId, $kotaName, $propinsiId, $propinsiName)
+    {
+        $this->dataPasien['pasien']['identitas']['desaId'] = '';
+        $this->dataPasien['pasien']['identitas']['desaName'] = '';
+        $this->dataPasien['pasien']['identitas']['kecamatanId'] = '';
+        $this->dataPasien['pasien']['identitas']['kecamatanName'] = '';
+        $this->dataPasien['pasien']['identitas']['kotaId'] = $kotaId;
+        $this->dataPasien['pasien']['identitas']['kotaName'] = $kotaName;
+        $this->dataPasien['pasien']['identitas']['propinsiId'] = $propinsiId;
+        $this->dataPasien['pasien']['identitas']['propinsiName'] = $propinsiName;
+        $this->kotaIdentitasLovStatus = false;
+        $this->kotaIdentitasLovSearch = '';
+    }
+    // LOV selected end
+    // /////////////////////
+
+
+    // /////////desaDomisil////////////
+    public function clickDesaDomisillov()
+    {
+        $this->desaDomisilLovStatus = true;
+        $this->desaDomisilLov = [];
+    }
+    public function updatedDesaDomisillovsearch()
+    {
+        // Variable Search
+        $search = $this->desaDomisilLovSearch;
+
+        // check LOV by id 
+        $desaDomisil = DB::table('rsmst_desas')
+            ->select(
+                'rsmst_desas.des_id  as des_id',
+                'rsmst_kecamatans.kec_id  as kec_id',
+                'rsmst_kabupatens.kab_id  as kab_id',
+                'rsmst_propinsis.prop_id  as prop_id',
+                'des_name  as des_name',
+                'kec_name  as kec_name',
+                'kab_name  as kab_name',
+                'prop_name  as prop_name',
+
+            )->join('rsmst_kecamatans', 'rsmst_kecamatans.kec_id', 'rsmst_desas.kec_id')
+            ->join('rsmst_kabupatens', 'rsmst_kabupatens.kab_id', 'rsmst_kecamatans.kab_id')
+            ->join('rsmst_propinsis', 'rsmst_propinsis.prop_id', 'rsmst_kabupatens.prop_id')
+            ->where(DB::raw("to_char(rsmst_desas.des_id)"), $search)
+            ->first();
+
+
+        if ($desaDomisil) {
+            $this->dataPasien['pasien']['domisil']['desaId'] = $desaDomisil->des_id;
+            $this->dataPasien['pasien']['domisil']['desaName'] = $desaDomisil->des_name;
+            $this->dataPasien['pasien']['domisil']['kecamatanId'] = $desaDomisil->kec_id;
+            $this->dataPasien['pasien']['domisil']['kecamatanName'] = $desaDomisil->kec_name;
+            $this->dataPasien['pasien']['domisil']['kotaId'] = $desaDomisil->kab_id;
+            $this->dataPasien['pasien']['domisil']['kotaName'] = $desaDomisil->kab_name;
+            $this->dataPasien['pasien']['domisil']['propinsiId'] = $desaDomisil->prop_id;
+            $this->dataPasien['pasien']['domisil']['propinsiName'] = $desaDomisil->prop_name;
+            $this->desaDomisilLovStatus = false;
+            $this->desaDomisilLovSearch = '';
+        } else {
+            // if there is no id found and check (min 3 char on search)
+            if (strlen($search) < 3) {
+                $this->desaDomisilLov = [];
+            } else {
+                $this->desaDomisilLov = DB::table('rsmst_desas')
+                    ->select(
+                        'rsmst_desas.des_id  as des_id',
+                        'rsmst_kecamatans.kec_id  as kec_id',
+                        'rsmst_kabupatens.kab_id  as kab_id',
+                        'rsmst_propinsis.prop_id  as prop_id',
+                        'des_name  as des_name',
+                        'kec_name  as kec_name',
+                        'kab_name  as kab_name',
+                        'prop_name  as prop_name',
+
+                    )->join('rsmst_kecamatans', 'rsmst_kecamatans.kec_id', 'rsmst_desas.kec_id')
+                    ->join('rsmst_kabupatens', 'rsmst_kabupatens.kab_id', 'rsmst_kecamatans.kab_id')
+                    ->join('rsmst_propinsis', 'rsmst_propinsis.prop_id', 'rsmst_kabupatens.prop_id')
+                    ->where('rsmst_kabupatens.kab_id', $this->dataPasien['pasien']['domisil']['kotaId'])
+                    ->where('rsmst_propinsis.prop_id', $this->dataPasien['pasien']['domisil']['propinsiId'])
+                    ->where(
+                        function ($q) use ($search) {
+                            $q->Where(
+                                DB::raw("replace(upper('ds'||des_name),' ','')"),
+                                'like',
+                                '%' . str_replace(' ', '', strtoupper($search)) . '%'
+                            )
+                                ->OrWhere(
+                                    DB::raw("replace(upper('kec'||kec_name),' ','')"),
+                                    'like',
+                                    '%' . str_replace(' ', '', strtoupper($search)) . '%'
+                                );
+                        }
+                    )
+                    ->orderBy('prop_name')
+                    ->orderBy('kab_name')
+                    ->orderBy('kec_name')
+                    ->orderBy('des_name')
+                    ->limit(30)->get();
+            }
+            $this->desaDomisilLovStatus = true;
+            $this->dataPasien['pasien']['domisil']['desaId'] = '';
+            $this->dataPasien['pasien']['domisil']['desaName'] = '';
+            $this->dataPasien['pasien']['domisil']['kecamatanId'] = '';
+            $this->dataPasien['pasien']['domisil']['kecamatanName'] = '';
+        }
+    }
+    // /////////////////////
+    // LOV selected start
+    public function setMydesaDomisilLov($desaId, $desaName, $kecId, $kecName)
+    {
+        $this->dataPasien['pasien']['domisil']['desaId'] = $desaId;
+        $this->dataPasien['pasien']['domisil']['desaName'] = $desaName;
+        $this->dataPasien['pasien']['domisil']['kecamatanId'] = $kecId;
+        $this->dataPasien['pasien']['domisil']['kecamatanName'] = $kecName;
+        $this->desaDomisilLovStatus = false;
+        $this->desaDomisilLovSearch = '';
+    }
+    // LOV selected end
+    // /////////////////////
+
+    // /////////kotaDomisil////////////
+    public function clickkotaDomisillov()
+    {
+        $this->kotaDomisilLovStatus = true;
+        $this->kotaDomisilLov = [];
+    }
+    public function updatedkotaDomisillovsearch()
+    {
+        // Variable Search
+        $search = $this->kotaDomisilLovSearch;
+
+        // check LOV by id 
+        $kotaDomisil = DB::table('rsmst_kabupatens')
+            ->select(
+
+                'rsmst_kabupatens.kab_id  as kab_id',
+                'rsmst_propinsis.prop_id  as prop_id',
+                'kab_name  as kab_name',
+                'prop_name  as prop_name',
+
+            )
+            ->join('rsmst_propinsis', 'rsmst_propinsis.prop_id', 'rsmst_kabupatens.prop_id')
+            ->where(DB::raw("to_char(rsmst_kabupatens.kab_id)"), $search)
+            ->first();
+
+
+        if ($kotaDomisil) {
+            $this->dataPasien['pasien']['domisil']['desaId'] = '';
+            $this->dataPasien['pasien']['domisil']['desaName'] = '';
+            $this->dataPasien['pasien']['domisil']['kecamatanId'] = '';
+            $this->dataPasien['pasien']['domisil']['kecamatanName'] = '';
+            $this->dataPasien['pasien']['domisil']['kotaId'] = $kotaDomisil->kab_id;
+            $this->dataPasien['pasien']['domisil']['kotaName'] = $kotaDomisil->kab_name;
+            $this->dataPasien['pasien']['domisil']['propinsiId'] = $kotaDomisil->prop_id;
+            $this->dataPasien['pasien']['domisil']['propinsiName'] = $kotaDomisil->prop_name;
+            $this->kotaDomisilLovStatus = false;
+            $this->kotaDomisilLovSearch = '';
+        } else {
+            // if there is no id found and check (min 3 char on search)
+            if (strlen($search) < 3) {
+                $this->kotaDomisilLov = [];
+            } else {
+                $this->kotaDomisilLov = DB::table('rsmst_kabupatens')
+                    ->select(
+                        'rsmst_kabupatens.kab_id  as kab_id',
+                        'rsmst_propinsis.prop_id  as prop_id',
+                        'kab_name  as kab_name',
+                        'prop_name  as prop_name',
+                    )
+                    ->join('rsmst_propinsis', 'rsmst_propinsis.prop_id', 'rsmst_kabupatens.prop_id')
+                    ->where(
+                        function ($q) use ($search) {
+                            $q->Where(
+                                DB::raw("replace(upper('kab'||kab_name),' ','')"),
+                                'like',
+                                '%' . str_replace(' ', '', strtoupper($search)) . '%'
+                            )
+                                ->OrWhere(
+                                    DB::raw("replace(upper('prop'||prop_name),' ','')"),
+                                    'like',
+                                    '%' . str_replace(' ', '', strtoupper($search)) . '%'
+                                );
+                        }
+                    )
+                    ->orderBy('prop_name')
+                    ->orderBy('kab_name')
+                    ->limit(30)->get();
+            }
+            $this->kotaDomisilLovStatus = true;
+            $this->dataPasien['pasien']['domisil']['desaId'] = '';
+            $this->dataPasien['pasien']['domisil']['desaName'] = '';
+            $this->dataPasien['pasien']['domisil']['kecamatanId'] = '';
+            $this->dataPasien['pasien']['domisil']['kecamatanName'] = '';
+            $this->dataPasien['pasien']['domisil']['kotaId'] = '';
+            $this->dataPasien['pasien']['domisil']['kotaName'] = '';
+            $this->dataPasien['pasien']['domisil']['propinsiId'] = '';
+            $this->dataPasien['pasien']['domisil']['propinsiName'] = '';
+        }
+    }
+    // /////////////////////
+    // LOV selected start
+    public function setMykotaDomisilLov($kotaId, $kotaName, $propinsiId, $propinsiName)
+    {
+        $this->dataPasien['pasien']['domisil']['desaId'] = '';
+        $this->dataPasien['pasien']['domisil']['desaName'] = '';
+        $this->dataPasien['pasien']['domisil']['kecamatanId'] = '';
+        $this->dataPasien['pasien']['domisil']['kecamatanName'] = '';
+        $this->dataPasien['pasien']['domisil']['kotaId'] = $kotaId;
+        $this->dataPasien['pasien']['domisil']['kotaName'] = $kotaName;
+        $this->dataPasien['pasien']['domisil']['propinsiId'] = $propinsiId;
+        $this->dataPasien['pasien']['domisil']['propinsiName'] = $propinsiName;
+        $this->kotaDomisilLovStatus = false;
+        $this->kotaDomisilLovSearch = '';
+    }
+    // LOV selected end
+    // /////////////////////
+
     // logic LOV end
 
 
@@ -819,6 +1236,9 @@ class MasterPasien extends Component
     // select data start////////////////
     public function render()
     {
+
+
+
         return view(
             'livewire.master-pasien.master-pasien',
             [

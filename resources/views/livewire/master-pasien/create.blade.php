@@ -369,94 +369,10 @@
                     </x-border-form>
 
                     <div id="AlamatIdentitas" class="inline-flex ">
-                        <x-border-form :title="__('Alamat Domisil')" :align="__('start')" :bgcolor="__('bg-red-100')" class="mr-2">
-                            <div>
-                                <x-input-label for="AlamatDomisil" :value="__('Alamat')" :required=false />
-                                <div class="flex items-center mb-2">
-                                    <x-text-input id="AlamatDomisil" placeholder="Alamat" class="mt-1 ml-2"
-                                        :disabled=$disabledProperty wire:model="dataPasien.pasien.domisil.alamat" />
-                                </div>
-                                @error('dataPasien.pasien.domisil.alamat')
-                                    <x-input-error :messages=$message />
-                                @enderror
-                            </div>
-                            <div>
-                                <x-input-label for="rtrwDomisil" :value="__('RT/RW')" :required=false />
-                                <div class="flex items-center mb-2">
-                                    <x-text-input id="rtrwDomisil" placeholder="RT" class="mt-1 ml-2 sm:w-1/3"
-                                        :disabled=$disabledProperty wire:model="dataPasien.pasien.domisil.rt" />
-                                    <x-text-input placeholder="RW" class="mt-1 ml-2 sm:w-1/3"
-                                        :disabled=$disabledProperty wire:model="dataPasien.pasien.domisil.rw" />
-                                    <x-text-input placeholder="Kode Pos" class="mt-1 ml-2 sm:w-1/3"
-                                        :disabled=$disabledProperty wire:model="dataPasien.pasien.domisil.kodepos" />
-                                </div>
-                                {{-- Error Message Start --}}
-                                <div class="flex items-center mb-2">
-                                    <div class="mt-1 ml-2 truncate sm:w-1/3">
-                                        @error('dataPasien.pasien.domisil.rt')
-                                            <x-input-error :messages=$message />
-                                        @enderror
-                                    </div>
-                                    <div class="mt-1 ml-2 truncate sm:w-1/3">
-                                        @error('dataPasien.pasien.domisil.rw')
-                                            <x-input-error :messages=$message />
-                                        @enderror
-                                    </div>
-                                    <div class="mt-1 ml-2 truncate sm:w-1/3">
-                                        @error('dataPasien.pasien.domisil.kodepos')
-                                            <x-input-error :messages=$message />
-                                        @enderror
-                                    </div>
 
-                                </div>
-                                {{-- Error Message End --}}
-                            </div>
-                            <div>
-                                <x-input-label for="DesaDomisil" :value="__('Desa')" :required=false />
-                                <div class="flex items-center mb-2">
-                                    <x-text-input id="DesaDomisil" placeholder="Desa" class="mt-1 ml-2"
-                                        :disabled=$disabledProperty wire:model="dataPasien.pasien.domisil.desa" />
-                                </div>
-                                @error('dataPasien.pasien.domisil.desa')
-                                    <x-input-error :messages=$message />
-                                @enderror
-                            </div>
-                            <div>
-                                <x-input-label for="KecamatanDomisil" :value="__('Kecamatan')" :required=false />
-                                <div class="flex items-center mb-2">
-                                    <x-text-input id="KecamatanDomisil" placeholder="Kecamatan" class="mt-1 ml-2"
-                                        :disabled=$disabledProperty wire:model="dataPasien.pasien.domisil.kecamatan" />
-                                </div>
-                                @error('dataPasien.pasien.domisil.kecamatan')
-                                    <x-input-error :messages=$message />
-                                @enderror
-                            </div>
-                            <div>
-                                <x-input-label for="KotaDomisil" :value="__('Kota')" :required=false />
-                                <div class="flex items-center mb-2">
-                                    <x-text-input placeholder="Kota" class="mt-1 ml-2" :disabled=$disabledProperty
-                                        wire:model="dataPasien.pasien.domisil.kota" />
-                                </div>
-                                @error('dataPasien.pasien.domisil.kota')
-                                    <x-input-error :messages=$message />
-                                @enderror
-                            </div>
-                            <div>
-                                <x-input-label for="PropinsiDomisil" :value="__('Propinsi')" :required=false />
-                                <div class="flex items-center mb-2">
-                                    <x-text-input id="PropinsiDomisil" placeholder="Propinsi" class="mt-1 ml-2"
-                                        :disabled=$disabledProperty wire:model="dataPasien.pasien.domisil.propinsi" />
-                                </div>
-                                @error('dataPasien.pasien.domisil.propinsi')
-                                    <x-input-error :messages=$message />
-                                @enderror
-                            </div>
-                        </x-border-form>
 
-                        <x-border-form :title="__('Identitas')" :align="__('start')" :bgcolor="__('bg-gray-50')" class="">
-                            <div class="flex justify-end">
-                                <x-check-box :valueunchecked="__('0')" :valuechecked="__('1')" :label="__('Sama dgn Domisil')" />
-                            </div>
+                        <x-border-form :title="__('Identitas')" :align="__('start')" :bgcolor="__('bg-gray-50')" class="mr-2">
+
                             <div class="grid grid-cols-2">
                                 {{-- grid 1 Identitas --}}
                                 <div>
@@ -543,48 +459,90 @@
                                 <div>
                                     <div>
                                         <x-input-label for="Desaidentitas" :value="__('Desa')" :required=false />
-                                        <div class="flex items-center mb-2">
-                                            <x-text-input id="Desaidentitas" placeholder="Desa" class="mt-1 ml-2"
-                                                :disabled=$disabledProperty
-                                                wire:model="dataPasien.pasien.identitas.desa" />
+
+                                        <div class="mt-1">
+
+                                            <div class="flex mb-2 ml-2 ">
+                                                <x-text-input placeholder="Desa"
+                                                    class="sm:rounded-none sm:rounded-l-lg" :disabled=true
+                                                    value="{{ $dataPasien['pasien']['identitas']['desaName'] }}" />
+                                                <x-green-button
+                                                    class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
+                                                    wire:click.prevent="clickdesaIdentitaslov()">
+                                                    <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor"
+                                                        viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"
+                                                        aria-hidden="true">
+                                                        <path clip-rule="evenodd" fill-rule="evenodd"
+                                                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                                                    </svg>
+                                                </x-green-button>
+
+                                            </div>
+
+                                            {{-- LOV hubunganDgnPasien --}}
+                                            @include('livewire.master-pasien.list-of-value-desaIdentitas')
                                         </div>
-                                        @error('dataPasien.pasien.identitas.desa')
+
+                                        @error('dataPasien.pasien.identitas.desaId')
                                             <x-input-error :messages=$message />
                                         @enderror
                                     </div>
+
                                     <div>
                                         <x-input-label for="Kecamatanidentitas" :value="__('Kecamatan')" :required=false />
                                         <div class="flex items-center mb-2">
                                             <x-text-input id="Kecamatanidentitas" placeholder="Kecamatan"
-                                                class="mt-1 ml-2" :disabled=$disabledProperty
-                                                wire:model="dataPasien.pasien.identitas.kecamatan" />
+                                                class="mt-1 ml-2" :disabled=true
+                                                value="{{ $dataPasien['pasien']['identitas']['kecamatanName'] }}" />
                                         </div>
-                                        @error('dataPasien.pasien.identitas.kecamatan')
+                                        @error('dataPasien.pasien.identitas.kecamatanId')
                                             <x-input-error :messages=$message />
                                         @enderror
                                     </div>
+
                                     <div>
-                                        <x-input-label for="Kotaidentitas" :value="__('Kota')" :required=false />
-                                        <div class="flex items-center mb-2">
-                                            <x-text-input placeholder="Kota" class="mt-1 ml-2"
-                                                :disabled=$disabledProperty
-                                                wire:model="dataPasien.pasien.identitas.kota" />
+                                        <x-input-label for="kotaidentitas" :value="__('kota')" :required=false />
+
+                                        <div class="mt-1">
+
+                                            <div class="flex mb-2 ml-2 ">
+                                                <x-text-input placeholder="kota"
+                                                    class="sm:rounded-none sm:rounded-l-lg" :disabled=true
+                                                    value="{{ $dataPasien['pasien']['identitas']['kotaName'] }}" />
+                                                <x-green-button
+                                                    class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
+                                                    wire:click.prevent="clickkotaIdentitaslov()">
+                                                    <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor"
+                                                        viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"
+                                                        aria-hidden="true">
+                                                        <path clip-rule="evenodd" fill-rule="evenodd"
+                                                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                                                    </svg>
+                                                </x-green-button>
+
+                                            </div>
+
+                                            {{-- LOV hubunganDgnPasien --}}
+                                            @include('livewire.master-pasien.list-of-value-kotaIdentitas')
                                         </div>
-                                        @error('dataPasien.pasien.identitas.kota')
+
+                                        @error('dataPasien.pasien.identitas.desaId')
                                             <x-input-error :messages=$message />
                                         @enderror
                                     </div>
+
                                     <div>
                                         <x-input-label for="Propinsiidentitas" :value="__('Propinsi')" :required=false />
                                         <div class="flex items-center mb-2">
                                             <x-text-input id="Propinsiidentitas" placeholder="Propinsi"
-                                                class="mt-1 ml-2" :disabled=$disabledProperty
-                                                wire:model="dataPasien.pasien.identitas.propinsi" />
+                                                class="mt-1 ml-2" :disabled=true
+                                                value="{{ $dataPasien['pasien']['identitas']['propinsiName'] }}" />
                                         </div>
-                                        @error('dataPasien.pasien.identitas.propinsi')
+                                        @error('dataPasien.pasien.identitas.propinsiId')
                                             <x-input-error :messages=$message />
                                         @enderror
                                     </div>
+
                                     <div>
                                         <x-input-label for="negaraidentitas" :value="__('Negara')" :required=false />
                                         <div class="flex items-center mb-2">
@@ -599,6 +557,150 @@
                                 </div>
                             </div>
                         </x-border-form>
+
+                        <x-border-form :title="__('Alamat Domisil')" :align="__('start')" :bgcolor="__('bg-gray-50')" class="">
+                            <div class="flex justify-end mb-6">
+                                <x-check-box :valueunchecked="__('0')" :valuechecked="__('1')" :label="__('Sama dgn Identitas')" />
+                            </div>
+
+                            <div>
+                                <x-input-label for="AlamatDomisil" :value="__('Alamat')" :required=false />
+                                <div class="flex items-center mb-2">
+                                    <x-text-input id="AlamatDomisil" placeholder="Alamat" class="mt-1 ml-2"
+                                        :disabled=$disabledProperty wire:model="dataPasien.pasien.domisil.alamat" />
+                                </div>
+                                @error('dataPasien.pasien.domisil.alamat')
+                                    <x-input-error :messages=$message />
+                                @enderror
+                            </div>
+                            <div>
+                                <x-input-label for="rtrwDomisil" :value="__('RT/RW')" :required=false />
+                                <div class="flex items-center mb-2">
+                                    <x-text-input id="rtrwDomisil" placeholder="RT" class="mt-1 ml-2 sm:w-1/3"
+                                        :disabled=$disabledProperty wire:model="dataPasien.pasien.domisil.rt" />
+                                    <x-text-input placeholder="RW" class="mt-1 ml-2 sm:w-1/3"
+                                        :disabled=$disabledProperty wire:model="dataPasien.pasien.domisil.rw" />
+                                    <x-text-input placeholder="Kode Pos" class="mt-1 ml-2 sm:w-1/3"
+                                        :disabled=$disabledProperty wire:model="dataPasien.pasien.domisil.kodepos" />
+                                </div>
+                                {{-- Error Message Start --}}
+                                <div class="flex items-center mb-2">
+                                    <div class="mt-1 ml-2 truncate sm:w-1/3">
+                                        @error('dataPasien.pasien.domisil.rt')
+                                            <x-input-error :messages=$message />
+                                        @enderror
+                                    </div>
+                                    <div class="mt-1 ml-2 truncate sm:w-1/3">
+                                        @error('dataPasien.pasien.domisil.rw')
+                                            <x-input-error :messages=$message />
+                                        @enderror
+                                    </div>
+                                    <div class="mt-1 ml-2 truncate sm:w-1/3">
+                                        @error('dataPasien.pasien.domisil.kodepos')
+                                            <x-input-error :messages=$message />
+                                        @enderror
+                                    </div>
+
+                                </div>
+                                {{-- Error Message End --}}
+                            </div>
+                            <div>
+                                <x-input-label for="Desadomisil" :value="__('Desa')" :required=false />
+
+                                <div class="mt-1">
+
+                                    <div class="flex mb-2 ml-2 ">
+                                        <x-text-input placeholder="Desa" class="sm:rounded-none sm:rounded-l-lg"
+                                            :disabled=true
+                                            value="{{ $dataPasien['pasien']['domisil']['desaName'] }}" />
+                                        <x-green-button class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
+                                            wire:click.prevent="clickDesaDomisillov()">
+                                            <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
+                                                xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                                <path clip-rule="evenodd" fill-rule="evenodd"
+                                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                                            </svg>
+                                        </x-green-button>
+
+                                    </div>
+
+                                    {{-- LOV hubunganDgnPasien --}}
+                                    @include('livewire.master-pasien.list-of-value-desaDomisil')
+                                </div>
+
+                                @error('dataPasien.pasien.domisil.desaId')
+                                    <x-input-error :messages=$message />
+                                @enderror
+                            </div>
+
+                            <div>
+                                <x-input-label for="KecamatanDomisil" :value="__('Kecamatan')" :required=false />
+                                <div class="flex items-center mb-2">
+                                    <x-text-input id="KecamatanDomisil" placeholder="Kecamatan" class="mt-1 ml-2"
+                                        :disabled=true
+                                        value="{{ $dataPasien['pasien']['domisil']['kecamatanName'] }}" />
+                                </div>
+                                @error('dataPasien.pasien.domisil.kecamatanId')
+                                    <x-input-error :messages=$message />
+                                @enderror
+                            </div>
+
+                            <div>
+                                <x-input-label for="kotadomisil" :value="__('kota')" :required=false />
+
+                                <div class="mt-1">
+
+                                    <div class="flex mb-2 ml-2 ">
+                                        <x-text-input placeholder="kota" class="sm:rounded-none sm:rounded-l-lg"
+                                            :disabled=true
+                                            value="{{ $dataPasien['pasien']['domisil']['kotaName'] }}" />
+                                        <x-green-button class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
+                                            wire:click.prevent="clickkotaDomisillov()">
+                                            <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
+                                                xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                                <path clip-rule="evenodd" fill-rule="evenodd"
+                                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                                            </svg>
+                                        </x-green-button>
+
+                                    </div>
+
+                                    {{-- LOV hubunganDgnPasien --}}
+                                    @include('livewire.master-pasien.list-of-value-kotaDomisil')
+                                </div>
+
+                                @error('dataPasien.pasien.domisil.desaId')
+                                    <x-input-error :messages=$message />
+                                @enderror
+                            </div>
+
+                            <div>
+                                <x-input-label for="Propinsidomisil" :value="__('Propinsi')" :required=false />
+                                <div class="flex items-center mb-2">
+                                    <x-text-input id="Propinsidomisil" placeholder="Propinsi" class="mt-1 ml-2"
+                                        :disabled=true
+                                        value="{{ $dataPasien['pasien']['domisil']['propinsiName'] }}" />
+                                </div>
+                                @error('dataPasien.pasien.domisil.propinsiId')
+                                    <x-input-error :messages=$message />
+                                @enderror
+                            </div>
+
+                            <div>
+                                <x-input-label for="negaraidentitas" :value="__('Negara')" :required=false />
+                                <div class="flex items-center mb-2">
+                                    <x-text-input id="negaraidentitas" placeholder="Negara [isi dgn ID]"
+                                        class="mt-1 ml-2" :disabled=$disabledProperty
+                                        wire:model="dataPasien.pasien.identitas.negara" />
+                                </div>
+                                @error('dataPasien.pasien.identitas.negara')
+                                    <x-input-error :messages=$message />
+                                @enderror
+                            </div>
+
+                        </x-border-form>
+
+
                     </div>
 
                     <x-border-form :title="__('Kontak')" :align="__('start')" :bgcolor="__('bg-gray-50')">
