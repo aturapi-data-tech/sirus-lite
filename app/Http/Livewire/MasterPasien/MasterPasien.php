@@ -5,6 +5,7 @@ namespace App\Http\Livewire\MasterPasien;
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
 use Livewire\WithPagination;
+use Illuminate\Support\Arr;
 use Carbon\Carbon;
 
 
@@ -187,6 +188,116 @@ class MasterPasien extends Component
                 ]
             ],
 
+        ]
+    ];
+    public $ruleDataPasien =
+    [
+        'pasien' => [
+            'regNo' => true,
+            'gelarDepan' => false,
+            'regName' => true,
+            'gelarBelakang' => false,
+            'namaPanggilan' => false,
+            'tempatLahir' => true,
+            'tglLahir' => true,
+            'thn' => false,
+            'bln' => false,
+            'hari' => false,
+
+            'jenisKelamin' => [
+                'jenisKelaminId' => true,
+                'jenisKelaminDesc' => true,
+            ],
+            'agama' => [
+                'agamaId' => true,
+                'agamaagamaDesc' => true,
+            ],
+
+            'statusPerkawinan' => [
+                'statusPerkawinanId' => true,
+                'statusPerkawinanDesc' => true,
+            ],
+
+            'pendidikan' => [
+                'pendidikanId' => true,
+                'pendidikanDesc' => true,
+            ],
+
+            'pekerjaan' => [
+                'pekerjaanId' => true,
+                'pekerjaanDesc' => true,
+            ],
+
+            'golonganDarah' => [
+                'golonganDarahId' => false,
+                'golonganDarahDesc' => false,
+            ],
+
+            'kewarganegaraan' => true,
+            'suku' => false,
+            'bahasa' => false,
+            'status' => [
+                'statusId' => true,
+                'statusDesc' => true,
+            ],
+
+            'domisil' => [
+                'alamat' => true,
+                'rt' => true,
+                'rw' => true,
+                'kodepos' => true,
+                'desaId' => true,
+                'kecamatanId' => true,
+                'kotaId' => true,
+                'propinsiId' => true,
+                'desaName' => true,
+                'kecamatanName' => true,
+                'kotaName' => true,
+                'propinsiName' => true,
+            ],
+
+            'identitas' => [
+                'nik' => true,
+                'idbpjs' => false,
+                'pasport' => false,
+                'alamat' => true,
+                'rt' => true,
+                'rw' => true,
+                'kodepos' => true,
+                'desaId' => true,
+                'kecamatanId' => true,
+                'kotaId' => true,
+                'propinsiId' => true,
+                'desaName' => true,
+                'kecamatanName' => true,
+                'kotaName' => true,
+                'propinsiName' => true,
+                'negara' => true,
+            ],
+
+            'kontak' => [
+                'kodenegara' => true,
+                'nomerTelponSelulerPasien' => true,
+                'nomerTelponLain' => false,
+            ],
+
+            'hubungan' => [
+                'namaAyah' => false,
+                'kodenegaraAyah' => false,
+                'nomerTelponSelulerAyah' => false,
+
+                'namaIbu' => false,
+                'kodenegaraIbu' => false,
+                'nomerTelponSelulerIbu' => false,
+
+                'namaPenanggungJawab' => true,
+                'kodenegaraPenanggungJawab' => true,
+                'nomerTelponSelulerPenanggungJawab' => true,
+                'hubunganDgnPasien' => [
+                    'hubunganDgnPasienId' => true,
+                    'hubunganDgnPasienDesc' => true,
+                ]
+            ]
         ]
     ];
 
@@ -1151,10 +1262,12 @@ class MasterPasien extends Component
 
 
 
+    // checkbox start
+    // sama dgn identitas
     public function updatedDatapasienPasienDomisilSamadgnidentitas()
     {
         if ($this->dataPasien['pasien']['domisil']['samadgnidentitas']) {
-            $this->dataPasien['pasien']['domisil']['alamat'] = $this->dataPasien['pasien']['identitas']['alamat'];
+            $this->ruleDataPasien['pasien']['domisil']['alamat'] = $this->dataPasien['pasien']['identitas']['alamat'];
             $this->dataPasien['pasien']['domisil']['rt'] = $this->dataPasien['pasien']['identitas']['rt'];
             $this->dataPasien['pasien']['domisil']['rw'] = $this->dataPasien['pasien']['identitas']['rw'];
             $this->dataPasien['pasien']['domisil']['kodepos'] = $this->dataPasien['pasien']['identitas']['kodepos'];
@@ -1184,6 +1297,18 @@ class MasterPasien extends Component
         }
     }
 
+    // pasien tidak dikenal
+    public function updatedDatapasienPasienPasientidakdikenal()
+    {
+        if ($this->dataPasien['pasien']['pasientidakdikenal']) {
+            $this->ruleDataPasien['pasien']['identitas']['nik'] = false;
+        } else {
+            $this->ruleDataPasien['pasien']['identitas']['nik'] = true;
+        }
+    }
+
+    // checkbox end
+
 
     // is going to insert data////////////////
     public function create()
@@ -1197,95 +1322,24 @@ class MasterPasien extends Component
     public function store()
     {
 
-        $customErrorMessages = [
-            'dataPasien.pasien.pasientidakdikenal' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.regNo' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.gelarDepan' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.regName' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.gelarBelakang' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.namaPanggilan' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.tempatLahir' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.tglLahir' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.thn' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.bln' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.hari' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.jenisKelamin.jenisKelaminId' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.jenisKelamin.jenisKelaminDesc' => 'Data Tida Boleh Kosong',
+        $messages = array(
+            'required' => 'Data tidak boleh kosong.', //data tdak boleh kosong
+            'digits' => 'Data harus berisi :digits digit.', //untuk angka harus berisi a length
+            'digits_between' => 'Data harus berisi antara :min-:max digit.', //untuk angka  antara a,b length
+            'min' => 'Data berisi minimal :min digit.', //untuk angka /character min length
+            'max' => 'Data berisi maximl :max digit.', //untuk angka /character max length
+            'exists' => 'Data tidak ada didalam data master', // mencari referensi pada table tertentu
+        );
 
-            'dataPasien.pasien.agama.agamaId' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.agama.agamaDesc' => 'Data Tida Boleh Kosong',
+        // require nik ketika pasien tidak dikenal
 
-            'dataPasien.pasien.statusPerkawinan.statusPerkawinanId' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.statusPerkawinan.statusPerkawinanDesc' => 'Data Tida Boleh Kosong',
 
-            'dataPasien.pasien.pendidikan.pendidikanId' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.pendidikan.pendidikanDesc' => 'Data Tida Boleh Kosong',
 
-            'dataPasien.pasien.pekerjaan.pekerjaanId' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.pekerjaan.pekerjaanDesc' => 'Data Tida Boleh Kosong',
-
-            'dataPasien.pasien.golonganDarah.golonganDarahId' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.golonganDarah.golonganDarahDesc' => 'Data Tida Boleh Kosong',
-
-            'dataPasien.pasien.kewarganegaraan' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.suku' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.bahasa' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.status.statusId' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.status.statusDesc' => 'Data Tida Boleh Kosong',
-
-            'dataPasien.pasien.domisil.samadgnidentitas' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.domisil.alamat' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.domisil.rt' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.domisil.rw' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.domisil.kodepos' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.domisil.desaId' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.domisil.kecamatanId' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.domisil.kotaId' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.domisil.propinsiId' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.domisil.desaName' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.domisil.kecamatanName' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.domisil.kotaName' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.domisil.propinsiName' => 'Data Tida Boleh Kosong',
-
-            'dataPasien.pasien.identitas.nik' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.identitas.idbpjs' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.identitas.pasport' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.identitas.alamat' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.identitas.rt' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.identitas.rw' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.identitas.kodepos' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.identitas.desaId' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.identitas.kecamatanId' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.identitas.kotaId' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.identitas.propinsiId' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.identitas.desaName' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.identitas.kecamatanName' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.identitas.kotaName' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.identitas.propinsiName' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.identitas.negara' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.kontak.kodenegara' => 'Data Tida Boleh Kosong',
-
-            'dataPasien.pasien.kontak.nomerTelponSelulerPasien' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.kontak.nomerTelponLain' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.hubungan.namaAyah' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.hubungan.kodenegaraAyah' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.hubungan.nomerTelponSelulerAyah' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.hubungan.namaIbu' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.hubungan.kodenegaraIbu' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.hubungan.nomerTelponSelulerIbu' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.hubungan.namaPenanggungJawab' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.hubungan.kodenegaraPenanggungJawab' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.hubungan.nomerTelponSelulerPenanggungJawab' => 'Data Tida Boleh Kosong',
-
-            'dataPasien.pasien.hubungan.hubunganDgnPasien.hubunganDgnPasienId' => 'Data Tida Boleh Kosong',
-            'dataPasien.pasien.hubungan.hubunganDgnPasien.hubunganDgnPasienDesc' => 'Data Tida Boleh Kosong',
-        ];
-
-        $this->validate([
+        $rules = [
             'dataPasien.pasien.pasientidakdikenal' => 'required',
             'dataPasien.pasien.regNo' => 'required',
             'dataPasien.pasien.gelarDepan' => 'required',
-            'dataPasien.pasien.regName' => 'required',
+            'dataPasien.pasien.regName' => 'required|min:3|max:200',
             'dataPasien.pasien.gelarBelakang' => 'required',
             'dataPasien.pasien.namaPanggilan' => 'required',
             'dataPasien.pasien.tempatLahir' => 'required',
@@ -1322,26 +1376,26 @@ class MasterPasien extends Component
             'dataPasien.pasien.domisil.rt' => 'required',
             'dataPasien.pasien.domisil.rw' => 'required',
             'dataPasien.pasien.domisil.kodepos' => 'required',
-            'dataPasien.pasien.domisil.desaId' => 'required',
-            'dataPasien.pasien.domisil.kecamatanId' => 'required',
-            'dataPasien.pasien.domisil.kotaId' => 'required',
-            'dataPasien.pasien.domisil.propinsiId' => 'required',
+            'dataPasien.pasien.domisil.desaId' => 'required|exists:rsmst_desas,des_id',
+            'dataPasien.pasien.domisil.kecamatanId' => 'exists:rsmst_kecamatans,kec_id',
+            'dataPasien.pasien.domisil.kotaId' => 'required|exists:rsmst_kabupatens,kab_id',
+            'dataPasien.pasien.domisil.propinsiId' => 'required|exists:rsmst_propinsis,prop_id',
             'dataPasien.pasien.domisil.desaName' => 'required',
             'dataPasien.pasien.domisil.kecamatanName' => 'required',
             'dataPasien.pasien.domisil.kotaName' => 'required',
             'dataPasien.pasien.domisil.propinsiName' => 'required',
 
-            'dataPasien.pasien.identitas.nik' => 'required',
-            'dataPasien.pasien.identitas.idbpjs' => 'required',
+
+            'dataPasien.pasien.identitas.idbpjs' => 'digits:13',
             'dataPasien.pasien.identitas.pasport' => 'required',
             'dataPasien.pasien.identitas.alamat' => 'required',
             'dataPasien.pasien.identitas.rt' => 'required',
             'dataPasien.pasien.identitas.rw' => 'required',
             'dataPasien.pasien.identitas.kodepos' => 'required',
-            'dataPasien.pasien.identitas.desaId' => 'required',
-            'dataPasien.pasien.identitas.kecamatanId' => 'required',
-            'dataPasien.pasien.identitas.kotaId' => 'required',
-            'dataPasien.pasien.identitas.propinsiId' => 'required',
+            'dataPasien.pasien.identitas.desaId' => 'required|exists:rsmst_desas,des_id',
+            'dataPasien.pasien.identitas.kecamatanId' => 'exists:rsmst_kecamatans,kec_id',
+            'dataPasien.pasien.identitas.kotaId' => 'required|exists:rsmst_kabupatens,kab_id',
+            'dataPasien.pasien.identitas.propinsiId' => 'required|exists:rsmst_propinsis,prop_id',
             'dataPasien.pasien.identitas.desaName' => 'required',
             'dataPasien.pasien.identitas.kecamatanName' => 'required',
             'dataPasien.pasien.identitas.kotaName' => 'required',
@@ -1349,21 +1403,32 @@ class MasterPasien extends Component
             'dataPasien.pasien.identitas.negara' => 'required',
             'dataPasien.pasien.kontak.kodenegara' => 'required',
 
-            'dataPasien.pasien.kontak.nomerTelponSelulerPasien' => 'required',
+            'dataPasien.pasien.kontak.nomerTelponSelulerPasien' => 'required|digits_between:6,15',
             'dataPasien.pasien.kontak.nomerTelponLain' => 'required',
-            'dataPasien.pasien.hubungan.namaAyah' => 'required',
+            'dataPasien.pasien.hubungan.namaAyah' => 'required|min:3|max:200',
             'dataPasien.pasien.hubungan.kodenegaraAyah' => 'required',
-            'dataPasien.pasien.hubungan.nomerTelponSelulerAyah' => 'required',
-            'dataPasien.pasien.hubungan.namaIbu' => 'required',
+            'dataPasien.pasien.hubungan.nomerTelponSelulerAyah' => 'required|min:3|max:200',
+            'dataPasien.pasien.hubungan.namaIbu' => 'required|min:3|max:200',
             'dataPasien.pasien.hubungan.kodenegaraIbu' => 'required',
-            'dataPasien.pasien.hubungan.nomerTelponSelulerIbu' => 'required',
-            'dataPasien.pasien.hubungan.namaPenanggungJawab' => 'required',
+            'dataPasien.pasien.hubungan.nomerTelponSelulerIbu' => 'required|min:3|max:200',
+            'dataPasien.pasien.hubungan.namaPenanggungJawab' => 'required|min:3|max:200',
             'dataPasien.pasien.hubungan.kodenegaraPenanggungJawab' => 'required',
-            'dataPasien.pasien.hubungan.nomerTelponSelulerPenanggungJawab' => 'required',
+            'dataPasien.pasien.hubungan.nomerTelponSelulerPenanggungJawab' => 'required|digits_between:6,15',
 
             'dataPasien.pasien.hubungan.hubunganDgnPasien.hubunganDgnPasienId' => 'required',
             'dataPasien.pasien.hubungan.hubunganDgnPasien.hubunganDgnPasienDesc' => 'required',
-        ], $customErrorMessages);
+        ];
+
+        // gabunga array nik jika pasien tidak dikenal
+        if ($this->dataPasien['pasien']['pasientidakdikenal']) {
+            $rules['dataPasien.pasien.identitas.nik'] =  'digits:16';
+        } else {
+            $rules['dataPasien.pasien.identitas.nik'] =  'required|digits:16';
+        }
+
+        $this->validate($rules, $messages);
+
+        // $this->validate(, $customErrorMessages);
 
         // Province::updateOrCreate(['id' => $this->province_id], [
         //     'name' => $this->name
@@ -1430,6 +1495,7 @@ class MasterPasien extends Component
         return view(
             'livewire.master-pasien.master-pasien',
             [
+                'ruleDataPasien' => $this->ruleDataPasien,
                 'pasiens' => DB::table('rsmst_pasiens')
                     ->select(
                         DB::raw("to_char(reg_date,'dd/mm/yyyy hh24:mi:ss') as reg_date"),
