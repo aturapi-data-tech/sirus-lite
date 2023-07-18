@@ -104,12 +104,12 @@
                                             <th scope="col" class="px-4 py-3">
 
                                                 @if ($sortField == 'name')
-                                                    <x-sort-link :active=true wire:click.prevent="sortBy('reg_name')"
+                                                    <x-sort-link :active=true wire:click.prevent="sortBy('reg_date')"
                                                         role="button" href="#">
                                                         No Identitas
                                                     </x-sort-link>
                                                 @else
-                                                    <x-sort-link :active=false wire:click.prevent="sortBy('reg_name')"
+                                                    <x-sort-link :active=false wire:click.prevent="sortBy('reg_date')"
                                                         role="button" href="#">
                                                         No Identitas
                                                     </x-sort-link>

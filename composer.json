@@ -19,6 +19,7 @@
         "livewire/livewire": "^2.12",
         "milon/barcode": "^10.0",
         "nesbot/carbon": "^2.67",
+        "spatie/array-to-xml": "^3.1",
         "yajra/laravel-oci8": "^10"
     },
     "require-dev": {
