@@ -1,7 +1,6 @@
 <div>
 
 
-
     <div class="px-1 pt-7">
         <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
             <!-- Card header -->
@@ -80,7 +79,9 @@
 
                     </div>
                     {{-- End Tools --}}
-
+                    @error('dataPasien.pasien.regNo')
+                        <x-input-error :messages=$message />
+                    @enderror
 
                     @if ($isOpen)
                         @include('livewire.master-pasien.create')
@@ -103,76 +104,43 @@
                                         <tr>
                                             <th scope="col" class="px-4 py-3">
 
-                                                @if ($sortField == 'name')
-                                                    <x-sort-link :active=true wire:click.prevent="sortBy('reg_date')"
-                                                        role="button" href="#">
-                                                        No Identitas
-                                                    </x-sort-link>
-                                                @else
-                                                    <x-sort-link :active=false wire:click.prevent="sortBy('reg_date')"
-                                                        role="button" href="#">
-                                                        No Identitas
-                                                    </x-sort-link>
-                                                @endif
+
+                                                <x-sort-link :active=false wire:click.prevent="" role="button"
+                                                    href="#">
+                                                    No Identitas
+                                                </x-sort-link>
+
                                             </th>
 
                                             <th scope="col" class="px-4 py-3 ">
-                                                @if ($sortField == 'reg_no')
-                                                    <x-sort-link :active=true wire:click.prevent="sortBy('reg_no')"
-                                                        role="button" href="#">
-                                                        Pasien
-                                                    </x-sort-link>
-                                                @else
-                                                    <x-sort-link :active=false wire:click.prevent="sortBy('reg_no')"
-                                                        role="button" href="#">
-                                                        Pasien
-                                                    </x-sort-link>
-                                                @endif
+                                                <x-sort-link :active=false wire:click.prevent="" role="button"
+                                                    href="#">
+                                                    Pasien
+                                                </x-sort-link>
                                             </th>
 
                                             <th scope="col" class="px-4 py-3">
 
-                                                @if ($sortField == 'name')
-                                                    <x-sort-link :active=true wire:click.prevent="sortBy('reg_name')"
-                                                        role="button" href="#">
-                                                        Status
-                                                    </x-sort-link>
-                                                @else
-                                                    <x-sort-link :active=false wire:click.prevent="sortBy('reg_name')"
-                                                        role="button" href="#">
-                                                        Status
-                                                    </x-sort-link>
-                                                @endif
+                                                <x-sort-link :active=false wire:click.prevent="" role="button"
+                                                    href="#">
+                                                    Status
+                                                </x-sort-link>
                                             </th>
 
                                             <th scope="col" class="px-4 py-3">
 
-                                                @if ($sortField == 'name')
-                                                    <x-sort-link :active=true wire:click.prevent="sortBy('reg_name')"
-                                                        role="button" href="#">
-                                                        No. Hp
-                                                    </x-sort-link>
-                                                @else
-                                                    <x-sort-link :active=false wire:click.prevent="sortBy('reg_name')"
-                                                        role="button" href="#">
-                                                        No. Hp
-                                                    </x-sort-link>
-                                                @endif
+                                                <x-sort-link :active=false wire:click.prevent="" role="button"
+                                                    href="#">
+                                                    No Hp
+                                                </x-sort-link>
                                             </th>
 
                                             <th scope="col" class="px-4 py-3">
 
-                                                @if ($sortField == 'name')
-                                                    <x-sort-link :active=true wire:click.prevent="sortBy('reg_name')"
-                                                        role="button" href="#">
-                                                        Tgl. Daftar
-                                                    </x-sort-link>
-                                                @else
-                                                    <x-sort-link :active=false wire:click.prevent="sortBy('reg_name')"
-                                                        role="button" href="#">
-                                                        Tgl. Daftar
-                                                    </x-sort-link>
-                                                @endif
+                                                <x-sort-link :active=false wire:click.prevent="" role="button"
+                                                    href="#">
+                                                    Tgl Daftar
+                                                </x-sort-link>
                                             </th>
 
 
@@ -370,6 +338,20 @@
 
 
 
+
+
+
+
+
+
+
+
+        {{-- Disabling enter key for form --}}
+        <script type="text/javascript">
+            $(document).on("keydown", "form", function(event) {
+                return event.key != "Enter";
+            });
+        </script>
 
 
 

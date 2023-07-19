@@ -2,6 +2,7 @@
     $disabledProperty = $isOpenMode === 'tampil' ? true : false;
 @endphp
 
+
 <div class="fixed inset-0 z-40 ease-out duration-400">
 
     <div class="flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
@@ -27,6 +28,10 @@
                     {{ $myTitle }}
                 </h3>
 
+                <h3 class="pl-12 text-2xl font-semibold text-white dark:text-white">
+                    {{ 'Reg No : ' . $dataPasien['pasien']['regNo'] }}
+                </h3>
+
                 {{-- Close Modal --}}
                 <button wire:click="closeModal()"
                     class="text-gray-400 bg-gray-50 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white">
@@ -39,29 +44,41 @@
 
             </div>
 
-            <form>
+            {{-- <div class="h-screen overflow-scroll snap-y snap-mandatory">
+                <div class="flex items-center justify-center w-screen h-screen snap-start bg-amber-200 text-8xl">1</div>
+                <div class="flex items-center justify-center w-screen h-screen bg-teal-200 snap-start text-8xl">2</div>
+                <div class="flex items-center justify-center w-screen h-screen snap-start bg-cyan-200 text-8xl">3</div>
+                <div class="flex items-center justify-center w-screen h-screen snap-start bg-fuchsia-200 text-8xl">4
+                </div>
+            </div> --}}
 
-                <div class="px-4 bg-white ">
+            <form class="scroll-smooth hover:scroll-auto">
+
+                <div class="px-4 bg-white snap-mandatory snap-y">
                     <div class="absolute right-4 top-16">
                         <x-check-box value='1' :label="__('Pasien Tidak Dikenal')"
-                            wire:model="dataPasien.pasien.pasientidakdikenal" />
+                            wire:model.debounce.500ms="dataPasien.pasien.pasientidakdikenal" />
                     </div>
 
-                    <x-border-form :title="__('Identitas Pasien')" :align="__('start')">
+                    <x-border-form :title="__('Pasien')" :align="__('start')" class="">
                         <div>
                             <x-input-label for="regName" :value="__('Nama Pasien')" :required="__($ruleDataPasien['pasien']['regName'])" />
                             <div class="flex items-center mb-2">
                                 <x-text-input placeholder="Gelar depan" class="mt-1 ml-2 sm:w-1/4" :errorshas="__($ruleDataPasien['pasien']['gelarDepan'])"
-                                    :disabled=$disabledProperty wire:model="dataPasien.pasien.gelarDepan" />
+                                    :disabled=$disabledProperty
+                                    wire:model.debounce.500ms="dataPasien.pasien.gelarDepan" />
                                 <x-text-input id="regName" placeholder="Nama" class="mt-1 ml-2 sm:w-3/4"
                                     :errorshas="__($ruleDataPasien['pasien']['regName'])" :disabled=$disabledProperty
-                                    wire:model="dataPasien.pasien.regName" />
+                                    wire:model.debounce.500ms="dataPasien.pasien.regName"
+                                    style="text-transform:uppercase" />
+
                                 <x-text-input placeholder="Gelar Belakang" class="mt-1 ml-2 sm:w-1/4" :errorshas="__($ruleDataPasien['pasien']['gelarBelakang'])"
-                                    :disabled=$disabledProperty wire:model="dataPasien.pasien.gelarBelakang" />
+                                    :disabled=$disabledProperty
+                                    wire:model.debounce.500ms="dataPasien.pasien.gelarBelakang" />
                                 <span> {{ ' / ' }}</span>
                                 <x-text-input placeholder="Nama Panggilan" class="mt-1 ml-2 sm:w-1/4" :errorshas="__($ruleDataPasien['pasien']['namaPanggilan'])"
                                     :disabled=$disabledProperty :disabled=$disabledProperty
-                                    wire:model="dataPasien.pasien.namaPanggilan" />
+                                    wire:model.debounce.500ms="dataPasien.pasien.namaPanggilan" />
                             </div>
                             {{-- Error Message Start --}}
                             <div class="flex items-center mb-2">
@@ -96,18 +113,19 @@
                             <div class="flex items-center mb-2">
                                 <x-text-input id="tempatLahir" placeholder="Tempat Lahir" class="mt-1 ml-2 sm:w-1/2"
                                     :errorshas="__($ruleDataPasien['pasien']['tempatLahir'])" :disabled=$disabledProperty
-                                    wire:model="dataPasien.pasien.tempatLahir" />
+                                    wire:model.debounce.500ms="dataPasien.pasien.tempatLahir"
+                                    style="text-transform:uppercase" />
                                 <x-text-input placeholder="Tgl Lahir [dd/mm/yyyy]" class="mt-1 ml-2 sm:w-1/2"
                                     :errorshas="__($ruleDataPasien['pasien']['tglLahir'])" :disabled=$disabledProperty
-                                    wire:model="dataPasien.pasien.tglLahir" />
+                                    wire:model.debounce.500ms="dataPasien.pasien.tglLahir" />
 
                                 <span> {{ ' / ' }}</span>
                                 <x-text-input placeholder="Umur Thn" class="mt-1 ml-2 sm:w-1/6" :errorshas="__($ruleDataPasien['pasien']['thn'])"
-                                    :disabled=$disabledProperty wire:model="dataPasien.pasien.thn" />
+                                    :disabled=$disabledProperty wire:model.debounce.500ms="dataPasien.pasien.thn" />
                                 <x-text-input placeholder="Umur Bln" class="mt-1 ml-2 sm:w-1/6" :errorshas="__($ruleDataPasien['pasien']['bln'])"
-                                    :disabled=$disabledProperty wire:model="dataPasien.pasien.bln" />
+                                    :disabled=$disabledProperty wire:model.debounce.500ms="dataPasien.pasien.bln" />
                                 <x-text-input placeholder="Umur Hari" class="mt-1 ml-2 sm:w-1/6" :errorshas="__($ruleDataPasien['pasien']['hari'])"
-                                    :disabled=$disabledProperty wire:model="dataPasien.pasien.hari" />
+                                    :disabled=$disabledProperty wire:model.debounce.500ms="dataPasien.pasien.hari" />
                             </div>
                             {{-- Error Message Start --}}
                             <div class="flex items-center mb-2">
@@ -159,7 +177,11 @@
                                         <x-text-input placeholder="Jenis Kelamin"
                                             class="sm:rounded-none sm:rounded-l-lg" :errorshas="__($ruleDataPasien['pasien']['jenisKelamin']['jenisKelaminId'])" :disabled=true
                                             value="{{ $dataPasien['pasien']['jenisKelamin']['jenisKelaminId'] . '. ' . $dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] }}" />
-                                        <x-green-button class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
+
+
+
+                                        <x-green-button :disabled=$disabledProperty
+                                            class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
                                             wire:click.prevent="clickJeniskelaminlov()">
                                             <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
                                                 xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -177,7 +199,8 @@
                                         <x-text-input placeholder="Agama" class="sm:rounded-none sm:rounded-l-lg"
                                             :errorshas="__($ruleDataPasien['pasien']['agama']['agamaId'])" :disabled=true
                                             value="{{ $dataPasien['pasien']['agama']['agamaId'] . '. ' . $dataPasien['pasien']['agama']['agamaDesc'] }}" />
-                                        <x-green-button class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
+                                        <x-green-button :disabled=$disabledProperty
+                                            class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
                                             wire:click.prevent="clickagamalov()">
                                             <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
                                                 xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -197,7 +220,8 @@
                                                 $ruleDataPasien['pasien']['statusPerkawinan']['statusPerkawinanId'],
                                             )" :disabled=true
                                             value="{{ $dataPasien['pasien']['statusPerkawinan']['statusPerkawinanId'] . '. ' . $dataPasien['pasien']['statusPerkawinan']['statusPerkawinanDesc'] }}" />
-                                        <x-green-button class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
+                                        <x-green-button :disabled=$disabledProperty
+                                            class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
                                             wire:click.prevent="clickstatusPerkawinanlov()">
                                             <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
                                                 xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -215,7 +239,8 @@
                                         <x-text-input placeholder="Pendidikan" class="sm:rounded-none sm:rounded-l-lg"
                                             :errorshas="__($ruleDataPasien['pasien']['pendidikan']['pendidikanId'])" :disabled=true
                                             value="{{ $dataPasien['pasien']['pendidikan']['pendidikanId'] . '. ' . $dataPasien['pasien']['pendidikan']['pendidikanDesc'] }}" />
-                                        <x-green-button class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
+                                        <x-green-button :disabled=$disabledProperty
+                                            class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
                                             wire:click.prevent="clickpendidikanlov()">
                                             <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
                                                 xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -233,7 +258,8 @@
                                         <x-text-input placeholder="pekerjaan" class="sm:rounded-none sm:rounded-l-lg"
                                             :errorshas="__($ruleDataPasien['pasien']['pekerjaan']['pekerjaanId'])" :disabled=true
                                             value="{{ $dataPasien['pasien']['pekerjaan']['pekerjaanId'] . '. ' . $dataPasien['pasien']['pekerjaan']['pekerjaanDesc'] }}" />
-                                        <x-green-button class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
+                                        <x-green-button :disabled=$disabledProperty
+                                            class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
                                             wire:click.prevent="clickpekerjaanlov()">
                                             <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
                                                 xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -302,7 +328,7 @@
                                                 )"
                                                 :disabled=true
                                                 value="{{ $dataPasien['pasien']['golonganDarah']['golonganDarahId'] . '. ' . $dataPasien['pasien']['golonganDarah']['golonganDarahDesc'] }}" />
-                                            <x-green-button
+                                            <x-green-button :disabled=$disabledProperty
                                                 class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
                                                 wire:click.prevent="clickgolonganDarahlov()">
                                                 <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor"
@@ -319,22 +345,22 @@
 
                                     <x-text-input id="Kewarganegaraan" placeholder="Kewarganegaraan"
                                         class="mt-1 ml-2 sm:w-1/5" :errorshas="__($ruleDataPasien['pasien']['kewarganegaraan'])" :disabled=$disabledProperty
-                                        wire:model="dataPasien.pasien.kewarganegaraan" />
+                                        wire:model.debounce.500ms="dataPasien.pasien.kewarganegaraan" />
 
                                     <x-text-input id="Suku" placeholder="Suku" class="mt-1 ml-2 sm:w-1/4"
                                         :errorshas="__($ruleDataPasien['pasien']['suku'])" :disabled=$disabledProperty
-                                        wire:model="dataPasien.pasien.suku" />
+                                        wire:model.debounce.500ms="dataPasien.pasien.suku" />
 
                                     <x-text-input id="Bahasa" placeholder="Bahasa yang digunakan"
                                         class="mt-1 ml-2 sm:w-1/5" :errorshas="__($ruleDataPasien['pasien']['bahasa'])" :disabled=$disabledProperty
-                                        wire:model="dataPasien.pasien.bahasa" />
+                                        wire:model.debounce.500ms="dataPasien.pasien.bahasa" />
 
                                     <div class="mt-1 ml-2 sm:w-1/5">
                                         <div class="flex ">
                                             <x-text-input placeholder="status" class="sm:rounded-none sm:rounded-l-lg"
                                                 :errorshas="__($ruleDataPasien['pasien']['status']['statusId'])" :disabled=true
                                                 value="{{ $dataPasien['pasien']['status']['statusId'] . '. ' . $dataPasien['pasien']['status']['statusDesc'] }}" />
-                                            <x-green-button
+                                            <x-green-button :disabled=$disabledProperty
                                                 class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
                                                 wire:click.prevent="clickstatuslov()">
                                                 <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor"
@@ -394,7 +420,7 @@
                                         <div class="flex items-center mb-2">
                                             <x-text-input id="nikidentitas" placeholder="NIK" class="mt-1 ml-2"
                                                 :errorshas="__($ruleDataPasien['pasien']['identitas']['nik'])" :disabled=$disabledProperty
-                                                wire:model="dataPasien.pasien.identitas.nik" />
+                                                wire:model.debounce.500ms="dataPasien.pasien.identitas.nik" />
                                         </div>
                                         @error('dataPasien.pasien.identitas.nik')
                                             <x-input-error :messages=$message />
@@ -405,7 +431,7 @@
                                         <div class="flex items-center mb-2">
                                             <x-text-input id="idBpjsidentitas" placeholder="Id BPJS [13digit]"
                                                 class="mt-1 ml-2" :errorshas="__($ruleDataPasien['pasien']['identitas']['idbpjs'])" :disabled=$disabledProperty
-                                                wire:model="dataPasien.pasien.identitas.idbpjs" />
+                                                wire:model.debounce.500ms="dataPasien.pasien.identitas.idbpjs" />
                                         </div>
                                         @error('dataPasien.pasien.identitas.idbpjs')
                                             <x-input-error :messages=$message />
@@ -416,7 +442,7 @@
                                         <div class="flex items-center mb-2">
                                             <x-text-input id="pasporidentitas" placeholder="Paspor [untuk WNA / WNI]"
                                                 class="mt-1 ml-2" :errorshas="__($ruleDataPasien['pasien']['identitas']['pasport'])" :disabled=$disabledProperty
-                                                wire:model="dataPasien.pasien.identitas.pasport" />
+                                                wire:model.debounce.500ms="dataPasien.pasien.identitas.pasport" />
                                         </div>
                                         @error('dataPasien.pasien.identitas.pasport')
                                             <x-input-error :messages=$message />
@@ -427,7 +453,7 @@
                                         <div class="flex items-center mb-2">
                                             <x-text-input id="Alamatidentitas" placeholder="Alamat" class="mt-1 ml-2"
                                                 :errorshas="__($ruleDataPasien['pasien']['identitas']['alamat'])" :disabled=$disabledProperty
-                                                wire:model="dataPasien.pasien.identitas.alamat" />
+                                                wire:model.debounce.500ms="dataPasien.pasien.identitas.alamat" />
                                         </div>
                                         @error('dataPasien.pasien.identitas.alamat')
                                             <x-input-error :messages=$message />
@@ -438,16 +464,16 @@
                                         <div class="flex items-center mb-2">
 
                                             <x-text-input id="rtrwidentitas" placeholder="RT [3digit]"
-                                                class="mt-1 ml-2 sm:w-1/3" :errorshas="__($ruleDataPasien['pasien']['identitas']['rt'])"
+                                                class="mt-1 ml-2 sm:w-1/3" :errorshas="__($errors->has('dataPasien.pasien.identitas.rt'))"
                                                 :disabled=$disabledProperty
-                                                wire:model="dataPasien.pasien.identitas.rt" />
+                                                wire:model.debounce.500ms="dataPasien.pasien.identitas.rt" />
 
                                             <x-text-input placeholder="RW [3digit]" class="mt-1 ml-2 sm:w-1/3"
-                                                :errorshas="__($ruleDataPasien['pasien']['identitas']['rw'])" :disabled=$disabledProperty
-                                                wire:model="dataPasien.pasien.identitas.rw" />
+                                                :errorshas="__($errors->has('dataPasien.pasien.identitas.rw'))" :disabled=$disabledProperty
+                                                wire:model.debounce.500ms="dataPasien.pasien.identitas.rw" />
                                             <x-text-input placeholder="Kode Pos" class="mt-1 ml-2 sm:w-1/3"
-                                                :errorshas="__($ruleDataPasien['pasien']['identitas']['kodepos'])" :disabled=$disabledProperty
-                                                wire:model="dataPasien.pasien.identitas.kodepos" />
+                                                :errorshas="__($errors->has('dataPasien.pasien.identitas.kodepos'))" :disabled=$disabledProperty
+                                                wire:model.debounce.500ms="dataPasien.pasien.identitas.kodepos" />
                                         </div>
                                         {{-- Error Message Start --}}
                                         <div class="flex items-center mb-2">
@@ -500,7 +526,7 @@
                                                     class="sm:rounded-none sm:rounded-l-lg" :errorshas="__($ruleDataPasien['pasien']['identitas']['desaName'])"
                                                     :disabled=true
                                                     value="{{ $dataPasien['pasien']['identitas']['desaName'] }}" />
-                                                <x-green-button
+                                                <x-green-button :disabled=$disabledProperty
                                                     class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
                                                     wire:click.prevent="clickdesaIdentitaslov()">
                                                     <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor"
@@ -545,7 +571,7 @@
                                                     class="sm:rounded-none sm:rounded-l-lg" :errorshas="__($ruleDataPasien['pasien']['identitas']['kotaId'])"
                                                     :disabled=true
                                                     value="{{ $dataPasien['pasien']['identitas']['kotaName'] }}" />
-                                                <x-green-button
+                                                <x-green-button :disabled=$disabledProperty
                                                     class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
                                                     wire:click.prevent="clickkotaIdentitaslov()">
                                                     <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor"
@@ -584,7 +610,7 @@
                                         <div class="flex items-center mb-2">
                                             <x-text-input id="negaraidentitas" placeholder="Negara [isi dgn ID]"
                                                 class="mt-1 ml-2" :errorshas="__($ruleDataPasien['pasien']['identitas']['negara'])" :disabled=$disabledProperty
-                                                wire:model="dataPasien.pasien.identitas.negara" />
+                                                wire:model.debounce.500ms="dataPasien.pasien.identitas.negara" />
                                         </div>
                                         @error('dataPasien.pasien.identitas.negara')
                                             <x-input-error :messages=$message />
@@ -597,7 +623,7 @@
                         <x-border-form :title="__('Alamat Domisil')" :align="__('start')" :bgcolor="__('bg-gray-50')" class="">
                             <div class="flex justify-end mb-6">
                                 <x-check-box value='1' :label="__('Sama dgn Identitas')"
-                                    wire:model="dataPasien.pasien.domisil.samadgnidentitas" />
+                                    wire:model.debounce.500ms="dataPasien.pasien.domisil.samadgnidentitas" />
                             </div>
 
                             <div>
@@ -605,7 +631,7 @@
                                 <div class="flex items-center mb-2">
                                     <x-text-input id="AlamatDomisil" placeholder="Alamat" class="mt-1 ml-2"
                                         :errorshas="__($ruleDataPasien['pasien']['domisil']['alamat'])" :disabled=$disabledProperty
-                                        wire:model="dataPasien.pasien.domisil.alamat" />
+                                        wire:model.debounce.500ms="dataPasien.pasien.domisil.alamat" />
                                 </div>
                                 @error('dataPasien.pasien.domisil.alamat')
                                     <x-input-error :messages=$message />
@@ -615,13 +641,14 @@
                                 <x-input-label for="rtrwDomisil" :value="__('RT/RW')" :required="__($ruleDataPasien['pasien']['domisil']['alamat'])" />
                                 <div class="flex items-center mb-2">
                                     <x-text-input id="rtrwDomisil" placeholder="RT [3digit]"
-                                        class="mt-1 ml-2 sm:w-1/3" :errorshas="__($ruleDataPasien['pasien']['domisil']['rt'])" :disabled=$disabledProperty
-                                        wire:model="dataPasien.pasien.domisil.rt" />
+                                        class="mt-1 ml-2 sm:w-1/3" :errorshas="__($errors->has('dataPasien.pasien.domisil.rt'))" :disabled=$disabledProperty
+                                        wire:model.debounce.500ms="dataPasien.pasien.domisil.rt" />
                                     <x-text-input placeholder="RW [3digit]" class="mt-1 ml-2 sm:w-1/3"
-                                        :errorshas="__($ruleDataPasien['pasien']['domisil']['rw'])" :disabled=$disabledProperty
-                                        wire:model="dataPasien.pasien.domisil.rw" />
-                                    <x-text-input placeholder="Kode Pos" class="mt-1 ml-2 sm:w-1/3" :errorshas="__($ruleDataPasien['pasien']['domisil']['kodepos'])"
-                                        :disabled=$disabledProperty wire:model="dataPasien.pasien.domisil.kodepos" />
+                                        :errorshas="__($errors->has('dataPasien.pasien.domisil.rw'))" :disabled=$disabledProperty
+                                        wire:model.debounce.500ms="dataPasien.pasien.domisil.rw" />
+                                    <x-text-input placeholder="Kode Pos" class="mt-1 ml-2 sm:w-1/3" :errorshas="__($errors->has('dataPasien.pasien.domisil.kodepos'))"
+                                        :disabled=$disabledProperty
+                                        wire:model.debounce.500ms="dataPasien.pasien.domisil.kodepos" />
                                 </div>
                                 {{-- Error Message Start --}}
                                 <div class="flex items-center mb-2">
@@ -653,7 +680,8 @@
                                         <x-text-input placeholder="Desa" class="sm:rounded-none sm:rounded-l-lg"
                                             :errorshas="__($ruleDataPasien['pasien']['domisil']['desaId'])" :disabled=true
                                             value="{{ $dataPasien['pasien']['domisil']['desaName'] }}" />
-                                        <x-green-button class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
+                                        <x-green-button :disabled=$disabledProperty
+                                            class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
                                             wire:click.prevent="clickDesaDomisillov()">
                                             <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
                                                 xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -694,7 +722,8 @@
                                         <x-text-input placeholder="kota" class="sm:rounded-none sm:rounded-l-lg"
                                             :errorshas="__($ruleDataPasien['pasien']['domisil']['kotaId'])" :disabled=true
                                             value="{{ $dataPasien['pasien']['domisil']['kotaName'] }}" />
-                                        <x-green-button class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
+                                        <x-green-button :disabled=$disabledProperty
+                                            class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
                                             wire:click.prevent="clickkotaDomisillov()">
                                             <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
                                                 xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -731,7 +760,7 @@
                                 <div class="flex items-center mb-2">
                                     <x-text-input id="negaraidentitas" placeholder="Negara [isi dgn ID]"
                                         class="mt-1 ml-2" :errorshas="__($ruleDataPasien['pasien']['identitas']['negara'])" :disabled=$disabledProperty
-                                        wire:model="dataPasien.pasien.identitas.negara" />
+                                        wire:model.debounce.500ms="dataPasien.pasien.identitas.negara" />
                                 </div>
                                 @error('dataPasien.pasien.identitas.negara')
                                     <x-input-error :messages=$message />
@@ -742,15 +771,16 @@
 
                     </div>
 
-                    <x-border-form :title="__('Kontak')" :align="__('start')" :bgcolor="__('bg-gray-50')">
+                    <x-border-form :title="__('Kontak')" :align="__('start')" :bgcolor="__('bg-gray-50')" class="">
                         <div>
                             <x-input-label for="nohpPasien" :value="__('No HP Pasien')" :required="__($ruleDataPasien['pasien']['kontak']['kodenegara'])" />
                             <div class="flex items-center mb-2">
                                 <x-text-input placeholder="No HP" class="mt-1 ml-2 sm:w-16" :errorshas="__($ruleDataPasien['pasien']['kontak']['kodenegara'])"
-                                    :disabled=$disabledProperty wire:model="dataPasien.pasien.kontak.kodenegara" />
+                                    :disabled=$disabledProperty
+                                    wire:model.debounce.500ms="dataPasien.pasien.kontak.kodenegara" />
                                 <x-text-input id="nohpPasien" placeholder="No HP" class="mt-1 ml-2 "
                                     :errorshas="__($ruleDataPasien['pasien']['kontak']['nomerTelponSelulerPasien'])" :disabled=$disabledProperty
-                                    wire:model="dataPasien.pasien.kontak.nomerTelponSelulerPasien" />
+                                    wire:model.debounce.500ms="dataPasien.pasien.kontak.nomerTelponSelulerPasien" />
                             </div>
                             @error('dataPasien.pasien.kontak.nomerTelponSelulerPasien')
                                 <x-input-error :messages=$message />
@@ -759,10 +789,11 @@
                             <x-input-label for="nohpTelponLain" :value="__('No Lain')" :required="__($ruleDataPasien['pasien']['kontak']['kodenegara'])" />
                             <div class="flex items-center mb-2">
                                 <x-text-input placeholder="No HP" class="mt-1 ml-2 sm:w-16" :errorshas="__($ruleDataPasien['pasien']['kontak']['kodenegara'])"
-                                    :disabled=$disabledProperty wire:model="dataPasien.pasien.kontak.kodenegara" />
+                                    :disabled=$disabledProperty
+                                    wire:model.debounce.500ms="dataPasien.pasien.kontak.kodenegara" />
                                 <x-text-input id="nohpTelponLain" placeholder="No HP" class="mt-1 ml-2 "
                                     :errorshas="__($ruleDataPasien['pasien']['kontak']['nomerTelponLain'])" :disabled=$disabledProperty
-                                    wire:model="dataPasien.pasien.kontak.nomerTelponLain" />
+                                    wire:model.debounce.500ms="dataPasien.pasien.kontak.nomerTelponLain" />
                             </div>
                             {{-- @error('dataPasien.pasien.kontak.nomerTelponLain')
                                 <x-input-error :messages=$message />
@@ -770,7 +801,7 @@
                         </div>
                     </x-border-form>
 
-                    <x-border-form :title="__('Hubungan')" :align="__('start')" :bgcolor="__('bg-gray-50')">
+                    <x-border-form :title="__('Hubungan')" :align="__('start')" :bgcolor="__('bg-gray-50')" class="">
 
                         <x-border-form :title="__('Penanggung Jawab')" :align="__('start')" :bgcolor="__('bg-yellow-100')">
                             {{-- PenanggungJawab --}}
@@ -779,15 +810,16 @@
                             <div class="flex items-center mb-2">
                                 <x-text-input id="PenanggungJawab" placeholder="Nama Penanggung Jawab"
                                     class="mt-1 ml-2" :errorshas="__($ruleDataPasien['pasien']['hubungan']['namaPenanggungJawab'])" :disabled=$disabledProperty
-                                    wire:model="dataPasien.pasien.hubungan.namaPenanggungJawab" />
+                                    wire:model.debounce.500ms="dataPasien.pasien.hubungan.namaPenanggungJawab"
+                                    style="text-transform:uppercase" />
                                 <x-text-input placeholder="No HP" class="mt-1 ml-2 sm:w-16" :errorshas="__($ruleDataPasien['pasien']['hubungan']['kodenegaraPenanggungJawab'])"
                                     :disabled=$disabledProperty
-                                    wire:model="dataPasien.pasien.hubungan.kodenegaraPenanggungJawab" />
+                                    wire:model.debounce.500ms="dataPasien.pasien.hubungan.kodenegaraPenanggungJawab" />
                                 <x-text-input id="nohpTelponLain" placeholder="No HP" class="mt-1 ml-2 "
                                     :errorshas="__(
                                         $ruleDataPasien['pasien']['hubungan']['nomerTelponSelulerPenanggungJawab'],
                                     )" :disabled=$disabledProperty
-                                    wire:model="dataPasien.pasien.hubungan.nomerTelponSelulerPenanggungJawab" />
+                                    wire:model.debounce.500ms="dataPasien.pasien.hubungan.nomerTelponSelulerPenanggungJawab" />
                             </div>
                             {{-- Error Message Start --}}
                             <div class="flex items-center mb-2">
@@ -825,7 +857,8 @@
                                             ],
                                         )" :disabled=true
                                         value="{{ $dataPasien['pasien']['hubungan']['hubunganDgnPasien']['hubunganDgnPasienId'] . '. ' . $dataPasien['pasien']['hubungan']['hubunganDgnPasien']['hubunganDgnPasienDesc'] }}" />
-                                    <x-green-button class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
+                                    <x-green-button :disabled=$disabledProperty
+                                        class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
                                         wire:click.prevent="clickhubunganDgnPasienlov()">
                                         <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
                                             xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -850,20 +883,35 @@
                             <div class="flex items-center mb-2">
                                 <x-text-input id="Ayah" placeholder="Nama Ayah" class="mt-1 ml-2"
                                     :errorshas="__($ruleDataPasien['pasien']['hubungan']['namaAyah'])" :disabled=$disabledProperty
-                                    wire:model="dataPasien.pasien.hubungan.namaAyah" />
+                                    wire:model.debounce.500ms="dataPasien.pasien.hubungan.namaAyah"
+                                    style="text-transform:uppercase" />
                                 <x-text-input placeholder="No HP" class="mt-1 ml-2 sm:w-16" :errorshas="__($ruleDataPasien['pasien']['hubungan']['kodenegaraAyah'])"
                                     :disabled=$disabledProperty
-                                    wire:model="dataPasien.pasien.hubungan.kodenegaraAyah" />
+                                    wire:model.debounce.500ms="dataPasien.pasien.hubungan.kodenegaraAyah" />
                                 <x-text-input id="nohpTelponLain" placeholder="No HP" class="mt-1 ml-2 "
                                     :errorshas="__($ruleDataPasien['pasien']['hubungan']['nomerTelponSelulerAyah'])" :disabled=$disabledProperty
-                                    wire:model="dataPasien.pasien.hubungan.nomerTelponSelulerAyah" />
+                                    wire:model.debounce.500ms="dataPasien.pasien.hubungan.nomerTelponSelulerAyah" />
                             </div>
-                            {{-- @error('dataPasien.pasien.hubungan.nomerTelponSelulerAyah')
-                                <x-input-error :messages=$message />
-                            @enderror
-                            @error('dataPasien.pasien.hubungan.nomerTelponSelulerAyah')
-                                <x-input-error :messages=$message />
-                            @enderror --}}
+                            {{-- Error Message Start --}}
+                            <div class="flex items-center mb-2">
+                                <div class="w-full mt-1 ml-2 truncate">
+                                    @error('dataPasien.pasien.hubungan.namaAyah')
+                                        <x-input-error :messages=$message />
+                                    @enderror
+                                </div>
+                                <div class="w-16 mt-1 ml-2 truncate">
+                                    {{-- @error('dataPasien.pasien.domisil.rw')
+                                        <x-input-error :messages=$message />
+                                    @enderror --}}
+                                </div>
+                                <div class="w-full mt-1 ml-2 truncate">
+                                    @error('dataPasien.pasien.hubungan.nomerTelponSelulerAyah')
+                                        <x-input-error :messages=$message />
+                                    @enderror
+                                </div>
+
+                            </div>
+                            {{-- Error Message End --}}
                         </div>
 
                         <div>
@@ -873,20 +921,35 @@
                             <div class="flex items-center mb-2">
                                 <x-text-input id="Ibu" placeholder="Nama Ibu" class="mt-1 ml-2"
                                     :errorshas="__($ruleDataPasien['pasien']['hubungan']['namaIbu'])" :disabled=$disabledProperty
-                                    wire:model="dataPasien.pasien.hubungan.namaIbu" />
+                                    wire:model.debounce.500ms="dataPasien.pasien.hubungan.namaIbu" />
                                 <x-text-input placeholder="No HP" class="mt-1 ml-2 sm:w-16" :errorshas="__($ruleDataPasien['pasien']['hubungan']['kodenegaraIbu'])"
                                     :disabled=$disabledProperty
-                                    wire:model="dataPasien.pasien.hubungan.kodenegaraIbu" />
+                                    wire:model.debounce.500ms="dataPasien.pasien.hubungan.kodenegaraIbu"
+                                    style="text-transform:uppercase" />
                                 <x-text-input id="nohpTelponLain" placeholder="No HP" class="mt-1 ml-2 "
                                     :errorshas="__($ruleDataPasien['pasien']['hubungan']['nomerTelponSelulerIbu'])" :disabled=$disabledProperty
-                                    wire:model="dataPasien.pasien.hubungan.nomerTelponSelulerIbu" />
+                                    wire:model.debounce.500ms="dataPasien.pasien.hubungan.nomerTelponSelulerIbu" />
                             </div>
-                            {{-- @error('dataPasien.pasien.hubungan.nomerTelponSelulerIbu')
-                                <x-input-error :messages=$message />
-                            @enderror
-                            @error('dataPasien.pasien.hubungan.nomerTelponSelulerIbu')
-                                <x-input-error :messages=$message />
-                            @enderror --}}
+                            {{-- Error Message Start --}}
+                            <div class="flex items-center mb-2">
+                                <div class="w-full mt-1 ml-2 truncate">
+                                    @error('dataPasien.pasien.hubungan.namaIbu')
+                                        <x-input-error :messages=$message />
+                                    @enderror
+                                </div>
+                                <div class="w-16 mt-1 ml-2 truncate">
+                                    {{-- @error('dataPasien.pasien.domisil.rw')
+                                        <x-input-error :messages=$message />
+                                    @enderror --}}
+                                </div>
+                                <div class="w-full mt-1 ml-2 truncate">
+                                    @error('dataPasien.pasien.hubungan.nomerTelponSelulerIbu')
+                                        <x-input-error :messages=$message />
+                                    @enderror
+                                </div>
+
+                            </div>
+                            {{-- Error Message End --}}
                         </div>
                     </x-border-form>
 
@@ -895,7 +958,8 @@
 
                 <div class="sticky bottom-0 px-4 py-3 bg-gray-50 sm:px-6 sm:flex sm:flex-row-reverse">
                     @if ($isOpenMode !== 'tampil')
-                        <x-green-button wire:click.prevent="store()" type="button">Simpan</x-green-button>
+                        <x-green-button :disabled=$disabledProperty wire:click.prevent="store()" type="button">Simpan
+                        </x-green-button>
                     @endif
                     <x-light-button wire:click="closeModal()" type="button">Keluar</x-light-button>
                 </div>

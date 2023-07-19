@@ -13,8 +13,7 @@ class MasterPasien extends Component
 {
     use WithPagination;
 
-    //  table data////////////////
-    public $name, $province_id;
+    //  table data//////////////// reser
     public $dataPasien = [
         "pasien" => [
             "pasientidakdikenal" => [],  //status pasien tdak dikenal 0 false 1 true
@@ -358,7 +357,6 @@ class MasterPasien extends Component
     //  modal status////////////////
     public $isOpen = 0;
     public $isOpenMode = 'insert';
-    public $tampilIsOpen = 0;
 
 
     // search logic -resetExcept////////////////
@@ -369,14 +367,10 @@ class MasterPasien extends Component
     ];
 
 
-    // sort logic -resetExcept////////////////
-    public $sortField = 'reg_date';
-    public $sortAsc = false;
-
 
     // listener from blade////////////////
     protected $listeners = [
-        'confirm_remove_record_province' => 'delete',
+        'confirm_remove_record_pasiens' => 'delete',
     ];
 
 
@@ -390,16 +384,16 @@ class MasterPasien extends Component
 
 
 
-    // resert input private////////////////
+    // resert semu input  kecuali////////////////
     private function resetInputFields(): void
     {
-        $this->reset([
-            'name',
-            'province_id',
+        // resert validation
+        $this->resetValidation();
+        // resert input
+        $this->resetExcept([
+            'limitPerPage',
+            'search',
 
-            'isOpen',
-            'tampilIsOpen',
-            'isOpenMode'
         ]);
     }
 
@@ -413,6 +407,7 @@ class MasterPasien extends Component
         $this->isOpen = true;
         $this->isOpenMode = 'insert';
     }
+
     private function openModalEdit(): void
     {
         $this->resetInputFields();
@@ -437,9 +432,10 @@ class MasterPasien extends Component
 
 
     // setLimitPerpage////////////////
-    public function setLimitPerPage($value)
+    public function setLimitPerPage($value): void
     {
         $this->limitPerPage = $value;
+        $this->resetValidation();
     }
 
 
@@ -449,28 +445,16 @@ class MasterPasien extends Component
     public function updatedSearch(): void
     {
         $this->resetPage();
+        $this->resetValidation();
     }
 
 
 
 
-    // logic ordering record (shotby)////////////////
-    public function sortBy($field)
-    {
-        if ($this->sortField === $field) {
-            $this->sortAsc = !$this->sortAsc;
-        } else {
-            $this->sortAsc = true;
-        }
-
-        $this->sortField = $field;
-    }
 
 
     // logic LOV start////////////////
     // jenis kelamin LOV
-    // nested
-    // Datapasien->Pasien->Jeniskelamin->Jeniskelaminid
 
     // /////////Jeniskelamin////////////
     public function clickJeniskelaminlov()
@@ -1262,9 +1246,26 @@ class MasterPasien extends Component
 
 
 
-    // checkbox start
-    // sama dgn identitas
-    public function updatedDatapasienPasienDomisilSamadgnidentitas()
+    ////////////////////////////logic lain/////////////////////////////////////
+
+    // update usia berdasarkan tgl lahir dan sebaliknya y m d ////////////////
+    //////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////
+    public function updatedDatapasienPasienTgllahir(): void
+    {
+        $this->hitungUsiaPasien($this->dataPasien['pasien']['tglLahir']);
+    }
+
+    public function updatedDatapasienPasienThn(): void
+    {
+        $this->hitungBirthdatePasien($this->dataPasien['pasien']['thn']);
+    }
+
+
+    // checkbox start//////////////////////////////////////////////
+    // sama dgn identitas///////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////
+    public function updatedDatapasienPasienDomisilSamadgnidentitas(): void
     {
         if ($this->dataPasien['pasien']['domisil']['samadgnidentitas']) {
             $this->dataPasien['pasien']['domisil']['alamat'] = $this->dataPasien['pasien']['identitas']['alamat'];
@@ -1298,7 +1299,7 @@ class MasterPasien extends Component
     }
 
     // pasien tidak dikenal
-    public function updatedDatapasienPasienPasientidakdikenal()
+    public function updatedDatapasienPasienPasientidakdikenal(): void
     {
         if ($this->dataPasien['pasien']['pasientidakdikenal']) {
             $this->ruleDataPasien['pasien']['identitas']['nik'] = false;
@@ -1307,27 +1308,26 @@ class MasterPasien extends Component
         }
     }
 
-    // checkbox end
-
-
-    // is going to insert data////////////////
-    public function create()
+    // reg No Pasien//////////////////////////////////////////////////
+    // ///////////////////////////////////////////////////////////////
+    // ///////////////////////////////////////////////////////////////
+    private function createRegNoPasien()
     {
-        $this->openModal();
+        $jmlpasien = DB::table('rsmst_pasiens')->count();
+        $this->dataPasien['pasien']['regNo'] = sprintf("%07s", $jmlpasien) . 'Z';
     }
 
-
-
-    // insert record start////////////////
-    public function store()
+    // validate Data Pasien//////////////////////////////////////////////////
+    // ///////////////////////////////////////////////////////////////
+    // ///////////////////////////////////////////////////////////////
+    private function validateDataPasien(): void
     {
-
         // customErrorMessages
         $messages = array(
             'required' => 'Data tidak boleh kosong.', //data tdak boleh kosong
             'digits' => 'Data harus berisi :digits digit.', //untuk angka harus berisi a length
             'digits_between' => 'Data harus berisi antara :min-:max digit.', //untuk angka  antara a,b length
-            'min' => 'Data berisi minimal :min digit.', //untuk angka /character min length
+            'min' => ':attribute Data berisi minimal :min digit.', //untuk angka /character min length
             'max' => 'Data berisi maximl :max digit.', //untuk angka /character max length
             'exists' => 'Data tidak ada didalam data master', // mencari referensi pada table tertentu
             'date_format' => 'Format tgl dd/mm/yyyy' //format tgl dd/mm/yyyy
@@ -1341,71 +1341,71 @@ class MasterPasien extends Component
             'dataPasien.pasien.pasientidakdikenal' => '',
             'dataPasien.pasien.regNo' => '',
             'dataPasien.pasien.gelarDepan' => '',
-            'dataPasien.pasien.regName' => 'required|min:3|max:200',
+            'dataPasien.pasien.regName' => 'bail|required|min:3|max:200',
             'dataPasien.pasien.gelarBelakang' => '',
             'dataPasien.pasien.namaPanggilan' => '',
-            'dataPasien.pasien.tempatLahir' => 'required',
-            'dataPasien.pasien.tglLahir' => 'required|date_format:d/m/Y',
+            'dataPasien.pasien.tempatLahir' => 'bail|required',
+            'dataPasien.pasien.tglLahir' => 'bail|required|date_format:d/m/Y',
             'dataPasien.pasien.thn' => '',
             'dataPasien.pasien.bln' => '',
             'dataPasien.pasien.hari' => '',
-            'dataPasien.pasien.jenisKelamin.jenisKelaminId' => 'required',
-            'dataPasien.pasien.jenisKelamin.jenisKelaminDesc' => 'required',
+            'dataPasien.pasien.jenisKelamin.jenisKelaminId' => 'bail|required',
+            'dataPasien.pasien.jenisKelamin.jenisKelaminDesc' => 'bail|required',
 
-            'dataPasien.pasien.agama.agamaId' => 'required',
-            'dataPasien.pasien.agama.agamaDesc' => 'required',
+            'dataPasien.pasien.agama.agamaId' => 'bail|required',
+            'dataPasien.pasien.agama.agamaDesc' => 'bail|required',
 
-            'dataPasien.pasien.statusPerkawinan.statusPerkawinanId' => 'required',
-            'dataPasien.pasien.statusPerkawinan.statusPerkawinanDesc' => 'required',
+            'dataPasien.pasien.statusPerkawinan.statusPerkawinanId' => 'bail|required',
+            'dataPasien.pasien.statusPerkawinan.statusPerkawinanDesc' => 'bail|required',
 
-            'dataPasien.pasien.pendidikan.pendidikanId' => 'required',
-            'dataPasien.pasien.pendidikan.pendidikanDesc' => 'required',
+            'dataPasien.pasien.pendidikan.pendidikanId' => 'bail|required',
+            'dataPasien.pasien.pendidikan.pendidikanDesc' => 'bail|required',
 
-            'dataPasien.pasien.pekerjaan.pekerjaanId' => 'required',
-            'dataPasien.pasien.pekerjaan.pekerjaanDesc' => 'required',
+            'dataPasien.pasien.pekerjaan.pekerjaanId' => 'bail|required',
+            'dataPasien.pasien.pekerjaan.pekerjaanDesc' => 'bail|required',
 
             'dataPasien.pasien.golonganDarah.golonganDarahId' => '',
             'dataPasien.pasien.golonganDarah.golonganDarahDesc' => '',
 
-            'dataPasien.pasien.kewarganegaraan' => 'required',
+            'dataPasien.pasien.kewarganegaraan' => 'bail|required',
             'dataPasien.pasien.suku' => '',
             'dataPasien.pasien.bahasa' => '',
-            'dataPasien.pasien.status.statusId' => 'required',
-            'dataPasien.pasien.status.statusDesc' => 'required',
+            'dataPasien.pasien.status.statusId' => 'bail|required',
+            'dataPasien.pasien.status.statusDesc' => 'bail|required',
 
             'dataPasien.pasien.domisil.samadgnidentitas' => '',
-            'dataPasien.pasien.domisil.alamat' => 'required',
-            'dataPasien.pasien.domisil.rt' => 'required',
-            'dataPasien.pasien.domisil.rw' => 'required',
-            'dataPasien.pasien.domisil.kodepos' => 'required',
-            'dataPasien.pasien.domisil.desaId' => 'required|exists:rsmst_desas,des_id',
-            'dataPasien.pasien.domisil.kecamatanId' => 'exists:rsmst_kecamatans,kec_id',
-            'dataPasien.pasien.domisil.kotaId' => 'required|exists:rsmst_kabupatens,kab_id',
-            'dataPasien.pasien.domisil.propinsiId' => 'required|exists:rsmst_propinsis,prop_id',
-            'dataPasien.pasien.domisil.desaName' => 'required',
-            'dataPasien.pasien.domisil.kecamatanName' => 'required',
-            'dataPasien.pasien.domisil.kotaName' => 'required',
-            'dataPasien.pasien.domisil.propinsiName' => 'required',
+            'dataPasien.pasien.domisil.alamat' => 'bail|required',
+            'dataPasien.pasien.domisil.rt' => 'bail|required',
+            'dataPasien.pasien.domisil.rw' => 'bail|required',
+            'dataPasien.pasien.domisil.kodepos' => 'bail|required',
+            'dataPasien.pasien.domisil.desaId' => 'bail|required|exists:rsmst_desas,des_id',
+            'dataPasien.pasien.domisil.kecamatanId' => 'bail|required|exists:rsmst_kecamatans,kec_id',
+            'dataPasien.pasien.domisil.kotaId' => 'bail|required|exists:rsmst_kabupatens,kab_id',
+            'dataPasien.pasien.domisil.propinsiId' => 'bail|required|exists:rsmst_propinsis,prop_id',
+            'dataPasien.pasien.domisil.desaName' => 'bail|required',
+            'dataPasien.pasien.domisil.kecamatanName' => 'bail|required',
+            'dataPasien.pasien.domisil.kotaName' => 'bail|required',
+            'dataPasien.pasien.domisil.propinsiName' => 'bail|required',
 
 
             'dataPasien.pasien.identitas.idbpjs' => 'digits:13',
             'dataPasien.pasien.identitas.pasport' => '',
             'dataPasien.pasien.identitas.alamat' => '',
-            'dataPasien.pasien.identitas.rt' => 'required',
-            'dataPasien.pasien.identitas.rw' => 'required',
-            'dataPasien.pasien.identitas.kodepos' => 'required',
-            'dataPasien.pasien.identitas.desaId' => 'required|exists:rsmst_desas,des_id',
-            'dataPasien.pasien.identitas.kecamatanId' => 'exists:rsmst_kecamatans,kec_id',
-            'dataPasien.pasien.identitas.kotaId' => 'required|exists:rsmst_kabupatens,kab_id',
-            'dataPasien.pasien.identitas.propinsiId' => 'required|exists:rsmst_propinsis,prop_id',
-            'dataPasien.pasien.identitas.desaName' => 'required',
-            'dataPasien.pasien.identitas.kecamatanName' => 'required',
-            'dataPasien.pasien.identitas.kotaName' => 'required',
-            'dataPasien.pasien.identitas.propinsiName' => 'required',
-            'dataPasien.pasien.identitas.negara' => 'required',
+            'dataPasien.pasien.identitas.rt' => 'bail|required',
+            'dataPasien.pasien.identitas.rw' => 'bail|required',
+            'dataPasien.pasien.identitas.kodepos' => 'bail|required',
+            'dataPasien.pasien.identitas.desaId' => 'bail|required|exists:rsmst_desas,des_id',
+            'dataPasien.pasien.identitas.kecamatanId' => 'bail|required|exists:rsmst_kecamatans,kec_id',
+            'dataPasien.pasien.identitas.kotaId' => 'bail|required|exists:rsmst_kabupatens,kab_id',
+            'dataPasien.pasien.identitas.propinsiId' => 'bail|required|exists:rsmst_propinsis,prop_id',
+            'dataPasien.pasien.identitas.desaName' => 'bail|required',
+            'dataPasien.pasien.identitas.kecamatanName' => 'bail|required',
+            'dataPasien.pasien.identitas.kotaName' => 'bail|required',
+            'dataPasien.pasien.identitas.propinsiName' => 'bail|required',
+            'dataPasien.pasien.identitas.negara' => 'bail|required',
 
-            'dataPasien.pasien.kontak.kodenegara' => 'required',
-            'dataPasien.pasien.kontak.nomerTelponSelulerPasien' => 'required|digits_between:6,15',
+            'dataPasien.pasien.kontak.kodenegara' => 'bail|required',
+            'dataPasien.pasien.kontak.nomerTelponSelulerPasien' => 'bail|required|digits_between:6,15',
             'dataPasien.pasien.kontak.nomerTelponLain' => '',
 
             'dataPasien.pasien.hubungan.namaAyah' => 'min:3|max:200',
@@ -1416,12 +1416,12 @@ class MasterPasien extends Component
             'dataPasien.pasien.hubungan.kodenegaraIbu' => '',
             'dataPasien.pasien.hubungan.nomerTelponSelulerIbu' => 'min:3|max:200',
 
-            'dataPasien.pasien.hubungan.namaPenanggungJawab' => 'required|min:3|max:200',
-            'dataPasien.pasien.hubungan.kodenegaraPenanggungJawab' => 'required',
-            'dataPasien.pasien.hubungan.nomerTelponSelulerPenanggungJawab' => 'required|digits_between:6,15',
+            'dataPasien.pasien.hubungan.namaPenanggungJawab' => 'bail|required|min:3|max:200',
+            'dataPasien.pasien.hubungan.kodenegaraPenanggungJawab' => 'bail|required',
+            'dataPasien.pasien.hubungan.nomerTelponSelulerPenanggungJawab' => 'bail|required|digits_between:6,15',
 
-            'dataPasien.pasien.hubungan.hubunganDgnPasien.hubunganDgnPasienId' => 'required',
-            'dataPasien.pasien.hubungan.hubunganDgnPasien.hubunganDgnPasienDesc' => 'required',
+            'dataPasien.pasien.hubungan.hubunganDgnPasien.hubunganDgnPasienId' => 'bail|required',
+            'dataPasien.pasien.hubungan.hubunganDgnPasien.hubunganDgnPasienDesc' => 'bail|required',
         ];
 
         // gabunga array nik jika pasien tidak dikenal
@@ -1432,27 +1432,12 @@ class MasterPasien extends Component
         }
 
         $this->validate($rules, $messages);
-
-
-
-
-        $this->createRegNoPasien();
-        $this->insertinsertDataPasien();
-
-        $this->closeModal();
-        $this->resetInputFields();
-        $this->emit('toastr-success', "Data " . $this->name . " berhasil disimpan.");
     }
-    // insert record end////////////////
 
-    private function createRegNoPasien()
-    {
-        // regNo Pasien
-        $jmlpasien = DB::table('rsmst_pasiens')->count();
-        $this->dataPasien['pasien']['regNo'] = sprintf("%07s", $jmlpasien) . 'Z';
-        // regNo Pasien
-    }
-    private function insertDataPasien()
+    // Insert Data Pasien//////////////////////////////////////////////////
+    // ///////////////////////////////////////////////////////////////
+    // ///////////////////////////////////////////////////////////////
+    private function insertDataPasien(): void
     {
         DB::table('rsmst_pasiens')->insert([
             'reg_date' => Carbon::now(),
@@ -1473,7 +1458,7 @@ class MasterPasien extends Component
             'job_id' => $this->dataPasien['pasien']['pekerjaan']['pekerjaanId'],
             'kk' => strtoupper($this->dataPasien['pasien']['hubungan']['namaPenanggungJawab']),
             'nyonya' => strtoupper($this->dataPasien['pasien']['hubungan']['namaIbu']),
-            'no_kk' => $this->dataPasien['pasien']['identitas']['nik'],
+            // 'no_kk' => $this->dataPasien['pasien']['identitas']['nik'],
             'address' => $this->dataPasien['pasien']['identitas']['alamat'],
             'des_id' => $this->dataPasien['pasien']['identitas']['desaId'],
             'rt' => $this->dataPasien['pasien']['identitas']['rt'],
@@ -1486,9 +1471,13 @@ class MasterPasien extends Component
             'meta_data_pasien_xml' => ArrayToXml::convert($this->dataPasien)
 
         ]);
+        $this->emit('toastr-success', "Data " .  $this->dataPasien['pasien']['regName'] . " berhasil disimpan.");
     }
 
-    private function updateDataPasien($regNo)
+    // update Data Pasien//////////////////////////////////////////////////
+    // ///////////////////////////////////////////////////////////////
+    // ///////////////////////////////////////////////////////////////
+    private function updateDataPasien($regNo): void
     {
         DB::table('rsmst_pasiens')->where('reg_no', $regNo)
             ->update([
@@ -1510,7 +1499,7 @@ class MasterPasien extends Component
                 'job_id' => $this->dataPasien['pasien']['pekerjaan']['pekerjaanId'],
                 'kk' => strtoupper($this->dataPasien['pasien']['hubungan']['namaPenanggungJawab']),
                 'nyonya' => strtoupper($this->dataPasien['pasien']['hubungan']['namaIbu']),
-                'no_kk' => $this->dataPasien['pasien']['identitas']['nik'],
+                // 'no_kk' => $this->dataPasien['pasien']['identitas']['nik'],
                 'address' => $this->dataPasien['pasien']['identitas']['alamat'],
                 'des_id' => $this->dataPasien['pasien']['identitas']['desaId'],
                 'rt' => $this->dataPasien['pasien']['identitas']['rt'],
@@ -1523,9 +1512,12 @@ class MasterPasien extends Component
                 'meta_data_pasien_xml' => ArrayToXml::convert($this->dataPasien)
 
             ]);
+
+        $this->emit('toastr-success', "Data " . $this->dataPasien['pasien']['regName'] . " berhasil diupdate.");
     }
 
     // Find data from table start////////////////
+    // syncronize array and table_json
     private function findData($value)
     {
         $findData = DB::table('rsmst_pasiens')
@@ -1550,21 +1542,34 @@ class MasterPasien extends Component
                     'birth_place',
                     'blood',
                     'marital_status',
-                    'rel_id',
-                    'edu_id',
-                    'job_id',
+                    'rsmst_religions.rel_id as rel_id',
+                    'rel_desc',
+                    'rsmst_educations.edu_id as edu_id',
+                    'edu_desc',
+                    'rsmst_jobs.job_id as job_id',
+                    'job_name',
                     'kk',
                     'nyonya',
                     'no_kk',
                     'address',
-                    'des_id',
+                    'rsmst_desas.des_id as des_id',
+                    'des_name',
                     'rt',
                     'rw',
-                    'kec_id',
-                    'kab_id',
-                    'prop_id',
+                    'rsmst_kecamatans.kec_id as kec_id',
+                    'kec_name',
+                    'rsmst_kabupatens.kab_id as kab_id',
+                    'kab_name',
+                    'rsmst_propinsis.prop_id as prop_id',
+                    'prop_name',
                     'phone'
-                )
+                )->join('rsmst_religions', 'rsmst_religions.rel_id', 'rsmst_pasiens.rel_id')
+                ->join('rsmst_educations', 'rsmst_educations.edu_id', 'rsmst_pasiens.edu_id')
+                ->join('rsmst_jobs', 'rsmst_jobs.job_id', 'rsmst_pasiens.job_id')
+                ->join('rsmst_desas', 'rsmst_desas.des_id', 'rsmst_pasiens.des_id')
+                ->join('rsmst_kecamatans', 'rsmst_kecamatans.kec_id', 'rsmst_pasiens.kec_id')
+                ->join('rsmst_kabupatens', 'rsmst_kabupatens.kab_id', 'rsmst_pasiens.kab_id')
+                ->join('rsmst_propinsis', 'rsmst_propinsis.prop_id', 'rsmst_pasiens.prop_id')
                 ->where('reg_no', $value)
                 ->first();
 
@@ -1585,25 +1590,50 @@ class MasterPasien extends Component
             $this->dataPasien['pasien']['golonganDarah']['golonganDarahId'] = '13';
             $this->dataPasien['pasien']['golonganDarah']['golonganDarahDesc'] = 'Tidak Tahu';
             $this->dataPasien['pasien']['statusPerkawinan']['statusPerkawinanId'] = '1';
-            $this->dataPasien['pasien']['statusPerkawinan']['statusPerkawinanId'] = 'Belum Kawin';
-            $this->dataPasien['pasien']['agama']['agamaId'] = '1';
-            $this->dataPasien['pasien']['agama']['agamaDesc'] = 'Islam';
-            $this->dataPasien['pasien']['pendidikan']['pendidikanId'] = '3';
-            $this->dataPasien['pasien']['pendidikan']['pendidikanDesc'] = 'SLTA Sederajat';
-            $this->dataPasien['pasien']['pekerjaan']['pekerjaanId'] = '4';
-            $this->dataPasien['pasien']['pekerjaan']['pekerjaanDesc'] = 'Pegawai Swasta/ Wiraswasta';
-            // //////////////////////kerjakan
+            $this->dataPasien['pasien']['statusPerkawinan']['statusPerkawinanDesc'] = 'Belum Kawin';
+
+            $this->dataPasien['pasien']['agama']['agamaId'] = $findData->rel_id;
+            $this->dataPasien['pasien']['agama']['agamaDesc'] = $findData->rel_desc;
+
+            $this->dataPasien['pasien']['pendidikan']['pendidikanId'] = $findData->edu_id;
+            $this->dataPasien['pasien']['pendidikan']['pendidikanDesc'] = $findData->edu_desc;
+
+            $this->dataPasien['pasien']['pekerjaan']['pekerjaanId'] = $findData->job_id;
+            $this->dataPasien['pasien']['pekerjaan']['pekerjaanDesc'] = $findData->job_name;
+
+
             $this->dataPasien['pasien']['hubungan']['namaPenanggungJawab'] = $findData->reg_no;
             $this->dataPasien['pasien']['hubungan']['namaIbu'] = $findData->reg_no;
-            $this->dataPasien['pasien']['identitas']['nik'] = $findData->reg_no;
-            $this->dataPasien['pasien']['identitas']['alamat'] = $findData->reg_no;
-            $this->dataPasien['pasien']['identitas']['desaId'] = $findData->reg_no;
-            $this->dataPasien['pasien']['identitas']['rt'] = $findData->reg_no;
-            $this->dataPasien['pasien']['identitas']['rw'] = $findData->reg_no;
-            $this->dataPasien['pasien']['identitas']['kecamatanId'] = $findData->reg_no;
-            $this->dataPasien['pasien']['identitas']['kotaId'] = $findData->reg_no;
-            $this->dataPasien['pasien']['identitas']['propinsiId'] = $findData->reg_no;
-            $this->dataPasien['pasien']['kontak']['nomerTelponSelulerPasien'] = $findData->reg_no;
+
+            $this->dataPasien['pasien']['identitas']['nik'] = $findData->nik_bpjs;
+            $this->dataPasien['pasien']['identitas']['idBpjs'] = $findData->nokartu_bpjs;
+
+
+            $this->dataPasien['pasien']['identitas']['alamat'] = $findData->address;
+
+            $this->dataPasien['pasien']['identitas']['desaId'] = $findData->des_id;
+            $this->dataPasien['pasien']['identitas']['desaName'] = $findData->des_name;
+
+            $this->dataPasien['pasien']['identitas']['rt'] = $findData->rt;
+            $this->dataPasien['pasien']['identitas']['rw'] = $findData->rw;
+            $this->dataPasien['pasien']['identitas']['kecamatanId'] = $findData->kec_id;
+            $this->dataPasien['pasien']['identitas']['kecamatanName'] = $findData->kec_name;
+
+            $this->dataPasien['pasien']['identitas']['kotaId'] = $findData->kab_id;
+            $this->dataPasien['pasien']['identitas']['kotaName'] = $findData->kab_name;
+
+            $this->dataPasien['pasien']['identitas']['propinsiId'] = $findData->prop_id;
+            $this->dataPasien['pasien']['identitas']['propinsiName'] = $findData->prop_name;
+
+            $this->dataPasien['pasien']['kontak']['nomerTelponSelulerPasien'] = $findData->phone;
+
+            $this->dataPasien['pasien']['hubungan']['namaPenanggungJawab'] = $findData->kk;
+            $this->dataPasien['pasien']['hubungan']['namaIbu'] = $findData->nyonya;
+
+
+            // $this->dataPasien['pasien']['hubungan']['noPenanggungJawab'] = $findData->no_kk;
+
+
             // dd($this->dataPasien);
         } else {
             // ubah data Pasien
@@ -1614,18 +1644,83 @@ class MasterPasien extends Component
     // Find data from table end////////////////
 
 
+    // hitungUsiaPasien
+    /////////////////////////////////////
+    /////////////////////////////////////
+    private function hitungUsiaPasien($birthDate): void
+    {
+
+        $mybirthDate = date('d/m/Y', strtotime($birthDate));
+
+        $birthDate = new \DateTime($mybirthDate);
+        $today = Carbon::now();
+
+        if ($birthDate > $today) {
+            $this->dataPasien['pasien']['thn'] = 0;
+            $this->dataPasien['pasien']['bln'] = 0;
+            $this->dataPasien['pasien']['hari'] = 0;
+        } else {
+            $y = $today->diff($birthDate)->y;
+            $m = $today->diff($birthDate)->m;
+            $d = $today->diff($birthDate)->d;
+            $this->dataPasien['pasien']['thn'] = $y;
+            $this->dataPasien['pasien']['bln'] = $m;
+            $this->dataPasien['pasien']['hari'] = $d;
+        }
+    }
+    /////////////////////////////////////
+    private function hitungBirthdatePasien($thn): void
+    {
+        if ($this->dataPasien['pasien']['tglLahir'] == null) {
+            $this->dataPasien['pasien']['tglLahir'] = Carbon::now()->subYears($thn)->format('d/m/Y');
+        }
+    }
+    /////////////////////////////////////
+
+    //////////////////////////logic lain///////////////////////////////////////
+
+
+
+
+
+
+
+    // is going to insert data////////////////
+    public function create()
+    {
+        $this->openModal();
+    }
+
+
+    // insert record start////////////////
+    public function store()
+    {
+
+        $this->validateDataPasien();
+
+        // Logic insert and update mode start //////////
+        if ($this->isOpenMode == 'insert') {
+            $this->createRegNoPasien();
+            $this->insertDataPasien();
+            $this->isOpenMode = 'update';
+        } else if ($this->isOpenMode == 'update') {
+            $this->updateDataPasien($this->dataPasien['pasien']['regNo']);
+        }
+
+
+
+        // $this->closeModal();
+        // $this->resetInputFields();
+    }
+
 
     // show edit record start////////////////
     public function edit($id)
     {
         $this->openModalEdit();
-
-        $province = $this->findData($id);
-        $this->province_id = $id;
-        $this->name = $province->name;
+        $this->findData($id);
     }
     // show edit record end////////////////
-
 
 
     // tampil record start////////////////
@@ -1637,11 +1732,23 @@ class MasterPasien extends Component
     // tampil record end////////////////
 
 
-
     // delete record start////////////////
     public function delete($id, $name)
     {
-        Province::find($id)->delete();
+
+        $this->dataPasien['pasien']['regNo'] = $id;
+        // customErrorMessages
+        $messages = array(
+            'unique' => 'Anda tidak dapat menghapus data ini, Data "' . $id . ' / ' . $name . '" sudah di pakai di dalam transaksi.', // mencari referensi pada table tertentu
+        );
+
+        $rules = ['dataPasien.pasien.regNo' => 'bail|unique:rstxn_rjhdrs,reg_no|unique:rstxn_ugdhdrs,reg_no|unique:rstxn_rihdrs,reg_no'];
+        $this->validate($rules, $messages);
+
+
+        DB::table('rsmst_pasiens')
+            ->where('reg_no', $id)
+            ->delete();
         $this->emit('toastr-success', "Hapus data " . $name . " berhasil.");
     }
     // delete record end////////////////
@@ -1651,6 +1758,7 @@ class MasterPasien extends Component
     // select data start////////////////
     public function render()
     {
+
         return view(
             'livewire.master-pasien.master-pasien',
             [
@@ -1698,4 +1806,7 @@ class MasterPasien extends Component
         );
     }
     // select data end////////////////
+
+
+
 }
