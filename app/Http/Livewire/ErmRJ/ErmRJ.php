@@ -16,14 +16,115 @@ class ErmRJ extends Component
     public $name, $province_id;
 
     // variable pasien dan screening di gabung pada collect data screening
-    public $dataPasienPoli = [
-        "regNo" => "",
-        "regName" => "",
-        "sex" => "",
-        "address" => "",
-        "rjDate" => "",
-        "rjNo" => "",
+    //  table data//////////////// 
+    public $dataPasien = [
+        "pasien" => [
+            "pasientidakdikenal" => [],  //status pasien tdak dikenal 0 false 1 true
+            "regNo" => "", //harus diisi
+            "gelarDepan" => "",
+            "regName" => "", //harus diisi / (Sesuai KTP)
+            "gelarBelakang" => "",
+            "namaPanggilan" => "",
+            "tempatLahir" => "", //harus diisi
+            "tglLahir" => "", //harus diisi / (dd/mm/yyyy)
+            "thn" => "",
+            "bln" => "",
+            "hari" => "",
+            "jenisKelamin" => [ //harus diisi (saveid)
+                "jenisKelaminId" => "",
+                "jenisKelaminDesc" => "",
+
+            ],
+            "agama" => [ //harus diisi (save id+nama)
+                "agamaId" => "",
+                "agamaDesc" => "",
+
+            ],
+            "statusPerkawinan" => [ //harus diisi (save id)
+                "statusPerkawinanId" => "",
+                "statusPerkawinanDesc" => "",
+            ],
+
+
+            "pendidikan" =>  [ //harus diisi (save id)
+                "pendidikanId" => "",
+                "pendidikanDesc" => "",
+
+            ],
+
+            "pekerjaan" => [ //harus diisi (save id)
+                "pekerjaanId" => "",
+                "pekerjaanDesc" => "",
+            ],
+
+
+            "golonganDarah" => [ //harus diisi (save id+nama) (default Tidak Tahu)
+                "golonganDarahId" => "",
+                "golonganDarahDesc" => "",
+            ],
+
+            "kewarganegaraan" => '', //Free text (defult INDONESIA)
+            "suku" => '', //Free text (defult Jawa)
+            "bahasa" => '', //Free text (defult Indonesia / Jawa)
+            "status" => [
+                "statusId" => "",
+                "statusDesc" => "",
+
+            ],
+            "identitas" => [
+                "nik" => "", //harus diisi
+                "idbpjs" => "",
+                "pasport" => "", //untuk WNA / WNI yang memiliki passport
+                "alamat" => "", //harus diisi
+                "rt" => "", //harus diisi
+                "rw" => "", //harus diisi
+                "kodepos" => "", //harus diisi
+                "desaId" => "", //harus diisi (Kode data Kemendagri)
+                "kecamatanId" => "", //harus diisi (Kode data Kemendagri)
+                "kotaId" => "", //harus diisi (Kode data Kemendagri)
+                "propinsiId" => "", //harus diisi (Kode data Kemendagri)
+                "desaName" => "", //harus diisi (Kode data Kemendagri)
+                "kecamatanName" => "", //harus diisi (Kode data Kemendagri)
+                "kotaName" => "", //harus diisi (Kode data Kemendagri)
+                "propinsiName" => "", //harus diisi (Kode data Kemendagri)
+                "negara" => "" //harus diisi (ISO 3166) ID 	IDN 	360 	ISO 3166-2:ID 	.id
+            ],
+            "kontak" => [
+                "kodenegara" => "", //+(62) Indonesia 
+                "nomerTelponSelulerPasien" => "", //+(kode negara) no telp
+                "nomerTelponLain" => "" //+(kode negara) no telp
+            ],
+
+
+        ]
     ];
+
+    //////////////////////////////
+    // Ref on top bar
+    //////////////////////////////
+    public $dateRjRef = '';
+
+    public $shiftRjRef = [
+        'shiftId' => '1',
+        'shiftDesc' => '1',
+        'shiftOptions' => [
+            ['shiftId' => '1', 'shiftDesc' => '1'],
+            ['shiftId' => '1', 'shiftDesc' => '1'],
+            ['shiftId' => '1', 'shiftDesc' => '1'],
+        ]
+    ];
+
+    public $statusRjRef = [
+        'statusId' => 'A',
+        'statusDesc' => 'Antrian',
+        'statusOptions' => [
+            ['statusId' => 'A', 'statusDesc' => 'Antrian'],
+            ['statusId' => 'L', 'statusDesc' => 'Selesai'],
+            ['statusId' => 'I', 'statusDesc' => 'Transfer'],
+        ]
+    ];
+    //////////////////////////////
+
     public $screeningQuestions = [
         [
             "sc_seq" => "1",
@@ -195,6 +296,7 @@ class ErmRJ extends Component
 
         ],
     ];
+
     public $screeningKesimpulan = [
         "sck_value" => 1,
         "sck_score" => 1,
@@ -220,6 +322,7 @@ class ErmRJ extends Component
             ],
         ]
     ];
+
     public $collectDataScreening = [];
     //////////////////////////////////////////////////////////////////////
     public $dataTandaVital = [
@@ -342,9 +445,7 @@ class ErmRJ extends Component
 
     //////////////////////////////////////////////////////////////////////
 
-    // Ref on top bar
-    public $ermStatusRef = 'A';
-    public $rjDateRef = '';
+
 
 
 
@@ -640,7 +741,7 @@ class ErmRJ extends Component
     // when new form instance
     public function mount()
     {
-        $this->rjDateRef = Carbon::now()->format('d/m/Y');
+        $this->dateRjRef = Carbon::now()->format('d/m/Y');
     }
 
 
@@ -668,8 +769,8 @@ class ErmRJ extends Component
                         'shift',
                         'vno_sep'
                     )
-                    ->where('erm_status', '=', $this->ermStatusRef)
-                    ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $this->rjDateRef)
+                    ->where('erm_status', '=', $this->statusRjRef['statusId'])
+                    ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $this->dateRjRef)
                     ->where(function ($q) {
                         $q->Where('reg_name', 'like', '%' . $this->search . '%')
                             ->orWhere('reg_no', 'like', '%' . $this->search . '%');

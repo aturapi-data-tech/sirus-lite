@@ -8,10 +8,16 @@ use Livewire\WithPagination;
 use Spatie\ArrayToXml\ArrayToXml;
 use Carbon\Carbon;
 
+use App\Http\Traits\customErrorMessagesTrait;
+use App\Http\Traits\BPJS\VclaimTrait;
+
+
+
 
 class MasterPasien extends Component
 {
-    use WithPagination;
+    use WithPagination, customErrorMessagesTrait, VclaimTrait;
+
 
     //  table data//////////////// reser
     public $dataPasien = [
@@ -300,6 +306,9 @@ class MasterPasien extends Component
         ]
     ];
 
+    public $dataPasienBPJS = [];
+    public $dataPasienBPJSSearch = "x";
+
     // limit record per page -resetExcept////////////////
     public $limitPerPage = 10;
 
@@ -422,7 +431,7 @@ class MasterPasien extends Component
         $this->isOpenMode = 'tampil';
     }
 
-    public function closeModal(): void
+    public function closeModal()
     {
         $this->resetInputFields();
     }
@@ -1323,15 +1332,7 @@ class MasterPasien extends Component
     private function validateDataPasien(): void
     {
         // customErrorMessages
-        $messages = array(
-            'required' => 'Data tidak boleh kosong.', //data tdak boleh kosong
-            'digits' => 'Data harus berisi :digits digit.', //untuk angka harus berisi a length
-            'digits_between' => 'Data harus berisi antara :min-:max digit.', //untuk angka  antara a,b length
-            'min' => ':attribute Data berisi minimal :min digit.', //untuk angka /character min length
-            'max' => 'Data berisi maximl :max digit.', //untuk angka /character max length
-            'exists' => 'Data tidak ada didalam data master', // mencari referensi pada table tertentu
-            'date_format' => 'Format tgl dd/mm/yyyy' //format tgl dd/mm/yyyy
-        );
+        $messages = customErrorMessagesTrait::messages();
 
         // require nik ketika pasien tidak dikenal
 
@@ -1514,6 +1515,15 @@ class MasterPasien extends Component
             ]);
 
         $this->emit('toastr-success', "Data " . $this->dataPasien['pasien']['regName'] . " berhasil diupdate.");
+    }
+
+    // update Data Pasien BPJS Search//////////////////////////////////////////////////
+    // ///////////////////////////////////////////////////////////////
+    // ///////////////////////////////////////////////////////////////
+    public function updatedDatapasienbpjssearch()
+    {
+
+        dd(VclaimTrait::peserta_nik($this->dataPasienBPJSSearch, Carbon::now()->format('Y-m-d'))->getOriginalContent());
     }
 
     // Find data from table start////////////////
@@ -1754,6 +1764,10 @@ class MasterPasien extends Component
     // delete record end////////////////
 
 
+
+    public function mount()
+    {
+    }
 
     // select data start////////////////
     public function render()

@@ -1,8 +1,7 @@
 <div>
 
-    <div class="px-4 pt-6">
-        <div
-            class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+    <div class="px-1 pt-7">
+        <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
             <!-- Card header -->
 
 
@@ -22,8 +21,6 @@
 
                     <div class="md:flex md:justify-between">
 
-
-
                         {{-- search --}}
                         <div class="relative pointer-events-auto md:w-1/2">
                             <div class="absolute inset-y-0 left-0 flex items-center p-5 pl-3 pointer-events-none">
@@ -41,9 +38,6 @@
                         </div>
                         {{-- end search --}}
 
-
-
-
                         {{-- two button --}}
                         <div class="flex justify-between mt-2 md:mt-0">
                             <x-primary-button wire:click="create()" class="flex justify-center flex-auto">
@@ -53,7 +47,7 @@
                                         d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
                                         clip-rule="evenodd"></path>
                                 </svg>
-                                Tambah Data {{ $myProgram }}
+                                Daftar {{ $myProgram }}
                             </x-primary-button>
 
 
@@ -83,14 +77,13 @@
                         </div>
                         {{-- end two button --}}
 
-
-
                     </div>
 
-                    <div class=" md:flex md:justify-start">
 
-                        {{-- date picker --}}
-                        <div class="relative w-full md:w-1/5">
+                    <div class="flex rounded-lg bg-gray-50">
+
+                        {{-- date --}}
+                        <div class="relative w-1/5 mt-2 ">
                             <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                 <svg aria-hidden="true" class="w-5 h-5 text-gray-500 dark:text-gray-400"
                                     fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -104,25 +97,47 @@
                             <x-text-input id="dateRjRef" datepicker datepicker-autohide datepicker-format="dd/mm/yyyy"
                                 type="text" class="p-2 pl-10 " placeholder="dd/mm/yyyy" wire:model="dateRjRef" />
                         </div>
-                        {{-- date --}}
-
-
-
 
                         {{-- radio --}}
-                        <div class="flex mt-2 md:w-full md:mt-0 md:ml-4">
+                        <div class="flex mt-2 ml-2">
                             @foreach ($statusRjRef['statusOptions'] as $sRj)
                                 {{-- @dd($sRj) --}}
                                 <x-radio-button :label="__($sRj['statusDesc'])" value="{{ $sRj['statusId'] }}"
                                     wire:model="statusRjRef.statusId" />
                             @endforeach
                         </div>
-                        {{-- radio --}}
+
+                        {{-- shift --}}
+                        <div class="mt-2 ml-0">
+                            <x-dropdown align="right" width="48" class="">
+                                <x-slot name="trigger">
+                                    {{-- Button shift --}}
+                                    <x-alternative-button class="inline-flex">
+                                        <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
+                                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                            <path clip-rule="evenodd" fill-rule="evenodd"
+                                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                                        </svg>
+                                        <span>{{ 'Shift' . $shiftRjRef['shiftDesc'] }}</span>
+                                    </x-alternative-button>
+                                </x-slot>
+                                {{-- Open shiftcontent --}}
+                                <x-slot name="content">
+
+                                    @foreach ($shiftRjRef['shiftOptions'] as $shift)
+                                        <x-dropdown-link
+                                            wire:click="setShift({{ $shift['shiftId'] }},{{ $shift['shiftDesc'] }})">
+                                            {{ __($shift['shiftDesc']) }}
+                                        </x-dropdown-link>
+                                    @endforeach
+                                </x-slot>
+                            </x-dropdown>
+                        </div>
+
                     </div>
 
-
                     @if ($isOpen)
-                        @include('livewire.erm-r-j.create')
+                        @include('livewire.daftar-r-j.create')
                     @endif
 
 
@@ -132,7 +147,7 @@
 
 
                 <!-- Table -->
-                <div class="flex flex-col mt-6">
+                <div class="flex flex-col mt-2">
                     <div class="overflow-x-auto rounded-lg">
                         <div class="inline-block min-w-full align-middle">
                             <div class="overflow-hidden shadow sm:rounded-lg">
@@ -153,20 +168,7 @@
                                                     </x-sort-link>
                                                 @endif
                                             </th>
-                                            <th scope="col" class="px-4 py-3">
 
-                                                @if ($sortField == 'name')
-                                                    <x-sort-link :active=true wire:click.prevent="sortBy('name')"
-                                                        role="button" href="#">
-                                                        TglLahir
-                                                    </x-sort-link>
-                                                @else
-                                                    <x-sort-link :active=false wire:click.prevent="sortBy('name')"
-                                                        role="button" href="#">
-                                                        TglLahir
-                                                    </x-sort-link>
-                                                @endif
-                                            </th>
                                             <th scope="col" class="px-4 py-3">
 
                                                 @if ($sortField == 'name')
@@ -224,13 +226,13 @@
                                             <tr class="border-b group dark:border-gray-700">
 
                                                 <td
-                                                    class="flex px-4 py-3 font-medium group-hover:bg-gray-100 group-hover:text-blue-700 whitespace-nowrap dark:text-white">
+                                                    class="flex px-4 py-3 font-medium group-hover:bg-gray-100 group-hover:text-primary whitespace-nowrap dark:text-white">
                                                     <img class="w-10 h-10 rounded-full" src="profile-picture-1.jpg"
                                                         alt="Jese image">
                                                     <div class="pl-3">
                                                         <div class="text-base font-semibold text-gray-700">
                                                             {{ $RJp->reg_no }}</div>
-                                                        <div class="font-normal text-blue-700">
+                                                        <div class="font-semibold text-primary">
                                                             {{ $RJp->reg_name . ' / (' . $RJp->sex . ')' . ' / ' . $RJp->thn }}
                                                         </div>
                                                         <div class="font-normal text-gray-500">
@@ -239,19 +241,16 @@
                                                     </div>
                                                 </td>
 
+
                                                 <td
-                                                    class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
-                                                    {{ $RJp->birth_date }}
-                                                </td>
-                                                <td
-                                                    class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-blue-700 whitespace-nowrap dark:text-white">
+                                                    class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-primary whitespace-nowrap dark:text-white">
                                                     {{ $RJp->vno_sep }}
                                                 </td>
 
                                                 <td
-                                                    class="px-4 py-3 font-medium text-gray-900 group-hover:bg-gray-100 group-hover:text-blue-700 whitespace-nowrap dark:text-white">
+                                                    class="px-4 py-3 font-medium text-gray-900 group-hover:bg-gray-100 group-hover:text-primary whitespace-nowrap dark:text-white">
                                                     <div class="">
-                                                        <div class="font-normal text-blue-700">{{ $RJp->poli_desc }}
+                                                        <div class="font-normal text-primary">{{ $RJp->poli_desc }}
                                                         </div>
                                                         <div class="font-normal text-gray-500">
                                                             {{ $RJp->dr_name . ' / ' . $RJp->klaim_id }}
@@ -261,11 +260,16 @@
 
                                                 <td
                                                     class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
-                                                    {{ $RJp->shift }}
+                                                    <div class="">
+                                                        <div class="font-normal text-primary">{{ $RJp->poli_desc }}
+                                                        </div>
+                                                        <div class="font-normal text-gray-500">
+                                                            {{ $RJp->dr_name . ' / ' . $RJp->klaim_id }}
+                                                        </div>
+                                                    </div>
                                                 </td>
 
-                                                <td
-                                                    class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-blue-700">
+                                                <td class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-primary">
 
 
 
@@ -358,9 +362,14 @@
 
 
 
-
-
-
+    {{-- call MasterPasien --}}
+    @if ($callMasterPasien)
+        @livewire('master-pasien.master-pasien', [
+            'isOpen' => true,
+            'isOpenMode' => 'insert',
+            'previousUrl' => $thisUrl,
+        ])
+    @endif
 
 
 
@@ -429,6 +438,26 @@
             });
 
 
+
+
+
+
+
+
+
+
+
+
+            // confirmation cari_Data_Pasien_Tidak_Ditemukan_Confirmation
+            window.livewire.on('cari_Data_Pasien_Tidak_Ditemukan_Confirmation', (obj) => {
+                console.log(obj.cariDataPasien)
+                let cfn = confirm('Data ' + obj.cariDataPasien +
+                    ' tidak ditemuka, apakah anda ingin menambahkan menjadi pasien baru ?');
+
+                if (cfn) {
+                    @this.set('callMasterPasien', true);
+                }
+            });
 
 
 
