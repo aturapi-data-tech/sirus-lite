@@ -11,12 +11,14 @@ use Illuminate\Support\Facades\Validator;
 use RealRashid\SweetAlert\Facades\Alert;
 
 use App\Http\Traits\customErrorMessagesTrait;
+use Illuminate\Support\Facades\DB;
+
 
 use Exception;
 
 trait VclaimTrait
 {
-    public static function sendResponse($message, $data, $code = 200)
+    public static function sendResponse($message, $data, $code = 200, $url, $requestTransferTime)
     {
         $response = [
             'response' => $data,
@@ -25,9 +27,19 @@ trait VclaimTrait
                 'code' => $code,
             ],
         ];
+
+        // Insert webLogStatus
+        DB::table('web_log_status')->insert([
+            'code' =>  $code,
+            'date_ref' => Carbon::now(),
+            'response' => json_encode($response, true),
+            'http_req' => $url,
+            'requestTransferTime' => $requestTransferTime
+        ]);
+
         return response()->json($response, $code);
     }
-    public static function sendError($error, $errorMessages = [], $code = 404)
+    public static function sendError($error, $errorMessages = [], $code = 404, $url, $requestTransferTime)
     {
         $response = [
             'metadata' => [
@@ -38,6 +50,15 @@ trait VclaimTrait
         if (!empty($errorMessages)) {
             $response['response'] = $errorMessages;
         }
+        // Insert webLogStatus
+        DB::table('web_log_status')->insert([
+            'code' =>  $code,
+            'date_ref' => Carbon::now(),
+            'response' => json_encode($response, true),
+            'http_req' => $url,
+            'requestTransferTime' => $requestTransferTime
+        ]);
+
         return response()->json($response, $code);
     }
 
@@ -221,10 +242,10 @@ trait VclaimTrait
         $output = \LZCompressor\LZString::decompressFromEncodedURIComponent($output);
         return $output;
     }
-    public static function response_decrypt($response, $signature)
+    public static function response_decrypt($response, $signature, $url, $requestTransferTime)
     {
         if ($response->failed()) {
-            return self::sendError($response->reason(),  $response->json('response'), $response->status());
+            return self::sendError($response->reason(),  $response->json('response'), $response->status(), $url, $requestTransferTime);
         } else {
             $decrypt = self::stringDecrypt($signature['decrypt_key'], $response->json('response'));
             $data = json_decode($decrypt);
@@ -237,15 +258,15 @@ trait VclaimTrait
                     $code = 400;
                 }
             }
-            return self::sendResponse($response->json('metaData.message'), $data, $code);
+            return self::sendResponse($response->json('metaData.message'), $data, $code, $url, $requestTransferTime);
         }
     }
     public static function response_no_decrypt($response)
     {
         if ($response->failed()) {
-            return self::sendError($response->reason(),  $response->json('response'), $response->status());
+            return self::sendError($response->reason(),  $response->json('response'), $response->status(), null, null);
         } else {
-            return self::sendResponse($response->json('metaData.message'), $response->json('response'), $response->json('metaData.code'));
+            return self::sendResponse($response->json('metaData.message'), $response->json('response'), $response->json('metaData.code'), null, null);
         }
     }
     // MONITORING
@@ -256,12 +277,12 @@ trait VclaimTrait
             "jenisPelayanan" => "required",
         ]);
         if ($validator->fails()) {
-            return self::sendError($validator->errors()->first(), null, 201);
+            return self::sendError($validator->errors()->first(), null, 201, null, null);
         }
         $url = env('VCLAIM_URL') . "Monitoring/Kunjungan/Tanggal/" . $request->tanggal . "/JnsPelayanan/" . $request->jenisPelayanan;
         $signature = self::signature();
         $response = Http::withHeaders($signature)->get($url);
-        return self::response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature, null, null);
     }
     public static function monitoring_data_klaim(Request $request)
     {
@@ -271,12 +292,12 @@ trait VclaimTrait
             "statusKlaim" => "required",
         ]);
         if ($validator->fails()) {
-            return self::sendError($validator->errors()->first(), null, 201);
+            return self::sendError($validator->errors()->first(), null, 201, null, null);
         }
         $url = env('VCLAIM_URL') . "Monitoring/Klaim/Tanggal/" . $request->tanggalPulang . "/JnsPelayanan/" . $request->jenisPelayanan . "/Status/" . $request->statusKlaim;
         $signature = self::signature();
         $response = Http::withHeaders($signature)->get($url);
-        return self::response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature, null, null);
     }
     public static function monitoring_pelayanan_peserta(Request $request)
     {
@@ -286,12 +307,12 @@ trait VclaimTrait
             "tanggalAkhir" => "required|date",
         ]);
         if ($validator->fails()) {
-            return self::sendError($validator->errors()->first(), null, 201);
+            return self::sendError($validator->errors()->first(), null, 201, null, null);
         }
         $url = env('VCLAIM_URL') . "monitoring/HistoriPelayanan/NoKartu/" . $request->nomorKartu . "/tglMulai/" . $request->tanggalMulai . "/tglAkhir/" . $request->tanggalAkhir;
         $signature = self::signature();
         $response = Http::withHeaders($signature)->get($url);
-        return self::response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature, null, null);
     }
     public static function monitoring_klaim_jasaraharja(Request $request)
     {
@@ -301,12 +322,12 @@ trait VclaimTrait
             "tanggalAkhir" => "required|date",
         ]);
         if ($validator->fails()) {
-            return self::sendError($validator->errors()->first(), null, 201);
+            return self::sendError($validator->errors()->first(), null, 201, null, null);
         }
         $url = env('VCLAIM_URL') . "monitoring/JasaRaharja/JnsPelayanan/" . $request->jenisPelayanan . "/tglMulai/" . $request->tanggalMulai . "/tglAkhir/" . $request->tanggalAkhir;
         $signature = self::signature();
         $response = Http::withHeaders($signature)->get($url);
-        return self::response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature, null, null);
     }
     // PESERTA
     public static function peserta_nomorkartu(Request $request)
@@ -316,12 +337,12 @@ trait VclaimTrait
             "tanggal" => "required|date",
         ]);
         if ($validator->fails()) {
-            return self::sendError($validator->errors()->first(), null, 400);
+            return self::sendError($validator->errors()->first(), null, 400, null, null);
         }
         $url = env('VCLAIM_URL') . "Peserta/nokartu/" . $request->nomorKartu . "/tglSEP/" . $request->tanggal;
         $signature = self::signature();
         $response = Http::withHeaders($signature)->get($url);
-        return self::response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature, null, null);
     }
     public static function peserta_nik($nik, $tanggal)
     {
@@ -340,7 +361,7 @@ trait VclaimTrait
         ], $messages);
 
         if ($validator->fails()) {
-            return self::sendError($validator->errors()->first(), null, 201);
+            return self::sendError($validator->errors()->first(), null, 201, null, null);
         }
 
 
@@ -354,11 +375,12 @@ trait VclaimTrait
                 ->get($url);
 
 
+            // dd($response->transferStats->getTransferTime()); Get Transfertime request
             // semua response error atau sukses dari BPJS di handle pada logic response_decrypt
-            return self::response_decrypt($response, $signature);
+            return self::response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
             /////////////////////////////////////////////////////////////////////////////
         } catch (Exception $e) {
-            return self::sendError('(Request Timeout) Cek Koneksi Internet / Server BPJS Bermasalah', null, 408);
+            return self::sendError('(Request Timeout) Cek Koneksi Internet / Server BPJS Bermasalah', null, 408, $url, null);
         }
     }
 
@@ -371,12 +393,12 @@ trait VclaimTrait
             "diagnosa" => "required",
         ]);
         if ($validator->fails()) {
-            return self::sendError($validator->errors()->first(), null, 201);
+            return self::sendError($validator->errors()->first(), null, 201, null, null);
         }
         $url = env('VCLAIM_URL') . "referensi/diagnosa/" . $request->diagnosa;
         $signature = self::signature();
         $response = Http::withHeaders($signature)->get($url);
-        return self::response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature, null, null);
     }
     public static function ref_poliklinik(Request $request)
     {
@@ -384,12 +406,12 @@ trait VclaimTrait
             "poliklinik" => "required",
         ]);
         if ($validator->fails()) {
-            return self::sendError($validator->errors()->first(), null, 201);
+            return self::sendError($validator->errors()->first(), null, 201, null, null);
         }
         $url = env('VCLAIM_URL') . "referensi/poli/" . $request->poliklinik;
         $signature = self::signature();
         $response = Http::withHeaders($signature)->get($url);
-        return self::response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature, null, null);
     }
     public static function ref_faskes(Request $request)
     {
@@ -398,12 +420,12 @@ trait VclaimTrait
             "jenisFaskes" => "required",
         ]);
         if ($validator->fails()) {
-            return self::sendError($validator->errors()->first(), null, 201);
+            return self::sendError($validator->errors()->first(), null, 201, null, null);
         }
         $url = env('VCLAIM_URL') . "referensi/faskes/" . $request->nama . "/" . $request->jenisFaskes;
         $signature = self::signature();
         $response = Http::withHeaders($signature)->get($url);
-        return self::response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature, null, null);
     }
     public static function ref_dpjp(Request $request)
     {
@@ -413,19 +435,19 @@ trait VclaimTrait
             "kodespesialis" => "required",
         ]);
         if ($validator->fails()) {
-            return self::sendError($validator->errors()->first(), null, 201);
+            return self::sendError($validator->errors()->first(), null, 201, null, null);
         }
         $url = env('VCLAIM_URL') . "referensi/dokter/pelayanan/" . $request->jenisPelayanan . "/tglPelayanan/" . $request->tanggal . "/Spesialis/" . $request->kodespesialis;
         $signature = self::signature();
         $response = Http::withHeaders($signature)->get($url);
-        return self::response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature, null, null);
     }
     public static function ref_provinsi(Request $request)
     {
         $url = env('VCLAIM_URL') . "referensi/propinsi";
         $signature = self::signature();
         $response = Http::withHeaders($signature)->get($url);
-        return self::response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature, null, null);
     }
     public static function ref_kabupaten(Request $request)
     {
@@ -433,12 +455,12 @@ trait VclaimTrait
             "kodeprovinsi" => "required",
         ]);
         if ($validator->fails()) {
-            return self::sendError($validator->errors()->first(), null, 201);
+            return self::sendError($validator->errors()->first(), null, 201, null, null);
         }
         $url = env('VCLAIM_URL') . "referensi/kabupaten/propinsi/" . $request->kodeprovinsi;
         $signature = self::signature();
         $response = Http::withHeaders($signature)->get($url);
-        return self::response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature, null, null);
     }
     public static function ref_kecamatan(Request $request)
     {
@@ -446,12 +468,12 @@ trait VclaimTrait
             "kodekabupaten" => "required",
         ]);
         if ($validator->fails()) {
-            return self::sendError($validator->errors()->first(), null, 201);
+            return self::sendError($validator->errors()->first(), null, 201, null, null);
         }
         $url = env('VCLAIM_URL') . "referensi/kecamatan/kabupaten/" . $request->kodekabupaten;
         $signature = self::signature();
         $response = Http::withHeaders($signature)->get($url);
-        return self::response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature, null, null);
     }
     // RENCANA KONTROL
     public static function suratkontrol_insert(Request $request)
@@ -464,7 +486,7 @@ trait VclaimTrait
             "user" => "required",
         ]);
         if ($validator->fails()) {
-            return self::sendError($validator->errors()->first(), null, 400);
+            return self::sendError($validator->errors()->first(), null, 400, null, null);
         }
         $url = env('VCLAIM_URL') . "RencanaKontrol/insert";
         $signature = self::signature();
@@ -479,7 +501,7 @@ trait VclaimTrait
             ]
         ];
         $response = Http::withHeaders($signature)->post($url, $data);
-        return self::response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature, null, null);
     }
     public static function suratkontrol_update(Request $request)
     {
@@ -492,7 +514,7 @@ trait VclaimTrait
             "user" => "required",
         ]);
         if ($validator->fails()) {
-            return self::sendError($validator->errors()->first(), null, 400);
+            return self::sendError($validator->errors()->first(), null, 400, null, null);
         }
         $url = env('VCLAIM_URL') . "RencanaKontrol/Update";
         $signature = self::signature();
@@ -508,7 +530,7 @@ trait VclaimTrait
             ]
         ];
         $response = Http::withHeaders($signature)->put($url, $data);
-        return self::response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature, null, null);
     }
     public static function suratkontrol_delete(Request $request)
     {
@@ -517,7 +539,7 @@ trait VclaimTrait
             "user" => "required",
         ]);
         if ($validator->fails()) {
-            return self::sendError($validator->errors()->first(), null, 201);
+            return self::sendError($validator->errors()->first(), null, 201, null, null);
         }
         $url = env('VCLAIM_URL') . "RencanaKontrol/Delete";
         $signature = self::signature();
@@ -531,7 +553,7 @@ trait VclaimTrait
             ]
         ];
         $response = Http::withHeaders($signature)->delete($url, $data);
-        return self::response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature, null, null);
     }
     public static function suratkontrol_nomor(Request $request)
     {
@@ -539,12 +561,12 @@ trait VclaimTrait
             "noSuratKontrol" => "required",
         ]);
         if ($validator->fails()) {
-            return self::sendError($validator->errors()->first(), null, 201);
+            return self::sendError($validator->errors()->first(), null, 201, null, null);
         }
         $url = env('VCLAIM_URL') . "RencanaKontrol/noSuratKontrol/" . $request->noSuratKontrol;
         $signature = self::signature();
         $response = Http::withHeaders($signature)->get($url);
-        return self::response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature, null, null);
     }
     public static function suratkontrol_peserta(Request $request)
     {
@@ -555,12 +577,12 @@ trait VclaimTrait
             "formatFilter" => "required",
         ]);
         if ($validator->fails()) {
-            return self::sendError($validator->errors()->first(), null, 400);
+            return self::sendError($validator->errors()->first(), null, 400, null, null);
         }
         $url = env('VCLAIM_URL') . "RencanaKontrol/ListRencanaKontrol/Bulan/" . sprintf("%02d", $request->bulan)  . "/Tahun/" . $request->tahun . "/Nokartu/" . $request->nomorKartu . "/filter/" . $request->formatFilter;
         $signature = self::signature();
         $response = Http::withHeaders($signature)->get($url);
-        return self::response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature, null, null);
     }
     public static function suratkontrol_tanggal(Request $request)
     {
@@ -570,12 +592,12 @@ trait VclaimTrait
             "formatFilter" => "required",
         ]);
         if ($validator->fails()) {
-            return self::sendError($validator->errors()->first(), null, 201);
+            return self::sendError($validator->errors()->first(), null, 201, null, null);
         }
         $url = env('VCLAIM_URL') . "RencanaKontrol/ListRencanaKontrol/tglAwal/" . $request->tanggalMulai . "/tglAkhir/" . $request->tanggalAkhir .  "/filter/" . $request->formatFilter;
         $signature = self::signature();
         $response = Http::withHeaders($signature)->get($url);
-        return self::response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature, null, null);
     }
     public static function suratkontrol_poli(Request $request)
     {
@@ -585,12 +607,12 @@ trait VclaimTrait
             "tanggalKontrol" => "required|date",
         ]);
         if ($validator->fails()) {
-            return self::sendError($validator->errors()->first(), null, 201);
+            return self::sendError($validator->errors()->first(), null, 201, null, null);
         }
         $url = env('VCLAIM_URL') . "RencanaKontrol/ListSpesialistik/JnsKontrol/" . $request->jenisKontrol  . "/nomor/" . $request->nomor . "/TglRencanaKontrol/" . $request->tanggalKontrol;
         $signature = self::signature();
         $response = Http::withHeaders($signature)->get($url);
-        return self::response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature, null, null);
     }
     public static function suratkontrol_dokter(Request $request)
     {
@@ -600,12 +622,12 @@ trait VclaimTrait
             "tanggalKontrol" => "required",
         ]);
         if ($validator->fails()) {
-            return self::sendError($validator->errors()->first(), null, 201);
+            return self::sendError($validator->errors()->first(), null, 201, null, null);
         }
         $url = env('VCLAIM_URL') . "RencanaKontrol/JadwalPraktekDokter/JnsKontrol/" . $request->jenisKontrol . "/KdPoli/" . $request->kodePoli . "/TglRencanaKontrol/" . $request->tanggalKontrol;
         $signature = self::signature();
         $response = Http::withHeaders($signature)->get($url);
-        return self::response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature, null, null);
     }
     // RUJUKAN
     public static function rujukan_nomor(Request $request)
@@ -614,12 +636,12 @@ trait VclaimTrait
             "nomorRujukan" => "required",
         ]);
         if ($validator->fails()) {
-            return self::sendError($validator->errors()->first(), null, 201);
+            return self::sendError($validator->errors()->first(), null, 201, null, null);
         }
         $url = env('VCLAIM_URL') . "Rujukan/" . $request->nomorRujukan;
         $signature = self::signature();
         $response = Http::withHeaders($signature)->get($url);
-        return self::response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature, null, null);
     }
     public static function rujukan_peserta(Request $request)
     {
@@ -627,12 +649,12 @@ trait VclaimTrait
             "nomorKartu" => "required",
         ]);
         if ($validator->fails()) {
-            return self::sendError($validator->errors()->first(), null, 201);
+            return self::sendError($validator->errors()->first(), null, 201, null, null);
         }
         $url = env('VCLAIM_URL') . "Rujukan/List/Peserta/" . $request->nomorKartu;
         $signature = self::signature();
         $response = Http::withHeaders($signature)->get($url);
-        return self::response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature, null, null);
     }
     public static function rujukan_rs_nomor(Request $request)
     {
@@ -640,12 +662,12 @@ trait VclaimTrait
             "nomorRujukan" => "required",
         ]);
         if ($validator->fails()) {
-            return self::sendError($validator->errors()->first(), null, 201);
+            return self::sendError($validator->errors()->first(), null, 201, null, null);
         }
         $url = env('VCLAIM_URL') . "Rujukan/RS/" . $request->nomorRujukan;
         $signature = self::signature();
         $response = Http::withHeaders($signature)->get($url);
-        return self::response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature, null, null);
     }
     public static function rujukan_rs_peserta(Request $request)
     {
@@ -653,12 +675,12 @@ trait VclaimTrait
             "nomorKartu" => "required",
         ]);
         if ($validator->fails()) {
-            return self::sendError($validator->errors()->first(), null, 201);
+            return self::sendError($validator->errors()->first(), null, 201, null, null);
         }
         $url = env('VCLAIM_URL') . "Rujukan/RS/List/Peserta/" . $request->nomorKartu;
         $signature = self::signature();
         $response = Http::withHeaders($signature)->get($url);
-        return self::response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature, null, null);
     }
     public static function rujukan_jumlah_sep(Request $request)
     {
@@ -668,12 +690,12 @@ trait VclaimTrait
             "nomorRujukan" => "required",
         ]);
         if ($validator->fails()) {
-            return self::sendError($validator->errors()->first(), null, 400);
+            return self::sendError($validator->errors()->first(), null, 400, null, null);
         }
         $url = env('VCLAIM_URL') . "Rujukan/JumlahSEP/" . $request->jenisRujukan . "/" . $request->nomorRujukan;
         $signature = self::signature();
         $response = Http::withHeaders($signature)->get($url);
-        return self::response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature, null, null);
     }
     // SEP
     public static function sep_insert(Request $request)
@@ -703,7 +725,7 @@ trait VclaimTrait
             "user" => "required",
         ]);
         if ($validator->fails()) {
-            return self::sendError($validator->errors()->first(), null, 201);
+            return self::sendError($validator->errors()->first(), null, 201, null, null);
         }
         $url = env('VCLAIM_URL') . "SEP/2.0/insert";
         $signature = self::signature();
@@ -772,7 +794,7 @@ trait VclaimTrait
             ]
         ];
         $response = Http::withHeaders($signature)->post($url, $data);
-        return self::response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature, null, null);
     }
     public static function sep_delete(Request $request)
     {
@@ -780,7 +802,7 @@ trait VclaimTrait
             "noSep" => "required",
         ]);
         if ($validator->fails()) {
-            return self::sendError($validator->errors()->first(), null, 201);
+            return self::sendError($validator->errors()->first(), null, 201, null, null);
         }
         $url = env('VCLAIM_URL') . "SEP/2.0/delete";
         $signature = self::signature();
@@ -794,7 +816,7 @@ trait VclaimTrait
             ]
         ];
         $response = Http::withHeaders($signature)->delete($url, $data);
-        return self::response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature, null, null);
     }
     public static function sep_nomor(Request $request)
     {
@@ -802,12 +824,12 @@ trait VclaimTrait
             "noSep" => "required",
         ]);
         if ($validator->fails()) {
-            return self::sendError($validator->errors()->first(), null, 201);
+            return self::sendError($validator->errors()->first(), null, 201, null, null);
         }
 
         $url = env('VCLAIM_URL') . "SEP/" . $request->noSep;
         $signature = self::signature();
         $response = Http::withHeaders($signature)->get($url);
-        return self::response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature, null, null);
     }
 }

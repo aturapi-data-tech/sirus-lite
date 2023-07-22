@@ -1644,7 +1644,7 @@ class MasterPasien extends Component
 
                 $this->emit('toastr-success', $CaridataVclaim->nama . ' ' . $CaridataVclaim->nik);
             } else {
-
+                // dd($CaridataVclaim);
                 $this->emit('toastr-error', $CaridataVclaim['metadata']['code'] . ' ' . $CaridataVclaim['metadata']['message']);
             }
             // ubah data Pasien

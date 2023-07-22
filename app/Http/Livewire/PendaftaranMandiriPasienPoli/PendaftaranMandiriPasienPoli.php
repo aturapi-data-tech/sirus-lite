@@ -57,9 +57,7 @@ class PendaftaranMandiriPasienPoli extends Component
         "passStatus" => "O",
         "rjStatus" => "A",
         "txnStatus" => "A",
-
-
-
+        "ermStatus" => "A",
     ];
 
 
@@ -84,7 +82,6 @@ class PendaftaranMandiriPasienPoli extends Component
             'regNo',
 
         ]);
-
     }
 
 
@@ -154,11 +151,9 @@ class PendaftaranMandiriPasienPoli extends Component
 
                 $this->cariDataJadwalPoli($this->hariIni);
             }
-
         } else {
             $this->emit('toastr-error', "Data Pasien tidak ditemukan, tempelkan kartu pasien anda ke mesin pemindai.");
         }
-
     }
 
 
@@ -177,12 +172,10 @@ class PendaftaranMandiriPasienPoli extends Component
             $this->dataPasien["birthPlace"] = $pasien->birth_place;
             $this->dataPasien["maritalStatus"] = $pasien->marital_status;
             $this->dataPasien["address"] = $pasien->address;
-
         } else {
             $this->resetInputFields();
             $this->emit('toastr-error', "Data Pasien dgn No Reg " . $id . " tidak ditemukan.");
         }
-
     }
 
     private function cariDataJadwalPoli($day): void
@@ -195,7 +188,6 @@ class PendaftaranMandiriPasienPoli extends Component
     public function updatedRegNo(): void
     {
         $this->cariDataPasien($this->regNo);
-
     }
     // logic stepper 1 end////////////////
 
@@ -293,10 +285,9 @@ class PendaftaranMandiriPasienPoli extends Component
         $this->emit('toastr-success', "Data sudah tersimpan.");
 
         return response()->streamDownload(
-            fn() => print($pdfContent),
+            fn () => print($pdfContent),
             "filename.pdf"
         );
-
     }
     // logic stepper 2 end////////////////
 
