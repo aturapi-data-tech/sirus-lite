@@ -567,7 +567,7 @@
                                 </div>
 
                                 <div wire:loading wire:target="dataPasien.pasien.cariDataPasien">
-                                    @include('livewire.daftar-r-j.loading')
+                                    <x-loading />
                                 </div>
 
                                 {{-- LOV caridatapasien --}}

@@ -31,7 +31,7 @@
                     </h3>
 
                     <h3 class="text-2xl font-semibold text-white dark:text-white">
-                        {{ $dataPasien['pasien']['regNo'] ? 'Reg No : ' . $dataPasien['pasien']['regNo'] : 'Reg No : ' . 'XXXXXXX' }}
+                        {{ $dataPasien['pasien']['regNo'] ? 'Reg No : ' . $dataPasien['pasien']['regNo'] : 'Reg No : ' . '. . .' }}
                     </h3>
                 </div>
 
@@ -40,6 +40,10 @@
                 <div class="flex items-center w-full ">
                     <x-text-input placeholder="cari data NIK dari Server BPJS" class="sm:w-1/2" :errorshas="__(false)"
                         :disabled=$disabledProperty wire:model.lazy="dataPasienBPJSSearch" />
+
+                    <div wire:loading wire:target="dataPasienBPJSSearch">
+                        <x-loading />
+                    </div>
 
 
                     <button wire:click="closeModal()"
@@ -54,13 +58,6 @@
 
             </div>
 
-            {{-- <div class="h-screen overflow-scroll snap-y snap-mandatory">
-                <div class="flex items-center justify-center w-screen h-screen snap-start bg-amber-200 text-8xl">1</div>
-                <div class="flex items-center justify-center w-screen h-screen bg-teal-200 snap-start text-8xl">2</div>
-                <div class="flex items-center justify-center w-screen h-screen snap-start bg-cyan-200 text-8xl">3</div>
-                <div class="flex items-center justify-center w-screen h-screen snap-start bg-fuchsia-200 text-8xl">4
-                </div>
-            </div> --}}
 
             <form class="scroll-smooth hover:scroll-auto">
 

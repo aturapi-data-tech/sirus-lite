@@ -367,7 +367,7 @@
         @livewire('master-pasien.master-pasien', [
             'isOpen' => true,
             'isOpenMode' => 'insert',
-            'previousUrl' => $thisUrl,
+            'dataPasienBPJSSearch' => $dataPasien['pasien']['cariDataPasien'],
         ])
     @endif
 

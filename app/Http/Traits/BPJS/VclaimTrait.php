@@ -2,7 +2,6 @@
 
 namespace App\Http\Traits\BPJS;
 
-use App\Http\Controllers\BPJS\ApiBPJSController;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
@@ -13,6 +12,7 @@ use RealRashid\SweetAlert\Facades\Alert;
 
 use App\Http\Traits\customErrorMessagesTrait;
 
+use Exception;
 
 trait VclaimTrait
 {
@@ -344,11 +344,26 @@ trait VclaimTrait
         }
 
 
-        $url = env('VCLAIM_URL') . "Peserta/nik/" . $nik . "/tglSEP/" . $tanggal;
-        $signature = self::signature();
-        $response = Http::withHeaders($signature)->get($url);
-        return self::response_decrypt($response, $signature);
+
+        // handler when time out and off line mode
+        try {
+
+            $url = env('VCLAIM_URL') . "Peserta/nik/" . $nik . "/tglSEP/" . $tanggal;
+            $signature = self::signature();
+            $response = Http::timeout(10)->withHeaders($signature)
+                ->get($url);
+
+
+            // semua response error atau sukses dari BPJS di handle pada logic response_decrypt
+            return self::response_decrypt($response, $signature);
+            /////////////////////////////////////////////////////////////////////////////
+        } catch (Exception $e) {
+            return self::sendError('(Request Timeout) Cek Koneksi Internet / Server BPJS Bermasalah', null, 408);
+        }
     }
+
+
+
     // REFERENSI
     public static function ref_diagnosa(Request $request)
     {
