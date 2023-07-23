@@ -354,6 +354,7 @@
     </div>
 
 
+</div>
 
 
 
@@ -380,16 +381,16 @@
 
 
 
-    {{-- push start ///////////////////////////////// --}}
-    @push('scripts')
-        {{-- script start --}}
-        <script src="{{ url('assets/js/jquery.min.js') }}"></script>
-        <script src="{{ url('assets/plugins/toastr/toastr.min.js') }}"></script>
-        <script src="{{ url('assets/flowbite/dist/datepicker.js') }}"></script>
 
-        {{-- script end --}}
 
+{{-- push start ///////////////////////////////// --}}
+@push('scripts')
+    {{-- script start --}}
+    <script src="{{ url('assets/js/jquery.min.js') }}"></script>
+    <script src="{{ url('assets/plugins/toastr/toastr.min.js') }}"></script>
+    <script src="{{ url('assets/flowbite/dist/datepicker.js') }}"></script>
 
+    {{-- script end --}}
 
 
 
@@ -398,15 +399,15 @@
 
 
 
-        {{-- Global Livewire JavaScript Object start --}}
-        <script type="text/javascript">
-            window.livewire.on('toastr-success', message => toastr.success(message));
-            window.Livewire.on('toastr-info', (message) => {
-                toastr.info(message)
-            });
-            window.livewire.on('toastr-error', message => toastr.error(message));
 
 
+    {{-- Global Livewire JavaScript Object start --}}
+    <script type="text/javascript">
+        window.livewire.on('toastr-success', message => toastr.success(message));
+        window.Livewire.on('toastr-info', (message) => {
+            toastr.info(message)
+        });
+        window.livewire.on('toastr-error', message => toastr.error(message));
 
 
 
@@ -418,17 +419,17 @@
 
 
 
-            // confirmation message remove record
-            window.livewire.on('confirm_remove_record', (key, name) => {
 
-                let cfn = confirm('Apakah anda ingin menghapus data ini ' + name + '?');
 
-                if (cfn) {
-                    window.livewire.emit('confirm_remove_record_RJp', key, name);
-                }
-            });
+        // confirmation message remove record
+        window.livewire.on('confirm_remove_record', (key, name) => {
 
+            let cfn = confirm('Apakah anda ingin menghapus data ini ' + name + '?');
 
+            if (cfn) {
+                window.livewire.emit('confirm_remove_record_RJp', key, name);
+            }
+        });
 
 
 
@@ -443,56 +444,56 @@
 
 
 
-            // press_dropdownButton flowbite
-            window.Livewire.on('pressDropdownButton', (key) => {
-                    // set the dropdown menu element
-                    const $targetEl = document.getElementById('dropdownMenu' + key);
 
-                    // set the element that trigger the dropdown menu on click
-                    const $triggerEl = document.getElementById('dropdownButton' + key);
 
-                    // options with default values
-                    const options = {
-                        placement: 'left',
-                        triggerType: 'click',
-                        offsetSkidding: 0,
-                        offsetDistance: 10,
-                        delay: 300,
-                        onHide: () => {
-                            console.log('dropdown has been hidden');
+        // press_dropdownButton flowbite
+        window.Livewire.on('pressDropdownButton', (key) => {
+                // set the dropdown menu element
+                const $targetEl = document.getElementById('dropdownMenu' + key);
 
-                        },
-                        onShow: () => {
-                            console.log('dropdown has been shown');
-                        },
-                        onToggle: () => {
-                            console.log('dropdown has been toggled');
-                        }
-                    };
+                // set the element that trigger the dropdown menu on click
+                const $triggerEl = document.getElementById('dropdownButton' + key);
 
-                    /*
-                     * $targetEl: required
-                     * $triggerEl: required
-                     * options: optional
-                     */
-                    const dropdown = new Dropdown($targetEl, $triggerEl, options);
+                // options with default values
+                const options = {
+                    placement: 'left',
+                    triggerType: 'click',
+                    offsetSkidding: 0,
+                    offsetDistance: 10,
+                    delay: 300,
+                    onHide: () => {
+                        console.log('dropdown has been hidden');
 
-                    dropdown.show();
+                    },
+                    onShow: () => {
+                        console.log('dropdown has been shown');
+                    },
+                    onToggle: () => {
+                        console.log('dropdown has been toggled');
+                    }
+                };
 
-                }
+                /*
+                 * $targetEl: required
+                 * $triggerEl: required
+                 * options: optional
+                 */
+                const dropdown = new Dropdown($targetEl, $triggerEl, options);
 
-            );
-        </script>
-        <script>
-            // $("#dateRjRef").change(function() {
-            //     const datepickerEl = document.getElementById('dateRjRef');
-            //     console.log(datepickerEl);
-            // });
-        </script>
-        {{-- Global Livewire JavaScript Object end --}}
-    @endpush
+                dropdown.show();
 
+            }
 
+        );
+    </script>
+    <script>
+        // $("#dateRjRef").change(function() {
+        //     const datepickerEl = document.getElementById('dateRjRef');
+        //     console.log(datepickerEl);
+        // });
+    </script>
+    {{-- Global Livewire JavaScript Object end --}}
+@endpush
 
 
 
@@ -504,11 +505,13 @@
 
 
 
-    @push('styles')
-        {{-- stylesheet start --}}
-        <link rel="stylesheet" href="{{ url('assets/plugins/toastr/toastr.min.css') }}">
 
-        {{-- stylesheet end --}}
-    @endpush
-    {{-- push end --}}
+
+@push('styles')
+    {{-- stylesheet start --}}
+    <link rel="stylesheet" href="{{ url('assets/plugins/toastr/toastr.min.css') }}">
+
+    {{-- stylesheet end --}}
+@endpush
+{{-- push end --}}
 </div>

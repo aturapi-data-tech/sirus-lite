@@ -303,6 +303,7 @@
     </div>
 
 
+</div>
 
 
 
@@ -328,14 +329,12 @@
 
 
 
-
-    {{-- push start ///////////////////////////////// --}}
-    @push('scripts')
-        {{-- script start --}}
-        <script src="{{ url('assets/js/jquery.min.js') }}"></script>
-        <script src="{{ url('assets/plugins/toastr/toastr.min.js') }}"></script>
-        {{-- script end --}}
-
+{{-- push start ///////////////////////////////// --}}
+@push('scripts')
+    {{-- script start --}}
+    <script src="{{ url('assets/js/jquery.min.js') }}"></script>
+    <script src="{{ url('assets/plugins/toastr/toastr.min.js') }}"></script>
+    {{-- script end --}}
 
 
 
@@ -346,12 +345,13 @@
 
 
 
-        {{-- Disabling enter key for form --}}
-        <script type="text/javascript">
-            $(document).on("keydown", "form", function(event) {
-                return event.key != "Enter";
-            });
-        </script>
+
+    {{-- Disabling enter key for form --}}
+    <script type="text/javascript">
+        $(document).on("keydown", "form", function(event) {
+            return event.key != "Enter";
+        });
+    </script>
 
 
 
@@ -359,14 +359,13 @@
 
 
 
-        {{-- Global Livewire JavaScript Object start --}}
-        <script type="text/javascript">
-            window.livewire.on('toastr-success', message => toastr.success(message));
-            window.Livewire.on('toastr-info', (message) => {
-                toastr.info(message)
-            });
-            window.livewire.on('toastr-error', message => toastr.error(message));
-
+    {{-- Global Livewire JavaScript Object start --}}
+    <script type="text/javascript">
+        window.livewire.on('toastr-success', message => toastr.success(message));
+        window.Livewire.on('toastr-info', (message) => {
+            toastr.info(message)
+        });
+        window.livewire.on('toastr-error', message => toastr.error(message));
 
 
 
@@ -379,15 +378,73 @@
 
 
 
-            // confirmation message remove record
-            window.livewire.on('confirm_remove_record', (key, name) => {
 
-                let cfn = confirm('Apakah anda ingin menghapus data ini ' + name + '?');
+        // confirmation message remove record
+        window.livewire.on('confirm_remove_record', (key, name) => {
 
-                if (cfn) {
-                    window.livewire.emit('confirm_remove_record_pasiens', key, name);
+            let cfn = confirm('Apakah anda ingin menghapus data ini ' + name + '?');
+
+            if (cfn) {
+                window.livewire.emit('confirm_remove_record_pasiens', key, name);
+            }
+        });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // press_dropdownButton flowbite
+        window.Livewire.on('pressDropdownButton', (key) => {
+            // set the dropdown menu element
+            const $targetEl = document.getElementById('dropdownMenu' + key);
+
+            // set the element that trigger the dropdown menu on click
+            const $triggerEl = document.getElementById('dropdownButton' + key);
+
+            // options with default values
+            const options = {
+                placement: 'left',
+                triggerType: 'click',
+                offsetSkidding: 0,
+                offsetDistance: 10,
+                delay: 300,
+                onHide: () => {
+                    console.log('dropdown has been hidden');
+
+                },
+                onShow: () => {
+                    console.log('dropdown has been shown');
+                },
+                onToggle: () => {
+                    console.log('dropdown has been toggled');
                 }
-            });
+            };
+
+            /*
+             * $targetEl: required
+             * $triggerEl: required
+             * options: optional
+             */
+            const dropdown = new Dropdown($targetEl, $triggerEl, options);
+
+            dropdown.show();
+
+        });
+    </script>
+    {{-- Global Livewire JavaScript Object end --}}
+@endpush
 
 
 
@@ -401,67 +458,10 @@
 
 
 
-
-
-
-
-            // press_dropdownButton flowbite
-            window.Livewire.on('pressDropdownButton', (key) => {
-                // set the dropdown menu element
-                const $targetEl = document.getElementById('dropdownMenu' + key);
-
-                // set the element that trigger the dropdown menu on click
-                const $triggerEl = document.getElementById('dropdownButton' + key);
-
-                // options with default values
-                const options = {
-                    placement: 'left',
-                    triggerType: 'click',
-                    offsetSkidding: 0,
-                    offsetDistance: 10,
-                    delay: 300,
-                    onHide: () => {
-                        console.log('dropdown has been hidden');
-
-                    },
-                    onShow: () => {
-                        console.log('dropdown has been shown');
-                    },
-                    onToggle: () => {
-                        console.log('dropdown has been toggled');
-                    }
-                };
-
-                /*
-                 * $targetEl: required
-                 * $triggerEl: required
-                 * options: optional
-                 */
-                const dropdown = new Dropdown($targetEl, $triggerEl, options);
-
-                dropdown.show();
-
-            });
-        </script>
-        {{-- Global Livewire JavaScript Object end --}}
-    @endpush
-
-
-
-
-
-
-
-
-
-
-
-
-
-    @push('styles')
-        {{-- stylesheet start --}}
-        <link rel="stylesheet" href="{{ url('assets/plugins/toastr/toastr.min.css') }}">
-        {{-- stylesheet end --}}
-    @endpush
-    {{-- push end --}}
+@push('styles')
+    {{-- stylesheet start --}}
+    <link rel="stylesheet" href="{{ url('assets/plugins/toastr/toastr.min.css') }}">
+    {{-- stylesheet end --}}
+@endpush
+{{-- push end --}}
 </div>

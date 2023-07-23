@@ -13,7 +13,7 @@
                     {{-- text --}}
                     <div class="mb-5">
                         <h3 class="text-3xl font-bold text-gray-900 dark:text-white">{{ $myTitle }}</h3>
-                        <span class="text-base font-normal text-gray-500 dark:text-gray-400">{{ $mySnipt }}</span>
+                        <span class="text-base font-normal text-gray-900 dark:text-gray-400">{{ $mySnipt }}</span>
                     </div>
                     {{-- end text --}}
 
@@ -85,7 +85,7 @@
                         {{-- date --}}
                         <div class="relative w-1/5 mt-2 ">
                             <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                <svg aria-hidden="true" class="w-5 h-5 text-gray-500 dark:text-gray-400"
+                                <svg aria-hidden="true" class="w-5 h-5 text-gray-900 dark:text-gray-400"
                                     fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                                     <path fill-rule="evenodd"
                                         d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
@@ -151,7 +151,7 @@
                     <div class="overflow-x-auto rounded-lg">
                         <div class="inline-block min-w-full align-middle">
                             <div class="overflow-hidden shadow sm:rounded-lg">
-                                <table class="w-full text-sm text-left text-gray-500 table-auto dark:text-gray-400">
+                                <table class="w-full text-sm text-left text-gray-900 table-auto dark:text-gray-400">
                                     <thead
                                         class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                         <tr>
@@ -235,7 +235,7 @@
                                                         <div class="font-semibold text-primary">
                                                             {{ $RJp->reg_name . ' / (' . $RJp->sex . ')' . ' / ' . $RJp->thn }}
                                                         </div>
-                                                        <div class="font-normal text-gray-500">
+                                                        <div class="font-normal text-gray-900">
                                                             {{ $RJp->address }}
                                                         </div>
                                                     </div>
@@ -252,7 +252,7 @@
                                                     <div class="">
                                                         <div class="font-normal text-primary">{{ $RJp->poli_desc }}
                                                         </div>
-                                                        <div class="font-normal text-gray-500">
+                                                        <div class="font-normal text-gray-900">
                                                             {{ $RJp->dr_name . ' / ' . $RJp->klaim_id }}
                                                         </div>
                                                     </div>
@@ -263,8 +263,11 @@
                                                     <div class="">
                                                         <div class="font-normal text-primary">{{ $RJp->poli_desc }}
                                                         </div>
-                                                        <div class="font-normal text-gray-500">
+                                                        <div class="font-normal text-gray-900">
                                                             {{ $RJp->dr_name . ' / ' . $RJp->klaim_id }}
+                                                        </div>
+                                                        <div class="font-normal text-gray-900">
+                                                            {{ 'Nomer Pelayanan ' . $RJp->no_antrian }}
                                                         </div>
                                                     </div>
                                                 </td>
@@ -329,7 +332,7 @@
 
                                 {{-- no data found start --}}
                                 @if ($RJpasiens->count() == 0)
-                                    <div class="w-full p-4 text-sm text-center text-gray-500 dark:text-gray-400">
+                                    <div class="w-full p-4 text-sm text-center text-gray-900 dark:text-gray-400">
                                         {{ 'Data ' . $myProgram . ' Tidak ditemukan' }}
                                     </div>
                                 @endif
@@ -449,9 +452,9 @@
 
 
             // confirmation cari_Data_Pasien_Tidak_Ditemukan_Confirmation
-            window.livewire.on('cari_Data_Pasien_Tidak_Ditemukan_Confirmation', (obj) => {
-                console.log(obj.cariDataPasien)
-                let cfn = confirm('Data ' + obj.cariDataPasien +
+            window.livewire.on('cari_Data_Pasien_Tidak_Ditemukan_Confirmation', (msg) => {
+                console.log(msg)
+                let cfn = confirm('Data ' + msg +
                     ' tidak ditemuka, apakah anda ingin menambahkan menjadi pasien baru ?');
 
                 if (cfn) {

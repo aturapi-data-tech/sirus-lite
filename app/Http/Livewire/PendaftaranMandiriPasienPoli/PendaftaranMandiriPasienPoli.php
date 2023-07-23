@@ -237,7 +237,8 @@ class PendaftaranMandiriPasienPoli extends Component
         $sql = "select count(*) no_antrian 
 		from rstxn_rjhdrs 
         where dr_id=:drId
-        and to_char(rj_date,'ddmmyyyy')=:tgl";
+        and to_char(rj_date,'ddmmyyyy')=:tgl
+        and klaim_id!='KR'";
         $findDataNoUrut = DB::scalar($sql, ["tgl" => $tglNoantrian, "drId" => $this->dataDaftarPasienPoli["drId"]]);
 
         if ($findDataNoUrut == 0) {

@@ -1713,7 +1713,7 @@ class MasterPasien extends Component
 
 
     // Find data from table start////////////////
-    // syncronize array and table_json
+    // syncronize array and table_json Pasien
     private function findData($value)
     {
         $findData = DB::table('rsmst_pasiens')
