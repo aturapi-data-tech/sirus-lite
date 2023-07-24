@@ -1629,20 +1629,19 @@ class MasterPasien extends Component
                 ->getOriginalContent();
 
             if ($CaridataVclaim['metadata']['code'] == 200) {
-
-                $CaridataVclaim = $CaridataVclaim['response']->peserta;
+                $CaridataVclaim = $CaridataVclaim['response']['peserta'];
 
                 // set dataPasien
                 $this->dataPasien['pasien']['regDate'] = Carbon::now();
-                $this->dataPasien['pasien']['regName'] = $CaridataVclaim->nama;
-                $this->dataPasien['pasien']['identitas']['idbpjs'] = $CaridataVclaim->noKartu;
-                $this->dataPasien['pasien']['identitas']['nik'] = $CaridataVclaim->nik;
-                $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminId'] = ($CaridataVclaim->sex == 'L') ? 1 : 2;
-                $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] = ($CaridataVclaim->sex == 'L') ? 'Laki-laki' : 'Perempuan';
+                $this->dataPasien['pasien']['regName'] = $CaridataVclaim['nama'];
+                $this->dataPasien['pasien']['identitas']['idbpjs'] = $CaridataVclaim['noKartu'];
+                $this->dataPasien['pasien']['identitas']['nik'] = $CaridataVclaim['nik'];
+                $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminId'] = ($CaridataVclaim['sex'] == 'L') ? 1 : 2;
+                $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] = ($CaridataVclaim['sex'] == 'L') ? 'Laki-laki' : 'Perempuan';
 
-                $this->dataPasien['pasien']['tglLahir'] = Carbon::createFromFormat('Y-m-d', $CaridataVclaim->tglLahir)->format('d/m/Y');
+                $this->dataPasien['pasien']['tglLahir'] = Carbon::createFromFormat('Y-m-d', $CaridataVclaim['tglLahir'])->format('d/m/Y');
 
-                $this->emit('toastr-success', $CaridataVclaim->nama . ' ' . $CaridataVclaim->nik);
+                $this->emit('toastr-success', $CaridataVclaim['nama'] . ' ' . $CaridataVclaim['nik']);
             } else {
                 // dd($CaridataVclaim);
                 $this->emit('toastr-error', $CaridataVclaim['metadata']['code'] . ' ' . $CaridataVclaim['metadata']['message']);

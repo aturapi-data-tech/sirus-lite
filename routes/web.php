@@ -11,6 +11,8 @@ use App\Http\Livewire\PendaftaranMandiriPasienPoli\PendaftaranMandiriPasienPoli;
 use App\Http\Livewire\DaftarRJ\DaftarRJ;
 use App\Http\Livewire\ErmRJ\ErmRJ;
 
+use App\Http\Livewire\SetupHfisBpjs\SetupHfisBpjs;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -45,6 +47,8 @@ Route::middleware('auth')->group(function () {
 
 Route::get('posts', PostTable::class)->middleware('auth')->name('posts');
 Route::get('masterlevelsatu', MasterLevelSatu::class)->middleware('auth')->name('MasterLevelSatu');
+
+
 Route::get('masterleveldua', MasterLevelDua::class)->middleware('auth')->name('MasterLevelDua');
 
 Route::get('pendaftaranMandiriPasienPoli', PendaftaranMandiriPasienPoli::class)->middleware('auth')->name('pendaftaranMandiriPasienPoli');
@@ -55,6 +59,9 @@ Route::view('/cetak-tiket', 'livewire.pendaftaran-mandiri-pasien-poli.cetak-tike
 Route::get('MasterPasien', MasterPasien::class)->middleware('auth')->name('MasterPasien');
 
 Route::get('daftarRJ', DaftarRJ::class)->middleware('auth')->name('daftarRJ');
+
+Route::get('SetupHfisBpjs', SetupHfisBpjs::class)->middleware('auth')->name('SetupHfisBpjs');
+
 Route::get('ermRJ', ErmRJ::class)->middleware('auth')->name('ermRJ');
 
 

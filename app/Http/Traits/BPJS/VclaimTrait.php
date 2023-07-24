@@ -247,17 +247,17 @@ trait VclaimTrait
         if ($response->failed()) {
             return self::sendError($response->reason(),  $response->json('response'), $response->status(), $url, $requestTransferTime);
         } else {
-            $decrypt = self::stringDecrypt($signature['decrypt_key'], $response->json('response'));
-            $data = json_decode($decrypt);
-            if ($response->json('metaData.code') == 1 || $response->json('metaData.code') == 0) {
-                $code = 200;
+            // Check Response !200           -> metaData D besar
+            $code = $response->json('metaData.code'); //code 200 -201 500 dll
+
+            if ($code == 200) {
+                $decrypt = self::stringDecrypt($signature['decrypt_key'], $response->json('response'));
+                $data = json_decode($decrypt, true);
             } else {
-                if ($response->json('metaData.code') == 200) {
-                    $code = $response->json('metaData.code');
-                } else {
-                    $code = 400;
-                }
+
+                $data = json_decode($response, true);
             }
+
             return self::sendResponse($response->json('metaData.message'), $data, $code, $url, $requestTransferTime);
         }
     }
@@ -361,7 +361,7 @@ trait VclaimTrait
         ], $messages);
 
         if ($validator->fails()) {
-            return self::sendError($validator->errors()->first(), null, 201, null, null);
+            return self::sendError($validator->errors()->first(), $validator->errors(), 201, null, null);
         }
 
 
@@ -371,7 +371,8 @@ trait VclaimTrait
 
             $url = env('VCLAIM_URL') . "Peserta/nik/" . $nik . "/tglSEP/" . $tanggal;
             $signature = self::signature();
-            $response = Http::timeout(10)->withHeaders($signature)
+            $response = Http::timeout(10)
+                ->withHeaders($signature)
                 ->get($url);
 
 
@@ -380,7 +381,7 @@ trait VclaimTrait
             return self::response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
             /////////////////////////////////////////////////////////////////////////////
         } catch (Exception $e) {
-            return self::sendError('(Request Timeout) Cek Koneksi Internet / Server BPJS Bermasalah', null, 408, $url, null);
+            return self::sendError($e->getMessage(), $validator->errors(), 408, $url, null);
         }
     }
 
@@ -400,19 +401,63 @@ trait VclaimTrait
         $response = Http::withHeaders($signature)->get($url);
         return self::response_decrypt($response, $signature, null, null);
     }
-    public static function ref_poliklinik(Request $request)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public static function ref_poliklinik($poliklinik)
     {
-        $validator = Validator::make(request()->all(), [
-            "poliklinik" => "required",
-        ]);
+
+        $messages = customErrorMessagesTrait::messages();
+        $r = ['poliklinik' => $poliklinik];
+        $validator = Validator::make($r, ["poliklinik" => "required"], $messages);
+
         if ($validator->fails()) {
-            return self::sendError($validator->errors()->first(), null, 201, null, null);
+            return self::sendError($validator->errors()->first(), $validator->errors(), 201, null, null);
         }
-        $url = env('VCLAIM_URL') . "referensi/poli/" . $request->poliklinik;
-        $signature = self::signature();
-        $response = Http::withHeaders($signature)->get($url);
-        return self::response_decrypt($response, $signature, null, null);
+
+        // handler when time out and off line mode
+        try {
+
+            $url = env('VCLAIM_URL') . "referensi/poli/" . $poliklinik;
+            $signature = self::signature();
+            $response = Http::timeout(10)
+                ->withHeaders($signature)
+                ->get($url);
+
+            return self::response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
+            /////////////////////////////////////////////////////////////////////////////
+        } catch (Exception $e) {
+            return self::sendError($e->getMessage(), $validator->errors(), 408, $url, null);
+        }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     public static function ref_faskes(Request $request)
     {
         $validator = Validator::make(request()->all(), [

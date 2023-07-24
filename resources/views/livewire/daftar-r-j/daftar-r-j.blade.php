@@ -436,7 +436,10 @@
                 let cfn = confirm('Apakah anda ingin menghapus data ini ' + name + '?');
 
                 if (cfn) {
+                    @this.set('PushDataAntrianStatus', true);
                     window.livewire.emit('confirm_remove_record_RJp', key, name);
+                } else {
+                    @this.set('PushDataAntrianStatus', false);
                 }
             });
 
@@ -453,7 +456,6 @@
 
             // confirmation cari_Data_Pasien_Tidak_Ditemukan_Confirmation
             window.livewire.on('cari_Data_Pasien_Tidak_Ditemukan_Confirmation', (msg) => {
-                console.log(msg)
                 let cfn = confirm('Data ' + msg +
                     ' tidak ditemuka, apakah anda ingin menambahkan menjadi pasien baru ?');
 
@@ -465,7 +467,15 @@
 
 
 
+            // confirmation rePush_Data_Antrian_Confirmation
+            window.livewire.on('rePush_Data_Antrian_Confirmation', () => {
+                let cfn = confirm('Apakah anda ingin mengulaingi Proses Kirim data Antrian ?');
 
+                if (cfn) {
+                    // emit ke controller
+                    window.livewire.emit('rePush_Data_Antrian');
+                }
+            });
 
 
 

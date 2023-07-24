@@ -1,6 +1,7 @@
 <?php
 
-namespace App\Http\Controllers\BPJS\Antrian;
+namespace App\Http\Traits\BPJS;
+
 
 use App\Http\Controllers\Admin\WhatsappController;
 use App\Http\Controllers\API\VclaimBPJSController;
@@ -36,20 +37,72 @@ use Mike42\Escpos\Printer;
 use RealRashid\SweetAlert\Facades\Alert;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
-class AntrianController extends ApiBPJSController
+
+use App\Http\Traits\customErrorMessagesTrait;
+
+use Exception;
+
+
+trait AntrianTrait
 {
+
+    public static function sendResponse($message, $data, $code = 200, $url, $requestTransferTime)
+    {
+        $response = [
+            'response' => $data,
+            'metadata' => [
+                'message' => $message,
+                'code' => $code,
+            ],
+        ];
+
+        // Insert webLogStatus
+        DB::table('web_log_status')->insert([
+            'code' =>  $code,
+            'date_ref' => Carbon::now(),
+            'response' => json_encode($response, true),
+            'http_req' => $url,
+            'requestTransferTime' => $requestTransferTime
+        ]);
+
+        return response()->json($response, $code);
+    }
+    public static function sendError($error, $errorMessages = [], $code = 404, $url, $requestTransferTime)
+    {
+        $response = [
+            'metadata' => [
+                'message' => $error,
+                'code' => $code,
+            ],
+        ];
+        if (!empty($errorMessages)) {
+            $response['response'] = $errorMessages;
+        }
+        // Insert webLogStatus
+        DB::table('web_log_status')->insert([
+            'code' =>  $code,
+            'date_ref' => Carbon::now(),
+            'response' => json_encode($response, true),
+            'http_req' => $url,
+            'requestTransferTime' => $requestTransferTime
+        ]);
+
+        return response()->json($response, $code);
+    }
+
+
     // VIEW SIMRS
-    public function status()
+    public static function status()
     {
         $token = Token::latest()->first();
         return view('bpjs.antrian.status', compact([
             'token'
         ]));
     }
-    public function antrian(Request $request)
+    public static function antrian(Request $request)
     {
         // get poli
-        $response = $this->ref_poli();
+        $response = self::ref_poli();
         if ($response->status() == 200) {
             $polikliniks = $response->getData()->response;
         } else {
@@ -70,12 +123,12 @@ class AntrianController extends ApiBPJSController
             'antrians',
         ]));
     }
-    public function list_task(Request $request)
+    public static function list_task(Request $request)
     {
         // get antrian
         $taskid = null;
         if (isset($request->kodebooking)) {
-            $response =  $this->taskid_antrean($request);
+            $response =  self::taskid_antrean($request);
             if ($response->status() == 200) {
                 $taskid = $response->getData()->response;
             }
@@ -86,11 +139,11 @@ class AntrianController extends ApiBPJSController
             'taskid',
         ]));
     }
-    public function dashboard_tanggal_index(Request $request)
+    public static function dashboard_tanggal_index(Request $request)
     {
         $antrians = null;
         if (isset($request->waktu)) {
-            $response =  $this->dashboard_tanggal($request);
+            $response =  self::dashboard_tanggal($request);
             if ($response->status() == 200) {
                 $antrians = $response->getData()->response->list;
                 Alert::success($response->getData()->metadata->message . ' ' . $response->status());
@@ -103,14 +156,14 @@ class AntrianController extends ApiBPJSController
             'antrians',
         ]));
     }
-    public function dashboard_bulan_index(Request $request)
+    public static function dashboard_bulan_index(Request $request)
     {
         $antrians = null;
         if (isset($request->tanggal)) {
             $tanggal = explode('-', $request->tanggal);
             $request['tahun'] = $tanggal[0];
             $request['bulan'] = $tanggal[1];
-            $response =  $this->dashboard_bulan($request);
+            $response =  self::dashboard_bulan($request);
             if ($response->status() == 200) {
                 $antrians = $response->getData()->response->list;
                 Alert::success($response->getData()->metadata->message . ' ' . $response->status());
@@ -124,7 +177,7 @@ class AntrianController extends ApiBPJSController
         ]));
     }
     // API FUNCTION
-    public function signature()
+    public static function signature()
     {
         $cons_id =  env('ANTRIAN_CONS_ID');
         $secretKey = env('ANTRIAN_SECRET_KEY');
@@ -140,7 +193,7 @@ class AntrianController extends ApiBPJSController
         $data['decrypt_key'] = $cons_id . $secretKey . $tStamp;
         return $data;
     }
-    public function stringDecrypt($key, $string)
+    public static function stringDecrypt($key, $string)
     {
         $encrypt_method = 'AES-256-CBC';
         $key_hash = hex2bin(hash('sha256', $key));
@@ -149,28 +202,26 @@ class AntrianController extends ApiBPJSController
         $output = \LZCompressor\LZString::decompressFromEncodedURIComponent($output);
         return $output;
     }
-    public function response_decrypt($response, $signature)
+    public static function response_decrypt($response, $signature, $url, $requestTransferTime)
     {
         if ($response->failed()) {
-            return $this->sendError($response->reason(),  $response->json('response'), $response->status());
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError($response->reason(),  $response->json('response'), $response->status(), $url, $requestTransferTime);
         } else {
-            $decrypt = $this->stringDecrypt($signature['decrypt_key'], $response->json('response'));
-            $data = json_decode($decrypt);
-            if ($response->json('metadata.code') == 1)
-                $code = 200;
-            else if ($response->json('metadata.code') == 2)
-                $code = 400;
-            else if ($response->json('metadata.code') == 0)
-                $code = 404;
-            else if ($response->json('metadata.code') == 204)
-                $code = 404;
-            else {
-                $code = $response->json('metadata.code');
+
+            // Check Response !200          -> metadata d kecil
+            $code = $response->json('metadata.code'); //code 200 -201 500 dll
+
+            if ($code == 200) {
+                $decrypt = self::stringDecrypt($signature['decrypt_key'], $response->json('response'));
+                $data = json_decode($decrypt, true);
+            } else {
+                $data = json_decode($response, true);
             }
-            return $this->sendResponse($response->json('metadata.message'), $data, $code);
+            return self::sendResponse($response->json('metadata.message'), $data, $code, $url, $requestTransferTime);
         }
     }
-    public function response_no_decrypt($response)
+    public static function response_no_decrypt($response)
     {
         if ($response->json('metadata.code') == 1) {
             $code = 200;
@@ -182,62 +233,99 @@ class AntrianController extends ApiBPJSController
             $code = 400;
         }
         if ($response->failed()) {
-            return $this->sendError($response->reason(),  $response->json('response'), $code);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError($response->reason(),  $response->json('response'), $code);
         } else {
-            return $this->sendResponse($response->json('metadata.message'), $response->json('response'), $code);
+            return self::sendResponse($response->json('metadata.message'), $response->json('response'), $code);
         }
     }
+
+
+
     // API BPJS
-    public function ref_poli()
+    public static function ref_poli()
     {
-        $url = env('ANTRIAN_URL') . "ref/poli";
-        $signature = $this->signature();
-        $response = Http::withHeaders($signature)->get($url);
-        return $this->response_decrypt($response, $signature);
+
+        // customErrorMessages
+        $messages = customErrorMessagesTrait::messages();
+
+        $r = [];
+        $rules = [];
+        $validator = Validator::make($r, $rules, $messages);
+
+        if ($validator->fails()) {
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError($validator->errors()->first(), $validator->errors(), 201, null, null);
+        }
+
+
+        // handler when time out and off line mode
+        try {
+
+            $url = env('ANTRIAN_URL') . "ref/poli";
+            $signature = self::signature();
+
+            $response = Http::timeout(10)
+                ->withHeaders($signature)
+                ->get($url);
+
+            // dd($response->getBody()->getContents());
+
+            // dd($response->transferStats->getTransferTime()); //Get Transfertime request
+            // semua response error atau sukses dari BPJS di handle pada logic response_decrypt
+            return self::response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
+            /////////////////////////////////////////////////////////////////////////////
+        } catch (Exception $e) {
+
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError($e->getMessage(), $validator->errors(), 408, $url, null);
+        }
     }
-    public function ref_dokter()
+    public static function ref_dokter()
     {
         $url = env('ANTRIAN_URL') . "ref/dokter";
-        $signature = $this->signature();
+        $signature = self::signature();
         $response = Http::withHeaders($signature)->get($url);
-        return $this->response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature);
     }
-    public function ref_jadwal_dokter(Request $request)
+    public static function ref_jadwal_dokter(Request $request)
     {
         $validator = Validator::make(request()->all(), [
             "kodePoli" => "required",
             "tanggal" =>  "required|date",
         ]);
         if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first(), $validator->errors(), 201);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError($validator->errors()->first(), $validator->errors(), 201);
         }
         $url = env('ANTRIAN_URL') . "jadwaldokter/kodepoli/" . $request->kodePoli . "/tanggal/" . $request->tanggal;
-        $signature = $this->signature();
+        $signature = self::signature();
         $response = Http::withHeaders($signature)->get($url);
-        return $this->response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature);
     }
-    public function ref_poli_fingerprint()
+    public static function ref_poli_fingerprint()
     {
         $url = env('ANTRIAN_URL') . "ref/poli/fp";
-        $signature = $this->signature();
+        $signature = self::signature();
         $response = Http::withHeaders($signature)->get($url);
-        return $this->response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature);
     }
-    public function ref_pasien_fingerprint(Request $request)
+    public static function ref_pasien_fingerprint(Request $request)
     {
         $validator = Validator::make(request()->all(), [
             "jenisIdentitas" => "required",
             "noIdentitas" =>  "required",
         ]);
         if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first(), null, 201);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError($validator->errors()->first(), null, 201);
         }
         $url = env('ANTRIAN_URL') . "ref/pasien/fp/identitas/" . $request->jenisIdentitas . "/noidentitas/" . $request->noIdentitas;
-        $signature = $this->signature();
+        $signature = self::signature();
         $response = Http::withHeaders($signature)->get($url);
-        return $this->response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature);
     }
-    public function update_jadwal_dokter(Request $request)
+    public static function update_jadwal_dokter(Request $request)
     {
         $validator = Validator::make(request()->all(), [
             "kodepoli" =>  "required",
@@ -246,10 +334,11 @@ class AntrianController extends ApiBPJSController
             "jadwal" =>  "required",
         ]);
         if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first(), $validator->errors(), 201);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError($validator->errors()->first(), $validator->errors(), 201);
         }
         $url = env('ANTRIAN_URL') . "jadwaldokter/updatejadwaldokter";
-        $signature = $this->signature();
+        $signature = self::signature();
         $response = Http::withHeaders($signature)->post(
             $url,
             [
@@ -259,13 +348,45 @@ class AntrianController extends ApiBPJSController
                 "jadwal" => $request->jadwal,
             ]
         );
-        return $this->response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature);
     }
-    public function tambah_antrean(Request $request)
+    public static function tambah_antrean($antreanadd)
     {
-        $validator = Validator::make(request()->all(), [
+
+        // customErrorMessages
+        $messages = customErrorMessagesTrait::messages();
+
+        $r = [
+            "kodebooking" => $antreanadd['kodebooking'],
+            "nomorkartu" =>  $antreanadd['nomorkartu'],
+            "nomorreferensi" =>  $antreanadd['nomorreferensi'],
+            "nik" =>  $antreanadd['nik'],
+            "nohp" => $antreanadd['nohp'],
+            "kodepoli" =>  $antreanadd['kodepoli'],
+            "norm" =>  $antreanadd['norm'],
+            "pasienbaru" =>  $antreanadd['pasienbaru'],
+            "tanggalperiksa" =>   $antreanadd['tanggalperiksa'],
+            "kodedokter" =>  $antreanadd['kodedokter'],
+            "jampraktek" =>  $antreanadd['jampraktek'],
+            "jeniskunjungan" => $antreanadd['jeniskunjungan'],
+            "jenispasien" =>  $antreanadd['jenispasien'],
+            "namapoli" =>  $antreanadd['namapoli'],
+            "namadokter" =>  $antreanadd['namadokter'],
+            "nomorantrean" =>  $antreanadd['nomorantrean'],
+            "angkaantrean" =>  $antreanadd['angkaantrean'],
+            "estimasidilayani" =>  $antreanadd['estimasidilayani'],
+            "sisakuotajkn" =>  $antreanadd['sisakuotajkn'],
+            "kuotajkn" => $antreanadd['kuotajkn'],
+            "sisakuotanonjkn" => $antreanadd['sisakuotanonjkn'],
+            "kuotanonjkn" => $antreanadd['kuotanonjkn'],
+            "keterangan" =>  $antreanadd['keterangan'],
+            // "nama" =>  $antreanadd['nama'],
+        ];
+
+
+        $rules = [
             "kodebooking" => "required",
-            "nomorkartu" =>  "required|digits:13|numeric",
+            "nomorkartu" =>  "digits:13|numeric",
             // "nomorreferensi" =>  "required",
             "nik" =>  "required|digits:16|numeric",
             "nohp" => "required|numeric",
@@ -277,8 +398,8 @@ class AntrianController extends ApiBPJSController
             "jampraktek" =>  "required",
             "jeniskunjungan" => "required",
             "jenispasien" =>  "required",
-            "namapoli" =>  "required",
-            "namadokter" =>  "required",
+            // "namapoli" =>  "required",
+            // "namadokter" =>  "required",
             "nomorantrean" =>  "required",
             "angkaantrean" =>  "required",
             "estimasidilayani" =>  "required",
@@ -287,44 +408,76 @@ class AntrianController extends ApiBPJSController
             "sisakuotanonjkn" => "required",
             "kuotanonjkn" => "required",
             "keterangan" =>  "required",
-            "nama" =>  "required",
-        ]);
+            // "nama" =>  "required",
+        ];
+
+        // ketika pasien umum nik dan noka boleh kosong
+        $rules['nomorkartu'] = ($antreanadd['jenispasien'] == 'JKN') ? 'digits:13|numeric' : '';
+        $rules['nik'] = ($antreanadd['jenispasien'] == 'JKN') ? 'required|digits:16|numeric' : '';
+
+        $validator = Validator::make($r, $rules, $messages);
+        // dd($validator->errors());
+
         if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first(), $validator->errors(), 201);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError($validator->errors()->first(), $validator->errors(), 201, null, null);
         }
-        $url = env('ANTRIAN_URL') . "antrean/add";
-        $signature = $this->signature();
-        $response = Http::withHeaders($signature)->post(
-            $url,
-            [
-                "kodebooking" => $request->kodebooking,
-                "jenispasien" => $request->jenispasien,
-                "nomorkartu" => $request->nomorkartu,
-                "nik" => $request->nik,
-                "nohp" => $request->nohp,
-                "kodepoli" => $request->kodepoli,
-                "namapoli" => $request->namapoli,
-                "pasienbaru" => $request->pasienbaru,
-                "norm" => $request->norm,
-                "tanggalperiksa" => $request->tanggalperiksa,
-                "kodedokter" => $request->kodedokter,
-                "namadokter" => $request->namadokter,
-                "jampraktek" => $request->jampraktek,
-                "jeniskunjungan" => $request->jeniskunjungan,
-                "nomorreferensi" => $request->nomorreferensi,
-                "nomorantrean" => $request->nomorantrean,
-                "angkaantrean" => $request->angkaantrean,
-                "estimasidilayani" => $request->estimasidilayani,
-                "sisakuotajkn" => $request->sisakuotajkn,
-                "kuotajkn" => $request->kuotajkn,
-                "sisakuotanonjkn" => $request->sisakuotanonjkn,
-                "kuotanonjkn" => $request->kuotanonjkn,
-                "keterangan" => $request->keterangan,
-            ]
-        );
-        return $this->response_decrypt($response, $signature);
+
+
+        // handler when time out and off line mode
+        try {
+
+            $antreanadd = $r;
+
+            $url = env('ANTRIAN_URL') . "antrean/add";
+            $signature = self::signature();
+
+            $response = Http::timeout(10)
+                ->withHeaders($signature)
+                ->post(
+                    $url,
+                    [
+                        "kodebooking" => $antreanadd['kodebooking'],
+                        "jenispasien" => $antreanadd['jenispasien'],
+                        "nomorkartu" => $antreanadd['nomorkartu'],
+                        "nik" => $antreanadd['nik'],
+                        "nohp" => $antreanadd['nohp'],
+                        "kodepoli" => $antreanadd['kodepoli'],
+                        "namapoli" => $antreanadd['namapoli'],
+                        "pasienbaru" => $antreanadd['pasienbaru'],
+                        "norm" => $antreanadd['norm'],
+                        "tanggalperiksa" => $antreanadd['tanggalperiksa'],
+                        "kodedokter" => $antreanadd['kodedokter'],
+                        "namadokter" => $antreanadd['namadokter'],
+                        "jampraktek" => $antreanadd['jampraktek'],
+                        "jeniskunjungan" => $antreanadd['jeniskunjungan'],
+                        "nomorreferensi" => $antreanadd['nomorreferensi'],
+                        "nomorantrean" => $antreanadd['nomorantrean'],
+                        "angkaantrean" => $antreanadd['angkaantrean'],
+                        "estimasidilayani" => $antreanadd['estimasidilayani'],
+                        "sisakuotajkn" => $antreanadd['sisakuotajkn'],
+                        "kuotajkn" => $antreanadd['kuotajkn'],
+                        "sisakuotanonjkn" => $antreanadd['sisakuotanonjkn'],
+                        "kuotanonjkn" => $antreanadd['kuotanonjkn'],
+                        "keterangan" => $antreanadd['keterangan'],
+                    ]
+                );
+
+            // dd($response->getBody()->getContents());
+
+            // dd($response->transferStats->getTransferTime()); //Get Transfertime request
+            // semua response error atau sukses dari BPJS di handle pada logic response_decrypt
+            return self::response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
+            /////////////////////////////////////////////////////////////////////////////
+        } catch (Exception $e) {
+            // error, msgError,Code,url,ReqtrfTime
+
+            return self::sendError($e->getMessage(), $validator->errors(), 408, $url, null);
+        }
     }
-    public function tambah_antrean_farmasi(Request $request)
+
+
+    public static function tambah_antrean_farmasi(Request $request)
     {
         $validator = Validator::make(request()->all(), [
             "kodebooking" => "required",
@@ -333,10 +486,11 @@ class AntrianController extends ApiBPJSController
             "keterangan" =>  "required",
         ]);
         if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first(), null, 400);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError($validator->errors()->first(), null, 400);
         }
         $url = env('ANTRIAN_URL') . "antrean/farmasi/add";
-        $signature = $this->signature();
+        $signature = self::signature();
         $response = Http::withHeaders($signature)->post(
             $url,
             [
@@ -346,9 +500,10 @@ class AntrianController extends ApiBPJSController
                 "keterangan" => $request->keterangan,
             ]
         );
-        return $this->response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature);
     }
-    public function update_antrean(Request $request)
+
+    public static function update_antrean(Request $request)
     {
         $validator = Validator::make(request()->all(), [
             "kodebooking" => "required",
@@ -356,10 +511,11 @@ class AntrianController extends ApiBPJSController
             "waktu" =>  "required",
         ]);
         if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first(), $validator->errors(), 201);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError($validator->errors()->first(), $validator->errors(), 201);
         }
         $url = env('ANTRIAN_URL') . "antrean/updatewaktu";
-        $signature = $this->signature();
+        $signature = self::signature();
         $response = Http::withHeaders($signature)->post(
             $url,
             [
@@ -369,10 +525,10 @@ class AntrianController extends ApiBPJSController
                 "jenisresep" => $request->jenisresep,
             ]
         );
-        return $this->response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature);
     }
     // bridging pendaftaran pa agil
-    public function update_antrean_pendaftaran(Request $request)
+    public static function update_antrean_pendaftaran(Request $request)
     {
         // cek request
         $validator = Validator::make(request()->all(), [
@@ -381,9 +537,10 @@ class AntrianController extends ApiBPJSController
             "waktu" => "required|numeric",
         ]);
         if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first(), $validator->errors(), 201);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError($validator->errors()->first(), $validator->errors(), 201);
         }
-        $response = $this->update_antrean($request);
+        $response = self::update_antrean($request);
         if ($response->status() == 200) {
             $antrian = Antrian::firstWhere('kodebooking', $request->kodebooking);
             $antrian->update([
@@ -400,17 +557,18 @@ class AntrianController extends ApiBPJSController
         $wa->send_notif($request);
         return response()->json($response);
     }
-    public function batal_antrean(Request $request)
+    public static function batal_antrean(Request $request)
     {
         $validator = Validator::make(request()->all(), [
             "kodebooking" => "required",
             "keterangan" =>  "required",
         ]);
         if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first(), $validator->errors(), 201);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError($validator->errors()->first(), $validator->errors(), 201);
         }
         $url = env('ANTRIAN_URL') . "antrean/batal";
-        $signature = $this->signature();
+        $signature = self::signature();
         $response = Http::withHeaders($signature)->post(
             $url,
             [
@@ -418,41 +576,43 @@ class AntrianController extends ApiBPJSController
                 "keterangan" => $request->keterangan,
             ]
         );
-        return $this->response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature);
     }
-    public function taskid_antrean(Request $request)
+    public static function taskid_antrean(Request $request)
     {
         $validator = Validator::make(request()->all(), [
             "kodebooking" => "required",
         ]);
         if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first(), $validator->errors(), 201);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError($validator->errors()->first(), $validator->errors(), 201);
         }
         $url = env('ANTRIAN_URL') . "antrean/getlisttask";
-        $signature = $this->signature();
+        $signature = self::signature();
         $response = Http::withHeaders($signature)->post(
             $url,
             [
                 "kodebooking" => $request->kodebooking,
             ]
         );
-        return $this->response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature);
     }
-    public function dashboard_tanggal(Request $request)
+    public static function dashboard_tanggal(Request $request)
     {
         $validator = Validator::make(request()->all(), [
             "tanggal" =>  "required|date|date_format:Y-m-d",
             "waktu" => "required|in:rs,server",
         ]);
         if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first(), $validator->errors(), 201);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError($validator->errors()->first(), $validator->errors(), 201);
         }
         $url = env('ANTRIAN_URL') . "dashboard/waktutunggu/tanggal/" . $request->tanggal . "/waktu/" . $request->waktu;
-        $signature = $this->signature();
+        $signature = self::signature();
         $response = Http::withHeaders($signature)->get($url);
-        return $this->response_no_decrypt($response, $signature);
+        return self::response_no_decrypt($response, $signature);
     }
-    public function dashboard_bulan(Request $request)
+    public static function dashboard_bulan(Request $request)
     {
         $validator = Validator::make(request()->all(), [
             "bulan" =>  "required|date_format:m",
@@ -460,60 +620,64 @@ class AntrianController extends ApiBPJSController
             "waktu" => "required|in:rs,server",
         ]);
         if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first(), $validator->errors(), 201);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError($validator->errors()->first(), $validator->errors(), 201);
         }
         $url = env('ANTRIAN_URL') . "dashboard/waktutunggu/bulan/" . $request->bulan . "/tahun/" . $request->tahun . "/waktu/" . $request->waktu;
-        $signature = $this->signature();
+        $signature = self::signature();
         $response = Http::withHeaders($signature)->get($url);
-        return $this->response_no_decrypt($response);
+        return self::response_no_decrypt($response);
     }
-    public function antrian_tanggal(Request $request)
+    public static function antrian_tanggal(Request $request)
     {
         $validator = Validator::make(request()->all(), [
             "tanggal" =>  "required|date",
         ]);
         if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first(), null, 201);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError($validator->errors()->first(), null, 201);
         }
         $url = env('ANTRIAN_URL') . "antrean/pendaftaran/tanggal/" . $request->tanggal;
-        $signature = $this->signature();
+        $signature = self::signature();
         $response = Http::withHeaders($signature)->get($url);
-        return $this->response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature);
     }
-    public function antrian_kodebooking(Request $request)
+    public static function antrian_kodebooking(Request $request)
     {
         $validator = Validator::make(request()->all(), [
             "kodeBooking" =>  "required",
         ]);
         if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first(), null, 201);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError($validator->errors()->first(), null, 201);
         }
         $url = env('ANTRIAN_URL') . "antrean/pendaftaran/kodebooking/" . $request->kodeBooking;
-        $signature = $this->signature();
+        $signature = self::signature();
         $response = Http::withHeaders($signature)->get($url);
-        return $this->response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature);
     }
-    public function antrian_belum_dilayani(Request $request)
+    public static function antrian_belum_dilayani(Request $request)
     {
         $validator = Validator::make(request()->all(), [
             "tanggal" =>  "required|date",
         ]);
         if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first(), null, 201);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError($validator->errors()->first(), null, 201);
         }
         $url = env('ANTRIAN_URL') . "antrean/pendaftaran/aktif";
-        $signature = $this->signature();
+        $signature = self::signature();
         $response = Http::withHeaders($signature)->get($url);
-        return $this->response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature);
     }
-    public function antrian_pendaftaran(Request $request)
+    public static function antrian_pendaftaran(Request $request)
     {
         $url = env('ANTRIAN_URL') . "antrean/pendaftaran/aktif";
-        $signature = $this->signature();
+        $signature = self::signature();
         $response = Http::withHeaders($signature)->get($url);
-        return $this->response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature);
     }
-    public function antrian_poliklinik(Request $request)
+    public static function antrian_poliklinik(Request $request)
     {
         $validator = Validator::make(request()->all(), [
             "kodePoli" =>  "required",
@@ -522,25 +686,26 @@ class AntrianController extends ApiBPJSController
             "jamPraktek" =>  "required",
         ]);
         if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first(), null, 201);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError($validator->errors()->first(), null, 201);
         }
         $url = env('ANTRIAN_URL') . "antrean/pendaftaran/kodepoli/" . $request->kodePoli . "/kodedokter/" . $request->kodeDokter . "/hari/" . $request->hari . "/jampraktek/" . $request->jamPraktek;
-        $signature = $this->signature();
+        $signature = self::signature();
         $response = Http::withHeaders($signature)->get($url);
-        return $this->response_decrypt($response, $signature);
+        return self::response_decrypt($response, $signature);
     }
     // API SIMRS
-    public function token(Request $request)
+    public static function token(Request $request)
     {
         if (Auth::attempt(['username' => $request->header('x-username'), 'password' => $request->header('x-password')])) {
             $user = Auth::user();
             $data['token'] =  $user->createToken('MyApp')->plainTextToken;
-            return $this->sendResponse('OK', $data, 200);
+            return self::sendResponse('OK', $data, 200);
         } else {
-            return $this->sendResponse("Unauthorized (Username dan Password Salah)", null, 401);
+            return self::sendResponse("Unauthorized (Username dan Password Salah)", null, 401);
         }
     }
-    public function auth_token(Request $request)
+    public static function auth_token(Request $request)
     {
         $aktif = Auth::check();
         $tokenexpired = 3600;
@@ -609,7 +774,7 @@ class AntrianController extends ApiBPJSController
             ];
         }
     }
-    public function status_antrean(Request $request)
+    public static function status_antrean(Request $request)
     {
         // validator
         $validator = Validator::make(request()->all(), [
@@ -678,7 +843,7 @@ class AntrianController extends ApiBPJSController
             ]));
         }
     }
-    public function status_antrian(Request $request) #yang dipakai api
+    public static function status_antrian(Request $request) #yang dipakai api
     {
         // validator
         $validator = Validator::make(request()->all(), [
@@ -688,12 +853,14 @@ class AntrianController extends ApiBPJSController
             "jampraktek" => "required",
         ]);
         if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first(), null, 201);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError($validator->errors()->first(), null, 201);
         }
         // check tanggal backdate
         $request['tanggal'] = $request->tanggalperiksa;
         if (Carbon::parse($request->tanggalperiksa)->endOfDay()->isPast()) {
-            return $this->sendError("Tanggal periksa sudah terlewat", null, 201);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError("Tanggal periksa sudah terlewat", null, 201);
         }
         // get jadwal poliklinik dari simrs
         $jadwals = JadwalDokter::where("hari",  Carbon::parse($request->tanggalperiksa)->dayOfWeek)
@@ -701,16 +868,19 @@ class AntrianController extends ApiBPJSController
             ->get();
         // tidak ada jadwal
         if (!isset($jadwals)) {
-            return $this->sendError("Tidak ada jadwal poliklinik dihari tersebut", null, 201);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError("Tidak ada jadwal poliklinik dihari tersebut", null, 201);
         }
         // get jadwal dokter
         $jadwal = $jadwals->where('kodedokter', $request->kodedokter)->first();
         // tidak ada dokter
         if (!isset($jadwal)) {
-            return $this->sendError("Tidak ada jadwal dokter dihari tersebut", null, 201);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError("Tidak ada jadwal dokter dihari tersebut", null, 201);
         }
         if ($jadwal->libur == 1) {
-            return $this->sendError("Jadwal Dokter dihari tersebut sedang diliburkan.", null, 201);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError("Jadwal Dokter dihari tersebut sedang diliburkan.", null, 201);
         }
         // get hitungan antrian
         $antrians = Antrian::where('tanggalperiksa', $request->tanggalperiksa)
@@ -722,7 +892,8 @@ class AntrianController extends ApiBPJSController
         // cek kapasitas pasien
         if ($request->method != 'Bridging') {
             if ($antrians >= $jadwal->kapasitaspasien) {
-                return $this->sendError("Kuota Dokter Telah Penuh", null, 201);
+                // error, msgError,Code,url,ReqtrfTime
+                return self::sendError("Kuota Dokter Telah Penuh", null, 201);
             }
         }
         //  get nomor antrian
@@ -760,9 +931,9 @@ class AntrianController extends ApiBPJSController
             "kuotanonjkn" =>  round($jadwal->kapasitaspasien * 20 / 100),
             "keterangan" => "Informasi antrian poliklinik",
         ];
-        return $this->sendResponse("OK", $response);
+        return self::sendResponse("OK", $response);
     }
-    public function ambil_antrian(Request $request) #ambil antrian api
+    public static function ambil_antrian(Request $request) #ambil antrian api
     {
         $validator = Validator::make(request()->all(), [
             "nomorkartu" => "required|numeric|digits:13",
@@ -777,15 +948,18 @@ class AntrianController extends ApiBPJSController
             // "nomorreferensi" => "numeric",
         ]);
         if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first(), null, 400);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError($validator->errors()->first(), null, 400);
         }
         // check tanggal backdate
         if (Carbon::parse($request->tanggalperiksa)->endOfDay()->isPast()) {
-            return $this->sendError("Tanggal periksa sudah terlewat", null, 400);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError("Tanggal periksa sudah terlewat", null, 400);
         }
         // check tanggal hanya 7 hari
         if (Carbon::parse($request->tanggalperiksa) >  Carbon::now()->addDay(6)) {
-            return $this->sendError("Antrian hanya dapat dibuat untuk 7 hari ke kedepan", null, 400);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError("Antrian hanya dapat dibuat untuk 7 hari ke kedepan", null, 400);
         }
         // get poliklinik
         $poli = PoliklinikDB::where('kodesubspesialis', $request->kodepoli)->first();
@@ -798,17 +972,20 @@ class AntrianController extends ApiBPJSController
             ->where('taskid', '<=', 4)
             ->count();
         if ($antrian_nik) {
-            return $this->sendError("Terdapat antrian dengan nomor NIK yang sama pada tanggal tersebut yang belum selesai. Silahkan batalkan terlebih dahulu jika ingin mendaftarkan lagi.", null, 201);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError("Terdapat antrian dengan nomor NIK yang sama pada tanggal tersebut yang belum selesai. Silahkan batalkan terlebih dahulu jika ingin mendaftarkan lagi.", null, 201);
         }
         // cek pasien baru
         $request['pasienbaru'] = 0;
         $pasien = PasienDB::where('no_Bpjs',  $request->nomorkartu)->first();
         if (empty($pasien)) {
-            return $this->sendError("Nomor Kartu BPJS Pasien termasuk Pasien Baru di RSUD Waled. Silahkan daftar melalui pendaftaran offline", null, 201);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError("Nomor Kartu BPJS Pasien termasuk Pasien Baru di RSUD Waled. Silahkan daftar melalui pendaftaran offline", null, 201);
         }
         // cek no kartu sesuai tidak
         if ($pasien->nik_bpjs != $request->nik) {
-            return $this->sendError("NIK anda yang terdaftar di BPJS dengan Di RSUD Waled berbeda. Silahkan perbaiki melalui pendaftaran offline", null, 201);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError("NIK anda yang terdaftar di BPJS dengan Di RSUD Waled berbeda. Silahkan perbaiki melalui pendaftaran offline", null, 201);
         }
         // Cek pasien kronis
         $kunjungan_kronis = KunjunganDB::where("no_rm", 'LIKE', '%' . $request->norm)
@@ -820,7 +997,8 @@ class AntrianController extends ApiBPJSController
             $unit = Unit::firstWhere('kode_unit', $kunjungan_kronis->kode_unit);
             if ($unit->KDPOLI ==  $request->kodepoli) {
                 if (now() < Carbon::parse($kunjungan_kronis->tgl_masuk)->addDay(29)) {
-                    return $this->sendError("Pada kunjungan sebelumnya di tanggal " . Carbon::parse($kunjungan_kronis->tgl_masuk)->translatedFormat('d F Y') . " anda termasuk pasien KRONIS. Sehingga bisa daftar lagi setelah 30 hari.", null, 201);
+                    // error, msgError,Code,url,ReqtrfTime
+                    return self::sendError("Pada kunjungan sebelumnya di tanggal " . Carbon::parse($kunjungan_kronis->tgl_masuk)->translatedFormat('d F Y') . " anda termasuk pasien KRONIS. Sehingga bisa daftar lagi setelah 30 hari.", null, 201);
                 }
             }
         }
@@ -837,14 +1015,17 @@ class AntrianController extends ApiBPJSController
                     $request['nomorRujukan'] = $suratkontrol->sep->provPerujuk->noRujukan;
                     // cek surat kontrol orang lain
                     if ($request->nomorkartu != $suratkontrol->sep->peserta->noKartu) {
-                        return $this->sendError("Nomor Kartu di Surat Kontrol dengan Kartu BPJS berberda", null, 400);
+                        // error, msgError,Code,url,ReqtrfTime
+                        return self::sendError("Nomor Kartu di Surat Kontrol dengan Kartu BPJS berberda", null, 400);
                     }
                     // cek surat tanggal kontrol
                     if (Carbon::parse($suratkontrol->tglRencanaKontrol) != Carbon::parse($request->tanggalperiksa)) {
-                        return $this->sendError("Tanggal periksa tidak sesuai dengan surat kontrol. Silahkan pengajuan perubahan tanggal surat kontrol terlebih dahulu.", null, 400);
+                        // error, msgError,Code,url,ReqtrfTime
+                        return self::sendError("Tanggal periksa tidak sesuai dengan surat kontrol. Silahkan pengajuan perubahan tanggal surat kontrol terlebih dahulu.", null, 400);
                     }
                 } else {
-                    return $this->sendError($response->getData()->metadata->message, null, $response->status());
+                    // error, msgError,Code,url,ReqtrfTime
+                    return self::sendError($response->getData()->metadata->message, null, $response->status());
                 }
             }
             // kunjungan rujukan
@@ -867,13 +1048,16 @@ class AntrianController extends ApiBPJSController
                         // cek rujukan telah digunakan atau tidak
                         $jumlah_sep =  $jumlah_sep->getData()->response->jumlahSEP;
                         if ($jumlah_sep != 0) {
-                            return $this->sendError("Rujukan anda telah digunakan untuk berobat. Untuk kunjungan selanjutnya silahkan gunakan Surat Kontrol yang dibuat di Poliklinik.", null, 400);
+                            // error, msgError,Code,url,ReqtrfTime
+                            return self::sendError("Rujukan anda telah digunakan untuk berobat. Untuk kunjungan selanjutnya silahkan gunakan Surat Kontrol yang dibuat di Poliklinik.", null, 400);
                         }
                     } else {
-                        return $this->sendError($jumlah_sep->getData()->metadata->message, null, $jumlah_sep->status());
+                        // error, msgError,Code,url,ReqtrfTime
+                        return self::sendError($jumlah_sep->getData()->metadata->message, null, $jumlah_sep->status());
                     }
                 } else {
-                    return $this->sendError($response->getData()->metadata->message, null, $response->status());
+                    // error, msgError,Code,url,ReqtrfTime
+                    return self::sendError($response->getData()->metadata->message, null, $response->status());
                 }
             }
         }
@@ -885,7 +1069,7 @@ class AntrianController extends ApiBPJSController
         $request['norm'] = $pasien->no_rm;
         $request['nama'] = $pasien->nama_px;
         // cek jadwal
-        $jadwal = $this->status_antrian($request);
+        $jadwal = self::status_antrian($request);
         if ($jadwal->status() == 200) {
             $jadwal = $jadwal->getData()->response;
             $request['namapoli'] = $jadwal->namapoli;
@@ -896,7 +1080,8 @@ class AntrianController extends ApiBPJSController
             $wa = new WhatsappController();
             $request['notif'] = 'Method ambil antrian ' . $request->method . ' jadwal , ' . $message . ' kodepoli ' . $request->kodepoli;
             $wa->send_notif($request);
-            return $this->sendError('Mohon maaf , ' . $message, null, 400);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError('Mohon maaf , ' . $message, null, 400);
         }
         // menghitung nomor antrian
         $antrian_all = Antrian::where('tanggalperiksa', $request->tanggalperiksa)
@@ -935,7 +1120,7 @@ class AntrianController extends ApiBPJSController
             $request['method'] = "JKN Mobile";
         }
         //tambah antrian bpjs
-        $response = $this->tambah_antrean($request);
+        $response = self::tambah_antrean($request);
         if ($response->status() == 200) {
             // tambah antrian database
             $antrian = Antrian::create([
@@ -1011,12 +1196,13 @@ class AntrianController extends ApiBPJSController
                 "kuotanonjkn" => $request->kuotanonjkn,
                 "keterangan" => $request->keterangan,
             ];
-            return $this->sendResponse("OK", $response);
+            return self::sendResponse("OK", $response);
         } else {
-            return $this->sendError($response->getData()->metadata->message, null, 400);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError($response->getData()->metadata->message, null, 400);
         }
     }
-    public function ambil_antrian_offline(Request $request) #ambil antrian mesin antrian
+    public static function ambil_antrian_offline(Request $request) #ambil antrian mesin antrian
     {
         $validator = Validator::make(request()->all(), [
             "kodepoli" => "required",
@@ -1026,14 +1212,17 @@ class AntrianController extends ApiBPJSController
             "jenispasien" => "required",
         ]);
         if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first(), null, 400);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError($validator->errors()->first(), null, 400);
         }
         // check tanggal
         if (Carbon::parse($request->tanggalperiksa)->endOfDay()->isPast()) {
-            return $this->sendError("Tanggal periksa sudah terlewat", null, 400);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError("Tanggal periksa sudah terlewat", null, 400);
         }
         if (Carbon::parse($request->tanggalperiksa) >  Carbon::now()->addDay(6)) {
-            return $this->sendError("Antrian hanya dapat dibuat untuk 7 hari ke kedepan", null, 400);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError("Antrian hanya dapat dibuat untuk 7 hari ke kedepan", null, 400);
         }
         $poli = PoliklinikDB::where('kodesubspesialis', $request->kodepoli)->first();
         $request['lantaipendaftaran'] = $poli->lantaipendaftaran;
@@ -1042,7 +1231,7 @@ class AntrianController extends ApiBPJSController
             $request['lantaipendaftaran'] = 1;
         }
         // cek jadwal
-        $jadwal = $this->status_antrian($request);
+        $jadwal = self::status_antrian($request);
         if ($jadwal->status() == 200) {
             $jadwal = $jadwal->getData()->response;
             $request['namapoli'] = $jadwal->namapoli;
@@ -1053,7 +1242,8 @@ class AntrianController extends ApiBPJSController
             $wa = new WhatsappController();
             $request['notif'] = 'Method ' . $request->method . ' jadwal , ' . $message;
             $wa->send_notif($request);
-            return $this->sendError('Mohon maaf , ' . $message, null, 400);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError('Mohon maaf , ' . $message, null, 400);
         }
         $antrian_poli = Antrian::where('tanggalperiksa', $request->tanggalperiksa)
             ->where('kodepoli', $request->kodepoli)
@@ -1126,15 +1316,16 @@ class AntrianController extends ApiBPJSController
             "kuotanonjkn" => $request->kuotanonjkn,
             "keterangan" => $request->keterangan,
         ];
-        return $this->sendResponse("OK", $response);
+        return self::sendResponse("OK", $response);
     }
-    public function sisa_antrian(Request $request)
+    public static function sisa_antrian(Request $request)
     {
         $validator = Validator::make(request()->all(), [
             "kodebooking" => "required",
         ]);
         if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first(), null, 201);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError($validator->errors()->first(), null, 201);
         }
         $antrian = Antrian::firstWhere('kodebooking', $request->kodebooking);
         // antrian ditermukan
@@ -1163,25 +1354,27 @@ class AntrianController extends ApiBPJSController
                 "waktutunggu" => $antrian->waktutunggu,
                 "keterangan" => $antrian->keterangan,
             ];
-            return $this->sendResponse("OK", $response);
+            return self::sendResponse("OK", $response);
         }
         // antrian tidak ditermukan
         else {
-            return $this->sendError('Antrian tidak ditemukan', null, 400);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError('Antrian tidak ditemukan', null, 400);
         }
     }
-    public function batal_antrian(Request $request)
+    public static function batal_antrian(Request $request)
     {
         $validator = Validator::make(request()->all(), [
             "kodebooking" => "required",
             "keterangan" => "required",
         ]);
         if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first(), null, 400);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError($validator->errors()->first(), null, 400);
         }
         $antrian = Antrian::firstWhere('kodebooking', $request->kodebooking);
         if (isset($antrian)) {
-            $response = $this->batal_antrean($request);
+            $response = self::batal_antrean($request);
             if ($response->status() == 200) {
                 // kirim notif wa
                 $wa = new WhatsappController();
@@ -1194,17 +1387,19 @@ class AntrianController extends ApiBPJSController
                     "status_api" => 1,
                     "keterangan" => $request->keterangan,
                 ]);
-                return $this->sendResponse("OK", null, 200);
+                return self::sendResponse("OK", null, 200);
             } else {
-                return $this->sendError($response->getData()->metadata->message, null, 201);
+                // error, msgError,Code,url,ReqtrfTime
+                return self::sendError($response->getData()->metadata->message, null, 201);
             }
         }
         // antrian tidak ditemukan
         else {
-            return $this->sendError('Antrian tidak ditemukan', null, 201);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError('Antrian tidak ditemukan', null, 201);
         }
     }
-    public function checkin_antrian(Request $request) #checkin antrian api
+    public static function checkin_antrian(Request $request) #checkin antrian api
     {
         // cek printer
         try {
@@ -1226,24 +1421,27 @@ class AntrianController extends ApiBPJSController
             "waktu" => "required",
         ]);
         if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first(), null, 400);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError($validator->errors()->first(), null, 400);
         }
         $antrian = Antrian::firstWhere('kodebooking', $request->kodebooking);
         if (isset($antrian)) {
             // check backdate
             if (!Carbon::parse($antrian->tanggalperiksa)->isToday()) {
-                return $this->sendError("Tanggal periksa bukan hari ini.", null, 400);
+                // error, msgError,Code,url,ReqtrfTime
+                return self::sendError("Tanggal periksa bukan hari ini.", null, 400);
             }
             $now = Carbon::now();
             $unit = UnitDB::firstWhere('KDPOLI', $antrian->kodepoli);
             $tarifkarcis = TarifLayananDetailDB::firstWhere('KODE_TARIF_DETAIL', $unit->kode_tarif_karcis);
             $tarifadm = TarifLayananDetailDB::firstWhere('KODE_TARIF_DETAIL', $unit->kode_tarif_adm);
             if ($antrian->taskid == 3) {
-                $this->print_ulang($request);
-                return $this->sendResponse("Printer Ulang", null, 200);
+                self::print_ulang($request);
+                return self::sendResponse("Printer Ulang", null, 200);
             }
             if ($antrian->taskid == 99) {
-                return $this->sendError("Antrian telah dibatalkan sebelumnya.", null, 400);
+                // error, msgError,Code,url,ReqtrfTime
+                return self::sendError("Antrian telah dibatalkan sebelumnya.", null, 400);
             }
             if ($antrian->pasienbaru) {
                 $request['pasienbaru_print'] = 'BARU';
@@ -1320,7 +1518,8 @@ class AntrianController extends ApiBPJSController
                             }
                             // gagal get rujukan
                             else {
-                                return $this->sendError($data->metaData->message,  null, 400);
+                                // error, msgError,Code,url,ReqtrfTime
+                                return self::sendError($data->metaData->message,  null, 400);
                             }
                         } else {
                             $request['nomorkartu'] = $antrian->nomorkartu;
@@ -1368,7 +1567,8 @@ class AntrianController extends ApiBPJSController
                     }
                     // gagal get surat kontrol
                     else {
-                        return $this->sendError($suratkontrol->metaData->message,  null, 400);
+                        // error, msgError,Code,url,ReqtrfTime
+                        return self::sendError($suratkontrol->metaData->message,  null, 400);
                     }
                 }
                 // daftar pake rujukan
@@ -1423,7 +1623,8 @@ class AntrianController extends ApiBPJSController
                     }
                     // gagal get rujukan
                     else {
-                        return $this->sendError($data->metaData->message,  null, 400);
+                        // error, msgError,Code,url,ReqtrfTime
+                        return self::sendError($data->metaData->message,  null, 400);
                     }
                 }
                 if (!isset($antrian->nomorsep)) {
@@ -1438,11 +1639,12 @@ class AntrianController extends ApiBPJSController
                             "nomorsep" => $request->nomorsep
                         ]);
                         // print sep
-                        $this->print_sep($request, $sep);
+                        self::print_sep($request, $sep);
                     }
                     // gagal buat sep
                     else {
-                        return $this->sendError("Gagal Buat SEP : " . $sep->metaData->message,  null, 400);
+                        // error, msgError,Code,url,ReqtrfTime
+                        return self::sendError("Gagal Buat SEP : " . $sep->metaData->message,  null, 400);
                     }
                 } else {
                     $requests["nomorsep"] = $antrian->nomorsep;
@@ -1478,7 +1680,7 @@ class AntrianController extends ApiBPJSController
                 $totalpribadi = $tarifkarcis->TOTAL_TARIF_NEW + $tarifadm->TOTAL_TARIF_NEW;
             }
             // update antrian bpjs
-            $response = $this->update_antrean($request);
+            $response = self::update_antrean($request);
             // jika antrian berhasil diupdate di bpjs
             if ($response->status() == 200) {
                 // insert simrs create kunjungan
@@ -1669,14 +1871,16 @@ class AntrianController extends ApiBPJSController
         }
         // jika antrian tidak ditemukan
         else {
-            return $this->sendError("Kode booking tidak ditemukan", null, 400);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError("Kode booking tidak ditemukan", null, 400);
         }
     }
-    public function info_pasien_baru(Request $request)
+    public static function info_pasien_baru(Request $request)
     {
-        return $this->sendError("Anda belum memiliki No RM di RSUD Waled (Pasien Baru). Silahkan daftar secara offline.", null, 400);
+        // error, msgError,Code,url,ReqtrfTime
+        return self::sendError("Anda belum memiliki No RM di RSUD Waled (Pasien Baru). Silahkan daftar secara offline.", null, 400);
         // // auth token
-        // $auth = $this->auth_token($request);
+        // $auth = self::auth_token($request);
         // if ($auth['metadata']['code'] != 200) {
         //     return $auth;
         // }
@@ -1803,7 +2007,7 @@ class AntrianController extends ApiBPJSController
         //     ];
         // }
     }
-    public function jadwal_operasi_rs(Request $request)
+    public static function jadwal_operasi_rs(Request $request)
     {
         // checking request
         $validator = Validator::make(request()->all(), [
@@ -1811,7 +2015,8 @@ class AntrianController extends ApiBPJSController
             "tanggalakhir" => "required|date",
         ]);
         if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first(), null, 201);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError($validator->errors()->first(), null, 201);
         }
         $request['tanggalawal'] = Carbon::parse($request->tanggalawal)->startOfDay();
         $request['tanggalakhir'] = Carbon::parse($request->tanggalakhir)->endOfDay();
@@ -1840,16 +2045,17 @@ class AntrianController extends ApiBPJSController
         $response = [
             "list" => $jadwals
         ];
-        return $this->sendResponse("OK", $response, 200);
+        return self::sendResponse("OK", $response, 200);
     }
-    public function jadwal_operasi_pasien(Request $request)
+    public static function jadwal_operasi_pasien(Request $request)
     {
         // checking request
         $validator = Validator::make(request()->all(), [
             "nopeserta" => "required|digits:13",
         ]);
         if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first(), null, 201);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError($validator->errors()->first(), null, 201);
         }
         $jadwalops = JadwalOperasi::where('nomor_bpjs', $request->nopeserta)->get();
         $jadwals = [];
@@ -1872,39 +2078,43 @@ class AntrianController extends ApiBPJSController
         $response = [
             "list" => $jadwals
         ];
-        return $this->sendResponse("OK", $response, 200);
+        return self::sendResponse("OK", $response, 200);
     }
-    public function ambil_antrian_farmasi(Request $request)
+    public static function ambil_antrian_farmasi(Request $request)
     {
         $validator = Validator::make(request()->all(), [
             "kodebooking" => "required",
         ]);
         if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first(), null, 400);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError($validator->errors()->first(), null, 400);
         }
         $antrian = Antrian::firstWhere('kodebooking', $request->kodebooking);
         if (empty($antrian)) {
-            return $this->sendError("Kode booking tidak ditemukan", null, 201);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError("Kode booking tidak ditemukan", null, 201);
         }
         $request['nomorantrean'] = $antrian->angkaantrean;
         $request['keterangan'] = "resep sistem antrian";
         if ($antrian->jenisresep == null) {
             $request['jenisresep'] = "Racikan";
         }
-        $api = $this->tambah_antrean_farmasi($request);
+        $api = self::tambah_antrean_farmasi($request);
         return response()->json($api->getData(), $api->status());
     }
-    public function status_antrian_farmasi(Request $request)
+    public static function status_antrian_farmasi(Request $request)
     {
         $validator = Validator::make(request()->all(), [
             "kodebooking" => "required",
         ]);
         if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first(), null, 400);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError($validator->errors()->first(), null, 400);
         }
         $antrian = Antrian::firstWhere('kodebooking', $request->kodebooking);
         if (empty($antrian)) {
-            return $this->sendError("Kode booking tidak ditemukan", null, 201);
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError("Kode booking tidak ditemukan", null, 201);
         }
         $totalantrean = Antrian::whereDate('tanggalperiksa', $antrian->tanggalperiksa)
             ->where('method', '!=', 'Bridging')
@@ -1933,7 +2143,7 @@ class AntrianController extends ApiBPJSController
             "antreanpanggil" => $request->antreanpanggil,
             "keterangan" => $request->keterangan,
         ];
-        return $this->sendResponse("OK", $responses);
+        return self::sendResponse("OK", $responses);
     }
     function print_karcis(Request $request,  $kunjungan)
     {
@@ -2043,7 +2253,7 @@ class AntrianController extends ApiBPJSController
             $printer->close();
         }
     }
-    public function print_ulang(Request $request)
+    public static function print_ulang(Request $request)
     {
         $antrian = Antrian::firstWhere('kodebooking', $request->kodebooking);
         $unit = UnitDB::firstWhere('KDPOLI', $antrian->kodepoli);
@@ -2104,11 +2314,11 @@ class AntrianController extends ApiBPJSController
         $response = $api->sep_nomor($request);
         if ($response->status() == 200) {
             $sep =  $response->getData()->response;
-            $this->print_sep($request, $sep);
-            $this->print_karcis($request, $kunjungan);
+            self::print_sep($request, $sep);
+            self::print_karcis($request, $kunjungan);
         } else {
-            return  $this->sendError($response->getData()->metadata->message, null, 400);
+            return  self::sendError($response->getData()->metadata->message, null, 400);
         }
-        return  $this->sendResponse("Print Ulang Berhasil", null, 200);
+        return  self::sendResponse("Print Ulang Berhasil", null, 200);
     }
 }

@@ -1107,9 +1107,9 @@
                                     <x-input-error :messages=$message />
                                 @enderror
 
-                                @foreach ($errors->all() as $error)
+                                {{-- @foreach ($errors->all() as $error)
                                     <div>{{ $error }}</div>
-                                @endforeach
+                                @endforeach --}}
 
                                 <div wire:loading wire:target="dataPasienLovSearch">
                                     <x-loading />
@@ -1158,7 +1158,8 @@
                                 <x-input-label :value="__('No Referensi')" :required="__('true')" />
                                 <div class="flex flex-col items-center mb-2">
                                     <x-text-input placeholder="No Referensi" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.noReferensi'))"
-                                        :disabled=$disabledPropertyRj wire:model.lazy="noReferensi"
+                                        :disabled=$disabledPropertyRj
+                                        wire:model.debounce.500ms="dataDaftarPoliRJ.noReferensi"
                                         wire:loading.attr="disabled" />
                                     <div>
                                         <p class="text-xs">di isi dgn : (No Rujukan untun FKTP /FKTL) (SKDP untuk
@@ -1235,7 +1236,12 @@
 
                 <div class="sticky bottom-0 px-4 py-3 bg-gray-50 sm:px-6 sm:flex sm:flex-row-reverse">
                     @if ($isOpenMode !== 'tampil')
-                        <x-green-button :disabled=$disabledPropertyRj wire:click.prevent="store()" type="button">
+                        <div wire:loading wire:target="store">
+                            <x-loading />
+                        </div>
+
+                        <x-green-button :disabled=$disabledPropertyRj wire:click.prevent="store()" type="button"
+                            wire:loading.remove>
                             Simpan
                         </x-green-button>
                     @endif

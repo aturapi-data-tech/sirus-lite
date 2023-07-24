@@ -7,7 +7,9 @@ use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
+
 use App\Http\Traits\customErrorMessagesTrait;
+use App\Http\Traits\BPJS\AntrianTrait;
 
 
 
@@ -376,8 +378,8 @@ class DaftarRJ extends Component
     // listener from blade////////////////
     protected $listeners = [
         'confirm_remove_record_province' => 'delete',
+        'rePush_Data_Antrian' => 'store',
     ];
-
 
 
 
@@ -885,8 +887,8 @@ class DaftarRJ extends Component
             $this->dataPasien['pasien']['statusPerkawinan']['statusPerkawinanId'] = '1';
             $this->dataPasien['pasien']['statusPerkawinan']['statusPerkawinanDesc'] = 'Belum Kawin';
 
-            $this->dataPasien['pasien']['dataDokter']['dataDokterId'] = $findData->rel_id;
-            $this->dataPasien['pasien']['dataDokter']['dataDokterDesc'] = $findData->rel_desc;
+            $this->dataPasien['pasien']['agama']['agamaId'] = $findData->rel_id;
+            $this->dataPasien['pasien']['agama']['agamaDesc'] = $findData->rel_desc;
 
             $this->dataPasien['pasien']['pendidikan']['pendidikanId'] = $findData->edu_id;
             $this->dataPasien['pasien']['pendidikan']['pendidikanDesc'] = $findData->edu_desc;
@@ -982,7 +984,7 @@ class DaftarRJ extends Component
 
             "dataDaftarPoliRJ.kunjunganInternalStatus" => "required",
 
-            "dataDaftarPoliRJ.noReferensi" => "bail|min:3|max:19'",
+            "dataDaftarPoliRJ.noReferensi" => "bail|min:3|max:19",
 
         ];
 
@@ -998,7 +1000,6 @@ class DaftarRJ extends Component
             $this->validate($rules, $messages);
         } catch (\Illuminate\Validation\ValidationException $e) {
 
-            // dd($validator->fails());
             $this->emit('toastr-error', "Lakukan Pengecekan kembali Input Data Pasien.");
             $this->validate($rules, $messages);
         }
@@ -1008,55 +1009,17 @@ class DaftarRJ extends Component
     // insert record start////////////////
     public function store()
     {
-        // Klaim & Kunjungan
-        $this->dataDaftarPoliRJ['klaimId'] = $this->JenisKlaim['JenisKlaimId'];
-        $this->dataDaftarPoliRJ['kunjunganId'] = $this->JenisKunjungan['JenisKunjunganId'];
+        // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
+        $this->setDataPrimer();
 
-        // noBooking
-        $this->dataDaftarPoliRJ['noBooking'] = Carbon::now()->format('YmdHis') . 'RSIM';
-
-        // rjNoMax
-        $sql = "select nvl(max(rj_no)+1,1) rjno_max from rstxn_rjhdrs";
-        $rjNoMax = DB::scalar($sql);
-
-        $this->dataDaftarPoliRJ['rjNo'] = $rjNoMax;
-
-        // noUrutAntrian (count all kecuali KRonis) if KR 999
-        $sql = "select count(*) no_antrian 
-		from rstxn_rjhdrs 
-        where dr_id=:drId
-        and to_char(rj_date,'ddmmyyyy')=:tgl
-        and klaim_id!='KR'";
-
-        // Antrian ketika data antrian kosong
-        if (!$this->dataDaftarPoliRJ['noAntrian']) {
-            // proses antrian
-            if ($this->dataDaftarPoliRJ['klaimId'] != 'KR') {
-                $noUrutAntrian = DB::scalar($sql, [
-                    "tgl" => Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'])->format('dmY'),
-                    "drId" => $this->dataDaftarPoliRJ['drId']
-                ]);
-                if ($noUrutAntrian == 0) {
-                    $noAntrian = 4;
-                } else if ($noUrutAntrian == 1) {
-                    $noAntrian = 5;
-                } else if ($noUrutAntrian == 2) {
-                    $noAntrian = 6;
-                } else if ($noUrutAntrian > 2) {
-                    $noAntrian = $noUrutAntrian + 3 + 1;
-                }
-            } else {
-                // Kronis
-                $noAntrian = 999;
-            }
-
-            $this->dataDaftarPoliRJ['noAntrian'] = $noAntrian;
-        }
-
-
-
+        // Validate RJ
         $this->validateDataRJ();
 
+        // Logic push data ke BPJS
+
+
+
+        $this->pushDataAntrian();
 
         // Logic insert and update mode start //////////
         if ($this->isOpenMode == 'insert') {
@@ -1065,6 +1028,8 @@ class DaftarRJ extends Component
         } else if ($this->isOpenMode == 'update') {
             $this->updateDataRJ($this->dataDaftarPoliRJ['rjNo']);
         }
+
+
 
 
         // Opstional (Jika ingin fast Entry resert setelah proses diatas)
@@ -1076,29 +1041,36 @@ class DaftarRJ extends Component
 
     private function insertDataRJ(): void
     {
+        // $pushDataAntrian = $this->pushDataAntrian();
+        // dd($pushDataAntrian);
+
         // insert into table transaksi
-        DB::table('rstxn_rjhdrs')->insert([
-            'rj_no' => $this->dataDaftarPoliRJ['rjNo'],
-            'rj_date' => DB::raw("to_date('" . $this->dataDaftarPoliRJ['rjDate'] . "','dd/mm/yyyy hh24:mi:ss')"),
-            'reg_no' => $this->dataDaftarPoliRJ['regNo'],
-            'nobooking' => $this->dataDaftarPoliRJ['noBooking'],
-            'no_antrian' => $this->dataDaftarPoliRJ['noAntrian'],
+        // DB::table('rstxn_rjhdrs')->insert([
+        //     'rj_no' => $this->dataDaftarPoliRJ['rjNo'],
+        //     'rj_date' => DB::raw("to_date('" . $this->dataDaftarPoliRJ['rjDate'] . "','dd/mm/yyyy hh24:mi:ss')"),
+        //     'reg_no' => $this->dataDaftarPoliRJ['regNo'],
+        //     'nobooking' => $this->dataDaftarPoliRJ['noBooking'],
+        //     'no_antrian' => $this->dataDaftarPoliRJ['noAntrian'],
 
-            'klaim_id' => $this->dataDaftarPoliRJ['klaimId'],
-            'poli_id' => $this->dataDaftarPoliRJ['poliId'],
-            'dr_id' => $this->dataDaftarPoliRJ['drId'],
-            'shift' => $this->dataDaftarPoliRJ['shift'],
+        //     'klaim_id' => $this->dataDaftarPoliRJ['klaimId'],
+        //     'poli_id' => $this->dataDaftarPoliRJ['poliId'],
+        //     'dr_id' => $this->dataDaftarPoliRJ['drId'],
+        //     'shift' => $this->dataDaftarPoliRJ['shift'],
 
-            'txn_status' => $this->dataDaftarPoliRJ['txnStatus'],
-            'rj_status' => $this->dataDaftarPoliRJ['rjStatus'],
-            'erm_status' => $this->dataDaftarPoliRJ['ermStatus'],
+        //     'txn_status' => $this->dataDaftarPoliRJ['txnStatus'],
+        //     'rj_status' => $this->dataDaftarPoliRJ['rjStatus'],
+        //     'erm_status' => $this->dataDaftarPoliRJ['ermStatus'],
 
-            'pass_status' => $this->dataDaftarPoliRJ['passStatus'], //Baru lama
+        //     'pass_status' => $this->dataDaftarPoliRJ['passStatus'], //Baru lama
 
-            'cek_lab' => $this->dataDaftarPoliRJ['cekLab'],
-            'sl_codefrom' => $this->dataDaftarPoliRJ['slCodeFrom'],
-            'kunjungan_internal_status' => $this->dataDaftarPoliRJ['kunjunganInternalStatus'],
-        ]);
+        //     'cek_lab' => $this->dataDaftarPoliRJ['cekLab'],
+        //     'sl_codefrom' => $this->dataDaftarPoliRJ['slCodeFrom'],
+        //     'kunjungan_internal_status' => $this->dataDaftarPoliRJ['kunjunganInternalStatus'],
+        //     'push_antrian_bpjs' => $pushAntrianBpjs,
+        //     'push_antrian_bpjs_json' => $pushAntrianBpjsJson,
+
+        // ]);
+
         $this->emit('toastr-success', "Data sudah tersimpan.");
     }
 
@@ -1135,6 +1107,160 @@ class DaftarRJ extends Component
         $this->emit('toastr-success', "Data berhasil diupdate.");
     }
 
+    // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
+    private function setDataPrimer(): void
+    {
+        // Klaim & Kunjungan
+        $this->dataDaftarPoliRJ['klaimId'] = $this->JenisKlaim['JenisKlaimId'];
+        $this->dataDaftarPoliRJ['kunjunganId'] = $this->JenisKunjungan['JenisKunjunganId'];
+
+        // noBooking
+        $this->dataDaftarPoliRJ['noBooking'] = Carbon::now()->format('YmdHis') . 'RSIM';
+
+        // rjNoMax
+        $sql = "select nvl(max(rj_no)+1,1) rjno_max from rstxn_rjhdrs";
+        $this->dataDaftarPoliRJ['rjNo'] = DB::scalar($sql);
+
+
+        // noUrutAntrian (count all kecuali KRonis) if KR 999
+        $sql = "select count(*) no_antrian 
+         from rstxn_rjhdrs 
+         where dr_id=:drId
+         and to_char(rj_date,'ddmmyyyy')=:tgl
+         and klaim_id!='KR'";
+
+        // Antrian ketika data antrian kosong
+        if (!$this->dataDaftarPoliRJ['noAntrian']) {
+            // proses antrian
+            if ($this->dataDaftarPoliRJ['klaimId'] != 'KR') {
+                $noUrutAntrian = DB::scalar($sql, [
+                    "tgl" => Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'])->format('dmY'),
+                    "drId" => $this->dataDaftarPoliRJ['drId']
+                ]);
+                if ($noUrutAntrian == 0) {
+                    $noAntrian = 4;
+                } else if ($noUrutAntrian == 1) {
+                    $noAntrian = 5;
+                } else if ($noUrutAntrian == 2) {
+                    $noAntrian = 6;
+                } else if ($noUrutAntrian > 2) {
+                    $noAntrian = $noUrutAntrian + 3 + 1;
+                }
+            } else {
+                // Kronis
+                $noAntrian = 999;
+            }
+
+            $this->dataDaftarPoliRJ['noAntrian'] = $noAntrian;
+        }
+    }
+
+    private function pushDataAntrian()
+    {
+        //push data antrian UMUM BPJS kecuali 'kronis'
+        if ($this->dataDaftarPoliRJ['klaimId'] != 'KR') {
+            $rjdate = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate']); //Tgl RJ
+
+            $dayDesc = $rjdate->isoFormat('dddd'); //Senin Selasa Rabu ...
+
+            $dayid = ($dayDesc == 'Senin') ? 1 //kode Senin Selasa Rabu ...
+                : ($dayDesc == 'Selasa' ? 2
+                    : ($dayDesc == 'Rabu' ? 3
+                        : ($dayDesc == 'Kamis' ? 4
+                            : ($dayDesc == 'Jumat' ? 5
+                                : 6
+                            )
+                        )
+                    )
+                );
+
+            $JadwalPraktek = json_decode(json_encode(DB::table('scmst_scpolis')
+                ->select(
+                    //Poli RS
+                    'scmst_scpolis.dr_id as dr_id',
+                    'rsmst_doctors.dr_name as dr_name',
+                    'scmst_scpolis.sc_poli_ket as sc_poli_ket',
+                    'scmst_scpolis.poli_id as poli_id',
+                    'rsmst_polis.poli_desc as poli_desc',
+
+                    //Poli BPJS
+                    'rsmst_doctors.kd_dr_bpjs as kd_dr_bpjs',
+                    'rsmst_polis.kd_poli_bpjs as kd_poli_bpjs',
+
+                    DB::raw("nvl(mulai_praktek,'00:00:00') as mulai_praktek"),
+                    DB::raw('nvl(kuota,35) as kuota'),
+                )
+                ->Join('rsmst_doctors', 'rsmst_doctors.dr_id', 'scmst_scpolis.dr_id')
+                ->Join('rsmst_polis', 'rsmst_polis.poli_id', 'scmst_scpolis.poli_id')
+                ->Where('day_id', $dayid)
+                ->Where('scmst_scpolis.dr_id', $this->dataDaftarPoliRJ['drId']) //Cek Poli RS
+                ->Where('sc_poli_status_', 1)
+                ->orderBy('scmst_scpolis.no_urut', 'ASC')
+                ->orderBy('scmst_scpolis.poli_id', 'ASC')
+                ->first(), true), true);
+
+
+            if (!$JadwalPraktek) {
+                $JadwalPraktek['mulai_praktek'] = '07:00:00';
+                $JadwalPraktek['kuota'] = 30;
+            }
+
+            // Pelayanan (Poli Tgl + Jam Layanan)
+            $hariLayananJamLayanan = Carbon::createFromFormat('d/m/Y H:i:s', $rjdate->format('d/m/Y') . ' ' . $JadwalPraktek['mulai_praktek']);
+            // $timestamp = $hariLayananJamLayanan->timestamp; //Timestemp Layanan
+            $jadwal_estimasi = $hariLayananJamLayanan->addMinutes(10 * ($this->dataDaftarPoliRJ['noAntrian'] + 1)); // Hari Layanan||JamPraktek + 10menit
+
+
+            $antreanadd = [
+                "kodebooking" => $this->dataDaftarPoliRJ['noBooking'],
+                "jenispasien" => ($this->dataDaftarPoliRJ['klaimId'] == 'JM') ? 'JKN' : 'NON JKN', //UMUM BPJS
+                "nomorkartu" => ($this->dataDaftarPoliRJ['klaimId'] == 'JM') ? $this->dataPasien['pasien']['identitas']['idbpjs'] : '',
+                "nik" => $this->dataPasien['pasien']['identitas']['nik'],
+                "nohp" => '62' . $this->dataPasien['pasien']['kontak']['nomerTelponSelulerPasien'],
+                "kodepoli" => $this->dataDaftarPoliRJ['kdpolibpjs'] ? $this->dataDaftarPoliRJ['kdpolibpjs'] : $this->dataDaftarPoliRJ['poliId'], //if null poliidRS
+                "namapoli" => $this->dataDaftarPoliRJ['poliDesc'],
+                "pasienbaru" => 0,
+                "norm" => $this->dataDaftarPoliRJ['regNo'],
+                "tanggalperiksa" => Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'])->format('Y-m-d'),
+                "kodedokter" => $this->dataDaftarPoliRJ['kddrbpjs'] ? $this->dataDaftarPoliRJ['kddrbpjs'] : $this->dataDaftarPoliRJ['drId'], //if Null dridRS
+                "namadokter" => $this->dataDaftarPoliRJ['drDesc'],
+                "jampraktek" => $JadwalPraktek['mulai_praktek'],
+                "jeniskunjungan" => $this->dataDaftarPoliRJ['kunjunganId'], //FKTP/FKTL/Kontrol/Internal
+                "nomorreferensi" => $this->dataDaftarPoliRJ['noReferensi'],
+                "nomorantrean" => $this->dataDaftarPoliRJ['noAntrian'],
+                "angkaantrean" => $this->dataDaftarPoliRJ['noAntrian'],
+                "estimasidilayani" => $jadwal_estimasi->timestamp,
+                "sisakuotajkn" => $JadwalPraktek['kuota'] - $this->dataDaftarPoliRJ['noAntrian'],
+                "kuotajkn" => $JadwalPraktek['kuota'],
+                "sisakuotanonjkn" => $JadwalPraktek['kuota'] - $this->dataDaftarPoliRJ['noAntrian'],
+                "kuotanonjkn" => $JadwalPraktek['kuota'],
+                "keterangan" => "Peserta harap 30 menit lebih awal guna pencatatan administrasi.",
+            ];
+        }
+
+        // http Post
+
+
+
+        $PushDataAntrian =  AntrianTrait::tambah_antrean($antreanadd)->getOriginalContent();
+
+        // metadata d kecil
+        if ($PushDataAntrian['metadata']['code'] == 200) {
+            $pushAntrianBpjs = $PushDataAntrian['metadata']['code'];
+            $pushAntrianBpjsJson = json_encode($antreanadd, true);
+            $this->emit('toastr-success', $PushDataAntrian['metadata']['code'] . ' ' . $PushDataAntrian['metadata']['message']);
+        } else {
+
+            $pushAntrianBpjs = $PushDataAntrian['metadata']['code'];
+            $pushAntrianBpjsJson = json_encode($antreanadd, true);
+            $this->emit('toastr-error', $PushDataAntrian['metadata']['code'] . ' ' . $PushDataAntrian['metadata']['message']);
+
+            // Ulangi Proses PushDataAntrian;
+            $this->emit('rePush_Data_Antrian_Confirmation');
+        }
+
+        return compact('pushAntrianBpjs', 'pushAntrianBpjsJson');
+    }
 
 
 
@@ -1159,6 +1285,8 @@ class DaftarRJ extends Component
     // select data start////////////////
     public function render()
     {
+        // dd(Carbon::createFromTimestamp(1690181400)->toDateTimeString());
+
         return view(
             'livewire.daftar-r-j.daftar-r-j',
             [
