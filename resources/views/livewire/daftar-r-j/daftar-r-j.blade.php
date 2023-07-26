@@ -370,7 +370,7 @@
         @livewire('master-pasien.master-pasien', [
             'isOpen' => true,
             'isOpenMode' => 'insert',
-            'dataPasienBPJSSearch' => $dataPasien['pasien']['cariDataPasien'],
+            'dataPasienBPJSSearch' => isset($dataPasien['pasien']['cariDataPasien']) ? $dataPasien['pasien']['cariDataPasien'] : '',
         ])
     @endif
 
@@ -476,6 +476,10 @@
                     window.livewire.emit('rePush_Data_Antrian');
                 }
             });
+
+
+
+
 
 
 

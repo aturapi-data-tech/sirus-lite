@@ -288,21 +288,58 @@ trait AntrianTrait
         $response = Http::withHeaders($signature)->get($url);
         return self::response_decrypt($response, $signature);
     }
-    public static function ref_jadwal_dokter(Request $request)
+
+
+    public static function ref_jadwal_dokter($kodePoli, $tgl)
     {
-        $validator = Validator::make(request()->all(), [
+
+
+
+        // customErrorMessages
+        $messages = customErrorMessagesTrait::messages();
+
+        $r = [
+            "kodePoli" => $kodePoli,
+            "tanggal" =>  $tgl,
+        ];
+
+        $rules = [
             "kodePoli" => "required",
             "tanggal" =>  "required|date",
-        ]);
+        ];
+
+        $validator = Validator::make($r, $rules, $messages);
+
         if ($validator->fails()) {
             // error, msgError,Code,url,ReqtrfTime
-            return self::sendError($validator->errors()->first(), $validator->errors(), 201);
+            return self::sendError($validator->errors()->first(), $validator->errors(), 201, null, null);
         }
-        $url = env('ANTRIAN_URL') . "jadwaldokter/kodepoli/" . $request->kodePoli . "/tanggal/" . $request->tanggal;
-        $signature = self::signature();
-        $response = Http::withHeaders($signature)->get($url);
-        return self::response_decrypt($response, $signature);
+
+
+        // handler when time out and off line mode
+        try {
+
+            $url = env('ANTRIAN_URL') . "jadwaldokter/kodepoli/" . $kodePoli . "/tanggal/" . $tgl;
+            $signature = self::signature();
+
+            $response = Http::timeout(10)
+                ->withHeaders($signature)
+                ->get($url);
+
+            // dd($response->getBody()->getContents());
+
+            // dd($response->transferStats->getTransferTime()); //Get Transfertime request
+            // semua response error atau sukses dari BPJS di handle pada logic response_decrypt
+            return self::response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
+            /////////////////////////////////////////////////////////////////////////////
+        } catch (Exception $e) {
+
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError($e->getMessage(), $validator->errors(), 408, $url, null);
+        }
     }
+
+
     public static function ref_poli_fingerprint()
     {
         $url = env('ANTRIAN_URL') . "ref/poli/fp";
@@ -503,30 +540,74 @@ trait AntrianTrait
         return self::response_decrypt($response, $signature);
     }
 
-    public static function update_antrean(Request $request)
+    public static function update_antrean($kodebooking, $taskid, $waktu, $jenisresep)
     {
-        $validator = Validator::make(request()->all(), [
+
+        // customErrorMessages
+        $messages = customErrorMessagesTrait::messages();
+
+        $r = [
+            "kodebooking" => $kodebooking,
+            "taskid" =>  $taskid,
+            "waktu" =>  $waktu,
+            "jenisresep" => $jenisresep //  "Tidak ada/Racikan/Non racikan" ---> khusus yang sudah implementasi antrean farmasi
+        ];
+
+
+        $rules = [
             "kodebooking" => "required",
             "taskid" =>  "required",
             "waktu" =>  "required",
-        ]);
+            "jenisresep" => "",
+        ];
+
+
+        $validator = Validator::make($r, $rules, $messages);
+
         if ($validator->fails()) {
             // error, msgError,Code,url,ReqtrfTime
-            return self::sendError($validator->errors()->first(), $validator->errors(), 201);
+            return self::sendError($validator->errors()->first(), $validator->errors(), 201, null, null);
         }
-        $url = env('ANTRIAN_URL') . "antrean/updatewaktu";
-        $signature = self::signature();
-        $response = Http::withHeaders($signature)->post(
-            $url,
-            [
-                "kodebooking" => $request->kodebooking,
-                "taskid" => $request->taskid,
-                "waktu" => $request->waktu,
-                "jenisresep" => $request->jenisresep,
-            ]
-        );
-        return self::response_decrypt($response, $signature);
+
+
+        // handler when time out and off line mode
+        try {
+
+
+            $url = env('ANTRIAN_URL') . "antrean/updatewaktu";
+            $signature = self::signature();
+
+            $response = Http::timeout(10)
+                ->withHeaders($signature)
+                ->post(
+                    $url,
+                    [
+                        "kodebooking" => $kodebooking,
+                        "taskid" => $taskid,
+                        "waktu" => $waktu,
+                        "jenisresep" => $jenisresep,
+                    ]
+                );
+
+            // dd($response->getBody()->getContents());
+
+            // dd($response->transferStats->getTransferTime()); //Get Transfertime request
+            // semua response error atau sukses dari BPJS di handle pada logic response_decrypt
+            return self::response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
+            /////////////////////////////////////////////////////////////////////////////
+        } catch (Exception $e) {
+            // error, msgError,Code,url,ReqtrfTime
+
+            return self::sendError($e->getMessage(), $validator->errors(), 408, $url, null);
+        }
     }
+
+
+
+
+
+
+
     // bridging pendaftaran pa agil
     public static function update_antrean_pendaftaran(Request $request)
     {

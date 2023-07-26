@@ -30,6 +30,9 @@ class SetupHfisBpjs extends Component
     public $hfisLovStatus = 0;
     public $hfisLovSearch = '';
 
+    // get Jadwal Dokter BPJS
+    public $jadwal_dokter = [];
+
 
     //  modal status////////////////
     public $isOpen = 0;
@@ -59,7 +62,7 @@ class SetupHfisBpjs extends Component
     //////////////////////////////
     // Ref on top bar
     //////////////////////////////
-    public $dateRjRef = '';
+    public $dateRef = '';
 
     ////////////////////////////////////////////////
     ///////////begin////////////////////////////////
@@ -127,15 +130,9 @@ class SetupHfisBpjs extends Component
     // resert page pagination when coloumn search change ////////////////
     public function updatedSearch(): void
     {
-        $this->hfisLovStatus = true;
-
-        $PushDataref_poli =  VclaimTrait::ref_poliklinik($this->search)->getOriginalContent();
-        dd($PushDataref_poli);
-        if ($PushDataref_poli['metadata']['code'] == 200) {
-            $this->emit('toastr-success', $PushDataref_poli['metadata']['code'] . ' ' . $PushDataref_poli['metadata']['message']);
-        } else {
-            $this->emit('toastr-error', $PushDataref_poli['metadata']['code'] . ' ' . $PushDataref_poli['metadata']['message']);
-        }
+        // updatedhfisLovSearch->run
+        $this->hfisLovSearch = $this->search;
+        $this->updatedHfislovsearch();
     }
 
 
@@ -236,49 +233,59 @@ class SetupHfisBpjs extends Component
 
     // /////////LOV////////////
     // /////////hfis////////////
-    public function clickhfislov()
-    {
-        $this->hfisLovStatus = true;
-        $this->hfisLov = $this->dataPasien['pasien']['hfis']['hfisOptions'];
-    }
-    public function updatedhfislovsearch()
+    // klik tdak dipakek
+    // public function clickhfislov()
+    // {
+    //     $this->hfisLovStatus = true;
+    //     $this->hfisLov = $this->dataPasien['pasien']['hfis']['hfisOptions'];
+    // }
+    public function updatedHfislovsearch()
     {
         // Variable Search
         $search = $this->hfisLovSearch;
 
-        // check LOV by id 
-        $hfis = collect($this->dataPasien['pasien']['hfis']['hfisOptions'])
-            ->where('hfisId', '=', $search)
-            ->first();
+        $this->hfisLovStatus = true;
 
-        if ($hfis) {
-            $this->dataPasien['pasien']['hfis']['hfisId'] = $hfis['hfisId'];
-            $this->dataPasien['pasien']['hfis']['hfisDesc'] = $hfis['hfisDesc'];
-            $this->hfisLovStatus = false;
-            $this->hfisLovSearch = '';
+        // if there is no id found and check (min 3 char on search)
+        if (strlen($search) < 3) {
+            $this->hfisLov = [];
         } else {
-            // if there is no id found and check (min 3 char on search)
-            if (strlen($search) < 3) {
-                $this->hfisLov = $this->dataPasien['pasien']['hfis']['hfisOptions'];
+
+            // Variable Search Get data BPJS
+            $HttpGetBpjs =  VclaimTrait::ref_poliklinik($search)->getOriginalContent();
+
+            if ($HttpGetBpjs['metadata']['code'] == 200) {
+                $this->hfisLov = $HttpGetBpjs['response']['poli'];
+                $this->emit('toastr-success', $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
             } else {
-                $this->hfisLov = collect($this->dataPasien['pasien']['hfis']['hfisOptions'])
-                    ->filter(function ($item) use ($search) {
-                        return false !== stristr($item['hfisDesc'], $search);
-                    });
+                $this->hfisLov = [];
+                $this->emit('toastr-error', $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
             }
-            $this->hfisLovStatus = true;
-            $this->dataPasien['pasien']['hfis']['hfisId'] = '';
-            $this->dataPasien['pasien']['hfis']['hfisDesc'] = '';
         }
     }
     // /////////////////////
     // LOV selected start
     public function setMyhfisLov($id, $name)
     {
-        $this->dataPasien['pasien']['hfis']['hfisId'] = $id;
-        $this->dataPasien['pasien']['hfis']['hfisDesc'] = $name;
+
+        // Variable Search Get data BPJS
+        $dateRef = Carbon::createFromFormat('d/m/Y', $this->dateRef)->format('Y-m-d');
+        $HttpGetBpjs =  AntrianTrait::ref_jadwal_dokter($id, $dateRef)->getOriginalContent();
+
+        // Variable Search Get data BPJS
+        if ($HttpGetBpjs['metadata']['code'] == 200) {
+            $this->jadwal_dokter = $HttpGetBpjs['response'];
+            // dd($this->jadwal_dokter);
+
+            $this->emit('toastr-success', $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+        } else {
+            $this->jadwal_dokter = [];
+            $this->emit('toastr-error', $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+        }
+
+
         $this->hfisLovStatus = false;
-        $this->hfisLovSearch = '';
+        // $this->hfisLovSearch = '';
     }
     // LOV selected end
     // /////////////////////
@@ -287,7 +294,8 @@ class SetupHfisBpjs extends Component
     // when new form instance
     public function mount()
     {
-        $this->dateRjRef = Carbon::now()->format('d/m/Y');
+        $this->dateRef = Carbon::now()->format('d/m/Y');
+        $this->jadwal_dokter = [];
     }
 
 
@@ -298,7 +306,7 @@ class SetupHfisBpjs extends Component
         return view(
             'livewire.setup-hfis-bpjs.setup-hfis-bpjs',
             [
-                'hfis' => collect([]),
+                'hfis' => [],
                 'myTitle' => 'HFIS BPJS',
                 'mySnipt' => 'Data HFIS BPJS',
                 'myProgram' => 'HFIS BPJS',

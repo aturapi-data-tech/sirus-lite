@@ -520,6 +520,9 @@ trait VclaimTrait
         $response = Http::withHeaders($signature)->get($url);
         return self::response_decrypt($response, $signature, null, null);
     }
+
+
+
     // RENCANA KONTROL
     public static function suratkontrol_insert(Request $request)
     {
@@ -674,6 +677,10 @@ trait VclaimTrait
         $response = Http::withHeaders($signature)->get($url);
         return self::response_decrypt($response, $signature, null, null);
     }
+
+
+
+
     // RUJUKAN
     public static function rujukan_nomor(Request $request)
     {
@@ -688,19 +695,47 @@ trait VclaimTrait
         $response = Http::withHeaders($signature)->get($url);
         return self::response_decrypt($response, $signature, null, null);
     }
-    public static function rujukan_peserta(Request $request)
+
+    public static function rujukan_peserta($nomorKartu) //fktp dari
     {
-        $validator = Validator::make(request()->all(), [
-            "nomorKartu" => "required",
-        ]);
+        // customErrorMessages
+        $messages = customErrorMessagesTrait::messages();
+
+        // Masukkan Nilai dari parameter
+        $r = [
+            'nomorKartu' => $nomorKartu,
+        ];
+        // lakukan validasis
+        $validator = Validator::make($r, [
+            "nomorKartu" => "required|digits:13",
+        ], $messages);
+
         if ($validator->fails()) {
-            return self::sendError($validator->errors()->first(), null, 201, null, null);
+            return self::sendError($validator->errors()->first(), $validator->errors(), 201, null, null);
         }
-        $url = env('VCLAIM_URL') . "Rujukan/List/Peserta/" . $request->nomorKartu;
-        $signature = self::signature();
-        $response = Http::withHeaders($signature)->get($url);
-        return self::response_decrypt($response, $signature, null, null);
+
+
+
+        // handler when time out and off line mode
+        try {
+
+            $url = env('VCLAIM_URL') . "Rujukan/List/Peserta/" . $nomorKartu;
+            $signature = self::signature();
+            $response = Http::timeout(10)
+                ->withHeaders($signature)
+                ->get($url);
+
+
+            // dd($response->transferStats->getTransferTime()); Get Transfertime request
+            // semua response error atau sukses dari BPJS di handle pada logic response_decrypt
+            return self::response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
+            /////////////////////////////////////////////////////////////////////////////
+        } catch (Exception $e) {
+            return self::sendError($e->getMessage(), $validator->errors(), 408, $url, null);
+        }
     }
+
+
     public static function rujukan_rs_nomor(Request $request)
     {
         $validator = Validator::make(request()->all(), [
@@ -714,7 +749,7 @@ trait VclaimTrait
         $response = Http::withHeaders($signature)->get($url);
         return self::response_decrypt($response, $signature, null, null);
     }
-    public static function rujukan_rs_peserta(Request $request)
+    public static function rujukan_rs_peserta(Request $request) //fktl dari
     {
         $validator = Validator::make(request()->all(), [
             "nomorKartu" => "required",

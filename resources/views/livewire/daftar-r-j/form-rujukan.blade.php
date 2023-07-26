@@ -1096,11 +1096,6 @@
 
 
                             <div>
-                                <div class="flex justify-end -mb-4">
-                                    <x-check-box value='N' :label="__('Pasien Baru')"
-                                        wire:model.debounce.500ms="dataDaftarPoliRJ.passStatus" />
-                                </div>
-
                                 <x-input-label for="pasporidentitas" :value="__('Cari Data Pasien dgn [ Nama / Reg No / NIK ]')" :required="__('true')" />
                                 <div class="flex items-center mb-2">
                                     <x-text-input id="pasporidentitas" placeholder="Paspor [untuk WNA / WNI]"
@@ -1174,6 +1169,10 @@
                                             wire:click.prevent="CarirujukanPeserta()" type="button"
                                             wire:loading.remove>No Ref</x-green-button>
 
+                                        <div wire:loading wire:target="CarirujukanPeserta">
+                                            <x-loading />
+                                        </div>
+
                                         <x-primary-button>Buat SKDP</x-primary-button>
                                     </div>
 
@@ -1187,7 +1186,7 @@
                                 </div>
                                 {{-- LOV --}}
                                 <div class="mt-2">
-                                    @include('livewire.daftar-r-j.list-of-value-rujukan')
+                                    @include('livewire.daftar-r-j.list-of-value-caridatapasien')
                                 </div>
 
 

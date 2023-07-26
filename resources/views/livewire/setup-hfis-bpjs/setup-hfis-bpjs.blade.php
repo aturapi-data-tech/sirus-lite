@@ -1,11 +1,11 @@
-<div>
+<div class="">
 
 
 
-    <div class="px-1 pt-7">
+    <div class="px-1 pt-7 ">
         <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
             <!-- Card header -->
-            <div class="w-full mb-1">
+            <div class="w-full h-screen mb-1 overflow-y-auto">
 
                 <div id="TopBarMenuMaster" class="">
 
@@ -39,7 +39,7 @@
                                     <x-loading />
                                 </div>
 
-                                {{-- LOV hfis --}}
+                                {{-- LOV jadwal_dokter --}}
                                 @include('livewire.setup-hfis-bpjs.list-of-value-hfis-bpjs')
                             </div>
 
@@ -55,9 +55,9 @@
                                 </div>
 
 
-                                <x-text-input id="dateRjRef" datepicker datepicker-autohide
+                                <x-text-input id="dateRef" datepicker datepicker-autohide
                                     datepicker-format="dd/mm/yyyy" type="text" class="p-2 pl-10 sm:w-1/6"
-                                    placeholder="dd/mm/yyyy" wire:model="dateRjRef" />
+                                    placeholder="dd/mm/yyyy" wire:model.lazy="dateRef" />
                             </div>
 
                         </div>
@@ -88,32 +88,32 @@
                                     <thead
                                         class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
                                         <tr>
-                                            <th scope="col" class="w-2/12 px-4 py-3">
-                                                @if ($sortField == 'hfs_id')
-                                                    <x-sort-link :active=true wire:click.prevent="sortBy('hfs_id')"
-                                                        role="button" href="#">
-                                                        Kode Provinsi
-                                                    </x-sort-link>
-                                                @else
-                                                    <x-sort-link :active=false wire:click.prevent="sortBy('hfs_id')"
-                                                        role="button" href="#">
-                                                        Kode Provinsi
-                                                    </x-sort-link>
-                                                @endif
-                                            </th>
-                                            <th scope="col" class="px-4 py-3">
 
-                                                @if ($sortField == 'name')
-                                                    <x-sort-link :active=true wire:click.prevent="sortBy('name')"
-                                                        role="button" href="#">
-                                                        Nama Kota
-                                                    </x-sort-link>
-                                                @else
-                                                    <x-sort-link :active=false wire:click.prevent="sortBy('name')"
-                                                        role="button" href="#">
-                                                        Nama Kota
-                                                    </x-sort-link>
-                                                @endif
+                                            <th scope="col" class="w-1/4 px-4 py-3">
+
+                                                <x-sort-link :active=false wire:click.prevent="" role="button"
+                                                    href="#">
+                                                    Dokter
+                                                </x-sort-link>
+
+                                            </th>
+
+                                            <th scope="col" class="w-1/3 px-4 py-3">
+
+                                                <x-sort-link :active=false wire:click.prevent="" role="button"
+                                                    href="#">
+                                                    Jadwal Hfiz
+                                                </x-sort-link>
+
+                                            </th>
+
+                                            <th scope="col" class="w-1/3 px-4 py-3">
+
+                                                <x-sort-link :active=false wire:click.prevent="" role="button"
+                                                    href="#">
+                                                    Status Kirim Antrian
+                                                </x-sort-link>
+
                                             </th>
 
 
@@ -126,14 +126,56 @@
                                     <tbody class="bg-white dark:bg-gray-800">
 
 
-                                        @foreach ($hfis as $hfs)
+                                        @foreach ($jadwal_dokter as $jd)
+                                            {{-- @dd($jd) --}}
                                             <tr class="border-b group dark:border-gray-700">
-                                                <th scope="row"
-                                                    class="px-4 py-3 font-medium text-gray-700 group-hover:bg-gray-50 group-hover:text-blue-700 whitespace-nowrap dark:text-white">
-                                                    {{ $hfs->id }}</th>
                                                 <td
-                                                    class="px-4 py-3 text-gray-700 group-hover:bg-gray-50 group-hover:text-blue-700">
-                                                    {{ $hfs->name }}</td>
+                                                    class="w-1/4 px-4 py-3 font-medium group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
+                                                    {{-- <img class="w-10 h-10 rounded-full " src="profile-picture-1.jpg"
+                                                    alt="Jese image"> --}}
+                                                    <div class="pl-0">
+                                                        <div class="font-semibold text-gray-700 ">
+                                                            {{ $jd['namadokter'] }}</div>
+                                                        <div class="font-semibold text-primary">
+                                                            {{ $jd['kodedokter'] . ' / (' . $jd['kodesubspesialis'] . ')' }}
+                                                        </div>
+                                                        <div class="font-normal text-gray-700">
+                                                            {{ $jd['namapoli'] }}
+                                                        </div>
+                                                    </div>
+                                                </td>
+
+                                                <td
+                                                    class="w-1/3 px-4 py-3 font-medium group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
+                                                    {{-- <img class="w-10 h-10 rounded-full " src="profile-picture-1.jpg"
+                                                    alt="Jese image"> --}}
+                                                    <div class="pl-0">
+                                                        <div class="font-semibold text-gray-700 ">
+                                                            {{ 'Kapasitas : ' . $jd['kapasitaspasien'] }}</div>
+                                                        <div class="font-semibold text-primary">
+                                                            {{ $jd['hari'] . ' / (Hari :' . $jd['namahari'] . ')' }}
+                                                        </div>
+                                                        <div class="font-normal text-gray-700">
+                                                            {{ $jd['jadwal'] }}
+                                                        </div>
+                                                    </div>
+                                                </td>
+
+                                                <td
+                                                    class="w-1/3 px-4 py-3 font-medium group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
+                                                    {{-- <img class="w-10 h-10 rounded-full " src="profile-picture-1.jpg"
+                                                    alt="Jese image"> --}}
+                                                    <div class="pl-0">
+                                                        <div class="font-semibold text-gray-700 ">
+                                                            {{ 'Jml Pasien RS : ' . $jd['kapasitaspasien'] }}</div>
+                                                        <div class="font-semibold text-primary">
+                                                            {{ 'Antrian Lengkap : ' . $jd['hari'] . ' / (Hari :' . $jd['namahari'] . ')' }}
+                                                        </div>
+                                                        <div class="font-normal text-gray-700">
+                                                            {{ 'Antrian Tidak Lengkap : ' . $jd['jadwal'] }}
+                                                        </div>
+                                                    </div>
+                                                </td>
 
 
                                                 <td
@@ -143,9 +185,9 @@
 
                                                     <!-- Dropdown Action menu Flowbite-->
                                                     <div>
-                                                        <x-light-button id="dropdownButton{{ $hfs->id }}"
+                                                        <x-light-button id="dropdownButton{{ $jd['kodedokter'] }}"
                                                             class="inline-flex"
-                                                            wire:click="$emit('pressDropdownButton','{{ $hfs->id }}')">
+                                                            wire:click="$emit('pressDropdownButton','{{ $jd['kodedokter'] }}')">
                                                             <svg class="w-5 h-5" aria-hidden="true" fill="currentColor"
                                                                 viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                                                                 <path
@@ -154,25 +196,25 @@
                                                         </x-light-button>
 
                                                         <!-- Dropdown Action Open menu -->
-                                                        <div id="dropdownMenu{{ $hfs->id }}"
+                                                        <div id="dropdownMenu{{ $jd['kodedokter'] }}"
                                                             class="z-10 hidden w-auto bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700">
                                                             <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
-                                                                aria-labelledby="dropdownButton{{ $hfs->id }}">
+                                                                aria-labelledby="dropdownButton{{ $jd['kodedokter'] }}">
                                                                 <li>
                                                                     <x-dropdown-link
-                                                                        wire:click="tampil('{{ $hfs->id }}')">
-                                                                        {{ __('Tampil | ' . $hfs->name) }}
+                                                                        wire:click="tampil('{{ $jd['kodedokter'] }}')">
+                                                                        {{ __('Tampil | ' . $jd['namadokter']) }}
                                                                     </x-dropdown-link>
                                                                 </li>
                                                                 <li>
                                                                     <x-dropdown-link
-                                                                        wire:click="edit('{{ $hfs->id }}')">
+                                                                        wire:click="edit('{{ $jd['kodedokter'] }}')">
                                                                         {{ __('Ubah') }}
                                                                     </x-dropdown-link>
                                                                 </li>
                                                                 <li>
                                                                     <x-dropdown-link
-                                                                        wire:click="$emit('confirm_remove_record', '{{ $hfs->id }}', '{{ $hfs->name }}')">
+                                                                        wire:click="$emit('confirm_remove_record', '{{ $jd['kodedokter'] }}', '{{ $jd['namadokter'] }}')">
                                                                         {{ __('Hapus') }}
                                                                     </x-dropdown-link>
                                                                 </li>
@@ -198,7 +240,7 @@
 
 
                                 {{-- no data found start --}}
-                                @if ($hfis->count() == 0)
+                                @if (count($jadwal_dokter) == 0)
                                     <div class="w-full p-4 text-sm text-center text-gray-500 dark:text-gray-400">
                                         {{ 'Data ' . $myProgram . ' Tidak ditemukan' }}
                                     </div>
@@ -216,8 +258,8 @@
 
                 <!-- Pagination start -->
                 {{-- <div class="flex items-center justify-end pt-3 sm:pt-6"> --}}
-                {{-- {{ $hfis->links() }} --}}
-                {{-- {{ $hfis->links('vendor.livewire.tailwind') }} --}}
+                {{-- {{ $jadwal_dokter->links() }} --}}
+                {{-- {{ $jadwal_dokter->links('vendor.livewire.tailwind') }} --}}
                 {{-- </div> --}}
                 <!-- Pagination end -->
 
@@ -296,7 +338,7 @@
                 let cfn = confirm('Apakah anda ingin menghapus data ini ' + name + '?');
 
                 if (cfn) {
-                    window.livewire.emit('confirm_remove_record_hfs', key, name);
+                    window.livewire.emit('confirm_remove_record_jd', key, name);
                 }
             });
 
