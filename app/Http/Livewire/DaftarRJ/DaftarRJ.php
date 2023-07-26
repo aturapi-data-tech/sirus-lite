@@ -1374,7 +1374,7 @@ class DaftarRJ extends Component
                 "jenispasien" => ($this->dataDaftarPoliRJ['klaimId'] == 'JM') ? 'JKN' : 'NON JKN', //Layanan UMUM BPJS
                 "nomorkartu" => ($this->dataDaftarPoliRJ['klaimId'] == 'JM') ? $this->dataPasien['pasien']['identitas']['idbpjs'] : '',
                 "nik" => $this->dataPasien['pasien']['identitas']['nik'],
-                "nohp" => '62' . $this->dataPasien['pasien']['kontak']['nomerTelponSelulerPasien'],
+                "nohp" =>  $this->dataPasien['pasien']['kontak']['nomerTelponSelulerPasien'],
                 "kodepoli" => $this->dataDaftarPoliRJ['kdpolibpjs'] ? $this->dataDaftarPoliRJ['kdpolibpjs'] : $this->dataDaftarPoliRJ['poliId'], //if null poliidRS
                 "namapoli" => $this->dataDaftarPoliRJ['poliDesc'],
                 "pasienbaru" => 0,
