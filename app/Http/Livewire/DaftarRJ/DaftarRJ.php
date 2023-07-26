@@ -1506,6 +1506,8 @@ class DaftarRJ extends Component
     // when new form instance
     public function mount()
     {
+
+
         $this->dateRjRef = Carbon::now()->format('d/m/Y');
 
         $findShift = DB::table('rstxn_shiftctls')->select('shift')
