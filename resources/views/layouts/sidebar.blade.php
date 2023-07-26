@@ -64,17 +64,17 @@
 
                         <ul id="dropdown-layouts" class="hidden py-2 space-y-2">
                             <li>
-                                <x-nav-link class="pl-11" :href="route('Pendaftaran Pasien Baru')" :active="request()->routeIs('MasterPasien')">
-                                    {{ __('Post') }}
+                                <x-nav-link class="pl-11" :href="route('MasterPasien')" :active="request()->routeIs('MasterPasien')">
+                                    {{ __('Pendaftaran Pasien Baru') }}
                                 </x-nav-link>
-                                <x-nav-link class="pl-11" :href="route('Pendaftaran Rawat Jalan')" :active="request()->routeIs('daftarRJ')">
-                                    {{ __('Master Level Satu') }}
+                                <x-nav-link class="pl-11" :href="route('daftarRJ')" :active="request()->routeIs('daftarRJ')">
+                                    {{ __('Pendaftaran Rawat Jalan') }}
                                 </x-nav-link>
-                                <x-nav-link class="pl-11" :href="route('ERM')" :active="request()->routeIs('ermRJ')">
-                                    {{ __('Master Level Dua') }}
+                                <x-nav-link class="pl-11" :href="route('ermRJ')" :active="request()->routeIs('ermRJ')">
+                                    {{ __('ERM') }}
                                 </x-nav-link>
                                 <x-nav-link class="pl-11" :href="route('HFIS BPJS')" :active="request()->routeIs('SetupHfisBpjs')">
-                                    {{ __('Master Level Dua') }}
+                                    {{ __('SetupHfisBpjs') }}
                                 </x-nav-link>
                             </li>
                         </ul>
