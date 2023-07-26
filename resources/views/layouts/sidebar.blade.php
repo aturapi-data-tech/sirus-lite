@@ -73,7 +73,7 @@
                                 <x-nav-link class="pl-11" :href="route('ermRJ')" :active="request()->routeIs('ermRJ')">
                                     {{ __('ERM') }}
                                 </x-nav-link>
-                                <x-nav-link class="pl-11" :href="route('HFIS BPJS')" :active="request()->routeIs('SetupHfisBpjs')">
+                                <x-nav-link class="pl-11" :href="route('SetupHfisBpjs')" :active="request()->routeIs('SetupHfisBpjs')">
                                     {{ __('SetupHfisBpjs') }}
                                 </x-nav-link>
                             </li>
