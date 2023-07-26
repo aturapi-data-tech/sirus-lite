@@ -1511,8 +1511,8 @@ class DaftarRJ extends Component
         $findShift = DB::table('rstxn_shiftctls')->select('shift')
             ->whereRaw("'" . Carbon::now()->format('H:i:s') . "' between shift_start and shift_end")
             ->first();
-        $this->shiftRjRef['shiftId'] = $findShift->shift ? $findShift->shift : 3;
-        $this->shiftRjRef['shiftDesc'] = $findShift->shift ? $findShift->shift : 3;
+        $this->shiftRjRef['shiftId'] = isset($findShift->shift) ? $findShift->shift : 3;
+        $this->shiftRjRef['shiftDesc'] = isset($findShift->shift) ? $findShift->shift : 3;
     }
 
 
