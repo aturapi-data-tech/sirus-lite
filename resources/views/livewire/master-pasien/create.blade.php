@@ -473,21 +473,15 @@
                                         <div class="flex items-center mb-2">
 
                                             <x-text-input id="rtrwidentitas" placeholder="RT [3digit]"
-                                                class="mt-1 ml-2 sm:w-1/3" :errorshas="__(
-                                                    $errors->has('dataPasien.dataPasien.pasien.identitas.rt'),
-                                                )"
+                                                class="mt-1 ml-2 sm:w-1/3" :errorshas="__($errors->has('dataPasien.pasien.identitas.rt'))"
                                                 :disabled=$disabledProperty
                                                 wire:model.debounce.500ms="dataPasien.pasien.identitas.rt" />
 
                                             <x-text-input placeholder="RW [3digit]" class="mt-1 ml-2 sm:w-1/3"
-                                                :errorshas="__(
-                                                    $errors->has('dataPasien.dataPasien.pasien.identitas.rw'),
-                                                )" :disabled=$disabledProperty
+                                                :errorshas="__($errors->has('dataPasien.pasien.identitas.rw'))" :disabled=$disabledProperty
                                                 wire:model.debounce.500ms="dataPasien.pasien.identitas.rw" />
                                             <x-text-input placeholder="Kode Pos" class="mt-1 ml-2 sm:w-1/3"
-                                                :errorshas="__(
-                                                    $errors->has('dataPasien.dataPasien.pasien.identitas.kodepos'),
-                                                )" :disabled=$disabledProperty
+                                                :errorshas="__($errors->has('dataPasien.pasien.identitas.kodepos'))" :disabled=$disabledProperty
                                                 wire:model.debounce.500ms="dataPasien.pasien.identitas.kodepos" />
                                         </div>
                                         {{-- Error Message Start --}}
@@ -656,12 +650,12 @@
                                 <x-input-label for="rtrwDomisil" :value="__('RT/RW')" :required="__($errors->has('dataPasien.pasien.domisil.alamat'))" />
                                 <div class="flex items-center mb-2">
                                     <x-text-input id="rtrwDomisil" placeholder="RT [3digit]"
-                                        class="mt-1 ml-2 sm:w-1/3" :errorshas="__($errors->has('dataPasien.dataPasien.pasien.domisil.rt'))" :disabled=$disabledProperty
+                                        class="mt-1 ml-2 sm:w-1/3" :errorshas="__($errors->has('dataPasien.pasien.domisil.rt'))" :disabled=$disabledProperty
                                         wire:model.debounce.500ms="dataPasien.pasien.domisil.rt" />
                                     <x-text-input placeholder="RW [3digit]" class="mt-1 ml-2 sm:w-1/3"
-                                        :errorshas="__($errors->has('dataPasien.dataPasien.pasien.domisil.rw'))" :disabled=$disabledProperty
+                                        :errorshas="__($errors->has('dataPasien.pasien.domisil.rw'))" :disabled=$disabledProperty
                                         wire:model.debounce.500ms="dataPasien.pasien.domisil.rw" />
-                                    <x-text-input placeholder="Kode Pos" class="mt-1 ml-2 sm:w-1/3" :errorshas="__($errors->has('dataPasien.dataPasien.pasien.domisil.kodepos'))"
+                                    <x-text-input placeholder="Kode Pos" class="mt-1 ml-2 sm:w-1/3" :errorshas="__($errors->has('dataPasien.pasien.domisil.kodepos'))"
                                         :disabled=$disabledProperty
                                         wire:model.debounce.500ms="dataPasien.pasien.domisil.kodepos" />
                                 </div>

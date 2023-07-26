@@ -659,25 +659,55 @@ trait AntrianTrait
         );
         return self::response_decrypt($response, $signature);
     }
-    public static function taskid_antrean(Request $request)
+    public static function taskid_antrean($kodebooking)
     {
-        $validator = Validator::make(request()->all(), [
-            "kodebooking" => "required",
-        ]);
+
+
+        // customErrorMessages
+        $messages = customErrorMessagesTrait::messages();
+
+        $r = ["kodebooking" => "required"];
+
+        $rules = ["kodebooking" => $kodebooking];
+
+        $validator = Validator::make($r, $rules, $messages);
+
         if ($validator->fails()) {
             // error, msgError,Code,url,ReqtrfTime
-            return self::sendError($validator->errors()->first(), $validator->errors(), 201);
+            return self::sendError($validator->errors()->first(), $validator->errors(), 201, null, null);
         }
-        $url = env('ANTRIAN_URL') . "antrean/getlisttask";
-        $signature = self::signature();
-        $response = Http::withHeaders($signature)->post(
-            $url,
-            [
-                "kodebooking" => $request->kodebooking,
-            ]
-        );
-        return self::response_decrypt($response, $signature);
+
+
+        // handler when time out and off line mode
+        try {
+
+            $url = env('ANTRIAN_URL') . "antrean/getlisttask";
+            $signature = self::signature();
+
+            $response = Http::timeout(10)
+                ->withHeaders($signature)
+                ->post(
+                    $url,
+                    [
+                        "kodebooking" => $kodebooking,
+                    ]
+                );
+
+            // dd($response->getBody()->getContents());
+
+            // dd($response->transferStats->getTransferTime()); //Get Transfertime request
+            // semua response error atau sukses dari BPJS di handle pada logic response_decrypt
+            return self::response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
+            /////////////////////////////////////////////////////////////////////////////
+        } catch (Exception $e) {
+
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError($e->getMessage(), $validator->errors(), 408, $url, null);
+        }
     }
+
+
+
     public static function dashboard_tanggal(Request $request)
     {
         $validator = Validator::make(request()->all(), [
