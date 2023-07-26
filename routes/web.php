@@ -56,6 +56,11 @@ Route::get('pendaftaranMandiriPasienPoli', PendaftaranMandiriPasienPoli::class)-
 Route::view('/cetak-tiket', 'livewire.pendaftaran-mandiri-pasien-poli.cetak-tiket');
 
 
+
+
+
+
+
 Route::get('MasterPasien', MasterPasien::class)->middleware('auth')->name('MasterPasien');
 
 Route::get('daftarRJ', DaftarRJ::class)->middleware('auth')->name('daftarRJ');
