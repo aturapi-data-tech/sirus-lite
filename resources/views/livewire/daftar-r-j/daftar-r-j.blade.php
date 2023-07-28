@@ -156,61 +156,26 @@
                                         class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                         <tr>
                                             <th scope="col" class="px-4 py-3 ">
-                                                @if ($sortField == 'RJp_id')
-                                                    <x-sort-link :active=true wire:click.prevent="sortBy('RJp_id')"
-                                                        role="button" href="#">
-                                                        Pasien
-                                                    </x-sort-link>
-                                                @else
-                                                    <x-sort-link :active=false wire:click.prevent="sortBy('RJp_id')"
-                                                        role="button" href="#">
-                                                        Pasien
-                                                    </x-sort-link>
-                                                @endif
+                                                <x-sort-link :active=false wire:click.prevent="sortBy('RJp_id')"
+                                                    role="button" href="#">
+                                                    Pasien
+                                                </x-sort-link>
+                                                @endf
                                             </th>
 
                                             <th scope="col" class="px-4 py-3">
-
-                                                @if ($sortField == 'name')
-                                                    <x-sort-link :active=true wire:click.prevent="sortBy('name')"
-                                                        role="button" href="#">
-                                                        SEP
-                                                    </x-sort-link>
-                                                @else
-                                                    <x-sort-link :active=false wire:click.prevent="sortBy('name')"
-                                                        role="button" href="#">
-                                                        SEP
-                                                    </x-sort-link>
-                                                @endif
+                                                <x-sort-link :active=false wire:click.prevent="sortBy('name')"
+                                                    role="button" href="#">
+                                                    SEP
+                                                </x-sort-link>
                                             </th>
                                             <th scope="col" class="px-4 py-3">
-
-                                                @if ($sortField == 'name')
-                                                    <x-sort-link :active=true wire:click.prevent="sortBy('name')"
-                                                        role="button" href="#">
-                                                        Poli
-                                                    </x-sort-link>
-                                                @else
-                                                    <x-sort-link :active=false wire:click.prevent="sortBy('name')"
-                                                        role="button" href="#">
-                                                        Poli
-                                                    </x-sort-link>
-                                                @endif
+                                                <x-sort-link :active=false wire:click.prevent="sortBy('name')"
+                                                    role="button" href="#">
+                                                    Poli
+                                                </x-sort-link>
                                             </th>
-                                            <th scope="col" class="px-4 py-3">
 
-                                                @if ($sortField == 'name')
-                                                    <x-sort-link :active=true wire:click.prevent="sortBy('name')"
-                                                        role="button" href="#">
-                                                        Shift
-                                                    </x-sort-link>
-                                                @else
-                                                    <x-sort-link :active=false wire:click.prevent="sortBy('name')"
-                                                        role="button" href="#">
-                                                        Shift
-                                                    </x-sort-link>
-                                                @endif
-                                            </th>
 
 
 
@@ -247,23 +212,13 @@
                                                     {{ $RJp->vno_sep }}
                                                 </td>
 
-                                                <td
-                                                    class="px-4 py-3 font-medium text-gray-900 group-hover:bg-gray-100 group-hover:text-primary whitespace-nowrap dark:text-white">
-                                                    <div class="">
-                                                        <div class="font-normal text-primary">{{ $RJp->poli_desc }}
-                                                        </div>
-                                                        <div class="font-normal text-gray-900">
-                                                            {{ $RJp->dr_name . ' / ' . $RJp->klaim_id }}
-                                                        </div>
-                                                    </div>
-                                                </td>
 
                                                 <td
                                                     class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
                                                     <div class="">
-                                                        <div class="font-normal text-primary">{{ $RJp->poli_desc }}
+                                                        <div class="font-semibold text-primary">{{ $RJp->poli_desc }}
                                                         </div>
-                                                        <div class="font-normal text-gray-900">
+                                                        <div class="font-semibold text-gray-900">
                                                             {{ $RJp->dr_name . ' / ' . $RJp->klaim_id }}
                                                         </div>
                                                         <div class="font-normal text-gray-900">

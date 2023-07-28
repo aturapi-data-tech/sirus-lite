@@ -570,6 +570,11 @@ class DaftarRJ extends Component
                 if ($cariDataPasienNik) {
                     $this->dataPasienLov = $cariDataPasienNik;
                 }
+                // by nokaBPJS
+                $cariDataPasienNokaBpjs = $this->cariDataPasienByKeyArr('nokartu_bpjs', $search);
+                if ($cariDataPasienNokaBpjs) {
+                    $this->dataPasienLov = $cariDataPasienNokaBpjs;
+                }
                 // by name
                 else {
                     $cariDataPasienName = json_decode(DB::table('rsmst_pasiens')
@@ -612,6 +617,7 @@ class DaftarRJ extends Component
                         ->join('rsmst_propinsis', 'rsmst_propinsis.prop_id', 'rsmst_kabupatens.prop_id')
                         ->where(DB::raw('upper(reg_name)'), 'like', '%' . strtoupper($search) . '%')
                         ->orWhere('reg_no', 'like', '%' . strtoupper($search) . '%')
+                        ->orWhere('address', 'like', '%' . strtoupper($search) . '%')
                         ->orderBy('reg_name', 'desc')
                         ->limit(50)
                         ->get(), true);
