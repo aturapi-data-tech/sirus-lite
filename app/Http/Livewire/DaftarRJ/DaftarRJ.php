@@ -1214,16 +1214,16 @@ class DaftarRJ extends Component
 
             "dataDaftarPoliRJ.kunjunganInternalStatus" => "required",
 
-            "dataDaftarPoliRJ.noReferensi" => "bail|min:3|max:19",
+            "dataDaftarPoliRJ.noReferensi" => "",
 
         ];
 
-        // gabunga array nik jika pasien tidak dikenal
-        // if ($this->dataPasien['pasien']['pasientidakdikenal']) {
-        //     $rules['dataPasien.pasien.identitas.nik'] =  'digits:16';
-        // } else {
-        //     $rules['dataPasien.pasien.identitas.nik'] =  'required|digits:16';
-        // }
+        // gabunga array noReferensi jika BPJS harus di isi
+        if ($this->JenisKlaim['JenisKlaimId'] == 'JM') {
+            $rules['dataDaftarPoliRJ.noReferensi'] =  'bail|required|min:3|max:19';
+        } else {
+            $rules['dataDaftarPoliRJ.noReferensi'] =  'bail|min:3|max:19';
+        }
 
         // Proses Validasi///////////////////////////////////////////
         try {
