@@ -1550,8 +1550,8 @@ class DaftarRJ extends Component
                     ->where('shift', '=', $this->shiftRjRef['shiftId'])
                     ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $this->dateRjRef)
                     ->where(function ($q) {
-                        $q->Where('reg_name', 'like', '%' . $this->search . '%')
-                            ->orWhere('reg_no', 'like', '%' . $this->search . '%');
+                        $q->Where(DB::raw('upper(reg_name)'), 'like', '%' . strtoupper($this->search) . '%')
+                            ->orWhere(DB::raw('upper(reg_no)'), 'like', '%' . strtoupper($this->search) . '%');
                     })
                     ->orderBy('rj_date1',  'desc')
                     ->paginate($this->limitPerPage),
