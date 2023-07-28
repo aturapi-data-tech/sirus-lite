@@ -160,7 +160,6 @@
                                                     role="button" href="#">
                                                     Pasien
                                                 </x-sort-link>
-                                                @endf
                                             </th>
 
                                             <th scope="col" class="px-4 py-3">
