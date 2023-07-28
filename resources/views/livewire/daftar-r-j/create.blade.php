@@ -1230,8 +1230,8 @@
                             <div>
                                 <x-input-label :value="__('Poli')" :required="__('true')" />
                                 <div class="flex items-center mb-2">
-                                    <x-text-input placeholder="Paspor [untuk WNA / WNI]" class="mt-1 ml-2"
-                                        :errorshas="__($errors->has('dataDaftarPoliRJ.poliId'))" :disabled=$disabledProperty
+                                    <x-text-input placeholder="Poli" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.poliId'))"
+                                        :disabled=$disabledProperty
                                         value="{{ $dataDaftarPoliRJ['poliId'] . ' ' . $dataDaftarPoliRJ['poliDesc'] }}" />
                                 </div>
                                 @error('dataDaftarPoliRJ.poliId')
