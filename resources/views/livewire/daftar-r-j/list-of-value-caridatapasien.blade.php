@@ -29,7 +29,9 @@
 
                             <div class="pl-0">
                                 <div class="font-semibold text-gray-700 ">
-                                    {{ $lov['reg_no'] . ' | ' . $lov['nik_bpjs'] }}</div>
+                                    {{ $lov['reg_no'] . ' | NIK :' . $lov['nik_bpjs'] }}</div>
+                                <div class="font-normal text-gray-700 ">
+                                    {{ 'BPJS : ' . $lov['nokartu_bpjs'] }}</div>
                                 <div class="font-semibold text-primary">
                                     {{ $lov['reg_name'] . ' / (' . $lov['sex'] . ')' . ' / ' . $lov['thn'] }}
                                 </div>

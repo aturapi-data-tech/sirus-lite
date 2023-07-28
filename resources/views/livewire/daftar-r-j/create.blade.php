@@ -1101,9 +1101,10 @@
                                         wire:model.debounce.500ms="dataDaftarPoliRJ.passStatus" />
                                 </div>
 
-                                <x-input-label for="pasporidentitas" :value="__('Cari Data Pasien dgn [ Nama / Reg No / NIK ]')" :required="__('true')" />
+                                <x-input-label for="dataPasienLovSearch" :value="__('Cari Data Pasien dgn [ Nama / Reg No / NIK / Noka BPJS]')" :required="__('true')" />
                                 <div class="flex items-center mb-2">
-                                    <x-text-input id="pasporidentitas" placeholder="Paspor [untuk WNA / WNI]"
+                                    <x-text-input id="dataPasienLovSearch"
+                                        placeholder="Cari Data Pasien dgn [ Nama / Reg No / NIK / Noka BPJS]"
                                         class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.regNo'))" :disabled=$disabledPropertyRj
                                         wire:model.lazy="dataPasienLovSearch" wire:loading.attr="disabled" />
 
