@@ -1556,6 +1556,9 @@ class DaftarRJ extends Component
                             ->orWhere(DB::raw('upper(poli_desc)'), 'like', '%' . strtoupper($this->search) . '%');
                     })
                     ->orderBy('rj_date1',  'desc')
+                    ->orderBy('dr_name',  'desc')
+                    ->orderBy('poli_desc',  'desc')
+                    ->orderBy('no_antrian',  'asc')
                     ->paginate($this->limitPerPage),
                 'myTitle' => 'Data Pasien Rawat Jalan',
                 'mySnipt' => 'Rekam Medis Pasien',
