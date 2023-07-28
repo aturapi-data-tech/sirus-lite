@@ -134,6 +134,33 @@
                             </x-dropdown>
                         </div>
 
+                        {{-- Dokter --}}
+                        <div class="mt-2 ml-0 bg-red-100">
+                            <x-dropdown align="right" width="48" class="">
+                                <x-slot name="trigger">
+                                    {{-- Button Dokter --}}
+                                    <x-alternative-button class="inline-flex">
+                                        <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
+                                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                            <path clip-rule="evenodd" fill-rule="evenodd"
+                                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                                        </svg>
+                                        <span>{{ 'Dokter ( ' . $drRjRef['drName'] . ' )' }}</span>
+                                    </x-alternative-button>
+                                </x-slot>
+                                {{-- Open shiftcontent --}}
+                                <x-slot name="content">
+
+                                    @foreach ($drRjRef['drOptions'] as $dr)
+                                        <x-dropdown-link
+                                            wire:click="setdrRjRef('{{ $dr['drId'] }}','{{ $dr['drName'] }}')">
+                                            {{ __($dr['drName']) }}
+                                        </x-dropdown-link>
+                                    @endforeach
+                                </x-slot>
+                            </x-dropdown>
+                        </div>
+
                     </div>
 
                     @if ($isOpen)
@@ -163,18 +190,23 @@
                                             </th>
 
                                             <th scope="col" class="px-4 py-3">
-                                                <x-sort-link :active=false wire:click.prevent="sortBy('name')"
-                                                    role="button" href="#">
+                                                <x-sort-link :active=false wire:click.prevent="" role="button"
+                                                    href="#">
                                                     SEP
                                                 </x-sort-link>
                                             </th>
                                             <th scope="col" class="px-4 py-3">
-                                                <x-sort-link :active=false wire:click.prevent="sortBy('name')"
-                                                    role="button" href="#">
+                                                <x-sort-link :active=false wire:click.prevent="" role="button"
+                                                    href="#">
                                                     Poli
                                                 </x-sort-link>
                                             </th>
-
+                                            <th scope="col" class="w-8 px-4 py-3">
+                                                <x-sort-link :active=false wire:click.prevent="" role="button"
+                                                    href="#">
+                                                    Status Layanan
+                                                </x-sort-link>
+                                            </th>
 
 
 
@@ -218,10 +250,31 @@
                                                         <div class="font-semibold text-primary">{{ $RJp->poli_desc }}
                                                         </div>
                                                         <div class="font-semibold text-gray-900">
-                                                            {{ $RJp->dr_name . ' / ' . $RJp->klaim_id }}
+                                                            {{ $RJp->dr_name . ' / ' }}
+                                                            {{ $RJp->klaim_id == 'UM'
+                                                                ? 'UMUM'
+                                                                : ($RJp->klaim_id == 'JM'
+                                                                    ? 'BPJS'
+                                                                    : ($RJp->klaim_id == 'KR'
+                                                                        ? 'Kronis'
+                                                                        : 'Asuransi Lain')) }}
                                                         </div>
                                                         <div class="font-normal text-gray-900">
                                                             {{ 'Nomer Pelayanan ' . $RJp->no_antrian }}
+                                                        </div>
+                                                    </div>
+                                                </td>
+
+                                                <td
+                                                    class="px-4 py-3 bg-yellow-100 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
+                                                    <div class="overflow-auto w-52">
+                                                        <div class="font-semibold text-primary">{{ $RJp->rj_status }}
+                                                        </div>
+                                                        <div class="font-semibold text-gray-900">
+                                                            {{ ' NoBooking ' . $RJp->nobooking }}
+                                                        </div>
+                                                        <div class="font-normal text-gray-900 ">
+                                                            {{ '' . $RJp->push_antrian_bpjs_status . $RJp->push_antrian_bpjs_json }}
                                                         </div>
                                                     </div>
                                                 </td>

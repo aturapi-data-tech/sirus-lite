@@ -277,6 +277,17 @@ class DaftarRJ extends Component
         ]
     ];
 
+    public $drRjRef = [
+        'drId' => 'All',
+        'drName' => 'All',
+        'drOptions' => [
+            [
+                'drId' => 'All',
+                'drName' => 'All'
+            ]
+        ]
+    ];
+
     // Pendaftaran RJ
     public $JenisKlaim = [
         'JenisKlaimId' => 'UM',
@@ -470,6 +481,37 @@ class DaftarRJ extends Component
     {
         $this->limitPerPage = $value;
         $this->resetValidation();
+    }
+
+    // setdrRjRef////////////////
+    public function setdrRjRef($id, $name): void
+    {
+        $this->drRjRef['drId'] = $id;
+        $this->drRjRef['drName'] = $name;
+    }
+
+    public function optionsdrRjRef()
+    {
+        $query = DB::table('rsview_rjkasir')
+            ->select(
+                'dr_id',
+                'dr_name',
+            )
+            ->where('shift', '=', $this->shiftRjRef['shiftId'])
+            ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $this->dateRjRef)
+            ->groupBy('dr_id')
+            ->groupBy('dr_name')
+            ->orderBy('dr_name', 'desc')
+            ->get();
+
+
+        $query->each(function ($item, $key) {
+            $this->drRjRef['drOptions'][$key + 1]['drId'] = $item->dr_id;
+            $this->drRjRef['drOptions'][$key + 1]['drName'] = $item->dr_name;
+        })->toArray();
+
+
+        // return ($query);
     }
 
 
@@ -973,6 +1015,54 @@ class DaftarRJ extends Component
     /////////////////////////////////////////////////////////////////
     ///////////cariDataPasienByKey/////////////////////////////////
     /////////////////////////////////////////////////////////////////
+    private function findData($rjno)
+    {
+
+        $findData = DB::table('rsview_rjkasir')
+            ->select('datadaftarpolirj_json')
+            ->where('rj_no', $rjno)
+            ->first();
+
+        if ($findData->datadaftarpolirj_json) {
+            $this->dataDaftarPoliRJ = json_decode($findData->datadaftarpolirj_json, true);
+            $this->setDataPasien($this->dataDaftarPoliRJ['regNo']);
+
+            $this->dataPasienLovSearch = $this->dataDaftarPoliRJ['regNo'];
+            $this->JenisKlaim['JenisKlaimId'] = $this->dataDaftarPoliRJ['klaimId'];
+            $this->JenisKunjungan['JenisKunjunganId'] = $this->dataDaftarPoliRJ['kunjunganId'];
+        } else {
+            $this->emit('toastr-error', "Data tidak dapat di proses.");
+        }
+        // dd($this->dataDaftarPoliRJ);
+        // $findData = DB::table('rsview_rjkasir')
+        //     ->select(
+        //         DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
+        //         DB::raw("to_char(rj_date,'yyyymmddhh24miss') AS rj_date1"),
+        //         'rj_no',
+        //         'reg_no',
+        //         'reg_name',
+        //         'sex',
+        //         'address',
+        //         'thn',
+        //         DB::raw("to_char(birth_date,'dd/mm/yyyy') AS birth_date"),
+        //         'poli_id',
+        //         'poli_desc',
+        //         'dr_id',
+        //         'dr_name',
+        //         'klaim_id',
+        //         'shift',
+        //         'vno_sep',
+        //         'no_antrian',
+        //         'rj_status',
+        //         'nobooking',
+        //         'push_antrian_bpjs_status',
+        //         'push_antrian_bpjs_json'
+        //     )
+        //     ->where('rj_no', '=', $id)
+        //     ->first();
+
+        // return $findData;
+    }
 
 
 
@@ -1180,6 +1270,13 @@ class DaftarRJ extends Component
         // $this->closeModal();
     }
 
+    // show edit record start////////////////
+    public function edit($id)
+    {
+        $this->openModalEdit();
+        $this->findData($id);
+    }
+    // show edit record end////////////////
 
     private function insertDataRJ(): void
     {
@@ -1513,59 +1610,78 @@ class DaftarRJ extends Component
     public function mount()
     {
 
-
+        // set date
         $this->dateRjRef = Carbon::now()->format('d/m/Y');
-
+        // set shift
         $findShift = DB::table('rstxn_shiftctls')->select('shift')
             ->whereRaw("'" . Carbon::now()->format('H:i:s') . "' between shift_start and shift_end")
             ->first();
         $this->shiftRjRef['shiftId'] = isset($findShift->shift) ? $findShift->shift : 3;
         $this->shiftRjRef['shiftDesc'] = isset($findShift->shift) ? $findShift->shift : 3;
+        // set data dokter
+        $this->optionsdrRjRef();
     }
 
 
     // select data start////////////////
     public function render()
     {
+
+        $this->optionsdrRjRef();
         // dd(Carbon::createFromTimestamp(1690181400)->toDateTimeString());
+        // Query ///////////////////////////////
+        //////////////////////////////////////////
+        $query = DB::table('rsview_rjkasir')
+            ->select(
+                DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
+                DB::raw("to_char(rj_date,'yyyymmddhh24miss') AS rj_date1"),
+                'rj_no',
+                'reg_no',
+                'reg_name',
+                'sex',
+                'address',
+                'thn',
+                DB::raw("to_char(birth_date,'dd/mm/yyyy') AS birth_date"),
+                'poli_id',
+                'poli_desc',
+                'dr_id',
+                'dr_name',
+                'klaim_id',
+                'shift',
+                'vno_sep',
+                'no_antrian',
+                'rj_status',
+                'nobooking',
+                'push_antrian_bpjs_status',
+                'push_antrian_bpjs_json'
+            )
+            ->where('rj_status', '=', $this->statusRjRef['statusId'])
+            ->where('shift', '=', $this->shiftRjRef['shiftId'])
+            ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $this->dateRjRef)
+            ->where(function ($q) {
+                $q->Where(DB::raw('upper(reg_name)'), 'like', '%' . strtoupper($this->search) . '%')
+                    ->orWhere(DB::raw('upper(reg_no)'), 'like', '%' . strtoupper($this->search) . '%')
+                    ->orWhere(DB::raw('upper(dr_name)'), 'like', '%' . strtoupper($this->search) . '%')
+                    ->orWhere(DB::raw('upper(poli_desc)'), 'like', '%' . strtoupper($this->search) . '%');
+            })
+            ->orderBy('rj_date1',  'desc')
+            ->orderBy('dr_name',  'desc')
+            ->orderBy('poli_desc',  'desc')
+            ->orderBy('no_antrian',  'asc');
+        // dokter if All then skiping Where clouse
+        // if ($this->drRjRef['drId'] != 'All') {
+        //     $query->where('dr_id', $this->drRjRef['drId']);
+        // }
+        // dd($query);
+        // Query ///////////////////////////////
+        //////////////////////////////////////////
+
+
 
         return view(
             'livewire.daftar-r-j.daftar-r-j',
             [
-                'RJpasiens' => DB::table('rsview_rjkasir')
-                    ->select(
-                        DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
-                        DB::raw("to_char(rj_date,'yyyymmddhh24miss') AS rj_date1"),
-                        'rj_no',
-                        'reg_no',
-                        'reg_name',
-                        'sex',
-                        'address',
-                        'thn',
-                        DB::raw("to_char(birth_date,'dd/mm/yyyy') AS birth_date"),
-                        'poli_id',
-                        'poli_desc',
-                        'dr_id',
-                        'dr_name',
-                        'klaim_id',
-                        'shift',
-                        'vno_sep',
-                        'no_antrian'
-                    )
-                    ->where('rj_status', '=', $this->statusRjRef['statusId'])
-                    ->where('shift', '=', $this->shiftRjRef['shiftId'])
-                    ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $this->dateRjRef)
-                    ->where(function ($q) {
-                        $q->Where(DB::raw('upper(reg_name)'), 'like', '%' . strtoupper($this->search) . '%')
-                            ->orWhere(DB::raw('upper(reg_no)'), 'like', '%' . strtoupper($this->search) . '%')
-                            ->orWhere(DB::raw('upper(dr_name)'), 'like', '%' . strtoupper($this->search) . '%')
-                            ->orWhere(DB::raw('upper(poli_desc)'), 'like', '%' . strtoupper($this->search) . '%');
-                    })
-                    ->orderBy('rj_date1',  'desc')
-                    ->orderBy('dr_name',  'desc')
-                    ->orderBy('poli_desc',  'desc')
-                    ->orderBy('no_antrian',  'asc')
-                    ->paginate($this->limitPerPage),
+                'RJpasiens' => $query->paginate($this->limitPerPage),
                 'myTitle' => 'Data Pasien Rawat Jalan',
                 'mySnipt' => 'Rekam Medis Pasien',
                 'myProgram' => 'Pasien Rawat Jalan',
