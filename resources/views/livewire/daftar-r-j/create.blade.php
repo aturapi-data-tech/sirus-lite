@@ -1106,7 +1106,8 @@
                                     <x-text-input id="dataPasienLovSearch"
                                         placeholder="Cari Data Pasien dgn [ Nama / Reg No / NIK / Noka BPJS]"
                                         class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.regNo'))" :disabled=$disabledPropertyRj
-                                        wire:model.lazy="dataPasienLovSearch" wire:loading.attr="disabled" />
+                                        wire:model.debounce.500ms="dataPasienLovSearch"
+                                        wire:loading.attr="disabled" />
 
                                 </div>
                                 @error('dataDaftarPoliRJ.regNo')
