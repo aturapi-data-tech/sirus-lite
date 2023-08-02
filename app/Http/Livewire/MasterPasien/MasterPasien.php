@@ -1792,67 +1792,6 @@ class MasterPasien extends Component
         if ($findData->meta_data_pasien_json == null) {
 
             $findData = $this->findDataByKey('reg_no', $value);
-
-            $this->dataPasien['pasien']['regDate'] = $findData->reg_date;
-            $this->dataPasien['pasien']['regNo'] = $findData->reg_no;
-            $this->dataPasien['pasien']['regName'] = $findData->reg_name;
-            $this->dataPasien['pasien']['identitas']['idbpjs'] = $findData->nokartu_bpjs;
-            $this->dataPasien['pasien']['identitas']['nik'] = $findData->nik_bpjs;
-            $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminId'] = ($findData->sex == 'L') ? 1 : 2;
-            $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] = ($findData->sex == 'L') ? 'Laki-laki' : 'Perempuan';
-            $this->dataPasien['pasien']['tglLahir'] = $findData->birth_date;
-            $this->dataPasien['pasien']['thn'] = $findData->thn;
-            $this->dataPasien['pasien']['bln'] = $findData->bln;
-            $this->dataPasien['pasien']['hari'] = $findData->hari;
-            $this->dataPasien['pasien']['tempatLahir'] = $findData->birth_place;
-            $this->dataPasien['pasien']['golonganDarah']['golonganDarahId'] = '13';
-            $this->dataPasien['pasien']['golonganDarah']['golonganDarahDesc'] = 'Tidak Tahu';
-            $this->dataPasien['pasien']['statusPerkawinan']['statusPerkawinanId'] = '1';
-            $this->dataPasien['pasien']['statusPerkawinan']['statusPerkawinanDesc'] = 'Belum Kawin';
-
-            $this->dataPasien['pasien']['agama']['agamaId'] = $findData->rel_id;
-            $this->dataPasien['pasien']['agama']['agamaDesc'] = $findData->rel_desc;
-
-            $this->dataPasien['pasien']['pendidikan']['pendidikanId'] = $findData->edu_id;
-            $this->dataPasien['pasien']['pendidikan']['pendidikanDesc'] = $findData->edu_desc;
-
-            $this->dataPasien['pasien']['pekerjaan']['pekerjaanId'] = $findData->job_id;
-            $this->dataPasien['pasien']['pekerjaan']['pekerjaanDesc'] = $findData->job_name;
-
-
-            $this->dataPasien['pasien']['hubungan']['namaPenanggungJawab'] = $findData->reg_no;
-            $this->dataPasien['pasien']['hubungan']['namaIbu'] = $findData->reg_no;
-
-            $this->dataPasien['pasien']['identitas']['nik'] = $findData->nik_bpjs;
-            $this->dataPasien['pasien']['identitas']['idBpjs'] = $findData->nokartu_bpjs;
-
-
-            $this->dataPasien['pasien']['identitas']['alamat'] = $findData->address;
-
-            $this->dataPasien['pasien']['identitas']['desaId'] = $findData->des_id;
-            $this->dataPasien['pasien']['identitas']['desaName'] = $findData->des_name;
-
-            $this->dataPasien['pasien']['identitas']['rt'] = $findData->rt;
-            $this->dataPasien['pasien']['identitas']['rw'] = $findData->rw;
-            $this->dataPasien['pasien']['identitas']['kecamatanId'] = $findData->kec_id;
-            $this->dataPasien['pasien']['identitas']['kecamatanName'] = $findData->kec_name;
-
-            $this->dataPasien['pasien']['identitas']['kotaId'] = $findData->kab_id;
-            $this->dataPasien['pasien']['identitas']['kotaName'] = $findData->kab_name;
-
-            $this->dataPasien['pasien']['identitas']['propinsiId'] = $findData->prop_id;
-            $this->dataPasien['pasien']['identitas']['propinsiName'] = $findData->prop_name;
-
-            $this->dataPasien['pasien']['kontak']['nomerTelponSelulerPasien'] = $findData->phone;
-
-            $this->dataPasien['pasien']['hubungan']['namaPenanggungJawab'] = $findData->kk;
-            $this->dataPasien['pasien']['hubungan']['namaIbu'] = $findData->nyonya;
-
-
-            // $this->dataPasien['pasien']['hubungan']['noPenanggungJawab'] = $findData->no_kk;
-
-
-            // dd($this->dataPasien);
         } else {
             // ubah data Pasien
             $this->dataPasien = json_decode($findData->meta_data_pasien_json, true);
