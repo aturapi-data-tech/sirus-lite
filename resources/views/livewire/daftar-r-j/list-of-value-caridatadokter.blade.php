@@ -1,4 +1,4 @@
-<div class="absolute">
+<div x-data @click.outside="$wire.dataDokterLovStatus = false" class="absolute">
     @if ($dataDokterLovStatus)
         <!-- Dropdown list Title -->
         <div x-data x-init="$refs.dataDokterLovSearch.focus()"

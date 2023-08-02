@@ -1,4 +1,4 @@
-<div class="absolute">
+<div x-data @click.outside="$wire.dataRujukanLovStatus = false" class="absolute">
     @if ($dataRujukanLovStatus)
         <!-- Dropdown list Title -->
         <div
