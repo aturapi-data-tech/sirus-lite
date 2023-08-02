@@ -1539,68 +1539,177 @@ class MasterPasien extends Component
         // 5. Entry Manual Pasien Baru
 
         // by reg_no
-
         $cariDataPasienRegNo = $this->findDataByKey('reg_no', $this->dataPasienBPJSSearch);
-
         if ($cariDataPasienRegNo) {
-            // do something
+            $this->emit('toastr-success', "Data " . $this->dataPasien['pasien']['regName'] . " berhasil ditampilkan.");
         } else {
 
             // by nik
             $cariDataPasienNik = $this->findDataByKey('nik_bpjs', $this->dataPasienBPJSSearch);
             if ($cariDataPasienNik) {
-                // do something
+                $this->emit('toastr-success', "Data " . $this->dataPasien['pasien']['regName'] . " berhasil ditampilkan.");
             } else {
                 // by nokaBPJS
                 $cariDataPasienNokaBpjs = $this->findDataByKey('nokartu_bpjs', $this->dataPasienBPJSSearch);
                 if ($cariDataPasienNokaBpjs) {
-                    // do something
+                    $this->emit('toastr-success', "Data " . $this->dataPasien['pasien']['regName'] . " berhasil ditampilkan.");
+                } else {
+                    // resert variable dataPasien otomatis (insert mode) cek data dari bpjs server
+                    $this->reset('dataPasien');
 
+                    $CaridataVclaim = VclaimTrait::peserta_nik($this->dataPasienBPJSSearch, Carbon::now()
+                        ->format('Y-m-d'))
+                        ->getOriginalContent();
+
+                    if ($CaridataVclaim['metadata']['code'] == 200) {
+                        $CaridataVclaim = $CaridataVclaim['response']['peserta'];
+
+                        // set dataPasien
+                        $this->dataPasien['pasien']['regDate'] = Carbon::now();
+                        $this->dataPasien['pasien']['regName'] = $CaridataVclaim['nama'];
+                        $this->dataPasien['pasien']['identitas']['idbpjs'] = $CaridataVclaim['noKartu'];
+                        $this->dataPasien['pasien']['identitas']['nik'] = $CaridataVclaim['nik'];
+                        $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminId'] = ($CaridataVclaim['sex'] == 'L') ? 1 : 2;
+                        $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] = ($CaridataVclaim['sex'] == 'L') ? 'Laki-laki' : 'Perempuan';
+
+                        $this->dataPasien['pasien']['tglLahir'] = Carbon::createFromFormat('Y-m-d', $CaridataVclaim['tglLahir'])->format('d/m/Y');
+
+                        $this->emit('toastr-success', $CaridataVclaim['nama'] . ' ' . $CaridataVclaim['nik']);
+                    } else {
+                        // dd($CaridataVclaim);
+                        $this->emit('toastr-error', $CaridataVclaim['metadata']['code'] . ' ' . $CaridataVclaim['metadata']['message']);
+                    }
                 }
             }
         }
+    }
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-        //cari dulu berdasarkan NIK ke DB Json
+    // ///////////////////////////////////////////////////////////////
+    // Find data by key and set data pasien
+    // ///////////////////////////////////////////////////////////////
+    // ///////////////////////////////////////////////////////////////
+    private function findDatabyKey($key, $search)
+    {
         $findData = DB::table('rsmst_pasiens')
-            ->select('meta_data_pasien_json')
-            ->where('nik_bpjs', $this->dataPasienBPJSSearch)
+            ->select(
+                DB::raw("to_char(reg_date,'dd/mm/yyyy hh24:mi:ss') as reg_date"),
+                DB::raw("to_char(reg_date,'yyyymmddhh24miss') as reg_date1"),
+                'reg_no',
+                'reg_name',
+                DB::raw("nvl(nokartu_bpjs,'-') as nokartu_bpjs"),
+                DB::raw("nvl(nik_bpjs,'-') as nik_bpjs"),
+                'sex',
+                DB::raw("to_char(birth_date,'dd/mm/yyyy') as birth_date"),
+                DB::raw("(select trunc( months_between( sysdate, birth_date ) /12 ) from dual) as thn"),
+                'bln',
+                'hari',
+                'birth_place',
+                'blood',
+                'marital_status',
+                'rsmst_religions.rel_id as rel_id',
+                'rel_desc',
+                'rsmst_educations.edu_id as edu_id',
+                'edu_desc',
+                'rsmst_jobs.job_id as job_id',
+                'job_name',
+                'kk',
+                'nyonya',
+                'no_kk',
+                'address',
+                'rsmst_desas.des_id as des_id',
+                'des_name',
+                'rt',
+                'rw',
+                'rsmst_kecamatans.kec_id as kec_id',
+                'kec_name',
+                'rsmst_kabupatens.kab_id as kab_id',
+                'kab_name',
+                'rsmst_propinsis.prop_id as prop_id',
+                'prop_name',
+                'phone'
+            )->join('rsmst_religions', 'rsmst_religions.rel_id', 'rsmst_pasiens.rel_id')
+            ->join('rsmst_educations', 'rsmst_educations.edu_id', 'rsmst_pasiens.edu_id')
+            ->join('rsmst_jobs', 'rsmst_jobs.job_id', 'rsmst_pasiens.job_id')
+            ->join('rsmst_desas', 'rsmst_desas.des_id', 'rsmst_pasiens.des_id')
+            ->join('rsmst_kecamatans', 'rsmst_kecamatans.kec_id', 'rsmst_pasiens.kec_id')
+            ->join('rsmst_kabupatens', 'rsmst_kabupatens.kab_id', 'rsmst_pasiens.kab_id')
+            ->join('rsmst_propinsis', 'rsmst_propinsis.prop_id', 'rsmst_pasiens.prop_id')
+            ->where($key, $search)
             ->first();
-        // cek metadataPasienJson
-        // jika json tidak ditemukan -> cari berdasarkan nik dgn set data berdasarkan DB per kolom
-        //jika nik tidak ditemukan cari di API BPJS
-        // 
+
+
+
+
 
 
         if ($findData) {
+            // resert variable dataPasien
+            $this->reset('dataPasien');
+            $this->isOpenMode = 'update';
 
-            // jika data JSON ditemukan resert data pasien dan set status = update
-            if ($findData->meta_data_pasien_json) {
-                // resert variable dataPasien
-                $this->reset('dataPasien');
-                $this->isOpenMode = 'update';
+            // cari meta data berdasarkan regno (primary key)
+            $findDataMetaDataPasienJson = DB::table('rsmst_pasiens')
+                ->select('meta_data_pasien_json')
+                ->where('reg_no', $findData->reg_no)
+                ->first();
+
+
+            // jika json tidak ditemukan -> cari berdasarkan regno (primary key) set data berdasarkan DB per kolom
+            if ($findDataMetaDataPasienJson->meta_data_pasien_json) {
 
                 $this->dataPasien = json_decode($findData->meta_data_pasien_json, true);
             } else {
 
-                // jika data JSON tidak ditemukan resert data pasien, findDataByKey dan set status = update
+                // cari meta data berdasarkan regno (primary key)
+                $findData = $findData = DB::table('rsmst_pasiens')
+                    ->select(
+                        DB::raw("to_char(reg_date,'dd/mm/yyyy hh24:mi:ss') as reg_date"),
+                        DB::raw("to_char(reg_date,'yyyymmddhh24miss') as reg_date1"),
+                        'reg_no',
+                        'reg_name',
+                        DB::raw("nvl(nokartu_bpjs,'-') as nokartu_bpjs"),
+                        DB::raw("nvl(nik_bpjs,'-') as nik_bpjs"),
+                        'sex',
+                        DB::raw("to_char(birth_date,'dd/mm/yyyy') as birth_date"),
+                        DB::raw("(select trunc( months_between( sysdate, birth_date ) /12 ) from dual) as thn"),
+                        'bln',
+                        'hari',
+                        'birth_place',
+                        'blood',
+                        'marital_status',
+                        'rsmst_religions.rel_id as rel_id',
+                        'rel_desc',
+                        'rsmst_educations.edu_id as edu_id',
+                        'edu_desc',
+                        'rsmst_jobs.job_id as job_id',
+                        'job_name',
+                        'kk',
+                        'nyonya',
+                        'no_kk',
+                        'address',
+                        'rsmst_desas.des_id as des_id',
+                        'des_name',
+                        'rt',
+                        'rw',
+                        'rsmst_kecamatans.kec_id as kec_id',
+                        'kec_name',
+                        'rsmst_kabupatens.kab_id as kab_id',
+                        'kab_name',
+                        'rsmst_propinsis.prop_id as prop_id',
+                        'prop_name',
+                        'phone'
+                    )->join('rsmst_religions', 'rsmst_religions.rel_id', 'rsmst_pasiens.rel_id')
+                    ->join('rsmst_educations', 'rsmst_educations.edu_id', 'rsmst_pasiens.edu_id')
+                    ->join('rsmst_jobs', 'rsmst_jobs.job_id', 'rsmst_pasiens.job_id')
+                    ->join('rsmst_desas', 'rsmst_desas.des_id', 'rsmst_pasiens.des_id')
+                    ->join('rsmst_kecamatans', 'rsmst_kecamatans.kec_id', 'rsmst_pasiens.kec_id')
+                    ->join('rsmst_kabupatens', 'rsmst_kabupatens.kab_id', 'rsmst_pasiens.kab_id')
+                    ->join('rsmst_propinsis', 'rsmst_propinsis.prop_id', 'rsmst_pasiens.prop_id')
+                    ->where('reg_no', $findData->reg_no)
+                    ->first();
 
-                $findData = $this->findDataByKey('nik_bpjs', $this->dataPasienBPJSSearch);
-
-                $this->reset('dataPasien');
-                $this->isOpenMode = 'update';
 
                 $this->dataPasien['pasien']['regDate'] = $findData->reg_date;
                 $this->dataPasien['pasien']['regNo'] = $findData->reg_no;
@@ -1661,93 +1770,11 @@ class MasterPasien extends Component
                 // $this->dataPasien['pasien']['hubungan']['noPenanggungJawab'] = $findData->no_kk;
 
             }
+
+            return true;
         } else {
-
-            // resert variable dataPasien otomatis (insert mode)
-            $this->reset('dataPasien');
-
-            $CaridataVclaim = VclaimTrait::peserta_nik($this->dataPasienBPJSSearch, Carbon::now()
-                ->format('Y-m-d'))
-                ->getOriginalContent();
-
-            if ($CaridataVclaim['metadata']['code'] == 200) {
-                $CaridataVclaim = $CaridataVclaim['response']['peserta'];
-
-                // set dataPasien
-                $this->dataPasien['pasien']['regDate'] = Carbon::now();
-                $this->dataPasien['pasien']['regName'] = $CaridataVclaim['nama'];
-                $this->dataPasien['pasien']['identitas']['idbpjs'] = $CaridataVclaim['noKartu'];
-                $this->dataPasien['pasien']['identitas']['nik'] = $CaridataVclaim['nik'];
-                $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminId'] = ($CaridataVclaim['sex'] == 'L') ? 1 : 2;
-                $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] = ($CaridataVclaim['sex'] == 'L') ? 'Laki-laki' : 'Perempuan';
-
-                $this->dataPasien['pasien']['tglLahir'] = Carbon::createFromFormat('Y-m-d', $CaridataVclaim['tglLahir'])->format('d/m/Y');
-
-                $this->emit('toastr-success', $CaridataVclaim['nama'] . ' ' . $CaridataVclaim['nik']);
-            } else {
-                // dd($CaridataVclaim);
-                $this->emit('toastr-error', $CaridataVclaim['metadata']['code'] . ' ' . $CaridataVclaim['metadata']['message']);
-            }
-            // ubah data Pasien
-            // $this->dataPasien = json_decode($findData->meta_data_pasien_json, true);
+            return false;
         }
-    }
-
-
-
-    // ///////////////////////////////////////////////////////////////
-    // Find data by key
-    // ///////////////////////////////////////////////////////////////
-    // ///////////////////////////////////////////////////////////////
-    private function findDatabyKey($key, $search)
-    {
-        $findData = DB::table('rsmst_pasiens')
-            ->select(
-                DB::raw("to_char(reg_date,'dd/mm/yyyy hh24:mi:ss') as reg_date"),
-                DB::raw("to_char(reg_date,'yyyymmddhh24miss') as reg_date1"),
-                'reg_no',
-                'reg_name',
-                DB::raw("nvl(nokartu_bpjs,'-') as nokartu_bpjs"),
-                DB::raw("nvl(nik_bpjs,'-') as nik_bpjs"),
-                'sex',
-                DB::raw("to_char(birth_date,'dd/mm/yyyy') as birth_date"),
-                DB::raw("(select trunc( months_between( sysdate, birth_date ) /12 ) from dual) as thn"),
-                'bln',
-                'hari',
-                'birth_place',
-                'blood',
-                'marital_status',
-                'rsmst_religions.rel_id as rel_id',
-                'rel_desc',
-                'rsmst_educations.edu_id as edu_id',
-                'edu_desc',
-                'rsmst_jobs.job_id as job_id',
-                'job_name',
-                'kk',
-                'nyonya',
-                'no_kk',
-                'address',
-                'rsmst_desas.des_id as des_id',
-                'des_name',
-                'rt',
-                'rw',
-                'rsmst_kecamatans.kec_id as kec_id',
-                'kec_name',
-                'rsmst_kabupatens.kab_id as kab_id',
-                'kab_name',
-                'rsmst_propinsis.prop_id as prop_id',
-                'prop_name',
-                'phone'
-            )->join('rsmst_religions', 'rsmst_religions.rel_id', 'rsmst_pasiens.rel_id')
-            ->join('rsmst_educations', 'rsmst_educations.edu_id', 'rsmst_pasiens.edu_id')
-            ->join('rsmst_jobs', 'rsmst_jobs.job_id', 'rsmst_pasiens.job_id')
-            ->join('rsmst_desas', 'rsmst_desas.des_id', 'rsmst_pasiens.des_id')
-            ->join('rsmst_kecamatans', 'rsmst_kecamatans.kec_id', 'rsmst_pasiens.kec_id')
-            ->join('rsmst_kabupatens', 'rsmst_kabupatens.kab_id', 'rsmst_pasiens.kab_id')
-            ->join('rsmst_propinsis', 'rsmst_propinsis.prop_id', 'rsmst_pasiens.prop_id')
-            ->where($key, $search)
-            ->first();
-        return $findData;
     }
 
 
