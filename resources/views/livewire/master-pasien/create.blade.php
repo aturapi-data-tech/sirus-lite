@@ -40,7 +40,7 @@
                 <div class="flex items-center w-full ">
                     <x-text-input placeholder="
                     Cari Data Pasien dgn [Reg No / NIK / Noka BPJS]"
-                        class="sm:w-1/2" :errorshas="__(false)" :disabled=$disabledProperty
+                        class="sm:w-2/3" :errorshas="__(false)" :disabled=$disabledProperty
                         wire:model.lazy="dataPasienBPJSSearch" />
 
                     <div wire:loading wire:target="dataPasienBPJSSearch">
