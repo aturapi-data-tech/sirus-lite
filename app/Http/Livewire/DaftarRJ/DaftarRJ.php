@@ -1720,10 +1720,10 @@ class DaftarRJ extends Component
                 ->orWhere(DB::raw('upper(dr_name)'), 'like', '%' . strtoupper($this->search) . '%')
                 ->orWhere(DB::raw('upper(poli_desc)'), 'like', '%' . strtoupper($this->search) . '%');
         })
-            ->orderBy('rj_date1',  'desc')
             ->orderBy('dr_name',  'desc')
             ->orderBy('poli_desc',  'desc')
-            ->orderBy('no_antrian',  'asc');
+            ->orderBy('no_antrian',  'asc')
+            ->orderBy('rj_date1',  'desc');
 
         ////////////////////////////////////////////////
         // end Query
