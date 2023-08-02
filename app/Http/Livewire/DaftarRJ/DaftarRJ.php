@@ -1722,7 +1722,7 @@ class DaftarRJ extends Component
         })
             ->orderBy('dr_name',  'desc')
             ->orderBy('poli_desc',  'desc')
-            ->orderBy('no_antrian',  'desc')
+            ->orderBy('no_antrian',  'asc')
             ->orderBy('rj_date1',  'desc');
 
         ////////////////////////////////////////////////
