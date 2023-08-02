@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\DaftarRJ;
+namespace App\Http\Livewire\PelayananRJ;
 
 use Illuminate\Support\Facades\DB;
 
@@ -17,7 +17,7 @@ use Illuminate\Support\Str;
 use Spatie\ArrayToXml\ArrayToXml;
 
 
-class DaftarRJ extends Component
+class PelayananRJ extends Component
 {
     use WithPagination;
 
@@ -1733,7 +1733,7 @@ class DaftarRJ extends Component
 
 
         return view(
-            'livewire.daftar-r-j.daftar-r-j',
+            'livewire.pelayanan-r-j.pelayanan-r-j',
             [
                 'RJpasiens' => $query->paginate($this->limitPerPage),
                 'myTitle' => 'Data Pasien Rawat Jalan',

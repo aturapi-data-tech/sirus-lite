@@ -35,11 +35,13 @@
                     </h3>
                 </div>
 
-                {{-- Cari NIK dan Close Modal --}}
+                {{-- Cari NIK dan Close Modal terakhir dari Server BPJS --}}
 
                 <div class="flex items-center w-full ">
-                    <x-text-input placeholder="cari data NIK dari Server BPJS" class="sm:w-1/2" :errorshas="__(false)"
-                        :disabled=$disabledProperty wire:model.lazy="dataPasienBPJSSearch" />
+                    <x-text-input placeholder="
+                    Cari Data Pasien dgn [Reg No / NIK / Noka BPJS]"
+                        class="sm:w-1/2" :errorshas="__(false)" :disabled=$disabledProperty
+                        wire:model.lazy="dataPasienBPJSSearch" />
 
                     <div wire:loading wire:target="dataPasienBPJSSearch">
                         <x-loading />
