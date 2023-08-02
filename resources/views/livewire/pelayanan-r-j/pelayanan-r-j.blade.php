@@ -302,13 +302,21 @@
                                                         </div>
 
 
-                                                        <x-yellow-button wire:click="masukPoli()" class="inline-flex">
+                                                        <x-yellow-button wire:click="masukPoli('{{ $RJp->rj_no }}')"
+                                                            wire:loading.remove>
                                                             Masuk Poli
                                                         </x-yellow-button>
+                                                        <div wire:loading wire:target="masukPoli">
+                                                            <x-loading />
+                                                        </div>
 
-                                                        <x-green-button wire:click="keluarPoli()" class="inline-flex">
+                                                        <x-green-button wire:click="keluarPoli('{{ $RJp->rj_no }}')"
+                                                            wire:loading.remove>
                                                             Keluar Poli
                                                         </x-green-button>
+                                                        <div wire:loading wire:target="keluarPoli">
+                                                            <x-loading />
+                                                        </div>
 
                                                     </div>
                                                     <!-- End Dropdown Action Open menu -->

@@ -1575,7 +1575,7 @@ class DaftarRJ extends Component
         $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId3'] = $this->dataDaftarPoliRJ['rjDate'];
         $noBooking = $this->dataDaftarPoliRJ['noBooking'];
 
-        $this->pushDataTaskId($noBooking, "3", $waktu);
+        $this->pushDataTaskId($noBooking, 3, $waktu);
     }
 
     private function pushDataTaskId($noBooking, $taskId, $time): void
@@ -1585,7 +1585,7 @@ class DaftarRJ extends Component
         // Update Task Id $kodebooking, $taskid, $waktu, $jenisresep
 
         $waktu = $time;
-        $HttpGetBpjs =  AntrianTrait::update_antrean($noBooking, 3, $waktu, "")->getOriginalContent();
+        $HttpGetBpjs =  AntrianTrait::update_antrean($noBooking, $taskId, $waktu, "")->getOriginalContent();
 
         // set http response to public
         $this->HttpGetBpjsStatus = $HttpGetBpjs['metadata']['code']; //status 200 201 400 ..
