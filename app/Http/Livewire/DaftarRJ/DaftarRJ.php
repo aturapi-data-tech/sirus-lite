@@ -1055,7 +1055,7 @@ class DaftarRJ extends Component
                     'shift',
                     'vno_sep',
                     'no_antrian',
-                    'rj_status',
+
                     'nobooking',
                     'push_antrian_bpjs_status',
                     'push_antrian_bpjs_json',
