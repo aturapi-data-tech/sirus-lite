@@ -1018,7 +1018,7 @@ class DaftarRJ extends Component
     /////////////////////////////////////////////////////////////////
     ///////////cariDataPasienByKey/////////////////////////////////
     /////////////////////////////////////////////////////////////////
-    private function findData($rjno)
+    private function findData($rjno): void
     {
 
         $findData = DB::table('rsview_rjkasir')
@@ -1096,7 +1096,7 @@ class DaftarRJ extends Component
                 "taskIdPelayanan" => [
                     "taskId1" => "",
                     "taskId2" => "",
-                    "taskId3" => "",
+                    "taskId3" => '' . $dataDaftarPoliRJ->rj_date . '',
                     "taskId4" => "",
                     "taskId5" => "",
                     "taskId6" => "",
@@ -1105,7 +1105,7 @@ class DaftarRJ extends Component
                 ],
             ];
         }
-        // dd($this->dataDaftarPoliRJ);
+        $this->setDataPasien($this->dataDaftarPoliRJ['regNo']);
         // 
 
         // return $findData;
