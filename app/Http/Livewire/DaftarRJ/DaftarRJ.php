@@ -597,83 +597,82 @@ class DaftarRJ extends Component
             // Proses Cari Data
 
 
-            // 1.Cari berdasarkan nik ->if null DB
-            // 2.Cari berdasarkan reg_no ->if null DB
-            // 2.Cari berdasarkan nokaBPJS ->if null DB
-            // 3.Cari berdasarkan reg_name ->if null DB
+            // 1.Cari berdasarkan reg_no  ->if null DB
+            // 2.Cari berdasarkan nik ->if null DB
+            // 3.Cari berdasarkan nokaBPJS ->if null DB
+            // 4.Cari berdasarkan reg_name ->if null DB
 
-            // 4. Goto Pasien Baru berdasarkan nik apiBPJS ->if null 
-            // 5. Entry Manual Pasien Baru
+            // 5. Goto Pasien Baru berdasarkan nik apiBPJS ->if null 
+            // 6. Entry Manual Pasien Baru
 
             // by reg_no
             $cariDataPasienRegNo = $this->cariDataPasienByKeyArr('reg_no', $search);
             if ($cariDataPasienRegNo) {
                 $this->dataPasienLov = $cariDataPasienRegNo;
             } else {
-
                 // by nik
                 $cariDataPasienNik = $this->cariDataPasienByKeyArr('nik_bpjs', $search);
                 if ($cariDataPasienNik) {
                     $this->dataPasienLov = $cariDataPasienNik;
-                }
-                // by nokaBPJS
-                $cariDataPasienNokaBpjs = $this->cariDataPasienByKeyArr('nokartu_bpjs', $search);
-                if ($cariDataPasienNokaBpjs) {
-                    $this->dataPasienLov = $cariDataPasienNokaBpjs;
-                }
-                // by name
-                else {
-                    $cariDataPasienName = json_decode(DB::table('rsmst_pasiens')
-                        ->select(
-                            DB::raw("to_char(reg_date,'dd/mm/yyyy hh24:mi:ss') as reg_date"),
-                            'reg_no',
-                            'reg_name',
-                            DB::raw("nvl(nokartu_bpjs,'-') as nokartu_bpjs"),
-                            DB::raw("nvl(nik_bpjs,'-') as nik_bpjs"),
-                            'sex',
-                            DB::raw("to_char(birth_date,'dd/mm/yyyy') as birth_date"),
-                            DB::raw("(select trunc( months_between( sysdate, birth_date ) /12 ) from dual) as thn"),
-                            'bln',
-                            'hari',
-                            'birth_place',
-                            'blood',
-                            'marital_status',
-                            'rel_id',
-                            'edu_id',
-                            'job_id',
-                            'kk',
-                            'nyonya',
-                            'no_kk',
-                            'address',
-                            'rsmst_desas.des_id  as des_id',
-                            'rsmst_kecamatans.kec_id  as kec_id',
-                            'rsmst_kabupatens.kab_id  as kab_id',
-                            'rsmst_propinsis.prop_id  as prop_id',
-                            'des_name  as des_name',
-                            'kec_name  as kec_name',
-                            'kab_name  as kab_name',
-                            'prop_name  as prop_name',
-                            'rt',
-                            'rw',
-                            'phone'
-                        )
-                        ->join('rsmst_desas', 'rsmst_desas.des_id', 'rsmst_pasiens.des_id')
-                        ->join('rsmst_kecamatans', 'rsmst_kecamatans.kec_id', 'rsmst_desas.kec_id')
-                        ->join('rsmst_kabupatens', 'rsmst_kabupatens.kab_id', 'rsmst_kecamatans.kab_id')
-                        ->join('rsmst_propinsis', 'rsmst_propinsis.prop_id', 'rsmst_kabupatens.prop_id')
-                        ->where(DB::raw('upper(reg_name)'), 'like', '%' . strtoupper($search) . '%')
-                        ->orWhere('reg_no', 'like', '%' . strtoupper($search) . '%')
-                        ->orWhere('address', 'like', '%' . strtoupper($search) . '%')
-                        ->orderBy('reg_name', 'desc')
-                        ->limit(50)
-                        ->get(), true);
-                    if ($cariDataPasienName) {
-                        $this->dataPasienLov = $cariDataPasienName;
+                } else {
+                    // by nokaBPJS
+                    $cariDataPasienNokaBpjs = $this->cariDataPasienByKeyArr('nokartu_bpjs', $search);
+                    if ($cariDataPasienNokaBpjs) {
+                        $this->dataPasienLov = $cariDataPasienNokaBpjs;
                     } else {
-                        // If Confirmation
-                        $this->dataPasienLov = [];
-                        $this->emit('cari_Data_Pasien_Tidak_Ditemukan_Confirmation', $search);
-                        // $this->callMasterPasien = true;
+                        // by name
+                        $cariDataPasienName = json_decode(DB::table('rsmst_pasiens')
+                            ->select(
+                                DB::raw("to_char(reg_date,'dd/mm/yyyy hh24:mi:ss') as reg_date"),
+                                'reg_no',
+                                'reg_name',
+                                DB::raw("nvl(nokartu_bpjs,'-') as nokartu_bpjs"),
+                                DB::raw("nvl(nik_bpjs,'-') as nik_bpjs"),
+                                'sex',
+                                DB::raw("to_char(birth_date,'dd/mm/yyyy') as birth_date"),
+                                DB::raw("(select trunc( months_between( sysdate, birth_date ) /12 ) from dual) as thn"),
+                                'bln',
+                                'hari',
+                                'birth_place',
+                                'blood',
+                                'marital_status',
+                                'rel_id',
+                                'edu_id',
+                                'job_id',
+                                'kk',
+                                'nyonya',
+                                'no_kk',
+                                'address',
+                                'rsmst_desas.des_id  as des_id',
+                                'rsmst_kecamatans.kec_id  as kec_id',
+                                'rsmst_kabupatens.kab_id  as kab_id',
+                                'rsmst_propinsis.prop_id  as prop_id',
+                                'des_name  as des_name',
+                                'kec_name  as kec_name',
+                                'kab_name  as kab_name',
+                                'prop_name  as prop_name',
+                                'rt',
+                                'rw',
+                                'phone'
+                            )
+                            ->join('rsmst_desas', 'rsmst_desas.des_id', 'rsmst_pasiens.des_id')
+                            ->join('rsmst_kecamatans', 'rsmst_kecamatans.kec_id', 'rsmst_desas.kec_id')
+                            ->join('rsmst_kabupatens', 'rsmst_kabupatens.kab_id', 'rsmst_kecamatans.kab_id')
+                            ->join('rsmst_propinsis', 'rsmst_propinsis.prop_id', 'rsmst_kabupatens.prop_id')
+                            ->where(DB::raw('upper(reg_name)'), 'like', '%' . strtoupper($search) . '%')
+                            ->orWhere('reg_no', 'like', '%' . strtoupper($search) . '%')
+                            ->orWhere('address', 'like', '%' . strtoupper($search) . '%')
+                            ->orderBy('reg_name', 'desc')
+                            ->limit(50)
+                            ->get(), true);
+                        if ($cariDataPasienName) {
+                            $this->dataPasienLov = $cariDataPasienName;
+                        } else {
+                            // If Confirmation
+                            $this->dataPasienLov = [];
+                            $this->emit('cari_Data_Pasien_Tidak_Ditemukan_Confirmation', $search);
+                            // $this->callMasterPasien = true;
+                        }
                     }
                 }
             }

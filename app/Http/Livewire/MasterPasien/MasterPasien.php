@@ -1531,6 +1531,48 @@ class MasterPasien extends Component
     public function updatedDatapasienbpjssearch()
     {
 
+        // 1.Cari berdasarkan nik ->if null DB
+        // 2.Cari berdasarkan reg_no ->if null DB
+        // 2.Cari berdasarkan nokaBPJS ->if null DB
+
+        // 4. Goto Pasien Baru berdasarkan nik apiBPJS ->if null 
+        // 5. Entry Manual Pasien Baru
+
+        // by reg_no
+
+        $cariDataPasienRegNo = $this->findDataByKey('reg_no', $this->dataPasienBPJSSearch);
+
+        if ($cariDataPasienRegNo) {
+            // do something
+        } else {
+
+            // by nik
+            $cariDataPasienNik = $this->findDataByKey('nik_bpjs', $this->dataPasienBPJSSearch);
+            if ($cariDataPasienNik) {
+                // do something
+            } else {
+                // by nokaBPJS
+                $cariDataPasienNokaBpjs = $this->findDataByKey('nokartu_bpjs', $this->dataPasienBPJSSearch);
+                if ($cariDataPasienNokaBpjs) {
+                    // do something
+
+                }
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         //cari dulu berdasarkan NIK ke DB Json
         $findData = DB::table('rsmst_pasiens')
             ->select('meta_data_pasien_json')
