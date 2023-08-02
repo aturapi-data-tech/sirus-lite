@@ -64,16 +64,19 @@
 
                         <ul id="dropdown-layouts" class="hidden py-2 space-y-2">
                             <li>
-                                <x-nav-link class="pl-11" :href="route('MasterPasien')" :active="request()->routeIs('MasterPasien')">
+                                <x-nav-link class="pl-4" :href="route('MasterPasien')" :active="request()->routeIs('MasterPasien')">
                                     {{ __('Pendaftaran Pasien Baru') }}
                                 </x-nav-link>
-                                <x-nav-link class="pl-11" :href="route('daftarRJ')" :active="request()->routeIs('daftarRJ')">
+                                <x-nav-link class="pl-4" :href="route('daftarRJ')" :active="request()->routeIs('daftarRJ')">
                                     {{ __('Pendaftaran Rawat Jalan') }}
                                 </x-nav-link>
-                                <x-nav-link class="pl-11" :href="route('ermRJ')" :active="request()->routeIs('ermRJ')">
+                                <x-nav-link class="pl-4" :href="route('pelayananRJ')" :active="request()->routeIs('pelayananRJ')">
+                                    {{ __('Pelayanan Rawat Jalan') }}
+                                </x-nav-link>
+                                <x-nav-link class="pl-4" :href="route('ermRJ')" :active="request()->routeIs('ermRJ')">
                                     {{ __('ERM') }}
                                 </x-nav-link>
-                                <x-nav-link class="pl-11" :href="route('SetupHfisBpjs')" :active="request()->routeIs('SetupHfisBpjs')">
+                                <x-nav-link class="pl-4" :href="route('SetupHfisBpjs')" :active="request()->routeIs('SetupHfisBpjs')">
                                     {{ __('SetupHfisBpjs') }}
                                 </x-nav-link>
                             </li>

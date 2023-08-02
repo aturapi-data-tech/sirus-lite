@@ -40,17 +40,6 @@
 
                         {{-- two button --}}
                         <div class="flex justify-between mt-2 md:mt-0">
-                            <x-primary-button wire:click="create()" class="flex justify-center flex-auto">
-                                <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path fill-rule="evenodd"
-                                        d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                                        clip-rule="evenodd"></path>
-                                </svg>
-                                Daftar {{ $myProgram }}
-                            </x-primary-button>
-
-
 
                             <x-dropdown align="right" width="48">
                                 <x-slot name="trigger">
@@ -164,7 +153,7 @@
                     </div>
 
                     @if ($isOpen)
-                        @include('livewire.daftar-r-j.create')
+                        @include('livewire.pelayanan-r-j.create')
                     @endif
 
 
@@ -182,26 +171,21 @@
                                     <thead
                                         class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                         <tr>
-                                            <th scope="col" class="w-1/3 px-4 py-3 ">
+                                            <th scope="col" class="px-4 py-3 ">
                                                 <x-sort-link :active=false wire:click.prevent="sortBy('RJp_id')"
                                                     role="button" href="#">
                                                     Pasien
                                                 </x-sort-link>
                                             </th>
 
-                                            <th scope="col" class="w-1/3 px-4 py-3">
-                                                <x-sort-link :active=false wire:click.prevent="" role="button"
-                                                    href="#">
-                                                    SEP
-                                                </x-sort-link>
-                                            </th>
-                                            <th scope="col" class="w-1/3 px-4 py-3">
+
+                                            <th scope="col" class="px-4 py-3 ">
                                                 <x-sort-link :active=false wire:click.prevent="" role="button"
                                                     href="#">
                                                     Poli
                                                 </x-sort-link>
                                             </th>
-                                            <th scope="col" class="w-8 w-1/3 px-4 py-3">
+                                            <th scope="col" class="px-4 py-3 ">
                                                 <x-sort-link :active=false wire:click.prevent="" role="button"
                                                     href="#">
                                                     Status Layanan
@@ -219,12 +203,16 @@
 
 
                                         @foreach ($RJpasiens as $RJp)
-                                            <tr class="border-b group dark:border-gray-700">
+                                            @php
+                                                $statusLayananBgcolor = $RJp->waktu_masuk_poli == null && $RJp->waktu_masuk_apt == null ? 'bg-yellow-100' : ($RJp->waktu_masuk_poli != null && $RJp->waktu_masuk_apt == null ? 'bg-red-100' : ($RJp->waktu_masuk_poli != null && $RJp->waktu_masuk_apt != null ? 'bg-green-100' : ''));
+                                            @endphp
+                                            <tr
+                                                class="border-b group dark:border-gray-700 {{ $statusLayananBgcolor }}">
 
                                                 <td
-                                                    class="flex px-4 py-3 font-medium group-hover:bg-gray-100 group-hover:text-primary whitespace-nowrap dark:text-white">
-                                                    <img class="w-10 h-10 rounded-full" src="profile-picture-1.jpg"
-                                                        alt="Jese image">
+                                                    class="flex items-center px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
+                                                    <span
+                                                        class="text-5xl font-semibold text-gray-700">{{ $RJp->no_antrian }}</span>
                                                     <div class="pl-3">
                                                         <div class="text-base font-semibold text-gray-700">
                                                             {{ $RJp->reg_no }}</div>
@@ -235,12 +223,6 @@
                                                             {{ $RJp->address }}
                                                         </div>
                                                     </div>
-                                                </td>
-
-
-                                                <td
-                                                    class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-primary whitespace-nowrap dark:text-white">
-                                                    {{ $RJp->vno_sep }}
                                                 </td>
 
 
@@ -268,13 +250,18 @@
                                                 <td
                                                     class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
                                                     <div class="overflow-auto w-52">
-                                                        <div class="font-semibold text-primary">{{ $RJp->rj_status }}
+                                                        <div class="font-semibold text-primary">
+                                                            {{ $RJp->waktu_masuk_poli == null && $RJp->waktu_masuk_apt == null
+                                                                ? 'Pendaftaran'
+                                                                : ($RJp->waktu_masuk_poli != null && $RJp->waktu_masuk_apt == null
+                                                                    ? 'Pelayanan ' . $RJp->poli_desc
+                                                                    : ($RJp->waktu_masuk_poli != null && $RJp->waktu_masuk_apt != null
+                                                                        ? 'Menunggu Resep'
+                                                                        : '--')) }}
                                                         </div>
-                                                        <div class="font-semibold text-gray-900">
+
+                                                        <div class="font-normal text-gray-900">
                                                             {{ '' . $RJp->nobooking }}
-                                                        </div>
-                                                        <div class="font-normal text-gray-900 ">
-                                                            {{ '' . $RJp->push_antrian_bpjs_status . $RJp->push_antrian_bpjs_json }}
                                                         </div>
                                                     </div>
                                                 </td>
@@ -284,7 +271,9 @@
 
 
                                                     <!-- Dropdown Action menu Flowbite-->
-                                                    <div>
+                                                    <div class="inline-flex">
+
+
                                                         <x-light-button id="dropdownButton{{ $RJp->rj_no }}"
                                                             class="inline-flex"
                                                             wire:click="$emit('pressDropdownButton','{{ $RJp->rj_no }}')">
@@ -304,24 +293,23 @@
                                                                 <li>
                                                                     <x-dropdown-link
                                                                         wire:click="tampil('{{ $RJp->rj_no }}')">
-                                                                        {{ __('Tampil | ' . $RJp->reg_name) }}
-                                                                    </x-dropdown-link>
-                                                                </li>
-                                                                <li>
-                                                                    <x-dropdown-link
-                                                                        wire:click="edit('{{ $RJp->rj_no }}')">
-                                                                        {{ __('Ubah') }}
-                                                                    </x-dropdown-link>
-                                                                </li>
-                                                                <li>
-                                                                    <x-dropdown-link
-                                                                        wire:click="$emit('confirm_remove_record', '{{ $RJp->rj_no }}', '{{ $RJp->reg_name }}')">
-                                                                        {{ __('Hapus') }}
+                                                                        {{ __('Screening | ' . $RJp->reg_name) }}
                                                                     </x-dropdown-link>
                                                                 </li>
 
+
                                                             </ul>
                                                         </div>
+
+
+                                                        <x-yellow-button wire:click="masukPoli()" class="inline-flex">
+                                                            Masuk Poli
+                                                        </x-yellow-button>
+
+                                                        <x-green-button wire:click="keluarPoli()" class="inline-flex">
+                                                            Keluar Poli
+                                                        </x-green-button>
+
                                                     </div>
                                                     <!-- End Dropdown Action Open menu -->
 
@@ -366,20 +354,6 @@
             </div>
         </div>
     </div>
-
-
-
-
-
-
-    {{-- call MasterPasien --}}
-    @if ($callMasterPasien)
-        @livewire('master-pasien.master-pasien', [
-            'isOpen' => true,
-            'isOpenMode' => 'insert',
-            'dataPasienBPJSSearch' => isset($dataPasien['pasien']['cariDataPasien']) ? $dataPasien['pasien']['cariDataPasien'] : '',
-        ])
-    @endif
 
 
 
