@@ -1,4 +1,4 @@
-<div class="absolute">
+<div x-data @click.outside="$wire.agamaLovStatus = false" class="absolute">
     @if ($agamaLovStatus)
         <!-- Dropdown list Title -->
         <div x-data x-init="$refs.agamaLovSearch.focus()"
