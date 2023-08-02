@@ -605,7 +605,7 @@ class DaftarRJ extends Component
             // 5. Goto Pasien Baru berdasarkan nik apiBPJS ->if null 
             // 6. Entry Manual Pasien Baru
 
-            // by reg_no
+            // by reg_noxxx
             $cariDataPasienRegNo = $this->cariDataPasienByKeyArr('reg_no', $search);
             if ($cariDataPasienRegNo) {
                 $this->dataPasienLov = $cariDataPasienRegNo;
