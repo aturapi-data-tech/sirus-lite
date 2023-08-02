@@ -416,7 +416,8 @@ class PelayananRJ extends Component
                 'push_antrian_bpjs_status',
                 'push_antrian_bpjs_json',
                 'waktu_masuk_poli',
-                'waktu_masuk_apt'
+                'waktu_masuk_apt',
+                'datadaftarpolirj_json'
             )
             ->where('rj_status', '=', $this->statusRjRef['statusId'])
             ->where('shift', '=', $this->shiftRjRef['shiftId'])
