@@ -1127,7 +1127,7 @@ class DaftarRJ extends Component
             ->whereRaw("'" . Carbon::now()->format('H:i:s') . "' between
             shift_start and shift_end")
             ->first();
-        $this->dataDaftarPoliRJ['shift'] = $findShift->shift ? $findShift->shift : 3;
+        $this->dataDaftarPoliRJ['shift'] = isset($findShift->shift) && $findShift->shift ? $findShift->shift : 3;
     }
 
     // Cari Data Pasien Rawat Jalan ////////////////
