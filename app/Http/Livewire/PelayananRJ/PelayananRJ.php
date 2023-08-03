@@ -98,7 +98,7 @@ class PelayananRJ extends Component
 
     // listener from blade////////////////
     protected $listeners = [
-        'confirm_remove_record_RJp' => 'delete',
+        'confirm_batal_poli_taskId' => 'batalPoli',
     ];
 
 
@@ -282,32 +282,74 @@ class PelayananRJ extends Component
 
     public function keluarPoli($rjNo)
     {
+        $sql = "select waktu_masuk_poli from rstxn_rjhdrs where rj_no=:rjNo";
+        $cek_waktu_masuk_poli = DB::scalar($sql, ['rjNo' => $rjNo]);
 
-        $sql = "select waktu_masuk_apt from rstxn_rjhdrs where rj_no=:rjNo";
-        $cek_waktu_masuk_apt = DB::scalar($sql, ['rjNo' => $rjNo]);
+        // Jika waktu masuk poli sudah terisi jalankan keluarPoli jika belum send err message
+        if ($cek_waktu_masuk_poli) {
 
-        $waktuMasukApotek = Carbon::now()->format('d/m/Y H:i:s');
+            $sql = "select waktu_masuk_apt from rstxn_rjhdrs where rj_no=:rjNo";
+            $cek_waktu_masuk_apt = DB::scalar($sql, ['rjNo' => $rjNo]);
 
-        // ketika cek_waktu_masuk_apt kosong lalu update
-        if (!$cek_waktu_masuk_apt) {
-            DB::table('rstxn_rjhdrs')
-                ->where('rj_no', $rjNo)
-                ->update([
-                    'waktu_masuk_apt' => DB::raw("to_date('" . $waktuMasukApotek . "','dd/mm/yyyy hh24:mi:ss')"), //waktu masuk = rjdate
-                ]);
+            $waktuMasukApotek = Carbon::now()->format('d/m/Y H:i:s');
+
+            // ketika cek_waktu_masuk_apt kosong lalu update
+            if (!$cek_waktu_masuk_apt) {
+                DB::table('rstxn_rjhdrs')
+                    ->where('rj_no', $rjNo)
+                    ->update([
+                        'waktu_masuk_apt' => DB::raw("to_date('" . $waktuMasukApotek . "','dd/mm/yyyy hh24:mi:ss')"), //waktu masuk = rjdate
+                    ]);
+            }
+
+            /////////////////////////
+            // Update TaskId 5
+            /////////////////////////
+
+            $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $waktuMasukApotek)->timestamp * 1000; //waktu dalam timestamp milisecond
+            // DB Json
+            $sql = "select datadaftarpolirj_json from rstxn_rjhdrs where rj_no=:rjNo";
+            $datadaftarpolirj_json = DB::scalar($sql, ['rjNo' => $rjNo]);
+            if ($datadaftarpolirj_json) {
+                $this->dataDaftarPoliRJ = json_decode($datadaftarpolirj_json, true);
+                $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5'] = $waktuMasukApotek;
+                DB::table('rstxn_rjhdrs')
+                    ->where('rj_no', $rjNo)
+                    ->update([
+                        'datadaftarpolirj_json' => json_encode($this->dataDaftarPoliRJ, true),
+                        'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
+                    ]);
+            }
+
+            // cari no Booking
+            $sql = "select nobooking from rstxn_rjhdrs where rj_no=:rjNo";
+            $noBooking =  DB::scalar($sql, ['rjNo' => $rjNo]);
+
+            $this->pushDataTaskId($noBooking, 5, $waktu);
+
+            $this->emit('toastr-success', "Keluar Poli $waktuMasukApotek");
+        } else {
+            $this->emit('toastr-error', "Satus Pasien Belum melalui pelayanan Poli");
         }
+    }
+
+
+    public function batalPoli($rjNo, $regName): void
+    {
+
+        $waktuBatalPoli = Carbon::now()->format('d/m/Y H:i:s');
 
         /////////////////////////
-        // Update TaskId 5
+        // Update TaskId 99
         /////////////////////////
 
-        $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $waktuMasukApotek)->timestamp * 1000; //waktu dalam timestamp milisecond
+        $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $waktuBatalPoli)->timestamp * 1000; //waktu dalam timestamp milisecond
         // DB Json
         $sql = "select datadaftarpolirj_json from rstxn_rjhdrs where rj_no=:rjNo";
         $datadaftarpolirj_json = DB::scalar($sql, ['rjNo' => $rjNo]);
         if ($datadaftarpolirj_json) {
             $this->dataDaftarPoliRJ = json_decode($datadaftarpolirj_json, true);
-            $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5'] = $waktuMasukApotek;
+            $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId99'] = $waktuBatalPoli;
             DB::table('rstxn_rjhdrs')
                 ->where('rj_no', $rjNo)
                 ->update([
@@ -320,9 +362,10 @@ class PelayananRJ extends Component
         $sql = "select nobooking from rstxn_rjhdrs where rj_no=:rjNo";
         $noBooking =  DB::scalar($sql, ['rjNo' => $rjNo]);
 
-        $this->pushDataTaskId($noBooking, 5, $waktu);
+        $this->pushDataTaskId($noBooking, 99, $waktu);
 
-        $this->emit('toastr-success', "Keluar Poli $waktuMasukApotek");
+
+        $this->emit('toastr-success', "Pembatalan " . $regName . "pelayanan Poli berhasil dilakukan.");
     }
 
     private function pushDataTaskId($noBooking, $taskId, $time): void

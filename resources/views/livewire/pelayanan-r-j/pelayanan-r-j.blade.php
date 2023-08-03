@@ -273,6 +273,9 @@
                                                             <div class="italic font-normal text-gray-900">
                                                                 {{ 'TaskId5 ' . json_decode($RJp->datadaftarpolirj_json)->taskIdPelayanan->taskId5 }}
                                                             </div>
+                                                            <div class="italic font-normal text-gray-900">
+                                                                {{ 'TaskId99 ' . json_decode($RJp->datadaftarpolirj_json)->taskIdPelayanan->taskId99 }}
+                                                            </div>
                                                         @endif
 
                                                     </div>
@@ -327,6 +330,15 @@
                                                             Keluar Poli
                                                         </x-green-button>
                                                         <div wire:loading wire:target="keluarPoli">
+                                                            <x-loading />
+                                                        </div>
+
+                                                        <x-red-button
+                                                            wire:click="$emit('confirm_batal_poli', '{{ $RJp->rj_no }}', '{{ $RJp->reg_name }}')"
+                                                            wire:loading.remove class="ml-12">
+                                                            Batal Poli
+                                                        </x-red-button>
+                                                        <div wire:loading wire:target="batalPoli">
                                                             <x-loading />
                                                         </div>
 
@@ -437,13 +449,17 @@
 
 
 
+
+
+
+
             // confirmation message remove record
-            window.livewire.on('confirm_remove_record', (key, name) => {
+            window.livewire.on('confirm_batal_poli', (key, name) => {
 
-                let cfn = confirm('Apakah anda ingin menghapus data ini ' + name + '?');
-
+                let cfn = confirm('Apakah anda ingin membatalkan data ini ' + name + '?');
                 if (cfn) {
-                    window.livewire.emit('confirm_remove_record_RJp', key, name);
+                    console.log(cfn)
+                    window.livewire.emit('confirm_batal_poli_taskId', key, name);
                 }
             });
 
