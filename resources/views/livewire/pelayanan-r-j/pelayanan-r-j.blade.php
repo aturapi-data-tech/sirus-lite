@@ -174,17 +174,12 @@
                                             <th scope="col" class="px-4 py-3 ">
                                                 <x-sort-link :active=false wire:click.prevent="sortBy('RJp_id')"
                                                     role="button" href="#">
-                                                    Pasien
+                                                    Pasien / Poli
                                                 </x-sort-link>
                                             </th>
 
 
-                                            <th scope="col" class="px-4 py-3 ">
-                                                <x-sort-link :active=false wire:click.prevent="" role="button"
-                                                    href="#">
-                                                    Poli
-                                                </x-sort-link>
-                                            </th>
+
                                             <th scope="col" class="px-4 py-3 ">
                                                 <x-sort-link :active=false wire:click.prevent="" role="button"
                                                     href="#">
@@ -222,14 +217,9 @@
                                                         <div class="font-normal text-gray-900">
                                                             {{ $RJp->address }}
                                                         </div>
-                                                    </div>
-                                                </td>
 
-
-                                                <td
-                                                    class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
-                                                    <div class="">
-                                                        <div class="font-semibold text-primary">{{ $RJp->poli_desc }}
+                                                        <div class="pt-2 font-semibold text-gray-700">
+                                                            {{ $RJp->poli_desc }}
                                                         </div>
                                                         <div class="font-semibold text-gray-900">
                                                             {{ $RJp->dr_name . ' / ' }}
