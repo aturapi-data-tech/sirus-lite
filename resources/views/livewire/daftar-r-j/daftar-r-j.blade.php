@@ -167,6 +167,10 @@
                         @include('livewire.daftar-r-j.create')
                     @endif
 
+                    @if ($formRujukanRefBPJSStatus)
+                        @include('livewire.daftar-r-j.form-rujukanRefBpjs')
+                    @endif
+
 
 
                 </div>

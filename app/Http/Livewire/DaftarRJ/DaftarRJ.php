@@ -383,6 +383,11 @@ class DaftarRJ extends Component
     public $dataRefBPJSLovSearch = '';
 
 
+    public $formRujukanRefBPJS = [];
+    public $formRujukanRefBPJSStatus = 0;
+    public $formRujukanRefBPJSSearch = '';
+
+
 
     // 
 
@@ -886,6 +891,9 @@ class DaftarRJ extends Component
 
         $this->dataRefBPJSLovStatus = false;
         $this->dataRefBPJSLovSearch = '';
+
+        // set formRujukanRefBPJSStatus true (open form)
+        $this->formRujukanRefBPJSStatus = true;
     }
     // LOV selected end
     /////////////////////////////////////////////////
@@ -1603,7 +1611,7 @@ class DaftarRJ extends Component
         if ($HttpGetBpjs['metadata']['code'] == 200) {
             $this->dataRefBPJSLovStatus = true;
             $this->dataRefBPJSLov = json_decode(json_encode($HttpGetBpjs['response']['rujukan'], true), true);
-            // dd($this->dataRefBPJSLov);
+
             $this->emit('toastr-success', $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
         } else {
             $this->dataRefBPJSLovStatus = false;
