@@ -1170,11 +1170,21 @@
                                         wire:loading.attr="disabled" />
                                 </div>
 
+                                {{-- LOV --}}
+                                <div class="mt-2">
+                                    @include('livewire.daftar-r-j.list-of-value-rujukanRefBpjs')
+                                </div>
+
                                 <div>
                                     <div class="flex justify-between">
                                         <x-green-button :disabled=$disabledPropertyRj
                                             wire:click.prevent="CarirujukanPeserta()" type="button"
-                                            wire:loading.remove>No Ref</x-green-button>
+                                            wire:loading.remove>No Ref
+                                        </x-green-button>
+
+                                        <div wire:loading wire:target="CarirujukanPeserta">
+                                            <x-loading />
+                                        </div>
 
                                         <x-primary-button>Buat SKDP</x-primary-button>
                                     </div>
@@ -1184,13 +1194,8 @@
                                     </p>
                                 </div>
 
-                                <div wire:loading wire:target="noReferensi">
-                                    <x-loading />
-                                </div>
-                                {{-- LOV --}}
-                                <div class="mt-2">
-                                    @include('livewire.daftar-r-j.list-of-value-rujukan')
-                                </div>
+
+
 
 
                             </div>

@@ -411,6 +411,48 @@ class PelayananRJ extends Component
     public function mount()
     {
 
+
+
+
+        // dd($result);
+        //get table oracle local
+        DB::connection('oracle')->table('RSMST_DESAS')->select('des_id', 'des_name', 'kec_id', 'st_desa')->get()
+            ->each(
+                function ($item) {
+
+                    // dd($item);
+                    //cek record oracle RS // if exist update else insert
+                    $cekrec = DB::connection('oraclers')
+                        ->table('RSMST_DESAS')->where('des_id', $item->des_id)
+                        ->first();
+
+                    if ($cekrec) {
+                        // update
+                        DB::connection('oraclers')->table('RSMST_DESAS')
+                            ->where('des_id', $item->des_id)
+                            ->update([
+                                'des_id' => $item->des_id,
+                                'des_name' => $item->des_name,
+                                'kec_id' => $item->kec_id,
+                                'st_desc' => $item->st_desa,
+                            ]);
+                    } else {
+                        // insert
+                        DB::connection('oraclers')->table('RSMST_DESAS')
+                            ->insert([
+                                'des_id' => $item->des_id,
+                                'des_name' => $item->des_name,
+                                'kec_id' => $item->kec_id,
+                                'st_desc' => $item->st_desa,
+
+
+
+                            ]);
+                    }
+                }
+            );
+
+        dd('x');
         // set date
         $this->dateRjRef = Carbon::now()->format('d/m/Y');
         // set shift

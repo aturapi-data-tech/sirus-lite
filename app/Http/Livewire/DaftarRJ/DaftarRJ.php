@@ -378,9 +378,9 @@ class DaftarRJ extends Component
     public $dataDokterLovStatus = 0;
     public $dataDokterLovSearch = '';
 
-    public $dataRujukanLov = [];
-    public $dataRujukanLovStatus = 0;
-    public $dataRujukanLovSearch = '';
+    public $dataRefBPJSLov = [];
+    public $dataRefBPJSLovStatus = 0;
+    public $dataRefBPJSLovSearch = '';
 
 
 
@@ -804,20 +804,20 @@ class DaftarRJ extends Component
 
 
     /////////////////////////////////////////////////
-    // Lov dataRujukan //////////////////////
+    // Lov dataRefBPJS //////////////////////
     ////////////////////////////////////////////////
-    public function clickdataRujukanlov()
+    public function clickdataRefBPJSlov()
     {
-        $this->dataRujukanLovStatus = true;
-        $this->dataRujukanLov = [];
+        $this->dataRefBPJSLovStatus = true;
+        $this->dataRefBPJSLov = [];
     }
-    public function updateddataRujukanlovsearch()
+    public function updateddataRefBPJSlovsearch()
     {
         // Variable Search
-        $search = $this->dataRujukanLovSearch;
+        $search = $this->dataRefBPJSLovSearch;
 
         // check LOV by id 
-        $dataRujukan = DB::table('rsmst_doctors')->select(
+        $dataRefBPJS = DB::table('rsmst_doctors')->select(
             'rsmst_doctors.dr_id as dr_id',
             'rsmst_doctors.dr_name as dr_name',
             'kd_dr_bpjs',
@@ -830,24 +830,24 @@ class DaftarRJ extends Component
             ->where('rsmst_doctors.dr_id', $search)
             ->first();
 
-        if ($dataRujukan) {
-            $this->dataDaftarPoliRJ['drId'] = $dataRujukan->dr_id;
-            $this->dataDaftarPoliRJ['drDesc'] = $dataRujukan->dr_name;
+        if ($dataRefBPJS) {
+            $this->dataDaftarPoliRJ['drId'] = $dataRefBPJS->dr_id;
+            $this->dataDaftarPoliRJ['drDesc'] = $dataRefBPJS->dr_name;
 
-            $this->dataDaftarPoliRJ['poliId'] = $dataRujukan->poli_id;
-            $this->dataDaftarPoliRJ['poliDesc'] = $dataRujukan->poli_desc;
+            $this->dataDaftarPoliRJ['poliId'] = $dataRefBPJS->poli_id;
+            $this->dataDaftarPoliRJ['poliDesc'] = $dataRefBPJS->poli_desc;
 
-            $this->dataDaftarPoliRJ['kddrbpjs'] = $dataRujukan->kd_dr_bpjs;
-            $this->dataDaftarPoliRJ['kdpolibpjs'] = $dataRujukan->kd_poli_bpjs;
+            $this->dataDaftarPoliRJ['kddrbpjs'] = $dataRefBPJS->kd_dr_bpjs;
+            $this->dataDaftarPoliRJ['kdpolibpjs'] = $dataRefBPJS->kd_poli_bpjs;
 
-            $this->dataRujukanLovStatus = false;
-            $this->dataRujukanLovSearch = '';
+            $this->dataRefBPJSLovStatus = false;
+            $this->dataRefBPJSLovSearch = '';
         } else {
             // if there is no id found and check (min 3 char on search)
             if (strlen($search) < 3) {
-                $this->dataRujukanLov = [];
+                $this->dataRefBPJSLov = [];
             } else {
-                $this->dataRujukanLov = json_decode(
+                $this->dataRefBPJSLov = json_decode(
                     DB::table('rsmst_doctors')->select(
                         'rsmst_doctors.dr_id as dr_id',
                         'rsmst_doctors.dr_name as dr_name',
@@ -869,7 +869,7 @@ class DaftarRJ extends Component
                     true
                 );
             }
-            $this->dataRujukanLovStatus = true;
+            $this->dataRefBPJSLovStatus = true;
             $this->dataDaftarPoliRJ['drId'] = '';
             $this->dataDaftarPoliRJ['drDesc'] = '';
             $this->dataDaftarPoliRJ['poliId'] = '';
@@ -880,35 +880,16 @@ class DaftarRJ extends Component
     }
     // /////////////////////
     // LOV selected start
-    public function setMydataRujukanLov($id, $name)
+    public function setMydataRefBPJSLov($id, $name)
     {
-        $dataRujukan = DB::table('rsmst_doctors')->select(
-            'rsmst_doctors.dr_id as dr_id',
-            'rsmst_doctors.dr_name as dr_name',
-            'kd_dr_bpjs',
+        $this->dataDaftarPoliRJ['noReferensi'] = $id;
 
-            'rsmst_polis.poli_id as poli_id',
-            'rsmst_polis.poli_desc as poli_desc',
-            'kd_poli_bpjs'
-        )
-            ->Join('rsmst_polis', 'rsmst_polis.poli_id', 'rsmst_doctors.poli_id')
-            ->where('rsmst_doctors.dr_id', $id)
-            ->first();
-        $this->dataDaftarPoliRJ['drId'] = $dataRujukan->dr_id;
-        $this->dataDaftarPoliRJ['drDesc'] = $dataRujukan->dr_name;
-
-        $this->dataDaftarPoliRJ['poliId'] = $dataRujukan->poli_id;
-        $this->dataDaftarPoliRJ['poliDesc'] = $dataRujukan->poli_desc;
-
-        $this->dataDaftarPoliRJ['kddrbpjs'] = $dataRujukan->kd_dr_bpjs;
-        $this->dataDaftarPoliRJ['kdpolibpjs'] = $dataRujukan->kd_poli_bpjs;
-
-        $this->dataRujukanLovStatus = false;
-        $this->dataRujukanLovSearch = '';
+        $this->dataRefBPJSLovStatus = false;
+        $this->dataRefBPJSLovSearch = '';
     }
     // LOV selected end
     /////////////////////////////////////////////////
-    // Lov dataRujukan //////////////////////
+    // Lov dataRefBPJS //////////////////////
     ////////////////////////////////////////////////
 
 
@@ -1613,20 +1594,20 @@ class DaftarRJ extends Component
 
 
 
-    private function rujukanPeserta($idBpjs): void
+    private function rujukanPesertaFKTP($idBpjs): void
     {
         // sini--------------------------------------------------------------------------------------------------------
         $HttpGetBpjs =  VclaimTrait::rujukan_peserta($idBpjs)->getOriginalContent();
 
         // metadata d kecil
         if ($HttpGetBpjs['metadata']['code'] == 200) {
-            $this->dataRujukanLovStatus = true;
-            $this->dataRujukanLov = json_decode(json_encode($HttpGetBpjs['response']['rujukan'], true), true);
-            dd($this->dataRujukanLov);
+            $this->dataRefBPJSLovStatus = true;
+            $this->dataRefBPJSLov = json_decode(json_encode($HttpGetBpjs['response']['rujukan'], true), true);
+            // dd($this->dataRefBPJSLov);
             $this->emit('toastr-success', $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
         } else {
-            $this->dataRujukanLovStatus = false;
-            $this->dataRujukanLov = [];
+            $this->dataRefBPJSLovStatus = false;
+            $this->dataRefBPJSLov = [];
             $this->emit('toastr-error', $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
         }
     }
@@ -1638,7 +1619,16 @@ class DaftarRJ extends Component
 
         // if jenis klaim BPJS dan Kunjungan = FKTP (1)
         if ($this->JenisKlaim['JenisKlaimId'] == 'JM' && $this->JenisKunjungan['JenisKunjunganId'] == 1) {
-            $this->rujukanPeserta($this->dataPasien['pasien']['identitas']['idbpjs']);
+            $this->rujukanPesertaFKTP($this->dataPasien['pasien']['identitas']['idbpjs']);
+        } else if ($this->JenisKlaim['JenisKlaimId'] == 'JM' && $this->JenisKunjungan['JenisKunjunganId'] == 2) {
+            // if jenis klaim BPJS dan Kunjungan = Kontrol (2)
+            $this->emit('toastr-error', 'Jenis Klaim Kontrol');
+        } else if ($this->JenisKlaim['JenisKlaimId'] == 'JM' && $this->JenisKunjungan['JenisKunjunganId'] == 3) {
+            // if jenis klaim BPJS dan Kunjungan = Inernal (3)
+            $this->emit('toastr-error', 'Jenis Klaim Inernal');
+        } else if ($this->JenisKlaim['JenisKlaimId'] == 'JM' && $this->JenisKunjungan['JenisKunjunganId'] == 4) {
+            // if jenis klaim BPJS dan Kunjungan = FKTL antar rs(4)
+            $this->emit('toastr-error', 'Jenis Klaim FKTL antar rs');
         }
     }
 

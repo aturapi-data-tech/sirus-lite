@@ -1,5 +1,5 @@
-<div x-data @click.outside="$wire.dataRujukanLovStatus = false" class="absolute">
-    @if ($dataRujukanLovStatus)
+<div x-data @click.outside="$wire.dataRefBPJSLovStatus = false" class="absolute">
+    @if ($dataRefBPJSLovStatus)
         <!-- Dropdown list Title -->
         <div
             class="flex items-center p-3 text-sm text-gray-700 bg-gray-100 border-t border-gray-200 rounded-t-lg dark:border-gray-600 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-500 hover:underline">
@@ -10,7 +10,7 @@
                     stroke-linecap="round" stroke-linejoin="round"></path>
             </svg>
 
-            <span>{{ count($dataRujukanLov) }}</span>
+            <span>{{ count($dataRefBPJSLov) }}</span>
 
         </div>
 
@@ -20,21 +20,25 @@
             <!-- Dropdown list -->
             <ul class="h-auto px-3 pt-3 pb-3 overflow-y-auto text-sm text-gray-700 dark:text-gray-200">
 
-                @foreach ($dataRujukanLov as $key => $lov)
+                @foreach ($dataRefBPJSLov as $key => $lov)
                     @php
                         $bgGanjilGenap = $key % 2 == 0 ? 'bg-gray-50' : 'bg-white';
                     @endphp
-                    <li wire:key='dataRujukanLov{{ $lov['reg_no'] }}' class="{{ $bgGanjilGenap }} ">
-                        <x-dropdown-link wire:click="setMydataRujukanLov('{{ $lov['reg_no'] }}')">
+                    <li wire:key='dataRefBPJSLov{{ $lov['noKunjungan'] }}' class="{{ $bgGanjilGenap }} ">
+                        <x-dropdown-link
+                            wire:click="setMydataRefBPJSLov('{{ $lov['noKunjungan'] }}','{{ $lov['peserta']['nama'] }}')">
 
                             <div class="pl-0">
+                                <div class="font-normal text-gray-700">
+                                    {{ $lov['tglKunjungan'] }}
+                                </div>
                                 <div class="font-semibold text-gray-700 ">
-                                    {{ $lov['reg_no'] . ' | ' . $lov['nik_bpjs'] }}</div>
+                                    {{ $lov['noKunjungan'] . ' | ' . $lov['pelayanan']['nama'] }}</div>
                                 <div class="font-semibold text-primary">
-                                    {{ $lov['reg_name'] . ' / (' . $lov['sex'] . ')' . ' / ' . $lov['thn'] }}
+                                    {{ $lov['poliRujukan']['nama'] . ' / (' . $lov['provPerujuk']['nama'] . ')' . ' / ' . $lov['diagnosa']['kode'] }}
                                 </div>
                                 <div class="font-normal text-gray-700">
-                                    {{ $lov['address'] }}
+                                    {{ $lov['peserta']['hakKelas']['keterangan'] }}
                                 </div>
                             </div>
 
@@ -42,13 +46,13 @@
                     </li>
                 @endforeach
 
-                @if (strlen($dataRujukanLovSearch) < 3 && count($dataRujukanLov) == 0)
+                @if (strlen($dataRefBPJSLovSearch) < 3 && count($dataRefBPJSLov) == 0)
                     <li>
                         <div class="w-full p-4 text-sm text-center text-gray-500 dark:text-gray-400">
                             {{ 'Masukkan minimal 3 karakter' }}
                         </div>
                     </li>
-                @elseif(strlen($dataRujukanLovSearch) >= 3 && count($dataRujukanLov) == 0)
+                @elseif(strlen($dataRefBPJSLovSearch) >= 3 && count($dataRefBPJSLov) == 0)
                     <li>
                         <div class="w-full p-4 text-sm text-center text-gray-500 dark:text-gray-400">
                             {{ 'Data Tidak ditemukan' }}
