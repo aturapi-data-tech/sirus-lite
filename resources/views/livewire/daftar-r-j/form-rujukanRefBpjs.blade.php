@@ -66,15 +66,7 @@
 
                 <div class="sticky bottom-0 flex justify-between px-4 py-3 bg-gray-50 sm:px-6">
 
-                    <div class="">
-                        <x-primary-button :disabled=$disabledPropertyRj wire:click.prevent="callFormPasien()"
-                            type="button" wire:loading.remove>
-                            Master Pasien
-                        </x-primary-button>
-                        <div wire:loading wire:target="callFormPasien">
-                            <x-loading />
-                        </div>
-                    </div>
+
                     <div>
                         @if ($isOpenMode !== 'tampil')
                             <div wire:loading wire:target="store">
