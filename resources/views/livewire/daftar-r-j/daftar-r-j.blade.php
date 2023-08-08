@@ -52,7 +52,7 @@
 
 
 
-                            <x-dropdown align="right" width="48">
+                            <x-dropdown align="right" :width="__('48')">
                                 <x-slot name="trigger">
                                     {{-- Button myLimitPerPage --}}
                                     <x-alternative-button class="inline-flex">
@@ -109,7 +109,7 @@
 
                         {{-- shift --}}
                         <div class="mt-2 ml-0">
-                            <x-dropdown align="right" width="48" class="">
+                            <x-dropdown align="right" :width="__('48')" class="">
                                 <x-slot name="trigger">
                                     {{-- Button shift --}}
                                     <x-alternative-button class="inline-flex">
@@ -135,8 +135,8 @@
                         </div>
 
                         {{-- Dokter --}}
-                        <div class="mt-2 ml-0 ">
-                            <x-dropdown align="right" width="48" :contentclasses="__('overflow-auto max-h-[150px] py-1 bg-white dark:bg-gray-700')">
+                        <div class="mt-2 ml-0">
+                            <x-dropdown align="right" :width="__('80')" :contentclasses="__('overflow-auto max-h-[150px] py-1 bg-white dark:bg-gray-700')">
                                 <x-slot name="trigger">
                                     {{-- Button Dokter --}}
                                     <x-alternative-button class="inline-flex">
