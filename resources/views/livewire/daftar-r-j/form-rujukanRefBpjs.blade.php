@@ -28,7 +28,7 @@
                 class="sticky top-0 flex items-center justify-between p-4 bg-opacity-75 border-b rounded-t bg-primary dark:border-gray-600">
 
                 <h3 class="w-full text-2xl font-semibold text-white dark:text-white">
-                    {{ 'Buat SEP' }}
+                    {{ 'Buat SEP ' . $myProgram }}
                 </h3>
 
 
@@ -51,22 +51,249 @@
 
 
             <form class="scroll-smooth hover:scroll-auto">
-                <div class="grid grid-cols-2">
+
+                <x-border-form :title="__('')" :align="__('start')" :bgcolor="__('bg-gray-50')" class="pb-4 mx-4">
+
+                    <div class="flex">
+                        <div class="flex items-center justify-end w-1/4 ">
+                            <x-input-label for="regName" :value="__('Spesialis / SubSpesialis')" :required="__($errors->has('SEPJsonReq.request.t_sep.poli.tujuan'))" />
+                        </div>
+
+                        <div class="flex items-center justify-end w-full ml-2 mr-5">
+                            {{ $SEPJsonReq['request']['t_sep']['poli']['eksekutif'] }}
+                            <x-check-box value='1' :label="__('Eksekutif')"
+                                wire:model.debounce.500ms="SEPJsonReq.request.t_sep.poli.eksekutifRef" />
+
+
+                            <x-text-input placeholder="Isi dgn data yang sesuai"
+                                class="ml-2 sm:rounded-none sm:rounded-l-lg" :errorshas="__($errors->has('SEPJsonReq.request.t_sep.poli.tujuan'))"
+                                :disabled=$disabledProperty
+                                value="{{ $SEPJsonReq['request']['t_sep']['poli']['tujuan'] . '   ' . $SEPJsonReq['request']['t_sep']['poli']['tujuanNama'] }}" />
+
+                            <x-green-button :disabled=false
+                                class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
+                                wire:click.prevent="clickJeniskelaminlov()">
+                                <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
+                                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                    <path clip-rule="evenodd" fill-rule="evenodd"
+                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                                </svg>
+                            </x-green-button>
+
+                            @error('SEPJsonReq.request.t_sep.poli.tujuan')
+                                <x-input-error :messages=$message />
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="flex">
+                        <div class="flex items-center justify-end w-1/4 ">
+                            <x-input-label for="regName" :value="__('DPJP yang melayani')" :required="__($errors->has('SEPJsonReq.request.t_sep.dpjpLayan'))" />
+                        </div>
+
+                        <div class="flex items-center justify-end w-full mr-5">
+                            <x-text-input placeholder="Isi dgn data yang sesuai"
+                                class="ml-2 sm:rounded-none sm:rounded-l-lg" :errorshas="__($errors->has('SEPJsonReq.request.t_sep.dpjpLayan'))"
+                                :disabled=$disabledProperty
+                                wire:model.debounce.500ms="SEPJsonReq.request.t_sep.dpjpLayan" />
+
+                            <x-green-button :disabled=false
+                                class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
+                                wire:click.prevent="clickJeniskelaminlov()">
+                                <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
+                                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                    <path clip-rule="evenodd" fill-rule="evenodd"
+                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                                </svg>
+                            </x-green-button>
+
+                            @error('SEPJsonReq.request.t_sep.dpjpLayan')
+                                <x-input-error :messages=$message />
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="flex">
+                        <div class="flex items-center justify-end w-1/4 ">
+                            <x-input-label for="regName" :value="__('Asal Rujukan')" :required="__($errors->has('SEPJsonReq.request.t_sep.rujukan.asalRujukan'))" />
+                        </div>
+
+                        <div class="flex items-center justify-end w-full mr-5">
+                            <x-text-input placeholder="Isi dgn data yang sesuai" class="mx-2 mt-1" :errorshas="__($errors->has('SEPJsonReq.request.t_sep.rujukan.asalRujukan'))"
+                                :disabled=$disabledProperty
+                                value="{{ $SEPJsonReq['request']['t_sep']['rujukan']['asalRujukan'] . '   ' . $SEPJsonReq['request']['t_sep']['rujukan']['asalRujukanNama'] }}" />
+                            @error('SEPJsonReq.request.t_sep.rujukan.asalRujukan')
+                                <x-input-error :messages=$message />
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="flex">
+                        <div class="flex items-center justify-end w-1/4 ">
+                            <x-input-label for="regName" :value="__('PPK Asal Rujukan')" :required="__($errors->has('SEPJsonReq.request.t_sep.rujukan.ppkRujukan'))" />
+                        </div>
+
+                        <div class="flex items-center justify-end w-full mr-5">
+                            <x-text-input placeholder="Isi dgn data yang sesuai" class="mx-2 mt-1" :errorshas="__($errors->has('SEPJsonReq.request.t_sep.rujukan.ppkRujukan'))"
+                                :disabled=$disabledProperty
+                                value="{{ $SEPJsonReq['request']['t_sep']['rujukan']['ppkRujukan'] . '   ' . $SEPJsonReq['request']['t_sep']['rujukan']['ppkRujukanNama'] }}" />
+                            @error('SEPJsonReq.request.t_sep.rujukan.ppkRujukan')
+                                <x-input-error :messages=$message />
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="flex">
+                        <div class="flex items-center justify-end w-1/4 ">
+                            <x-input-label for="regName" :value="__('Tanggal Rujukan')" :required="__($errors->has('SEPJsonReq.request.t_sep.rujukan.tglRujukan'))" />
+                        </div>
+
+                        <div class="flex items-center justify-end w-full mr-5">
+                            <x-text-input placeholder="Isi dgn data yang sesuai" class="mx-2 mt-1" :errorshas="__($errors->has('SEPJsonReq.request.t_sep.rujukan.tglRujukan'))"
+                                :disabled=$disabledProperty
+                                wire:model.debounce.500ms="SEPJsonReq.request.t_sep.rujukan.tglRujukan" />
+                            @error('SEPJsonReq.request.t_sep.rujukan.tglRujukan')
+                                <x-input-error :messages=$message />
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="flex">
+                        <div class="flex items-center justify-end w-1/4 ">
+                            <x-input-label for="regName" :value="__('Nomer Rujukan')" :required="__($errors->has('SEPJsonReq.request.t_sep.rujukan.noRujukan'))" />
+                        </div>
+
+                        <div class="flex items-center justify-end w-full mr-5">
+                            <x-text-input placeholder="Isi dgn data yang sesuai" class="mx-2 mt-1" :errorshas="__($errors->has('SEPJsonReq.request.t_sep.rujukan.noRujukan'))"
+                                :disabled=$disabledProperty
+                                wire:model.debounce.500ms="SEPJsonReq.request.t_sep.rujukan.noRujukan" />
+                            @error('SEPJsonReq.request.t_sep.rujukan.noRujukan')
+                                <x-input-error :messages=$message />
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="flex">
+                        <div class="flex items-center justify-end w-1/4 ">
+                            <x-input-label for="regName" :value="__('Tanggal SEP')" :required="__($errors->has('SEPJsonReq.request.t_sep.tglSep'))" />
+                        </div>
+
+                        <div class="flex items-center justify-end w-full mr-5">
+                            <x-text-input placeholder="Isi dgn data yang sesuai" class="mx-2 mt-1" :errorshas="__($errors->has('SEPJsonReq.request.t_sep.tglSep'))"
+                                :disabled=$disabledProperty
+                                wire:model.debounce.500ms="SEPJsonReq.request.t_sep.tglSep" />
+                            @error('SEPJsonReq.request.t_sep.tglSep')
+                                <x-input-error :messages=$message />
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="flex">
+                        <div class="flex items-center justify-end w-1/4 ">
+                            <x-input-label for="regName" :value="__('No MR')" :required="__($errors->has('SEPJsonReq.request.t_sep.noMR'))" />
+                        </div>
+
+                        <div class="flex items-center justify-start w-full mr-5">
+                            <x-text-input placeholder="Isi dgn data yang sesuai" class="mx-2 mt-1 md:w-1/4"
+                                :errorshas="__($errors->has('SEPJsonReq.request.t_sep.noMR'))" :disabled=false
+                                wire:model.debounce.500ms="SEPJsonReq.request.t_sep.noMR" />
+                            {{ $SEPJsonReq['request']['t_sep']['cob']['cob'] }}
+                            <x-check-box value='1' :label="__('Peserta COB')"
+                                wire:model.debounce.500ms="SEPJsonReq.request.t_sep.cob.cobRef" />
+                            @error('SEPJsonReq.request.t_sep.cob.cob')
+                                <x-input-error :messages=$message />
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="flex">
+                        <div class="flex items-center justify-end w-1/4 ">
+                            <x-input-label for="regName" :value="__('Diagnosa')" :required="__($errors->has('SEPJsonReq.request.t_sep.diagAwal'))" />
+                        </div>
+
+                        <div class="flex items-center justify-end w-full mr-5">
+                            <x-text-input placeholder="Isi dgn data yang sesuai"
+                                class="ml-2 sm:rounded-none sm:rounded-l-lg" :errorshas="__($errors->has('SEPJsonReq.request.t_sep.diagAwal'))"
+                                :disabled=$disabledProperty
+                                value="{{ $SEPJsonReq['request']['t_sep']['diagAwal'] . '   ' . $SEPJsonReq['request']['t_sep']['diagAwalNama'] }}" />
+
+                            <x-green-button :disabled=false
+                                class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
+                                wire:click.prevent="clickJeniskelaminlov()">
+                                <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
+                                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                    <path clip-rule="evenodd" fill-rule="evenodd"
+                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                                </svg>
+                            </x-green-button>
+                            @error('SEPJsonReq.request.t_sep.diagAwal')
+                                <x-input-error :messages=$message />
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="flex">
+                        <div class="flex items-center justify-end w-1/4 ">
+                            <x-input-label for="regName" :value="__('Nomer Telpon')" :required="__($errors->has('SEPJsonReq.request.t_sep.noTelp'))" />
+                        </div>
+
+                        <div class="flex items-center justify-end w-full mr-5">
+                            <x-text-input placeholder="Isi dgn data yang sesuai" class="mx-2 mt-1" :errorshas="__($errors->has('SEPJsonReq.request.t_sep.noTelp'))"
+                                :disabled=false wire:model.debounce.500ms="SEPJsonReq.request.t_sep.noTelp" />
+                            @error('SEPJsonReq.request.t_sep.noTelp')
+                                <x-input-error :messages=$message />
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="flex">
+                        <div class="flex items-center justify-end w-1/4 ">
+                            <x-input-label for="regName" :value="__('Catatan')" :required="__($errors->has('SEPJsonReq.request.t_sep.catatan'))" />
+                        </div>
+
+                        <div class="flex items-center justify-end w-full mr-5">
+                            <x-text-input placeholder="Isi dgn data yang sesuai" class="mx-2 mt-1" :errorshas="__($errors->has('SEPJsonReq.request.t_sep.catatan'))"
+                                :disabled=false wire:model.debounce.500ms="SEPJsonReq.request.t_sep.catatan" />
+                            @error('SEPJsonReq.request.t_sep.catatan')
+                                <x-input-error :messages=$message />
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="flex">
+                        <div class="flex items-center justify-end w-1/4 ">
+                            <x-input-label for="regName" :value="__('Status Kecelakaan')" :required="__($errors->has('SEPJsonReq.request.t_sep.jaminan.lakaLantas'))" />
+                        </div>
+
+                        <div class="flex items-center justify-end w-full mr-5">
+                            <x-text-input placeholder="Isi dgn data yang sesuai" class="mx-2 mt-1" :errorshas="__($errors->has('SEPJsonReq.request.t_sep.jaminan.lakaLantas'))"
+                                :disabled=$disabledProperty
+                                wire:model.debounce.500ms="SEPJsonReq.request.t_sep.jaminan.lakaLantas" />
+                            @error('SEPJsonReq.request.t_sep.jaminan.lakaLantas')
+                                <x-input-error :messages=$message />
+                            @enderror
+                        </div>
+                    </div>
 
 
 
 
-
-
-                    {{-- isi --}}
+                </x-border-form>
 
 
 
-                </div>
 
                 <div class="sticky bottom-0 flex justify-between px-4 py-3 bg-gray-50 sm:px-6">
 
-
+                    <div class="">
+                        {{-- <x-primary-button :disabled=$disabledPropertyRj wire:click.prevent="callFormPasien()"
+                            type="button" wire:loading.remove>
+                            Master Pasien
+                        </x-primary-button>
+                        <div wire:loading wire:target="callFormPasien">
+                            <x-loading />
+                        </div> --}}
+                    </div>
                     <div>
                         @if ($isOpenMode !== 'tampil')
                             <div wire:loading wire:target="store">

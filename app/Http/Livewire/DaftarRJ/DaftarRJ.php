@@ -358,7 +358,7 @@ class DaftarRJ extends Component
         "request" =>  [
             "t_sep" =>  [
                 "noKartu" => "",
-                "tglSep" => "", //Y-m-d
+                "tglSep" => "7", //Y-m-d
                 "ppkPelayanan" => "",
                 "jnsPelayanan" => "",
                 "klsRawat" =>  [
@@ -367,27 +367,32 @@ class DaftarRJ extends Component
                     "pembiayaan" => "",
                     "penanggungJawab" => "",
                 ],
-                "noMR" => "",
+                "noMR" => "8",
                 "rujukan" =>  [
-                    "asalRujukan" => "",
-                    "tglRujukan" => "", //Y-m-d
-                    "noRujukan" => "",
-                    "ppkRujukan" => "",
+                    "asalRujukan" => "3",
+                    "tglRujukan" => "5", //Y-m-d
+                    "noRujukan" => "6",
+                    "ppkRujukan" => "4",
                 ],
-                "catatan" => "",
-                "diagAwal" => "",
+                "catatan" => "9",
+                "diagAwal" => "x",
                 "poli" =>  [
-                    "tujuan" => "",
-                    "eksekutif" => "",
+                    "tujuan" => "1",
+                    "tujuanNama" => "",
+                    "eksekutif" => "0",
+                    "eksekutifRef" => [],
                 ],
                 "cob" =>  [
                     "cob" => "0",
+                    "cobRef" => [],
                 ],
                 "katarak" =>  [
                     "katarak" => "0",
+                    "katarakRef" => [],
                 ],
                 "jaminan" =>  [
                     "lakaLantas" => "0",
+                    "lakaLantasRef" => [],
                     "noLP" => "",
                     "penjamin" =>  [
                         "tglKejadian" => "",
@@ -411,8 +416,8 @@ class DaftarRJ extends Component
                     "noSurat" => "",
                     "kodeDPJP" => "",
                 ],
-                "dpjpLayan" => "",
-                "noTelp" => "",
+                "dpjpLayan" => "2",
+                "noTelp" => "123123123",
                 "user" => "sirus App",
             ],
         ],
@@ -991,11 +996,100 @@ class DaftarRJ extends Component
     {
         $this->dataDaftarPoliRJ['noReferensi'] = $id;
 
+
+
+        // dd($dataRefBPJSLov);
+        // set SEPJsonReq
+        $this->setSEPJsonReq($id);
+
+        // dd($this->SEPJsonReq);
         $this->dataRefBPJSLovStatus = false;
         $this->dataRefBPJSLovSearch = '';
 
         // set formRujukanRefBPJSStatus true (open form)
         $this->formRujukanRefBPJSStatus = true;
+    }
+
+    private function setSEPJsonReq($id): void
+    {
+        // cari data Lov dgn no Kunjungan 
+        $dataRefBPJSLov = collect($this->dataRefBPJSLov)->where('noKunjungan', $id)->first();
+
+        $this->SEPJsonReq = [
+            "request" =>  [
+                "t_sep" =>  [
+                    "noKartu" => "" . $dataRefBPJSLov['peserta']['noKartu'] . "",
+                    "tglSep" => "" . Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'])->format('Y-m-d') . "", //Y-m-d =tgl rj
+                    "ppkPelayanan" => "0184R006", //ppk rs
+                    "jnsPelayanan" => "" . $dataRefBPJSLov['pelayanan']['kode'] . "", // {jenis pelayanan = 1. r.inap 2. r.jalan}
+                    "klsRawat" =>  [
+                        "klsRawatHak" => "" . $dataRefBPJSLov['peserta']['hakKelas']['kode'] . "",
+                        "klsRawatHakNama" => "" . $dataRefBPJSLov['peserta']['hakKelas']['keterangan'] . "",
+                        "klsRawatNaik" => "", //{diisi jika naik kelas rawat, 1. VVIP, 2. VIP, 3. Kelas 1, 4. Kelas 2, 5. Kelas 3, 6. ICCU, 7. ICU, 8. Diatas Kelas 1}
+                        "pembiayaan" => "", //{1. Pribadi, 2. Pemberi Kerja, 3. Asuransi Kesehatan Tambahan. diisi jika naik kelas rawat}
+                        "penanggungJawab" => "", //{Contoh: jika pembiayaan 1 maka penanggungJawab=Pribadi. diisi jika naik kelas rawat}
+                    ],
+                    "noMR" => "" . $dataRefBPJSLov['peserta']['mr']['noMR'] . "",
+                    "rujukan" =>  [
+                        "asalRujukan" => "" . $this->JenisKunjungan['JenisKunjunganId'] == "1" ? "1" : ($this->JenisKunjungan['JenisKunjunganId'] == "4" ? "2" : "0") . "", //{asal rujukan ->1.Faskes 1, 2. Faskes 2(RS)}
+                        "asalRujukanNama" => "" . $this->JenisKunjungan['JenisKunjunganId'] == "1" ? "Faskes Tingkat 1" : ($this->JenisKunjungan['JenisKunjunganId'] == "4" ? "Faskes Tingkat 2 RS" : "0") . "", //{asal rujukan ->1.Faskes 1, 2. Faskes 2(RS)}
+                        "tglRujukan" => "" . $dataRefBPJSLov['tglKunjungan'] . "", //Y-m-d
+                        "noRujukan" => "" . $dataRefBPJSLov['noKunjungan'] . "",
+                        "ppkRujukan" => "" . $dataRefBPJSLov['provPerujuk']['kode'] . "", //{kode faskes rujukam -> baca di referensi faskes}
+                        "ppkRujukanNama" => "" . $dataRefBPJSLov['provPerujuk']['nama'] . "", //{kode faskes rujukam -> baca di referensi faskes}
+                    ],
+                    "catatan" => "-",
+                    "diagAwal" => "" . $dataRefBPJSLov['diagnosa']['kode'] . "",
+                    "diagAwalNama" => "" . $dataRefBPJSLov['diagnosa']['nama'] . "",
+                    "poli" =>  [
+                        "tujuan" => "" . $dataRefBPJSLov['poliRujukan']['kode'] . "",
+                        "tujuanNama" => "" . $dataRefBPJSLov['poliRujukan']['nama'] . "",
+                        "eksekutif" => "" . (collect($this->SEPJsonReq['request']['t_sep']['poli']['eksekutifRef'])->count() > 0) ? "1" : "0" . "", //{poli eksekutif -> 0. Tidak 1.Ya}
+                        "eksekutifRef" =>  $this->SEPJsonReq['request']['t_sep']['poli']['eksekutifRef'], //{poli eksekutif -> 0. Tidak 1.Ya}
+                    ],
+                    "cob" =>  [
+                        "cob" => "" . (collect($this->SEPJsonReq['request']['t_sep']['cob']['cobRef'])->count() > 0) ? "1" : "0" . "", //{cob -> 0.Tidak 1. Ya}
+                        "cobRef" => $this->SEPJsonReq['request']['t_sep']['cob']['cobRef'], //{cob -> 0.Tidak 1. Ya}
+
+                    ],
+                    "katarak" =>  [
+                        "katarak" => "" . (collect($this->SEPJsonReq['request']['t_sep']['katarak']['katarakRef'])->count() > 0) ? "1" : "0" . "", //{katarak --> 0.Tidak 1.Ya}
+                        "katarakRef" =>  $this->SEPJsonReq['request']['t_sep']['katarak']['katarakRef'], //{katarak --> 0.Tidak 1.Ya}
+
+                    ],
+
+                    // fitur jaminan laka blm dikerjakan
+                    "jaminan" =>  [
+                        "lakaLantas" => "0", //" 0 : Bukan Kecelakaan lalu lintas [BKLL], 1 : KLL dan bukan kecelakaan Kerja [BKK], 2 : KLL dan KK, 3 : KK",
+                        "noLP" => "",
+                        "penjamin" =>  [
+                            "tglKejadian" => "",
+                            "keterangan" => "",
+                            "suplesi" =>  [
+                                "suplesi" => "0",
+                                "noSepSuplesi" => "",
+                                "lokasiLaka" =>  [
+                                    "kdPropinsi" => "",
+                                    "kdKabupaten" => "",
+                                    "kdKecamatan" => "",
+                                ]
+                            ]
+                        ]
+                    ],
+                    "tujuanKunj" => "0", //{"0": Normal,"1": Prosedur,"2": Konsul Dokter}
+                    "flagProcedure" => "",
+                    "kdPenunjang" => "",
+                    "assesmentPel" => "",
+                    "skdp" =>  [
+                        "noSurat" => "",
+                        "kodeDPJP" => "",
+                    ],
+                    "dpjpLayan" => "" . $dataRefBPJSLov['pelayanan']['kode'] == 1 ? "" : $dataRefBPJSLov['provPerujuk']['kode'] . "", //(tidak diisi jika jnsPelayanan = "1" (RANAP),
+                    "noTelp" => "" . $dataRefBPJSLov['peserta']['mr']['noTelepon'] . "",
+                    "user" => "sirus App",
+                ],
+            ],
+        ];
     }
     // LOV selected end
     /////////////////////////////////////////////////
