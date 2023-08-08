@@ -135,8 +135,8 @@
                         </div>
 
                         {{-- Dokter --}}
-                        <div class="mt-2 ml-0">
-                            <x-dropdown align="right" width="48" class="">
+                        <div class="mt-2 ml-0 ">
+                            <x-dropdown align="right" width="48" :contentclasses="__('overflow-auto max-h-[150px] py-1 bg-white dark:bg-gray-700')">
                                 <x-slot name="trigger">
                                     {{-- Button Dokter --}}
                                     <x-alternative-button class="inline-flex">
@@ -205,7 +205,7 @@
                                                     Poli
                                                 </x-sort-link>
                                             </th>
-                                            <th scope="col" class="w-8 w-1/3 px-4 py-3">
+                                            <th scope="col" class="w-1/3 px-4 py-3 ">
                                                 <x-sort-link :active=false wire:click.prevent="" role="button"
                                                     href="#">
                                                     Status Layanan

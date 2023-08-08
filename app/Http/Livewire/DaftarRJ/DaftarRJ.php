@@ -498,14 +498,15 @@ class DaftarRJ extends Component
 
         // resert validation
         $this->resetValidation();
-        // resert input
+        // resert input kecuali
         $this->resetExcept([
             'limitPerPage',
             'search',
             'dateRjRef',
             'shiftRjRef',
             'statusRjRef',
-            // 'drRjRef',
+            'drRjRef'
+
 
         ]);
     }
@@ -555,6 +556,7 @@ class DaftarRJ extends Component
 
     private function optionsdrRjRef(): void
     {
+
         // Query
         $query = DB::table('rsview_rjkasir')
             ->select(
@@ -614,6 +616,7 @@ class DaftarRJ extends Component
 
         $this->resetPage();
         $this->resetValidation();
+        $this->resetInputFields();
     }
     // date
     public function updatedDaterjref(): void
@@ -622,6 +625,7 @@ class DaftarRJ extends Component
 
         $this->resetPage();
         $this->resetValidation();
+        $this->resetInputFields();
     }
     // status
     public function updatedStatusrjref(): void
@@ -630,6 +634,7 @@ class DaftarRJ extends Component
 
         $this->resetPage();
         $this->resetValidation();
+        $this->resetInputFields();
     }
     // dr
     public function setdrRjRef($id, $name): void
@@ -640,6 +645,7 @@ class DaftarRJ extends Component
         $this->drRjRef['drName'] = $name;
         $this->resetPage();
         $this->resetValidation();
+        $this->resetInputFields();
     }
     // shift
     public function setShift($id, $desc): void
@@ -650,6 +656,7 @@ class DaftarRJ extends Component
         $this->shiftRjRef['shiftDesc'] = $desc;
         $this->resetPage();
         $this->resetValidation();
+        $this->resetInputFields();
     }
     /////////////////////////////////////////////////////////////////////
 

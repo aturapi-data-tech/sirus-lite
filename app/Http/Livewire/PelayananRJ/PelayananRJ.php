@@ -124,7 +124,7 @@ class PelayananRJ extends Component
             'dateRjRef',
             'shiftRjRef',
             'statusRjRef',
-            // 'drRjRef,'
+            'drRjRef'
 
         ]);
     }
@@ -196,6 +196,7 @@ class PelayananRJ extends Component
 
         $this->resetPage();
         $this->resetValidation();
+        $this->resetInputFields();
     }
     // date
     public function updatedDaterjref(): void
@@ -204,6 +205,7 @@ class PelayananRJ extends Component
 
         $this->resetPage();
         $this->resetValidation();
+        $this->resetInputFields();
     }
     // status
     public function updatedStatusrjref(): void
@@ -212,6 +214,7 @@ class PelayananRJ extends Component
 
         $this->resetPage();
         $this->resetValidation();
+        $this->resetInputFields();
     }
     // dr
     public function setdrRjRef($id, $name): void
@@ -222,6 +225,7 @@ class PelayananRJ extends Component
         $this->drRjRef['drName'] = $name;
         $this->resetPage();
         $this->resetValidation();
+        $this->resetInputFields();
     }
     // shift
     public function setShift($id, $desc): void
@@ -232,6 +236,7 @@ class PelayananRJ extends Component
         $this->shiftRjRef['shiftDesc'] = $desc;
         $this->resetPage();
         $this->resetValidation();
+        $this->resetInputFields();
     }
     /////////////////////////////////////////////////////////////////////
 
