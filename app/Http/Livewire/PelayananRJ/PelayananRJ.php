@@ -155,12 +155,6 @@ class PelayananRJ extends Component
         $this->resetValidation();
     }
 
-    // setdrRjRef////////////////
-    public function setdrRjRef($id, $name): void
-    {
-        $this->drRjRef['drId'] = $id;
-        $this->drRjRef['drName'] = $name;
-    }
 
     private function optionsdrRjRef(): void
     {
@@ -185,22 +179,61 @@ class PelayananRJ extends Component
     }
 
 
-    // setShift//////////////// Tabular
-    public function setShift($id, $desc): void
-    {
-        $this->shiftRjRef['shiftId'] = $id;
-        $this->shiftRjRef['shiftDesc'] = $desc;
-        $this->resetValidation();
-    }
 
 
 
+
+    /////////////////////////////////////////////////////////////////////
     // resert page pagination when coloumn search change ////////////////
+    // tabular Ref topbar
+    /////////////////////////////////////////////////////////////////////
+
+    // search
     public function updatedSearch(): void
     {
+        // $this->emit('toastr-error', "search.");
+
         $this->resetPage();
         $this->resetValidation();
     }
+    // date
+    public function updatedDaterjref(): void
+    {
+        // $this->emit('toastr-error', "date.");
+
+        $this->resetPage();
+        $this->resetValidation();
+    }
+    // status
+    public function updatedStatusrjref(): void
+    {
+        // $this->emit('toastr-error', "status.");
+
+        $this->resetPage();
+        $this->resetValidation();
+    }
+    // dr
+    public function setdrRjRef($id, $name): void
+    {
+        // $this->emit('toastr-error', "dr.");
+
+        $this->drRjRef['drId'] = $id;
+        $this->drRjRef['drName'] = $name;
+        $this->resetPage();
+        $this->resetValidation();
+    }
+    // shift
+    public function setShift($id, $desc): void
+    {
+        // $this->emit('toastr-error', "shift.");
+
+        $this->shiftRjRef['shiftId'] = $id;
+        $this->shiftRjRef['shiftDesc'] = $desc;
+        $this->resetPage();
+        $this->resetValidation();
+    }
+    /////////////////////////////////////////////////////////////////////
+
 
 
 

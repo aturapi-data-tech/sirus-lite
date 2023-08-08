@@ -354,7 +354,69 @@ class DaftarRJ extends Component
     public $HttpGetBpjsStatus; //status push antrian 200 /201/ 400
     public $HttpGetBpjsJson; // response json
 
-
+    public $SEPJsonReq = [
+        "request" =>  [
+            "t_sep" =>  [
+                "noKartu" => "",
+                "tglSep" => "", //Y-m-d
+                "ppkPelayanan" => "",
+                "jnsPelayanan" => "",
+                "klsRawat" =>  [
+                    "klsRawatHak" => "",
+                    "klsRawatNaik" => "",
+                    "pembiayaan" => "",
+                    "penanggungJawab" => "",
+                ],
+                "noMR" => "",
+                "rujukan" =>  [
+                    "asalRujukan" => "",
+                    "tglRujukan" => "", //Y-m-d
+                    "noRujukan" => "",
+                    "ppkRujukan" => "",
+                ],
+                "catatan" => "",
+                "diagAwal" => "",
+                "poli" =>  [
+                    "tujuan" => "",
+                    "eksekutif" => "",
+                ],
+                "cob" =>  [
+                    "cob" => "0",
+                ],
+                "katarak" =>  [
+                    "katarak" => "0",
+                ],
+                "jaminan" =>  [
+                    "lakaLantas" => "0",
+                    "noLP" => "",
+                    "penjamin" =>  [
+                        "tglKejadian" => "",
+                        "keterangan" => "",
+                        "suplesi" =>  [
+                            "suplesi" => "0",
+                            "noSepSuplesi" => "",
+                            "lokasiLaka" =>  [
+                                "kdPropinsi" => "",
+                                "kdKabupaten" => "",
+                                "kdKecamatan" => "",
+                            ]
+                        ]
+                    ]
+                ],
+                "tujuanKunj" => "0",
+                "flagProcedure" => "",
+                "kdPenunjang" => "",
+                "assesmentPel" => "",
+                "skdp" =>  [
+                    "noSurat" => "",
+                    "kodeDPJP" => "",
+                ],
+                "dpjpLayan" => "",
+                "noTelp" => "",
+                "user" => "sirus App",
+            ],
+        ],
+    ];
     //////////////////////////////
 
 
@@ -488,12 +550,7 @@ class DaftarRJ extends Component
         $this->resetValidation();
     }
 
-    // setdrRjRef////////////////
-    public function setdrRjRef($id, $name): void
-    {
-        $this->drRjRef['drId'] = $id;
-        $this->drRjRef['drName'] = $name;
-    }
+
 
     private function optionsdrRjRef(): void
     {
@@ -518,13 +575,7 @@ class DaftarRJ extends Component
     }
 
 
-    // setShift//////////////// Tabular
-    public function setShift($id, $desc): void
-    {
-        $this->shiftRjRef['shiftId'] = $id;
-        $this->shiftRjRef['shiftDesc'] = $desc;
-        $this->resetValidation();
-    }
+
 
     // setShiftRJ//////////////// Form
     public function setShiftRJ($id, $desc): void
@@ -550,13 +601,56 @@ class DaftarRJ extends Component
 
 
 
-
+    /////////////////////////////////////////////////////////////////////
     // resert page pagination when coloumn search change ////////////////
+    // tabular Ref topbar
+    /////////////////////////////////////////////////////////////////////
+
+    // search
     public function updatedSearch(): void
     {
+        // $this->emit('toastr-error', "search.");
+
         $this->resetPage();
         $this->resetValidation();
     }
+    // date
+    public function updatedDaterjref(): void
+    {
+        // $this->emit('toastr-error', "date.");
+
+        $this->resetPage();
+        $this->resetValidation();
+    }
+    // status
+    public function updatedStatusrjref(): void
+    {
+        // $this->emit('toastr-error', "status.");
+
+        $this->resetPage();
+        $this->resetValidation();
+    }
+    // dr
+    public function setdrRjRef($id, $name): void
+    {
+        // $this->emit('toastr-error', "dr.");
+
+        $this->drRjRef['drId'] = $id;
+        $this->drRjRef['drName'] = $name;
+        $this->resetPage();
+        $this->resetValidation();
+    }
+    // shift
+    public function setShift($id, $desc): void
+    {
+        // $this->emit('toastr-error', "shift.");
+
+        $this->shiftRjRef['shiftId'] = $id;
+        $this->shiftRjRef['shiftDesc'] = $desc;
+        $this->resetPage();
+        $this->resetValidation();
+    }
+    /////////////////////////////////////////////////////////////////////
 
 
 
