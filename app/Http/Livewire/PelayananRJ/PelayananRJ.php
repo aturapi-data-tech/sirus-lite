@@ -124,6 +124,7 @@ class PelayananRJ extends Component
             'dateRjRef',
             'shiftRjRef',
             'statusRjRef',
+            'drRjRef,'
 
         ]);
     }
