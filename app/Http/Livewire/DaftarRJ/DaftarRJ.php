@@ -505,7 +505,7 @@ class DaftarRJ extends Component
             'dateRjRef',
             'shiftRjRef',
             'statusRjRef',
-            'drRjRef',
+            // 'drRjRef',
 
         ]);
     }
