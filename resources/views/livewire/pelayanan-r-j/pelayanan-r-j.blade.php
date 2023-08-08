@@ -41,7 +41,7 @@
                         {{-- two button --}}
                         <div class="flex justify-between mt-2 md:mt-0">
 
-                            <x-dropdown align="right" :width="__('48')">
+                            <x-dropdown align="right" :width="__('20')">
                                 <x-slot name="trigger">
                                     {{-- Button myLimitPerPage --}}
                                     <x-alternative-button class="inline-flex">
@@ -98,7 +98,7 @@
 
                         {{-- shift --}}
                         <div class="mt-2 ml-0">
-                            <x-dropdown align="right" :width="__('48')" class="">
+                            <x-dropdown align="right" :width="__('20')" class="">
                                 <x-slot name="trigger">
                                     {{-- Button shift --}}
                                     <x-alternative-button class="inline-flex">
