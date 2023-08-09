@@ -819,7 +819,7 @@ class DaftarRJ extends Component
         // Variable Search
         $search = $this->dataDokterLovSearch;
 
-        // check LOV by id 
+        // check LOV by dr_id rs id 
         $dataDokter = DB::table('rsmst_doctors')->select(
             'rsmst_doctors.dr_id as dr_id',
             'rsmst_doctors.dr_name as dr_name',
@@ -1015,6 +1015,35 @@ class DaftarRJ extends Component
         // cari data Lov dgn no Kunjungan 
         $dataRefBPJSLov = collect($this->dataRefBPJSLov)->where('noKunjungan', $id)->first();
 
+        // cari data Poli sesuai rujukan BPJS (mapping data poli dan dokter)
+        $cariDataIdBpjs_dr_poli = DB::table('rsmst_doctors')
+            ->select('kd_dr_bpjs', 'kd_poli_bpjs', 'rsmst_doctors.dr_id as dr_id', 'dr_name', 'rsmst_doctors.poli_id as poli_id', 'poli_desc')
+            ->join('rsmst_polis', 'rsmst_doctors.poli_id', 'rsmst_polis.poli_id')
+            ->where('kd_poli_bpjs', $dataRefBPJSLov['poliRujukan']['kode'])
+            ->first();
+
+        // Jika cariDataIdBpjs_dr_poli true
+        if ($cariDataIdBpjs_dr_poli) {
+
+            // Jika Data doker dan poli bpjs true
+            if ($cariDataIdBpjs_dr_poli->kd_dr_bpjs && $cariDataIdBpjs_dr_poli->kd_poli_bpjs) {
+                // set data dokter RJ
+                $this->dataDaftarPoliRJ['drId'] = $cariDataIdBpjs_dr_poli->dr_id;
+                $this->dataDaftarPoliRJ['drDesc'] = $cariDataIdBpjs_dr_poli->dr_name;
+
+                $this->dataDaftarPoliRJ['poliId'] = $cariDataIdBpjs_dr_poli->poli_id;
+                $this->dataDaftarPoliRJ['poliDesc'] = $cariDataIdBpjs_dr_poli->poli_desc;
+
+                $this->dataDaftarPoliRJ['kddrbpjs'] = $cariDataIdBpjs_dr_poli->kd_dr_bpjs;
+                $this->dataDaftarPoliRJ['kdpolibpjs'] = $cariDataIdBpjs_dr_poli->kd_poli_bpjs;
+            } else {
+                // jika salah satu data kosong
+                $this->emit('toastr-error', "Data Dokter atau Poli mapping BPJS belum di set.");
+            }
+        } else {
+            $this->emit('toastr-error', "Data Dokter atau Poli mapping BPJS belum tidak di temukan.");
+        }
+
         $this->SEPJsonReq = [
             "request" =>  [
                 "t_sep" =>  [
@@ -1044,16 +1073,16 @@ class DaftarRJ extends Component
                     "poli" =>  [
                         "tujuan" => "" . $dataRefBPJSLov['poliRujukan']['kode'] . "",
                         "tujuanNama" => "" . $dataRefBPJSLov['poliRujukan']['nama'] . "",
-                        "eksekutif" => "" . (collect($this->SEPJsonReq['request']['t_sep']['poli']['eksekutifRef'])->count() > 0) ? "1" : "0" . "", //{poli eksekutif -> 0. Tidak 1.Ya}
+                        "eksekutif" => "" . "0" . "", //{poli eksekutif -> 0. Tidak 1.Ya}
                         "eksekutifRef" =>  $this->SEPJsonReq['request']['t_sep']['poli']['eksekutifRef'], //{poli eksekutif -> 0. Tidak 1.Ya}
                     ],
                     "cob" =>  [
-                        "cob" => "" . (collect($this->SEPJsonReq['request']['t_sep']['cob']['cobRef'])->count() > 0) ? "1" : "0" . "", //{cob -> 0.Tidak 1. Ya}
+                        "cob" => "" . "0" . "", //{cob -> 0.Tidak 1. Ya}
                         "cobRef" => $this->SEPJsonReq['request']['t_sep']['cob']['cobRef'], //{cob -> 0.Tidak 1. Ya}
 
                     ],
                     "katarak" =>  [
-                        "katarak" => "" . (collect($this->SEPJsonReq['request']['t_sep']['katarak']['katarakRef'])->count() > 0) ? "1" : "0" . "", //{katarak --> 0.Tidak 1.Ya}
+                        "katarak" => "" . "0" . "", //{katarak --> 0.Tidak 1.Ya}
                         "katarakRef" =>  $this->SEPJsonReq['request']['t_sep']['katarak']['katarakRef'], //{katarak --> 0.Tidak 1.Ya}
 
                     ],
@@ -1084,7 +1113,8 @@ class DaftarRJ extends Component
                         "noSurat" => "",
                         "kodeDPJP" => "",
                     ],
-                    "dpjpLayan" => "" . $dataRefBPJSLov['pelayanan']['kode'] == 1 ? "" : $dataRefBPJSLov['provPerujuk']['kode'] . "", //(tidak diisi jika jnsPelayanan = "1" (RANAP),
+                    "dpjpLayan" => "" . $dataRefBPJSLov['pelayanan']['kode'] == 1 ? "" : $cariDataIdBpjs_dr_poli->kd_dr_bpjs . "", //(tidak diisi jika jnsPelayanan = "1" (RANAP),
+                    "dpjpLayanNama" => "" . $cariDataIdBpjs_dr_poli->dr_name . "", //(tidak diisi jika jnsPelayanan = "1" (RANAP),
                     "noTelp" => "" . $dataRefBPJSLov['peserta']['mr']['noTelepon'] . "",
                     "user" => "sirus App",
                 ],
@@ -1800,7 +1830,6 @@ class DaftarRJ extends Component
 
     private function rujukanPesertaFKTP($idBpjs): void
     {
-        // sini--------------------------------------------------------------------------------------------------------
         $HttpGetBpjs =  VclaimTrait::rujukan_peserta($idBpjs)->getOriginalContent();
 
         // metadata d kecil
@@ -1815,6 +1844,9 @@ class DaftarRJ extends Component
             $this->emit('toastr-error', $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
         }
     }
+
+
+
     public function CarirujukanPeserta(): void
     {
         if ($this->JenisKlaim['JenisKlaimId'] != 'JM') {
@@ -1835,6 +1867,9 @@ class DaftarRJ extends Component
             $this->emit('toastr-error', 'Jenis Klaim FKTL antar rs');
         }
     }
+
+
+
 
     public function callFormPasien(): void
     {
@@ -1862,6 +1897,8 @@ class DaftarRJ extends Component
         // set data dokter ref
         $this->optionsdrRjRef();
     }
+
+
 
 
     // select data start////////////////

@@ -62,7 +62,8 @@
                         <div class="flex items-center justify-end w-full ml-2 mr-5">
                             {{ $SEPJsonReq['request']['t_sep']['poli']['eksekutif'] }}
                             <x-check-box value='1' :label="__('Eksekutif')"
-                                wire:model.debounce.500ms="SEPJsonReq.request.t_sep.poli.eksekutifRef" />
+                                wire:model.debounce.500ms="SEPJsonReq.request.t_sep.poli.eksekutifRef"
+                                wire:click="$set('SEPJsonReq.request.t_sep.poli.eksekutif',{{ $SEPJsonReq['request']['t_sep']['poli']['eksekutif'] ? '0' : '1' }})" />
 
 
                             <x-text-input placeholder="Isi dgn data yang sesuai"
@@ -95,7 +96,7 @@
                             <x-text-input placeholder="Isi dgn data yang sesuai"
                                 class="ml-2 sm:rounded-none sm:rounded-l-lg" :errorshas="__($errors->has('SEPJsonReq.request.t_sep.dpjpLayan'))"
                                 :disabled=$disabledProperty
-                                wire:model.debounce.500ms="SEPJsonReq.request.t_sep.dpjpLayan" />
+                                value="{{ $SEPJsonReq['request']['t_sep']['dpjpLayan'] . '   ' . $SEPJsonReq['request']['t_sep']['dpjpLayanNama'] }}" />
 
                             <x-green-button :disabled=false
                                 class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
@@ -199,7 +200,8 @@
                                 wire:model.debounce.500ms="SEPJsonReq.request.t_sep.noMR" />
                             {{ $SEPJsonReq['request']['t_sep']['cob']['cob'] }}
                             <x-check-box value='1' :label="__('Peserta COB')"
-                                wire:model.debounce.500ms="SEPJsonReq.request.t_sep.cob.cobRef" />
+                                wire:model.debounce.500ms="SEPJsonReq.request.t_sep.cob.cobRef"
+                                wire:click="$set('SEPJsonReq.request.t_sep.cob.cob',{{ $SEPJsonReq['request']['t_sep']['cob']['cob'] ? '0' : '1' }})" />
                             @error('SEPJsonReq.request.t_sep.cob.cob')
                                 <x-input-error :messages=$message />
                             @enderror
