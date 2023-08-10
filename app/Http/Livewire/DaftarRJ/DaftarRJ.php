@@ -1234,7 +1234,6 @@ class DaftarRJ extends Component
                     'rj_status',
                     'txn_status',
                     'erm_status',
-                    'vno_sep',
                 )
                 ->where('rj_no', '=', $rjno)
                 ->first();
