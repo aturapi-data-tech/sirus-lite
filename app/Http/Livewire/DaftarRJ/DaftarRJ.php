@@ -1055,8 +1055,7 @@ class DaftarRJ extends Component
         }
 
         // Cek Apakah reqSep ada datanya apa blm
-        dd($this->dataDaftarPoliRJ['sep']['reqSep']);
-        if (isset($this->dataDaftarPoliRJ['sep']['reqSep'])) {
+        if (isset($this->dataDaftarPoliRJ['sep']['reqSep']['request'])) {
 
             $this->SEPJsonReq = $this->dataDaftarPoliRJ['sep']['reqSep'];
             // set formRujukanRefBPJSStatus true (open form)
