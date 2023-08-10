@@ -104,7 +104,7 @@
                             </div>
                         </div>
                         {{-- LOV Dokter --}}
-                        <div class="mt-1 bg-red-300">
+                        <div class="relative mt-0 bg-red-300">
                             @include('livewire.daftar-r-j.list-of-value-caridatadokterBpjs')
                         </div>
                     </div>
