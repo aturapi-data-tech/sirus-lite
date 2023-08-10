@@ -1872,6 +1872,7 @@ class DaftarRJ extends Component
             ->select('kd_dr_bpjs', 'kd_poli_bpjs', 'rsmst_doctors.dr_id as dr_id', 'dr_name', 'rsmst_doctors.poli_id as poli_id', 'poli_desc')
             ->join('rsmst_polis', 'rsmst_doctors.poli_id', 'rsmst_polis.poli_id')
             ->where('kd_poli_bpjs', $dataRefBPJSLov['poliRujukan']['kode'])
+            ->whereNotNull('kd_poli_bpjs')
             ->whereNotNull('kd_dr_bpjs')
             ->first();
 
