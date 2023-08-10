@@ -463,6 +463,12 @@ class DaftarRJ extends Component
     public $formRujukanRefBPJSStatus = 0;
     public $formRujukanRefBPJSSearch = '';
 
+    public $dataDiagnosaBPJSLov = [];
+    public $dataDiagnosaBPJSLovStatus = 0;
+    public $dataDiagnosaBPJSLovSearch = '';
+
+
+
 
 
     // 
@@ -2118,6 +2124,91 @@ class DaftarRJ extends Component
     // LOV selected end
     /////////////////////////////////////////////////
     // Lov dataDokterRJ //////////////////////
+    ////////////////////////////////////////////////
+
+
+    /////////////////////////////////////////////////
+    // Lov dataDiagnosaBPJSSEP //////////////////////
+    ////////////////////////////////////////////////
+    public function clickdataDiagnosaBPJSlov()
+    {
+        $this->dataDiagnosaBPJSLovStatus = true;
+        $this->dataDiagnosaBPJSLov = [];
+    }
+
+    public function updateddataDiagnosaBPJSlovsearch()
+    {
+        // Variable Search
+        $search = $this->dataDiagnosaBPJSLovSearch;
+
+        // check LOV by dr_id rs id 
+        $dataDiagnosaBPJS = DB::table('rsmst_mstdiags')->select(
+            'diag_id',
+            'diag_desc',
+            'icdx',
+        )
+            ->where('diag_id', $search)
+            ->first();
+
+        if ($dataDiagnosaBPJS) {
+
+            // set dokter sep
+            $this->SEPJsonReq['request']['t_sep']['diagAwal'] = $dataDiagnosaBPJS->icdx;
+            $this->SEPJsonReq['request']['t_sep']['diagAwalNama'] = $dataDiagnosaBPJS->diag_desc;
+
+
+            $this->dataDiagnosaBPJSLovStatus = false;
+            $this->dataDiagnosaBPJSLovSearch = '';
+        } else {
+            // if there is no id found and check (min 3 char on search)
+            if (strlen($search) < 3) {
+                $this->dataDiagnosaBPJSLov = [];
+            } else {
+                $this->dataDiagnosaBPJSLov = json_decode(
+                    DB::table('rsmst_mstdiags')->select(
+                        'diag_id',
+                        'diag_desc',
+                        'icdx',
+                    )
+
+                        ->Where(DB::raw('upper(diag_desc)'), 'like', '%' . strtoupper($search) . '%')
+                        ->orWhere(DB::raw('upper(icdx)'), 'like', '%' . strtoupper($search) . '%')
+                        ->limit(10)
+                        ->orderBy('diag_id', 'ASC')
+                        ->orderBy('diag_desc', 'ASC')
+                        ->get(),
+                    true
+                );
+            }
+            $this->dataDiagnosaBPJSLovStatus = true;
+            // set dokter sep
+            $this->SEPJsonReq['request']['t_sep']['diagAwal'] = '';
+            $this->SEPJsonReq['request']['t_sep']['diagAwalNama'] = '';
+        }
+    }
+    // /////////////////////
+    // LOV selected start
+    public function setMydataDiagnosaBPJSLov($id, $name)
+    {
+        $dataDiagnosaBPJS = DB::table('rsmst_mstdiags')->select(
+            'diag_id',
+            'diag_desc',
+            'icdx',
+        )
+            ->where('diag_id', $id)
+            ->first();
+
+        // set dokter sep
+        $this->SEPJsonReq['request']['t_sep']['diagAwal'] = $dataDiagnosaBPJS->icdx;
+        $this->SEPJsonReq['request']['t_sep']['diagAwalNama'] = $dataDiagnosaBPJS->diag_desc;
+
+
+        $this->dataDiagnosaBPJSLovStatus = false;
+        $this->dataDiagnosaBPJSLovSearch = '';
+    }
+    // LOV selected end
+    /////////////////////////////////////////////////
+    // Lov dataDiagnosaRJ //////////////////////
     ////////////////////////////////////////////////
 
 
