@@ -1178,11 +1178,11 @@
                                 <div>
                                     <div class="flex justify-between">
                                         <x-green-button :disabled=$disabledPropertyRj
-                                            wire:click.prevent="CarirujukanPeserta()" type="button"
-                                            wire:loading.remove>No Ref
+                                            wire:click.prevent="clickrujukanPeserta()" type="button"
+                                            wire:loading.remove>No Referensi
                                         </x-green-button>
 
-                                        <div wire:loading wire:target="CarirujukanPeserta">
+                                        <div wire:loading wire:target="clickrujukanPeserta">
                                             <x-loading />
                                         </div>
 
