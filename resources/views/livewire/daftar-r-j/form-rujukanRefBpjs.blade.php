@@ -76,31 +76,36 @@
                             @enderror
                         </div>
                     </div>
+                    <div class="">
+                        <div class="flex">
+                            <div class="flex items-center justify-end w-1/4 ">
+                                <x-input-label for="regName" :value="__('DPJP yang melayani')" :required="__($errors->has('SEPJsonReq.request.t_sep.dpjpLayan'))" />
+                            </div>
 
-                    <div class="flex">
-                        <div class="flex items-center justify-end w-1/4 ">
-                            <x-input-label for="regName" :value="__('DPJP yang melayani')" :required="__($errors->has('SEPJsonReq.request.t_sep.dpjpLayan'))" />
+                            <div class="flex items-center justify-end w-full mr-5">
+                                <x-text-input placeholder="Isi dgn data yang sesuai"
+                                    class="ml-2 sm:rounded-none sm:rounded-l-lg" :errorshas="__($errors->has('SEPJsonReq.request.t_sep.dpjpLayan'))"
+                                    :disabled=$disabledProperty
+                                    value="{{ $SEPJsonReq['request']['t_sep']['dpjpLayan'] . '   ' . $SEPJsonReq['request']['t_sep']['dpjpLayanNama'] }}" />
+
+                                <x-green-button :disabled=false
+                                    class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
+                                    wire:click.prevent="clickdataDokterBPJSlov()">
+                                    <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
+                                        xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                        <path clip-rule="evenodd" fill-rule="evenodd"
+                                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                                    </svg>
+                                </x-green-button>
+
+                                @error('SEPJsonReq.request.t_sep.dpjpLayan')
+                                    <x-input-error :messages=$message />
+                                @enderror
+                            </div>
                         </div>
-
-                        <div class="flex items-center justify-end w-full mr-5">
-                            <x-text-input placeholder="Isi dgn data yang sesuai"
-                                class="ml-2 sm:rounded-none sm:rounded-l-lg" :errorshas="__($errors->has('SEPJsonReq.request.t_sep.dpjpLayan'))"
-                                :disabled=$disabledProperty
-                                value="{{ $SEPJsonReq['request']['t_sep']['dpjpLayan'] . '   ' . $SEPJsonReq['request']['t_sep']['dpjpLayanNama'] }}" />
-
-                            <x-green-button :disabled=false
-                                class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
-                                wire:click.prevent="$emit('toastr-error','clickDpjpLayanlov()')">
-                                <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
-                                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                    <path clip-rule="evenodd" fill-rule="evenodd"
-                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-                                </svg>
-                            </x-green-button>
-
-                            @error('SEPJsonReq.request.t_sep.dpjpLayan')
-                                <x-input-error :messages=$message />
-                            @enderror
+                        {{-- LOV Dokter --}}
+                        <div class="mt-1 bg-red-300">
+                            @include('livewire.daftar-r-j.list-of-value-caridatadokterBpjs')
                         </div>
                     </div>
 

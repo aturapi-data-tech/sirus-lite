@@ -450,6 +450,10 @@ class DaftarRJ extends Component
     public $dataDokterLovStatus = 0;
     public $dataDokterLovSearch = '';
 
+    public $dataDokterBPJSLov = [];
+    public $dataDokterBPJSLovStatus = 0;
+    public $dataDokterBPJSLovSearch = '';
+
     public $dataRefBPJSLov = [];
     public $dataRefBPJSLovStatus = 0;
     public $dataRefBPJSLovSearch = '';
@@ -1982,6 +1986,139 @@ class DaftarRJ extends Component
     ////////////////////////////////////////////////
 
 
+    /////////////////////////////////////////////////
+    // Lov dataDokterBPJSSEP //////////////////////
+    ////////////////////////////////////////////////
+    public function clickdataDokterBPJSlov()
+    {
+        $this->dataDokterBPJSLovStatus = true;
+        $this->dataDokterBPJSLov = [];
+    }
+
+    public function updateddataDokterBPJSlovsearch()
+    {
+        // Variable Search
+        $search = $this->dataDokterBPJSLovSearch;
+
+        // check LOV by dr_id rs id 
+        $dataDokterBPJS = DB::table('rsmst_doctors')->select(
+            'rsmst_doctors.dr_id as dr_id',
+            'rsmst_doctors.dr_name as dr_name',
+            'kd_dr_bpjs',
+
+            'rsmst_polis.poli_id as poli_id',
+            'rsmst_polis.poli_desc as poli_desc',
+            'kd_poli_bpjs'
+        )
+            ->Join('rsmst_polis', 'rsmst_polis.poli_id', 'rsmst_doctors.poli_id')
+            ->where('rsmst_doctors.dr_id', $search)
+            ->first();
+
+        if ($dataDokterBPJS) {
+            // set dokter antrol
+            $this->dataDaftarPoliRJ['drId'] = $dataDokterBPJS->dr_id;
+            $this->dataDaftarPoliRJ['drDesc'] = $dataDokterBPJS->dr_name;
+
+            $this->dataDaftarPoliRJ['poliId'] = $dataDokterBPJS->poli_id;
+            $this->dataDaftarPoliRJ['poliDesc'] = $dataDokterBPJS->poli_desc;
+
+            $this->dataDaftarPoliRJ['kddrbpjs'] = $dataDokterBPJS->kd_dr_bpjs;
+            $this->dataDaftarPoliRJ['kdpolibpjs'] = $dataDokterBPJS->kd_poli_bpjs;
+
+            // set dokter sep
+            $this->SEPJsonReq['request']['t_sep']['dpjpLayan'] = $dataDokterBPJS->kd_dr_bpjs;
+            $this->SEPJsonReq['request']['t_sep']['dpjpLayanNama'] = $dataDokterBPJS->dr_name;
+            $this->SEPJsonReq['request']['t_sep']['poli']['tujuan'] = $dataDokterBPJS->kd_poli_bpjs;
+            $this->SEPJsonReq['request']['t_sep']['poli']['tujuanNama'] = $dataDokterBPJS->poli_desc;
+
+
+            $this->dataDokterBPJSLovStatus = false;
+            $this->dataDokterBPJSLovSearch = '';
+        } else {
+            // if there is no id found and check (min 3 char on search)
+            if (strlen($search) < 3) {
+                $this->dataDokterBPJSLov = [];
+            } else {
+                $this->dataDokterBPJSLov = json_decode(
+                    DB::table('rsmst_doctors')->select(
+                        'rsmst_doctors.dr_id as dr_id',
+                        'rsmst_doctors.dr_name as dr_name',
+                        'kd_dr_bpjs',
+
+                        'rsmst_polis.poli_id as poli_id',
+                        'rsmst_polis.poli_desc as poli_desc',
+                        'kd_poli_bpjs'
+
+                    )
+                        ->Join('rsmst_polis', 'rsmst_polis.poli_id', 'rsmst_doctors.poli_id')
+
+                        ->Where(DB::raw('upper(dr_name)'), 'like', '%' . strtoupper($search) . '%')
+                        ->orWhere('poli_desc', 'like', '%' . strtoupper($search) . '%')
+                        ->limit(10)
+                        ->orderBy('dr_name', 'ASC')
+                        ->orderBy('poli_desc', 'ASC')
+                        ->get(),
+                    true
+                );
+            }
+            $this->dataDokterBPJSLovStatus = true;
+            // set dokter antrol
+
+            $this->dataDaftarPoliRJ['drId'] = '';
+            $this->dataDaftarPoliRJ['drDesc'] = '';
+            $this->dataDaftarPoliRJ['poliId'] = '';
+            $this->dataDaftarPoliRJ['poliDesc'] = '';
+            $this->dataDaftarPoliRJ['kddrbpjs'] = '';
+            $this->dataDaftarPoliRJ['kdpolibpjs'] = '';
+
+            // set dokter sep
+            $this->SEPJsonReq['request']['t_sep']['dpjpLayan'] = '';
+            $this->SEPJsonReq['request']['t_sep']['dpjpLayanNama'] = '';
+            $this->SEPJsonReq['request']['t_sep']['poli']['tujuan'] = '';
+            $this->SEPJsonReq['request']['t_sep']['poli']['tujuanNama'] = '';
+        }
+    }
+    // /////////////////////
+    // LOV selected start
+    public function setMydataDokterBPJSLov($id, $name)
+    {
+        $dataDokterBPJS = DB::table('rsmst_doctors')->select(
+            'rsmst_doctors.dr_id as dr_id',
+            'rsmst_doctors.dr_name as dr_name',
+            'kd_dr_bpjs',
+
+            'rsmst_polis.poli_id as poli_id',
+            'rsmst_polis.poli_desc as poli_desc',
+            'kd_poli_bpjs'
+        )
+            ->Join('rsmst_polis', 'rsmst_polis.poli_id', 'rsmst_doctors.poli_id')
+            ->where('rsmst_doctors.dr_id', $id)
+            ->first();
+
+        // set dokter antrol
+        $this->dataDaftarPoliRJ['drId'] = $dataDokterBPJS->dr_id;
+        $this->dataDaftarPoliRJ['drDesc'] = $dataDokterBPJS->dr_name;
+
+        $this->dataDaftarPoliRJ['poliId'] = $dataDokterBPJS->poli_id;
+        $this->dataDaftarPoliRJ['poliDesc'] = $dataDokterBPJS->poli_desc;
+
+        $this->dataDaftarPoliRJ['kddrbpjs'] = $dataDokterBPJS->kd_dr_bpjs;
+        $this->dataDaftarPoliRJ['kdpolibpjs'] = $dataDokterBPJS->kd_poli_bpjs;
+
+        // set dokter sep
+        $this->SEPJsonReq['request']['t_sep']['dpjpLayan'] = $dataDokterBPJS->kd_dr_bpjs;
+        $this->SEPJsonReq['request']['t_sep']['dpjpLayanNama'] = $dataDokterBPJS->dr_name;
+        $this->SEPJsonReq['request']['t_sep']['poli']['tujuan'] = $dataDokterBPJS->kd_poli_bpjs;
+        $this->SEPJsonReq['request']['t_sep']['poli']['tujuanNama'] = $dataDokterBPJS->poli_desc;
+
+
+        $this->dataDokterBPJSLovStatus = false;
+        $this->dataDokterBPJSLovSearch = '';
+    }
+    // LOV selected end
+    /////////////////////////////////////////////////
+    // Lov dataDokterRJ //////////////////////
+    ////////////////////////////////////////////////
 
 
 
