@@ -777,10 +777,43 @@ trait VclaimTrait
         $response = Http::withHeaders($signature)->get($url);
         return self::response_decrypt($response, $signature, null, null);
     }
+
+
     // SEP
-    public static function sep_insert(Request $request)
+    public static function sep_insert($SEPJsonReq)
     {
-        $validator = Validator::make(request()->all(), [
+
+        // customErrorMessages
+        $messages = customErrorMessagesTrait::messages();
+
+        // Masukkan Nilai dari parameter
+        $r = [
+            "noKartu" => $SEPJsonReq['request']['t_sep']['noKartu'],
+            "tglSep" => $SEPJsonReq['request']['t_sep']['tglSep'],
+            "ppkPelayanan" => $SEPJsonReq['request']['t_sep']['ppkPelayanan'],
+            "jnsPelayanan" => $SEPJsonReq['request']['t_sep']['jnsPelayanan'],
+            "klsRawatHak" => $SEPJsonReq['request']['t_sep']['klsRawat']['klsRawatHak'],
+            "asalRujukan" => $SEPJsonReq['request']['t_sep']['rujukan']['asalRujukan'],
+            "tglRujukan" => $SEPJsonReq['request']['t_sep']['rujukan']['tglRujukan'],
+            "noRujukan" => $SEPJsonReq['request']['t_sep']['rujukan']['noRujukan'],
+            "ppkRujukan" => $SEPJsonReq['request']['t_sep']['rujukan']['ppkRujukan'],
+            "catatan" => $SEPJsonReq['request']['t_sep']['catatan'],
+            "diagAwal" => $SEPJsonReq['request']['t_sep']['diagAwal'],
+            "tujuan" => $SEPJsonReq['request']['t_sep']['poli']['tujuan'],
+            "eksekutif" => $SEPJsonReq['request']['t_sep']['poli']['eksekutif'],
+            "tujuanKunj" => $SEPJsonReq['request']['t_sep']['tujuanKunj'],
+            // "flagProcedure" => $SEPJsonReq['request']['t_sep']['flagProcedure'],
+            // "kdPenunjang" => $SEPJsonReq['request']['t_sep']['kdPenunjang'],
+            // "assesmentPel" => $SEPJsonReq['request']['t_sep']['assesmentPel'],
+            // "noSurat" => $SEPJsonReq['request']['t_sep']['noSurat'],
+            // "kodeDPJP" => $SEPJsonReq['request']['t_sep']['kodeDPJP'],
+            "dpjpLayan" => $SEPJsonReq['request']['t_sep']['dpjpLayan'],
+            "noTelp" => $SEPJsonReq['request']['t_sep']['noTelp'],
+            "user" => $SEPJsonReq['request']['t_sep']['user'],
+        ];
+
+        // lakukan validasis
+        $validator = Validator::make($r, [
             "noKartu" => "required",
             "tglSep" => "required",
             "ppkPelayanan" => "required",
@@ -803,79 +836,36 @@ trait VclaimTrait
             "dpjpLayan" => "required",
             "noTelp" => "required",
             "user" => "required",
-        ]);
+        ], $messages);
+
         if ($validator->fails()) {
-            return self::sendError($validator->errors()->first(), null, 201, null, null);
+            return self::sendError($validator->errors()->first(), $validator->errors(), 201, null, null);
         }
-        $url = env('VCLAIM_URL') . "SEP/2.0/insert";
-        $signature = self::signature();
-        $signature['Content-Type'] = 'application/x-www-form-urlencoded';
-        $data = [
-            "request" => [
-                "t_sep" => [
-                    "noKartu" => $request->noKartu,
-                    "tglSep" => $request->tglSep,
-                    "ppkPelayanan" => $request->ppkPelayanan,
-                    "jnsPelayanan" => $request->jnsPelayanan,
-                    "klsRawat" => [
-                        "klsRawatHak" => $request->klsRawatHak,
-                        "klsRawatNaik" => "",
-                        "pembiayaan" => "",
-                        "penanggungJawab" => "",
-                    ],
-                    "noMR" => $request->noMR,
-                    "rujukan" => [
-                        "asalRujukan" =>  $request->asalRujukan,
-                        "tglRujukan" =>  $request->tglRujukan,
-                        "noRujukan" =>  $request->noRujukan,
-                        "ppkRujukan" =>  $request->ppkRujukan,
-                    ],
-                    "catatan" => $request->catatan,
-                    "diagAwal" => $request->diagAwal,
-                    "poli" => [
-                        "tujuan" => $request->tujuan,
-                        "eksekutif" => $request->eksekutif,
-                    ],
-                    "cob" => [
-                        "cob" => "0"
-                    ],
-                    "katarak" => [
-                        "katarak" => "0"
-                    ],
-                    "jaminan" => [
-                        "lakaLantas" => "0",
-                        "noLP" => "",
-                        "penjamin" => [
-                            "tglKejadian" => "",
-                            "keterangan" => "",
-                            "suplesi" => [
-                                "suplesi" => "0",
-                                "noSepSuplesi" => "",
-                                "lokasiLaka" => [
-                                    "kdPropinsi" => "",
-                                    "kdKabupaten" => "",
-                                    "kdKecamatan" => "",
-                                ]
-                            ]
-                        ]
-                    ],
-                    "tujuanKunj" => $request->tujuanKunj,
-                    "flagProcedure" => $request->flagProcedure,
-                    "kdPenunjang" => $request->kdPenunjang,
-                    "assesmentPel" => $request->assesmentPel,
-                    "skdp" => [
-                        "noSurat" => $request->noSurat,
-                        "kodeDPJP" => $request->kodeDPJP,
-                    ],
-                    "dpjpLayan" => $request->dpjpLayan,
-                    "noTelp" => $request->noTelp,
-                    "user" =>  $request->user,
-                ]
-            ]
-        ];
-        $response = Http::withHeaders($signature)->post($url, $data);
-        return self::response_decrypt($response, $signature, null, null);
+
+
+
+        // handler when time out and off line mode
+        try {
+
+            $url = env('VCLAIM_URL') . "SEP/2.0/insert";
+            $signature = self::signature();
+            $signature['Content-Type'] = 'application/x-www-form-urlencoded';
+            $data = $SEPJsonReq;
+
+            $response = Http::timeout(10)
+                ->withHeaders($signature)
+                ->post($url, $data);
+
+
+            // dd($response->transferStats->getTransferTime()); Get Transfertime request
+            // semua response error atau sukses dari BPJS di handle pada logic response_decrypt
+            return self::response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
+            /////////////////////////////////////////////////////////////////////////////
+        } catch (Exception $e) {
+            return self::sendError($e->getMessage(), $validator->errors(), 408, $url, null);
+        }
     }
+
     public static function sep_delete(Request $request)
     {
         $validator = Validator::make(request()->all(), [

@@ -1101,7 +1101,7 @@
                                         wire:model.debounce.500ms="dataDaftarPoliRJ.passStatus" />
                                 </div>
 
-                                <x-input-label for="dataPasienLovSearch" :value="__('Cari Data Pasien dgn [ Nama / Reg No / NIK / Noka BPJS]')" :required="__('true')" />
+                                <x-input-label for="dataPasienLovSearch" :value="__('Cari Data Pasien dgn [ Nama / Reg No / NIK / Noka BPJS]')" :required="__(true)" />
 
                                 <div class="flex items-center mb-2">
                                     <x-text-input id="dataPasienLovSearch"
@@ -1130,7 +1130,7 @@
                             </div>
 
                             <div>
-                                <x-input-label :value="__('Jenis Klaim')" :required="__('true')" />
+                                <x-input-label :value="__('Jenis Klaim')" :required="__(true)" />
                                 <div class="grid grid-cols-4 my-2">
 
                                     @foreach ($JenisKlaim['JenisKlaimOptions'] as $sRj)
@@ -1146,7 +1146,7 @@
                             </div>
 
                             <div>
-                                <x-input-label :value="__('Jenis Kunjungan')" :required="__('true')" />
+                                <x-input-label :value="__('Jenis Kunjungan')" :required="__(true)" />
                                 <div class="grid grid-cols-4 my-2">
 
                                     @foreach ($JenisKunjungan['JenisKunjunganOptions'] as $sRj)
@@ -1162,7 +1162,7 @@
                             </div>
 
                             <div>
-                                <x-input-label :value="__('No Referensi')" :required="__('true')" />
+                                <x-input-label :value="__('No Referensi')" :required="__(true)" />
                                 <div class="flex items-center mb-2">
                                     <x-text-input placeholder="No Referensi" class="mt-1" :errorshas="__($errors->has('dataDaftarPoliRJ.noReferensi'))"
                                         :disabled=$disabledPropertyRj
@@ -1202,7 +1202,7 @@
 
 
                             <div>
-                                <x-input-label :value="__('Dokter')" :required="__('true')" />
+                                <x-input-label :value="__('Dokter')" :required="__(true)" />
                                 <div class="mt-1 ml-2 ">
                                     <div class="flex ">
                                         <x-text-input placeholder="Dokter" class="sm:rounded-none sm:rounded-l-lg"
@@ -1234,13 +1234,25 @@
                             </div>
 
                             <div>
-                                <x-input-label :value="__('Poli')" :required="__('true')" />
+                                <x-input-label :value="__('Poli')" :required="__(true)" />
                                 <div class="flex items-center mb-2">
                                     <x-text-input placeholder="Poli" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.poliId'))"
                                         :disabled=$disabledProperty
                                         value="{{ $dataDaftarPoliRJ['poliId'] . ' ' . $dataDaftarPoliRJ['poliDesc'] }}" />
                                 </div>
                                 @error('dataDaftarPoliRJ.poliId')
+                                    <x-input-error :messages=$message />
+                                @enderror
+                            </div>
+
+                            <div>
+                                <x-input-label :value="__('NoSep')" :required="__(false)" />
+                                <div class="flex items-center mb-2">
+                                    <x-text-input placeholder="NoSep" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.sep.noSep'))"
+                                        :disabled=$disabledProperty
+                                        value="{{ isset($dataDaftarPoliRJ['sep']['noSep']) ? $dataDaftarPoliRJ['sep']['noSep'] : '-' }}" />
+                                </div>
+                                @error('dataDaftarPoliRJ.sep.noSep')
                                     <x-input-error :messages=$message />
                                 @enderror
                             </div>

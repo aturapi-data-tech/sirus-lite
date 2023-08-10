@@ -59,27 +59,17 @@
                             <x-input-label for="regName" :value="__('Spesialis / SubSpesialis')" :required="__($errors->has('SEPJsonReq.request.t_sep.poli.tujuan'))" />
                         </div>
 
-                        <div class="flex items-center justify-end w-full ml-2 mr-5">
+                        <div class="flex items-center justify-end w-full my-1 ml-2 mr-5">
                             {{ $SEPJsonReq['request']['t_sep']['poli']['eksekutif'] }}
                             <x-check-box value='1' :label="__('Eksekutif')"
                                 wire:model.debounce.500ms="SEPJsonReq.request.t_sep.poli.eksekutifRef"
                                 wire:click="$set('SEPJsonReq.request.t_sep.poli.eksekutif',{{ $SEPJsonReq['request']['t_sep']['poli']['eksekutif'] ? '0' : '1' }})" />
 
 
-                            <x-text-input placeholder="Isi dgn data yang sesuai"
-                                class="ml-2 sm:rounded-none sm:rounded-l-lg" :errorshas="__($errors->has('SEPJsonReq.request.t_sep.poli.tujuan'))"
+                            <x-text-input placeholder="Isi dgn data yang sesuai" class="mx-2 mt-1" :errorshas="__($errors->has('SEPJsonReq.request.t_sep.poli.tujuan'))"
                                 :disabled=$disabledProperty
                                 value="{{ $SEPJsonReq['request']['t_sep']['poli']['tujuan'] . '   ' . $SEPJsonReq['request']['t_sep']['poli']['tujuanNama'] }}" />
 
-                            <x-green-button :disabled=false
-                                class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
-                                wire:click.prevent="clickJeniskelaminlov()">
-                                <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
-                                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                    <path clip-rule="evenodd" fill-rule="evenodd"
-                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-                                </svg>
-                            </x-green-button>
 
                             @error('SEPJsonReq.request.t_sep.poli.tujuan')
                                 <x-input-error :messages=$message />
@@ -100,7 +90,7 @@
 
                             <x-green-button :disabled=false
                                 class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
-                                wire:click.prevent="clickJeniskelaminlov()">
+                                wire:click.prevent="$emit('toastr-error','clickDpjpLayanlov()')">
                                 <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
                                     xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                                     <path clip-rule="evenodd" fill-rule="evenodd"
@@ -215,13 +205,13 @@
 
                         <div class="flex items-center justify-end w-full mr-5">
                             <x-text-input placeholder="Isi dgn data yang sesuai"
-                                class="ml-2 sm:rounded-none sm:rounded-l-lg" :errorshas="__($errors->has('SEPJsonReq.request.t_sep.diagAwal'))"
+                                class="mt-1 ml-2 sm:rounded-none sm:rounded-l-lg" :errorshas="__($errors->has('SEPJsonReq.request.t_sep.diagAwal'))"
                                 :disabled=$disabledProperty
                                 value="{{ $SEPJsonReq['request']['t_sep']['diagAwal'] . '   ' . $SEPJsonReq['request']['t_sep']['diagAwalNama'] }}" />
 
                             <x-green-button :disabled=false
-                                class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
-                                wire:click.prevent="clickJeniskelaminlov()">
+                                class="mt-1 sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
+                                wire:click.prevent="$emit('toastr-error','clickDiagAwallov()')">
                                 <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
                                     xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                                     <path clip-rule="evenodd" fill-rule="evenodd"
@@ -298,16 +288,16 @@
                     </div>
                     <div>
                         @if ($isOpenMode !== 'tampil')
-                            <div wire:loading wire:target="store">
+                            <div wire:loading wire:target="storeDataSepReq">
                                 <x-loading />
                             </div>
 
-                            <x-green-button :disabled=$disabledPropertyRj wire:click.prevent="store()" type="button"
-                                wire:loading.remove>
+                            <x-green-button :disabled=$disabledPropertyRj wire:click.prevent="storeDataSepReq()"
+                                type="button" wire:loading.remove>
                                 Simpan
                             </x-green-button>
                         @endif
-                        <x-light-button wire:click="closeModal()" type="button">Keluar</x-light-button>
+                        <x-light-button wire:click.prevent="storeDataSepReq()" type="button">Keluar</x-light-button>
                     </div>
                 </div>
 
