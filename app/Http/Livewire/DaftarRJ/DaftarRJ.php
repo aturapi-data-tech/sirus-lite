@@ -1125,7 +1125,7 @@ class DaftarRJ extends Component
             } else if ($this->JenisKlaim['JenisKlaimId'] == 'JM' && $this->JenisKunjungan['JenisKunjunganId'] == 4) {
                 // if jenis klaim BPJS dan Kunjungan = FKTL antar rs(4)
                 $this->rujukanPesertaFKTL($this->dataPasien['pasien']['identitas']['idbpjs']);
-                $this->emit('toastr-error', 'Jenis Klaim FKTL antar rs');
+                $this->emit('toastr-error', 'Jenis Klaim FKTL antar rs cek');
             }
         }
     }
@@ -1697,7 +1697,7 @@ class DaftarRJ extends Component
             ->first();
 
 
-        $cekAntrianAntreanBPJS = $cekAntrianAntreanBPJS->push_antrian_bpjs_status ? $cekAntrianAntreanBPJS->push_antrian_bpjs_status : "";
+        $cekAntrianAntreanBPJS = isset($cekAntrianAntreanBPJS->push_antrian_bpjs_status) ? $cekAntrianAntreanBPJS->push_antrian_bpjs_status : "";
         // 1 cek proses pada database status
         if ($cekAntrianAntreanBPJS == 200) {
             // set http response to public
