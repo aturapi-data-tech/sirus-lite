@@ -2003,7 +2003,6 @@ class DaftarRJ extends Component
         }
 
 
-        dd($this->JenisKunjungan['JenisKunjunganId']);
         $this->SEPJsonReq = [
             "request" =>  [
                 "t_sep" =>  [
@@ -2020,8 +2019,8 @@ class DaftarRJ extends Component
                     ],
                     "noMR" => "" . $dataRefBPJSLov['peserta']['mr']['noMR'] . "",
                     "rujukan" =>  [
-                        "asalRujukan" => "" . $this->JenisKunjungan['JenisKunjunganId'] == "1" ? "1" : ($this->JenisKunjungan['JenisKunjunganId'] == "4" ? "2" : "0") . "", //{asal rujukan ->1.Faskes 1, 2. Faskes 2(RS)}
-                        "asalRujukanNama" => "" . $this->JenisKunjungan['JenisKunjunganId'] == "1" ? "Faskes Tingkat 1" : ($this->JenisKunjungan['JenisKunjunganId'] == "4" ? "Faskes Tingkat 2 RS" : "0") . "", //{asal rujukan ->1.Faskes 1, 2. Faskes 2(RS)}
+                        "asalRujukan" => "" . $this->JenisKunjungan['JenisKunjunganId'] == "1" ? "1" : ($this->JenisKunjungan['JenisKunjunganId'] == "4" ? "2" : "1") . "", //{asal rujukan ->1.Faskes 1, 2. Faskes 2(RS)}
+                        "asalRujukanNama" => "" . $this->JenisKunjungan['JenisKunjunganId'] == "1" ? "Faskes Tingkat 1" : ($this->JenisKunjungan['JenisKunjunganId'] == "4" ? "Faskes Tingkat 2 RS" : "Faskes Tingkat 1") . "", //{asal rujukan ->1.Faskes 1, 2. Faskes 2(RS)}
                         "tglRujukan" => "" . $dataRefBPJSLov['tglKunjungan'] . "", //Y-m-d
                         "noRujukan" => "" . $dataRefBPJSLov['noKunjungan'] . "",
                         "ppkRujukan" => "" . $dataRefBPJSLov['provPerujuk']['kode'] . "", //{kode faskes rujukam -> baca di referensi faskes}
