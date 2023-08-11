@@ -749,7 +749,7 @@ trait VclaimTrait
         $response = Http::withHeaders($signature)->get($url);
         return self::response_decrypt($response, $signature, null, null);
     }
-    public static function rujukan_rs_peserta(Request $nomorKartu) //fktl dari
+    public static function rujukan_rs_peserta($nomorKartu) //fktl dari
     {
         // customErrorMessages
         $messages = customErrorMessagesTrait::messages();
