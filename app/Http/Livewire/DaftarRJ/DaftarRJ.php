@@ -724,7 +724,13 @@ class DaftarRJ extends Component
     // is going to delete data////////////////
     public function delete()
     {
-        $this->emit('toastr-error', "Data tidak dapat di proses.");
+        $this->emit('toastr-error', "delete Data tidak dapat di proses.");
+    }
+
+    // is going to tampil data////////////////
+    public function tampil()
+    {
+        $this->emit('toastr-error', "tampil Data tidak dapat di proses.");
     }
 
     // is going to edit data/////////////////
