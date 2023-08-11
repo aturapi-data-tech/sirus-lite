@@ -1693,8 +1693,10 @@ class DaftarRJ extends Component
             ->where('rj_no', $this->dataDaftarPoliRJ['rjNo'])
             ->first();
 
+
+        $cekAntrianAntreanBPJS = $cekAntrianAntreanBPJS->push_antrian_bpjs_status ? $cekAntrianAntreanBPJS->push_antrian_bpjs_status : "";
         // 1 cek proses pada database status
-        if ($cekAntrianAntreanBPJS->push_antrian_bpjs_status == 200) {
+        if ($cekAntrianAntreanBPJS == 200) {
             // set http response to public
             $this->HttpGetBpjsStatus = $cekAntrianAntreanBPJS->push_antrian_bpjs_status; //status 200 201 400 ..
             $this->HttpGetBpjsJson = $cekAntrianAntreanBPJS->push_antrian_bpjs_json; //Return Response Tambah Antrean
