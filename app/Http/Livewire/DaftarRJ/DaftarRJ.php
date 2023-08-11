@@ -1701,6 +1701,7 @@ class DaftarRJ extends Component
         // 1 cek proses pada database status
         if ($cekAntrianAntreanBPJS == 200) {
             // set http response to public
+            dd($cekAntrianAntreanBPJS);
             $this->HttpGetBpjsStatus = $cekAntrianAntreanBPJS->push_antrian_bpjs_status; //status 200 201 400 ..
             $this->HttpGetBpjsJson = $cekAntrianAntreanBPJS->push_antrian_bpjs_json; //Return Response Tambah Antrean
 
