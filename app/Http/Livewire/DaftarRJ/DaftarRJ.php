@@ -1107,7 +1107,8 @@ class DaftarRJ extends Component
         }
 
         // Cek Apakah reqSep ada datanya apa blm
-        if (isset($this->dataDaftarPoliRJ['sep']['reqSep']['request']) && isset($this->dataDaftarPoliRJ['sep']['noSep'])) {
+        // if (isset($this->dataDaftarPoliRJ['sep']['reqSep']['request']) && isset($this->dataDaftarPoliRJ['sep']['noSep'])) {
+        if ($this->dataDaftarPoliRJ['sep']['noSep']) {
 
             $this->SEPJsonReq = $this->dataDaftarPoliRJ['sep']['reqSep'];
             // set formRujukanRefBPJSStatus true (open form)
@@ -1128,6 +1129,7 @@ class DaftarRJ extends Component
                 $this->emit('toastr-error', 'Jenis Klaim FKTL antar rs cek');
             }
         }
+        // }
     }
 
     ///////////cariDataPasienByKey/////////////////////////////////
@@ -1984,7 +1986,7 @@ class DaftarRJ extends Component
         if ($cariDataIdBpjs_dr_poli) {
 
             // Jika Data doker dan poli bpjs true
-            if ($cariDataIdBpjs_dr_poli->kd_dr_bpjs && $cariDataIdBpjs_dr_poli->kd_poli_bpjs) {
+            if (isset($cariDataIdBpjs_dr_poli->kd_dr_bpjs) && isset($cariDataIdBpjs_dr_poli->kd_poli_bpjs)) {
                 // set data dokter RJ
                 $this->dataDaftarPoliRJ['drId'] = $cariDataIdBpjs_dr_poli->dr_id;
                 $this->dataDaftarPoliRJ['drDesc'] = $cariDataIdBpjs_dr_poli->dr_name;
