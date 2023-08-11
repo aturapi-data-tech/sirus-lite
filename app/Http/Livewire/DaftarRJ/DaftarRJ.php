@@ -1124,6 +1124,7 @@ class DaftarRJ extends Component
                 $this->rujukanPesertaFKTP($this->dataPasien['pasien']['identitas']['idbpjs']);
             } else if ($this->JenisKlaim['JenisKlaimId'] == 'JM' && $this->JenisKunjungan['JenisKunjunganId'] == 4) {
                 // if jenis klaim BPJS dan Kunjungan = FKTL antar rs(4)
+                $this->rujukanPesertaFKTL($this->dataPasien['pasien']['identitas']['idbpjs']);
                 $this->emit('toastr-error', 'Jenis Klaim FKTL antar rs');
             }
         }
@@ -1779,6 +1780,23 @@ class DaftarRJ extends Component
     private function rujukanPesertaFKTP($idBpjs): void
     {
         $HttpGetBpjs =  VclaimTrait::rujukan_peserta($idBpjs)->getOriginalContent();
+
+        // metadata d kecil
+        if ($HttpGetBpjs['metadata']['code'] == 200) {
+            $this->dataRefBPJSLovStatus = true;
+            $this->dataRefBPJSLov = json_decode(json_encode($HttpGetBpjs['response']['rujukan'], true), true);
+
+            $this->emit('toastr-success', $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+        } else {
+            $this->dataRefBPJSLovStatus = false;
+            $this->dataRefBPJSLov = [];
+            $this->emit('toastr-error', $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+        }
+    }
+
+    private function rujukanPesertaFKTL($idBpjs): void
+    {
+        $HttpGetBpjs =  VclaimTrait::rujukan_rs_peserta($idBpjs)->getOriginalContent();
 
         // metadata d kecil
         if ($HttpGetBpjs['metadata']['code'] == 200) {
