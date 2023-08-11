@@ -1697,11 +1697,10 @@ class DaftarRJ extends Component
             ->first();
 
 
-        $cekAntrianAntreanBPJS = isset($cekAntrianAntreanBPJS->push_antrian_bpjs_status) ? $cekAntrianAntreanBPJS->push_antrian_bpjs_status : "";
+        $cekAntrianAntreanBPJSStatus = isset($cekAntrianAntreanBPJS->push_antrian_bpjs_status) ? $cekAntrianAntreanBPJS->push_antrian_bpjs_status : "";
         // 1 cek proses pada database status
-        if ($cekAntrianAntreanBPJS == 200) {
+        if ($cekAntrianAntreanBPJSStatus == 200) {
             // set http response to public
-            dd($cekAntrianAntreanBPJS);
             $this->HttpGetBpjsStatus = $cekAntrianAntreanBPJS->push_antrian_bpjs_status; //status 200 201 400 ..
             $this->HttpGetBpjsJson = $cekAntrianAntreanBPJS->push_antrian_bpjs_json; //Return Response Tambah Antrean
 
