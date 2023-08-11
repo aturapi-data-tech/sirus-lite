@@ -2002,6 +2002,8 @@ class DaftarRJ extends Component
             $this->emit('toastr-error', "Data Dokter atau Poli mapping BPJS belum tidak di temukan.");
         }
 
+
+        dd($this->JenisKunjungan['JenisKunjunganId']);
         $this->SEPJsonReq = [
             "request" =>  [
                 "t_sep" =>  [
