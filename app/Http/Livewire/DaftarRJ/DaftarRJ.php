@@ -1331,14 +1331,16 @@ class DaftarRJ extends Component
                     "resSep" => [],
                 ]
             ];
-        }
-        $this->setDataPasien($this->dataDaftarPoliRJ['regNo']);
-        $this->dataPasienLovSearch = $this->dataDaftarPoliRJ['regNo'];
-        $this->JenisKlaim['JenisKlaimId'] = $dataDaftarPoliRJ->klaim_id == 'JM' ? 'JM' : 'UM';
-        $this->JenisKlaim['JenisKlaimDesc'] = $dataDaftarPoliRJ->klaim_id == 'JM' ? 'BPJS' : 'UMUM';
 
-        $this->JenisKunjungan['JenisKunjunganId'] = '1';
-        $this->JenisKunjungan['JenisKunjunganDesc'] = 'Rujukan FKTP';
+            $this->setDataPasien($this->dataDaftarPoliRJ['regNo']);
+            $this->dataPasienLovSearch = $this->dataDaftarPoliRJ['regNo'];
+            $this->JenisKlaim['JenisKlaimId'] = $dataDaftarPoliRJ->klaim_id == 'JM' ? 'JM' : 'UM';
+            $this->JenisKlaim['JenisKlaimDesc'] = $dataDaftarPoliRJ->klaim_id == 'JM' ? 'BPJS' : 'UMUM';
+
+            $this->JenisKunjungan['JenisKunjunganId'] = '1';
+            $this->JenisKunjungan['JenisKunjunganDesc'] = 'Rujukan FKTP';
+        }
+
 
         // 
 
