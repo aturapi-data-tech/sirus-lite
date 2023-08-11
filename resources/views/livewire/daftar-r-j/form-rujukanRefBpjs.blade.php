@@ -169,6 +169,22 @@
                         </div>
                     </div>
 
+                    @if ($JenisKunjungan['JenisKunjunganId'] == 3)
+                        <div class="flex">
+                            <div class="flex items-center justify-end w-1/4 ">
+                                <x-input-label for="regName" :value="__('Nomer SKDP')" :required="__($errors->has('SEPJsonReq.request.t_sep.skdp.noSurat'))" />
+                            </div>
+                            <div class="flex items-center justify-end w-full mr-5">
+                                <x-text-input placeholder="Isi dgn data yang sesuai" class="mx-2 mt-1"
+                                    :errorshas="__($errors->has('SEPJsonReq.request.t_sep.skdp.noSurat'))" :disabled=false
+                                    wire:model.debounce.500ms="SEPJsonReq.request.t_sep.skdp.noSurat" />
+                                @error('SEPJsonReq.request.t_sep.skdp.noSurat')
+                                    <x-input-error :messages=$message />
+                                @enderror
+                            </div>
+                        </div>
+                    @endif
+
                     <div class="flex">
                         <div class="flex items-center justify-end w-1/4 ">
                             <x-input-label for="regName" :value="__('Tanggal SEP')" :required="__($errors->has('SEPJsonReq.request.t_sep.tglSep'))" />
@@ -278,6 +294,129 @@
                             @enderror
                         </div>
                     </div>
+
+
+                    @if ($JenisKunjungan['JenisKunjunganId'] == 2 || $JenisKunjungan['JenisKunjunganId'] == 3)
+                        <div class="flex pt-2">
+                            <div class="flex items-center justify-end w-1/4 ">
+                                <x-input-label for="regName" :value="__('tujuanKunj')" :required="__($errors->has('SEPJsonReq.request.t_sep.tujuanKunj'))" />
+                            </div>
+
+                            <x-dropdown align="right" :width="__('80')">
+                                <x-slot name="trigger">
+                                    {{-- Button myLimitPerPage --}}
+                                    <x-alternative-button class="inline-flex w-96" wire:click.prevent="">
+                                        <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
+                                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                            <path clip-rule="evenodd" fill-rule="evenodd"
+                                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                                        </svg>
+                                        ({{ $SEPJsonReq['request']['t_sep']['tujuanKunj'] . ' ' . $SEPJsonReq['request']['t_sep']['tujuanKunjDesc'] }})
+                                    </x-alternative-button>
+                                </x-slot>
+                                {{-- Open myLimitPerPagecontent --}}
+                                <x-slot name="content">
+
+                                    @foreach ($SEPQuestionnaire['tujuanKunj'] as $tujuanKunj)
+                                        <x-dropdown-link
+                                            wire:click="settujuanKunj('{{ $tujuanKunj['tujuanKunjId'] }}','{{ $tujuanKunj['tujuanKunjDesc'] }}')">
+                                            {{ __($tujuanKunj['tujuanKunjId'] . ' ' . $tujuanKunj['tujuanKunjDesc']) }}
+                                        </x-dropdown-link>
+                                    @endforeach
+                                </x-slot>
+                            </x-dropdown>
+                        </div>
+
+                        <div class="flex">
+                            <div class="flex items-center justify-end w-1/4 ">
+                                <x-input-label for="regName" :value="__('flagProcedure')" :required="__($errors->has('SEPJsonReq.request.t_sep.flagProcedure'))" />
+                            </div>
+
+                            <x-dropdown align="right" :width="__('80')">
+                                <x-slot name="trigger">
+                                    {{-- Button myLimitPerPage --}}
+                                    <x-alternative-button class="inline-flex w-96" wire:click.prevent="">
+                                        <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
+                                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                            <path clip-rule="evenodd" fill-rule="evenodd"
+                                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                                        </svg>
+                                        ({{ $SEPJsonReq['request']['t_sep']['flagProcedure'] . ' ' . $SEPJsonReq['request']['t_sep']['flagProcedureDesc'] }})
+                                    </x-alternative-button>
+                                </x-slot>
+                                {{-- Open myLimitPerPagecontent --}}
+                                <x-slot name="content">
+
+                                    @foreach ($SEPQuestionnaire['flagProcedure'] as $flagProcedure)
+                                        <x-dropdown-link
+                                            wire:click="setflagProcedure('{{ $flagProcedure['flagProcedureId'] }}','{{ $flagProcedure['flagProcedureDesc'] }}')">
+                                            {{ __($flagProcedure['flagProcedureId'] . ' ' . $flagProcedure['flagProcedureDesc']) }}
+                                        </x-dropdown-link>
+                                    @endforeach
+                                </x-slot>
+                            </x-dropdown>
+                        </div>
+
+                        <div class="flex">
+                            <div class="flex items-center justify-end w-1/4 ">
+                                <x-input-label for="regName" :value="__('kdPenunjang')" :required="__($errors->has('SEPJsonReq.request.t_sep.kdPenunjang'))" />
+                            </div>
+
+                            <x-dropdown align="right" :width="__('80')">
+                                <x-slot name="trigger">
+                                    {{-- Button myLimitPerPage --}}
+                                    <x-alternative-button class="inline-flex w-96" wire:click.prevent="">
+                                        <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
+                                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                            <path clip-rule="evenodd" fill-rule="evenodd"
+                                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                                        </svg>
+                                        ({{ $SEPJsonReq['request']['t_sep']['kdPenunjang'] . ' ' . $SEPJsonReq['request']['t_sep']['kdPenunjangDesc'] }})
+                                    </x-alternative-button>
+                                </x-slot>
+                                {{-- Open myLimitPerPagecontent --}}
+                                <x-slot name="content">
+
+                                    @foreach ($SEPQuestionnaire['kdPenunjang'] as $kdPenunjang)
+                                        <x-dropdown-link
+                                            wire:click="setkdPenunjang('{{ $kdPenunjang['kdPenunjangId'] }}','{{ $kdPenunjang['kdPenunjangDesc'] }}')">
+                                            {{ __($kdPenunjang['kdPenunjangId'] . ' ' . $kdPenunjang['kdPenunjangDesc']) }}
+                                        </x-dropdown-link>
+                                    @endforeach
+                                </x-slot>
+                            </x-dropdown>
+                        </div>
+
+                        <div class="flex">
+                            <div class="flex items-center justify-end w-1/4 ">
+                                <x-input-label for="regName" :value="__('assesmentPel')" :required="__($errors->has('SEPJsonReq.request.t_sep.assesmentPel'))" />
+                            </div>
+
+                            <x-dropdown align="right" :width="__('80')">
+                                <x-slot name="trigger">
+                                    {{-- Button myLimitPerPage --}}
+                                    <x-alternative-button class="inline-flex w-96" wire:click.prevent="">
+                                        <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
+                                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                            <path clip-rule="evenodd" fill-rule="evenodd"
+                                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                                        </svg>
+                                        ({{ $SEPJsonReq['request']['t_sep']['assesmentPel'] . ' ' . $SEPJsonReq['request']['t_sep']['assesmentPelDesc'] }})
+                                    </x-alternative-button>
+                                </x-slot>
+                                {{-- Open myLimitPerPagecontent --}}
+                                <x-slot name="content">
+
+                                    @foreach ($SEPQuestionnaire['assesmentPel'] as $assesmentPel)
+                                        <x-dropdown-link
+                                            wire:click="setassesmentPel('{{ $assesmentPel['assesmentPelId'] }}','{{ $assesmentPel['assesmentPelDesc'] }}')">
+                                            {{ __($assesmentPel['assesmentPelId'] . ' ' . $assesmentPel['assesmentPelDesc']) }}
+                                        </x-dropdown-link>
+                                    @endforeach
+                                </x-slot>
+                            </x-dropdown>
+                        </div>
+                    @endif
 
 
 

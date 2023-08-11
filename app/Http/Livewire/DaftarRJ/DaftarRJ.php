@@ -414,9 +414,18 @@ class DaftarRJ extends Component
                     ]
                 ],
                 "tujuanKunj" => "0",
+                "tujuanKunjDesc" => "Normal",
+
                 "flagProcedure" => "",
+                "flagProcedureDesc" => "",
+
                 "kdPenunjang" => "",
+                "kdPenunjangDesc" => "",
+
                 "assesmentPel" => "",
+                "assesmentPelDesc" => "",
+
+
                 "skdp" =>  [
                     "noSurat" => "",
                     "kodeDPJP" => "",
@@ -428,7 +437,40 @@ class DaftarRJ extends Component
         ],
     ];
     //////////////////////////////
+    public $SEPQuestionnaire = [
+        'tujuanKunj' => [
+            ['tujuanKunjId' => '0', 'tujuanKunjDesc' => 'Normal'],
+            ['tujuanKunjId' => '1', 'tujuanKunjDesc' => 'Prosedur'],
+            ['tujuanKunjId' => '2', 'tujuanKunjDesc' => 'Konsul Dokter'],
+        ],
+        'flagProcedure' => [
+            ['flagProcedureId' => '0', 'flagProcedureDesc' => 'Prosedur Tidak Berkelanjutan'],
+            ['flagProcedureId' => '1', 'flagProcedureDesc' => 'Prosedur dan Terapi Berkelanjutan'],
+        ],
+        'kdPenunjang' => [
+            ['kdPenunjangId' => '1', 'kdPenunjangDesc' => 'Radioterapi'],
+            ['kdPenunjangId' => '2', 'kdPenunjangDesc' => 'Kemoterapi'],
+            ['kdPenunjangId' => '3', 'kdPenunjangDesc' => 'Rehabilitasi Medik'],
+            ['kdPenunjangId' => '4', 'kdPenunjangDesc' => 'Rehabilitasi Psikososial'],
+            ['kdPenunjangId' => '5', 'kdPenunjangDesc' => 'Transfusi Darah'],
+            ['kdPenunjangId' => '6', 'kdPenunjangDesc' => 'Pelayanan Gigi'],
+            ['kdPenunjangId' => '7', 'kdPenunjangDesc' => 'Laboratorium'],
+            ['kdPenunjangId' => '8', 'kdPenunjangDesc' => 'USG'],
+            ['kdPenunjangId' => '9', 'kdPenunjangDesc' => 'Farmasi'],
+            ['kdPenunjangId' => '10', 'kdPenunjangDesc' => 'Lain-Lain'],
+            ['kdPenunjangId' => '11', 'kdPenunjangDesc' => 'MRI'],
+            ['kdPenunjangId' => '12', 'kdPenunjangDesc' => 'HEMODIALISA'],
 
+
+        ],
+        'assesmentPel' => [
+            ['assesmentPelId' => '1', 'assesmentPelDesc' => 'Poli spesialis tidak tersedia pada hari sebelumnya'],
+            ['assesmentPelId' => '2', 'assesmentPelDesc' => 'Jam Poli telah berakhir pada hari sebelumnya'],
+            ['assesmentPelId' => '3', 'assesmentPelDesc' => 'Dokter Spesialis yang dimaksud tidak praktek pada hari sebelumnya'],
+            ['assesmentPelId' => '4', 'assesmentPelDesc' => 'Atas Instruksi RS'],
+            ['assesmentPelId' => '5', 'assesmentPelDesc' => 'Tujuan Kontrol'],
+        ],
+    ];
 
 
     //////////////////////////////////////////////////////////////////////
@@ -1076,10 +1118,10 @@ class DaftarRJ extends Component
                 $this->rujukanPesertaFKTP($this->dataPasien['pasien']['identitas']['idbpjs']);
             } else if ($this->JenisKlaim['JenisKlaimId'] == 'JM' && $this->JenisKunjungan['JenisKunjunganId'] == 2) {
                 // if jenis klaim BPJS dan Kunjungan = Kontrol (2)
-                $this->emit('toastr-error', 'Jenis Klaim Kontrol');
+                $this->rujukanPesertaFKTP($this->dataPasien['pasien']['identitas']['idbpjs']);
             } else if ($this->JenisKlaim['JenisKlaimId'] == 'JM' && $this->JenisKunjungan['JenisKunjunganId'] == 3) {
                 // if jenis klaim BPJS dan Kunjungan = Inernal (3)
-                $this->emit('toastr-error', 'Jenis Klaim Inernal');
+                $this->rujukanPesertaFKTP($this->dataPasien['pasien']['identitas']['idbpjs']);
             } else if ($this->JenisKlaim['JenisKlaimId'] == 'JM' && $this->JenisKunjungan['JenisKunjunganId'] == 4) {
                 // if jenis klaim BPJS dan Kunjungan = FKTL antar rs(4)
                 $this->emit('toastr-error', 'Jenis Klaim FKTL antar rs');
@@ -1266,7 +1308,7 @@ class DaftarRJ extends Component
                 "noAntrian" => "" . $dataDaftarPoliRJ->no_antrian . "",
                 "noBooking" => "" . $dataDaftarPoliRJ->nobooking . "",
                 "slCodeFrom" => "02",
-                "passStatus" => "O",
+                "passStatus" => "",
                 "rjStatus" => "" . $dataDaftarPoliRJ->rj_status . "",
                 "txnStatus" => "" . $dataDaftarPoliRJ->txn_status . "",
                 "ermStatus" => "" . $dataDaftarPoliRJ->erm_status . "",
@@ -1291,6 +1333,13 @@ class DaftarRJ extends Component
             ];
         }
         $this->setDataPasien($this->dataDaftarPoliRJ['regNo']);
+        $this->dataPasienLovSearch = $this->dataDaftarPoliRJ['regNo'];
+        $this->JenisKlaim['JenisKlaimId'] = $dataDaftarPoliRJ->klaim_id == 'JM' ? 'JM' : 'UM';
+        $this->JenisKlaim['JenisKlaimDesc'] = $dataDaftarPoliRJ->klaim_id == 'JM' ? 'BPJS' : 'UMUM';
+
+        $this->JenisKunjungan['JenisKunjunganId'] = '1';
+        $this->JenisKunjungan['JenisKunjunganDesc'] = 'Rujukan FKTP';
+
         // 
 
         // return $findData;
@@ -1787,10 +1836,10 @@ class DaftarRJ extends Component
                 ? $this->SEPJsonReq['request']['t_sep']['rujukan']['noRujukan']
                 : (
                     ($this->JenisKunjungan['JenisKunjunganId'] == 2)
-                    ? $this->SEPJsonReq['request']['t_sep']['rujukan']['noRujukan']
+                    ? $this->SEPJsonReq['request']['t_sep']['rujukan']['noRujukan'] . '1'
                     : (
                         ($this->JenisKunjungan['JenisKunjunganId'] == 3)
-                        ? $this->SEPJsonReq['request']['t_sep']['rujukan']['noRujukan']
+                        ? $this->SEPJsonReq['request']['t_sep']['skdp']['noSurat']
                         : (
                             ($this->JenisKunjungan['JenisKunjunganId'] == 4)
                             ? $this->SEPJsonReq['request']['t_sep']['rujukan']['noRujukan']
@@ -1958,7 +2007,7 @@ class DaftarRJ extends Component
                     "diagAwal" => "" . $dataRefBPJSLov['diagnosa']['kode'] . "",
                     "diagAwalNama" => "" . $dataRefBPJSLov['diagnosa']['nama'] . "",
                     "poli" =>  [
-                        "tujuan" => "" . $dataRefBPJSLov['poliRujukan']['kode'] . "",
+                        "tujuan" => "" . $dataRefBPJSLov['poliRujukan']['kode'] . "", //Untuk Kunjungan Internal beda poli dgn rujukan
                         "tujuanNama" => "" . $dataRefBPJSLov['poliRujukan']['nama'] . "",
                         "eksekutif" => "" . "0" . "", //{poli eksekutif -> 0. Tidak 1.Ya}
                         "eksekutifRef" =>  $this->SEPJsonReq['request']['t_sep']['poli']['eksekutifRef'], //{poli eksekutif -> 0. Tidak 1.Ya}
@@ -1993,12 +2042,21 @@ class DaftarRJ extends Component
                         ]
                     ],
                     "tujuanKunj" => "0", //{"0": Normal,"1": Prosedur,"2": Konsul Dokter}
+                    "tujuanKunjDesc" => "Normal",
+
                     "flagProcedure" => "",
+                    "flagProcedureDesc" => "",
+
                     "kdPenunjang" => "",
+                    "kdPenunjangDesc" => "",
+
                     "assesmentPel" => "",
+                    "assesmentPelDesc" => "",
                     "skdp" =>  [
-                        "noSurat" => "",
-                        "kodeDPJP" => "",
+                        "noSurat" => "", //disi ketika wire model dan JenisKunjunganId == 3
+                        "kodeDPJP" => "" . $dataRefBPJSLov['pelayanan']['kode'] == 1
+                            ? "" : (($cariDataIdBpjs_dr_poli->kd_dr_bpjs && $this->JenisKunjungan['JenisKunjunganId'] == 3)
+                                ? $cariDataIdBpjs_dr_poli->kd_dr_bpjs : "") . "", //tidak di isi jika jenis kunjungan selain KONTROL
                     ],
                     "dpjpLayan" => "" . $dataRefBPJSLov['pelayanan']['kode'] == 1
                         ? "" : ($cariDataIdBpjs_dr_poli->kd_dr_bpjs
@@ -2233,6 +2291,28 @@ class DaftarRJ extends Component
     /////////////////////////////////////////////////
     // Lov dataDiagnosaRJ //////////////////////
     ////////////////////////////////////////////////
+
+    public function settujuanKunj($id, $name)
+    {
+        $this->SEPJsonReq['request']['t_sep']['tujuanKunj'] = $this->JenisKunjungan['JenisKunjunganId'] == 2 || $this->JenisKunjungan['JenisKunjunganId'] == 3 ? $id : "";
+        $this->SEPJsonReq['request']['t_sep']['tujuanKunjDesc'] = $this->JenisKunjungan['JenisKunjunganId'] == 2 || $this->JenisKunjungan['JenisKunjunganId'] == 3 ? $name : "";
+    }
+
+    public function setflagProcedure($id, $name)
+    {
+        $this->SEPJsonReq['request']['t_sep']['flagProcedure'] = $this->SEPJsonReq['request']['t_sep']['tujuanKunj'] == 0 ? "" : $id;
+        $this->SEPJsonReq['request']['t_sep']['flagProcedureDesc'] =  $this->SEPJsonReq['request']['t_sep']['tujuanKunj'] == 0 ? "" : $name;
+    }
+    public function setkdPenunjang($id, $name)
+    {
+        $this->SEPJsonReq['request']['t_sep']['kdPenunjang'] = $this->SEPJsonReq['request']['t_sep']['tujuanKunj'] == 0 ? "" : $id;
+        $this->SEPJsonReq['request']['t_sep']['kdPenunjangDesc'] = $this->SEPJsonReq['request']['t_sep']['tujuanKunj'] == 0 ? "" : $name;
+    }
+    public function setassesmentPel($id, $name)
+    {
+        $this->SEPJsonReq['request']['t_sep']['assesmentPel'] = $this->SEPJsonReq['request']['t_sep']['tujuanKunj'] == 0 || $this->SEPJsonReq['request']['t_sep']['tujuanKunj'] == 2 ? $id : "";
+        $this->SEPJsonReq['request']['t_sep']['assesmentPelDesc'] = $this->SEPJsonReq['request']['t_sep']['tujuanKunj'] == 0 || $this->SEPJsonReq['request']['t_sep']['tujuanKunj'] == 2 ? $name : "";
+    }
 
 
 
