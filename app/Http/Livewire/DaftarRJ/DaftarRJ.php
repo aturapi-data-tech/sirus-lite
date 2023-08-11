@@ -1632,23 +1632,23 @@ class DaftarRJ extends Component
         // http Post
 
 
-        //ketika Push Tambah Antrean Berhasil buat SEP
-        //////////////////////////////////////////////
-        $this->pushInsertSEP($this->SEPJsonReq);
-        //ketika Push Tambah Antrean Berhasil buat SEP
-        //////////////////////////////////////////////
 
-        // Tambah Antrean
-        $HttpGetBpjs =  AntrianTrait::tambah_antrean($antreanadd)->getOriginalContent();
-        // set http response to public
-        $this->HttpGetBpjsStatus = $HttpGetBpjs['metadata']['code']; //status 200 201 400 ..
-        $this->HttpGetBpjsJson = json_encode($HttpGetBpjs, true); //Return Response Tambah Antrean
+        // Lakukan 2 x cek http dan BPJS untuk memastikan proses kirim data berhasil 
+        // dan menentukan nilai status / jika code =200 skip proses tersebut
+        // jika antrean berhasil-> buat SEP
+        //jika gagal ulangi-> antrean
+        // (pembuatan SEP dilakukan ketika proses antrean berhasil)
 
+        $cekAntrianAntreanBPJS = DB::table('rstxn_rjhdrs')
+            ->select('push_antrian_bpjs_status', 'push_antrian_bpjs_json')
+            ->where('rj_no', $this->dataDaftarPoliRJ['rjNo'])
+            ->first();
 
-        // metadata d kecil
-        if ($HttpGetBpjs['metadata']['code'] == 200) {
-            $this->emit('toastr-success', 'Tambah Antrian ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
-
+        // 1 cek proses pada database status
+        if ($cekAntrianAntreanBPJS->push_antrian_bpjs_status == 200) {
+            // set http response to public
+            $this->HttpGetBpjsStatus = $cekAntrianAntreanBPJS->push_antrian_bpjs_status; //status 200 201 400 ..
+            $this->HttpGetBpjsJson = $cekAntrianAntreanBPJS->push_antrian_bpjs_json; //Return Response Tambah Antrean
 
             //ketika Push Tambah Antrean Berhasil buat SEP
             //////////////////////////////////////////////
@@ -1656,13 +1656,38 @@ class DaftarRJ extends Component
             //ketika Push Tambah Antrean Berhasil buat SEP
             //////////////////////////////////////////////
 
-
         } else {
-            $this->emit('toastr-error', 'Tambah Antrian ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+            // Tambah Antrean
+            $HttpGetBpjs =  AntrianTrait::tambah_antrean($antreanadd)->getOriginalContent();
+            // set http response to public
+            $this->HttpGetBpjsStatus = $HttpGetBpjs['metadata']['code']; //status 200 201 400 ..
+            $this->HttpGetBpjsJson = json_encode($HttpGetBpjs, true); //Return Response Tambah Antrean
 
-            // Ulangi Proses pushDataAntrian;
-            $this->emit('rePush_Data_Antrian_Confirmation');
+
+            // 2 cek proses pada getHttp
+            if ($HttpGetBpjs['metadata']['code'] == 200) {
+                $this->emit('toastr-success', 'Tambah Antrian ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+
+                $this->HttpGetBpjsStatus = $HttpGetBpjs['metadata']['code']; //status 200 201 400 ..
+                $this->HttpGetBpjsJson = json_encode($HttpGetBpjs, true); //Return Response Tambah Antrean
+
+                //ketika Push Tambah Antrean Berhasil buat SEP
+                //////////////////////////////////////////////
+                $this->pushInsertSEP($this->SEPJsonReq);
+                //ketika Push Tambah Antrean Berhasil buat SEP
+                //////////////////////////////////////////////
+            } else {
+                $this->emit('toastr-error', 'Tambah Antrian ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+
+                $this->HttpGetBpjsStatus = $HttpGetBpjs['metadata']['code']; //status 200 201 400 ..
+                $this->HttpGetBpjsJson = json_encode($HttpGetBpjs, true); //Return Response Tambah Antrean
+
+                // Ulangi Proses pushDataAntrian;
+                $this->emit('rePush_Data_Antrian_Confirmation');
+            }
         }
+
+
 
         /////////////////////////
         // Update TaskId 3
@@ -1685,9 +1710,7 @@ class DaftarRJ extends Component
         $waktu = $time;
         $HttpGetBpjs =  AntrianTrait::update_antrean($noBooking, $taskId, $waktu, "")->getOriginalContent();
 
-        // set http response to public
-        $this->HttpGetBpjsStatus = $HttpGetBpjs['metadata']['code']; //status 200 201 400 ..
-        $this->HttpGetBpjsJson = json_encode($HttpGetBpjs, true); //Return Response Tambah Antrean
+
 
         // metadata d kecil
         if ($HttpGetBpjs['metadata']['code'] == 200) {
