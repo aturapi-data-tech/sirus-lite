@@ -1,8 +1,6 @@
 @php
     $disabledProperty = true;
     
-    $disabledPropertyRj = $isOpenMode === 'tampil' ? true : false;
-    
     $disabledPropertyRjStatus = $statusRjRef['statusId'] !== 'A' ? true : false;
     
 @endphp
@@ -38,7 +36,7 @@
                     <div>
                         <div class="flex items-center mb-2">
                             <x-text-input id="pasporidentitas" placeholder="Tanggal [ dd/mm/yyyy hh24:mi:ss ]"
-                                class="mt-1 ml-2 sm:w-[160px]" :errorshas="__($errors->has('dataDaftarPoliRJ.rjDate'))" :disabled=$disabledPropertyRj
+                                class="mt-1 ml-2 sm:w-[160px]" :errorshas="__($errors->has('dataDaftarPoliRJ.rjDate'))" :disabled=$disabledPropertyRjStatus
                                 wire:model.debounce.500ms="dataDaftarPoliRJ.rjDate" />
                         </div>
                         @error('dataDaftarPoliRJ.rjDate')
@@ -1109,7 +1107,7 @@
                                 <div class="flex items-center mb-2">
                                     <x-text-input id="dataPasienLovSearch"
                                         placeholder="Cari Data Pasien dgn [ Nama / Reg No / NIK / Noka BPJS]"
-                                        class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.regNo'))" :disabled=$disabledPropertyRj
+                                        class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.regNo'))" :disabled=$disabledPropertyRjStatus
                                         wire:model.debounce.500ms="dataPasienLovSearch" />
 
                                 </div>
@@ -1168,7 +1166,7 @@
                                 <x-input-label :value="__('No Referensi')" :required="__(true)" />
                                 <div class="flex items-center mb-2">
                                     <x-text-input placeholder="No Referensi" class="mt-1" :errorshas="__($errors->has('dataDaftarPoliRJ.noReferensi'))"
-                                        :disabled=$disabledPropertyRj
+                                        :disabled=$disabledPropertyRjStatus
                                         wire:model.debounce.500ms="dataDaftarPoliRJ.noReferensi"
                                         wire:loading.attr="disabled" />
                                 </div>
@@ -1180,7 +1178,7 @@
 
                                 <div>
                                     <div class="flex justify-between">
-                                        <x-green-button :disabled=$disabledPropertyRj
+                                        <x-green-button :disabled=$disabledPropertyRjStatus
                                             wire:click.prevent="clickrujukanPeserta()" type="button"
                                             wire:loading.remove>No Referensi
                                         </x-green-button>
@@ -1211,7 +1209,7 @@
                                         <x-text-input placeholder="Dokter" class="sm:rounded-none sm:rounded-l-lg"
                                             :errorshas="__($errors->has('dataDaftarPoliRJ.drId'))" :disabled=true
                                             value="{{ $dataDaftarPoliRJ['drId'] . ' ' . $dataDaftarPoliRJ['drDesc'] }}" />
-                                        <x-green-button :disabled=$disabledPropertyRj
+                                        <x-green-button :disabled=$disabledPropertyRjStatus
                                             class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
                                             wire:click.prevent="clickdataDokterlov()">
                                             <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
@@ -1273,7 +1271,7 @@
                 <div class="sticky bottom-0 flex justify-between px-4 py-3 bg-gray-50 sm:px-6">
 
                     <div class="">
-                        <x-primary-button :disabled=$disabledPropertyRj wire:click.prevent="callFormPasien()"
+                        <x-primary-button :disabled=$disabledPropertyRjStatus wire:click.prevent="callFormPasien()"
                             type="button" wire:loading.remove>
                             Master Pasien
                         </x-primary-button>
