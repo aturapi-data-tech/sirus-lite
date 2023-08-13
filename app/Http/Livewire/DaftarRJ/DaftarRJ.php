@@ -1110,32 +1110,31 @@ class DaftarRJ extends Component
         // Cek jika bukan BPJS
         if ($this->JenisKlaim['JenisKlaimId'] != 'JM') {
             $this->emit('toastr-error', 'Jenis Klaim ' . $this->JenisKlaim['JenisKlaimDesc']);
-        }
-
-        // Cek Apakah reqSep ada datanya apa blm
-        // if (isset($this->dataDaftarPoliRJ['sep']['reqSep']['request']) && isset($this->dataDaftarPoliRJ['sep']['noSep'])) {
-        if ($this->dataDaftarPoliRJ['sep']['noSep']) {
-
-            $this->SEPJsonReq = $this->dataDaftarPoliRJ['sep']['reqSep'];
-            // set formRujukanRefBPJSStatus true (open form)
-            $this->formRujukanRefBPJSStatus = true;
         } else {
-            // if jenis klaim BPJS dan Kunjungan = FKTP (1)
-            if ($this->JenisKlaim['JenisKlaimId'] == 'JM' && $this->JenisKunjungan['JenisKunjunganId'] == 1) {
-                $this->rujukanPesertaFKTP($this->dataPasien['pasien']['identitas']['idbpjs']);
-            } else if ($this->JenisKlaim['JenisKlaimId'] == 'JM' && $this->JenisKunjungan['JenisKunjunganId'] == 2) {
-                // if jenis klaim BPJS dan Kunjungan = Kontrol (2)
-                $this->rujukanPesertaFKTP($this->dataPasien['pasien']['identitas']['idbpjs']);
-            } else if ($this->JenisKlaim['JenisKlaimId'] == 'JM' && $this->JenisKunjungan['JenisKunjunganId'] == 3) {
-                // if jenis klaim BPJS dan Kunjungan = Inernal (3)
-                $this->rujukanPesertaFKTP($this->dataPasien['pasien']['identitas']['idbpjs']);
-            } else if ($this->JenisKlaim['JenisKlaimId'] == 'JM' && $this->JenisKunjungan['JenisKunjunganId'] == 4) {
-                // if jenis klaim BPJS dan Kunjungan = FKTL antar rs(4)
-                $this->rujukanPesertaFKTL($this->dataPasien['pasien']['identitas']['idbpjs']);
-                $this->emit('toastr-error', 'Jenis Klaim FKTL antar rs cek');
+            // Cek Apakah reqSep ada datanya apa blm
+            // if (isset($this->dataDaftarPoliRJ['sep']['reqSep']['request']) && isset($this->dataDaftarPoliRJ['sep']['noSep'])) {
+            if ($this->dataDaftarPoliRJ['sep']['noSep']) {
+
+                $this->SEPJsonReq = $this->dataDaftarPoliRJ['sep']['reqSep'];
+                // set formRujukanRefBPJSStatus true (open form)
+                $this->formRujukanRefBPJSStatus = true;
+            } else {
+                // if jenis klaim BPJS dan Kunjungan = FKTP (1)
+                if ($this->JenisKlaim['JenisKlaimId'] == 'JM' && $this->JenisKunjungan['JenisKunjunganId'] == 1) {
+                    $this->rujukanPesertaFKTP($this->dataPasien['pasien']['identitas']['idbpjs']);
+                } else if ($this->JenisKlaim['JenisKlaimId'] == 'JM' && $this->JenisKunjungan['JenisKunjunganId'] == 2) {
+                    // if jenis klaim BPJS dan Kunjungan = Kontrol (2)
+                    $this->rujukanPesertaFKTP($this->dataPasien['pasien']['identitas']['idbpjs']);
+                } else if ($this->JenisKlaim['JenisKlaimId'] == 'JM' && $this->JenisKunjungan['JenisKunjunganId'] == 3) {
+                    // if jenis klaim BPJS dan Kunjungan = Inernal (3)
+                    $this->rujukanPesertaFKTP($this->dataPasien['pasien']['identitas']['idbpjs']);
+                } else if ($this->JenisKlaim['JenisKlaimId'] == 'JM' && $this->JenisKunjungan['JenisKunjunganId'] == 4) {
+                    // if jenis klaim BPJS dan Kunjungan = FKTL antar rs(4)
+                    $this->rujukanPesertaFKTL($this->dataPasien['pasien']['identitas']['idbpjs']);
+                    $this->emit('toastr-error', 'Jenis Klaim FKTL antar rs cek');
+                }
             }
         }
-        // }
     }
 
     ///////////cariDataPasienByKey/////////////////////////////////
@@ -1863,17 +1862,17 @@ class DaftarRJ extends Component
 
             $this->dataDaftarPoliRJ['noReferensi'] =
                 ($this->JenisKunjungan['JenisKunjunganId'] == 1)
-                ? $this->SEPJsonReq['request']['t_sep']['rujukan']['noRujukan']
+                ? (isset($this->SEPJsonReq['request']['t_sep']['rujukan']['noRujukan']) ? $this->SEPJsonReq['request']['t_sep']['rujukan']['noRujukan'] : "Data tidak dapat diproses")
                 : (
                     ($this->JenisKunjungan['JenisKunjunganId'] == 2)
-                    ? $this->SEPJsonReq['request']['t_sep']['rujukan']['noRujukan'] . '1'
+                    ? (isset($this->SEPJsonReq['request']['t_sep']['rujukan']['noRujukan']) ? $this->SEPJsonReq['request']['t_sep']['rujukan']['noRujukan'] : "Data tidak dapat diproses") . '1'
                     : (
                         ($this->JenisKunjungan['JenisKunjunganId'] == 3)
                         ? $this->SEPJsonReq['request']['t_sep']['skdp']['noSurat']
                         : (
                             ($this->JenisKunjungan['JenisKunjunganId'] == 4)
-                            ? $this->SEPJsonReq['request']['t_sep']['rujukan']['noRujukan']
-                            : $this->SEPJsonReq['request']['t_sep']['rujukan']['noRujukan']
+                            ? (isset($this->SEPJsonReq['request']['t_sep']['rujukan']['noRujukan']) ? $this->SEPJsonReq['request']['t_sep']['rujukan']['noRujukan'] : "Data tidak dapat diproses")
+                            : (isset($this->SEPJsonReq['request']['t_sep']['rujukan']['noRujukan']) ? $this->SEPJsonReq['request']['t_sep']['rujukan']['noRujukan'] : "Data tidak dapat diproses")
                         )
                     )
                 );

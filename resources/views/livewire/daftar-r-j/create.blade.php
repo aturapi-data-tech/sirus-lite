@@ -2,6 +2,9 @@
     $disabledProperty = true;
     
     $disabledPropertyRj = $isOpenMode === 'tampil' ? true : false;
+    
+    $disabledPropertyRjStatus = $statusRjRef['statusId'] !== 'A' ? true : false;
+    
 @endphp
 
 
@@ -1284,8 +1287,8 @@
                                 <x-loading />
                             </div>
 
-                            <x-green-button :disabled=$disabledPropertyRj wire:click.prevent="store()" type="button"
-                                wire:loading.remove>
+                            <x-green-button :disabled=$disabledPropertyRjStatus wire:click.prevent="store()"
+                                type="button" wire:loading.remove>
                                 Simpan
                             </x-green-button>
                         @endif

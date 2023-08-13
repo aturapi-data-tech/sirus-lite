@@ -2,6 +2,8 @@
     $disabledProperty = true;
     
     $disabledPropertyRj = $isOpenMode === 'tampil' ? true : false;
+    
+    $disabledPropertyRjStatus = $statusRjRef['statusId'] !== 'A' ? true : false;
 @endphp
 
 
@@ -60,15 +62,15 @@
                         </div>
 
                         <div class="flex items-center justify-end w-full my-1 ml-2 mr-5">
-                            {{ $SEPJsonReq['request']['t_sep']['poli']['eksekutif'] }}
+                            {{ isset($SEPJsonReq['request']['t_sep']['poli']['eksekutif']) ? $SEPJsonReq['request']['t_sep']['poli']['eksekutif'] : 'Data tidak dapat di proses' }}
                             <x-check-box value='1' :label="__('Eksekutif')"
                                 wire:model.debounce.500ms="SEPJsonReq.request.t_sep.poli.eksekutifRef"
-                                wire:click="$set('SEPJsonReq.request.t_sep.poli.eksekutif',{{ $SEPJsonReq['request']['t_sep']['poli']['eksekutif'] ? '0' : '1' }})" />
+                                wire:click="$set('SEPJsonReq.request.t_sep.poli.eksekutif',{{ (isset($SEPJsonReq['request']['t_sep']['poli']['eksekutif']) ? $SEPJsonReq['request']['t_sep']['poli']['eksekutif'] : '0') ? '0' : '1' }})" />
 
 
                             <x-text-input placeholder="Isi dgn data yang sesuai" class="mx-2 mt-1" :errorshas="__($errors->has('SEPJsonReq.request.t_sep.poli.tujuan'))"
                                 :disabled=$disabledProperty
-                                value="{{ $SEPJsonReq['request']['t_sep']['poli']['tujuan'] . '   ' . $SEPJsonReq['request']['t_sep']['poli']['tujuanNama'] }}" />
+                                value="{{ (isset($SEPJsonReq['request']['t_sep']['poli']['tujuan']) ? $SEPJsonReq['request']['t_sep']['poli']['tujuan'] : 'Data tidak dapat di proses') . '   ' . (isset($SEPJsonReq['request']['t_sep']['poli']['tujuanNama']) ? $SEPJsonReq['request']['t_sep']['poli']['tujuanNama'] : 'Data tidak dapat di proses') }}" />
 
 
                             @error('SEPJsonReq.request.t_sep.poli.tujuan')
@@ -86,7 +88,7 @@
                                 <x-text-input placeholder="Isi dgn data yang sesuai"
                                     class="ml-2 sm:rounded-none sm:rounded-l-lg" :errorshas="__($errors->has('SEPJsonReq.request.t_sep.dpjpLayan'))"
                                     :disabled=$disabledProperty
-                                    value="{{ $SEPJsonReq['request']['t_sep']['dpjpLayan'] . '   ' . $SEPJsonReq['request']['t_sep']['dpjpLayanNama'] }}" />
+                                    value="{{ (isset($SEPJsonReq['request']['t_sep']['dpjpLayan']) ? $SEPJsonReq['request']['t_sep']['dpjpLayan'] : 'Data tidak dapat di proses') . '   ' . (isset($SEPJsonReq['request']['t_sep']['dpjpLayanNama']) ? $SEPJsonReq['request']['t_sep']['dpjpLayanNama'] : 'Data tidak dapat di proses') }}" />
 
                                 <x-green-button :disabled=false
                                     class="sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
@@ -117,7 +119,7 @@
                         <div class="flex items-center justify-end w-full mr-5">
                             <x-text-input placeholder="Isi dgn data yang sesuai" class="mx-2 mt-1" :errorshas="__($errors->has('SEPJsonReq.request.t_sep.rujukan.asalRujukan'))"
                                 :disabled=$disabledProperty
-                                value="{{ $SEPJsonReq['request']['t_sep']['rujukan']['asalRujukan'] . '   ' . $SEPJsonReq['request']['t_sep']['rujukan']['asalRujukanNama'] }}" />
+                                value="{{ (isset($SEPJsonReq['request']['t_sep']['rujukan']['asalRujukan']) ? $SEPJsonReq['request']['t_sep']['rujukan']['asalRujukan'] : 'Data tidak dapat di proses') . '   ' . (isset($SEPJsonReq['request']['t_sep']['rujukan']['asalRujukanNama']) ? $SEPJsonReq['request']['t_sep']['rujukan']['asalRujukanNama'] : 'Data tidak dapat di proses') }}" />
                             @error('SEPJsonReq.request.t_sep.rujukan.asalRujukan')
                                 <x-input-error :messages=$message />
                             @enderror
@@ -132,7 +134,7 @@
                         <div class="flex items-center justify-end w-full mr-5">
                             <x-text-input placeholder="Isi dgn data yang sesuai" class="mx-2 mt-1" :errorshas="__($errors->has('SEPJsonReq.request.t_sep.rujukan.ppkRujukan'))"
                                 :disabled=$disabledProperty
-                                value="{{ $SEPJsonReq['request']['t_sep']['rujukan']['ppkRujukan'] . '   ' . $SEPJsonReq['request']['t_sep']['rujukan']['ppkRujukanNama'] }}" />
+                                value="{{ (isset($SEPJsonReq['request']['t_sep']['rujukan']['ppkRujukan']) ? $SEPJsonReq['request']['t_sep']['rujukan']['ppkRujukan'] : 'Data tidak dapat di proses') . '   ' . (isset($SEPJsonReq['request']['t_sep']['rujukan']['ppkRujukanNama']) ? $SEPJsonReq['request']['t_sep']['rujukan']['ppkRujukanNama'] : 'Data tidak dapat di proses') }}" />
                             @error('SEPJsonReq.request.t_sep.rujukan.ppkRujukan')
                                 <x-input-error :messages=$message />
                             @enderror
@@ -209,10 +211,10 @@
                             <x-text-input placeholder="Isi dgn data yang sesuai" class="mx-2 mt-1 md:w-1/4"
                                 :errorshas="__($errors->has('SEPJsonReq.request.t_sep.noMR'))" :disabled=false
                                 wire:model.debounce.500ms="SEPJsonReq.request.t_sep.noMR" />
-                            {{ $SEPJsonReq['request']['t_sep']['cob']['cob'] }}
+                            {{ isset($SEPJsonReq['request']['t_sep']['cob']['cob']) ? $SEPJsonReq['request']['t_sep']['cob']['cob'] : 'Data tidak dapat di proses' }}
                             <x-check-box value='1' :label="__('Peserta COB')"
                                 wire:model.debounce.500ms="SEPJsonReq.request.t_sep.cob.cobRef"
-                                wire:click="$set('SEPJsonReq.request.t_sep.cob.cob',{{ $SEPJsonReq['request']['t_sep']['cob']['cob'] ? '0' : '1' }})" />
+                                wire:click="$set('SEPJsonReq.request.t_sep.cob.cob',{{ (isset($SEPJsonReq['request']['t_sep']['cob']['cob']) ? $SEPJsonReq['request']['t_sep']['cob']['cob'] : '0') ? '0' : '1' }})" />
                             @error('SEPJsonReq.request.t_sep.cob.cob')
                                 <x-input-error :messages=$message />
                             @enderror
@@ -229,7 +231,7 @@
                                 <x-text-input placeholder="Isi dgn data yang sesuai"
                                     class="mt-1 ml-2 sm:rounded-none sm:rounded-l-lg" :errorshas="__($errors->has('SEPJsonReq.request.t_sep.diagAwal'))"
                                     :disabled=$disabledProperty
-                                    value="{{ $SEPJsonReq['request']['t_sep']['diagAwal'] . '   ' . $SEPJsonReq['request']['t_sep']['diagAwalNama'] }}" />
+                                    value="{{ (isset($SEPJsonReq['request']['t_sep']['diagAwal']) ? $SEPJsonReq['request']['t_sep']['diagAwal'] : 'Data tidak dapat di proses') . '   ' . (isset($SEPJsonReq['request']['t_sep']['diagAwalNama']) ? $SEPJsonReq['request']['t_sep']['diagAwalNama'] : 'Data tidak dapat di proses') }}" />
 
                                 <x-green-button :disabled=false
                                     class="mt-1 sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
@@ -311,7 +313,7 @@
                                             <path clip-rule="evenodd" fill-rule="evenodd"
                                                 d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
                                         </svg>
-                                        ({{ $SEPJsonReq['request']['t_sep']['tujuanKunj'] . ' ' . $SEPJsonReq['request']['t_sep']['tujuanKunjDesc'] }})
+                                        ({{ (isset($SEPJsonReq['request']['t_sep']['tujuanKunj']) ? $SEPJsonReq['request']['t_sep']['tujuanKunj'] : 'Data tidak dapat di proses') . ' ' . (isset($SEPJsonReq['request']['t_sep']['tujuanKunjDesc']) ? $SEPJsonReq['request']['t_sep']['tujuanKunjDesc'] : 'Data tidak dapat diproses') }})
                                     </x-alternative-button>
                                 </x-slot>
                                 {{-- Open myLimitPerPagecontent --}}
@@ -341,7 +343,7 @@
                                             <path clip-rule="evenodd" fill-rule="evenodd"
                                                 d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
                                         </svg>
-                                        ({{ $SEPJsonReq['request']['t_sep']['flagProcedure'] . ' ' . $SEPJsonReq['request']['t_sep']['flagProcedureDesc'] }})
+                                        ({{ (isset($SEPJsonReq['request']['t_sep']['flagProcedure']) ? $SEPJsonReq['request']['t_sep']['flagProcedure'] : 'Data tidak dapat di proses') . ' ' . (isset($SEPJsonReq['request']['t_sep']['flagProcedureDesc']) ? $SEPJsonReq['request']['t_sep']['flagProcedureDesc'] : 'Data tidak dapat di proses') }})
                                     </x-alternative-button>
                                 </x-slot>
                                 {{-- Open myLimitPerPagecontent --}}
@@ -371,7 +373,8 @@
                                             <path clip-rule="evenodd" fill-rule="evenodd"
                                                 d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
                                         </svg>
-                                        ({{ $SEPJsonReq['request']['t_sep']['kdPenunjang'] . ' ' . $SEPJsonReq['request']['t_sep']['kdPenunjangDesc'] }})
+
+                                        {{ (isset($SEPJsonReq['request']['t_sep']['kdPenunjang']) ? $SEPJsonReq['request']['t_sep']['kdPenunjang'] : 'Data tidak dapat diproses') . ' ' . (isset($SEPJsonReq['request']['t_sep']['kdPenunjangDesc']) ? $SEPJsonReq['request']['t_sep']['kdPenunjangDesc'] : 'Data tidak dapat di proses') }}
                                     </x-alternative-button>
                                 </x-slot>
                                 {{-- Open myLimitPerPagecontent --}}
@@ -401,7 +404,7 @@
                                             <path clip-rule="evenodd" fill-rule="evenodd"
                                                 d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
                                         </svg>
-                                        ({{ $SEPJsonReq['request']['t_sep']['assesmentPel'] . ' ' . $SEPJsonReq['request']['t_sep']['assesmentPelDesc'] }})
+                                        ({{ (isset($SEPJsonReq['request']['t_sep']['assesmentPel']) ? $SEPJsonReq['request']['t_sep']['assesmentPel'] : 'Data tidak dapat di proses') . ' ' . (isset($SEPJsonReq['request']['t_sep']['assesmentPelDesc']) ? $SEPJsonReq['request']['t_sep']['assesmentPelDesc'] : 'Data tidak dapat di proses') }})
                                     </x-alternative-button>
                                 </x-slot>
                                 {{-- Open myLimitPerPagecontent --}}
@@ -443,7 +446,9 @@
                                 <x-loading />
                             </div>
 
-                            <x-green-button :disabled=$disabledPropertyRj wire:click.prevent="storeDataSepReq()"
+                            @dd($disabledPropertyRjStatus);
+
+                            <x-green-button :disabled=$disabledPropertyRjStatus wire:click.prevent="storeDataSepReq()"
                                 type="button" wire:loading.remove>
                                 Simpan
                             </x-green-button>
