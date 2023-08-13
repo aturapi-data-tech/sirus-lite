@@ -2357,7 +2357,11 @@ class DaftarRJ extends Component
     public function callRJskdp(): void
     {
         // set Call RJskdp True
-        $this->callRJskdp = true;
+        if ($this->dataDaftarPoliRJ['regNo']) {
+            $this->callRJskdp = true;
+        } else {
+            $this->emit('toastr-error', "Data Tidak dapat di proses, No Reg Pasien Kosong");
+        }
     }
 
 
