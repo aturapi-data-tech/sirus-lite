@@ -446,7 +446,6 @@
                                 <x-loading />
                             </div>
 
-                            @dd($disabledPropertyRjStatus);
 
                             <x-green-button :disabled=$disabledPropertyRjStatus wire:click.prevent="storeDataSepReq()"
                                 type="button" wire:loading.remove>
