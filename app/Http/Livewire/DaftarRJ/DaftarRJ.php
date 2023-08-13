@@ -2360,7 +2360,7 @@ class DaftarRJ extends Component
         if ($this->dataDaftarPoliRJ['regNo']) {
             $this->callRJskdp = true;
         } else {
-            $this->emit('toastr-error', "Data Tidak dapat di proses, No Reg Pasien Kosong");
+            $this->emit('toastr-error', "Data Tidak dapat di proses (Reg No Pasien Kosong)");
         }
     }
 
