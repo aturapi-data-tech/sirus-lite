@@ -1187,7 +1187,14 @@
                                             <x-loading />
                                         </div>
 
-                                        <x-primary-button>Buat SKDP</x-primary-button>
+                                        <div class="">
+                                            <x-primary-button :disabled=false wire:click.prevent="callRJskdp()"
+                                                type="button" wire:loading.remove>Buat SKDP</x-primary-button>
+                                            <div wire:loading wire:target="callRJskdp">
+                                                <x-loading />
+                                            </div>
+                                        </div>
+
                                     </div>
 
                                     <p class="text-xs">di isi dgn : (No Rujukan untun FKTP /FKTL) (SKDP untuk

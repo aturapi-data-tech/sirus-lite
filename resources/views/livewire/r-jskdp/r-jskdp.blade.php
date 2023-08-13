@@ -38,19 +38,10 @@
                         </div>
                         {{-- end search --}}
 
+
+
                         {{-- two button --}}
                         <div class="flex justify-between mt-2 md:mt-0">
-                            <x-primary-button wire:click="create()" class="flex justify-center flex-auto">
-                                <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path fill-rule="evenodd"
-                                        d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                                        clip-rule="evenodd"></path>
-                                </svg>
-                                Daftar {{ $myProgram }}
-                            </x-primary-button>
-
-
 
                             <x-dropdown align="right" :width="__('20')">
                                 <x-slot name="trigger">
@@ -82,64 +73,12 @@
 
                     <div class="flex rounded-lg bg-gray-50">
 
-                        {{-- date --}}
-                        <div class="relative w-1/5 mt-2 ">
-                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                <svg aria-hidden="true" class="w-5 h-5 text-gray-900 dark:text-gray-400"
-                                    fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                    <path fill-rule="evenodd"
-                                        d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                                        clip-rule="evenodd"></path>
-                                </svg>
-                            </div>
-
-
-                            <x-text-input id="dateRjRef" datepicker datepicker-autohide datepicker-format="dd/mm/yyyy"
-                                type="text" class="p-2 pl-10 " placeholder="dd/mm/yyyy" wire:model="dateRjRef" />
-                        </div>
-
-                        {{-- radio --}}
-                        <div class="flex mt-2 ml-2">
-                            @foreach ($statusRjRef['statusOptions'] as $sRj)
-                                {{-- @dd($sRj) --}}
-                                <x-radio-button :label="__($sRj['statusDesc'])" value="{{ $sRj['statusId'] }}"
-                                    wire:model="statusRjRef.statusId" />
-                            @endforeach
-                        </div>
-
-                        {{-- shift --}}
-                        <div class="mt-2 ml-0">
-                            <x-dropdown align="right" :width="__('20')" class="">
-                                <x-slot name="trigger">
-                                    {{-- Button shift --}}
-                                    <x-alternative-button class="inline-flex">
-                                        <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
-                                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                            <path clip-rule="evenodd" fill-rule="evenodd"
-                                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-                                        </svg>
-                                        <span>{{ 'Shift' . $shiftRjRef['shiftDesc'] }}</span>
-                                    </x-alternative-button>
-                                </x-slot>
-                                {{-- Open shiftcontent --}}
-                                <x-slot name="content">
-
-                                    @foreach ($shiftRjRef['shiftOptions'] as $shift)
-                                        <x-dropdown-link
-                                            wire:click="setShift({{ $shift['shiftId'] }},{{ $shift['shiftDesc'] }})">
-                                            {{ __($shift['shiftDesc']) }}
-                                        </x-dropdown-link>
-                                    @endforeach
-                                </x-slot>
-                            </x-dropdown>
-                        </div>
-
                         {{-- Dokter --}}
-                        <div class="mt-2 ml-0">
+                        <div class="mt-2 ml-2">
                             <x-dropdown align="right" :width="__('80')" :contentclasses="__('overflow-auto max-h-[150px] py-1 bg-white dark:bg-gray-700')">
                                 <x-slot name="trigger">
                                     {{-- Button Dokter --}}
-                                    <x-alternative-button class="inline-flex">
+                                    <x-alternative-button class="inline-flex w-80">
                                         <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
                                             xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                                             <path clip-rule="evenodd" fill-rule="evenodd"
@@ -170,8 +109,6 @@
                     @if ($formRujukanRefBPJSStatus)
                         @include('livewire.daftar-r-j.form-rujukanRefBpjs')
                     @endif
-
-
 
 
 
@@ -210,7 +147,7 @@
                                             <th scope="col" class="w-1/3 px-4 py-3 ">
                                                 <x-sort-link :active=false wire:click.prevent="" role="button"
                                                     href="#">
-                                                    Status Layanan
+                                                    Rujukan
                                                 </x-sort-link>
                                             </th>
 
@@ -266,7 +203,7 @@
                                                                         : 'Asuransi Lain')) }}
                                                         </div>
                                                         <div class="font-normal text-gray-900">
-                                                            {{ 'Nomer Pelayanan ' . $RJp->no_antrian }}
+                                                            {{ 'Tanggal : ' . $RJp->rj_date }}
                                                         </div>
                                                     </div>
                                                 </td>
@@ -385,47 +322,6 @@
             'isOpenMode' => 'insert',
             'dataPasienBPJSSearch' => isset($dataPasien['pasien']['cariDataPasien']) ? $dataPasien['pasien']['cariDataPasien'] : '',
         ])
-    @endif
-
-    @if ($callRJskdp)
-        <div class="fixed inset-0 z-40 ease-out duration-400">
-            <div class="flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-                <!-- This element is to trick the browser into transition-opacity. -->
-                <div class="fixed inset-0 transition-opacity">
-                    <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
-                </div>
-                <!-- This element is to trick the browser into centering the modal contents. -->
-                <span class="hidden sm:inline-block sm:align-middle sm:h-screen"></span>​
-                <div class="inline-block overflow-auto text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:max-h-[35rem] sm:my-8 sm:align-middle sm:w-11/12"
-                    role="dialog" aria-modal="true" aria-labelledby="modal-headline">
-                    <div
-                        class="sticky top-0 flex items-center justify-between p-4 bg-opacity-75 border-b rounded-t bg-primary dark:border-gray-600">
-
-                        {{-- Close Modal --}}
-                        <button wire:click="$set('callRJskdp',false)"
-                            class="text-gray-400 bg-gray-50 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd"
-                                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                                    clip-rule="evenodd"></path>
-                            </svg>
-                        </button>
-
-
-
-                    </div>
-
-                    {{-- call Program --}}
-                    @livewire('r-jskdp.r-jskdp', [
-                        // 'isOpen' => true,
-                        // 'isOpenMode' => 'insert',
-                        'regNoRef' => isset($dataPasien['pasien']['regNo']) ? $dataPasien['pasien']['regNo'] : '',
-                    ])
-
-                </div>
-            </div>
-        </div>
     @endif
 
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\DaftarRJ;
+namespace App\Http\Livewire\RJskdp;
 
 use Illuminate\Support\Facades\DB;
 
@@ -17,7 +17,7 @@ use Illuminate\Support\Str;
 use Spatie\ArrayToXml\ArrayToXml;
 
 
-class DaftarRJ extends Component
+class RJskdp extends Component
 {
     use WithPagination;
 
@@ -256,6 +256,8 @@ class DaftarRJ extends Component
     // Ref on top bar
     //////////////////////////////
     public $dateRjRef = '';
+    public $regNoRef = '';
+
 
     public $shiftRjRef = [
         'shiftId' => '1',
@@ -287,6 +289,7 @@ class DaftarRJ extends Component
             ]
         ]
     ];
+
 
     // Pendaftaran RJ
     public $JenisKlaim = [
@@ -519,9 +522,9 @@ class DaftarRJ extends Component
     public $isOpen = 0;
     public $isOpenMode = 'insert';
 
-    // call Form
+    // call MasterPasien Form
     public $callMasterPasien = 0;
-    public $callRJskdp = 0;
+
 
 
     // search logic -resetExcept////////////////
@@ -567,7 +570,8 @@ class DaftarRJ extends Component
             'dateRjRef',
             'shiftRjRef',
             'statusRjRef',
-            'drRjRef'
+            'drRjRef',
+            'regNoRef'
 
 
         ]);
@@ -625,8 +629,9 @@ class DaftarRJ extends Component
                 'dr_id',
                 'dr_name',
             )
-            ->where('shift', '=', $this->shiftRjRef['shiftId'])
-            ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $this->dateRjRef)
+            ->where('rj_status', '=', 'L')
+            ->where('reg_no', '=', $this->regNoRef)
+
             ->groupBy('dr_id')
             ->groupBy('dr_name')
             ->orderBy('dr_name', 'desc')
@@ -639,6 +644,12 @@ class DaftarRJ extends Component
         })->toArray();
     }
 
+    private function setregNoRef(): void
+    {
+        if ($this->regNoRef) {
+            $this->regNoRef = $this->regNoRef;
+        }
+    }
 
 
     // setShiftRJ//////////////// Form
@@ -2354,28 +2365,17 @@ class DaftarRJ extends Component
         $this->callMasterPasien = true;
     }
 
-    public function callRJskdp(): void
-    {
-        // set Call RJskdp True
-        $this->callRJskdp = true;
-    }
-
 
 
     // when new form instance
     public function mount()
     {
 
-        // set date
-        $this->dateRjRef = Carbon::now()->format('d/m/Y');
-        // set shift
-        $findShift = DB::table('rstxn_shiftctls')->select('shift')
-            ->whereRaw("'" . Carbon::now()->format('H:i:s') . "' between shift_start and shift_end")
-            ->first();
-        $this->shiftRjRef['shiftId'] = isset($findShift->shift) && $findShift->shift ? $findShift->shift : 3;
-        $this->shiftRjRef['shiftDesc'] = isset($findShift->shift) && $findShift->shift ? $findShift->shift : 3;
+
         // set data dokter ref
         $this->optionsdrRjRef();
+
+        $this->setregNoRef();
     }
 
 
@@ -2385,10 +2385,13 @@ class DaftarRJ extends Component
     public function render()
     {
 
+        $this->emit('toastr-error', $this->regNoRef);
+
         // render drRjRef
         // set data dokter ref
         $this->optionsdrRjRef();
 
+        $this->setregNoRef();
         //////////////////////////////////////////
         // Query ///////////////////////////////
         //////////////////////////////////////////
@@ -2416,9 +2419,10 @@ class DaftarRJ extends Component
                 'push_antrian_bpjs_status',
                 'push_antrian_bpjs_json'
             )
-            ->where('rj_status', '=', $this->statusRjRef['statusId'])
-            ->where('shift', '=', $this->shiftRjRef['shiftId'])
-            ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $this->dateRjRef);
+            ->where('rj_status', '=', 'L')
+            ->where('reg_no', '=', $this->regNoRef);
+
+
 
         //Jika where dokter tidak kosong
         if ($this->drRjRef['drId'] != 'All') {
@@ -2431,22 +2435,21 @@ class DaftarRJ extends Component
                 ->orWhere(DB::raw('upper(dr_name)'), 'like', '%' . strtoupper($this->search) . '%')
                 ->orWhere(DB::raw('upper(poli_desc)'), 'like', '%' . strtoupper($this->search) . '%');
         })
+            ->orderBy('rj_date1',  'desc')
             ->orderBy('dr_name',  'desc')
             ->orderBy('poli_desc',  'desc')
-            ->orderBy('no_antrian',  'asc')
-            ->orderBy('rj_date1',  'desc');
+            ->orderBy('no_antrian',  'asc');
 
         ////////////////////////////////////////////////
         // end Query
         ///////////////////////////////////////////////
 
 
-
         return view(
-            'livewire.daftar-r-j.daftar-r-j',
+            'livewire.r-jskdp.r-jskdp',
             [
                 'RJpasiens' => $query->paginate($this->limitPerPage),
-                'myTitle' => 'Data Pasien Rawat Jalan',
+                'myTitle' => 'Data SKDP Pasien Rawat Jalan',
                 'mySnipt' => 'Rekam Medis Pasien',
                 'myProgram' => 'Pasien Rawat Jalan',
                 'myLimitPerPages' => [5, 10, 15, 20, 100],
