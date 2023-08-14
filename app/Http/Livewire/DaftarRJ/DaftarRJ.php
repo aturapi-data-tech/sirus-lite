@@ -439,15 +439,18 @@ class DaftarRJ extends Component
     //////////////////////////////
     public $SEPQuestionnaire = [
         'tujuanKunj' => [
+            ['tujuanKunjId' => '', 'tujuanKunjDesc' => ''],
             ['tujuanKunjId' => '0', 'tujuanKunjDesc' => 'Normal'],
             ['tujuanKunjId' => '1', 'tujuanKunjDesc' => 'Prosedur'],
             ['tujuanKunjId' => '2', 'tujuanKunjDesc' => 'Konsul Dokter'],
         ],
         'flagProcedure' => [
+            ['flagProcedureId' => '', 'flagProcedureDesc' => ''],
             ['flagProcedureId' => '0', 'flagProcedureDesc' => 'Prosedur Tidak Berkelanjutan'],
             ['flagProcedureId' => '1', 'flagProcedureDesc' => 'Prosedur dan Terapi Berkelanjutan'],
         ],
         'kdPenunjang' => [
+            ['kdPenunjangId' => '', 'kdPenunjangDesc' => ''],
             ['kdPenunjangId' => '1', 'kdPenunjangDesc' => 'Radioterapi'],
             ['kdPenunjangId' => '2', 'kdPenunjangDesc' => 'Kemoterapi'],
             ['kdPenunjangId' => '3', 'kdPenunjangDesc' => 'Rehabilitasi Medik'],
@@ -464,6 +467,7 @@ class DaftarRJ extends Component
 
         ],
         'assesmentPel' => [
+            ['assesmentPelId' => '', 'assesmentPelDesc' => ''],
             ['assesmentPelId' => '1', 'assesmentPelDesc' => 'Poli spesialis tidak tersedia pada hari sebelumnya'],
             ['assesmentPelId' => '2', 'assesmentPelDesc' => 'Jam Poli telah berakhir pada hari sebelumnya'],
             ['assesmentPelId' => '3', 'assesmentPelDesc' => 'Dokter Spesialis yang dimaksud tidak praktek pada hari sebelumnya'],
@@ -1868,10 +1872,10 @@ class DaftarRJ extends Component
                 ? (isset($this->SEPJsonReq['request']['t_sep']['rujukan']['noRujukan']) ? $this->SEPJsonReq['request']['t_sep']['rujukan']['noRujukan'] : "Data tidak dapat diproses")
                 : (
                     ($this->JenisKunjungan['JenisKunjunganId'] == 2)
-                    ? (isset($this->SEPJsonReq['request']['t_sep']['rujukan']['noRujukan']) ? $this->SEPJsonReq['request']['t_sep']['rujukan']['noRujukan'] : "Data tidak dapat diproses") . '1'
+                    ? (isset($this->dataPasien['pasien']['regNo']) ? $this->dataPasien['pasien']['regNo'] : "Data tidak dapat diproses") . '1'
                     : (
                         ($this->JenisKunjungan['JenisKunjunganId'] == 3)
-                        ? $this->SEPJsonReq['request']['t_sep']['skdp']['noSurat']
+                        ? (isset($this->SEPJsonReq['request']['t_sep']['skdp']['noSurat']) ? $this->SEPJsonReq['request']['t_sep']['skdp']['noSurat'] : "Data tidak dapat diproses")
                         : (
                             ($this->JenisKunjungan['JenisKunjunganId'] == 4)
                             ? (isset($this->SEPJsonReq['request']['t_sep']['rujukan']['noRujukan']) ? $this->SEPJsonReq['request']['t_sep']['rujukan']['noRujukan'] : "Data tidak dapat diproses")
@@ -1968,7 +1972,6 @@ class DaftarRJ extends Component
         // set SEPJsonReq
         $this->setSEPJsonReq($id);
 
-        dd($this->SEPJsonReq);
         $this->dataRefBPJSLovStatus = false;
         $this->dataRefBPJSLovSearch = '';
 
@@ -2325,26 +2328,50 @@ class DaftarRJ extends Component
     // Lov dataDiagnosaRJ //////////////////////
     ////////////////////////////////////////////////
 
+
+    // logic flagProcedure???
+    // public function settujuanKunj($id, $name)
+    // {
+    //     $this->SEPJsonReq['request']['t_sep']['tujuanKunj'] = $this->JenisKunjungan['JenisKunjunganId'] == 2 || $this->JenisKunjungan['JenisKunjunganId'] == 3 ? $id : "";
+    //     $this->SEPJsonReq['request']['t_sep']['tujuanKunjDesc'] = $this->JenisKunjungan['JenisKunjunganId'] == 2 || $this->JenisKunjungan['JenisKunjunganId'] == 3 ? $name : "";
+    // }
+
+    // public function setflagProcedure($id, $name)
+    // {
+    //     $this->SEPJsonReq['request']['t_sep']['flagProcedure'] = $this->SEPJsonReq['request']['t_sep']['tujuanKunj'] == 0 ? "" : $id;
+    //     $this->SEPJsonReq['request']['t_sep']['flagProcedureDesc'] =  $this->SEPJsonReq['request']['t_sep']['tujuanKunj'] == 0 ? "" : $name;
+    // }
+    // public function setkdPenunjang($id, $name)
+    // {
+    //     $this->SEPJsonReq['request']['t_sep']['kdPenunjang'] = $this->SEPJsonReq['request']['t_sep']['tujuanKunj'] == 0 ? "" : $id;
+    //     $this->SEPJsonReq['request']['t_sep']['kdPenunjangDesc'] = $this->SEPJsonReq['request']['t_sep']['tujuanKunj'] == 0 ? "" : $name;
+    // }
+    // public function setassesmentPel($id, $name)
+    // {
+    //     $this->SEPJsonReq['request']['t_sep']['assesmentPel'] = $this->SEPJsonReq['request']['t_sep']['tujuanKunj'] == 0 || $this->SEPJsonReq['request']['t_sep']['tujuanKunj'] == 2 ? $id : "";
+    //     $this->SEPJsonReq['request']['t_sep']['assesmentPelDesc'] = $this->SEPJsonReq['request']['t_sep']['tujuanKunj'] == 0 || $this->SEPJsonReq['request']['t_sep']['tujuanKunj'] == 2 ? $name : "";
+    // }
+
     public function settujuanKunj($id, $name)
     {
-        $this->SEPJsonReq['request']['t_sep']['tujuanKunj'] = $this->JenisKunjungan['JenisKunjunganId'] == 2 || $this->JenisKunjungan['JenisKunjunganId'] == 3 ? $id : "";
-        $this->SEPJsonReq['request']['t_sep']['tujuanKunjDesc'] = $this->JenisKunjungan['JenisKunjunganId'] == 2 || $this->JenisKunjungan['JenisKunjunganId'] == 3 ? $name : "";
+        $this->SEPJsonReq['request']['t_sep']['tujuanKunj'] = $id;
+        $this->SEPJsonReq['request']['t_sep']['tujuanKunjDesc'] = $name;
     }
 
     public function setflagProcedure($id, $name)
     {
-        $this->SEPJsonReq['request']['t_sep']['flagProcedure'] = $this->SEPJsonReq['request']['t_sep']['tujuanKunj'] == 0 ? "" : $id;
-        $this->SEPJsonReq['request']['t_sep']['flagProcedureDesc'] =  $this->SEPJsonReq['request']['t_sep']['tujuanKunj'] == 0 ? "" : $name;
+        $this->SEPJsonReq['request']['t_sep']['flagProcedure'] = $id;
+        $this->SEPJsonReq['request']['t_sep']['flagProcedureDesc'] = $name;
     }
     public function setkdPenunjang($id, $name)
     {
-        $this->SEPJsonReq['request']['t_sep']['kdPenunjang'] = $this->SEPJsonReq['request']['t_sep']['tujuanKunj'] == 0 ? "" : $id;
-        $this->SEPJsonReq['request']['t_sep']['kdPenunjangDesc'] = $this->SEPJsonReq['request']['t_sep']['tujuanKunj'] == 0 ? "" : $name;
+        $this->SEPJsonReq['request']['t_sep']['kdPenunjang'] = $id;
+        $this->SEPJsonReq['request']['t_sep']['kdPenunjangDesc'] = $name;
     }
     public function setassesmentPel($id, $name)
     {
-        $this->SEPJsonReq['request']['t_sep']['assesmentPel'] = $this->SEPJsonReq['request']['t_sep']['tujuanKunj'] == 0 || $this->SEPJsonReq['request']['t_sep']['tujuanKunj'] == 2 ? $id : "";
-        $this->SEPJsonReq['request']['t_sep']['assesmentPelDesc'] = $this->SEPJsonReq['request']['t_sep']['tujuanKunj'] == 0 || $this->SEPJsonReq['request']['t_sep']['tujuanKunj'] == 2 ? $name : "";
+        $this->SEPJsonReq['request']['t_sep']['assesmentPel'] = $id;
+        $this->SEPJsonReq['request']['t_sep']['assesmentPelDesc'] = $name;
     }
 
 

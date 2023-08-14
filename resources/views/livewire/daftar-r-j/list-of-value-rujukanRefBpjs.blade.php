@@ -26,7 +26,7 @@
                     @endphp
                     <li wire:key='dataRefBPJSLov{{ $lov['noKunjungan'] }}' class="{{ $bgGanjilGenap }} ">
                         <x-dropdown-link
-                            wire:click="setMydataRefBPJSLov('{{ $lov['noKunjungan'] }}','{{ $lov['peserta']['nama'] }}')">
+                            wire:click="setMydataRefBPJSLov('{{ addslashes($lov['noKunjungan']) }}','{{ addslashes($lov['peserta']['nama']) }}')">
 
                             <div class="pl-0">
                                 <div class="font-normal text-gray-700">
