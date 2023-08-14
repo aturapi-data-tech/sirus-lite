@@ -1258,6 +1258,9 @@ class DaftarRJ extends Component
                 ];
             }
 
+            // jika sep ditemukan tetapi variable kosong set sep pda array
+            $this->dataDaftarPoliRJ['sep']['noSep'] = isset($findData->vno_sep) ? $findData->vno_sep : "";
+
             $this->setDataPasien($this->dataDaftarPoliRJ['regNo']);
 
             $this->dataPasienLovSearch = $this->dataDaftarPoliRJ['regNo'];
@@ -1965,7 +1968,7 @@ class DaftarRJ extends Component
         // set SEPJsonReq
         $this->setSEPJsonReq($id);
 
-        // dd($this->SEPJsonReq);
+        dd($this->SEPJsonReq);
         $this->dataRefBPJSLovStatus = false;
         $this->dataRefBPJSLovSearch = '';
 
