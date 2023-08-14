@@ -1845,6 +1845,7 @@ class DaftarRJ extends Component
         //////////////////////////////////////////////
         $HttpGetBpjs =  VclaimTrait::sep_insert($SEPJsonReq)->getOriginalContent();
         if ($HttpGetBpjs['metadata']['code'] == 200) {
+            dd($HttpGetBpjs);
             $this->dataDaftarPoliRJ['sep']['resSep'] = $HttpGetBpjs['response']['response']['sep'];
             $this->dataDaftarPoliRJ['sep']['noSep'] = $HttpGetBpjs['response']['response']['sep']['noSep'];
 
