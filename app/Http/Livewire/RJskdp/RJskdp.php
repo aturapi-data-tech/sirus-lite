@@ -255,29 +255,8 @@ class RJskdp extends Component
     //////////////////////////////
     // Ref on top bar
     //////////////////////////////
-    public $dateRjRef = '';
-    public $regNoRef = '';
+    public $regNoRef = '060931Z';
 
-
-    public $shiftRjRef = [
-        'shiftId' => '1',
-        'shiftDesc' => '1',
-        'shiftOptions' => [
-            ['shiftId' => '1', 'shiftDesc' => '1'],
-            ['shiftId' => '2', 'shiftDesc' => '2'],
-            ['shiftId' => '3', 'shiftDesc' => '3'],
-        ]
-    ];
-
-    public $statusRjRef = [
-        'statusId' => 'A',
-        'statusDesc' => 'Antrian',
-        'statusOptions' => [
-            ['statusId' => 'A', 'statusDesc' => 'Antrian'],
-            ['statusId' => 'L', 'statusDesc' => 'Selesai'],
-            ['statusId' => 'I', 'statusDesc' => 'Transfer'],
-        ]
-    ];
 
     public $drRjRef = [
         'drId' => 'All',
@@ -291,189 +270,8 @@ class RJskdp extends Component
     ];
 
 
-    // Pendaftaran RJ
-    public $JenisKlaim = [
-        'JenisKlaimId' => 'UM',
-        'JenisKlaimDesc' => 'UMUM',
-        'JenisKlaimOptions' => [
-            ['JenisKlaimId' => 'UM', 'JenisKlaimDesc' => 'UMUM'],
-            ['JenisKlaimId' => 'JM', 'JenisKlaimDesc' => 'BPJS'],
-            ['JenisKlaimId' => 'JML', 'JenisKlaimDesc' => 'Asuransi Lain'],
-            ['JenisKlaimId' => 'KR', 'JenisKlaimDesc' => 'Kronis'],
-
-        ]
-    ];
-
-    public $JenisKunjungan = [
-        'JenisKunjunganId' => '1',
-        'JenisKunjunganDesc' => 'Rujukan FKTP',
-        'JenisKunjunganOptions' => [
-            ['JenisKunjunganId' => '1', 'JenisKunjunganDesc' => 'Rujukan FKTP'],
-            ['JenisKunjunganId' => '2', 'JenisKunjunganDesc' => 'Rujukan Internal'],
-            ['JenisKunjunganId' => '3', 'JenisKunjunganDesc' => 'Kontrol'],
-            ['JenisKunjunganId' => '4', 'JenisKunjunganDesc' => 'Rujukan Antar RS'],
-
-        ]
-    ];
-
-    public $dataDaftarPoliRJ = [
-        "regNo" => '',
-
-        "drId" => '',
-        "drDesc" => '',
-
-        "poliId" => '',
-        "poliDesc" => '',
-
-        "kddrbpjs" => '',
-        "kdpolibpjs" => '',
-
-        "rjDate" => '',
-        "rjNo" => '',
-        "shift" => '',
-        "noAntrian" => '',
-        "noBooking" => '',
-        "slCodeFrom" => "02",
-        "passStatus" => "",
-        "rjStatus" => "A",
-        "txnStatus" => "A",
-        "ermStatus" => "A",
-        "cekLab" => "0",
-        "kunjunganInternalStatus" => "0",
-        "noReferensi" => '',
-        "taskIdPelayanan" => [
-            "taskId1" => "",
-            "taskId2" => "",
-            "taskId3" => "",
-            "taskId4" => "",
-            "taskId5" => "",
-            "taskId6" => "",
-            "taskId7" => "",
-            "taskId99" => "",
-        ],
-        'sep' => [
-            "noSep" => "",
-            "reqSep" => [],
-            "resSep" => [],
-        ]
-    ];
-
-    // http status Push antrian BPJS
-    public $HttpGetBpjsStatus; //status push antrian 200 /201/ 400
-    public $HttpGetBpjsJson; // response json
-
-    public $SEPJsonReq = [
-        "request" =>  [
-            "t_sep" =>  [
-                "noKartu" => "",
-                "tglSep" => "", //Y-m-d
-                "ppkPelayanan" => "",
-                "jnsPelayanan" => "",
-                "klsRawat" =>  [
-                    "klsRawatHak" => "",
-                    "klsRawatNaik" => "",
-                    "pembiayaan" => "",
-                    "penanggungJawab" => "",
-                ],
-                "noMR" => "",
-                "rujukan" =>  [
-                    "asalRujukan" => "",
-                    "tglRujukan" => "", //Y-m-d
-                    "noRujukan" => "",
-                    "ppkRujukan" => "",
-                ],
-                "catatan" => "",
-                "diagAwal" => "",
-                "poli" =>  [
-                    "tujuan" => "",
-                    "tujuanNama" => "",
-                    "eksekutif" => "0",
-                    "eksekutifRef" => [],
-                ],
-                "cob" =>  [
-                    "cob" => "0",
-                    "cobRef" => [],
-                ],
-                "katarak" =>  [
-                    "katarak" => "0",
-                    "katarakRef" => [],
-                ],
-                "jaminan" =>  [
-                    "lakaLantas" => "0",
-                    "lakaLantasRef" => [],
-                    "noLP" => "",
-                    "penjamin" =>  [
-                        "tglKejadian" => "",
-                        "keterangan" => "",
-                        "suplesi" =>  [
-                            "suplesi" => "0",
-                            "noSepSuplesi" => "",
-                            "lokasiLaka" =>  [
-                                "kdPropinsi" => "",
-                                "kdKabupaten" => "",
-                                "kdKecamatan" => "",
-                            ]
-                        ]
-                    ]
-                ],
-                "tujuanKunj" => "0",
-                "tujuanKunjDesc" => "Normal",
-
-                "flagProcedure" => "",
-                "flagProcedureDesc" => "",
-
-                "kdPenunjang" => "",
-                "kdPenunjangDesc" => "",
-
-                "assesmentPel" => "",
-                "assesmentPelDesc" => "",
-
-
-                "skdp" =>  [
-                    "noSurat" => "",
-                    "kodeDPJP" => "",
-                ],
-                "dpjpLayan" => "",
-                "noTelp" => "",
-                "user" => "sirus App",
-            ],
-        ],
-    ];
-    //////////////////////////////
-    public $SEPQuestionnaire = [
-        'tujuanKunj' => [
-            ['tujuanKunjId' => '0', 'tujuanKunjDesc' => 'Normal'],
-            ['tujuanKunjId' => '1', 'tujuanKunjDesc' => 'Prosedur'],
-            ['tujuanKunjId' => '2', 'tujuanKunjDesc' => 'Konsul Dokter'],
-        ],
-        'flagProcedure' => [
-            ['flagProcedureId' => '0', 'flagProcedureDesc' => 'Prosedur Tidak Berkelanjutan'],
-            ['flagProcedureId' => '1', 'flagProcedureDesc' => 'Prosedur dan Terapi Berkelanjutan'],
-        ],
-        'kdPenunjang' => [
-            ['kdPenunjangId' => '1', 'kdPenunjangDesc' => 'Radioterapi'],
-            ['kdPenunjangId' => '2', 'kdPenunjangDesc' => 'Kemoterapi'],
-            ['kdPenunjangId' => '3', 'kdPenunjangDesc' => 'Rehabilitasi Medik'],
-            ['kdPenunjangId' => '4', 'kdPenunjangDesc' => 'Rehabilitasi Psikososial'],
-            ['kdPenunjangId' => '5', 'kdPenunjangDesc' => 'Transfusi Darah'],
-            ['kdPenunjangId' => '6', 'kdPenunjangDesc' => 'Pelayanan Gigi'],
-            ['kdPenunjangId' => '7', 'kdPenunjangDesc' => 'Laboratorium'],
-            ['kdPenunjangId' => '8', 'kdPenunjangDesc' => 'USG'],
-            ['kdPenunjangId' => '9', 'kdPenunjangDesc' => 'Farmasi'],
-            ['kdPenunjangId' => '10', 'kdPenunjangDesc' => 'Lain-Lain'],
-            ['kdPenunjangId' => '11', 'kdPenunjangDesc' => 'MRI'],
-            ['kdPenunjangId' => '12', 'kdPenunjangDesc' => 'HEMODIALISA'],
-
-
-        ],
-        'assesmentPel' => [
-            ['assesmentPelId' => '1', 'assesmentPelDesc' => 'Poli spesialis tidak tersedia pada hari sebelumnya'],
-            ['assesmentPelId' => '2', 'assesmentPelDesc' => 'Jam Poli telah berakhir pada hari sebelumnya'],
-            ['assesmentPelId' => '3', 'assesmentPelDesc' => 'Dokter Spesialis yang dimaksud tidak praktek pada hari sebelumnya'],
-            ['assesmentPelId' => '4', 'assesmentPelDesc' => 'Atas Instruksi RS'],
-            ['assesmentPelId' => '5', 'assesmentPelDesc' => 'Tujuan Kontrol'],
-        ],
-    ];
+    // dataDaftarPoliRJ RJ
+    public $dataDaftarPoliRJ = [];
 
 
     //////////////////////////////////////////////////////////////////////
@@ -486,45 +284,12 @@ class RJskdp extends Component
     public $limitPerPage = 10;
 
 
-    //  table LOV////////////////
-    public $dataPasienLov = [];
-    public $dataPasienLovStatus = 0;
-    public $dataPasienLovSearch = '';
-
-    public $dataDokterLov = [];
-    public $dataDokterLovStatus = 0;
-    public $dataDokterLovSearch = '';
-
-    public $dataDokterBPJSLov = [];
-    public $dataDokterBPJSLovStatus = 0;
-    public $dataDokterBPJSLovSearch = '';
-
-    public $dataRefBPJSLov = [];
-    public $dataRefBPJSLovStatus = 0;
-    public $dataRefBPJSLovSearch = '';
-
-
-    public $formRujukanRefBPJS = [];
-    public $formRujukanRefBPJSStatus = 0;
-    public $formRujukanRefBPJSSearch = '';
-
-    public $dataDiagnosaBPJSLov = [];
-    public $dataDiagnosaBPJSLovStatus = 0;
-    public $dataDiagnosaBPJSLovSearch = '';
-
-
-
-
 
     // 
 
     //  modal status////////////////
     public $isOpen = 0;
     public $isOpenMode = 'insert';
-
-    // call MasterPasien Form
-    public $callMasterPasien = 0;
-
 
 
     // search logic -resetExcept////////////////
@@ -535,16 +300,10 @@ class RJskdp extends Component
     ];
 
 
-    // sort logic -resetExcept////////////////
-    public $sortField = 'reg_no';
-    public $sortAsc = true;
-
 
     // listener from blade////////////////
     protected $listeners = [
-        'confirm_remove_record_RJp' => 'delete',
-        'rePush_Data_Antrian' => 'store',
-        // 'rePush_Data_TaskId' => '', //blm di pakai ->model fitur blm diemukan (repush data to URL)
+        'xxxxx' => 'xxxxx',
     ];
 
 
@@ -567,9 +326,6 @@ class RJskdp extends Component
         $this->resetExcept([
             'limitPerPage',
             'search',
-            'dateRjRef',
-            'shiftRjRef',
-            'statusRjRef',
             'drRjRef',
             'regNoRef'
 
@@ -581,13 +337,7 @@ class RJskdp extends Component
 
 
     // open and close modal start////////////////
-    private function openModal(): void
-    {
-        $this->resetInputFields();
-        $this->isOpen = true;
-        $this->isOpenMode = 'insert';
-        $this->setShiftnCurrentDate();
-    }
+
     private function openModalEdit(): void
     {
         $this->resetInputFields();
@@ -595,12 +345,7 @@ class RJskdp extends Component
         $this->isOpenMode = 'update';
     }
 
-    private function openModalTampil(): void
-    {
-        $this->resetInputFields();
-        $this->isOpen = true;
-        $this->isOpenMode = 'tampil';
-    }
+
 
     public function closeModal(): void
     {
@@ -644,24 +389,6 @@ class RJskdp extends Component
         })->toArray();
     }
 
-    private function setregNoRef(): void
-    {
-        if ($this->regNoRef) {
-            $this->regNoRef = $this->regNoRef;
-        }
-    }
-
-
-    // setShiftRJ//////////////// Form
-    public function setShiftRJ($id, $desc): void
-    {
-        $this->dataDaftarPoliRJ['shift'] = $id;
-        $this->resetValidation();
-    }
-
-
-
-
 
 
 
@@ -680,24 +407,7 @@ class RJskdp extends Component
         $this->resetValidation();
         $this->resetInputFields();
     }
-    // date
-    public function updatedDaterjref(): void
-    {
-        // $this->emit('toastr-error', "date.");
 
-        $this->resetPage();
-        $this->resetValidation();
-        $this->resetInputFields();
-    }
-    // status
-    public function updatedStatusrjref(): void
-    {
-        // $this->emit('toastr-error', "status.");
-
-        $this->resetPage();
-        $this->resetValidation();
-        $this->resetInputFields();
-    }
     // dr
     public function setdrRjRef($id, $name): void
     {
@@ -709,49 +419,22 @@ class RJskdp extends Component
         $this->resetValidation();
         $this->resetInputFields();
     }
-    // shift
-    public function setShift($id, $desc): void
-    {
-        // $this->emit('toastr-error', "shift.");
-
-        $this->shiftRjRef['shiftId'] = $id;
-        $this->shiftRjRef['shiftDesc'] = $desc;
-        $this->resetPage();
-        $this->resetValidation();
-        $this->resetInputFields();
-    }
     /////////////////////////////////////////////////////////////////////
 
 
 
 
 
-    // is going to insert data////////////////
-    public function create()
-    {
-        $this->openModal();
-    }
-
-    // is going to delete data////////////////
-    public function delete()
-    {
-        $this->emit('toastr-error', "delete Data tidak dapat di proses.");
-    }
-
-    // is going to tampil data////////////////
-    public function tampil()
-    {
-        $this->emit('toastr-error', "tampil Data tidak dapat di proses.");
-    }
 
     // is going to edit data/////////////////
     public function edit($id)
     {
-        $this->openModalEdit();
-        $this->findData($id);
+        $this->emit('toastr-error', "Pembuatan Data SKDP dalam proses pengerjaan.");
+
+        // $this->openModalEdit();
+        // $this->findData($id);
     }
 
-    // logic LOV start////////////////
 
 
 
@@ -769,17 +452,9 @@ class RJskdp extends Component
     //////////////////////////////////////////////
     // updated when change Record ////////////////
     ///////////////////////////////////////////////
-    // klaimId
-    public function updatedJenisklaimJenisklaimid()
-    {
-        $this->dataDaftarPoliRJ['klaimId'] = $this->JenisKlaim['JenisKlaimId'];
-    }
 
-    // kunjunganId
-    public function updatedJeniskunjunganJeniskunjunganid()
-    {
-        $this->dataDaftarPoliRJ['kunjunganId'] = $this->JenisKunjungan['JenisKunjunganId'];
-    }
+
+
     //////////////////////////////////////////////
     // updated when change Record ////////////////
     ///////////////////////////////////////////////
@@ -861,68 +536,8 @@ class RJskdp extends Component
         // Validate RJ
         $this->validateDataRJ();
 
-        // Logic push data ke BPJS
-
-
-        // Push data antrian dan Task ID 3
-        $this->pushDataAntrian();
-
-
-
-        // Logic insert and update mode start //////////
-        if ($this->isOpenMode == 'insert') {
-            $this->insertDataRJ();
-            $this->isOpenMode = 'update';
-        } else if ($this->isOpenMode == 'update') {
-            $this->updateDataRJ($this->dataDaftarPoliRJ['rjNo']);
-        }
-
-
-
-
-        // Opstional (Jika ingin fast Entry resert setelah proses diatas)
-        // Jika ingin auto close resert dan close aktifkan
-        // $this->resetInputFields();
-        // $this->closeModal();
-    }
-
-    private function insertDataRJ(): void
-    {
-
-        // insert into table transaksi
-        DB::table('rstxn_rjhdrs')->insert([
-            'rj_no' => $this->dataDaftarPoliRJ['rjNo'],
-            'rj_date' => DB::raw("to_date('" . $this->dataDaftarPoliRJ['rjDate'] . "','dd/mm/yyyy hh24:mi:ss')"),
-            'reg_no' => $this->dataDaftarPoliRJ['regNo'],
-            'nobooking' => $this->dataDaftarPoliRJ['noBooking'],
-            'no_antrian' => $this->dataDaftarPoliRJ['noAntrian'],
-
-            'klaim_id' => $this->dataDaftarPoliRJ['klaimId'],
-            'poli_id' => $this->dataDaftarPoliRJ['poliId'],
-            'dr_id' => $this->dataDaftarPoliRJ['drId'],
-            'shift' => $this->dataDaftarPoliRJ['shift'],
-
-            'txn_status' => $this->dataDaftarPoliRJ['txnStatus'],
-            'rj_status' => $this->dataDaftarPoliRJ['rjStatus'],
-            'erm_status' => $this->dataDaftarPoliRJ['ermStatus'],
-
-            'pass_status' => $this->dataDaftarPoliRJ['passStatus'] == 'N' ? 'N' : 'O', //Baru lama
-
-            'cek_lab' => $this->dataDaftarPoliRJ['cekLab'],
-            'sl_codefrom' => $this->dataDaftarPoliRJ['slCodeFrom'],
-            'kunjungan_internal_status' => $this->dataDaftarPoliRJ['kunjunganInternalStatus'],
-            'push_antrian_bpjs_status' => $this->HttpGetBpjsStatus, //status push antrian 200 /201/ 400
-            'push_antrian_bpjs_json' => $this->HttpGetBpjsJson,  // response json
-            'datadaftarpolirj_json' => json_encode($this->dataDaftarPoliRJ, true),
-            'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
-
-            'waktu_masuk_pelayanan' => DB::raw("to_date('" . $this->dataDaftarPoliRJ['rjDate'] . "','dd/mm/yyyy hh24:mi:ss')"), //waktu masuk = rjdate
-
-            'vno_sep' => isset($this->dataDaftarPoliRJ['sep']['noSep']) ? $this->dataDaftarPoliRJ['sep']['noSep'] : "",
-
-        ]);
-
-        $this->emit('toastr-success', "Data sudah tersimpan.");
+        // Logic update mode start //////////
+        $this->updateDataRJ($this->dataDaftarPoliRJ['rjNo']);
     }
 
     private function updateDataRJ($rjNo): void
@@ -962,68 +577,10 @@ class RJskdp extends Component
                 'vno_sep' => isset($this->dataDaftarPoliRJ['sep']['noSep']) ? $this->dataDaftarPoliRJ['sep']['noSep'] : "",
             ]);
 
-        $this->emit('toastr-success', "Data berhasil diupdate.");
+        $this->emit('toastr-success', "Pembuatan SKDP berhasil disimpan.");
     }
     // insert and update record end////////////////
 
-
-
-    // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
-    private function setDataPrimer(): void
-    {
-        // Klaim & Kunjungan 
-        // dd($this->dataDaftarPoliRJ['klaimId']);
-        $this->dataDaftarPoliRJ['klaimId'] = $this->JenisKlaim['JenisKlaimId'];
-        $this->dataDaftarPoliRJ['kunjunganId'] = $this->JenisKunjungan['JenisKunjunganId'];
-
-        // JenisKunjungan Internal 
-        if ($this->JenisKunjungan['JenisKunjunganId'] == 2) {
-            $this->dataDaftarPoliRJ['kunjunganInternalStatus'] = "1";
-        }
-
-        // noBooking
-        if (!$this->dataDaftarPoliRJ['noBooking']) {
-            $this->dataDaftarPoliRJ['noBooking'] = Carbon::now()->format('YmdHis') . 'RSIM';
-        }
-
-        // rjNoMax
-        if (!$this->dataDaftarPoliRJ['rjNo']) {
-            $sql = "select nvl(max(rj_no)+1,1) rjno_max from rstxn_rjhdrs";
-            $this->dataDaftarPoliRJ['rjNo'] = DB::scalar($sql);
-        }
-
-        // noUrutAntrian (count all kecuali KRonis) if KR 999
-        $sql = "select count(*) no_antrian 
-         from rstxn_rjhdrs 
-         where dr_id=:drId
-         and to_char(rj_date,'ddmmyyyy')=:tgl
-         and klaim_id!='KR'";
-
-        // Antrian ketika data antrian kosong
-        if (!$this->dataDaftarPoliRJ['noAntrian']) {
-            // proses antrian
-            if ($this->dataDaftarPoliRJ['klaimId'] != 'KR') {
-                $noUrutAntrian = DB::scalar($sql, [
-                    "tgl" => Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'])->format('dmY'),
-                    "drId" => $this->dataDaftarPoliRJ['drId']
-                ]);
-                if ($noUrutAntrian == 0) {
-                    $noAntrian = 4;
-                } else if ($noUrutAntrian == 1) {
-                    $noAntrian = 5;
-                } else if ($noUrutAntrian == 2) {
-                    $noAntrian = 6;
-                } else if ($noUrutAntrian > 2) {
-                    $noAntrian = $noUrutAntrian + 3 + 1;
-                }
-            } else {
-                // Kronis
-                $noAntrian = 999;
-            }
-
-            $this->dataDaftarPoliRJ['noAntrian'] = $noAntrian;
-        }
-    }
 
     private function setDataPasien($value): void
     {
@@ -1102,51 +659,7 @@ class RJskdp extends Component
         }
     }
 
-    private function setShiftnCurrentDate(): void
-    {
-        // dd/mm/yyyy hh24:mi:ss
-        $this->dataDaftarPoliRJ['rjDate'] = Carbon::now()->format('d/m/Y H:i:s');
 
-        // shift
-        $findShift = DB::table('rstxn_shiftctls')->select('shift')
-            ->whereRaw("'" . Carbon::now()->format('H:i:s') . "' between
-            shift_start and shift_end")
-            ->first();
-        $this->dataDaftarPoliRJ['shift'] = isset($findShift->shift) && $findShift->shift ? $findShift->shift : 3;
-    }
-
-
-    public function clickrujukanPeserta(): void
-    {
-        // Cek jika bukan BPJS
-        if ($this->JenisKlaim['JenisKlaimId'] != 'JM') {
-            $this->emit('toastr-error', 'Jenis Klaim ' . $this->JenisKlaim['JenisKlaimDesc']);
-        } else {
-            // Cek Apakah reqSep ada datanya apa blm
-            // if (isset($this->dataDaftarPoliRJ['sep']['reqSep']['request']) && isset($this->dataDaftarPoliRJ['sep']['noSep'])) {
-            if ($this->dataDaftarPoliRJ['sep']['noSep']) {
-
-                $this->SEPJsonReq = $this->dataDaftarPoliRJ['sep']['reqSep'];
-                // set formRujukanRefBPJSStatus true (open form)
-                $this->formRujukanRefBPJSStatus = true;
-            } else {
-                // if jenis klaim BPJS dan Kunjungan = FKTP (1)
-                if ($this->JenisKlaim['JenisKlaimId'] == 'JM' && $this->JenisKunjungan['JenisKunjunganId'] == 1) {
-                    $this->rujukanPesertaFKTP($this->dataPasien['pasien']['identitas']['idbpjs']);
-                } else if ($this->JenisKlaim['JenisKlaimId'] == 'JM' && $this->JenisKunjungan['JenisKunjunganId'] == 2) {
-                    // if jenis klaim BPJS dan Kunjungan = Kontrol (2)
-                    $this->rujukanPesertaFKTP($this->dataPasien['pasien']['identitas']['idbpjs']);
-                } else if ($this->JenisKlaim['JenisKlaimId'] == 'JM' && $this->JenisKunjungan['JenisKunjunganId'] == 3) {
-                    // if jenis klaim BPJS dan Kunjungan = Inernal (3)
-                    $this->rujukanPesertaFKTP($this->dataPasien['pasien']['identitas']['idbpjs']);
-                } else if ($this->JenisKlaim['JenisKlaimId'] == 'JM' && $this->JenisKunjungan['JenisKunjunganId'] == 4) {
-                    // if jenis klaim BPJS dan Kunjungan = FKTL antar rs(4)
-                    $this->rujukanPesertaFKTL($this->dataPasien['pasien']['identitas']['idbpjs']);
-                    $this->emit('toastr-error', 'Jenis Klaim FKTL antar rs cek');
-                }
-            }
-        }
-    }
 
     ///////////cariDataPasienByKey/////////////////////////////////
     private function cariDataPasienByKeyArr($key, $search)
@@ -1366,1032 +879,38 @@ class RJskdp extends Component
         // return $findData;
     }
 
-    ////////////////////////////////////////////////
-    // Lov Pasien //////////////////////
-    ////////////////////////////////////////////////
-    public function updateddataPasienlovsearch()
-    {
-        // Variable Search
-        $search = $this->dataPasienLovSearch;
 
-        // check LOV by id 
 
-        // set Call MasterPasien False
-        $this->callMasterPasien = false;
 
-        // Open Lov Pasien Status
-        $this->dataPasienLovStatus = true;
 
-        // if there is no id found and check (min 3 char on search)
 
-        if (strlen($search) < 3) {
-            $this->dataPasienLov = [];
-        } else {
 
 
-            // Proses Cari Data
 
 
-            // 1.Cari berdasarkan reg_no  ->if null DB
-            // 2.Cari berdasarkan nik ->if null DB
-            // 3.Cari berdasarkan nokaBPJS ->if null DB
-            // 4.Cari berdasarkan reg_name ->if null DB
 
-            // 5. Goto Pasien Baru berdasarkan nik apiBPJS ->if null 
-            // 6. Entry Manual Pasien Baru
 
-            // by reg_noxxx
-            $cariDataPasienRegNo = $this->cariDataPasienByKeyArr('reg_no', $search);
-            if ($cariDataPasienRegNo) {
-                $this->dataPasienLov = $cariDataPasienRegNo;
-            } else {
-                // by nik
-                $cariDataPasienNik = $this->cariDataPasienByKeyArr('nik_bpjs', $search);
-                if ($cariDataPasienNik) {
-                    $this->dataPasienLov = $cariDataPasienNik;
-                } else {
-                    // by nokaBPJS
-                    $cariDataPasienNokaBpjs = $this->cariDataPasienByKeyArr('nokartu_bpjs', $search);
-                    if ($cariDataPasienNokaBpjs) {
-                        $this->dataPasienLov = $cariDataPasienNokaBpjs;
-                    } else {
-                        // by name
-                        $cariDataPasienName = json_decode(DB::table('rsmst_pasiens')
-                            ->select(
-                                DB::raw("to_char(reg_date,'dd/mm/yyyy hh24:mi:ss') as reg_date"),
-                                'reg_no',
-                                'reg_name',
-                                DB::raw("nvl(nokartu_bpjs,'-') as nokartu_bpjs"),
-                                DB::raw("nvl(nik_bpjs,'-') as nik_bpjs"),
-                                'sex',
-                                DB::raw("to_char(birth_date,'dd/mm/yyyy') as birth_date"),
-                                DB::raw("(select trunc( months_between( sysdate, birth_date ) /12 ) from dual) as thn"),
-                                'bln',
-                                'hari',
-                                'birth_place',
-                                'blood',
-                                'marital_status',
-                                'rel_id',
-                                'edu_id',
-                                'job_id',
-                                'kk',
-                                'nyonya',
-                                'no_kk',
-                                'address',
-                                'rsmst_desas.des_id  as des_id',
-                                'rsmst_kecamatans.kec_id  as kec_id',
-                                'rsmst_kabupatens.kab_id  as kab_id',
-                                'rsmst_propinsis.prop_id  as prop_id',
-                                'des_name  as des_name',
-                                'kec_name  as kec_name',
-                                'kab_name  as kab_name',
-                                'prop_name  as prop_name',
-                                'rt',
-                                'rw',
-                                'phone'
-                            )
-                            ->join('rsmst_desas', 'rsmst_desas.des_id', 'rsmst_pasiens.des_id')
-                            ->join('rsmst_kecamatans', 'rsmst_kecamatans.kec_id', 'rsmst_desas.kec_id')
-                            ->join('rsmst_kabupatens', 'rsmst_kabupatens.kab_id', 'rsmst_kecamatans.kab_id')
-                            ->join('rsmst_propinsis', 'rsmst_propinsis.prop_id', 'rsmst_kabupatens.prop_id')
-                            ->where(DB::raw('upper(reg_name)'), 'like', '%' . strtoupper($search) . '%')
-                            ->orWhere('reg_no', 'like', '%' . strtoupper($search) . '%')
-                            ->orWhere('address', 'like', '%' . strtoupper($search) . '%')
-                            ->orderBy('reg_name', 'desc')
-                            ->limit(50)
-                            ->get(), true);
-                        if ($cariDataPasienName) {
-                            $this->dataPasienLov = $cariDataPasienName;
-                        } else {
-                            // If Confirmation
-                            $this->dataPasienLov = [];
-                            $this->emit('cari_Data_Pasien_Tidak_Ditemukan_Confirmation', $search);
-                            // $this->callMasterPasien = true;
-                        }
-                    }
-                }
-            }
-        }
-    }
-    // /////////////////////
-    // LOV selected start
-    public function setMydataPasienLov($id)
-    {
-        $this->setDataPasien($id);
-        $this->dataDaftarPoliRJ['regNo'] = $id;
 
-        $this->dataPasienLovStatus = false;
-        $this->dataPasienLov = [];
-        $this->dataPasienLovSearch = $id;
-    }
-    ////////////////////////////////////////////////
-    // Lov Pasien //////////////////////
-    ////////////////////////////////////////////////
 
-
-
-    /////////////////////////////////////////////////
-    // Lov dataDokterRJ //////////////////////
-    ////////////////////////////////////////////////
-    public function clickdataDokterlov()
-    {
-        $this->dataDokterLovStatus = true;
-        $this->dataDokterLov = [];
-    }
-
-    public function updateddataDokterlovsearch()
-    {
-        // Variable Search
-        $search = $this->dataDokterLovSearch;
-
-        // check LOV by dr_id rs id 
-        $dataDokter = DB::table('rsmst_doctors')->select(
-            'rsmst_doctors.dr_id as dr_id',
-            'rsmst_doctors.dr_name as dr_name',
-            'kd_dr_bpjs',
-
-            'rsmst_polis.poli_id as poli_id',
-            'rsmst_polis.poli_desc as poli_desc',
-            'kd_poli_bpjs'
-        )
-            ->Join('rsmst_polis', 'rsmst_polis.poli_id', 'rsmst_doctors.poli_id')
-            ->where('rsmst_doctors.dr_id', $search)
-            ->first();
-
-        if ($dataDokter) {
-            $this->dataDaftarPoliRJ['drId'] = $dataDokter->dr_id;
-            $this->dataDaftarPoliRJ['drDesc'] = $dataDokter->dr_name;
-
-            $this->dataDaftarPoliRJ['poliId'] = $dataDokter->poli_id;
-            $this->dataDaftarPoliRJ['poliDesc'] = $dataDokter->poli_desc;
-
-            $this->dataDaftarPoliRJ['kddrbpjs'] = $dataDokter->kd_dr_bpjs;
-            $this->dataDaftarPoliRJ['kdpolibpjs'] = $dataDokter->kd_poli_bpjs;
-
-            $this->dataDokterLovStatus = false;
-            $this->dataDokterLovSearch = '';
-        } else {
-            // if there is no id found and check (min 3 char on search)
-            if (strlen($search) < 3) {
-                $this->dataDokterLov = [];
-            } else {
-                $this->dataDokterLov = json_decode(
-                    DB::table('rsmst_doctors')->select(
-                        'rsmst_doctors.dr_id as dr_id',
-                        'rsmst_doctors.dr_name as dr_name',
-                        'kd_dr_bpjs',
-
-                        'rsmst_polis.poli_id as poli_id',
-                        'rsmst_polis.poli_desc as poli_desc',
-                        'kd_poli_bpjs'
-
-                    )
-                        ->Join('rsmst_polis', 'rsmst_polis.poli_id', 'rsmst_doctors.poli_id')
-
-                        ->Where(DB::raw('upper(dr_name)'), 'like', '%' . strtoupper($search) . '%')
-                        ->orWhere('poli_desc', 'like', '%' . strtoupper($search) . '%')
-                        ->limit(10)
-                        ->orderBy('dr_name', 'ASC')
-                        ->orderBy('poli_desc', 'ASC')
-                        ->get(),
-                    true
-                );
-            }
-            $this->dataDokterLovStatus = true;
-            $this->dataDaftarPoliRJ['drId'] = '';
-            $this->dataDaftarPoliRJ['drDesc'] = '';
-            $this->dataDaftarPoliRJ['poliId'] = '';
-            $this->dataDaftarPoliRJ['poliDesc'] = '';
-            $this->dataDaftarPoliRJ['kddrbpjs'] = '';
-            $this->dataDaftarPoliRJ['kdpolibpjs'] = '';
-        }
-    }
-    // /////////////////////
-    // LOV selected start
-    public function setMydataDokterLov($id, $name)
-    {
-        $dataDokter = DB::table('rsmst_doctors')->select(
-            'rsmst_doctors.dr_id as dr_id',
-            'rsmst_doctors.dr_name as dr_name',
-            'kd_dr_bpjs',
-
-            'rsmst_polis.poli_id as poli_id',
-            'rsmst_polis.poli_desc as poli_desc',
-            'kd_poli_bpjs'
-        )
-            ->Join('rsmst_polis', 'rsmst_polis.poli_id', 'rsmst_doctors.poli_id')
-            ->where('rsmst_doctors.dr_id', $id)
-            ->first();
-        $this->dataDaftarPoliRJ['drId'] = $dataDokter->dr_id;
-        $this->dataDaftarPoliRJ['drDesc'] = $dataDokter->dr_name;
-
-        $this->dataDaftarPoliRJ['poliId'] = $dataDokter->poli_id;
-        $this->dataDaftarPoliRJ['poliDesc'] = $dataDokter->poli_desc;
-
-        $this->dataDaftarPoliRJ['kddrbpjs'] = $dataDokter->kd_dr_bpjs;
-        $this->dataDaftarPoliRJ['kdpolibpjs'] = $dataDokter->kd_poli_bpjs;
-
-        $this->dataDokterLovStatus = false;
-        $this->dataDokterLovSearch = '';
-    }
-    // LOV selected end
-    /////////////////////////////////////////////////
-    // Lov dataDokterRJ //////////////////////
-    ////////////////////////////////////////////////
-
-
-
-
-
-
-
-
-    // ////////////////
-    // Antrol Logic
-    // ////////////////
-
-
-    private function pushDataAntrian()
-    {
-        //push data antrian UMUM BPJS kecuali 'kronis'
-        if ($this->dataDaftarPoliRJ['klaimId'] != 'KR') {
-            $rjdate = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate']); //Tgl RJ
-
-            $dayDesc = $rjdate->isoFormat('dddd'); //Senin Selasa Rabu ...
-
-            $dayid = ($dayDesc == 'Senin') ? 1 //kode Senin Selasa Rabu ...
-                : ($dayDesc == 'Selasa' ? 2
-                    : ($dayDesc == 'Rabu' ? 3
-                        : ($dayDesc == 'Kamis' ? 4
-                            : ($dayDesc == 'Jumat' ? 5
-                                : 6
-                            )
-                        )
-                    )
-                );
-
-            $JadwalPraktek = json_decode(json_encode(DB::table('scmst_scpolis')
-                ->select(
-                    //Poli RS
-                    'scmst_scpolis.dr_id as dr_id',
-                    'rsmst_doctors.dr_name as dr_name',
-                    'scmst_scpolis.sc_poli_ket as sc_poli_ket',
-                    'scmst_scpolis.poli_id as poli_id',
-                    'rsmst_polis.poli_desc as poli_desc',
-
-                    //Poli BPJS
-                    'rsmst_doctors.kd_dr_bpjs as kd_dr_bpjs',
-                    'rsmst_polis.kd_poli_bpjs as kd_poli_bpjs',
-
-                    DB::raw("nvl(mulai_praktek,'00:00:00') as mulai_praktek"),
-                    DB::raw("nvl(selesai_praktek,'00:00:00') as selesai_praktek"),
-
-                    DB::raw('nvl(kuota,35) as kuota'),
-                )
-                ->Join('rsmst_doctors', 'rsmst_doctors.dr_id', 'scmst_scpolis.dr_id')
-                ->Join('rsmst_polis', 'rsmst_polis.poli_id', 'scmst_scpolis.poli_id')
-                ->Where('day_id', $dayid)
-                ->Where('scmst_scpolis.dr_id', $this->dataDaftarPoliRJ['drId']) //Cek Poli RS
-                ->Where('sc_poli_status_', 1)
-                ->orderBy('scmst_scpolis.no_urut', 'ASC')
-                ->orderBy('scmst_scpolis.poli_id', 'ASC')
-                ->first(), true), true);
-
-
-            if (!$JadwalPraktek) {
-                $JadwalPraktek['mulai_praktek'] = '07:00:00';
-                $JadwalPraktek['selesai_praktek'] = '13:00:00';
-
-                $JadwalPraktek['kuota'] = 30;
-            }
-
-            // Pelayanan (Poli Tgl + Jam Layanan)
-            $hariLayananJamLayanan = Carbon::createFromFormat('d/m/Y H:i:s', $rjdate->format('d/m/Y') . ' ' . $JadwalPraktek['mulai_praktek']);
-            // $timestamp = $hariLayananJamLayanan->timestamp; //Timestemp Layanan
-            $jadwal_estimasi = $hariLayananJamLayanan->addMinutes(10 * ($this->dataDaftarPoliRJ['noAntrian'] + 1)); // Hari Layanan||JamPraktek + 10menit
-            // JamPraktek
-            $jampraktek = Str::substr($JadwalPraktek['mulai_praktek'], 0, 5) . '-' . Str::substr($JadwalPraktek['selesai_praktek'], 0, 5); //'00:00-00:00'
-
-            $antreanadd = [
-                "kodebooking" => $this->dataDaftarPoliRJ['noBooking'],
-                "jenispasien" => ($this->dataDaftarPoliRJ['klaimId'] == 'JM') ? 'JKN' : 'NON JKN', //Layanan UMUM BPJS
-                "nomorkartu" => ($this->dataDaftarPoliRJ['klaimId'] == 'JM') ? $this->dataPasien['pasien']['identitas']['idbpjs'] : '',
-                "nik" => $this->dataPasien['pasien']['identitas']['nik'],
-                "nohp" =>  $this->dataPasien['pasien']['kontak']['nomerTelponSelulerPasien'],
-                "kodepoli" => $this->dataDaftarPoliRJ['kdpolibpjs'] ? $this->dataDaftarPoliRJ['kdpolibpjs'] : $this->dataDaftarPoliRJ['poliId'], //if null poliidRS
-                "namapoli" => $this->dataDaftarPoliRJ['poliDesc'],
-                "pasienbaru" => 0,
-                "norm" => $this->dataDaftarPoliRJ['regNo'],
-                "tanggalperiksa" => Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'])->format('Y-m-d'),
-                "kodedokter" => $this->dataDaftarPoliRJ['kddrbpjs'] ? $this->dataDaftarPoliRJ['kddrbpjs'] : $this->dataDaftarPoliRJ['drId'], //if Null dridRS
-                "namadokter" => $this->dataDaftarPoliRJ['drDesc'],
-                "jampraktek" => $jampraktek,
-                "jeniskunjungan" => $this->dataDaftarPoliRJ['kunjunganId'], //FKTP/FKTL/Kontrol/Internal
-                "nomorreferensi" => $this->dataDaftarPoliRJ['noReferensi'],
-                "nomorantrean" => $this->dataDaftarPoliRJ['noAntrian'],
-                "angkaantrean" => $this->dataDaftarPoliRJ['noAntrian'],
-                "estimasidilayani" => $jadwal_estimasi->timestamp,
-                "sisakuotajkn" => $JadwalPraktek['kuota'] - $this->dataDaftarPoliRJ['noAntrian'],
-                "kuotajkn" => $JadwalPraktek['kuota'],
-                "sisakuotanonjkn" => $JadwalPraktek['kuota'] - $this->dataDaftarPoliRJ['noAntrian'],
-                "kuotanonjkn" => $JadwalPraktek['kuota'],
-                "keterangan" => "Peserta harap 30 menit lebih awal guna pencatatan administrasi.",
-            ];
-        }
-
-        // http Post
-
-
-
-        // Lakukan 2 x cek http dan BPJS untuk memastikan proses kirim data berhasil 
-        // dan menentukan nilai status / jika code =200 skip proses tersebut
-        // jika antrean berhasil-> buat SEP
-        //jika gagal ulangi-> antrean
-        // (pembuatan SEP dilakukan ketika proses antrean berhasil)
-
-        $cekAntrianAntreanBPJS = DB::table('rstxn_rjhdrs')
-            ->select('push_antrian_bpjs_status', 'push_antrian_bpjs_json')
-            ->where('rj_no', $this->dataDaftarPoliRJ['rjNo'])
-            ->first();
-
-
-        $cekAntrianAntreanBPJSStatus = isset($cekAntrianAntreanBPJS->push_antrian_bpjs_status) ? $cekAntrianAntreanBPJS->push_antrian_bpjs_status : "";
-        // 1 cek proses pada database status
-        if ($cekAntrianAntreanBPJSStatus == 200) {
-            // set http response to public
-            $this->HttpGetBpjsStatus = $cekAntrianAntreanBPJS->push_antrian_bpjs_status; //status 200 201 400 ..
-            $this->HttpGetBpjsJson = $cekAntrianAntreanBPJS->push_antrian_bpjs_json; //Return Response Tambah Antrean
-
-            //ketika Push Tambah Antrean Berhasil buat SEP
-            //////////////////////////////////////////////
-            $this->pushInsertSEP($this->SEPJsonReq);
-            //ketika Push Tambah Antrean Berhasil buat SEP
-            //////////////////////////////////////////////
-
-        } else {
-            // Tambah Antrean
-            $HttpGetBpjs =  AntrianTrait::tambah_antrean($antreanadd)->getOriginalContent();
-            // set http response to public
-            $this->HttpGetBpjsStatus = $HttpGetBpjs['metadata']['code']; //status 200 201 400 ..
-            $this->HttpGetBpjsJson = json_encode($HttpGetBpjs, true); //Return Response Tambah Antrean
-
-
-            // 2 cek proses pada getHttp
-            if ($HttpGetBpjs['metadata']['code'] == 200) {
-                $this->emit('toastr-success', 'Tambah Antrian ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
-
-                $this->HttpGetBpjsStatus = $HttpGetBpjs['metadata']['code']; //status 200 201 400 ..
-                $this->HttpGetBpjsJson = json_encode($HttpGetBpjs, true); //Return Response Tambah Antrean
-
-                //ketika Push Tambah Antrean Berhasil buat SEP
-                //////////////////////////////////////////////
-                $this->pushInsertSEP($this->SEPJsonReq);
-                //ketika Push Tambah Antrean Berhasil buat SEP
-                //////////////////////////////////////////////
-            } else {
-                $this->emit('toastr-error', 'Tambah Antrian ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
-
-                $this->HttpGetBpjsStatus = $HttpGetBpjs['metadata']['code']; //status 200 201 400 ..
-                $this->HttpGetBpjsJson = json_encode($HttpGetBpjs, true); //Return Response Tambah Antrean
-
-                // Ulangi Proses pushDataAntrian;
-                $this->emit('rePush_Data_Antrian_Confirmation');
-            }
-        }
-
-
-
-        /////////////////////////
-        // Update TaskId 3
-        /////////////////////////
-
-        $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'])->timestamp * 1000; //waktu dalam timestamp milisecond
-        // DB Json
-        $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId3'] = $this->dataDaftarPoliRJ['rjDate'];
-        $noBooking = $this->dataDaftarPoliRJ['noBooking'];
-
-        $this->pushDataTaskId($noBooking, 3, $waktu);
-    }
-
-    private function pushDataTaskId($noBooking, $taskId, $time): void
-    {
-        //////////////////////////////////////////////////////////
-        /////////////////////////////////////////////////////////
-        // Update Task Id $kodebooking, $taskid, $waktu, $jenisresep
-
-        $waktu = $time;
-        $HttpGetBpjs =  AntrianTrait::update_antrean($noBooking, $taskId, $waktu, "")->getOriginalContent();
-
-
-
-        // metadata d kecil
-        if ($HttpGetBpjs['metadata']['code'] == 200) {
-            $this->emit('toastr-success', 'Task Id' . $taskId . ' ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
-        } else {
-            $this->emit('toastr-error', 'Task Id' . $taskId . ' ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
-
-            // Ulangi Proses pushTaskId;
-            // $this->emit('rePush_Data_TaskId_Confirmation');
-        }
-    }
-
-    private function rujukanPesertaFKTP($idBpjs): void
-    {
-        $HttpGetBpjs =  VclaimTrait::rujukan_peserta($idBpjs)->getOriginalContent();
-
-        // metadata d kecil
-        if ($HttpGetBpjs['metadata']['code'] == 200) {
-            $this->dataRefBPJSLovStatus = true;
-            $this->dataRefBPJSLov = json_decode(json_encode($HttpGetBpjs['response']['rujukan'], true), true);
-
-            $this->emit('toastr-success', $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
-        } else {
-            $this->dataRefBPJSLovStatus = false;
-            $this->dataRefBPJSLov = [];
-            $this->emit('toastr-error', $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
-        }
-    }
-
-    private function rujukanPesertaFKTL($idBpjs): void
-    {
-        $HttpGetBpjs =  VclaimTrait::rujukan_rs_peserta($idBpjs)->getOriginalContent();
-
-        // metadata d kecil
-        if ($HttpGetBpjs['metadata']['code'] == 200) {
-            $this->dataRefBPJSLovStatus = true;
-            $this->dataRefBPJSLov = json_decode(json_encode($HttpGetBpjs['response']['rujukan'], true), true);
-
-            $this->emit('toastr-success', $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
-        } else {
-            $this->dataRefBPJSLovStatus = false;
-            $this->dataRefBPJSLov = [];
-            $this->emit('toastr-error', $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
-        }
-    }
-
-
-
-
-
-
-
-
-
-    // ////////////////
-    // SEP Logic
-    // ////////////////
-
-    private function pushInsertSEP($SEPJsonReq)
-    {
-        //ketika Push Tambah Antrean Berhasil buat SEP
-        //////////////////////////////////////////////
-        $HttpGetBpjs =  VclaimTrait::sep_insert($SEPJsonReq)->getOriginalContent();
-        if ($HttpGetBpjs['metadata']['code'] == 200) {
-            $this->dataDaftarPoliRJ['sep']['resSep'] = $HttpGetBpjs['response']['response']['sep'];
-            $this->dataDaftarPoliRJ['sep']['noSep'] = $HttpGetBpjs['response']['response']['sep']['noSep'];
-
-            $this->emit('toastr-success', 'SEP ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
-        } else {
-            $this->emit('toastr-error', 'SEP ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
-        }
-
-        // response sep value
-        //ketika Push Tambah Antrean Berhasil buat SEP
-        //////////////////////////////////////////////
-    }
-
-    public function storeDataSepReq(): void
-    {
-        // jika jenis klaim JM (BPJS)
-        if ($this->JenisKlaim['JenisKlaimId'] == 'JM') {
-
-            //tambah logic untuk antrol
-            //jika 1 kunjungan awal set data noRujukan
-            //jika 2 internal set data -----
-            //jika 3 kontrol set data no SKDP
-            //jika 4 kunjungan awal dari RS set data noRujukan
-
-            $this->dataDaftarPoliRJ['noReferensi'] =
-                ($this->JenisKunjungan['JenisKunjunganId'] == 1)
-                ? (isset($this->SEPJsonReq['request']['t_sep']['rujukan']['noRujukan']) ? $this->SEPJsonReq['request']['t_sep']['rujukan']['noRujukan'] : "Data tidak dapat diproses")
-                : (
-                    ($this->JenisKunjungan['JenisKunjunganId'] == 2)
-                    ? (isset($this->SEPJsonReq['request']['t_sep']['rujukan']['noRujukan']) ? $this->SEPJsonReq['request']['t_sep']['rujukan']['noRujukan'] : "Data tidak dapat diproses") . '1'
-                    : (
-                        ($this->JenisKunjungan['JenisKunjunganId'] == 3)
-                        ? $this->SEPJsonReq['request']['t_sep']['skdp']['noSurat']
-                        : (
-                            ($this->JenisKunjungan['JenisKunjunganId'] == 4)
-                            ? (isset($this->SEPJsonReq['request']['t_sep']['rujukan']['noRujukan']) ? $this->SEPJsonReq['request']['t_sep']['rujukan']['noRujukan'] : "Data tidak dapat diproses")
-                            : (isset($this->SEPJsonReq['request']['t_sep']['rujukan']['noRujukan']) ? $this->SEPJsonReq['request']['t_sep']['rujukan']['noRujukan'] : "Data tidak dapat diproses")
-                        )
-                    )
-                );
-        }
-        // close Form
-        $this->formRujukanRefBPJSStatus = false;
-
-        $this->dataDaftarPoliRJ['sep']['reqSep'] = $this->SEPJsonReq;
-    }
-
-    /////////////////////////////////////////////////
-    // Lov dataRefBPJSLov //////////////////////
-    ////////////////////////////////////////////////
-    public function clickdataRefBPJSlov()
-    {
-        $this->dataRefBPJSLovStatus = true;
-        $this->dataRefBPJSLov = [];
-    }
-    public function updateddataRefBPJSlovsearch()
-    {
-        // Variable Search
-        $search = $this->dataRefBPJSLovSearch;
-
-        // check LOV by id 
-        $dataRefBPJS = DB::table('rsmst_doctors')->select(
-            'rsmst_doctors.dr_id as dr_id',
-            'rsmst_doctors.dr_name as dr_name',
-            'kd_dr_bpjs',
-
-            'rsmst_polis.poli_id as poli_id',
-            'rsmst_polis.poli_desc as poli_desc',
-            'kd_poli_bpjs'
-        )
-            ->Join('rsmst_polis', 'rsmst_polis.poli_id', 'rsmst_doctors.poli_id')
-            ->where('rsmst_doctors.dr_id', $search)
-            ->first();
-
-        if ($dataRefBPJS) {
-            $this->dataDaftarPoliRJ['drId'] = $dataRefBPJS->dr_id;
-            $this->dataDaftarPoliRJ['drDesc'] = $dataRefBPJS->dr_name;
-
-            $this->dataDaftarPoliRJ['poliId'] = $dataRefBPJS->poli_id;
-            $this->dataDaftarPoliRJ['poliDesc'] = $dataRefBPJS->poli_desc;
-
-            $this->dataDaftarPoliRJ['kddrbpjs'] = $dataRefBPJS->kd_dr_bpjs;
-            $this->dataDaftarPoliRJ['kdpolibpjs'] = $dataRefBPJS->kd_poli_bpjs;
-
-            $this->dataRefBPJSLovStatus = false;
-            $this->dataRefBPJSLovSearch = '';
-        } else {
-            // if there is no id found and check (min 3 char on search)
-            if (strlen($search) < 3) {
-                $this->dataRefBPJSLov = [];
-            } else {
-                $this->dataRefBPJSLov = json_decode(
-                    DB::table('rsmst_doctors')->select(
-                        'rsmst_doctors.dr_id as dr_id',
-                        'rsmst_doctors.dr_name as dr_name',
-                        'kd_dr_bpjs',
-
-                        'rsmst_polis.poli_id as poli_id',
-                        'rsmst_polis.poli_desc as poli_desc',
-                        'kd_poli_bpjs'
-
-                    )
-                        ->Join('rsmst_polis', 'rsmst_polis.poli_id', 'rsmst_doctors.poli_id')
-
-                        ->Where(DB::raw('upper(dr_name)'), 'like', '%' . strtoupper($search) . '%')
-                        ->orWhere('poli_desc', 'like', '%' . strtoupper($search) . '%')
-                        ->limit(10)
-                        ->orderBy('dr_name', 'ASC')
-                        ->orderBy('poli_desc', 'ASC')
-                        ->get(),
-                    true
-                );
-            }
-            $this->dataRefBPJSLovStatus = true;
-            $this->dataDaftarPoliRJ['drId'] = '';
-            $this->dataDaftarPoliRJ['drDesc'] = '';
-            $this->dataDaftarPoliRJ['poliId'] = '';
-            $this->dataDaftarPoliRJ['poliDesc'] = '';
-            $this->dataDaftarPoliRJ['kddrbpjs'] = '';
-            $this->dataDaftarPoliRJ['kdpolibpjs'] = '';
-        }
-    }
-    public function setMydataRefBPJSLov($id, $name)
-    {
-
-        // dd($dataRefBPJSLov);
-        // set SEPJsonReq
-        $this->setSEPJsonReq($id);
-
-        // dd($this->SEPJsonReq);
-        $this->dataRefBPJSLovStatus = false;
-        $this->dataRefBPJSLovSearch = '';
-
-        // set formRujukanRefBPJSStatus true (open form)
-        $this->formRujukanRefBPJSStatus = true;
-    }
-
-    private function setSEPJsonReq($id): void
-    {
-        // cari data Lov dgn no Kunjungan 
-        $dataRefBPJSLov = collect($this->dataRefBPJSLov)->where('noKunjungan', $id)->first();
-
-        // cari data Poli sesuai rujukan BPJS (mapping data poli dan dokter)
-        $cariDataIdBpjs_dr_poli = DB::table('rsmst_doctors')
-            ->select('kd_dr_bpjs', 'kd_poli_bpjs', 'rsmst_doctors.dr_id as dr_id', 'dr_name', 'rsmst_doctors.poli_id as poli_id', 'poli_desc')
-            ->join('rsmst_polis', 'rsmst_doctors.poli_id', 'rsmst_polis.poli_id')
-            ->where('kd_poli_bpjs', $dataRefBPJSLov['poliRujukan']['kode'])
-            ->whereNotNull('kd_poli_bpjs')
-            ->whereNotNull('kd_dr_bpjs')
-            ->first();
-
-        // Jika cariDataIdBpjs_dr_poli true
-        if ($cariDataIdBpjs_dr_poli) {
-
-            // Jika Data doker dan poli bpjs true
-            if (isset($cariDataIdBpjs_dr_poli->kd_dr_bpjs) && isset($cariDataIdBpjs_dr_poli->kd_poli_bpjs)) {
-                // set data dokter RJ
-                $this->dataDaftarPoliRJ['drId'] = $cariDataIdBpjs_dr_poli->dr_id;
-                $this->dataDaftarPoliRJ['drDesc'] = $cariDataIdBpjs_dr_poli->dr_name;
-
-                $this->dataDaftarPoliRJ['poliId'] = $cariDataIdBpjs_dr_poli->poli_id;
-                $this->dataDaftarPoliRJ['poliDesc'] = $cariDataIdBpjs_dr_poli->poli_desc;
-
-                $this->dataDaftarPoliRJ['kddrbpjs'] = $cariDataIdBpjs_dr_poli->kd_dr_bpjs;
-                $this->dataDaftarPoliRJ['kdpolibpjs'] = $cariDataIdBpjs_dr_poli->kd_poli_bpjs;
-            } else {
-                // jika salah satu data kosong
-                $this->emit('toastr-error', "Data Dokter atau Poli mapping BPJS belum di set.");
-            }
-        } else {
-            $this->emit('toastr-error', "Data Dokter atau Poli mapping BPJS belum tidak di temukan.");
-        }
-
-
-        $this->SEPJsonReq = [
-            "request" =>  [
-                "t_sep" =>  [
-                    "noKartu" => "" . $dataRefBPJSLov['peserta']['noKartu'] . "",
-                    "tglSep" => "" . Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'])->format('Y-m-d') . "", //Y-m-d =tgl rj
-                    "ppkPelayanan" => "0184R006", //ppk rs
-                    "jnsPelayanan" => "" . $dataRefBPJSLov['pelayanan']['kode'] . "", // {jenis pelayanan = 1. r.inap 2. r.jalan}
-                    "klsRawat" =>  [
-                        "klsRawatHak" => "" . $dataRefBPJSLov['peserta']['hakKelas']['kode'] . "",
-                        "klsRawatHakNama" => "" . $dataRefBPJSLov['peserta']['hakKelas']['keterangan'] . "",
-                        "klsRawatNaik" => "", //{diisi jika naik kelas rawat, 1. VVIP, 2. VIP, 3. Kelas 1, 4. Kelas 2, 5. Kelas 3, 6. ICCU, 7. ICU, 8. Diatas Kelas 1}
-                        "pembiayaan" => "", //{1. Pribadi, 2. Pemberi Kerja, 3. Asuransi Kesehatan Tambahan. diisi jika naik kelas rawat}
-                        "penanggungJawab" => "", //{Contoh: jika pembiayaan 1 maka penanggungJawab=Pribadi. diisi jika naik kelas rawat}
-                    ],
-                    "noMR" => "" . $dataRefBPJSLov['peserta']['mr']['noMR'] . "",
-                    "rujukan" =>  [
-                        "asalRujukan" => "" . $this->JenisKunjungan['JenisKunjunganId'] == "1" ? "1" : ($this->JenisKunjungan['JenisKunjunganId'] == "4" ? "2" : "1") . "", //{asal rujukan ->1.Faskes 1, 2. Faskes 2(RS)}
-                        "asalRujukanNama" => "" . $this->JenisKunjungan['JenisKunjunganId'] == "1" ? "Faskes Tingkat 1" : ($this->JenisKunjungan['JenisKunjunganId'] == "4" ? "Faskes Tingkat 2 RS" : "Faskes Tingkat 1") . "", //{asal rujukan ->1.Faskes 1, 2. Faskes 2(RS)}
-                        "tglRujukan" => "" . $dataRefBPJSLov['tglKunjungan'] . "", //Y-m-d
-                        "noRujukan" => "" . $dataRefBPJSLov['noKunjungan'] . "",
-                        "ppkRujukan" => "" . $dataRefBPJSLov['provPerujuk']['kode'] . "", //{kode faskes rujukam -> baca di referensi faskes}
-                        "ppkRujukanNama" => "" . $dataRefBPJSLov['provPerujuk']['nama'] . "", //{kode faskes rujukam -> baca di referensi faskes}
-                    ],
-                    "catatan" => "-",
-                    "diagAwal" => "" . $dataRefBPJSLov['diagnosa']['kode'] . "",
-                    "diagAwalNama" => "" . $dataRefBPJSLov['diagnosa']['nama'] . "",
-                    "poli" =>  [
-                        "tujuan" => "" . $dataRefBPJSLov['poliRujukan']['kode'] . "", //Untuk Kunjungan Internal beda poli dgn rujukan
-                        "tujuanNama" => "" . $dataRefBPJSLov['poliRujukan']['nama'] . "",
-                        "eksekutif" => "" . "0" . "", //{poli eksekutif -> 0. Tidak 1.Ya}
-                        "eksekutifRef" =>  $this->SEPJsonReq['request']['t_sep']['poli']['eksekutifRef'], //{poli eksekutif -> 0. Tidak 1.Ya}
-                    ],
-                    "cob" =>  [
-                        "cob" => "" . "0" . "", //{cob -> 0.Tidak 1. Ya}
-                        "cobRef" => $this->SEPJsonReq['request']['t_sep']['cob']['cobRef'], //{cob -> 0.Tidak 1. Ya}
-
-                    ],
-                    "katarak" =>  [
-                        "katarak" => "" . "0" . "", //{katarak --> 0.Tidak 1.Ya}
-                        "katarakRef" =>  $this->SEPJsonReq['request']['t_sep']['katarak']['katarakRef'], //{katarak --> 0.Tidak 1.Ya}
-
-                    ],
-
-                    // fitur jaminan laka blm dikerjakan
-                    "jaminan" =>  [
-                        "lakaLantas" => "0", //" 0 : Bukan Kecelakaan lalu lintas [BKLL], 1 : KLL dan bukan kecelakaan Kerja [BKK], 2 : KLL dan KK, 3 : KK",
-                        "noLP" => "",
-                        "penjamin" =>  [
-                            "tglKejadian" => "",
-                            "keterangan" => "",
-                            "suplesi" =>  [
-                                "suplesi" => "0",
-                                "noSepSuplesi" => "",
-                                "lokasiLaka" =>  [
-                                    "kdPropinsi" => "",
-                                    "kdKabupaten" => "",
-                                    "kdKecamatan" => "",
-                                ]
-                            ]
-                        ]
-                    ],
-                    "tujuanKunj" => "0", //{"0": Normal,"1": Prosedur,"2": Konsul Dokter}
-                    "tujuanKunjDesc" => "Normal",
-
-                    "flagProcedure" => "",
-                    "flagProcedureDesc" => "",
-
-                    "kdPenunjang" => "",
-                    "kdPenunjangDesc" => "",
-
-                    "assesmentPel" => "",
-                    "assesmentPelDesc" => "",
-                    "skdp" =>  [
-                        "noSurat" => "", //disi ketika wire model dan JenisKunjunganId == 3
-                        "kodeDPJP" => "" . $dataRefBPJSLov['pelayanan']['kode'] == 1
-                            ? "" : (($cariDataIdBpjs_dr_poli->kd_dr_bpjs && $this->JenisKunjungan['JenisKunjunganId'] == 3)
-                                ? $cariDataIdBpjs_dr_poli->kd_dr_bpjs : "") . "", //tidak di isi jika jenis kunjungan selain KONTROL
-                    ],
-                    "dpjpLayan" => "" . $dataRefBPJSLov['pelayanan']['kode'] == 1
-                        ? "" : ($cariDataIdBpjs_dr_poli->kd_dr_bpjs
-                            ? $cariDataIdBpjs_dr_poli->kd_dr_bpjs : "") . "", //(tidak diisi jika jnsPelayanan = "1" (RANAP),
-                    "dpjpLayanNama" => "" . $cariDataIdBpjs_dr_poli->dr_name . "", //(tidak diisi jika jnsPelayanan = "1" (RANAP),
-                    "noTelp" => "" . $dataRefBPJSLov['peserta']['mr']['noTelepon'] . "",
-                    "user" => "sirus App",
-                ],
-            ],
-        ];
-    }
-    /////////////////////////////////////////////////
-    // Lov dataRefBPJSLov //////////////////////
-    ////////////////////////////////////////////////
-
-
-    /////////////////////////////////////////////////
-    // Lov dataDokterBPJSSEP //////////////////////
-    ////////////////////////////////////////////////
-    public function clickdataDokterBPJSlov()
-    {
-        $this->dataDokterBPJSLovStatus = true;
-        $this->dataDokterBPJSLov = [];
-    }
-
-    public function updateddataDokterBPJSlovsearch()
-    {
-        // Variable Search
-        $search = $this->dataDokterBPJSLovSearch;
-
-        // check LOV by dr_id rs id 
-        $dataDokterBPJS = DB::table('rsmst_doctors')->select(
-            'rsmst_doctors.dr_id as dr_id',
-            'rsmst_doctors.dr_name as dr_name',
-            'kd_dr_bpjs',
-
-            'rsmst_polis.poli_id as poli_id',
-            'rsmst_polis.poli_desc as poli_desc',
-            'kd_poli_bpjs'
-        )
-            ->Join('rsmst_polis', 'rsmst_polis.poli_id', 'rsmst_doctors.poli_id')
-            ->where('rsmst_doctors.dr_id', $search)
-            ->first();
-
-        if ($dataDokterBPJS) {
-            // set dokter antrol
-            $this->dataDaftarPoliRJ['drId'] = $dataDokterBPJS->dr_id;
-            $this->dataDaftarPoliRJ['drDesc'] = $dataDokterBPJS->dr_name;
-
-            $this->dataDaftarPoliRJ['poliId'] = $dataDokterBPJS->poli_id;
-            $this->dataDaftarPoliRJ['poliDesc'] = $dataDokterBPJS->poli_desc;
-
-            $this->dataDaftarPoliRJ['kddrbpjs'] = $dataDokterBPJS->kd_dr_bpjs;
-            $this->dataDaftarPoliRJ['kdpolibpjs'] = $dataDokterBPJS->kd_poli_bpjs;
-
-            // set dokter sep
-            $this->SEPJsonReq['request']['t_sep']['dpjpLayan'] = $dataDokterBPJS->kd_dr_bpjs;
-            $this->SEPJsonReq['request']['t_sep']['dpjpLayanNama'] = $dataDokterBPJS->dr_name;
-            $this->SEPJsonReq['request']['t_sep']['poli']['tujuan'] = $dataDokterBPJS->kd_poli_bpjs;
-            $this->SEPJsonReq['request']['t_sep']['poli']['tujuanNama'] = $dataDokterBPJS->poli_desc;
-
-
-            $this->dataDokterBPJSLovStatus = false;
-            $this->dataDokterBPJSLovSearch = '';
-        } else {
-            // if there is no id found and check (min 3 char on search)
-            if (strlen($search) < 3) {
-                $this->dataDokterBPJSLov = [];
-            } else {
-                $this->dataDokterBPJSLov = json_decode(
-                    DB::table('rsmst_doctors')->select(
-                        'rsmst_doctors.dr_id as dr_id',
-                        'rsmst_doctors.dr_name as dr_name',
-                        'kd_dr_bpjs',
-
-                        'rsmst_polis.poli_id as poli_id',
-                        'rsmst_polis.poli_desc as poli_desc',
-                        'kd_poli_bpjs'
-
-                    )
-                        ->Join('rsmst_polis', 'rsmst_polis.poli_id', 'rsmst_doctors.poli_id')
-
-                        ->Where(DB::raw('upper(dr_name)'), 'like', '%' . strtoupper($search) . '%')
-                        ->orWhere('poli_desc', 'like', '%' . strtoupper($search) . '%')
-                        ->limit(10)
-                        ->orderBy('dr_name', 'ASC')
-                        ->orderBy('poli_desc', 'ASC')
-                        ->get(),
-                    true
-                );
-            }
-            $this->dataDokterBPJSLovStatus = true;
-            // set dokter antrol
-
-            $this->dataDaftarPoliRJ['drId'] = '';
-            $this->dataDaftarPoliRJ['drDesc'] = '';
-            $this->dataDaftarPoliRJ['poliId'] = '';
-            $this->dataDaftarPoliRJ['poliDesc'] = '';
-            $this->dataDaftarPoliRJ['kddrbpjs'] = '';
-            $this->dataDaftarPoliRJ['kdpolibpjs'] = '';
-
-            // set dokter sep
-            $this->SEPJsonReq['request']['t_sep']['dpjpLayan'] = '';
-            $this->SEPJsonReq['request']['t_sep']['dpjpLayanNama'] = '';
-            $this->SEPJsonReq['request']['t_sep']['poli']['tujuan'] = '';
-            $this->SEPJsonReq['request']['t_sep']['poli']['tujuanNama'] = '';
-        }
-    }
-    // /////////////////////
-    // LOV selected start
-    public function setMydataDokterBPJSLov($id, $name)
-    {
-        $dataDokterBPJS = DB::table('rsmst_doctors')->select(
-            'rsmst_doctors.dr_id as dr_id',
-            'rsmst_doctors.dr_name as dr_name',
-            'kd_dr_bpjs',
-
-            'rsmst_polis.poli_id as poli_id',
-            'rsmst_polis.poli_desc as poli_desc',
-            'kd_poli_bpjs'
-        )
-            ->Join('rsmst_polis', 'rsmst_polis.poli_id', 'rsmst_doctors.poli_id')
-            ->where('rsmst_doctors.dr_id', $id)
-            ->first();
-
-        // set dokter antrol
-        $this->dataDaftarPoliRJ['drId'] = $dataDokterBPJS->dr_id;
-        $this->dataDaftarPoliRJ['drDesc'] = $dataDokterBPJS->dr_name;
-
-        $this->dataDaftarPoliRJ['poliId'] = $dataDokterBPJS->poli_id;
-        $this->dataDaftarPoliRJ['poliDesc'] = $dataDokterBPJS->poli_desc;
-
-        $this->dataDaftarPoliRJ['kddrbpjs'] = $dataDokterBPJS->kd_dr_bpjs;
-        $this->dataDaftarPoliRJ['kdpolibpjs'] = $dataDokterBPJS->kd_poli_bpjs;
-
-        // set dokter sep
-        $this->SEPJsonReq['request']['t_sep']['dpjpLayan'] = $dataDokterBPJS->kd_dr_bpjs;
-        $this->SEPJsonReq['request']['t_sep']['dpjpLayanNama'] = $dataDokterBPJS->dr_name;
-        $this->SEPJsonReq['request']['t_sep']['poli']['tujuan'] = $dataDokterBPJS->kd_poli_bpjs;
-        $this->SEPJsonReq['request']['t_sep']['poli']['tujuanNama'] = $dataDokterBPJS->poli_desc;
-
-
-        $this->dataDokterBPJSLovStatus = false;
-        $this->dataDokterBPJSLovSearch = '';
-    }
-    // LOV selected end
-    /////////////////////////////////////////////////
-    // Lov dataDokterRJ //////////////////////
-    ////////////////////////////////////////////////
-
-
-    /////////////////////////////////////////////////
-    // Lov dataDiagnosaBPJSSEP //////////////////////
-    ////////////////////////////////////////////////
-    public function clickdataDiagnosaBPJSlov()
-    {
-        $this->dataDiagnosaBPJSLovStatus = true;
-        $this->dataDiagnosaBPJSLov = [];
-    }
-
-    public function updateddataDiagnosaBPJSlovsearch()
-    {
-        // Variable Search
-        $search = $this->dataDiagnosaBPJSLovSearch;
-
-        // check LOV by dr_id rs id 
-        $dataDiagnosaBPJS = DB::table('rsmst_mstdiags')->select(
-            'diag_id',
-            'diag_desc',
-            'icdx',
-        )
-            ->where('diag_id', $search)
-            ->first();
-
-        if ($dataDiagnosaBPJS) {
-
-            // set dokter sep
-            $this->SEPJsonReq['request']['t_sep']['diagAwal'] = $dataDiagnosaBPJS->icdx;
-            $this->SEPJsonReq['request']['t_sep']['diagAwalNama'] = $dataDiagnosaBPJS->diag_desc;
-
-
-            $this->dataDiagnosaBPJSLovStatus = false;
-            $this->dataDiagnosaBPJSLovSearch = '';
-        } else {
-            // if there is no id found and check (min 3 char on search)
-            if (strlen($search) < 3) {
-                $this->dataDiagnosaBPJSLov = [];
-            } else {
-                $this->dataDiagnosaBPJSLov = json_decode(
-                    DB::table('rsmst_mstdiags')->select(
-                        'diag_id',
-                        'diag_desc',
-                        'icdx',
-                    )
-
-                        ->Where(DB::raw('upper(diag_desc)'), 'like', '%' . strtoupper($search) . '%')
-                        ->orWhere(DB::raw('upper(icdx)'), 'like', '%' . strtoupper($search) . '%')
-                        ->limit(10)
-                        ->orderBy('diag_id', 'ASC')
-                        ->orderBy('diag_desc', 'ASC')
-                        ->get(),
-                    true
-                );
-            }
-            $this->dataDiagnosaBPJSLovStatus = true;
-            // set dokter sep
-            $this->SEPJsonReq['request']['t_sep']['diagAwal'] = '';
-            $this->SEPJsonReq['request']['t_sep']['diagAwalNama'] = '';
-        }
-    }
-    // /////////////////////
-    // LOV selected start
-    public function setMydataDiagnosaBPJSLov($id, $name)
-    {
-        $dataDiagnosaBPJS = DB::table('rsmst_mstdiags')->select(
-            'diag_id',
-            'diag_desc',
-            'icdx',
-        )
-            ->where('diag_id', $id)
-            ->first();
-
-        // set dokter sep
-        $this->SEPJsonReq['request']['t_sep']['diagAwal'] = $dataDiagnosaBPJS->icdx;
-        $this->SEPJsonReq['request']['t_sep']['diagAwalNama'] = $dataDiagnosaBPJS->diag_desc;
-
-
-        $this->dataDiagnosaBPJSLovStatus = false;
-        $this->dataDiagnosaBPJSLovSearch = '';
-    }
-    // LOV selected end
-    /////////////////////////////////////////////////
-    // Lov dataDiagnosaRJ //////////////////////
-    ////////////////////////////////////////////////
-
-    public function settujuanKunj($id, $name)
-    {
-        $this->SEPJsonReq['request']['t_sep']['tujuanKunj'] = $this->JenisKunjungan['JenisKunjunganId'] == 2 || $this->JenisKunjungan['JenisKunjunganId'] == 3 ? $id : "";
-        $this->SEPJsonReq['request']['t_sep']['tujuanKunjDesc'] = $this->JenisKunjungan['JenisKunjunganId'] == 2 || $this->JenisKunjungan['JenisKunjunganId'] == 3 ? $name : "";
-    }
-
-    public function setflagProcedure($id, $name)
-    {
-        $this->SEPJsonReq['request']['t_sep']['flagProcedure'] = $this->SEPJsonReq['request']['t_sep']['tujuanKunj'] == 0 ? "" : $id;
-        $this->SEPJsonReq['request']['t_sep']['flagProcedureDesc'] =  $this->SEPJsonReq['request']['t_sep']['tujuanKunj'] == 0 ? "" : $name;
-    }
-    public function setkdPenunjang($id, $name)
-    {
-        $this->SEPJsonReq['request']['t_sep']['kdPenunjang'] = $this->SEPJsonReq['request']['t_sep']['tujuanKunj'] == 0 ? "" : $id;
-        $this->SEPJsonReq['request']['t_sep']['kdPenunjangDesc'] = $this->SEPJsonReq['request']['t_sep']['tujuanKunj'] == 0 ? "" : $name;
-    }
-    public function setassesmentPel($id, $name)
-    {
-        $this->SEPJsonReq['request']['t_sep']['assesmentPel'] = $this->SEPJsonReq['request']['t_sep']['tujuanKunj'] == 0 || $this->SEPJsonReq['request']['t_sep']['tujuanKunj'] == 2 ? $id : "";
-        $this->SEPJsonReq['request']['t_sep']['assesmentPelDesc'] = $this->SEPJsonReq['request']['t_sep']['tujuanKunj'] == 0 || $this->SEPJsonReq['request']['t_sep']['tujuanKunj'] == 2 ? $name : "";
-    }
-
-
-
-
-    // callFormPasien
-    public function callFormPasien(): void
-    {
-        // set Call MasterPasien True
-        $this->callMasterPasien = true;
-    }
 
 
 
     // when new form instance
     public function mount()
     {
-
-
         // set data dokter ref
         $this->optionsdrRjRef();
-
-        $this->setregNoRef();
     }
-
 
 
 
     // select data start////////////////
     public function render()
     {
-
-        $this->emit('toastr-error', $this->regNoRef);
-
         // render drRjRef
         // set data dokter ref
         $this->optionsdrRjRef();
 
-        $this->setregNoRef();
         //////////////////////////////////////////
         // Query ///////////////////////////////
         //////////////////////////////////////////

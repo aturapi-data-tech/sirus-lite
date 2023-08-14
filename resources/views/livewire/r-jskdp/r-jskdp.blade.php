@@ -106,10 +106,6 @@
                         @include('livewire.daftar-r-j.create')
                     @endif
 
-                    @if ($formRujukanRefBPJSStatus)
-                        @include('livewire.daftar-r-j.form-rujukanRefBpjs')
-                    @endif
-
 
 
                 </div>
@@ -147,7 +143,7 @@
                                             <th scope="col" class="w-1/3 px-4 py-3 ">
                                                 <x-sort-link :active=false wire:click.prevent="" role="button"
                                                     href="#">
-                                                    Rujukan
+                                                    Kontrol
                                                 </x-sort-link>
                                             </th>
 
@@ -244,24 +240,14 @@
                                                             class="z-10 hidden w-auto bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700">
                                                             <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
                                                                 aria-labelledby="dropdownButton{{ $RJp->rj_no }}">
-                                                                <li>
-                                                                    <x-dropdown-link
-                                                                        wire:click="tampil('{{ $RJp->rj_no }}')">
-                                                                        {{ __('Tampil | ' . $RJp->reg_name) }}
-                                                                    </x-dropdown-link>
-                                                                </li>
+
                                                                 <li>
                                                                     <x-dropdown-link
                                                                         wire:click="edit('{{ $RJp->rj_no }}')">
-                                                                        {{ __('Ubah') }}
+                                                                        {{ __('Buat SKDP') }}
                                                                     </x-dropdown-link>
                                                                 </li>
-                                                                <li>
-                                                                    <x-dropdown-link
-                                                                        wire:click="$emit('confirm_remove_record', '{{ $RJp->rj_no }}', '{{ $RJp->reg_name }}')">
-                                                                        {{ __('Hapus') }}
-                                                                    </x-dropdown-link>
-                                                                </li>
+
 
                                                             </ul>
                                                         </div>
@@ -309,24 +295,6 @@
             </div>
         </div>
     </div>
-
-
-
-
-
-
-    {{-- call MasterPasien --}}
-    @if ($callMasterPasien)
-        @livewire('master-pasien.master-pasien', [
-            'isOpen' => true,
-            'isOpenMode' => 'insert',
-            'dataPasienBPJSSearch' => isset($dataPasien['pasien']['cariDataPasien']) ? $dataPasien['pasien']['cariDataPasien'] : '',
-        ])
-    @endif
-
-
-
-
 
 
 
