@@ -810,8 +810,8 @@ trait VclaimTrait
     {
 
         // customErrorMessages
-        $messages = customErrorMessagesTrait::messages();
-
+        // $messages = customErrorMessagesTrait::messages();
+        $messages = [];
         // Masukkan Nilai dari parameter
         $r = [
             "noKartu" => $SEPJsonReq['request']['t_sep']['noKartu'],

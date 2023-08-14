@@ -373,8 +373,7 @@
                                             <path clip-rule="evenodd" fill-rule="evenodd"
                                                 d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
                                         </svg>
-
-                                        {{ (isset($SEPJsonReq['request']['t_sep']['kdPenunjang']) ? $SEPJsonReq['request']['t_sep']['kdPenunjang'] : 'Data tidak dapat diproses') . ' ' . (isset($SEPJsonReq['request']['t_sep']['kdPenunjangDesc']) ? $SEPJsonReq['request']['t_sep']['kdPenunjangDesc'] : 'Data tidak dapat di proses') }}
+                                        ({{ (isset($SEPJsonReq['request']['t_sep']['kdPenunjang']) ? $SEPJsonReq['request']['t_sep']['kdPenunjang'] : 'Data tidak dapat diproses') . ' ' . (isset($SEPJsonReq['request']['t_sep']['kdPenunjangDesc']) ? $SEPJsonReq['request']['t_sep']['kdPenunjangDesc'] : 'Data tidak dapat di proses') }})
                                     </x-alternative-button>
                                 </x-slot>
                                 {{-- Open myLimitPerPagecontent --}}

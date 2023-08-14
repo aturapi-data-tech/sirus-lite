@@ -1714,6 +1714,7 @@ class DaftarRJ extends Component
         $cekAntrianAntreanBPJSStatus = isset($cekAntrianAntreanBPJS->push_antrian_bpjs_status) ? $cekAntrianAntreanBPJS->push_antrian_bpjs_status : "";
         // 1 cek proses pada database status
         if ($cekAntrianAntreanBPJSStatus == 200) {
+
             // set http response to public
             $this->HttpGetBpjsStatus = $cekAntrianAntreanBPJS->push_antrian_bpjs_status; //status 200 201 400 ..
             $this->HttpGetBpjsJson = $cekAntrianAntreanBPJS->push_antrian_bpjs_json; //Return Response Tambah Antrean
@@ -1839,6 +1840,7 @@ class DaftarRJ extends Component
 
     private function pushInsertSEP($SEPJsonReq)
     {
+
         //ketika Push Tambah Antrean Berhasil buat SEP
         //////////////////////////////////////////////
         $HttpGetBpjs =  VclaimTrait::sep_insert($SEPJsonReq)->getOriginalContent();
@@ -1872,7 +1874,7 @@ class DaftarRJ extends Component
                 ? (isset($this->SEPJsonReq['request']['t_sep']['rujukan']['noRujukan']) ? $this->SEPJsonReq['request']['t_sep']['rujukan']['noRujukan'] : "Data tidak dapat diproses")
                 : (
                     ($this->JenisKunjungan['JenisKunjunganId'] == 2)
-                    ? (isset($this->dataPasien['pasien']['regNo']) ? $this->dataPasien['pasien']['regNo'] : "Data tidak dapat diproses") . '1'
+                    ? (isset($this->SEPJsonReq['request']['t_sep']['rujukan']['noRujukan']) ? substr($this->SEPJsonReq['request']['t_sep']['rujukan']['noRujukan'], 0, 16) : "Data tidak dapat diproses") . 'XXX'
                     : (
                         ($this->JenisKunjungan['JenisKunjunganId'] == 3)
                         ? (isset($this->SEPJsonReq['request']['t_sep']['skdp']['noSurat']) ? $this->SEPJsonReq['request']['t_sep']['skdp']['noSurat'] : "Data tidak dapat diproses")
