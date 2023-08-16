@@ -540,7 +540,6 @@ trait VclaimTrait
                 "user" =>  'Sirus',
             ]
         ];
-
         // lakukan validasis
         $validator = Validator::make($r, [
             "request.noSEP" => "required",
@@ -578,34 +577,59 @@ trait VclaimTrait
         }
     }
 
-    public static function suratkontrol_update(Request $request)
+    public static function suratkontrol_update($kontrol)
     {
-        $validator = Validator::make(request()->all(), [
-            "noSuratKontrol" => "required",
-            "noSep" => "required",
-            "kodeDokter" => "required",
-            "poliKontrol" => "required",
-            "tglRencanaKontrol" => "required|date",
-            "user" => "required",
-        ]);
-        if ($validator->fails()) {
-            return self::sendError($validator->errors()->first(), null, 400, null, null);
-        }
-        $url = env('VCLAIM_URL') . "RencanaKontrol/Update";
-        $signature = self::signature();
-        $signature['Content-Type'] = 'application/x-www-form-urlencoded';
-        $data = [
+
+        // customErrorMessages
+        // $messages = customErrorMessagesTrait::messages();
+        $messages = [];
+        // Masukkan Nilai dari parameter
+        $r = [
             "request" => [
-                "noSuratKontrol" => $request->noSuratKontrol,
-                "noSEP" => $request->noSep,
-                "kodeDokter" => $request->kodeDokter,
-                "poliKontrol" => $request->poliKontrol,
-                "tglRencanaKontrol" => $request->tglRencanaKontrol,
-                "user" =>  $request->user,
+                "request.noSuratKontrol" => $kontrol['noSKDPBPJS'],
+                "noSEP" => $kontrol['noSEP'],
+                "tglRencanaKontrol" => Carbon::createFromFormat('d/m/Y', $kontrol['tglKontrol'])->format('Y-m-d'),
+                "poliKontrol" => $kontrol['poliKontrolBPJS'],
+                "kodeDokter" => $kontrol['drKontrolBPJS'],
+                "user" =>  'Sirus',
             ]
         ];
-        $response = Http::withHeaders($signature)->put($url, $data);
-        return self::response_decrypt($response, $signature, null, null);
+
+        // lakukan validasis
+        $validator = Validator::make($r, [
+            "request.noSuratKontrol" => "required",
+            "request.noSEP" => "required",
+            "request.tglRencanaKontrol" => "required|date",
+            "request.kodeDokter" => "required",
+            "request.poliKontrol" => "required",
+            "request.user" => "required",
+        ], $messages);
+
+        if ($validator->fails()) {
+            return self::sendError($validator->errors()->first(), $validator->errors(), 201, null, null);
+        }
+
+
+
+        // handler when time out and off line mode
+        try {
+            $url = env('VCLAIM_URL') . "RencanaKontrol/Update";
+            $signature = self::signature();
+            $signature['Content-Type'] = 'application/x-www-form-urlencoded';
+            $data = $r;
+
+            $response = Http::timeout(10)
+                ->withHeaders($signature)
+                ->post($url, $data);
+
+
+            // dd($response->transferStats->getTransferTime()); Get Transfertime request
+            // semua response error atau sukses dari BPJS di handle pada logic response_decrypt
+            return self::response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
+            /////////////////////////////////////////////////////////////////////////////
+        } catch (Exception $e) {
+            return self::sendError($e->getMessage(), $validator->errors(), 408, $url, null);
+        }
     }
     public static function suratkontrol_delete(Request $request)
     {
