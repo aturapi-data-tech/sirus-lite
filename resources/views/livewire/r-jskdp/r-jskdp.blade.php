@@ -103,7 +103,7 @@
                     </div>
 
                     @if ($isOpen)
-                        @include('livewire.daftar-r-j.create')
+                        @include('livewire.r-jskdp.create')
                     @endif
 
 
@@ -207,13 +207,21 @@
                                                 <td
                                                     class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
                                                     <div class="overflow-auto w-52">
-                                                        <div class="font-semibold text-primary">{{ $RJp->rj_status }}
+                                                        <div class="italic font-normal text-gray-900">
+                                                            {{ 'Kontrol RS : ' .
+                                                                (isset(json_decode($RJp->datadaftarpolirj_json)->kontrol->noKontrolRS)
+                                                                    ? (json_decode($RJp->datadaftarpolirj_json)->kontrol->noKontrolRS
+                                                                        ? json_decode($RJp->datadaftarpolirj_json)->kontrol->noKontrolRS
+                                                                        : '')
+                                                                    : '') }}
                                                         </div>
-                                                        <div class="font-semibold text-gray-900">
-                                                            {{ '' . $RJp->nobooking }}
-                                                        </div>
-                                                        <div class="font-normal text-gray-900 ">
-                                                            {{ '' . $RJp->push_antrian_bpjs_status . $RJp->push_antrian_bpjs_json }}
+                                                        <div class="italic font-normal text-gray-900">
+                                                            {{ 'SKDP BPJS : ' .
+                                                                (isset(json_decode($RJp->datadaftarpolirj_json)->kontrol->noSKDPBPJS)
+                                                                    ? (json_decode($RJp->datadaftarpolirj_json)->kontrol->noSKDPBPJS
+                                                                        ? json_decode($RJp->datadaftarpolirj_json)->kontrol->noSKDPBPJS
+                                                                        : '')
+                                                                    : '') }}
                                                         </div>
                                                     </div>
                                                 </td>
