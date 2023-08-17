@@ -11,6 +11,9 @@ use App\Http\Livewire\PendaftaranMandiriPasienPoli\PendaftaranMandiriPasienPoli;
 use App\Http\Livewire\DaftarRJ\DaftarRJ;
 use App\Http\Livewire\RJskdp\RJskdp;
 
+use App\Http\Livewire\MrRJ\Skdp;
+
+
 
 use App\Http\Livewire\PelayananRJ\PelayananRJ;
 use App\Http\Livewire\ErmRJ\ErmRJ;
@@ -69,6 +72,9 @@ Route::get('MasterPasien', MasterPasien::class)->middleware('auth')->name('Maste
 
 Route::get('daftarRJ', DaftarRJ::class)->middleware('auth')->name('daftarRJ');
 Route::get('RJskdp', RJskdp::class)->middleware('auth')->name('RJskdp');
+
+
+Route::get('MrRJ/Skdp', Skdp::class)->middleware('auth')->name('MRRJskdp');
 
 
 Route::get('pelayananRJ', PelayananRJ::class)->middleware('auth')->name('pelayananRJ');

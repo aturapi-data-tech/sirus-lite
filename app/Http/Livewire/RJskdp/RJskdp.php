@@ -482,9 +482,6 @@ class RJskdp extends Component
         $this->findData($id);
     }
 
-    private function setKontrol(): void
-    {
-    }
 
 
 
@@ -651,19 +648,14 @@ class RJskdp extends Component
 
         ];
 
-        // gabunga array noReferensi jika BPJS harus di isi
-        if ($this->JenisKlaim['JenisKlaimId'] == 'JM') {
-            $rules['dataDaftarPoliRJ.noReferensi'] =  'bail|required|min:3|max:19';
-        } else {
-            $rules['dataDaftarPoliRJ.noReferensi'] =  'bail|min:3|max:19';
-        }
+
 
         // Proses Validasi///////////////////////////////////////////
         try {
             $this->validate($rules, $messages);
         } catch (\Illuminate\Validation\ValidationException $e) {
 
-            $this->emit('toastr-error', "Lakukan Pengecekan kembali Input Data Pasien.");
+            $this->emit('toastr-error', "Lakukan Pengecekan kembali Input Data.");
             $this->validate($rules, $messages);
         }
     }
@@ -839,12 +831,37 @@ class RJskdp extends Component
         if ($findData->datadaftarpolirj_json) {
             $this->dataDaftarPoliRJ = json_decode($findData->datadaftarpolirj_json, true);
 
+            $this->setDataPasien($this->dataDaftarPoliRJ['regNo']);
+
             // jika kontrol tidak ditemukan tambah variable kontrol pda array
             if (isset($this->dataDaftarPoliRJ['kontrol']) == false) {
                 $this->dataDaftarPoliRJ['kontrol'] = $this->kontrol;
             }
 
-            $this->setDataPasien($this->dataDaftarPoliRJ['regNo']);
+            $this->dataDaftarPoliRJ['kontrol']['tglKontrol'] = $this->dataDaftarPoliRJ['kontrol']['tglKontrol']
+                ? $this->dataDaftarPoliRJ['kontrol']['tglKontrol']
+                : Carbon::now()->addDays(8)->format('d/m/Y');
+            $this->dataDaftarPoliRJ['kontrol']['drKontrol'] = $this->dataDaftarPoliRJ['kontrol']['drKontrol']
+                ? $this->dataDaftarPoliRJ['kontrol']['drKontrol']
+                : $this->dataDaftarPoliRJ['drId'];
+            $this->dataDaftarPoliRJ['kontrol']['drKontrolDesc'] = $this->dataDaftarPoliRJ['kontrol']['drKontrolDesc']
+                ? $this->dataDaftarPoliRJ['kontrol']['drKontrolDesc']
+                : $this->dataDaftarPoliRJ['drDesc'];
+            $this->dataDaftarPoliRJ['kontrol']['drKontrolBPJS'] =  $this->dataDaftarPoliRJ['kontrol']['drKontrolBPJS']
+                ? $this->dataDaftarPoliRJ['kontrol']['drKontrolBPJS']
+                : $this->dataDaftarPoliRJ['kddrbpjs'];
+            $this->dataDaftarPoliRJ['kontrol']['poliKontrol'] = $this->dataDaftarPoliRJ['kontrol']['poliKontrol']
+                ? $this->dataDaftarPoliRJ['kontrol']['poliKontrol']
+                : $this->dataDaftarPoliRJ['poliId'];
+            $this->dataDaftarPoliRJ['kontrol']['poliKontrolDesc'] = $this->dataDaftarPoliRJ['kontrol']['poliKontrolDesc']
+                ? $this->dataDaftarPoliRJ['kontrol']['poliKontrolDesc']
+                : $this->dataDaftarPoliRJ['poliDesc'];
+            $this->dataDaftarPoliRJ['kontrol']['poliKontrolBPJS'] = $this->dataDaftarPoliRJ['kontrol']['poliKontrolBPJS']
+                ? $this->dataDaftarPoliRJ['kontrol']['poliKontrolBPJS']
+                : $this->dataDaftarPoliRJ['kdpolibpjs'];
+            $this->dataDaftarPoliRJ['kontrol']['noSEP'] = $this->dataDaftarPoliRJ['kontrol']['noSEP']
+                ? $this->dataDaftarPoliRJ['kontrol']['noSEP']
+                : $this->dataDaftarPoliRJ['sep']['noSep'];
         } else {
 
             $this->emit('toastr-error', "Json Tidak ditemukan, Data sedang diproses ulang.");
