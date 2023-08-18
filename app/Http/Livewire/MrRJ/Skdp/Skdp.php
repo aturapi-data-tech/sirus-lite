@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\MrRJ;
+namespace App\Http\Livewire\MrRJ\Skdp;
 
 use Illuminate\Support\Facades\DB;
 
@@ -517,63 +517,8 @@ class Skdp extends Component
     public function render()
     {
 
-        //////////////////////////////////////////
-        // Query ///////////////////////////////
-        //////////////////////////////////////////
-        // $query = DB::table('rsview_rjkasir')
-        //     ->select(
-        //         DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
-        //         DB::raw("to_char(rj_date,'yyyymmddhh24miss') AS rj_date1"),
-        //         'rj_no',
-        //         'reg_no',
-        //         'reg_name',
-        //         'sex',
-        //         'address',
-        //         'thn',
-        //         DB::raw("to_char(birth_date,'dd/mm/yyyy') AS birth_date"),
-        //         'poli_id',
-        //         'poli_desc',
-        //         'dr_id',
-        //         'dr_name',
-        //         'klaim_id',
-        //         'shift',
-        //         'vno_sep',
-        //         'no_antrian',
-        //         'rj_status',
-        //         'nobooking',
-        //         'push_antrian_bpjs_status',
-        //         'push_antrian_bpjs_json',
-        //         'datadaftarpolirj_json'
-        //     )
-        //     // ->whereNotIn('rj_status', ['A', 'F'])
-        //     ->where('rj_status', 'L')
-        //     ->where('reg_no', '=', $this->regNoRef);
-
-
-
-        //Jika where dokter tidak kosong
-        // if ($this->drRjRef['drId'] != 'All') {
-        //     $query->where('dr_id', $this->drRjRef['drId']);
-        // }
-
-        // $query->where(function ($q) {
-        //     $q->Where(DB::raw('upper(reg_name)'), 'like', '%' . strtoupper($this->search) . '%')
-        //         ->orWhere(DB::raw('upper(reg_no)'), 'like', '%' . strtoupper($this->search) . '%')
-        //         ->orWhere(DB::raw('upper(dr_name)'), 'like', '%' . strtoupper($this->search) . '%')
-        //         ->orWhere(DB::raw('upper(poli_desc)'), 'like', '%' . strtoupper($this->search) . '%');
-        // })
-        //     ->orderBy('rj_date1',  'desc')
-        //     ->orderBy('dr_name',  'desc')
-        //     ->orderBy('poli_desc',  'desc')
-        //     ->orderBy('no_antrian',  'asc');
-
-        ////////////////////////////////////////////////
-        // end Query
-        ///////////////////////////////////////////////
-
-
         return view(
-            'livewire.mr-r-j.skdp',
+            'livewire.mr-r-j.skdp.skdp',
             [
                 // 'RJpasiens' => $query->paginate($this->limitPerPage),
                 'myTitle' => 'Data SKDP Pasien Rawat Jalan',

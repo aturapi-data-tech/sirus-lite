@@ -33,7 +33,7 @@
 
 
                         <div id="TransaksiRawatJalan" class="px-4">
-                            <x-border-form :title="__('Jadwal Kontrol')" :align="__('start')" :bgcolor="__('bg-white')" class="mr-0">
+                            <x-border-form :title="__($myTitle)" :align="__('start')" :bgcolor="__('bg-white')" class="mr-0">
 
 
                                 <div>
@@ -132,7 +132,7 @@
                                     </div> --}}
                                         {{-- LOV Dokter --}}
                                         <div class="mt-2">
-                                            @include('livewire.r-jskdp.list-of-value-caridatadokter')
+                                            @include('livewire.mr-r-j.skdp.list-of-value-caridatadokter')
                                         </div>
 
                                     </div>
