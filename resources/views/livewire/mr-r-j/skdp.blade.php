@@ -35,30 +35,25 @@
                         <div id="TransaksiRawatJalan" class="px-4">
                             <x-border-form :title="__('Jadwal Kontrol')" :align="__('start')" :bgcolor="__('bg-white')" class="mr-0">
 
+
                                 <div>
-                                    <x-input-label for="dataDaftarPoliRJ.kontrol.noSEP" :value="__('SEP')"
-                                        :required="__(true)" />
+                                    <div class='grid items-center grid-cols-2 gap-4 mb-2'>
+                                        <x-input-label for="dataDaftarPoliRJ.kontrol.noKontrolRS" :value="__('No Kontrol RS')"
+                                            :required="__(true)" />
 
-                                    <div class="flex items-center mb-2">
-                                        <x-text-input id="dataDaftarPoliRJ.kontrol.noSEP" placeholder="SEP"
-                                            class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.kontrol.noSEP'))" :disabled=true
-                                            wire:model.debounce.500ms="dataDaftarPoliRJ.kontrol.noSEP" />
-
+                                        <x-input-label for="dataDaftarPoliRJ.kontrol.noSEP" :value="__('SEP')"
+                                            :required="__(false)" />
                                     </div>
-                                    @error('dataDaftarPoliRJ.kontrol.noSEP')
-                                        <x-input-error :messages=$message />
-                                    @enderror
-                                </div>
 
-                                <div>
-                                    <x-input-label for="dataDaftarPoliRJ.kontrol.noKontrolRS" :value="__('No Kontrol RS')"
-                                        :required="__(true)" />
-
-                                    <div class="flex items-center mb-2">
+                                    <div class="grid items-center grid-cols-2 gap-2 mb-2">
                                         <x-text-input id="dataDaftarPoliRJ.kontrol.noKontrolRS"
                                             placeholder="No Kontrol RS" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.kontrol.noKontrolRS'))"
                                             :disabled=true
                                             wire:model.debounce.500ms="dataDaftarPoliRJ.kontrol.noKontrolRS" />
+
+                                        <x-text-input id="dataDaftarPoliRJ.kontrol.noSEP" placeholder="SEP"
+                                            class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.kontrol.noSEP'))" :disabled=true
+                                            wire:model.debounce.500ms="dataDaftarPoliRJ.kontrol.noSEP" />
 
                                     </div>
                                     @error('dataDaftarPoliRJ.kontrol.noKontrolRS')
