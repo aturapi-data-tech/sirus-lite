@@ -264,7 +264,7 @@ class Skdp extends Component
         $this->setDataPrimer();
 
         //  off sementara
-        // $this->pushSuratKontrolBPJS();
+        $this->pushSuratKontrolBPJS();
 
         // Validate RJ
         $this->validateDataRJ();
@@ -330,7 +330,7 @@ class Skdp extends Component
                 : $this->dataDaftarPoliRJ['kdpolibpjs'];
             $this->dataDaftarPoliRJ['kontrol']['noSEP'] = $this->dataDaftarPoliRJ['kontrol']['noSEP']
                 ? $this->dataDaftarPoliRJ['kontrol']['noSEP']
-                : $this->dataDaftarPoliRJ['sep']['noSep'];
+                : $findData->vno_sep;
         } else {
 
             $this->emit('toastr-error', "Json Tidak ditemukan, Data sedang diproses ulang.");
