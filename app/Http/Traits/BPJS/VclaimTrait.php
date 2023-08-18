@@ -965,18 +965,46 @@ trait VclaimTrait
         $response = Http::withHeaders($signature)->delete($url, $data);
         return self::response_decrypt($response, $signature, null, null);
     }
-    public static function sep_nomor(Request $request)
+    public static function sep_nomor($noSep)
     {
-        $validator = Validator::make(request()->all(), [
+
+        // customErrorMessages
+        // $messages = customErrorMessagesTrait::messages();
+        $messages = [];
+        // Masukkan Nilai dari parameter
+        $r = [
+            "noSep" => $noSep,
+        ];
+
+        // lakukan validasis
+        $validator = Validator::make($r, [
             "noSep" => "required",
-        ]);
+        ], $messages);
+
         if ($validator->fails()) {
-            return self::sendError($validator->errors()->first(), null, 201, null, null);
+            return self::sendError($validator->errors()->first(), $validator->errors(), 201, null, null);
         }
 
-        $url = env('VCLAIM_URL') . "SEP/" . $request->noSep;
-        $signature = self::signature();
-        $response = Http::withHeaders($signature)->get($url);
-        return self::response_decrypt($response, $signature, null, null);
+
+
+        // handler when time out and off line mode
+        try {
+
+            $url = env('VCLAIM_URL') . "SEP/" . $noSep;
+            $signature = self::signature();
+            $signature['Content-Type'] = 'application/x-www-form-urlencoded';
+
+            $response = Http::timeout(10)
+                ->withHeaders($signature)
+                ->get($url);
+
+
+            // dd($response->transferStats->getTransferTime()); Get Transfertime request
+            // semua response error atau sukses dari BPJS di handle pada logic response_decrypt
+            return self::response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
+            /////////////////////////////////////////////////////////////////////////////
+        } catch (Exception $e) {
+            return self::sendError($e->getMessage(), $validator->errors(), 408, $url, null);
+        }
     }
 }

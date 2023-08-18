@@ -15,6 +15,7 @@ use App\Http\Traits\BPJS\VclaimTrait;
 
 use Illuminate\Support\Str;
 use Spatie\ArrayToXml\ArrayToXml;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 
 class DaftarRJ extends Component
@@ -2376,6 +2377,58 @@ class DaftarRJ extends Component
         $this->SEPJsonReq['request']['t_sep']['assesmentPel'] = $id;
         $this->SEPJsonReq['request']['t_sep']['assesmentPelDesc'] = $name;
     }
+
+    public function cetakSEP()
+    {
+        // cek BPJS atau bukan
+        if ($this->JenisKlaim['JenisKlaimId'] != 'JM') {
+            $this->emit('toastr-error', 'Jenis Klaim ' . $this->JenisKlaim['JenisKlaimDesc']);
+        } else {
+            // cek ada resSep ada atau tidak
+            if (!$this->dataDaftarPoliRJ['sep']['resSep']) {
+
+                // Http cek sep by no SEP
+                //////////////////////////////////////////////
+                $HttpGetBpjs =  VclaimTrait::sep_nomor($this->dataDaftarPoliRJ['sep']['noSep'])->getOriginalContent();
+
+                if ($HttpGetBpjs['metadata']['code'] == 200) {
+
+                    $this->dataDaftarPoliRJ['sep']['resSep'] = $HttpGetBpjs['response'];
+                    $this->dataDaftarPoliRJ['sep']['noSep'] = $HttpGetBpjs['response']['noSep'];
+
+                    // update database
+                    DB::table('rstxn_rjhdrs')
+                        ->where('rj_no', $this->dataDaftarPoliRJ['rjNo'])
+                        ->update([
+                            'datadaftarpolirj_json' => json_encode($this->dataDaftarPoliRJ, true),
+                            'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
+                        ]);
+
+
+                    $this->emit('toastr-success', 'CetakSEP ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+                } else {
+                    $this->emit('toastr-error', 'CetakSEP ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+                }
+            } else {
+
+                // cetak PDF
+                $data = [
+                    'data' => $this->dataDaftarPoliRJ['sep']['resSep']
+                ];
+                $pdfContent = PDF::loadView('livewire.daftar-r-j.cetak-sep', $data)->output();
+                $this->emit('toastr-error', 'cetak sep');
+
+                return response()->streamDownload(
+                    fn () => print($pdfContent),
+                    "filename.pdf"
+                );
+            }
+        }
+    }
+
+
+
+
 
 
 
