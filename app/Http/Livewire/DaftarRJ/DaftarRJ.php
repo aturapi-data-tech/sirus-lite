@@ -2413,7 +2413,9 @@ class DaftarRJ extends Component
 
                 // cetak PDF
                 $data = [
-                    'data' => $this->dataDaftarPoliRJ['sep']['resSep']
+                    'data' => $this->dataDaftarPoliRJ['sep']['resSep'],
+                    'reqData' => $this->dataDaftarPoliRJ['sep']['reqSep'],
+
                 ];
                 $pdfContent = PDF::loadView('livewire.daftar-r-j.cetak-sep', $data)->output();
                 $this->emit('toastr-error', 'cetak sep');
