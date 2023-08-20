@@ -2418,7 +2418,7 @@ class DaftarRJ extends Component
 
                 ];
                 $pdfContent = PDF::loadView('livewire.daftar-r-j.cetak-sep', $data)->output();
-                $this->emit('toastr-error', 'cetak sep');
+                $this->emit('toastr-success', 'CetakSEP');
 
                 return response()->streamDownload(
                     fn () => print($pdfContent),
