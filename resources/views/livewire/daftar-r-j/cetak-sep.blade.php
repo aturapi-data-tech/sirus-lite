@@ -290,6 +290,7 @@
 
                     </th>
                     @php
+                        dd($reqData['rujukan']['tglRujukan']);
                         $tglRujukan = isset($reqData['rujukan']['tglRujukan']) ? ($reqData['rujukan']['tglRujukan'] ? $reqData['rujukan']['tglRujukan'] : $carbon::now()->format('Y-m-d')) : $carbon::now()->format('Y-m-d');
                         $tglRujukanAwal = $carbon::createFromFormat('Y-m-d', $tglRujukan);
                         $tglBatasRujukan = $carbon::createFromFormat('Y-m-d', $tglRujukan)->addMonths(3);
