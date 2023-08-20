@@ -119,7 +119,7 @@
                     <td class="text-sm" dir="ltr">COB</td>
                     <td class="text-sm" dir="ltr">:</td>
                     <td class="text-sm" dir="ltr">
-                        {{ isset($reqData['request']['t_sep']['cob']) ? ($reqData['request']['t_sep']['cob'] ? $reqData['request']['t_sep']['cob'] : '-') : '--' }}
+                        {{ isset($reqData['request']['t_sep']['cob']['cob']) ? ($reqData['request']['t_sep']['cob']['cob'] ? $reqData['request']['t_sep']['cob']['cob'] : '-') : '--' }}
                     </td>
                 </tr>
                 <tr style="height: 20px">
