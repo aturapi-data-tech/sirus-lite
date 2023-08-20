@@ -290,14 +290,13 @@
 
                     </th>
                     @php
-                        $tglRujukan = isset($reqData['rujukan']['tglRujukan']) ? ($reqData['rujukan']['tglRujukan'] ? $reqData['rujukan']['tglRujukan'] : $carbon::now()->format('Y-m-d')) : $carbon::now()->format('Y-m-d');
+                        $tglRujukan = isset($reqData['request']['t_sep']['rujukan']['tglRujukan']) ? ($reqData['request']['t_sep']['rujukan']['tglRujukan'] ? $reqData['request']['t_sep']['rujukan']['tglRujukan'] : $carbon::now()->format('Y-m-d')) : $carbon::now()->format('Y-m-d');
                         $tglRujukanAwal = $carbon::createFromFormat('Y-m-d', $tglRujukan);
                         $tglBatasRujukan = $carbon::createFromFormat('Y-m-d', $tglRujukan)->addMonths(3);
                         
                         $diffInDays = $tglBatasRujukan->diffInDays($carbon::now());
                         $propertyDiffInDays = $diffInDays <= 20 ? 'red' : ($diffInDays <= 30 ? 'yellow' : '');
                     @endphp
-                    @dd($reqData)
                     <td style= " color : {{ $propertyDiffInDays }}"class="italic font-semibold " dir="ltr"
                         colspan="7">Masa
                         berlaku {{ $tglRujukanAwal->format('d/m/Y') }} s/d
