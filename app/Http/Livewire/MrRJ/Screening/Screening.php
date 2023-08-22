@@ -399,7 +399,7 @@ class Screening extends Component
 
 
     // /prosesDataScreening/////////////
-    public function prosesDataScreening($label, $value, $score, $key)
+    public function prosesDataScreening($desc, $value, $score, $label, $key)
     {
 
         $this->dataDaftarPoliRJ['screening'][$key]['sc_value'] = $value;
@@ -414,7 +414,7 @@ class Screening extends Component
         // //////////////////////////////////////
 
 
-        $this->emit('toastr-success', "$label Kesimpulan : $KesimpulanDariScreening");
+        $this->emit('toastr-success', "$desc : $label Kesimpulan : $KesimpulanDariScreening");
     }
 
     // /prosesDataKesimpulan/////////////

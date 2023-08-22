@@ -880,7 +880,7 @@ class EmrRJ extends Component
             'livewire.emr-r-j.emr-r-j',
             [
                 'RJpasiens' => $query->paginate($this->limitPerPage),
-                'myTitle' => 'Data Rekam Medis',
+                'myTitle' => 'Screening Rawat Jalan',
                 'mySnipt' => 'Rekam Medis Pasien',
                 'myProgram' => 'Rekam Medis',
                 'myLimitPerPages' => [5, 10, 15, 20, 100],

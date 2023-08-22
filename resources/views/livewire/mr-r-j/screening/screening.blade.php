@@ -12,6 +12,7 @@
             $disabledProperty = true;
             
             $disabledPropertyRjStatus = false;
+            $screeningPropertyStatus = $dataDaftarPoliRJ['screeningKesimpulan']['sck_value'] == 1 ? 'bg-green-100' : ($dataDaftarPoliRJ['screeningKesimpulan']['sck_value'] == 2 ? 'bg-yellow-100' : ($dataDaftarPoliRJ['screeningKesimpulan']['sck_value'] == 3 ? 'bg-red-100' : 'bg-grey-100'));
             
         @endphp
 
@@ -22,8 +23,8 @@
 
 
 
-        <form class="scroll-smooth hover:scroll-auto">
-            <div class="grid grid-cols-1">
+        <form class="scroll-smooth hover:scroll-auto ">
+            <div class="grid grid-cols-1 {{ $screeningPropertyStatus }}">
 
 
 
@@ -31,7 +32,8 @@
 
 
                 <div id="TransaksiRawatJalan" class="px-4">
-                    <x-border-form :title="__($myTitle)" :align="__('start')" :bgcolor="__('bg-white')" class="mr-0">
+                    {{-- <x-border-form :title="__($myTitle)" :align="__('start')" :bgcolor="__('bg-white')" class="mr-0"> --}}
+                    <x-border-form :title="__('')" :align="__('start')" :bgcolor="__('bg-white')" class="mr-0">
 
 
 

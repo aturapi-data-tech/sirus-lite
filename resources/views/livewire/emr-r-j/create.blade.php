@@ -46,6 +46,9 @@
 
 
 
+
+
+
             </div>
 
 
@@ -53,13 +56,8 @@
             <form class="scroll-smooth hover:scroll-auto">
                 <div class="grid grid-cols-1">
 
-
-
-
-
-
                     {{-- Pasien --}}
-                    <div id="DataPasien" class="px-4 py-2 bg-white">
+                    <div id="DataPasien" class="sticky top-0 px-4 py-2 bg-white ">
 
 
                         <div class="px-4 bg-white snap-mandatory snap-y">
@@ -81,10 +79,11 @@
                                     </div>
                                 </div>
                                 {{--  --}}
-                                <div class="flex">
-                                    <div class="font-semibold text-gray-700">{{ $dataDaftarPoliRJ['poliDesc'] }}
+                                <div class="grid">
+                                    <div class="px-2 font-semibold text-gray-700 justify-self-end">
+                                        {{ $dataDaftarPoliRJ['poliDesc'] }}
                                     </div>
-                                    <div class="font-semibold text-primary">
+                                    <div class="px-2 font-semibold text-primary justify-self-end">
                                         {{ $dataDaftarPoliRJ['drDesc'] . ' / ' }}
                                         {{ $dataDaftarPoliRJ['klaimId'] == 'UM'
                                             ? 'UMUM'
@@ -94,8 +93,11 @@
                                                     ? 'Kronis'
                                                     : 'Asuransi Lain')) }}
                                     </div>
-                                    <div class="font-normal text-gray-900">
+                                    <div class="px-2 font-normal text-gray-900 justify-self-end">
                                         {{ 'Nomer Pelayanan ' . $dataDaftarPoliRJ['noAntrian'] }}
+                                    </div>
+                                    <div class="px-2 py-2 text-xs text-gray-700 justify-self-end">
+                                        {{ 'Tgl :' . $dataDaftarPoliRJ['rjDate'] }}
                                     </div>
                                 </div>
                             </div>
@@ -108,6 +110,10 @@
 
 
                     </div>
+
+
+
+
 
 
 

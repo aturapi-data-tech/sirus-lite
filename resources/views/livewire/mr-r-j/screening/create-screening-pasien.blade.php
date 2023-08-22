@@ -28,6 +28,7 @@
                                 '{{ $sQ['sc_desc'] }}',
                                 '{{ $sCO['option_value'] }}',
                                 '{{ $sCO['option_score'] }}',
+                                '{{ $sCO['option_label'] }}',
                                 '{{ $key }}',
                                 )"
                                         wire:model="dataDaftarPoliRJ.screening.{{ $key }}.sc_value"
