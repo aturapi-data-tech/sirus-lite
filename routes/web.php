@@ -4,8 +4,6 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Livewire\Post\PostTable;
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Livewire\MasterLevelSatu\MasterLevelSatu;
-use App\Http\Livewire\MasterLevelDua\MasterLevelDua;
 use App\Http\Livewire\MasterPasien\MasterPasien;
 use App\Http\Livewire\PendaftaranMandiriPasienPoli\PendaftaranMandiriPasienPoli;
 use App\Http\Livewire\DaftarRJ\DaftarRJ;
@@ -17,7 +15,7 @@ use App\Http\Livewire\MrRJ\Screening\Screening;
 
 
 use App\Http\Livewire\PelayananRJ\PelayananRJ;
-use App\Http\Livewire\ErmRJ\ErmRJ;
+use App\Http\Livewire\EmrRJ\EmrRJ;
 
 use App\Http\Livewire\SetupHfisBpjs\SetupHfisBpjs;
 
@@ -53,21 +51,11 @@ Route::middleware('auth')->group(function () {
 //     ->middleware(['auth', 'verified']);
 
 
-Route::get('posts', PostTable::class)->middleware('auth')->name('posts');
-Route::get('masterlevelsatu', MasterLevelSatu::class)->middleware('auth')->name('MasterLevelSatu');
 
 
-Route::get('masterleveldua', MasterLevelDua::class)->middleware('auth')->name('MasterLevelDua');
 
 Route::get('pendaftaranMandiriPasienPoli', PendaftaranMandiriPasienPoli::class)->middleware('auth')->name('pendaftaranMandiriPasienPoli');
-
 Route::view('/cetak-tiket', 'livewire.pendaftaran-mandiri-pasien-poli.cetak-tiket');
-
-
-
-
-
-
 
 Route::get('MasterPasien', MasterPasien::class)->middleware('auth')->name('MasterPasien');
 
@@ -87,7 +75,7 @@ Route::get('pelayananRJ', PelayananRJ::class)->middleware('auth')->name('pelayan
 
 Route::get('SetupHfisBpjs', SetupHfisBpjs::class)->middleware('auth')->name('SetupHfisBpjs');
 
-Route::get('ermRJ', ErmRJ::class)->middleware('auth')->name('ermRJ');
+Route::get('EmrRJ', EmrRJ::class)->middleware('auth')->name('EmrRJ');
 
 
 

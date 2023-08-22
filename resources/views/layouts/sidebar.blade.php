@@ -73,8 +73,8 @@
                                 <x-nav-link class="pl-4" :href="route('pelayananRJ')" :active="request()->routeIs('pelayananRJ')">
                                     {{ __('Pelayanan Rawat Jalan') }}
                                 </x-nav-link>
-                                <x-nav-link class="pl-4" :href="route('ermRJ')" :active="request()->routeIs('ermRJ')">
-                                    {{ __('ERM') }}
+                                <x-nav-link class="pl-4" :href="route('EmrRJ')" :active="request()->routeIs('EmrRJ')">
+                                    {{ __('E Medical Record') }}
                                 </x-nav-link>
                                 <x-nav-link class="pl-4" :href="route('SetupHfisBpjs')" :active="request()->routeIs('SetupHfisBpjs')">
                                     {{ __('SetupHfisBpjs') }}

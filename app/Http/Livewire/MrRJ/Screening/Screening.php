@@ -8,12 +8,6 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
 
-use App\Http\Traits\customErrorMessagesTrait;
-use App\Http\Traits\BPJS\AntrianTrait;
-use App\Http\Traits\BPJS\VclaimTrait;
-
-
-use Illuminate\Support\Str;
 use Spatie\ArrayToXml\ArrayToXml;
 
 
@@ -25,14 +19,14 @@ class Screening extends Component
     //////////////////////////////
     // Ref on top bar
     //////////////////////////////
-    public $rjNoRef = '430269';
+    public $rjNoRef = '430268';
 
 
 
     // dataDaftarPoliRJ RJ
     public $dataDaftarPoliRJ = [];
 
-    // data SKDP / kontrol=>[] 
+    // data screening / kesimpulan=>[] 
     public $screeningQuestions = [
         [
             "sc_seq" => "1",
@@ -230,123 +224,8 @@ class Screening extends Component
             ],
         ]
     ];
-    public $collectDataScreening = [];
-    //////////////////////////////////////////////////////////////////////
-    public $dataTandaVital = [
-        [
-            "tv_seq" => "1",
-            "tv_label" => "Tekanan Darah",
-            "tv_mou" => "mmHg",
-            "tv_value" => 0
-        ],
-        [
-            "tv_seq" => "2",
-            "tv_label" => "Frekuensi Nadi",
-            "tv_mou" => "x/menit",
-            "tv_value" => 0
-        ],
-        [
-            "tv_seq" => "3",
-            "tv_label" => "Suhu",
-            "tv_mou" => "C",
-            "tv_value" => 0
-        ],
-        [
-            "tv_seq" => "4",
-            "tv_label" => "Frekuansi Nafas",
-            "tv_mou" => "x/menit",
-            "tv_value" => 0
-        ],
-        [
-            "tv_seq" => "4",
-            "tv_label" => "Saturasi Oksigen",
-            "tv_mou" => "%",
-            "tv_value" => 0
-        ],
-        [
-            "tv_seq" => "4",
-            "tv_label" => "GDA",
-            "tv_mou" => "mg/dl",
-            "tv_value" => 0
-        ],
-        [
-            "tv_seq" => "5",
-            "tv_label" => "Skor Nyeri",
-            "tv_mou" => "",
-            "tv_value" => 0
-        ],
-        [
-            "tv_seq" => "6",
-            "tv_label" => "Skor Jatuh",
-            "tv_mou" => "",
-            "tv_value" => 0
-        ],
-    ];
-    public $dataAntropometri = [
-        [
-            "ap_seq" => "1",
-            "ap_label" => "Berat Badan",
-            "ap_mou" => "Kg",
-            "ap_value" => 0
-        ],
-        [
-            "ap_seq" => "2",
-            "ap_label" => "Tinggi Badan",
-            "ap_mou" => "Cm",
-            "ap_value" => 0
-        ],
-        [
-            "ap_seq" => "3",
-            "ap_label" => "Lingkar Kepala",
-            "ap_mou" => "Cm",
-            "ap_value" => 0
-        ],
-        [
-            "ap_seq" => "4",
-            "ap_label" => "IMT",
-            "ap_mou" => "",
-            "ap_value" => 0
-        ],
-        [
-            "ap_seq" => "5",
-            "ap_label" => "Lingkar Lengan Atas",
-            "ap_mou" => "Cm",
-            "ap_value" => 0
-        ],
-    ];
-    public $dataFungsional = [
-        [
-            "fu_seq" => "1",
-            "fu_label" => "Alat Bantu",
-            "fu_mou" => "",
-            "fu_value" => "-"
-        ],
-        [
-            "fu_seq" => "2",
-            "fu_label" => "Prothesa",
-            "fu_mou" => "",
-            "fu_value" => "-"
-        ],
-        [
-            "fu_seq" => "3",
-            "fu_label" => "Cacat Tubuh",
-            "fu_mou" => "",
-            "fu_value" => "-"
-        ],
-        [
-            "fu_seq" => "4",
-            "fu_label" => "ADL",
-            "fu_mou" => "",
-            "fu_value" => "-"
-        ],
-        [
-            "fu_seq" => "5",
-            "fu_label" => "Riwayat",
-            "fu_mou" => "",
-            "fu_value" => "-"
-        ],
-    ];
-    //////////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////
 
 
 
@@ -380,82 +259,16 @@ class Screening extends Component
 
 
 
-
-
     // ////////////////
-    // RJ Logic
+    // screening Logic
     // ////////////////
 
-    //////////////////////////////////////////////
-    // updated when change Record ////////////////
-    ///////////////////////////////////////////////
 
-
-
-    //////////////////////////////////////////////
-    // updated when change Record ////////////////
-    ///////////////////////////////////////////////
-
-
-
-
-    // validate Data RJ//////////////////////////////////////////////////
-    private function validateDataRJ(): void
-    {
-        // customErrorMessages
-        $messages = customErrorMessagesTrait::messages();
-
-        // require nik ketika pasien tidak dikenal
-
-
-
-        $rules = [
-
-            "dataDaftarPoliRJ.kontrol.noKontrolRS" => "required",
-
-            "dataDaftarPoliRJ.kontrol.noSKDPBPJS" => "",
-            "dataDaftarPoliRJ.kontrol.noAntrian" => "",
-
-            "dataDaftarPoliRJ.kontrol.tglKontrol" => "bail|required|date_format:d/m/Y",
-
-            "dataDaftarPoliRJ.kontrol.drKontrol" => "required",
-            "dataDaftarPoliRJ.kontrol.drKontrolDesc" => "required",
-            "dataDaftarPoliRJ.kontrol.drKontrolBPJS" => "",
-
-
-            "dataDaftarPoliRJ.kontrol.poliKontrol" => "required",
-            "dataDaftarPoliRJ.kontrol.poliKontrolDesc" => "required",
-            "dataDaftarPoliRJ.kontrol.poliKontrolBPJS" => "",
-
-            "dataDaftarPoliRJ.kontrol.catatan" => "",
-
-        ];
-
-
-
-        // Proses Validasi///////////////////////////////////////////
-        try {
-            $this->validate($rules, $messages);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-
-            $this->emit('toastr-error', "Lakukan Pengecekan kembali Input Data.");
-            $this->validate($rules, $messages);
-        }
-    }
 
 
     // insert and update record start////////////////
     public function store()
     {
-        // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
-        $this->setDataPrimer();
-
-
-
-        // Validate RJ
-        $this->validateDataRJ();
-
-        // Logic update mode start //////////
         $this->updateDataRJ($this->dataDaftarPoliRJ['rjNo']);
     }
 
@@ -470,17 +283,15 @@ class Screening extends Component
                 'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
             ]);
 
-        $this->emit('toastr-success', "Surat Kontrol berhasil disimpan.");
+        $this->emit('toastr-success', "Screening " . $this->dataDaftarPoliRJ['regNo'] . " berhasil disimpan.");
     }
     // insert and update record end////////////////
 
 
     private function findData($rjno): void
     {
-
-
         $findData = DB::table('rsview_rjkasir')
-            ->select('datadaftarpolirj_json', 'vno_sep')
+            ->select('datadaftarpolirj_json')
             ->where('rj_no', $rjno)
             ->first();
 
@@ -488,36 +299,15 @@ class Screening extends Component
         if ($findData->datadaftarpolirj_json) {
             $this->dataDaftarPoliRJ = json_decode($findData->datadaftarpolirj_json, true);
 
-            // jika kontrol tidak ditemukan tambah variable kontrol pda array
+            // jika screening tidak ditemukan tambah variable kontrol pda array
             if (isset($this->dataDaftarPoliRJ['screening']) == false) {
                 $this->dataDaftarPoliRJ['screening'] = $this->screeningQuestions;
             }
 
-
-            // $this->dataDaftarPoliRJ['screening']['tglKontrol'] = $this->dataDaftarPoliRJ['screening']['tglKontrol']
-            //     ? $this->dataDaftarPoliRJ['screening']['tglKontrol']
-            //     : Carbon::now()->addDays(8)->format('d/m/Y');
-            // $this->dataDaftarPoliRJ['screening']['drKontrol'] = $this->dataDaftarPoliRJ['screening']['drKontrol']
-            //     ? $this->dataDaftarPoliRJ['screening']['drKontrol']
-            //     : $this->dataDaftarPoliRJ['drId'];
-            // $this->dataDaftarPoliRJ['screening']['drKontrolDesc'] = $this->dataDaftarPoliRJ['screening']['drKontrolDesc']
-            //     ? $this->dataDaftarPoliRJ['screening']['drKontrolDesc']
-            //     : $this->dataDaftarPoliRJ['drDesc'];
-            // $this->dataDaftarPoliRJ['screening']['drKontrolBPJS'] =  $this->dataDaftarPoliRJ['screening']['drKontrolBPJS']
-            //     ? $this->dataDaftarPoliRJ['screening']['drKontrolBPJS']
-            //     : $this->dataDaftarPoliRJ['kddrbpjs'];
-            // $this->dataDaftarPoliRJ['screening']['poliKontrol'] = $this->dataDaftarPoliRJ['screening']['poliKontrol']
-            //     ? $this->dataDaftarPoliRJ['screening']['poliKontrol']
-            //     : $this->dataDaftarPoliRJ['poliId'];
-            // $this->dataDaftarPoliRJ['screening']['poliKontrolDesc'] = $this->dataDaftarPoliRJ['screening']['poliKontrolDesc']
-            //     ? $this->dataDaftarPoliRJ['screening']['poliKontrolDesc']
-            //     : $this->dataDaftarPoliRJ['poliDesc'];
-            // $this->dataDaftarPoliRJ['screening']['poliKontrolBPJS'] = $this->dataDaftarPoliRJ['screening']['poliKontrolBPJS']
-            //     ? $this->dataDaftarPoliRJ['screening']['poliKontrolBPJS']
-            //     : $this->dataDaftarPoliRJ['kdpolibpjs'];
-            // $this->dataDaftarPoliRJ['screening']['noSEP'] = $this->dataDaftarPoliRJ['screening']['noSEP']
-            //     ? $this->dataDaftarPoliRJ['screening']['noSEP']
-            //     : $findData->vno_sep;
+            // jika screeningKesimpulan tidak ditemukan tambah variable kontrol pda array
+            if (isset($this->dataDaftarPoliRJ['screeningKesimpulan']) == false) {
+                $this->dataDaftarPoliRJ['screeningKesimpulan'] = $this->screeningKesimpulan;
+            }
         } else {
 
             $this->emit('toastr-error', "Json Tidak ditemukan, Data sedang diproses ulang.");
@@ -595,116 +385,54 @@ class Screening extends Component
                 ]
             ];
 
-            // jika kontrol tidak ditemukan tambah variable kontrol pda array
+            // jika screening tidak ditemukan tambah variable kontrol pda array
             if (isset($this->dataDaftarPoliRJ['screening']) == false) {
                 $this->dataDaftarPoliRJ['screening'] = $this->screeningQuestions;
             }
 
-
-
-            // setDataKontrol
-            // $this->dataDaftarPoliRJ['screening']['tglKontrol'] = $this->dataDaftarPoliRJ['screening']['tglKontrol']
-            //     ? $this->dataDaftarPoliRJ['screening']['tglKontrol']
-            //     : Carbon::now()->addDays(8)->format('d/m/Y');
-            // $this->dataDaftarPoliRJ['screening']['drKontrol'] = $this->dataDaftarPoliRJ['screening']['drKontrol']
-            //     ? $this->dataDaftarPoliRJ['screening']['drKontrol']
-            //     : $dataDaftarPoliRJ->dr_id;
-            // $this->dataDaftarPoliRJ['screening']['drKontrolDesc'] = $this->dataDaftarPoliRJ['screening']['drKontrolDesc']
-            //     ? $this->dataDaftarPoliRJ['screening']['drKontrolDesc']
-            //     : $dataDaftarPoliRJ->dr_name;
-            // $this->dataDaftarPoliRJ['screening']['drKontrolBPJS'] =  $this->dataDaftarPoliRJ['screening']['drKontrolBPJS']
-            //     ? $this->dataDaftarPoliRJ['screening']['drKontrolBPJS']
-            //     : $dataDaftarPoliRJ->kd_dr_bpjs;
-            // $this->dataDaftarPoliRJ['screening']['poliKontrol'] = $this->dataDaftarPoliRJ['screening']['poliKontrol']
-            //     ? $this->dataDaftarPoliRJ['screening']['poliKontrol']
-            //     : $dataDaftarPoliRJ->poli_id;
-            // $this->dataDaftarPoliRJ['screening']['poliKontrolDesc'] = $this->dataDaftarPoliRJ['screening']['poliKontrolDesc']
-            //     ? $this->dataDaftarPoliRJ['screening']['poliKontrolDesc']
-            //     : $dataDaftarPoliRJ->poli_desc;
-            // $this->dataDaftarPoliRJ['screening']['poliKontrolBPJS'] = $this->dataDaftarPoliRJ['screening']['poliKontrolBPJS']
-            //     ? $this->dataDaftarPoliRJ['screening']['poliKontrolBPJS']
-            //     : $dataDaftarPoliRJ->kd_poli_bpjs;
-            // $this->dataDaftarPoliRJ['screening']['noSEP'] = $this->dataDaftarPoliRJ['screening']['noSEP']
-            //     ? $this->dataDaftarPoliRJ['screening']['noSEP']
-            //     : $dataDaftarPoliRJ->vno_sep;
+            // jika screeningKesimpulan tidak ditemukan tambah variable kontrol pda array
+            if (isset($this->dataDaftarPoliRJ['screeningKesimpulan']) == false) {
+                $this->dataDaftarPoliRJ['screeningKesimpulan'] = $this->screeningKesimpulan;
+            }
         }
     }
 
-    // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
-    private function setDataPrimer(): void
-    {
-        // $noKontrol = Carbon::now()->addDays(8)->format('dmY') . $this->dataDaftarPoliRJ['screening']['drKontrol'] . $this->dataDaftarPoliRJ['screening']['poliKontrol'];
-        // $this->dataDaftarPoliRJ['screening']['noKontrolRS'] =  $this->dataDaftarPoliRJ['screening']['noKontrolRS'] ? $this->dataDaftarPoliRJ['screening']['noKontrolRS'] : $noKontrol;
-    }
 
     // /prosesDataScreening/////////////
     public function prosesDataScreening($label, $value, $score, $key)
     {
 
-        $collection = collect($this->dataDaftarPoliRJ['screening']);
-        // update collectDataScreening
-        if (collect($collection)->where('sc_desc', $label)->contains('sc_desc', $label)) {
-
-            $this->dataDaftarPoliRJ['screening'][$key]['sc_value'] = $value;
-            $this->dataDaftarPoliRJ['screening'][$key]['sc_score'] = $score;
-        }
+        $this->dataDaftarPoliRJ['screening'][$key]['sc_value'] = $value;
+        $this->dataDaftarPoliRJ['screening'][$key]['sc_score'] = $score;
 
 
         // update kesimpulan dari screening otomatis
-        // $KesimpulanDariScreening = $this->updateDataKesimpulanDariScreening() == 1 ? 'Sesuai Antrian' : ($this->updateDataKesimpulanDariScreening() == 2 ? 'Disegerakan' : 'IGD');
+        $KesimpulanDariScreening = $this->updateDataKesimpulanDariScreening() == 1
+            ? 'Sesuai Antrian' : ($this->updateDataKesimpulanDariScreening() == 2
+                ? 'Disegerakan' : 'IGD');
 
         // //////////////////////////////////////
 
 
-        // $this->emit('toastr-success', "$label Kesimpulan : $KesimpulanDariScreening");
+        $this->emit('toastr-success', "$label Kesimpulan : $KesimpulanDariScreening");
     }
-    // /prosesDataScreening/////////////
 
-
-
-
-    // ////////////////
-    // Antrol Logic
-    // ////////////////
-
-
-    private function pushSuratKontrolBPJS(): void
+    // /prosesDataKesimpulan/////////////
+    public function prosesDataKesimpulan($value, $label)
     {
-
-
-        //push data SuratKontrolBPJS
-        if ($this->dataDaftarPoliRJ['klaimId'] = 'JM') {
-
-
-            // jika SKDP kosong lakukan push data
-            // insert
-            if (!$this->dataDaftarPoliRJ['kontrol']['noSKDPBPJS']) {
-                $HttpGetBpjs =  VclaimTrait::suratkontrol_insert($this->dataDaftarPoliRJ['kontrol'])->getOriginalContent();
-
-                // 2 cek proses pada getHttp
-                if ($HttpGetBpjs['metadata']['code'] == 200) {
-                    $this->emit('toastr-success', 'KONTROL ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
-                    $this->dataDaftarPoliRJ['kontrol']['noSKDPBPJS'] = $HttpGetBpjs['metadata']['response']['noSuratKontrol']; //status 200 201 400 ..
-
-                    $this->emit('toastr-success', 'KONTROL ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
-                } else {
-                    $this->emit('toastr-error', 'KONTROL ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
-                }
-            } else {
-                // update
-                $HttpGetBpjs =  VclaimTrait::suratkontrol_update($this->dataDaftarPoliRJ['kontrol'])->getOriginalContent();
-
-                if ($HttpGetBpjs['metadata']['code'] == 200) {
-                    $this->emit('toastr-success', 'UPDATEKONTROL ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
-                    $this->dataDaftarPoliRJ['kontrol']['noSKDPBPJS'] = $HttpGetBpjs['metadata']['response']['noSuratKontrol']; //status 200 201 400 ..
-
-                    $this->emit('toastr-success', 'UPDATEKONTROL ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
-                } else {
-                    $this->emit('toastr-error', 'UPDATEKONTROL ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
-                }
-            }
-        }
+        $this->dataDaftarPoliRJ['screeningKesimpulan']['sck_value'] = $value;
     }
+
+    // /updateDataKesimpulanDariScreening/////////////
+    private function updateDataKesimpulanDariScreening()
+    {
+        $KesimpulanDariScreening = collect($this->dataDaftarPoliRJ['screening'])
+            ->pluck('sc_score')
+            ->max();
+        $this->dataDaftarPoliRJ['screeningKesimpulan']['sck_value'] = $KesimpulanDariScreening != 0 ? $KesimpulanDariScreening : 1;
+        return ($KesimpulanDariScreening);
+    }
+
 
 
 
@@ -717,8 +445,6 @@ class Screening extends Component
     public function mount()
     {
         $this->findData($this->rjNoRef);
-        // set data dokter ref
-        // $this->store();
     }
 
 
@@ -730,14 +456,10 @@ class Screening extends Component
         return view(
             'livewire.mr-r-j.screening.screening',
             [
-                // 'RJpasiens' => $query->paginate($this->limitPerPage),
-                'myTitle' => 'Data Screening Pasien Rawat Jalan',
-                'mySnipt' => 'Rekam Medis Pasien',
-                'myProgram' => 'Pasien Rawat Jalan',
+                'myTitle' => 'Screening Rawat Jalan',
+                'mySnipt' => 'Rekam Medis',
+                'myProgram' => 'Rawat Jalan',
             ]
         );
     }
-    // select data end////////////////
-
-
 }

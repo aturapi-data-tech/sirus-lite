@@ -1,8 +1,0 @@
-{"pasien":{"rjNo":"415863","rjDate":"2023-05-30 08:50:03","regNo":"000511
-Z","regName":"BAYANAH","sex":"P"},"screening":{"6":{"sc_seq":"1","sc_desc":"Apakah Pasien
-Sadar?","sc_score":1,"sc_value":"1"},"7":{"sc_seq":"2","sc_desc":"Apakah Pasien Merasa Sesak
-Nafas?","sc_score":1,"sc_value":"1"},"8":{"sc_seq":"3","sc_desc":"Apakah Pasien Beresiko
-Jatuh?","sc_score":1,"sc_value":"1"},"9":{"sc_seq":"4","sc_desc":"Apakah Pasien Nyeri Pada
-Dada?","sc_score":1,"sc_value":"1"},"10":{"sc_seq":"5","sc_desc":"Apakah Pasien Batuk Selama 2 Minggu
-Terakhir?","sc_score":1,"sc_value":"1"},"11":{"sc_seq":"6","sc_desc":"Tingkat Nyeri
-Pasien","sc_score":1,"sc_image":"pain_scale_level.jpg","sc_value":"0"}}}

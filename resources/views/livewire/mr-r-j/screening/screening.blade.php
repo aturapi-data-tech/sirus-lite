@@ -1,62 +1,19 @@
 <div>
 
-    <div class="px-1 pt-7">
-        <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
-            <!-- Card header -->
-
-
-
-            <div class="w-full mb-1">
-
-
-
-                @php
-                    $disabledProperty = true;
-                    
-                    $disabledPropertyRjStatus = false;
-                    
-                @endphp
 
 
 
 
+    <div class="w-full mb-1">
 
 
 
-
-                <form class="scroll-smooth hover:scroll-auto">
-                    <div class="grid grid-cols-1">
-
-
-
-
-
-
-                        <div id="TransaksiRawatJalan" class="px-4">
-                            <x-border-form :title="__($myTitle)" :align="__('start')" :bgcolor="__('bg-white')" class="mr-0">
-
-
-
-                                <div class="">
-
-
-
-                                    {{-- --------------------------------------------------------------- --}}
-                                    @include('livewire.mr-r-j.screening.create-screening-pasien')
-                                    {{-- --------------------------------------------------------------- --}}
-                                    @include('livewire.mr-r-j.screening.create-screening-kesimpulan')
-
-                                    <div class="flex ">
-                                        {{-- --------------------------------------------------------------- --}}
-                                        @include('livewire.mr-r-j.screening.create-tanda-vital-pasien')
-                                        {{-- --------------------------------------------------------------- --}}
-                                        @include('livewire.mr-r-j.screening.create-antropometri-pasien')
-                                        {{-- --------------------------------------------------------------- --}}
-                                        @include('livewire.mr-r-j.screening.create-fungsional-pasien')
-                                    </div>
-
-
-                                </div>
+        @php
+            $disabledProperty = true;
+            
+            $disabledPropertyRjStatus = false;
+            
+        @endphp
 
 
 
@@ -65,44 +22,76 @@
 
 
 
+        <form class="scroll-smooth hover:scroll-auto">
+            <div class="grid grid-cols-1">
 
 
 
-                            </x-border-form>
-                        </div>
 
 
 
-                    </div>
+                <div id="TransaksiRawatJalan" class="px-4">
+                    <x-border-form :title="__($myTitle)" :align="__('start')" :bgcolor="__('bg-white')" class="mr-0">
 
-                    <div class="sticky bottom-0 flex justify-between px-4 py-3 bg-gray-50 sm:px-6">
+
 
                         <div class="">
-                            {{-- null --}}
+
+
+
+                            {{-- --------------------------------------------------------------- --}}
+                            @include('livewire.mr-r-j.screening.create-screening-pasien')
+                            {{-- --------------------------------------------------------------- --}}
+                            @include('livewire.mr-r-j.screening.create-screening-kesimpulan')
+
+
+
+
                         </div>
-                        <div>
-                            <div wire:loading wire:target="store">
-                                <x-loading />
-                            </div>
-
-                            <x-green-button :disabled=$disabledPropertyRjStatus wire:click.prevent="store()"
-                                type="button" wire:loading.remove>
-                                Simpan
-                            </x-green-button>
-                        </div>
-                    </div>
-
-
-                </form>
 
 
 
 
+
+
+
+
+
+
+
+                    </x-border-form>
+                </div>
 
 
 
             </div>
-        </div>
+
+            <div class="sticky bottom-0 flex justify-between px-4 py-3 bg-gray-50 sm:px-6">
+
+                <div class="">
+                    {{-- null --}}
+                </div>
+                <div>
+                    <div wire:loading wire:target="store">
+                        <x-loading />
+                    </div>
+
+                    <x-green-button :disabled=$disabledPropertyRjStatus wire:click.prevent="store()" type="button"
+                        wire:loading.remove>
+                        Simpan
+                    </x-green-button>
+                </div>
+            </div>
+
+
+        </form>
+
+
+
+
+
+
+
     </div>
 
 

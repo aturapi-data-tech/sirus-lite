@@ -1,5 +1,5 @@
-<x-border-form :title="__('Screening Pasien')" :align="__('start')">
-    <div id="divScreeningPasien" class="flex flex-col w-full ">
+<x-border-form :title="__('Pertanyaan?')" :align="__('start')">
+    <div id="divScreeningPasien" class="flex flex-col w-full my-2">
         @isset($dataDaftarPoliRJ['screening'])
             @foreach ($dataDaftarPoliRJ['screening'] as $key => $sQ)
                 <div>
