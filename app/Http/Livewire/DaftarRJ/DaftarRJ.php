@@ -1267,10 +1267,17 @@ class DaftarRJ extends Component
             $this->dataDaftarPoliRJ['sep']['noSep'] = isset($findData->vno_sep) ? $findData->vno_sep : "";
 
             $this->setDataPasien($this->dataDaftarPoliRJ['regNo']);
+            // dd(isset($this->dataDaftarPoliRJ['klaimId']));
+            if (!isset($this->dataDaftarPoliRJ['klaimId'])) {
+                $this->emit('toastr-error', "Data Klaim tidak ditemukan, Reset Data Ke UMUM");
+            }
+            if (!isset($this->dataDaftarPoliRJ['kunjunganId'])) {
+                $this->emit('toastr-error', "Data Kunjungan tidak ditemukan, Reset Data Ke FKTP");
+            }
 
             $this->dataPasienLovSearch = $this->dataDaftarPoliRJ['regNo'];
-            $this->JenisKlaim['JenisKlaimId'] = $this->dataDaftarPoliRJ['klaimId'];
-            $this->JenisKunjungan['JenisKunjunganId'] = $this->dataDaftarPoliRJ['kunjunganId'];
+            $this->JenisKlaim['JenisKlaimId'] = isset($this->dataDaftarPoliRJ['klaimId']) ? $this->dataDaftarPoliRJ['klaimId'] : "UM";
+            $this->JenisKunjungan['JenisKunjunganId'] = isset($this->dataDaftarPoliRJ['kunjunganId']) ? $this->dataDaftarPoliRJ['kunjunganId'] : '1';
         } else {
 
             $this->emit('toastr-error', "Data tidak dapat di proses.");
