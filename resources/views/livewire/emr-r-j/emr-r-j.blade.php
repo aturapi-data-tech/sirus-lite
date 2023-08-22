@@ -312,7 +312,7 @@
                                                                 </li>
                                                                 <li>
                                                                     <x-dropdown-link
-                                                                        wire:click="edit('{{ $RJp->rj_no }}')">
+                                                                        wire:click="emr('{{ $RJp->rj_no }}')">
                                                                         {{ __('Rekam Medis') }}
                                                                     </x-dropdown-link>
                                                                 </li>

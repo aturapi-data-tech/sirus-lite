@@ -359,13 +359,7 @@ class EmrRJ extends Component
 
 
     // open and close modal start////////////////
-    private function openModal(): void
-    {
-        $this->resetInputFields();
-        $this->isOpen = true;
-        $this->isOpenMode = 'insert';
-        $this->setShiftnCurrentDate();
-    }
+
     private function openModalScreening(): void
     {
         $this->resetInputFields();
@@ -373,12 +367,13 @@ class EmrRJ extends Component
         $this->isOpenMode = 'screening';
     }
 
-    private function openModalTampil(): void
+    private function openModalEmr(): void
     {
         $this->resetInputFields();
         $this->isOpen = true;
-        $this->isOpenMode = 'tampil';
+        $this->isOpenMode = 'emr';
     }
+
 
     public function closeModal(): void
     {
@@ -510,6 +505,14 @@ class EmrRJ extends Component
     {
         $this->openModalScreening();
         $this->findData($id);
+    }
+    // is going to screening data////////////////
+    public function emr($id)
+    {
+        $this->emit('toastr-error', "Data tidak dapat di proses.");
+
+        // $this->openModalErm();
+        // $this->findData($id);
     }
 
     // is going to edit data/////////////////
