@@ -11,10 +11,10 @@
 
 
                     {{-- text --}}
-                    <div class="mb-5">
+                    {{-- <div class="mb-5">
                         <h3 class="text-3xl font-bold text-gray-900 dark:text-white">{{ $myTitle }}</h3>
                         <span class="text-base font-normal text-gray-900 dark:text-gray-400">{{ $mySnipt }}</span>
-                    </div>
+                    </div> --}}
                     {{-- end text --}}
 
 

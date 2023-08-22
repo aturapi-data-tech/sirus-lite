@@ -401,6 +401,10 @@
                     <div
                         class="sticky top-0 flex items-center justify-between p-4 bg-opacity-75 border-b rounded-t bg-primary dark:border-gray-600">
 
+                        <h3 class="text-2xl font-semibold text-white dark:text-white">
+                            Data SKDP Rawat Jalan
+                        </h3>
+
                         {{-- Close Modal --}}
                         <button wire:click="$set('callRJskdp',false)"
                             class="text-gray-400 bg-gray-50 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white">
