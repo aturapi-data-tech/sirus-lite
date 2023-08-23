@@ -40,11 +40,7 @@
                     <th style="height: 20px;">
                     </th>
                     <td class="text-sm" dir="ltr">
-                        {{ isset($data['informasi']['prolanisPRB'])
-                            ? ($data['informasi']['prolanisPRB']
-                                ? $data['informasi']['prolanisPRB']
-                                : '-')
-                            : '--' }}
+                        {{ isset($data['informasi']['prolanisPRB']) ? ($data['informasi']['prolanisPRB'] ? 'PRB : Ya' : 'PRB : Tidak') : 'PRB :--Tidak' }}
                     </td>
                     <td class="text-sm"></td>
                     <td class="text-sm"></td>
@@ -119,7 +115,7 @@
                     <td class="text-sm" dir="ltr">COB</td>
                     <td class="text-sm" dir="ltr">:</td>
                     <td class="text-sm" dir="ltr">
-                        {{ isset($reqData['request']['t_sep']['cob']['cob']) ? ($reqData['request']['t_sep']['cob']['cob'] ? $reqData['request']['t_sep']['cob']['cob'] : '-') : '--' }}
+                        {{ isset($reqData['request']['t_sep']['cob']['cob']) ? ($reqData['request']['t_sep']['cob']['cob'] ? 'Ya' : 'Tidak') : '--Tidak' }}
                     </td>
                 </tr>
                 <tr style="height: 20px">
@@ -187,7 +183,8 @@
                     </td>
                     <td class="text-sm" dir="ltr">:</td>
                     <td class="text-sm" dir="ltr">
-                        {{ isset($data['dpjp']['nmDPJP']) ? ($data['dpjp']['nmDPJP'] ? $data['dpjp']['nmDPJP'] : '-') : '--' }}
+
+                        {{ isset($reqData['request']['t_sep']['dpjpLayanNama']) ? ($reqData['request']['t_sep']['dpjpLayanNama'] ? $reqData['request']['t_sep']['dpjpLayanNama'] : '-') : '--' }}
                     </td>
 
                     <td class="text-sm"></td>
@@ -201,7 +198,7 @@
                     <td class="text-sm" dir="ltr">Faskes Perujuk</td>
                     <td class="text-sm" dir="ltr">:</td>
                     <td class="text-sm" dir="ltr">
-                        {{ isset($data['rujukan']['asalRujukanNama']) ? ($data['rujukan']['asalRujukanNama'] ? $data['rujukan']['asalRujukanNama'] : '-') : '--' }}
+                        {{ isset($reqData['request']['t_sep']['rujukan']['asalRujukanNama']) ? ($reqData['request']['t_sep']['rujukan']['asalRujukanNama'] ? $reqData['request']['t_sep']['rujukan']['asalRujukanNama'] : '-') : '--' }}
                     </td>
 
                     <td class="text-sm"></td>
