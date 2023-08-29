@@ -79,6 +79,9 @@
                                 <x-nav-link class="pl-4" :href="route('SetupHfisBpjs')" :active="request()->routeIs('SetupHfisBpjs')">
                                     {{ __('SetupHfisBpjs') }}
                                 </x-nav-link>
+                                <x-nav-link class="pl-4" :href="route('displayPelayananRJ')" :active="request()->routeIs('displayPelayananRJ')">
+                                    {{ __('Display Pelayanan RJ') }}
+                                </x-nav-link>
                             </li>
                         </ul>
 
