@@ -15,6 +15,8 @@ use App\Http\Livewire\MrRJ\Screening\Screening;
 
 
 use App\Http\Livewire\PelayananRJ\PelayananRJ;
+use App\Http\Livewire\DisplayPelayananRJ\DisplayPelayananRJ;
+
 use App\Http\Livewire\EmrRJ\EmrRJ;
 
 use App\Http\Livewire\SetupHfisBpjs\SetupHfisBpjs;
@@ -70,6 +72,7 @@ Route::get('MrRJ/Screening', Screening::class)->middleware('auth')->name('MRRJSc
 
 
 Route::get('pelayananRJ', PelayananRJ::class)->middleware('auth')->name('pelayananRJ');
+Route::get('displayPelayananRJ', displayPelayananRJ::class)->middleware('auth')->name('displayPelayananRJ');
 
 
 
