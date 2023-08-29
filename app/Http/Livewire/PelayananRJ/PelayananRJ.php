@@ -298,15 +298,22 @@ class PelayananRJ extends Component
         // DB Json
         $sql = "select datadaftarpolirj_json from rstxn_rjhdrs where rj_no=:rjNo";
         $datadaftarpolirj_json = DB::scalar($sql, ['rjNo' => $rjNo]);
+
         if ($datadaftarpolirj_json) {
             $this->dataDaftarPoliRJ = json_decode($datadaftarpolirj_json, true);
-            $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4'] = $waktuMasukPoli;
-            DB::table('rstxn_rjhdrs')
-                ->where('rj_no', $rjNo)
-                ->update([
-                    'datadaftarpolirj_json' => json_encode($this->dataDaftarPoliRJ, true),
-                    'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
-                ]);
+
+            if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']) {
+                $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4'] = $waktuMasukPoli;
+                DB::table('rstxn_rjhdrs')
+                    ->where('rj_no', $rjNo)
+                    ->update([
+                        'datadaftarpolirj_json' => json_encode($this->dataDaftarPoliRJ, true),
+                        'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
+                    ]);
+                $this->emit('toastr-success', "Masuk Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']);
+            } else {
+                $this->emit('toastr-error', "Masuk Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']);
+            }
         }
 
         // cari no Booking
@@ -314,8 +321,6 @@ class PelayananRJ extends Component
         $noBooking =  DB::scalar($sql, ['rjNo' => $rjNo]);
 
         $this->pushDataTaskId($noBooking, 4, $waktu);
-
-        $this->emit('toastr-success', "Masuk Poli $waktuMasukPoli");
     }
 
 
@@ -351,24 +356,31 @@ class PelayananRJ extends Component
             $datadaftarpolirj_json = DB::scalar($sql, ['rjNo' => $rjNo]);
             if ($datadaftarpolirj_json) {
                 $this->dataDaftarPoliRJ = json_decode($datadaftarpolirj_json, true);
-                $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5'] = $waktuMasukApotek;
-                DB::table('rstxn_rjhdrs')
-                    ->where('rj_no', $rjNo)
-                    ->update([
-                        'datadaftarpolirj_json' => json_encode($this->dataDaftarPoliRJ, true),
-                        'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
-                    ]);
+
+                if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']) {
+                    $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5'] = $waktuMasukApotek;
+
+                    DB::table('rstxn_rjhdrs')
+                        ->where('rj_no', $rjNo)
+                        ->update([
+                            'datadaftarpolirj_json' => json_encode($this->dataDaftarPoliRJ, true),
+                            'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
+                        ]);
+                    $this->emit('toastr-success', "Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
+                } else {
+                    $this->emit('toastr-error', "Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
+                }
+
+                // cari no Booking
+                $sql = "select nobooking from rstxn_rjhdrs where rj_no=:rjNo";
+                $noBooking =  DB::scalar($sql, ['rjNo' => $rjNo]);
+
+                $this->pushDataTaskId($noBooking, 5, $waktu);
+
+                $this->emit('toastr-success', "Keluar Poli $waktuMasukApotek");
+            } else {
+                $this->emit('toastr-error', "Satus Pasien Belum melalui pelayanan Poli");
             }
-
-            // cari no Booking
-            $sql = "select nobooking from rstxn_rjhdrs where rj_no=:rjNo";
-            $noBooking =  DB::scalar($sql, ['rjNo' => $rjNo]);
-
-            $this->pushDataTaskId($noBooking, 5, $waktu);
-
-            $this->emit('toastr-success', "Keluar Poli $waktuMasukApotek");
-        } else {
-            $this->emit('toastr-error', "Satus Pasien Belum melalui pelayanan Poli");
         }
     }
 
