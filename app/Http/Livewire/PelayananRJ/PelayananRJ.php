@@ -8,21 +8,15 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
 
-use App\Http\Traits\customErrorMessagesTrait;
 use App\Http\Traits\BPJS\AntrianTrait;
-use App\Http\Traits\BPJS\VclaimTrait;
 
 
-use Illuminate\Support\Str;
 use Spatie\ArrayToXml\ArrayToXml;
 
 
 class PelayananRJ extends Component
 {
     use WithPagination;
-
-
-
 
 
 
@@ -66,6 +60,17 @@ class PelayananRJ extends Component
     //////////////////////////////
 
     public $dataDaftarPoliRJ = [];
+    public $taskIdPelayanan = [
+        "taskId1" => "",
+        "taskId2" => "",
+        "taskId3" => "",
+        "taskId4" => "",
+        "taskId5" => "",
+        "taskId6" => "",
+        "taskId7" => "",
+        "taskId99" => "",
+    ];
+
 
 
 
@@ -76,10 +81,6 @@ class PelayananRJ extends Component
 
 
     // 
-
-    //  modal status////////////////
-    public $isOpen = 0;
-    public $isOpenMode = 'insert';
 
 
 
@@ -129,22 +130,6 @@ class PelayananRJ extends Component
         ]);
     }
 
-
-
-
-    // open and close modal start////////////////
-    private function openModalTampil(): void
-    {
-        $this->resetInputFields();
-        $this->isOpen = true;
-        $this->isOpenMode = 'tampil';
-    }
-
-    public function closeModal(): void
-    {
-        $this->resetInputFields();
-    }
-    // open and close modal end////////////////
 
 
 
@@ -241,41 +226,138 @@ class PelayananRJ extends Component
     /////////////////////////////////////////////////////////////////////
 
 
-
-
-
-
-    // logic LOV start////////////////
-
-    ////////////////////////////////////////////////
-    // Lov //////////////////////
-    ////////////////////////////////////////////////
-
-    // null
-
-
-    ////////////////////////////logic lain/////////////////////////////////////
-
-
-    // tampil record start////////////////
-    public function tampil($id)
+    /////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////
+    private function updateDataRJ($rjNo): void
     {
-        $this->emit('toastr-error', ":) Fitur dlm proses pengerjaan.");
-    }
-    // tampil record end////////////////
 
+        // update table trnsaksi
+        DB::table('rstxn_rjhdrs')
+            ->where('rj_no', $rjNo)
+            ->update([
+                'datadaftarpolirj_json' => json_encode($this->dataDaftarPoliRJ, true),
+                'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
+            ]);
 
-
-    // show edit record start////////////////
-    public function edit($id)
-    {
-        $this->openModalEdit();
-        $this->findData($id);
+        $this->emit('toastr-success', "Json Berhasil di update.");
     }
 
-    // tampil record start////////////////
+    private function findData($rjNo): void
+    {
+
+
+        $findData = DB::table('rsview_rjkasir')
+            ->select('datadaftarpolirj_json', 'vno_sep', DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"))
+            ->where('rj_no', $rjNo)
+            ->first();
+
+
+        if ($findData->datadaftarpolirj_json) {
+            $this->dataDaftarPoliRJ = json_decode($findData->datadaftarpolirj_json, true);
+
+            // jika taskId3 tidak ditemukan tambah variable kontrol pda array
+            if (isset($this->dataDaftarPoliRJ['taskIdPelayanan']) == false) {
+                $this->dataDaftarPoliRJ['taskIdPelayanan'] = $this->taskIdPelayanan;
+                // update DB
+                $this->updateDataRJ($rjNo);
+            }
+
+            $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId3'] = $findData->rj_date;
+        } else {
+
+            $this->emit('toastr-error', "Json Tidak ditemukan, Data sedang diproses ulang.");
+            $dataDaftarPoliRJ = DB::table('rsview_rjkasir')
+                ->select(
+                    DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
+                    DB::raw("to_char(rj_date,'yyyymmddhh24miss') AS rj_date1"),
+                    'rj_no',
+                    'reg_no',
+                    'reg_name',
+                    'sex',
+                    'address',
+                    'thn',
+                    DB::raw("to_char(birth_date,'dd/mm/yyyy') AS birth_date"),
+                    'poli_id',
+                    'poli_desc',
+                    'dr_id',
+                    'dr_name',
+                    'klaim_id',
+                    'shift',
+                    'vno_sep',
+                    'no_antrian',
+
+                    'nobooking',
+                    'push_antrian_bpjs_status',
+                    'push_antrian_bpjs_json',
+                    'kd_dr_bpjs',
+                    'kd_poli_bpjs',
+                    'rj_status',
+                    'txn_status',
+                    'erm_status',
+                )
+                ->where('rj_no', '=', $rjNo)
+                ->first();
+
+            $this->dataDaftarPoliRJ = [
+                "regNo" => "" . $dataDaftarPoliRJ->reg_no . "",
+
+                "drId" => "" . $dataDaftarPoliRJ->dr_id . "",
+                "drDesc" => "" . $dataDaftarPoliRJ->dr_name . "",
+
+                "poliId" => "" . $dataDaftarPoliRJ->poli_id . "",
+                "poliDesc" => "" . $dataDaftarPoliRJ->poli_desc . "",
+
+                "kddrbpjs" => "" . $dataDaftarPoliRJ->kd_dr_bpjs . "",
+                "kdpolibpjs" => "" . $dataDaftarPoliRJ->kd_poli_bpjs . "",
+
+                "rjDate" => "" . $dataDaftarPoliRJ->rj_date . "",
+                "rjNo" => "" . $dataDaftarPoliRJ->rj_no . "",
+                "shift" => "" . $dataDaftarPoliRJ->shift . "",
+                "noAntrian" => "" . $dataDaftarPoliRJ->no_antrian . "",
+                "noBooking" => "" . $dataDaftarPoliRJ->nobooking . "",
+                "slCodeFrom" => "02",
+                "passStatus" => "",
+                "rjStatus" => "" . $dataDaftarPoliRJ->rj_status . "",
+                "txnStatus" => "" . $dataDaftarPoliRJ->txn_status . "",
+                "ermStatus" => "" . $dataDaftarPoliRJ->erm_status . "",
+                "cekLab" => "0",
+                "kunjunganInternalStatus" => "0",
+                "noReferensi" => "" . $dataDaftarPoliRJ->reg_no . "",
+                "taskIdPelayanan" => [
+                    "taskId1" => "",
+                    "taskId2" => "",
+                    "taskId3" => "" . $dataDaftarPoliRJ->rj_date . "",
+                    "taskId4" => "",
+                    "taskId5" => "",
+                    "taskId6" => "",
+                    "taskId7" => "",
+                    "taskId99" => "",
+                ],
+                'sep' => [
+                    "noSep" => "" . $dataDaftarPoliRJ->vno_sep . "",
+                    "reqSep" => [],
+                    "resSep" => [],
+                ]
+            ];
+
+            // jika kontrol tidak ditemukan tambah variable kontrol pda array
+            // jika taskId3 tidak ditemukan tambah variable kontrol pda array
+            if (isset($this->dataDaftarPoliRJ['taskIdPelayanan']) == false) {
+                $this->dataDaftarPoliRJ['taskIdPelayanan'] = $this->taskIdPelayanan;
+            }
+
+            $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId3'] = $findData->rj_date;
+            // update DB
+            $this->updateDataRJ($rjNo);
+        }
+    }
+
     public function masukPoli($rjNo)
     {
+
+        $this->findData($rjNo);
+
         $sql = "select waktu_masuk_poli from rstxn_rjhdrs where rj_no=:rjNo";
         $cek_waktu_masuk_poli = DB::scalar($sql, ['rjNo' => $rjNo]);
 
@@ -304,12 +386,9 @@ class PelayananRJ extends Component
 
             if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']) {
                 $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4'] = $waktuMasukPoli;
-                DB::table('rstxn_rjhdrs')
-                    ->where('rj_no', $rjNo)
-                    ->update([
-                        'datadaftarpolirj_json' => json_encode($this->dataDaftarPoliRJ, true),
-                        'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
-                    ]);
+                // update DB
+                $this->updateDataRJ($rjNo);
+
                 $this->emit('toastr-success', "Masuk Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']);
             } else {
                 $this->emit('toastr-error', "Masuk Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']);
@@ -360,12 +439,9 @@ class PelayananRJ extends Component
                 if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']) {
                     $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5'] = $waktuMasukApotek;
 
-                    DB::table('rstxn_rjhdrs')
-                        ->where('rj_no', $rjNo)
-                        ->update([
-                            'datadaftarpolirj_json' => json_encode($this->dataDaftarPoliRJ, true),
-                            'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
-                        ]);
+                    // update DB
+                    $this->updateDataRJ($rjNo);
+
                     $this->emit('toastr-success', "Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
                 } else {
                     $this->emit('toastr-error', "Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
@@ -391,7 +467,7 @@ class PelayananRJ extends Component
         $waktuBatalPoli = Carbon::now()->format('d/m/Y H:i:s');
 
         /////////////////////////
-        // Update TaskId 99
+        // Update TaskId 99 jika task id 5 sudah terisi maka tidak dapat dilakukan pembatalan
         /////////////////////////
 
         $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $waktuBatalPoli)->timestamp * 1000; //waktu dalam timestamp milisecond
@@ -399,14 +475,14 @@ class PelayananRJ extends Component
         $sql = "select datadaftarpolirj_json from rstxn_rjhdrs where rj_no=:rjNo";
         $datadaftarpolirj_json = DB::scalar($sql, ['rjNo' => $rjNo]);
         if ($datadaftarpolirj_json) {
-            $this->dataDaftarPoliRJ = json_decode($datadaftarpolirj_json, true);
-            $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId99'] = $waktuBatalPoli;
-            DB::table('rstxn_rjhdrs')
-                ->where('rj_no', $rjNo)
-                ->update([
-                    'datadaftarpolirj_json' => json_encode($this->dataDaftarPoliRJ, true),
-                    'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
-                ]);
+            if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']) {
+                $this->dataDaftarPoliRJ = json_decode($datadaftarpolirj_json, true);
+                $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId99'] = $waktuBatalPoli;
+                // update DB
+                $this->updateDataRJ($rjNo);
+            } else {
+                $this->emit('toastr-error', "Pembatalan tidak dapat dilakukan, " . $regName . " sudak melakukan pelayanan Poli.");
+            }
         }
 
         // cari no Booking
@@ -416,8 +492,16 @@ class PelayananRJ extends Component
         $this->pushDataTaskId($noBooking, 99, $waktu);
 
 
-        $this->emit('toastr-success', "Pembatalan " . $regName . "pelayanan Poli berhasil dilakukan.");
+        $this->emit('toastr-success', "Pembatalan " . $regName . " pelayanan Poli berhasil dilakukan.");
     }
+
+
+
+
+
+
+
+
 
     private function pushDataTaskId($noBooking, $taskId, $time): void
     {
@@ -446,25 +530,10 @@ class PelayananRJ extends Component
 
 
 
-
-
-
-
-
-
-
-
-    // tampil record end//////////////// // tampil record start////////////////
-
-    // tampil record end////////////////
-
     // when new form instance
     public function mount()
     {
 
-
-        // dd($result);
-        //get table oracle local
         // set date
         $this->dateRjRef = Carbon::now()->format('d/m/Y');
         // set shift

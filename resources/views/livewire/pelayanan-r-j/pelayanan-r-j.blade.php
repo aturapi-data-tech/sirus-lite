@@ -152,9 +152,7 @@
 
                     </div>
 
-                    @if ($isOpen)
-                        @include('livewire.pelayanan-r-j.create')
-                    @endif
+
 
 
 
@@ -279,35 +277,11 @@
                                                     <div class="inline-flex">
 
 
-                                                        <x-light-button id="dropdownButton{{ $RJp->rj_no }}"
-                                                            class="inline-flex"
-                                                            wire:click="$emit('pressDropdownButton','{{ $RJp->rj_no }}')">
-                                                            <svg class="w-5 h-5" aria-hidden="true"
-                                                                fill="currentColor" viewbox="0 0 20 20"
-                                                                xmlns="http://www.w3.org/2000/svg">
-                                                                <path
-                                                                    d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
-                                                            </svg>
-                                                        </x-light-button>
-
-                                                        <!-- Dropdown Action Open menu -->
-                                                        <div id="dropdownMenu{{ $RJp->rj_no }}"
-                                                            class="z-10 hidden w-auto bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700">
-                                                            <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
-                                                                aria-labelledby="dropdownButton{{ $RJp->rj_no }}">
-                                                                <li>
-                                                                    <x-dropdown-link
-                                                                        wire:click="tampil('{{ $RJp->rj_no }}')">
-                                                                        {{ __('Screening | ' . $RJp->reg_name) }}
-                                                                    </x-dropdown-link>
-                                                                </li>
 
 
-                                                            </ul>
-                                                        </div>
 
-
-                                                        <x-yellow-button wire:click="masukPoli('{{ $RJp->rj_no }}')"
+                                                        <x-yellow-button
+                                                            wire:click="masukPoli('{{ addslashes($RJp->rj_no) }}')"
                                                             wire:loading.remove>
                                                             Masuk Poli
                                                         </x-yellow-button>
@@ -315,7 +289,8 @@
                                                             <x-loading />
                                                         </div>
 
-                                                        <x-green-button wire:click="keluarPoli('{{ $RJp->rj_no }}')"
+                                                        <x-green-button
+                                                            wire:click="keluarPoli('{{ addslashes($RJp->rj_no) }}')"
                                                             wire:loading.remove>
                                                             Keluar Poli
                                                         </x-green-button>
@@ -324,7 +299,7 @@
                                                         </div>
 
                                                         <x-red-button
-                                                            wire:click="$emit('confirm_batal_poli', '{{ $RJp->rj_no }}', '{{ $RJp->reg_name }}')"
+                                                            wire:click="$emit('confirm_batal_poli', '{{ addslashes($RJp->rj_no) }}', '{{ addslashes($RJp->reg_name) }}')"
                                                             wire:loading.remove class="ml-12">
                                                             Batal Poli
                                                         </x-red-button>
