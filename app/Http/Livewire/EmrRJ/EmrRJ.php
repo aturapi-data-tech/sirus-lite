@@ -285,6 +285,46 @@ class EmrRJ extends Component
 
     public $dataDaftarPoliRJ = [];
 
+    public $EmrMenu = [
+        [
+            'ermMenuId' => 'anamnesia',
+            'ermMenuName' => 'Anamnesia'
+        ],
+        [
+            'ermMenuId' => 'pemeriksaan',
+            'ermMenuName' => 'Pemeriksaan'
+        ],
+        [
+            'ermMenuId' => 'penilaian',
+            'ermMenuName' => 'Penilaian'
+        ],
+        [
+            'ermMenuId' => 'diagnosis',
+            'ermMenuName' => 'Diagnosis (ICD)'
+        ],
+        [
+            'ermMenuId' => 'penandaanGbr',
+            'ermMenuName' => 'Penandaan Gambar'
+        ],
+        [
+            'ermMenuId' => 'perencanaan',
+            'ermMenuName' => 'Perencanaan'
+        ],
+        [
+            'ermMenuId' => 'cppt',
+            'ermMenuName' => 'CPPT'
+        ],
+        [
+            'ermMenuId' => 'resumeMds',
+            'ermMenuName' => 'Resume Medis'
+        ],
+        [
+            'ermMenuId' => 'penerbitanSrt',
+            'ermMenuName' => 'Penerbitan Surat'
+        ],
+
+    ];
+
 
 
 
@@ -306,6 +346,9 @@ class EmrRJ extends Component
     //  modal status////////////////
     public $isOpen = 0;
     public $isOpenMode = 'insert';
+
+    public $isOpenEmr = 0;
+    public $isOpenEmrMode = 'insert';
 
 
     // search logic -resetExcept////////////////
@@ -370,8 +413,8 @@ class EmrRJ extends Component
     private function openModalEmr(): void
     {
         $this->resetInputFields();
-        $this->isOpen = true;
-        $this->isOpenMode = 'emr';
+        $this->isOpenEmr = true;
+        $this->isOpenEmrMode = 'emr';
     }
 
 
@@ -509,10 +552,8 @@ class EmrRJ extends Component
     // is going to screening data////////////////
     public function emr($id)
     {
-        $this->emit('toastr-error', "Data tidak dapat di proses.");
-
-        // $this->openModalErm();
-        // $this->findData($id);
+        $this->openModalEmr();
+        $this->findData($id);
     }
 
     // is going to edit data/////////////////
@@ -682,8 +723,8 @@ class EmrRJ extends Component
 
             $this->setDataPasien($this->dataDaftarPoliRJ['regNo']);
         } else {
+            $this->emit('toastr-error', "Json Tidak ditemukan, Data sedang diproses ulang.");
 
-            $this->emit('toastr-error', "Data tidak dapat di proses.");
             $dataDaftarPoliRJ = DB::table('rsview_rjkasir')
                 ->select(
                     DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
@@ -759,6 +800,11 @@ class EmrRJ extends Component
             ];
 
             $this->setDataPasien($this->dataDaftarPoliRJ['regNo']);
+            $this->dataDaftarPoliRJ['klaimId'] = $dataDaftarPoliRJ->klaim_id == 'JM' ? 'JM' : 'UM';
+            $this->dataDaftarPoliRJ['JenisKlaimDesc'] = $dataDaftarPoliRJ->klaim_id == 'JM' ? 'BPJS' : 'UMUM';
+
+            $this->dataDaftarPoliRJ['kunjunganId'] = '1';
+            $this->dataDaftarPoliRJ['JenisKunjunganDesc'] = 'Rujukan FKTP';
         }
 
 

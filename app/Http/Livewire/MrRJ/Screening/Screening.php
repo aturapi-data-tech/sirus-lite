@@ -385,6 +385,12 @@ class Screening extends Component
                 ]
             ];
 
+            $this->dataDaftarPoliRJ['klaimId'] = $dataDaftarPoliRJ->klaim_id == 'JM' ? 'JM' : 'UM';
+            $this->dataDaftarPoliRJ['JenisKlaimDesc'] = $dataDaftarPoliRJ->klaim_id == 'JM' ? 'BPJS' : 'UMUM';
+
+            $this->dataDaftarPoliRJ['kunjunganId'] = '1';
+            $this->dataDaftarPoliRJ['JenisKunjunganDesc'] = 'Rujukan FKTP';
+
             // jika screening tidak ditemukan tambah variable kontrol pda array
             if (isset($this->dataDaftarPoliRJ['screening']) == false) {
                 $this->dataDaftarPoliRJ['screening'] = $this->screeningQuestions;

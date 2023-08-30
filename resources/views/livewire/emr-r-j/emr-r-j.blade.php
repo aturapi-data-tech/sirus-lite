@@ -167,6 +167,10 @@
                         @include('livewire.emr-r-j.create')
                     @endif
 
+                    @if ($isOpenEmr)
+                        @include('livewire.emr-r-j.create-emr')
+                    @endif
+
 
 
 

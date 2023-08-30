@@ -341,6 +341,12 @@ class PelayananRJ extends Component
                 ]
             ];
 
+            $this->dataDaftarPoliRJ['klaimId'] = $dataDaftarPoliRJ->klaim_id == 'JM' ? 'JM' : 'UM';
+            $this->dataDaftarPoliRJ['JenisKlaimDesc'] = $dataDaftarPoliRJ->klaim_id == 'JM' ? 'BPJS' : 'UMUM';
+
+            $this->dataDaftarPoliRJ['kunjunganId'] = '1';
+            $this->dataDaftarPoliRJ['JenisKunjunganDesc'] = 'Rujukan FKTP';
+
             // jika kontrol tidak ditemukan tambah variable kontrol pda array
             // jika taskId3 tidak ditemukan tambah variable kontrol pda array
             if (isset($this->dataDaftarPoliRJ['taskIdPelayanan']) == false) {

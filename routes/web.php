@@ -11,6 +11,7 @@ use App\Http\Livewire\RJskdp\RJskdp;
 
 use App\Http\Livewire\MrRJ\Skdp\Skdp;
 use App\Http\Livewire\MrRJ\Screening\Screening;
+use App\Http\Livewire\MrRJ\Anamnesia\Anamnesia;
 
 
 
@@ -69,6 +70,7 @@ Route::get('RJskdp', RJskdp::class)->middleware('auth')->name('RJskdp');
 // MR
 Route::get('MrRJ/Skdp', Skdp::class)->middleware('auth')->name('MRRJskdp');
 Route::get('MrRJ/Screening', Screening::class)->middleware('auth')->name('MRRJScreening');
+Route::get('MrRJ/Anamnesia', Anamnesia::class)->middleware('auth')->name('MRRJAnamnesia');
 
 
 Route::get('pelayananRJ', PelayananRJ::class)->middleware('auth')->name('pelayananRJ');
