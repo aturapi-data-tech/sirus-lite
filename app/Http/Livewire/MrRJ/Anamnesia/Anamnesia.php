@@ -52,12 +52,7 @@ class Anamnesia extends Component
             "riwayatPenyakitSekarangUmum" => ""
         ],
 
-        "riwayatPenyakitSekarangUmumTab" => "Riwayat Penyakit Sekarang (Umum)",
-        "riwayatPenyakitSekarangUmum" => [
-            "riwayatPenyakitSekarangUmum" => ""
-        ],
-
-        "riwayatPenyakitDahuluTab" => "Riwayat Penyakit Dahulu",
+        "riwayatPenyakitDahuluTab" => "Riwayat",
         "riwayatPenyakitDahulu" => [
             "riwayatPenyakitDahulu" => ""
         ],
@@ -78,7 +73,7 @@ class Anamnesia extends Component
         "faktorResiko" => [
             "hipertensi" => [],
             "diabetesMelitus" => [],
-            "penyakit Jantung" => [],
+            "penyakitJantung" => [],
             "asma" => [],
             "stroke" => [],
             "liver" => [],

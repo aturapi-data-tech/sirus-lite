@@ -5,7 +5,6 @@
     
 @endphp
 
-
 <div class="fixed inset-0 z-40 ease-out duration-400">
 
     <div class="flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
