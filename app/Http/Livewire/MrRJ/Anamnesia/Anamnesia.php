@@ -93,7 +93,7 @@ class Anamnesia extends Component
             "lainLain" => ""
         ],
 
-        "statusFungsionalTab" => "Riwayat Penyakit Keluarga",
+        "statusFungsionalTab" => "Status Fungsional",
         "statusFungsional" => [
             "tongkat" => [],
             "kursiRoda" => [],
