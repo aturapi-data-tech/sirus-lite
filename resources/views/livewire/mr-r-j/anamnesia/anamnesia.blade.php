@@ -76,6 +76,48 @@
                                     @click="activeTab ='{{ $dataDaftarPoliRJ['anamnesia']['statusFungsionalTab'] }}'">{{ $dataDaftarPoliRJ['anamnesia']['statusFungsionalTab'] }}</label>
                             </li>
 
+                            <li class="mr-2">
+                                <label
+                                    class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
+                                    :class="activeTab === '{{ $dataDaftarPoliRJ['anamnesia']['statusPsikologisTab'] }}' ?
+                                        'text-primary border-primary bg-gray-100' : ''"
+                                    @click="activeTab ='{{ $dataDaftarPoliRJ['anamnesia']['statusPsikologisTab'] }}'">{{ $dataDaftarPoliRJ['anamnesia']['statusPsikologisTab'] }}</label>
+                            </li>
+
+
+                            <li class="mr-2">
+                                <label
+                                    class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
+                                    :class="activeTab === '{{ $dataDaftarPoliRJ['anamnesia']['statusFungsionalTab'] }}' ?
+                                        'text-primary border-primary bg-gray-100' : ''"
+                                    @click="activeTab ='{{ $dataDaftarPoliRJ['anamnesia']['statusFungsionalTab'] }}'">{{ $dataDaftarPoliRJ['anamnesia']['statusFungsionalTab'] }}</label>
+                            </li>
+
+                            <li class="mr-2">
+                                <label
+                                    class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
+                                    :class="activeTab === '{{ $dataDaftarPoliRJ['anamnesia']['statusFungsionalTab'] }}' ?
+                                        'text-primary border-primary bg-gray-100' : ''"
+                                    @click="activeTab ='{{ $dataDaftarPoliRJ['anamnesia']['statusFungsionalTab'] }}'">{{ $dataDaftarPoliRJ['anamnesia']['statusFungsionalTab'] }}</label>
+                            </li>
+
+                            <li class="mr-2">
+                                <label
+                                    class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
+                                    :class="activeTab === '{{ $dataDaftarPoliRJ['anamnesia']['statusFungsionalTab'] }}' ?
+                                        'text-primary border-primary bg-gray-100' : ''"
+                                    @click="activeTab ='{{ $dataDaftarPoliRJ['anamnesia']['statusFungsionalTab'] }}'">{{ $dataDaftarPoliRJ['anamnesia']['statusFungsionalTab'] }}</label>
+                            </li>
+
+                            <li class="mr-2">
+                                <label
+                                    class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
+                                    :class="activeTab === '{{ $dataDaftarPoliRJ['anamnesia']['statusFungsionalTab'] }}' ?
+                                        'text-primary border-primary bg-gray-100' : ''"
+                                    @click="activeTab ='{{ $dataDaftarPoliRJ['anamnesia']['statusFungsionalTab'] }}'">{{ $dataDaftarPoliRJ['anamnesia']['statusFungsionalTab'] }}</label>
+                            </li>
+
+
                         </ul>
                     </div>
 
@@ -135,7 +177,14 @@
 
                     </div>
 
+                    <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800"
+                        :class="{
+                            'active': activeTab === '{{ $dataDaftarPoliRJ['anamnesia']['statusPsikologisTab'] }}'
+                        }"
+                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarPoliRJ['anamnesia']['statusPsikologisTab'] }}'">
+                        @include('livewire.mr-r-j.anamnesia.statusPsikologisTab')
 
+                    </div>
 
 
                 </div>

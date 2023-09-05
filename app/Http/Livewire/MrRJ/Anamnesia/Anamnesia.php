@@ -154,13 +154,13 @@ class Anamnesia extends Component
         "spiritualTab" => "Spiritual",
         "spiritual" => [
             "spiritual" => "Islam",
-            "ibadahTeratur" => "",
+            "ibadahTeratur" => "Tidak",
             "ibadahTeraturOptions" => [
                 ["ibadahTeratur" => "Ya"],
                 ["ibadahTeratur" => "Tidak"],
             ],
 
-            "nilaiKepercayaan" => "",
+            "nilaiKepercayaan" => "Tidak",
             "nilaiKepercayaanOptions" => [
                 ["nilaiKepercayaan" => "Ya"],
                 ["nilaiKepercayaan" => "Tidak"],
