@@ -21,10 +21,10 @@
         {{-- <form class="scroll-smooth hover:scroll-auto"> --}}
         <div class="grid grid-cols-1">
 
-            <div id="TransaksiRawatJalan" class="px-4">
+            <div id="TransaksiRawatJalan" class="px-2">
                 <div id="TransaksiRawatJalan" x-data="{ activeTab: 'Keluhan Utama' }">
 
-                    <div class="px-4 mb-4 border-b border-gray-200 dark:border-gray-700">
+                    <div class="px-2 mb-2 border-b border-gray-200 dark:border-gray-700">
                         <ul
                             class="flex flex-wrap -mb-px text-xs font-medium text-center text-gray-500 dark:text-gray-400">
                             <li class="mr-2">

@@ -114,17 +114,17 @@
 
 
                     {{-- Transasi Rawat Jalan --}}
-                    <div id="TransaksiRawatJalan" x-data="{ activeTab: 'anamnesia' }">
+                    <div id="TransaksiRawatJalan" x-data="{ activeTab: 'anamnesia' }" class="flex">
 
-                        <div class="px-4 mb-4 border-b border-gray-200 dark:border-gray-700">
+                        <div class="px-4 mb-0 border-b border-gray-200 dark:border-gray-700 w-[250px] overflow-auto">
                             <ul
-                                class="flex flex-wrap -mb-px text-sm font-medium text-center text-gray-500 dark:text-gray-400">
+                                class="flex flex-col flex-wrap -mb-px text-sm font-medium text-gray-500 text-start dark:text-gray-400">
                                 @foreach ($EmrMenu as $EmrM)
-                                    <li class="mr-2">
+                                    <li class="mr-0 rounded-lg"
+                                        :class="activeTab === '{{ $EmrM['ermMenuId'] }}' ?
+                                            'text-primary border-primary bg-gray-100' : ''">
                                         <label
                                             class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
-                                            :class="activeTab === '{{ $EmrM['ermMenuId'] }}' ?
-                                                'text-primary border-primary bg-gray-100' : ''"
                                             @click="activeTab ='{{ $EmrM['ermMenuId'] }}'">{{ $EmrM['ermMenuName'] }}</label>
                                     </li>
                                 @endforeach
@@ -133,7 +133,7 @@
                         </div>
 
                         @foreach ($EmrMenu as $EmrM)
-                            <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800"
+                            <div class="p-0 rounded-lg bg-gray-50 dark:bg-gray-800"
                                 :class="{
                                     'active': activeTab === '{{ $EmrM['ermMenuId'] }}'
                                 }"
