@@ -120,37 +120,55 @@
                             <ul
                                 class="flex flex-col flex-wrap -mb-px text-sm font-medium text-gray-500 text-start dark:text-gray-400">
                                 @foreach ($EmrMenu as $EmrM)
-                                    <li class="mr-0 rounded-lg"
+                                    <li wire:key="tab-{{ $EmrM['ermMenuId'] }}" class="mr-0 rounded-lg"
                                         :class="activeTab === '{{ $EmrM['ermMenuId'] }}' ?
                                             'text-primary border-primary bg-gray-100' : ''">
                                         <label
                                             class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
-                                            @click="activeTab ='{{ $EmrM['ermMenuId'] }}'">{{ $EmrM['ermMenuName'] }}</label>
+                                            @click="activeTab ='{{ $EmrM['ermMenuId'] }}'"
+                                            wire:click="$set('activeTab', '{{ $EmrM['ermMenuId'] }}')">{{ $EmrM['ermMenuName'] }}</label>
                                     </li>
                                 @endforeach
+
 
                             </ul>
                         </div>
 
-                        @foreach ($EmrMenu as $EmrM)
+                        {{-- @foreach ($EmrMenu as $EmrM)
                             <div class="p-0 rounded-lg bg-gray-50 dark:bg-gray-800"
                                 :class="{
                                     'active': activeTab === '{{ $EmrM['ermMenuId'] }}'
                                 }"
                                 x-show.transition.in.opacity.duration.600="activeTab === '{{ $EmrM['ermMenuId'] }}'">
 
-                                {{-- call Program --}}
-                                {{-- define Componenet Ex-> @livewire('mr-r-j.anamnesia.anamnesia',[par=>$par])  --}}
+
                                 @php
                                     $ermProgram = $EmrM['ermMenuId'] . '.' . $EmrM['ermMenuId'];
                                 @endphp
-                                @if ($EmrM['ermMenuId'] == 'anamnesia')
-                                    @livewire("mr-r-j.$ermProgram", [
+
+                                @livewire(
+                                    "mr-r-j.$ermProgram",
+                                    [
                                         'rjNoRef' => isset($dataDaftarPoliRJ['rjNo']) ? $dataDaftarPoliRJ['rjNo'] : '1',
-                                    ])
-                                @endif
+                                    ],
+                                    key('content-' . $EmrM['ermMenuId'])
+                                )
                             </div>
-                        @endforeach
+                        @endforeach --}}
+
+                        @if ($activeTab == 'anamnesia')
+                            <div class="p-0 rounded-lg bg-gray-50 dark:bg-gray-800">
+                                <livewire:mr-r-j.anamnesia.anamnesia :rjNoRef="$dataDaftarPoliRJ['rjNo']"
+                                    :wire:key="'user-profile-two-anamnesia'">
+                            </div>
+                        @endif
+
+                        @if ($activeTab == 'pemeriksaan')
+                            <div class="p-0 rounded-lg bg-gray-50 dark:bg-gray-800">
+                                <livewire:mr-r-j.pemeriksaan.pemeriksaan :rjNoRef="$dataDaftarPoliRJ['rjNo']"
+                                    :wire:key="'user-profile-two-pemeriksaan'">
+                            </div>
+                        @endif
 
                     </div>
 

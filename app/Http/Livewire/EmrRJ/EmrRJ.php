@@ -281,8 +281,12 @@ class EmrRJ extends Component
         ]
     ];
 
-    // Pendaftaran RJ
 
+
+
+
+    public $activeTab = "anamnesia";
+    // Pendaftaran RJ
     public $dataDaftarPoliRJ = [];
 
     public $EmrMenu = [
@@ -294,34 +298,34 @@ class EmrRJ extends Component
             'ermMenuId' => 'pemeriksaan',
             'ermMenuName' => 'Pemeriksaan'
         ],
-        [
-            'ermMenuId' => 'penilaian',
-            'ermMenuName' => 'Penilaian'
-        ],
-        [
-            'ermMenuId' => 'diagnosis',
-            'ermMenuName' => 'Diagnosis (ICD)'
-        ],
-        [
-            'ermMenuId' => 'penandaanGbr',
-            'ermMenuName' => 'Penandaan Gambar'
-        ],
-        [
-            'ermMenuId' => 'perencanaan',
-            'ermMenuName' => 'Perencanaan'
-        ],
-        [
-            'ermMenuId' => 'cppt',
-            'ermMenuName' => 'CPPT'
-        ],
-        [
-            'ermMenuId' => 'resumeMds',
-            'ermMenuName' => 'Resume Medis'
-        ],
-        [
-            'ermMenuId' => 'penerbitanSrt',
-            'ermMenuName' => 'Penerbitan Surat'
-        ],
+        // [
+        //     'ermMenuId' => 'penilaian',
+        //     'ermMenuName' => 'Penilaian'
+        // ],
+        // [
+        //     'ermMenuId' => 'diagnosis',
+        //     'ermMenuName' => 'Diagnosis (ICD)'
+        // ],
+        // [
+        //     'ermMenuId' => 'penandaanGbr',
+        //     'ermMenuName' => 'Penandaan Gambar'
+        // ],
+        // [
+        //     'ermMenuId' => 'perencanaan',
+        //     'ermMenuName' => 'Perencanaan'
+        // ],
+        // [
+        //     'ermMenuId' => 'cppt',
+        //     'ermMenuName' => 'CPPT'
+        // ],
+        // [
+        //     'ermMenuId' => 'resumeMds',
+        //     'ermMenuName' => 'Resume Medis'
+        // ],
+        // [
+        //     'ermMenuId' => 'penerbitanSrt',
+        //     'ermMenuName' => 'Penerbitan Surat'
+        // ],
 
     ];
 
