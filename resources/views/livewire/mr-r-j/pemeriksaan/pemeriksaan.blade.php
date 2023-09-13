@@ -24,7 +24,7 @@
             <div id="TransaksiRawatJalan" class="px-2">
                 <div id="TransaksiRawatJalan" x-data="{ activeTab: 'Umum' }">
 
-                    <div class="px-2 mb-2 border-b border-gray-200 dark:border-gray-700">
+                    <div class="px-2 border-b border-gray-200 dark:border-gray-700">
                         <ul
                             class="flex flex-wrap -mb-px text-xs font-medium text-center text-gray-500 dark:text-gray-400">
                             <li class="mr-2">
@@ -35,6 +35,22 @@
                                     @click="activeTab ='{{ $dataDaftarPoliRJ['pemeriksaan']['umumTab'] }}'">{{ $dataDaftarPoliRJ['pemeriksaan']['umumTab'] }}</label>
                             </li>
 
+                            <li class="mr-2">
+                                <label
+                                    class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
+                                    :class="activeTab === '{{ 'Fisik' }}' ?
+                                        'text-primary border-primary bg-gray-100' : ''"
+                                    @click="activeTab ='{{ 'Fisik' }}'">{{ 'Fisik' }}</label>
+                            </li>
+
+                            <li class="mr-2">
+                                <label
+                                    class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
+                                    :class="activeTab === '{{ 'Anatomi' }}' ?
+                                        'text-primary border-primary bg-gray-100' : ''"
+                                    @click="activeTab ='{{ 'Anatomi' }}'">{{ 'Anatomi' }}</label>
+                            </li>
+
 
 
 
@@ -42,12 +58,30 @@
                         </ul>
                     </div>
 
-                    <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800"
+                    <div class="p-2 rounded-lg bg-gray-50 dark:bg-gray-800"
                         :class="{
                             'active': activeTab === '{{ $dataDaftarPoliRJ['pemeriksaan']['umumTab'] }}'
                         }"
                         x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarPoliRJ['pemeriksaan']['umumTab'] }}'">
                         @include('livewire.mr-r-j.pemeriksaan.umumTab')
+
+                    </div>
+
+                    <div class="p-2 rounded-lg bg-gray-50 dark:bg-gray-800"
+                        :class="{
+                            'active': activeTab === '{{ 'Fisik' }}'
+                        }"
+                        x-show.transition.in.opacity.duration.600="activeTab === '{{ 'Fisik' }}'">
+                        @include('livewire.mr-r-j.pemeriksaan.fisikTab')
+
+                    </div>
+
+                    <div class="p-2 rounded-lg bg-gray-50 dark:bg-gray-800"
+                        :class="{
+                            'active': activeTab === '{{ 'Anatomi' }}'
+                        }"
+                        x-show.transition.in.opacity.duration.600="activeTab === '{{ 'Anatomi' }}'">
+                        @include('livewire.mr-r-j.pemeriksaan.anatomiTab')
 
                     </div>
 

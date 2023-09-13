@@ -517,7 +517,7 @@ class Pemeriksaan extends Component
                 'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
             ]);
 
-        $this->emit('toastr-success', "Anamnesia berhasil disimpan.");
+        $this->emit('toastr-success', "Pemeriksaan berhasil disimpan.");
     }
     // insert and update record end////////////////
 
