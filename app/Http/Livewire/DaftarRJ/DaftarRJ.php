@@ -870,6 +870,8 @@ class DaftarRJ extends Component
         // Logic insert and update mode start //////////
         if ($this->isOpenMode == 'insert') {
 
+            // cari data berdasarkan regno pada tgl tsb dgn status selain 'F'
+            // fungsi dasar untuk memperbaiki data EMR
             $cekDoblePendaftaran = DB::table('rsview_rjkasir')
                 ->where('rj_status', '!=', 'F')
                 ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $this->dateRjRef)
