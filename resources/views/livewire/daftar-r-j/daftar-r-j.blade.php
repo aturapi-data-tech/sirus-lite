@@ -505,6 +505,17 @@
             });
 
 
+            // confirmation message doble record
+            window.livewire.on('confirm_doble_record', (key, name) => {
+
+                let cfn = confirm('Pasien Sudah terdaftar, Apakah anda ingin tetap menyimpan data ini ' + name + '?');
+
+                if (cfn) {
+                    window.livewire.emit('confirm_doble_record_RJp', key, name);
+                }
+            });
+
+
 
 
 

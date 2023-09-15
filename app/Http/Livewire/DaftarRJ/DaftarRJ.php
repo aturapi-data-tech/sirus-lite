@@ -523,6 +523,7 @@ class DaftarRJ extends Component
     //  modal status////////////////
     public $isOpen = 0;
     public $isOpenMode = 'insert';
+    public $forceInsertRecord = 0;
 
     // call Form
     public $callMasterPasien = 0;
@@ -546,6 +547,7 @@ class DaftarRJ extends Component
     protected $listeners = [
         'confirm_remove_record_RJp' => 'delete',
         'rePush_Data_Antrian' => 'store',
+        'confirm_doble_record_RJp' => 'setforceInsertRecord'
         // 'rePush_Data_TaskId' => '', //blm di pakai ->model fitur blm diemukan (repush data to URL)
     ];
 
@@ -846,38 +848,63 @@ class DaftarRJ extends Component
     }
 
 
+    public function setforceInsertRecord()
+    {
+        $this->forceInsertRecord = '1';
+
+        if ($this->forceInsertRecord) {
+            $this->insertDataRJ();
+            $this->isOpenMode = 'update';
+        }
+    }
+
     // insert and update record start////////////////
     public function store()
     {
         // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
         $this->setDataPrimer();
-
         // Validate RJ
         $this->validateDataRJ();
-
-        // Logic push data ke BPJS
-
-
-        // Push data antrian dan Task ID 3
-        $this->pushDataAntrian();
-
 
 
         // Logic insert and update mode start //////////
         if ($this->isOpenMode == 'insert') {
-            $this->insertDataRJ();
-            $this->isOpenMode = 'update';
+
+            $cekDoblePendaftaran = DB::table('rsview_rjkasir')
+                ->where('rj_status', '!=', 'F')
+                ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $this->dateRjRef)
+                ->where("reg_no", '=', $this->dataDaftarPoliRJ['regNo'])
+                ->count();
+
+
+            //cek Doble Pendaftaran
+            if ($cekDoblePendaftaran > 0) {
+                $this->emit('confirm_doble_record', $this->dataDaftarPoliRJ['regNo'], $this->dataDaftarPoliRJ['regNo']);
+            } else {
+                $this->forceInsertRecord = '1';
+            }
+
+
+            // forceInsert record by default is flase true when cekDoblePendaftaran=0 or confirmation from user
+            if ($this->forceInsertRecord) {
+                $this->insertDataRJ();
+                $this->isOpenMode = 'update';
+            }
         } else if ($this->isOpenMode == 'update') {
             $this->updateDataRJ($this->dataDaftarPoliRJ['rjNo']);
         }
 
 
+        // Logic push data ke BPJS
+        // Push data antrian dan Task ID 3
+        $this->pushDataAntrian();
 
 
         // Opstional (Jika ingin fast Entry resert setelah proses diatas)
         // Jika ingin auto close resert dan close aktifkan
         // $this->resetInputFields();
         // $this->closeModal();
+
     }
 
     private function insertDataRJ(): void
