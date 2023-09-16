@@ -865,6 +865,9 @@ class DaftarRJ extends Component
         $this->setDataPrimer();
         // Validate RJ
         $this->validateDataRJ();
+        // Logic push data ke BPJS
+        // Push data antrian dan Task ID 3
+        $this->pushDataAntrian();
 
 
         // Logic insert and update mode start //////////
@@ -897,9 +900,6 @@ class DaftarRJ extends Component
         }
 
 
-        // Logic push data ke BPJS
-        // Push data antrian dan Task ID 3
-        $this->pushDataAntrian();
 
 
         // Opstional (Jika ingin fast Entry resert setelah proses diatas)
@@ -1789,7 +1789,7 @@ class DaftarRJ extends Component
                 $this->HttpGetBpjsJson = json_encode($HttpGetBpjs, true); //Return Response Tambah Antrean
 
                 // Ulangi Proses pushDataAntrian;
-                $this->emit('rePush_Data_Antrian_Confirmation');
+                // $this->emit('rePush_Data_Antrian_Confirmation');
             }
         }
 
