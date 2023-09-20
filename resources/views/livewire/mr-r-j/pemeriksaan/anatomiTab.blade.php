@@ -54,8 +54,13 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-4 gap-2 my-2">
+            <div class="grid grid-cols-6 gap-2 my-2">
                 <div class="mb-2 ">
+                    <x-text-input id="" placeholder="" class="mt-1 ml-2" :errorshas="__($errors->has(''))" :disabled=true
+                        wire:model.debounce.500ms="" />
+                </div>
+
+                {{-- <div class="mb-2 ">
                     <x-text-input id="" placeholder="" class="mt-1 ml-2" :errorshas="__($errors->has(''))" :disabled=true
                         wire:model.debounce.500ms="" />
                 </div>
@@ -68,12 +73,7 @@
                 <div class="mb-2 ">
                     <x-text-input id="" placeholder="" class="mt-1 ml-2" :errorshas="__($errors->has(''))" :disabled=true
                         wire:model.debounce.500ms="" />
-                </div>
-
-                <div class="mb-2 ">
-                    <x-text-input id="" placeholder="" class="mt-1 ml-2" :errorshas="__($errors->has(''))" :disabled=true
-                        wire:model.debounce.500ms="" />
-                </div>
+                </div> --}}
             </div>
 
         </div>
