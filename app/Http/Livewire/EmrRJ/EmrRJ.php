@@ -291,6 +291,10 @@ class EmrRJ extends Component
 
     public $EmrMenu = [
         [
+            'ermMenuId' => 'keperawatan',
+            'ermMenuName' => 'Keperawatan'
+        ],
+        [
             'ermMenuId' => 'anamnesia',
             'ermMenuName' => 'Anamnesia'
         ],
@@ -298,10 +302,10 @@ class EmrRJ extends Component
             'ermMenuId' => 'pemeriksaan',
             'ermMenuName' => 'Pemeriksaan'
         ],
-        // [
-        //     'ermMenuId' => 'penilaian',
-        //     'ermMenuName' => 'Penilaian'
-        // ],
+        [
+            'ermMenuId' => 'penilaian',
+            'ermMenuName' => 'Penilaian'
+        ],
         // [
         //     'ermMenuId' => 'diagnosis',
         //     'ermMenuName' => 'Diagnosis (ICD)'

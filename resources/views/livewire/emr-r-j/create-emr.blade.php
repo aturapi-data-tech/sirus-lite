@@ -170,6 +170,13 @@
                             </div>
                         @endif
 
+                        @if ($activeTab == 'penilaian')
+                            <div class="p-0 rounded-lg bg-gray-50 dark:bg-gray-800">
+                                <livewire:mr-r-j.penilaian.penilaian :rjNoRef="$dataDaftarPoliRJ['rjNo']"
+                                    :wire:key="'user-profile-two-penilaian'">
+                            </div>
+                        @endif
+
                     </div>
 
                 </div>
