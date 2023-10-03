@@ -2494,9 +2494,6 @@ class DaftarRJ extends Component
     public function mount()
     {
 
-        $this->dataDaftarPoliRJ['rjNo'] = 436600;
-        $this->findData(436600);
-
         // set date
         $this->dateRjRef = Carbon::now()->format('d/m/Y');
         // set shift

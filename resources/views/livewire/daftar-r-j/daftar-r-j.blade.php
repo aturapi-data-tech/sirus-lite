@@ -50,10 +50,6 @@
                                 Daftar {{ $myProgram }}
                             </x-primary-button>
 
-                            <x-yellow-button wire:click.prevent="cetakSEP()" type="button" wire:loading.remove>
-                                Cetak SEP
-                            </x-yellow-button>
-
 
                             <x-dropdown align="right" :width="__('20')">
                                 <x-slot name="trigger">
