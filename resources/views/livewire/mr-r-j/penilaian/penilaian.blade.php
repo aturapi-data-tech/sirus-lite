@@ -22,7 +22,7 @@
         <div class="grid grid-cols-1">
 
             <div id="TransaksiRawatJalan" class="px-2">
-                <div id="TransaksiRawatJalan" x-data="{ activeTab: 'Keluhan Utama' }">
+                <div id="TransaksiRawatJalan" x-data="{ activeTab: 'Fisik' }">
 
                     <div class="px-2 mb-2 border-b border-gray-200 dark:border-gray-700">
                         <ul
@@ -30,83 +30,69 @@
                             <li class="mr-2">
                                 <label
                                     class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
-                                    :class="activeTab === '{{ $dataDaftarPoliRJ['anamnesia']['keluhanUtamaTab'] }}' ?
+                                    :class="activeTab === '{{ $dataDaftarPoliRJ['penilaian']['fisikTab'] }}' ?
                                         'text-primary border-primary bg-gray-100' : ''"
-                                    @click="activeTab ='{{ $dataDaftarPoliRJ['anamnesia']['keluhanUtamaTab'] }}'">{{ $dataDaftarPoliRJ['anamnesia']['keluhanUtamaTab'] }}</label>
+                                    @click="activeTab ='{{ $dataDaftarPoliRJ['penilaian']['fisikTab'] }}'">{{ $dataDaftarPoliRJ['penilaian']['fisikTab'] }}</label>
                             </li>
 
                             <li class="mr-2">
                                 <label
                                     class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
-                                    :class="activeTab === '{{ $dataDaftarPoliRJ['anamnesia']['anamnesiaDiperolehTab'] }}' ?
+                                    :class="activeTab === '{{ $dataDaftarPoliRJ['penilaian']['nyeriTab'] }}' ?
                                         'text-primary border-primary bg-gray-100' : ''"
-                                    @click="activeTab ='{{ $dataDaftarPoliRJ['anamnesia']['anamnesiaDiperolehTab'] }}'">{{ $dataDaftarPoliRJ['anamnesia']['anamnesiaDiperolehTab'] }}</label>
+                                    @click="activeTab ='{{ $dataDaftarPoliRJ['penilaian']['nyeriTab'] }}'">{{ $dataDaftarPoliRJ['penilaian']['nyeriTab'] }}</label>
+                            </li>
+
+                            <li class="mr-2">
+                                <label
+                                    class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
+                                    :class="activeTab === '{{ $dataDaftarPoliRJ['penilaian']['statusPediatrikTab'] }}' ?
+                                        'text-primary border-primary bg-gray-100' : ''"
+                                    @click="activeTab ='{{ $dataDaftarPoliRJ['penilaian']['statusPediatrikTab'] }}'">{{ $dataDaftarPoliRJ['penilaian']['statusPediatrikTab'] }}</label>
+                            </li>
+
+                            <li class="mr-2">
+                                <label
+                                    class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
+                                    :class="activeTab === '{{ $dataDaftarPoliRJ['penilaian']['diagnosisTab'] }}' ?
+                                        'text-primary border-primary bg-gray-100' : ''"
+                                    @click="activeTab ='{{ $dataDaftarPoliRJ['penilaian']['diagnosisTab'] }}'">{{ $dataDaftarPoliRJ['penilaian']['diagnosisTab'] }}</label>
                             </li>
 
                             <li class="mr-2">
                                 <label
                                     class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
                                     :class="activeTab ===
-                                        '{{ $dataDaftarPoliRJ['anamnesia']['riwayatPenyakitSekarangUmumTab'] }}' ?
+                                        '{{ $dataDaftarPoliRJ['penilaian']['resikoJatuhTab'] . $dataDaftarPoliRJ['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseTab'] }}' ?
                                         'text-primary border-primary bg-gray-100' : ''"
-                                    @click="activeTab ='{{ $dataDaftarPoliRJ['anamnesia']['riwayatPenyakitSekarangUmumTab'] }}'">{{ $dataDaftarPoliRJ['anamnesia']['riwayatPenyakitSekarangUmumTab'] }}</label>
+                                    @click="activeTab ='{{ $dataDaftarPoliRJ['penilaian']['resikoJatuhTab'] . $dataDaftarPoliRJ['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseTab'] }}'">{{ $dataDaftarPoliRJ['penilaian']['resikoJatuhTab'] . ' / ' . $dataDaftarPoliRJ['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseTab'] }}</label>
                             </li>
 
                             <li class="mr-2">
                                 <label
                                     class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
-                                    :class="activeTab === '{{ $dataDaftarPoliRJ['anamnesia']['riwayatPenyakitDahuluTab'] }}' ?
+                                    :class="activeTab ===
+                                        '{{ $dataDaftarPoliRJ['penilaian']['resikoJatuhTab'] . $dataDaftarPoliRJ['penilaian']['resikoJatuh']['skalaHumptyDumpty']['skalaHumptyDumptyTab'] }}' ?
                                         'text-primary border-primary bg-gray-100' : ''"
-                                    @click="activeTab ='{{ $dataDaftarPoliRJ['anamnesia']['riwayatPenyakitDahuluTab'] }}'">{{ $dataDaftarPoliRJ['anamnesia']['riwayatPenyakitDahuluTab'] }}</label>
+                                    @click="activeTab ='{{ $dataDaftarPoliRJ['penilaian']['resikoJatuhTab'] . $dataDaftarPoliRJ['penilaian']['resikoJatuh']['skalaHumptyDumpty']['skalaHumptyDumptyTab'] }}'">{{ $dataDaftarPoliRJ['penilaian']['resikoJatuhTab'] . ' / ' . $dataDaftarPoliRJ['penilaian']['resikoJatuh']['skalaHumptyDumpty']['skalaHumptyDumptyTab'] }}</label>
                             </li>
 
                             <li class="mr-2">
                                 <label
                                     class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
-                                    :class="activeTab === '{{ $dataDaftarPoliRJ['anamnesia']['penyakitKeluargaTab'] }}' ?
+                                    :class="activeTab ===
+                                        '{{ $dataDaftarPoliRJ['penilaian']['resikoJatuhTab'] . $dataDaftarPoliRJ['penilaian']['resikoJatuh']['edmonson']['edmonsonTab'] }}' ?
                                         'text-primary border-primary bg-gray-100' : ''"
-                                    @click="activeTab ='{{ $dataDaftarPoliRJ['anamnesia']['penyakitKeluargaTab'] }}'">{{ $dataDaftarPoliRJ['anamnesia']['penyakitKeluargaTab'] }}</label>
+                                    @click="activeTab ='{{ $dataDaftarPoliRJ['penilaian']['resikoJatuhTab'] . $dataDaftarPoliRJ['penilaian']['resikoJatuh']['edmonson']['edmonsonTab'] }}'">{{ $dataDaftarPoliRJ['penilaian']['resikoJatuhTab'] . ' / ' . $dataDaftarPoliRJ['penilaian']['resikoJatuh']['edmonson']['edmonsonTab'] }}</label>
                             </li>
 
                             <li class="mr-2">
                                 <label
                                     class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
-                                    :class="activeTab === '{{ $dataDaftarPoliRJ['anamnesia']['statusFungsionalTab'] }}' ?
+                                    :class="activeTab ===
+                                        '{{ $dataDaftarPoliRJ['penilaian']['dekubitus']['dekubitusTab'] }}' ?
                                         'text-primary border-primary bg-gray-100' : ''"
-                                    @click="activeTab ='{{ $dataDaftarPoliRJ['anamnesia']['statusFungsionalTab'] }}'">{{ $dataDaftarPoliRJ['anamnesia']['statusFungsionalTab'] }}</label>
-                            </li>
-
-                            <li class="mr-2">
-                                <label
-                                    class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
-                                    :class="activeTab === '{{ $dataDaftarPoliRJ['anamnesia']['statusPsikologisTab'] }}' ?
-                                        'text-primary border-primary bg-gray-100' : ''"
-                                    @click="activeTab ='{{ $dataDaftarPoliRJ['anamnesia']['statusPsikologisTab'] }}'">{{ $dataDaftarPoliRJ['anamnesia']['statusPsikologisTab'] }}</label>
-                            </li>
-
-
-                            <li class="mr-2">
-                                <label
-                                    class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
-                                    :class="activeTab === '{{ $dataDaftarPoliRJ['anamnesia']['edukasiTab'] }}' ?
-                                        'text-primary border-primary bg-gray-100' : ''"
-                                    @click="activeTab ='{{ $dataDaftarPoliRJ['anamnesia']['edukasiTab'] }}'">{{ $dataDaftarPoliRJ['anamnesia']['edukasiTab'] }}</label>
-                            </li>
-
-                            <li class="mr-2">
-                                <label
-                                    class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
-                                    :class="activeTab === '{{ $dataDaftarPoliRJ['anamnesia']['screeningGiziTab'] }}' ?
-                                        'text-primary border-primary bg-gray-100' : ''"
-                                    @click="activeTab ='{{ $dataDaftarPoliRJ['anamnesia']['screeningGiziTab'] }}'">{{ $dataDaftarPoliRJ['anamnesia']['screeningGiziTab'] }}</label>
-                            </li>
-
-                            <li class="mr-2">
-                                <label
-                                    class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
-                                    :class="activeTab === '{{ $dataDaftarPoliRJ['anamnesia']['batukTab'] }}' ?
-                                        'text-primary border-primary bg-gray-100' : ''"
-                                    @click="activeTab ='{{ $dataDaftarPoliRJ['anamnesia']['batukTab'] }}'">{{ $dataDaftarPoliRJ['anamnesia']['batukTab'] }}</label>
+                                    @click="activeTab ='{{ $dataDaftarPoliRJ['penilaian']['dekubitus']['dekubitusTab'] }}'">{{ $dataDaftarPoliRJ['penilaian']['dekubitus']['dekubitusTab'] }}</label>
                             </li>
 
 
@@ -117,95 +103,80 @@
 
                     <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800"
                         :class="{
-                            'active': activeTab === '{{ $dataDaftarPoliRJ['anamnesia']['keluhanUtamaTab'] }}'
+                            'active': activeTab === '{{ $dataDaftarPoliRJ['penilaian']['fisikTab'] }}'
                         }"
-                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarPoliRJ['anamnesia']['keluhanUtamaTab'] }}'">
-                        @include('livewire.mr-r-j.anamnesia.keluhanUtamaTab')
+                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarPoliRJ['penilaian']['fisikTab'] }}'">
+                        @include('livewire.mr-r-j.penilaian.fisikTab')
 
                     </div>
 
                     <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800"
                         :class="{
-                            'active': activeTab === '{{ $dataDaftarPoliRJ['anamnesia']['anamnesiaDiperolehTab'] }}'
+                            'active': activeTab === '{{ $dataDaftarPoliRJ['penilaian']['nyeriTab'] }}'
                         }"
-                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarPoliRJ['anamnesia']['anamnesiaDiperolehTab'] }}'">
-                        @include('livewire.mr-r-j.anamnesia.anamnesiaDiperolehTab')
+                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarPoliRJ['penilaian']['nyeriTab'] }}'">
+                        @include('livewire.mr-r-j.penilaian.nyeriTab')
+
+                    </div>
+
+                    <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800"
+                        :class="{
+                            'active': activeTab === '{{ $dataDaftarPoliRJ['penilaian']['statusPediatrikTab'] }}'
+                        }"
+                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarPoliRJ['penilaian']['statusPediatrikTab'] }}'">
+                        @include('livewire.mr-r-j.penilaian.statusPediatrikTab')
+
+                    </div>
+
+                    <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800"
+                        :class="{
+                            'active': activeTab === '{{ $dataDaftarPoliRJ['penilaian']['diagnosisTab'] }}'
+                        }"
+                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarPoliRJ['penilaian']['diagnosisTab'] }}'">
+                        @include('livewire.mr-r-j.penilaian.diagnosisTab')
 
                     </div>
 
                     <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800"
                         :class="{
                             'active': activeTab ===
-                                '{{ $dataDaftarPoliRJ['anamnesia']['riwayatPenyakitSekarangUmumTab'] }}'
+                                '{{ $dataDaftarPoliRJ['penilaian']['resikoJatuhTab'] . $dataDaftarPoliRJ['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseTab'] }}'
                         }"
-                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarPoliRJ['anamnesia']['riwayatPenyakitSekarangUmumTab'] }}'">
-                        @include('livewire.mr-r-j.anamnesia.riwayatPenyakitSekarangUmumTab')
+                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarPoliRJ['penilaian']['resikoJatuhTab'] . $dataDaftarPoliRJ['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseTab'] }}'">
+                        @include('livewire.mr-r-j.penilaian.skalaMorseTab')
 
                     </div>
 
                     <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800"
                         :class="{
-                            'active': activeTab === '{{ $dataDaftarPoliRJ['anamnesia']['riwayatPenyakitDahuluTab'] }}'
+                            'active': activeTab ===
+                                '{{ $dataDaftarPoliRJ['penilaian']['resikoJatuhTab'] . $dataDaftarPoliRJ['penilaian']['resikoJatuh']['skalaHumptyDumpty']['skalaHumptyDumptyTab'] }}'
                         }"
-                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarPoliRJ['anamnesia']['riwayatPenyakitDahuluTab'] }}'">
-                        @include('livewire.mr-r-j.anamnesia.riwayatPenyakitDahuluTab')
-
-                    </div>
-
-
-                    <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800"
-                        :class="{
-                            'active': activeTab === '{{ $dataDaftarPoliRJ['anamnesia']['penyakitKeluargaTab'] }}'
-                        }"
-                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarPoliRJ['anamnesia']['penyakitKeluargaTab'] }}'">
-                        @include('livewire.mr-r-j.anamnesia.penyakitKeluargaTab')
+                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarPoliRJ['penilaian']['resikoJatuhTab'] . $dataDaftarPoliRJ['penilaian']['resikoJatuh']['skalaHumptyDumpty']['skalaHumptyDumptyTab'] }}'">
+                        @include('livewire.mr-r-j.penilaian.skalaHumptyDumptyTab')
 
                     </div>
 
                     <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800"
                         :class="{
-                            'active': activeTab === '{{ $dataDaftarPoliRJ['anamnesia']['statusFungsionalTab'] }}'
+                            'active': activeTab ===
+                                '{{ $dataDaftarPoliRJ['penilaian']['resikoJatuhTab'] . $dataDaftarPoliRJ['penilaian']['resikoJatuh']['edmonson']['edmonsonTab'] }}'
                         }"
-                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarPoliRJ['anamnesia']['statusFungsionalTab'] }}'">
-                        @include('livewire.mr-r-j.anamnesia.statusFungsionalTab')
+                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarPoliRJ['penilaian']['resikoJatuhTab'] . $dataDaftarPoliRJ['penilaian']['resikoJatuh']['edmonson']['edmonsonTab'] }}'">
+                        @include('livewire.mr-r-j.penilaian.edmonsonTab')
 
                     </div>
 
                     <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800"
                         :class="{
-                            'active': activeTab === '{{ $dataDaftarPoliRJ['anamnesia']['statusPsikologisTab'] }}'
+                            'active': activeTab ===
+                                '{{ $dataDaftarPoliRJ['penilaian']['dekubitus']['dekubitusTab'] }}'
                         }"
-                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarPoliRJ['anamnesia']['statusPsikologisTab'] }}'">
-                        @include('livewire.mr-r-j.anamnesia.statusPsikologisTab')
+                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarPoliRJ['penilaian']['dekubitus']['dekubitusTab'] }}'">
+                        @include('livewire.mr-r-j.penilaian.dekubitusTab')
 
                     </div>
 
-                    <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800"
-                        :class="{
-                            'active': activeTab === '{{ $dataDaftarPoliRJ['anamnesia']['edukasiTab'] }}'
-                        }"
-                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarPoliRJ['anamnesia']['edukasiTab'] }}'">
-                        @include('livewire.mr-r-j.anamnesia.edukasiTab')
-
-                    </div>
-
-                    <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800"
-                        :class="{
-                            'active': activeTab === '{{ $dataDaftarPoliRJ['anamnesia']['screeningGiziTab'] }}'
-                        }"
-                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarPoliRJ['anamnesia']['screeningGiziTab'] }}'">
-                        @include('livewire.mr-r-j.anamnesia.screeningGiziTab')
-
-                    </div>
-
-                    <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800"
-                        :class="{
-                            'active': activeTab === '{{ $dataDaftarPoliRJ['anamnesia']['batukTab'] }}'
-                        }"
-                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarPoliRJ['anamnesia']['batukTab'] }}'">
-                        @include('livewire.mr-r-j.anamnesia.batukTab')
-
-                    </div>
 
 
                 </div>
@@ -279,11 +250,11 @@
 
 
             {{-- Disabling enter key for form --}}
-            <script type="text/javascript">
+            {{-- <script type="text/javascript">
                 $(document).on("keydown", "form", function(event) {
                     return event.key != "Enter";
                 });
-            </script>
+            </script> --}}
 
 
 

@@ -32,243 +32,265 @@ class Penilaian extends Component
     // dataDaftarPoliRJ RJ
     public $dataDaftarPoliRJ = [];
 
-    // data SKDP / anamnesia=>[] 
-    public $anamnesia =
+    // data SKDP / penilaian=>[] 
+    public $penilaian =
     [
-        "keluhanUtamaTab" => "Keluhan Utama",
-        "keluhanUtama" => [
-            "keluhanUtama" => ""
+        "fisikTab" => "Fisik",
+        "fisik" => [
+            "fisik" => ""
         ],
 
-        "anamnesiaDiperolehTab" => "Anamnesia Diperoleh",
-        "anamnesiaDiperoleh" => [
-            "autoanamnesia" => [],
-            "allonanamnesia" => [],
-            "anamnesiaDiperolehDari" => ""
-        ],
-
-        "riwayatPenyakitSekarangUmumTab" => "Riwayat Penyakit Sekarang (Umum)",
-        "riwayatPenyakitSekarangUmum" => [
-            "riwayatPenyakitSekarangUmum" => ""
-        ],
-
-        "riwayatPenyakitDahuluTab" => "Riwayat",
-        "riwayatPenyakitDahulu" => [
-            "riwayatPenyakitDahulu" => ""
-        ],
-
-        "alergiTab" => "Alergi",
-        "alergi" => [
-            "alergi" => ""
-        ],
-
-        "lainLainTab" => "lain-Lain",
-        "lainLain" => [
-            "merokok" => [],
-            "terpaparRokok" => []
-
-        ],
-
-        "faktorResikoTab" => "Faktor Resiko",
-        "faktorResiko" => [
-            "hipertensi" => [],
-            "diabetesMelitus" => [],
-            "penyakitJantung" => [],
-            "asma" => [],
-            "stroke" => [],
-            "liver" => [],
-            "tuberculosisParu" => [],
-            "rokok" => [],
-            "minumAlkohol" => [],
-            "ginjal" => [],
-            "lainLain" => ""
-        ],
-
-        "penyakitKeluargaTab" => "Riwayat Penyakit Keluarga",
-        "penyakitKeluarga" => [
-            "hipertensi" => [],
-            "diabetesMelitus" => [],
-            "penyakitJantung" => [],
-            "asma" => [],
-            "lainLain" => ""
-        ],
-
-        "statusFungsionalTab" => "Status Fungsional",
-        "statusFungsional" => [
-            "tongkat" => [],
-            "kursiRoda" => [],
-            "brankard" => [],
-            "walker" => [],
-            "lainLain" => ""
-        ],
-
-        "cacatTubuhTab" => "Cacat Tubuh",
-        "cacatTubuh" => [
-            "cacatTubuh" => [],
-            "sebutCacatTubuh" => ""
-        ],
-
-        "statusPsikologisTab" => "Status Psikologis",
-        "statusPsikologis" => [
-            "tidakAdaKelainan" => [],
-            "marah" => [],
-            "ccemas" => [],
-            "takut" => [],
-            "sedih" => [],
-            "cenderungBunuhDiri" => [],
-            "sebutstatusPsikologis" => ""
-        ],
-
-        "statusMentalTab" => "Status Mental",
-        "statusMental" => [
-            "statusMental" => "Sadar dan Orientasi Baik",
-            "statusMentalOption" => [
-                ["statusMental" => "Sadar dan Orientasi Baik"],
-                ["statusMental" => "Ada Masalah Perilaku"],
-                ["statusMental" => "Perilaku Kekerasan yang dialami sebelumnya"],
+        "nyeriTab" => "Nyeri",
+        "nyeri" => [
+            "nyeri" => "Tidak",
+            "nyeriOptions" => [
+                ["nyeri" => "Ya"],
+                ["nyeri" => "Tidak"],
             ],
-            "keteranganStatusMental" => "",
-        ],
-
-        "hubunganDgnKeluargaTab" => "Sosial",
-        "hubunganDgnKeluarga" => [
-            "hubunganDgnKeluarga" => "Baik",
-            "hubunganDgnKeluargaOption" => [
-                ["hubunganDgnKeluarga" => "Baik"],
-                ["hubunganDgnKeluarga" => "Tidak Baik"],
+            "nyeriKet" => "",
+            "nyeriKetOptions" => [
+                ["nyeriKet" => "Akut"],
+                ["nyeriKet" => "Kronis"],
             ],
-        ],
-
-        "tempatTinggalTab" => "Tempat Tinggal",
-        "tempatTinggal" => [
-            "tempatTinggal" => "Rumah",
-            "tempatTinggalOption" => [
-                ["tempatTinggal" => "Rumah"],
-                ["tempatTinggal" => "Panti"],
-                ["tempatTinggal" => "Lain-lain"],
+            "skalaNyeri" => "",
+            "nyeriMetode" => "",
+            "nyeriMetodeOptions" => [
+                ["nyeriMetode" => "NRS"],
+                ["nyeriMetode" => "BPS"],
+                ["nyeriMetode" => "NIPS"],
+                ["nyeriMetode" => "FLACC"],
+                ["nyeriMetode" => "VAS"],
             ],
-            "keteranganTempatTinggal" => ""
-
+            "pencetus" => "",
+            "gambar" => "",
+            "durasi" => "",
+            "lokasi" => "",
         ],
 
-        "spiritualTab" => "Spiritual",
-        "spiritual" => [
-            "spiritual" => "Islam",
-            "ibadahTeratur" => "Tidak",
-            "ibadahTeraturOptions" => [
-                ["ibadahTeratur" => "Ya"],
-                ["ibadahTeratur" => "Tidak"],
+        "statusPediatrikTab" => "Status Pediatrik",
+        "statusPediatrik" => [
+            "statusPediatrik" => "",
+            "statusPediatrikOptions" => [
+                ["statusPediatrik" => "Gizi Kurang"],
+                ["statusPediatrik" => "Gizi Cukup"],
+                ["statusPediatrik" => "Gizi Lebih"],
+            ]
+        ],
+
+        "diagnosisTab" => "Diagnosis",
+        "diagnosis" => [
+            "diagnosis" => "",
+        ],
+
+        "resikoJatuhTab" => "Resiko Jatuh",
+        "resikoJatuh" => [
+            "skalaMorse" => [
+                "skalaMorseTab" => "Skala Morse Score",
+                "skalaMorseScore" => "",
+
+                "riwayatJatuh3blnTerakhir" => "",
+                "riwayatJatuh3blnTerakhirOptions" => [
+                    ["riwayatJatuh3blnTerakhir" => "Ya"],
+                    ["riwayatJatuh3blnTerakhir" => "Tidak"],
+                ],
+                "diagSekunder" => "",
+                "diagSekunderOptions" => [
+                    ["diagSekunder" => "Ya"],
+                    ["diagSekunder" => "Tidak"],
+                ],
+                "alatBantu" => "",
+                "alatBantuOptions" => [
+                    ["alatBantu" => "Tidak Ada / Bed Rest"],
+                    ["alatBantu" => "Tongkat / Alat Penopang / Walker"],
+                    ["alatBantu" => "Furnitur"],
+
+                ],
+                "heparin" => "",
+                "heparinOptions" => [
+                    ["heparin" => "Ya"],
+                    ["heparin" => "Tidak"],
+                ],
+                "gayaBerjalan" => "",
+                "gayaBerjalanOptions" => [
+                    ["gayaBerjalan" => "Lemah"],
+                    ["gayaBerjalan" => "Terganggu"],
+                ],
+                "kesadaran" => "",
+                "kesadaranOptions" => [
+                    ["kesadaran" => "Baik"],
+                    ["kesadaran" => "Lupa / Pelupa"],
+                ],
             ],
 
-            "nilaiKepercayaan" => "Tidak",
-            "nilaiKepercayaanOptions" => [
-                ["nilaiKepercayaan" => "Ya"],
-                ["nilaiKepercayaan" => "Tidak"],
+            "skalaHumptyDumpty" => [
+                "skalaHumptyDumptyTab" => "Skala Humpty Dumpty Score",
+                "skalaHumptyDumptyScore" => "",
+                "skalaHumptyDumptyket" => ">= 13 Tahun",
+                "skalaHumptyDumptysex" => "Perempuan",
+
+                "diagnosa" => "",
+                "diagnosaOptions" => [
+                    ["diagnosa" => "Kelainan Neurologi"],
+                    ["diagnosa" => "Perubahan dalam Oksigenasi (Masalah Saluran Nafas, Dehidrasi, Anemia, Anoreksi, Slokop/sakit kepala, dll)"],
+                    ["diagnosa" => "Kelamin Priksi/Perilaku"],
+                    ["diagnosa" => "Diagnosa Lain"],
+                ],
+                "gangguanKognitif" => "",
+                "gangguanKognitifOptions" => [
+                    ["gangguanKognitif" => "Tidak Sadar terhadap Keterbatasan"],
+                    ["gangguanKognitif" => "Lupa keterbatasan"],
+                    ["gangguanKognitif" => "Mengetahui Kemampuan Diri"],
+                ],
+                "faktorLingkungan" => "",
+                "faktorLingkunganOptions" => [
+                    ["faktorLingkungan" => "Riwayat jatuh dari tempat tidur saat bayi anak"],
+                    ["faktorLingkungan" => "Pasien menggunakan alat bantu box atau mobel"],
+                    ["faktorLingkungan" => "Pasien berada ditempat tidur"],
+                    ["faktorLingkungan" => "Diluar ruang rawat"],
+                ],
+                "penggunaanObat" => "",
+                "penggunaanObatOptions" => [
+                    ["penggunaanObat" => "Bermacam-macam obat yang digunakan: obat sedarif (kecuali pasien ICU yang menggunakan sedasi dan paralisis), Hipnotik, Barbiturat, Fenotiazin, Antidepresan, Laksans/Diuretika,Narketik"],
+                    ["penggunaanObat" => "Salah satu pengobatan diatas"],
+                    ["penggunaanObat" => "Pengobatan lain"],
+                ],
+                "responTerhadapOperasi" => "",
+                "responTerhadapOperasiOptions" => [
+                    ["responTerhadapOperasi" => "Dalam 24 Jam"],
+                    ["responTerhadapOperasi" => "Dalam 48 jam riwayat jatuh"],
+                    ["responTerhadapOperasi" => "> 48 jam"],
+                ],
             ],
 
-            "keteranganSpiritual" => ""
+            "edmonson" => [
+                "edmonsonTab" => "Edmonson Psychiatric Fall Risk Assesment",
+                "edmonsonScore" => "",
+                "edmonsonUsia" => "< 50 Tahun",
+
+                "statusMental" => "",
+                "statusMentalOptions" => [
+                    ["statusMental" => "Sadar penuh dan orientasi waktu baik"],
+                    ["statusMental" => "Agitasi / Cemas"],
+                    ["statusMental" => "Sering bingung"],
+                    ["statusMental" => "Bingung dan disorientasi"],
+                ],
+
+                "eliminasi" => "",
+                "eliminasiOptions" => [
+                    ["eliminasi" => "Mandiri untuk BAB dan BAK"],
+                    ["eliminasi" => "Memakai Kateter / Ostomy"],
+                    ["eliminasi" => "BAB dan BAK dengan bantuan"],
+                    ["eliminasi" => "Gangguan eliminasi (inkontinensia, banyak BAK di malam hari, sering BAB dan BAK)"],
+                    ["eliminasi" => "Inkontinensia tetapi bisa ambulasi mandiri"],
+                ],
+
+                "medikasi" => "",
+                "medikasiOptions" => [
+                    ["medikasi" => "Tidak ada pengobatan yang diberikan"],
+                    ["medikasi" => "Obat-obatan jantung"],
+                    ["medikasi" => "Obat psikiatri termasuk benzodiazepin dan anti depresan"],
+                    ["medikasi" => "Meningkatnya dosis obat yang dikonsumsi / ditambahkan dalam 24 jam terakhir"],
+                ],
+
+                "diagnosis" => "",
+                "diagnosisOptions" => [
+                    ["diagnosis" => "Bipolar / gangguan scizo affective"],
+                    ["diagnosis" => "Penyalahgunaan zat terlarang dan alkohol"],
+                    ["diagnosis" => "Gangguan depresi mayor"],
+                    ["diagnosis" => "Dimensia / Delirium"],
+                ],
+
+                "ambulasi" => "",
+                "ambulasiOptions" => [
+                    ["ambulasi" => "Ambulasi mandiri dan langkah stabil atau pasien imobil"],
+                    ["ambulasi" => "Penggunaan alat bantu yang tepat (tongkat, walker, tripod, dll)"],
+                    ["ambulasi" => "Vertigo / Hipotensi Ortostatik / Kelemahan"],
+                    ["ambulasi" => "Langkah tidak stabil, butuh bantuan dan menyadari kemampuannya"],
+                ],
+
+                "nutrisi" => "",
+                "nutrisiOptions" => [
+                    ["nutrisi" => "Hanya sedikit mendapatkan asupan makanan / minum dalam 24 jam terakhir"],
+                    ["nutrisi" => "Nafsu makan baik"],
+                ],
+
+                "ganguanTidur" => "",
+                "ganguanTidurOptions" => [
+                    ["ganguanTidur" => "Tidak ada gangguan tidur"],
+                    ["ganguanTidur" => "Ada gangguan tidur yang dilaporkan keluarga pasien / staf"],
+                ],
+
+                "riwayatJatuh" => "",
+                "riwayatJatuhOptions" => [
+                    ["riwayatJatuh" => "Tidak ada riwayat jatuh"],
+                    ["riwayatJatuh" => "Ada riwayat jatuh dalam 3 bulan terakhir"],
+                ],
+
+
+                "faktorLingkungan" => "",
+                "faktorLingkunganOptions" => [
+                    ["faktorLingkungan" => "Riwayat jatuh dari tempat tidur saat bayi anak"],
+                    ["faktorLingkungan" => "Pasien menggunakan alat bantu box atau mobel"],
+                    ["faktorLingkungan" => "Pasien berada ditempat tidur"],
+                    ["faktorLingkungan" => "Diluar ruang rawat"],
+                ],
+                "penggunaanObat" => "",
+                "penggunaanObatOptions" => [
+                    ["penggunaanObat" => "Bermacam-macam obat yang digunakan: obat sedarif (kecuali pasien ICU yang menggunakan sedasi dan paralisis), Hipnotik, Barbiturat, Fenotiazin, Antidepresan, Laksans/Diuretika,Narketik"],
+                    ["penggunaanObat" => "Salah satu pengobatan diatas"],
+                    ["penggunaanObat" => "Pengobatan lain"],
+                ],
+                "responTerhadapOperasi" => "",
+                "responTerhadapOperasiOptions" => [
+                    ["responTerhadapOperasi" => "Dalam 24 Jam"],
+                    ["responTerhadapOperasi" => "Dalam 48 jam riwayat jatuh"],
+                    ["responTerhadapOperasi" => "> 48 jam"],
+                ],
+            ],
 
         ],
 
-        "ekonomiTab" => "Ekonomi",
-        "ekonomi" => [
-            "pengambilKeputusan" => "Ayah",
-            "pekerjaan" => "Swasta",
-            "penghasilanBln" => "",
-            "penghasilanBlnOptions" => [
-                ["penghasilanBln" => "< 5Jt"],
-                ["penghasilanBln" => "5Jt - 10Jt"],
-                ["penghasilanBln" => ">10Jt"],
-
-            ],
-            "keteranganEkonomi" => ""
-
-        ],
-
-        "edukasiTab" => "Edukasi",
-        "edukasi" => [
-            "pasienKeluargaMenerimaInformasi" => "",
-            "pasienKeluargaMenerimaInformasiOptions" => [
-                ["pasienKeluargaMenerimaInformasi" => "Ya"],
-                ["pasienKeluargaMenerimaInformasi" => "Tidak"],
+        "dekubitus" => [
+            "dekubitusTab" => "Dekubitus",
+            "kodisiFisik" => "",
+            "kodisiFisikOptions" => [
+                ["kodisiFisik" => "Baik"],
+                ["kodisiFisik" => "Lumayan"],
+                ["kodisiFisik" => "Buruk"],
+                ["kodisiFisik" => "Sangat Buruk"],
             ],
 
-            "hambatanEdukasi" => "",
-            "keteranganHambatanEdukasi" => "",
-            "hambatanEdukasiOptions" => [
-                ["hambatanEdukasi" => "Ya"],
-                ["hambatanEdukasi" => "Tidak"],
+            "kesadaran" => "",
+            "kesadaranOptions" => [
+                ["kesadaran" => "Kompos Mentis"],
+                ["kesadaran" => "Apatis"],
+                ["kesadaran" => "Konfus/Soporis"],
+                ["kesadaran" => "Stupor/Koma"],
             ],
 
-            "penerjemah" => "",
-            "keteranganPenerjemah" => "",
-            "penerjemahOptions" => [
-                ["penerjemah" => "Ya"],
-                ["penerjemah" => "Tidak"],
+            "aktifitas" => "",
+            "aktifitasOptions" => [
+                ["aktifitas" => "Dapat Berpindah"],
+                ["aktifitas" => "Berjalan Dengan Bantuan"],
+                ["aktifitas" => "Terbatas di Kursi"],
+                ["aktifitas" => "Terbatas di Tempat Tidur"],
             ],
 
-            "diagPenyakit" => [],
-            "obat" => [],
-            "dietNutrisi" => [],
-            "rehabMedik" => [],
-            "managemenNyeri" => [],
-            "penggunaanAlatMedis" => [],
-            "hakKewajibanPasien" => [],
-
-            "edukasiFollowUp" => "",
-            "segeraKembaliIGDjika" => "",
-            "informedConsent" => "", //uploadfile pdf dll
-            "keteranganEdukasi" => ""
-        ],
-
-        "screeningGiziTab" => "Screening Gizi",
-        "screeningGizi" => [
-            "perubahanBB3Bln" => "",
-            "perubahanBB3BlnScore" => "0",
-            "perubahanBB3BlnOptions" => [
-                ["perubahanBB3Bln" => "Ya (1)"],
-                ["perubahanBB3Bln" => "Tidak (0)"],
-
+            "mobilitas" => "",
+            "mobilitasOptions" => [
+                ["mobilitas" => "Bergerak Bebas"],
+                ["mobilitas" => "Sedikit Terbatas"],
+                ["mobilitas" => "Sangat Terbatas"],
+                ["mobilitas" => "Tak Bisa Bergerak"],
             ],
 
-            "jmlPerubahabBB" => "",
-            "jmlPerubahabBBScore" => "0",
-            "jmlPerubahabBBOptions" => [
-                ["jmlPerubahabBB" => "0,5Kg-1Kg (1)"],
-                ["jmlPerubahabBB" => ">5Kg-10Kg (2)"],
-                ["jmlPerubahabBB" => ">10Kg-15Kg (3)"],
-                ["jmlPerubahabBB" => ">15Kg-20Kg (4)"],
+            "inkontinensia" => "",
+            "inkontinensiaOptions" => [
+                ["inkontinensia" => "Tidak Ngompol"],
+                ["inkontinensia" => "Kadang-kadang"],
+                ["inkontinensia" => "Sering Inkontinensia Urin"],
+                ["inkontinensia" => "Sering Inkontinensia Alvi dan Urin"],
             ],
-
-            "intakeMakanan" => "",
-            "intakeMakananScore" => "0",
-            "intakeMakananOptions" => [
-                ["intakeMakanan" => "Ya (1)"],
-                ["intakeMakanan" => "Tidak (0)"],
-
-            ],
-            "keteranganScreeningGizi" => "",
-            "scoreTotalScreeningGizi" => "0",
-            "tglScreeningGizi" => ""
-        ],
-
-        "batukTab" => "Batuk",
-        "batuk" => [
-            "riwayatDemam" => [],
-            "keteranganRiwayatDemam" => "",
-
-            "berkeringatMlmHari" => [],
-            "keteranganBerkeringatMlmHari" => "",
-
-            "bepergianDaerahWabah" => [],
-            "keteranganBepergianDaerahWabah" => "",
-
-            "riwayatPakaiObatJangkaPanjangan" => [],
-            "keteranganRiwayatPakaiObatJangkaPanjangan" => "",
-
-            "BBTurunTanpaSebab" => [],
-            "keteranganBBTurunTanpaSebab" => "",
-
         ],
     ];
     //////////////////////////////////////////////////////////////////////
@@ -359,7 +381,7 @@ class Penilaian extends Component
                 'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
             ]);
 
-        $this->emit('toastr-success', "Anamnesia berhasil disimpan.");
+        $this->emit('toastr-success', "Penilaian Fisik berhasil disimpan.");
     }
     // insert and update record end////////////////
 
@@ -378,8 +400,8 @@ class Penilaian extends Component
             $this->dataDaftarPoliRJ = json_decode($findData->datadaftarpolirj_json, true);
 
             // jika kontrol tidak ditemukan tambah variable kontrol pda array
-            if (isset($this->dataDaftarPoliRJ['anamnesia']) == false) {
-                $this->dataDaftarPoliRJ['anamnesia'] = $this->anamnesia;
+            if (isset($this->dataDaftarPoliRJ['penilaian']) == false) {
+                $this->dataDaftarPoliRJ['penilaian'] = $this->penilaian;
             }
         } else {
 
@@ -466,8 +488,8 @@ class Penilaian extends Component
 
 
             // jika kontrol tidak ditemukan tambah variable kontrol pda array
-            if (isset($this->dataDaftarPoliRJ['anamnesia']) == false) {
-                $this->dataDaftarPoliRJ['anamnesia'] = $this->anamnesia;
+            if (isset($this->dataDaftarPoliRJ['penilaian']) == false) {
+                $this->dataDaftarPoliRJ['penilaian'] = $this->penilaian;
             }
         }
     }

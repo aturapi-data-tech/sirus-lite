@@ -176,11 +176,11 @@
 
 
             {{-- Disabling enter key for form --}}
-            <script type="text/javascript">
+            {{-- <script type="text/javascript">
                 $(document).on("keydown", "form", function(event) {
                     return event.key != "Enter";
                 });
-            </script>
+            </script> --}}
 
 
 

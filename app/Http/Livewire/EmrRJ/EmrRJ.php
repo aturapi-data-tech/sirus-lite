@@ -908,7 +908,7 @@ class EmrRJ extends Component
                 'push_antrian_bpjs_json'
             )
             ->where('erm_status', '=', $this->statusRjRef['statusId'])
-            ->where('shift', '=', $this->shiftRjRef['shiftId'])
+            // ->where('shift', '=', $this->shiftRjRef['shiftId'])
             ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $this->dateRjRef);
 
         //Jika where dokter tidak kosong
