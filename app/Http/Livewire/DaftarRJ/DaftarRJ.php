@@ -1749,8 +1749,8 @@ class DaftarRJ extends Component
 
 
         $cekAntrianAntreanBPJSStatus = isset($cekAntrianAntreanBPJS->push_antrian_bpjs_status) ? $cekAntrianAntreanBPJS->push_antrian_bpjs_status : "";
-        // 1 cek proses pada database status
-        if ($cekAntrianAntreanBPJSStatus == 200) {
+        // 1 cek proses pada database status 208 task id sudah terbit
+        if ($cekAntrianAntreanBPJSStatus == 200 || $cekAntrianAntreanBPJSStatus == 208) {
 
             // set http response to public
             $this->HttpGetBpjsStatus = $cekAntrianAntreanBPJS->push_antrian_bpjs_status; //status 200 201 400 ..
@@ -1771,7 +1771,7 @@ class DaftarRJ extends Component
 
 
             // 2 cek proses pada getHttp
-            if ($HttpGetBpjs['metadata']['code'] == 200) {
+            if ($HttpGetBpjs['metadata']['code'] == 200 || $HttpGetBpjs['metadata']['code'] == 208) {
                 $this->emit('toastr-success', 'Tambah Antrian ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
 
                 $this->HttpGetBpjsStatus = $HttpGetBpjs['metadata']['code']; //status 200 201 400 ..
