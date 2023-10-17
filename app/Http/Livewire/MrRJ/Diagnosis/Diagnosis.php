@@ -34,6 +34,7 @@ class Diagnosis extends Component
 
     // data SKDP / kontrol=>[] 
     public $diagnosis = [];
+    public $procedure = [];
     //////////////////////////////////////////////////////////////////////
 
 
@@ -42,6 +43,10 @@ class Diagnosis extends Component
     public $dataDiagnosaICD10Lov = [];
     public $dataDiagnosaICD10LovStatus = 0;
     public $dataDiagnosaICD10LovSearch = '';
+
+    public $dataProcedureICD9CmLov = [];
+    public $dataProcedureICD9CmLovStatus = 0;
+    public $dataProcedureICD9CmLovSearch = '';
 
 
 
@@ -173,6 +178,89 @@ class Diagnosis extends Component
 
 
 
+
+
+
+
+    /////////////////////////////////////////////////
+    // Lov dataProcedureICD9CmSEP //////////////////////
+    ////////////////////////////////////////////////
+    public function clickdataProcedureICD9Cmlov()
+    {
+        $this->dataProcedureICD9CmLovStatus = true;
+        $this->dataProcedureICD9CmLov = [];
+    }
+
+    public function updateddataProcedureICD9Cmlovsearch()
+    {
+        // Variable Search
+        $search = $this->dataProcedureICD9CmLovSearch;
+
+        // check LOV by dr_id rs id 
+        $dataProcedureICD9Cm = DB::table('rsmst_mstprocedures')->select(
+            'proc_id',
+            'proc_desc',
+        )
+            ->where('proc_id', $search)
+            ->first();
+
+        if ($dataProcedureICD9Cm) {
+
+            // set dokter sep
+            $this->addProcedureICD9Cm($dataProcedureICD9Cm->proc_id, $dataProcedureICD9Cm->proc_desc);
+
+
+            $this->dataProcedureICD9CmLovStatus = false;
+            $this->dataProcedureICD9CmLovSearch = '';
+        } else {
+            // if there is no id found and check (min 3 char on search)
+            if (strlen($search) < 3) {
+                $this->dataProcedureICD9CmLov = [];
+            } else {
+                $this->dataProcedureICD9CmLov = json_decode(
+                    DB::table('rsmst_mstprocedures')->select(
+                        'proc_id',
+                        'proc_desc',
+                    )
+
+                        ->Where(DB::raw('upper(proc_desc)'), 'like', '%' . strtoupper($search) . '%')
+                        ->limit(10)
+                        ->orderBy('proc_id', 'ASC')
+                        ->orderBy('proc_desc', 'ASC')
+                        ->get(),
+                    true
+                );
+            }
+            $this->dataProcedureICD9CmLovStatus = true;
+            // set doing nothing
+        }
+    }
+    // /////////////////////
+    // LOV selected start
+    public function setMydataProcedureICD9CmLov($id, $name)
+    {
+        $dataProcedureICD9Cm = DB::table('rsmst_mstprocedures')->select(
+            'proc_id',
+            'proc_desc',
+        )
+            ->where('proc_id', $id)
+            ->first();
+
+        // set dokter sep
+        $this->addProcedureICD9Cm($dataProcedureICD9Cm->proc_id, $dataProcedureICD9Cm->proc_desc);
+
+
+
+        $this->dataProcedureICD9CmLovStatus = false;
+        $this->dataProcedureICD9CmLovSearch = '';
+    }
+    // LOV selected end
+    /////////////////////////////////////////////////
+    // Lov dataDiagnosaRJ //////////////////////
+    ////////////////////////////////////////////////
+
+
+
     // validate Data RJ//////////////////////////////////////////////////
     private function validateDataRJ(): void
     {
@@ -245,6 +333,9 @@ class Diagnosis extends Component
             // jika diagnosis tidak ditemukan tambah variable diagnosis pda array
             if (isset($this->dataDaftarPoliRJ['diagnosis']) == false) {
                 $this->dataDaftarPoliRJ['diagnosis'] = $this->diagnosis;
+            }
+            if (isset($this->dataDaftarPoliRJ['procedure']) == false) {
+                $this->dataDaftarPoliRJ['procedure'] = $this->procedure;
             }
         } else {
 
@@ -334,6 +425,9 @@ class Diagnosis extends Component
             if (isset($this->dataDaftarPoliRJ['diagnosis']) == false) {
                 $this->dataDaftarPoliRJ['diagnosis'] = $this->diagnosis;
             }
+            if (isset($this->dataDaftarPoliRJ['procedure']) == false) {
+                $this->dataDaftarPoliRJ['procedure'] = $this->procedure;
+            }
         }
     }
 
@@ -355,6 +449,25 @@ class Diagnosis extends Component
         $diagnosis = collect($this->dataDaftarPoliRJ['diagnosis'])->where("diagId", '!=', $diagId)->toArray();
         $this->dataDaftarPoliRJ['diagnosis'] = $diagnosis;
     }
+
+
+
+
+
+    private function addProcedureICD9Cm($procedureId, $procedureDesc): void
+    {
+        $checkProcedurenosaCount = collect($this->dataDaftarPoliRJ['procedure'])->count();
+
+        $this->dataDaftarPoliRJ['procedure'][] = ['procedureId' => $procedureId, 'procedureDesc' => $procedureDesc, 'ketProcedure' => 'Keterangan Procedure'];
+    }
+
+    public function removeProcedureICD9Cm($procedureId)
+    {
+
+        $procedure = collect($this->dataDaftarPoliRJ['procedure'])->where("procedureId", '!=', $procedureId)->toArray();
+        $this->dataDaftarPoliRJ['procedure'] = $procedure;
+    }
+
 
 
 
