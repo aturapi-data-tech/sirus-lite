@@ -306,10 +306,10 @@ class EmrRJ extends Component
             'ermMenuId' => 'penilaian',
             'ermMenuName' => 'Penilaian'
         ],
-        // [
-        //     'ermMenuId' => 'diagnosis',
-        //     'ermMenuName' => 'Diagnosis (ICD)'
-        // ],
+        [
+            'ermMenuId' => 'diagnosis',
+            'ermMenuName' => 'Diagnosis (ICD)'
+        ],
         // [
         //     'ermMenuId' => 'penandaanGbr',
         //     'ermMenuName' => 'Penandaan Gambar'

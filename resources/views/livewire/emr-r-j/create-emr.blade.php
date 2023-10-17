@@ -1,8 +1,8 @@
 @php
     $disabledProperty = true;
-    
+
     $disabledPropertyRjStatus = $statusRjRef['statusId'] !== 'A' ? true : false;
-    
+
 @endphp
 
 <div class="fixed inset-0 z-40 ease-out duration-400">
@@ -174,6 +174,13 @@
                             <div class="p-0 rounded-lg bg-gray-50 dark:bg-gray-800">
                                 <livewire:mr-r-j.penilaian.penilaian :rjNoRef="$dataDaftarPoliRJ['rjNo']"
                                     :wire:key="'user-profile-two-penilaian'">
+                            </div>
+                        @endif
+
+                        @if ($activeTab == 'diagnosis')
+                            <div class="p-0 rounded-lg bg-gray-50 dark:bg-gray-800">
+                                <livewire:mr-r-j.diagnosis.diagnosis :rjNoRef="$dataDaftarPoliRJ['rjNo']"
+                                    :wire:key="'user-profile-two-diagnosis'">
                             </div>
                         @endif
 
