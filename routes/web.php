@@ -15,6 +15,8 @@ use App\Http\Livewire\MrRJ\Anamnesia\Anamnesia;
 use App\Http\Livewire\MrRJ\Pemeriksaan\Pemeriksaan;
 use App\Http\Livewire\MrRJ\Penilaian\Penilaian;
 use App\Http\Livewire\MrRJ\Diagnosis\Diagnosis;
+use App\Http\Livewire\MrRJ\Perencanaan\Perencanaan;
+
 
 
 
@@ -78,6 +80,7 @@ Route::get('MrRJ/Anamnesia', Anamnesia::class)->middleware('auth')->name('MRRJAn
 Route::get('MrRJ/Pemeriksaan', Pemeriksaan::class)->middleware('auth')->name('MRRJPemeriksaan');
 Route::get('MrRJ/Penilaian', Penilaian::class)->middleware('auth')->name('MRRJPenilaian');
 Route::get('MrRJ/Diagnosis', Diagnosis::class)->middleware('auth')->name('MRRJDiagnosis');
+Route::get('MrRJ/Perencanaan', Perencanaan::class)->middleware('auth')->name('MRRJPerencanaan');
 
 
 Route::get('pelayananRJ', PelayananRJ::class)->middleware('auth')->name('pelayananRJ');

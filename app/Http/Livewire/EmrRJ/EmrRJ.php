@@ -290,10 +290,10 @@ class EmrRJ extends Component
     public $dataDaftarPoliRJ = [];
 
     public $EmrMenu = [
-        [
-            'ermMenuId' => 'keperawatan',
-            'ermMenuName' => 'Keperawatan'
-        ],
+        // [
+        //     'ermMenuId' => 'keperawatan',
+        //     'ermMenuName' => 'Keperawatan'
+        // ],
         [
             'ermMenuId' => 'anamnesia',
             'ermMenuName' => 'Anamnesia'
@@ -314,10 +314,10 @@ class EmrRJ extends Component
         //     'ermMenuId' => 'penandaanGbr',
         //     'ermMenuName' => 'Penandaan Gambar'
         // ],
-        // [
-        //     'ermMenuId' => 'perencanaan',
-        //     'ermMenuName' => 'Perencanaan'
-        // ],
+        [
+            'ermMenuId' => 'perencanaan',
+            'ermMenuName' => 'Perencanaan'
+        ],
         // [
         //     'ermMenuId' => 'cppt',
         //     'ermMenuName' => 'CPPT'

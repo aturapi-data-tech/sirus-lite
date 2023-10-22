@@ -184,6 +184,13 @@
                             </div>
                         @endif
 
+                        @if ($activeTab == 'perencanaan')
+                            <div class="p-0 rounded-lg bg-gray-50 dark:bg-gray-800">
+                                <livewire:mr-r-j.perencanaan.perencanaan :rjNoRef="$dataDaftarPoliRJ['rjNo']"
+                                    :wire:key="'user-profile-two-perencanaan'">
+                            </div>
+                        @endif
+
                     </div>
 
                 </div>
