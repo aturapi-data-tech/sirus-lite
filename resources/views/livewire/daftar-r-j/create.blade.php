@@ -1,8 +1,8 @@
 @php
     $disabledProperty = true;
-    
+
     $disabledPropertyRjStatus = $statusRjRef['statusId'] !== 'A' ? true : false;
-    
+
 @endphp
 
 
@@ -1257,7 +1257,7 @@
                                 <x-input-label :value="__('NoSep')" :required="__(false)" />
                                 <div class="flex items-center mb-2">
                                     <x-text-input placeholder="NoSep" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.sep.noSep'))"
-                                        :disabled=$disabledProperty
+                                        :disabled=$disabledPropertyRjStatus
                                         value="{{ isset($dataDaftarPoliRJ['sep']['noSep']) ? $dataDaftarPoliRJ['sep']['noSep'] : '-' }}" />
                                 </div>
 
