@@ -1272,16 +1272,6 @@
                                     </div>
                                 </div>
 
-                                <div class="flex items-center justify-end mb-2">
-
-                                    <x-yellow-button wire:click.prevent="cetakEtiket()" type="button"
-                                        wire:loading.remove>
-                                        Cetak Etiket
-                                    </x-yellow-button>
-                                    <div wire:loading wire:target="cetakEtiket">
-                                        <x-loading />
-                                    </div>
-                                </div>
 
                                 @error('dataDaftarPoliRJ.sep.noSep')
                                     <x-input-error :messages=$message />

@@ -28,8 +28,8 @@
                                     class="flex-none mr-3">
                                     <path d="m19 19-3.5-3.5" stroke="currentColor" stroke-width="2"
                                         stroke-linecap="round" stroke-linejoin="round"></path>
-                                    <circle cx="11" cy="11" r="6" stroke="currentColor"
-                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></circle>
+                                    <circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round"></circle>
                                 </svg>
                             </div>
                             <x-text-input id="simpleSearch" name="namesimpleSearch" type="text" class="p-2 pl-10"
@@ -216,7 +216,7 @@
 
 
 
-                                            <th scope="col" class="w-8 px-4 py-3 text-center">Action
+                                            <th scope="col" class="w-1/3 px-4 py-3 text-center">Action
                                             </th>
                                         </tr>
                                     </thead>
@@ -226,14 +226,14 @@
                                         @foreach ($RJpasiens as $RJp)
                                             <tr class="border-b group dark:border-gray-700">
 
+
                                                 <td
-                                                    class="flex px-4 py-3 font-medium group-hover:bg-gray-100 group-hover:text-primary whitespace-nowrap dark:text-white">
-                                                    <img class="w-10 h-10 rounded-full" src="profile-picture-1.jpg"
-                                                        alt="Jese image">
-                                                    <div class="pl-3">
-                                                        <div class="text-base font-semibold text-gray-700">
-                                                            {{ $RJp->reg_no }}</div>
+                                                    class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
+                                                    <div class="">
                                                         <div class="font-semibold text-primary">
+                                                            {{ $RJp->reg_no }}
+                                                        </div>
+                                                        <div class="font-semibold text-gray-900">
                                                             {{ $RJp->reg_name . ' / (' . $RJp->sex . ')' . ' / ' . $RJp->thn }}
                                                         </div>
                                                         <div class="font-normal text-gray-900">
@@ -287,49 +287,53 @@
                                                 <td class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-primary">
 
 
+                                                    <div class="inline-flex">
 
-                                                    <!-- Dropdown Action menu Flowbite-->
-                                                    <div>
-                                                        <x-light-button id="dropdownButton{{ $RJp->rj_no }}"
-                                                            class="inline-flex"
-                                                            wire:click="$emit('pressDropdownButton','{{ $RJp->rj_no }}')">
-                                                            <svg class="w-5 h-5" aria-hidden="true"
-                                                                fill="currentColor" viewbox="0 0 20 20"
-                                                                xmlns="http://www.w3.org/2000/svg">
-                                                                <path
-                                                                    d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
-                                                            </svg>
-                                                        </x-light-button>
+                                                        <livewire:cetak.cetak-etiket :regNo="$RJp->reg_no"
+                                                            :wire:key="$RJp->reg_no">
 
-                                                        <!-- Dropdown Action Open menu -->
-                                                        <div id="dropdownMenu{{ $RJp->rj_no }}"
-                                                            class="z-10 hidden w-auto bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700">
-                                                            <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
-                                                                aria-labelledby="dropdownButton{{ $RJp->rj_no }}">
-                                                                <li>
-                                                                    <x-dropdown-link
-                                                                        wire:click="tampil('{{ $RJp->rj_no }}')">
-                                                                        {{ __('Tampil | ' . $RJp->reg_name) }}
-                                                                    </x-dropdown-link>
-                                                                </li>
-                                                                <li>
-                                                                    <x-dropdown-link
-                                                                        wire:click="edit('{{ $RJp->rj_no }}')">
-                                                                        {{ __('Ubah') }}
-                                                                    </x-dropdown-link>
-                                                                </li>
-                                                                <li>
-                                                                    <x-dropdown-link
-                                                                        wire:click="$emit('confirm_remove_record', '{{ $RJp->rj_no }}', '{{ $RJp->reg_name }}')">
-                                                                        {{ __('Hapus') }}
-                                                                    </x-dropdown-link>
-                                                                </li>
+                                                            <!-- Dropdown Action menu Flowbite-->
+                                                            <div>
+                                                                <x-light-button id="dropdownButton{{ $RJp->rj_no }}"
+                                                                    class="inline-flex"
+                                                                    wire:click="$emit('pressDropdownButton','{{ $RJp->rj_no }}')">
+                                                                    <svg class="w-5 h-5" aria-hidden="true"
+                                                                        fill="currentColor" viewbox="0 0 20 20"
+                                                                        xmlns="http://www.w3.org/2000/svg">
+                                                                        <path
+                                                                            d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
+                                                                    </svg>
+                                                                </x-light-button>
 
-                                                            </ul>
-                                                        </div>
+                                                                <!-- Dropdown Action Open menu -->
+                                                                <div id="dropdownMenu{{ $RJp->rj_no }}"
+                                                                    class="z-10 hidden w-auto bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700">
+                                                                    <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
+                                                                        aria-labelledby="dropdownButton{{ $RJp->rj_no }}">
+                                                                        <li>
+                                                                            <x-dropdown-link
+                                                                                wire:click="tampil('{{ $RJp->rj_no }}')">
+                                                                                {{ __('Tampil | ' . $RJp->reg_name) }}
+                                                                            </x-dropdown-link>
+                                                                        </li>
+                                                                        <li>
+                                                                            <x-dropdown-link
+                                                                                wire:click="edit('{{ $RJp->rj_no }}')">
+                                                                                {{ __('Ubah') }}
+                                                                            </x-dropdown-link>
+                                                                        </li>
+                                                                        <li>
+                                                                            <x-dropdown-link
+                                                                                wire:click="$emit('confirm_remove_record', '{{ $RJp->rj_no }}', '{{ $RJp->reg_name }}')">
+                                                                                {{ __('Hapus') }}
+                                                                            </x-dropdown-link>
+                                                                        </li>
+
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                            <!-- End Dropdown Action Open menu -->
                                                     </div>
-                                                    <!-- End Dropdown Action Open menu -->
-
 
                                                 </td>
                                             </tr>

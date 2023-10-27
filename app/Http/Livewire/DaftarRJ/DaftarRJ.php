@@ -2464,27 +2464,6 @@ class DaftarRJ extends Component
         }
     }
 
-    public function cetakEtiket()
-    {
-
-
-
-        // cetak PDF
-        $data = [
-            'data' => $this->dataPasien['pasien'],
-
-        ];
-        $pdfContent = PDF::loadView('livewire.daftar-r-j.cetak-etiket', $data)->output();
-        $this->emit('toastr-success', 'Cetak Etiket');
-
-        return response()->streamDownload(
-            fn () => print($pdfContent),
-            "etiket.pdf"
-        );
-    }
-
-
-
 
 
 

@@ -20,17 +20,10 @@
 
 <body>
     <table class="w-full">
-
         <tr>
-            <td class="mr-2 w-44">
+            <td class="text-start">
                 <img src="madinahlogo.png" class="object-fill h-8">
             </td>
-
-            <td>
-                <p class="ml-2 text-base font-bold text-start"><span></span></p>
-                <p class="ml-2 text-base font-bold text-start"><span></span></p>
-            </td>
-
         </tr>
 
         {{-- <tr style="background-color : rgb(42, 194, 37)">
@@ -46,8 +39,8 @@
 
 
 
-    <table style="font-size: 10px">
-        <tr>
+    <table style="font-size: 9px">
+        <tr class="font-bold">
             <td>
                 <p><span>RegNo</span></p>
             </td>
@@ -61,10 +54,23 @@
                     </span>
                 </p>
             </td>
-            <td colspan="2"></td>
-            <td></td>
         </tr>
-        <tr>
+        <tr class="font-bold">
+            <td>
+                <p><span>NIK</span></p>
+            </td>
+            <td>
+                <p>
+                    <span>:
+                        {{ isset($data['identitas']['nik']) ? ($data['identitas']['nik'] ? $data['identitas']['nik'] : '-') : '--' }}
+                    </span>
+                    <span class="ml-16">
+
+                    </span>
+                </p>
+            </td>
+        </tr>
+        <tr class="font-bold">
             <td>
                 <p><span>Pasien</span></p>
             </td>
@@ -76,14 +82,41 @@
                     <span>/
                         {{ isset($data['jenisKelamin']['jenisKelaminDesc']) ? ($data['jenisKelamin']['jenisKelaminDesc'] ? $data['jenisKelamin']['jenisKelaminDesc'] : '-') : '--' }}
                     </span>
+                </p>
+            </td>
+
+        </tr>
+        <tr>
+            <td>
+                <p><span>TTL</span></p>
+            </td>
+            <td>
+                <p>
+                    <span>:
+                        {{ isset($data['tglLahir']) ? ($data['tglLahir'] ? $data['tglLahir'] : '-') : '--' }}
+                    </span>
                     <span>/
                         {{ isset($data['thn']) ? ($data['thn'] ? $data['thn'] : '-') : '--' }}
+                    </span>
+                    <span>/
+                        {{ isset($data['tempatLahir']) ? ($data['tempatLahir'] ? $data['tempatLahir'] : '-') : '--' }}
                     </span>
                 </p>
             </td>
 
-            <td></td>
         </tr>
+        {{-- <tr>
+            <td>
+                <p><span>Hp</span></p>
+            </td>
+            <td>
+                <p>
+                    <span>:
+                        {{ isset($data['kontak']['nomerTelponSelulerPasien']) ? ($data['kontak']['nomerTelponSelulerPasien'] ? $data['kontak']['nomerTelponSelulerPasien'] : '-') : '--' }}
+                    </span>
+                </p>
+            </td>
+        </tr> --}}
         <tr>
             <td>
                 <p><span>Alamat</span></p>
@@ -95,21 +128,33 @@
                     </span>
                 </p>
             </td>
-            <td></td>
-            <td></td>
-            <td></td>
         </tr>
 
+    </table>
+
+    <table class="w-full">
         <tr>
-            <td></td>
-            <td></td>
+            @php
+                $regNo = isset($data['regNo']) ? ($data['regNo'] ? $data['regNo'] : '-') : '--';
+            @endphp
+            <td class="w-1/2 text-white">
+                <span>{!! DNS1D::getBarcodeHTML($regNo, 'C39', 1) !!}</span>
+            </td>
+            <td class="w-1/3">
+                <p>
+                    <span>{!! DNS2D::getBarcodeHTML($regNo, 'QRCODE', 1.5, 1.5) !!}</span>
+                </p>
+            </td>
+        </tr>
+
+        {{-- <tr style="background-color : rgb(42, 194, 37)">
+            <td ></td>
             <td></td>
         </tr>
-        <tr>
+        <tr style="background-color : rgb(110, 50, 160)">
+            <td ></td>
             <td></td>
-            <td></td>
-            <td></td>
-        </tr>
+        </tr> --}}
     </table>
 </body>
 
