@@ -1163,6 +1163,13 @@
                             </div>
 
                             <div>
+                                @if ($JenisKunjungan['JenisKunjunganId'] === '3')
+                                    <x-check-box value='1' :label="__('Post Inap')"
+                                        wire:model="dataDaftarPoliRJ.postInap" />
+                                @endif
+                            </div>
+
+                            <div>
                                 <x-input-label :value="__('No Referensi')" :required="__(true)" />
                                 <div class="flex items-center mb-2">
                                     <x-text-input placeholder="No Referensi" class="mt-1" :errorshas="__($errors->has('dataDaftarPoliRJ.noReferensi'))"
