@@ -584,7 +584,11 @@ class PelayananRJ extends Component
 
             // off kan jika memberatkan program
             // ulangi proses taskId start pushDataAntrian booking + task id 3
-            $this->pushDataAntrian($rjNo);
+            // $this->pushDataAntrian($rjNo);
+
+            $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId3'])->timestamp * 1000; //waktu dalam timestamp milisecond
+            $this->pushDataTaskId($noBooking, 3, $waktu);
+
             $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4'])->timestamp * 1000; //waktu dalam timestamp milisecond
             $this->pushDataTaskId($noBooking, 4, $waktu);
             // ulangi proses taskId end
