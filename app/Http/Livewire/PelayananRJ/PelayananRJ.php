@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 use App\Http\Traits\BPJS\AntrianTrait;
 
@@ -60,6 +61,7 @@ class PelayananRJ extends Component
     //////////////////////////////
 
     public $dataDaftarPoliRJ = [];
+    public  $dataPasien = [];
     public $taskIdPelayanan = [
         "taskId1" => "",
         "taskId2" => "",
@@ -357,6 +359,136 @@ class PelayananRJ extends Component
             // update DB
             $this->updateDataRJ($rjNo);
         }
+
+        $this->setDataPasien($this->dataDaftarPoliRJ['regNo']);
+    }
+
+    private function setDataPasien($value): void
+    {
+        $findData = DB::table('rsmst_pasiens')
+            ->select('meta_data_pasien_json')
+            ->where('reg_no', $value)
+            ->first();
+
+        if ($findData->meta_data_pasien_json == null) {
+
+            $findData = $this->cariDataPasienByKeyCollection('reg_no', $value);
+
+            $this->dataPasien['pasien']['regDate'] = $findData->reg_date;
+            $this->dataPasien['pasien']['regNo'] = $findData->reg_no;
+            $this->dataPasien['pasien']['regName'] = $findData->reg_name;
+            $this->dataPasien['pasien']['identitas']['idbpjs'] = $findData->nokartu_bpjs;
+            $this->dataPasien['pasien']['identitas']['nik'] = $findData->nik_bpjs;
+            $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminId'] = ($findData->sex == 'L') ? 1 : 2;
+            $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] = ($findData->sex == 'L') ? 'Laki-laki' : 'Perempuan';
+            $this->dataPasien['pasien']['tglLahir'] = $findData->birth_date;
+            $this->dataPasien['pasien']['thn'] = $findData->thn;
+            $this->dataPasien['pasien']['bln'] = $findData->bln;
+            $this->dataPasien['pasien']['hari'] = $findData->hari;
+            $this->dataPasien['pasien']['tempatLahir'] = $findData->birth_place;
+            $this->dataPasien['pasien']['golonganDarah']['golonganDarahId'] = '13';
+            $this->dataPasien['pasien']['golonganDarah']['golonganDarahDesc'] = 'Tidak Tahu';
+            $this->dataPasien['pasien']['statusPerkawinan']['statusPerkawinanId'] = '1';
+            $this->dataPasien['pasien']['statusPerkawinan']['statusPerkawinanDesc'] = 'Belum Kawin';
+
+            $this->dataPasien['pasien']['agama']['agamaId'] = $findData->rel_id;
+            $this->dataPasien['pasien']['agama']['agamaDesc'] = $findData->rel_desc;
+
+            $this->dataPasien['pasien']['pendidikan']['pendidikanId'] = $findData->edu_id;
+            $this->dataPasien['pasien']['pendidikan']['pendidikanDesc'] = $findData->edu_desc;
+
+            $this->dataPasien['pasien']['pekerjaan']['pekerjaanId'] = $findData->job_id;
+            $this->dataPasien['pasien']['pekerjaan']['pekerjaanDesc'] = $findData->job_name;
+
+
+            $this->dataPasien['pasien']['hubungan']['namaPenanggungJawab'] = $findData->reg_no;
+            $this->dataPasien['pasien']['hubungan']['namaIbu'] = $findData->reg_no;
+
+            $this->dataPasien['pasien']['identitas']['nik'] = $findData->nik_bpjs;
+            $this->dataPasien['pasien']['identitas']['idBpjs'] = $findData->nokartu_bpjs;
+
+
+            $this->dataPasien['pasien']['identitas']['alamat'] = $findData->address;
+
+            $this->dataPasien['pasien']['identitas']['desaId'] = $findData->des_id;
+            $this->dataPasien['pasien']['identitas']['desaName'] = $findData->des_name;
+
+            $this->dataPasien['pasien']['identitas']['rt'] = $findData->rt;
+            $this->dataPasien['pasien']['identitas']['rw'] = $findData->rw;
+            $this->dataPasien['pasien']['identitas']['kecamatanId'] = $findData->kec_id;
+            $this->dataPasien['pasien']['identitas']['kecamatanName'] = $findData->kec_name;
+
+            $this->dataPasien['pasien']['identitas']['kotaId'] = $findData->kab_id;
+            $this->dataPasien['pasien']['identitas']['kotaName'] = $findData->kab_name;
+
+            $this->dataPasien['pasien']['identitas']['propinsiId'] = $findData->prop_id;
+            $this->dataPasien['pasien']['identitas']['propinsiName'] = $findData->prop_name;
+
+            $this->dataPasien['pasien']['kontak']['nomerTelponSelulerPasien'] = $findData->phone;
+
+            $this->dataPasien['pasien']['hubungan']['namaPenanggungJawab'] = $findData->kk;
+            $this->dataPasien['pasien']['hubungan']['namaIbu'] = $findData->nyonya;
+
+
+            // $this->dataPasien['pasien']['hubungan']['noPenanggungJawab'] = $findData->no_kk;
+
+
+            // dd($this->dataPasien);
+        } else {
+            // ubah data Pasien
+            $this->dataPasien = json_decode($findData->meta_data_pasien_json, true);
+        }
+    }
+
+    private function cariDataPasienByKeyCollection($key, $search)
+    {
+        $findData = DB::table('rsmst_pasiens')
+            ->select(
+                DB::raw("to_char(reg_date,'dd/mm/yyyy hh24:mi:ss') as reg_date"),
+                DB::raw("to_char(reg_date,'yyyymmddhh24miss') as reg_date1"),
+                'reg_no',
+                'reg_name',
+                DB::raw("nvl(nokartu_bpjs,'-') as nokartu_bpjs"),
+                DB::raw("nvl(nik_bpjs,'-') as nik_bpjs"),
+                'sex',
+                DB::raw("to_char(birth_date,'dd/mm/yyyy') as birth_date"),
+                DB::raw("(select trunc( months_between( sysdate, birth_date ) /12 ) from dual) as thn"),
+                'bln',
+                'hari',
+                'birth_place',
+                'blood',
+                'marital_status',
+                'rsmst_religions.rel_id as rel_id',
+                'rel_desc',
+                'rsmst_educations.edu_id as edu_id',
+                'edu_desc',
+                'rsmst_jobs.job_id as job_id',
+                'job_name',
+                'kk',
+                'nyonya',
+                'no_kk',
+                'address',
+                'rsmst_desas.des_id as des_id',
+                'des_name',
+                'rt',
+                'rw',
+                'rsmst_kecamatans.kec_id as kec_id',
+                'kec_name',
+                'rsmst_kabupatens.kab_id as kab_id',
+                'kab_name',
+                'rsmst_propinsis.prop_id as prop_id',
+                'prop_name',
+                'phone'
+            )->join('rsmst_religions', 'rsmst_religions.rel_id', 'rsmst_pasiens.rel_id')
+            ->join('rsmst_educations', 'rsmst_educations.edu_id', 'rsmst_pasiens.edu_id')
+            ->join('rsmst_jobs', 'rsmst_jobs.job_id', 'rsmst_pasiens.job_id')
+            ->join('rsmst_desas', 'rsmst_desas.des_id', 'rsmst_pasiens.des_id')
+            ->join('rsmst_kecamatans', 'rsmst_kecamatans.kec_id', 'rsmst_pasiens.kec_id')
+            ->join('rsmst_kabupatens', 'rsmst_kabupatens.kab_id', 'rsmst_pasiens.kab_id')
+            ->join('rsmst_propinsis', 'rsmst_propinsis.prop_id', 'rsmst_pasiens.prop_id')
+            ->where($key, $search)
+            ->first();
+        return $findData;
     }
 
     public function masukPoli($rjNo)
@@ -367,10 +499,11 @@ class PelayananRJ extends Component
         $sql = "select waktu_masuk_poli from rstxn_rjhdrs where rj_no=:rjNo";
         $cek_waktu_masuk_poli = DB::scalar($sql, ['rjNo' => $rjNo]);
 
-        $waktuMasukPoli = Carbon::now()->format('d/m/Y H:i:s');
 
         // ketika cek_waktu_masuk_poli kosong lalu update
         if (!$cek_waktu_masuk_poli) {
+            $waktuMasukPoli = Carbon::now()->format('d/m/Y H:i:s');
+
             DB::table('rstxn_rjhdrs')
                 ->where('rj_no', $rjNo)
                 ->update([
@@ -381,29 +514,23 @@ class PelayananRJ extends Component
         /////////////////////////
         // Update TaskId 4
         /////////////////////////
+        $sqlWaktuMasukPoli = "select to_char(waktu_masuk_poli,'dd/mm/yyyy hh24:mi:ss') as waktu_masuk_poli from rstxn_rjhdrs where rj_no=:rjNo";
+        $waktuMasukPoli = DB::scalar($sqlWaktuMasukPoli, ['rjNo' => $rjNo]);
 
-        $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $waktuMasukPoli)->timestamp * 1000; //waktu dalam timestamp milisecond
-        // DB Json
-        $sql = "select datadaftarpolirj_json from rstxn_rjhdrs where rj_no=:rjNo";
-        $datadaftarpolirj_json = DB::scalar($sql, ['rjNo' => $rjNo]);
+        if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']) {
+            $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4'] = $waktuMasukPoli;
+            // update DB
+            $this->updateDataRJ($rjNo);
 
-        if ($datadaftarpolirj_json) {
-            $this->dataDaftarPoliRJ = json_decode($datadaftarpolirj_json, true);
-
-            if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']) {
-                $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4'] = $waktuMasukPoli;
-                // update DB
-                $this->updateDataRJ($rjNo);
-
-                $this->emit('toastr-success', "Masuk Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']);
-            } else {
-                $this->emit('toastr-error', "Masuk Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']);
-            }
+            $this->emit('toastr-success', "Masuk Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']);
+        } else {
+            $this->emit('toastr-error', "Masuk Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']);
         }
 
         // cari no Booking
-        $sql = "select nobooking from rstxn_rjhdrs where rj_no=:rjNo";
-        $noBooking =  DB::scalar($sql, ['rjNo' => $rjNo]);
+        $noBooking =  $this->dataDaftarPoliRJ['noBooking'];
+
+        $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4'])->timestamp * 1000; //waktu dalam timestamp milisecond
 
         $this->pushDataTaskId($noBooking, 4, $waktu);
     }
@@ -411,64 +538,76 @@ class PelayananRJ extends Component
 
     public function keluarPoli($rjNo)
     {
-        $sql = "select waktu_masuk_poli from rstxn_rjhdrs where rj_no=:rjNo";
-        $cek_waktu_masuk_poli = DB::scalar($sql, ['rjNo' => $rjNo]);
+        // SEMENTARA {WAKTU MASUK APT = WAKTU KELUAR POLI}
+        $this->findData($rjNo);
 
-        // Jika waktu masuk poli sudah terisi jalankan keluarPoli jika belum send err message
-        if ($cek_waktu_masuk_poli) {
 
-            $sql = "select waktu_masuk_apt from rstxn_rjhdrs where rj_no=:rjNo";
-            $cek_waktu_masuk_apt = DB::scalar($sql, ['rjNo' => $rjNo]);
+        $sql = "select waktu_masuk_apt from rstxn_rjhdrs where rj_no=:rjNo";
+        $cek_waktu_masuk_apt = DB::scalar($sql, ['rjNo' => $rjNo]);
 
+        // ketika cek_waktu_masuk_apt kosong lalu update
+        if (!$cek_waktu_masuk_apt) {
             $waktuMasukApotek = Carbon::now()->format('d/m/Y H:i:s');
 
-            // ketika cek_waktu_masuk_apt kosong lalu update
-            if (!$cek_waktu_masuk_apt) {
-                DB::table('rstxn_rjhdrs')
-                    ->where('rj_no', $rjNo)
-                    ->update([
-                        'waktu_masuk_apt' => DB::raw("to_date('" . $waktuMasukApotek . "','dd/mm/yyyy hh24:mi:ss')"), //waktu masuk = rjdate
-                    ]);
-            }
+            DB::table('rstxn_rjhdrs')
+                ->where('rj_no', $rjNo)
+                ->update([
+                    'waktu_masuk_apt' => DB::raw("to_date('" . $waktuMasukApotek . "','dd/mm/yyyy hh24:mi:ss')"), //waktu masuk = rjdate
+                ]);
+        }
 
-            /////////////////////////
-            // Update TaskId 5
-            /////////////////////////
+        /////////////////////////
+        // Update TaskId 5         // SEMENTARA {WAKTU MASUK APT = WAKTU KELUAR POLI}
+        /////////////////////////
+        $sqlwaktuMasukApotek = "select to_char(waktu_masuk_apt,'dd/mm/yyyy hh24:mi:ss') as waktu_masuk_apt  from rstxn_rjhdrs where rj_no=:rjNo";
+        $waktuMasukApotek = DB::scalar($sqlwaktuMasukApotek, ['rjNo' => $rjNo]);
 
-            $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $waktuMasukApotek)->timestamp * 1000; //waktu dalam timestamp milisecond
-            // DB Json
-            $sql = "select datadaftarpolirj_json from rstxn_rjhdrs where rj_no=:rjNo";
-            $datadaftarpolirj_json = DB::scalar($sql, ['rjNo' => $rjNo]);
-            if ($datadaftarpolirj_json) {
-                $this->dataDaftarPoliRJ = json_decode($datadaftarpolirj_json, true);
+        // check task Id 4 sudah dilakukan atau belum
+        if ($this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']) {
 
-                if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']) {
-                    $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5'] = $waktuMasukApotek;
+            if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']) {
+                $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5'] = $waktuMasukApotek;
+                // update DB
+                $this->updateDataRJ($rjNo);
 
-                    // update DB
-                    $this->updateDataRJ($rjNo);
-
-                    $this->emit('toastr-success', "Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
-                } else {
-                    $this->emit('toastr-error', "Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
-                }
-
-                // cari no Booking
-                $sql = "select nobooking from rstxn_rjhdrs where rj_no=:rjNo";
-                $noBooking =  DB::scalar($sql, ['rjNo' => $rjNo]);
-
-                $this->pushDataTaskId($noBooking, 5, $waktu);
-
-                $this->emit('toastr-success', "Keluar Poli $waktuMasukApotek");
+                $this->emit('toastr-success', "Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
             } else {
-                $this->emit('toastr-error', "Satus Pasien Belum melalui pelayanan Poli");
+                $this->emit('toastr-error', "Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
             }
+
+            // cari no Booking
+            $noBooking =  $this->dataDaftarPoliRJ['noBooking'];
+
+            // //////////////////////////
+            // //////////////////////////
+            // //////////////////////////
+
+            // off kan jika memberatkan program
+            // ulangi proses taskId start pushDataAntrian booking + task id 3
+            $this->pushDataAntrian($rjNo);
+            $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4'])->timestamp * 1000; //waktu dalam timestamp milisecond
+            $this->pushDataTaskId($noBooking, 4, $waktu);
+            // ulangi proses taskId end
+
+            // //////////////////////////
+            // //////////////////////////
+            // //////////////////////////
+
+
+            $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5'])->timestamp * 1000; //waktu dalam timestamp milisecond
+            $this->pushDataTaskId($noBooking, 5, $waktu);
+
+            $this->emit('toastr-success', "Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
+        } else {
+            $this->emit('toastr-error', "Satus Pasien Belum melalui pelayanan Poli");
         }
     }
 
 
     public function batalPoli($rjNo, $regName): void
     {
+
+        $this->findData($rjNo);
 
         $waktuBatalPoli = Carbon::now()->format('d/m/Y H:i:s');
 
@@ -477,36 +616,22 @@ class PelayananRJ extends Component
         /////////////////////////
 
         $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $waktuBatalPoli)->timestamp * 1000; //waktu dalam timestamp milisecond
-        // DB Json
-        $sql = "select datadaftarpolirj_json from rstxn_rjhdrs where rj_no=:rjNo";
-        $datadaftarpolirj_json = DB::scalar($sql, ['rjNo' => $rjNo]);
-        if ($datadaftarpolirj_json) {
-            if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']) {
-                $this->dataDaftarPoliRJ = json_decode($datadaftarpolirj_json, true);
-                $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId99'] = $waktuBatalPoli;
-                // update DB
-                $this->updateDataRJ($rjNo);
-            } else {
-                $this->emit('toastr-error', "Pembatalan tidak dapat dilakukan, " . $regName . " sudak melakukan pelayanan Poli.");
-            }
+
+        if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']) {
+            $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId99'] = $waktuBatalPoli;
+            // cari no Booking
+            $noBooking =  $this->dataDaftarPoliRJ['noBooking'];
+
+            $this->pushDataTaskId($noBooking, 99, $waktu);
+
+            // update DB
+            $this->updateDataRJ($rjNo);
+
+            $this->emit('toastr-success', "Pembatalan " . $regName . " pelayanan Poli berhasil dilakukan.");
+        } else {
+            $this->emit('toastr-error', "Pembatalan tidak dapat dilakukan, " . $regName . " sudak melakukan pelayanan Poli.");
         }
-
-        // cari no Booking
-        $sql = "select nobooking from rstxn_rjhdrs where rj_no=:rjNo";
-        $noBooking =  DB::scalar($sql, ['rjNo' => $rjNo]);
-
-        $this->pushDataTaskId($noBooking, 99, $waktu);
-
-
-        $this->emit('toastr-success', "Pembatalan " . $regName . " pelayanan Poli berhasil dilakukan.");
     }
-
-
-
-
-
-
-
 
 
     private function pushDataTaskId($noBooking, $taskId, $time): void
@@ -535,6 +660,144 @@ class PelayananRJ extends Component
 
 
 
+    private function pushDataAntrian($rjNo)
+    {
+
+        $this->findData($rjNo);
+        //push data antrian UMUM BPJS kecuali 'kronis'
+        if ($this->dataDaftarPoliRJ['klaimId'] != 'KR') {
+            $rjdate = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate']); //Tgl RJ
+
+            $dayDesc = $rjdate->isoFormat('dddd'); //Senin Selasa Rabu ...
+
+            $dayid = ($dayDesc == 'Senin') ? 1 //kode Senin Selasa Rabu ...
+                : ($dayDesc == 'Selasa' ? 2
+                    : ($dayDesc == 'Rabu' ? 3
+                        : ($dayDesc == 'Kamis' ? 4
+                            : ($dayDesc == 'Jumat' ? 5
+                                : 6
+                            )
+                        )
+                    )
+                );
+
+            $JadwalPraktek = json_decode(json_encode(DB::table('scmst_scpolis')
+                ->select(
+                    //Poli RS
+                    'scmst_scpolis.dr_id as dr_id',
+                    'rsmst_doctors.dr_name as dr_name',
+                    'scmst_scpolis.sc_poli_ket as sc_poli_ket',
+                    'scmst_scpolis.poli_id as poli_id',
+                    'rsmst_polis.poli_desc as poli_desc',
+
+                    //Poli BPJS
+                    'rsmst_doctors.kd_dr_bpjs as kd_dr_bpjs',
+                    'rsmst_polis.kd_poli_bpjs as kd_poli_bpjs',
+
+                    DB::raw("nvl(mulai_praktek,'00:00:00') as mulai_praktek"),
+                    DB::raw("nvl(selesai_praktek,'00:00:00') as selesai_praktek"),
+
+                    DB::raw('nvl(kuota,35) as kuota'),
+                )
+                ->Join('rsmst_doctors', 'rsmst_doctors.dr_id', 'scmst_scpolis.dr_id')
+                ->Join('rsmst_polis', 'rsmst_polis.poli_id', 'scmst_scpolis.poli_id')
+                ->Where('day_id', $dayid)
+                ->Where('scmst_scpolis.dr_id', $this->dataDaftarPoliRJ['drId']) //Cek Poli RS
+                ->Where('sc_poli_status_', 1)
+                ->orderBy('scmst_scpolis.no_urut', 'ASC')
+                ->orderBy('scmst_scpolis.poli_id', 'ASC')
+                ->first(), true), true);
+
+
+            if (!$JadwalPraktek) {
+                $JadwalPraktek['mulai_praktek'] = '07:00:00';
+                $JadwalPraktek['selesai_praktek'] = '13:00:00';
+
+                $JadwalPraktek['kuota'] = 30;
+            }
+
+            // Pelayanan (Poli Tgl + Jam Layanan)
+            $hariLayananJamLayanan = Carbon::createFromFormat('d/m/Y H:i:s', $rjdate->format('d/m/Y') . ' ' . $JadwalPraktek['mulai_praktek']);
+            // $timestamp = $hariLayananJamLayanan->timestamp; //Timestemp Layanan
+            $jadwal_estimasi = $hariLayananJamLayanan->addMinutes(10 * ($this->dataDaftarPoliRJ['noAntrian'] + 1)); // Hari Layanan||JamPraktek + 10menit
+            // JamPraktek
+            $jampraktek = Str::substr($JadwalPraktek['mulai_praktek'], 0, 5) . '-' . Str::substr($JadwalPraktek['selesai_praktek'], 0, 5); //'00:00-00:00'
+
+            $antreanadd = [
+                "kodebooking" => $this->dataDaftarPoliRJ['noBooking'],
+                "jenispasien" => ($this->dataDaftarPoliRJ['klaimId'] == 'JM') ? 'JKN' : 'NON JKN', //Layanan UMUM BPJS
+                "nomorkartu" => ($this->dataDaftarPoliRJ['klaimId'] == 'JM') ? $this->dataPasien['pasien']['identitas']['idbpjs'] : '',
+                "nik" => $this->dataPasien['pasien']['identitas']['nik'],
+                "nohp" =>  $this->dataPasien['pasien']['kontak']['nomerTelponSelulerPasien'],
+                "kodepoli" => $this->dataDaftarPoliRJ['kdpolibpjs'] ? $this->dataDaftarPoliRJ['kdpolibpjs'] : $this->dataDaftarPoliRJ['poliId'], //if null poliidRS
+                "namapoli" => $this->dataDaftarPoliRJ['poliDesc'],
+                "pasienbaru" => 0,
+                "norm" => $this->dataDaftarPoliRJ['regNo'],
+                "tanggalperiksa" => Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'])->format('Y-m-d'),
+                "kodedokter" => $this->dataDaftarPoliRJ['kddrbpjs'] ? $this->dataDaftarPoliRJ['kddrbpjs'] : $this->dataDaftarPoliRJ['drId'], //if Null dridRS
+                "namadokter" => $this->dataDaftarPoliRJ['drDesc'],
+                "jampraktek" => $jampraktek,
+                "jeniskunjungan" => $this->dataDaftarPoliRJ['kunjunganId'], //FKTP/FKTL/Kontrol/Internal
+                "nomorreferensi" => $this->dataDaftarPoliRJ['noReferensi'],
+                "nomorantrean" => $this->dataDaftarPoliRJ['noAntrian'],
+                "angkaantrean" => $this->dataDaftarPoliRJ['noAntrian'],
+                "estimasidilayani" => $jadwal_estimasi->timestamp,
+                "sisakuotajkn" => $JadwalPraktek['kuota'] - $this->dataDaftarPoliRJ['noAntrian'],
+                "kuotajkn" => $JadwalPraktek['kuota'],
+                "sisakuotanonjkn" => $JadwalPraktek['kuota'] - $this->dataDaftarPoliRJ['noAntrian'],
+                "kuotanonjkn" => $JadwalPraktek['kuota'],
+                "keterangan" => "Peserta harap 30 menit lebih awal guna pencatatan administrasi.",
+            ];
+        }
+
+        // http Post
+
+
+
+        // Lakukan 2 x cek http dan BPJS untuk memastikan proses kirim data berhasil 
+        // dan menentukan nilai status / jika code =200 skip proses tersebut
+        // jika antrean berhasil-> buat SEP
+        //jika gagal ulangi-> antrean
+        // (pembuatan SEP dilakukan ketika proses antrean berhasil)
+
+        $cekAntrianAntreanBPJS = DB::table('rstxn_rjhdrs')
+            ->select('push_antrian_bpjs_status', 'push_antrian_bpjs_json')
+            ->where('rj_no', $this->dataDaftarPoliRJ['rjNo'])
+            ->first();
+
+
+        $cekAntrianAntreanBPJSStatus = isset($cekAntrianAntreanBPJS->push_antrian_bpjs_status) ? $cekAntrianAntreanBPJS->push_antrian_bpjs_status : "";
+        // 1 cek proses pada database status 208 task id sudah terbit
+        if ($cekAntrianAntreanBPJSStatus !== 200 || $cekAntrianAntreanBPJSStatus !== 208) {
+
+            // Tambah Antrean
+            $HttpGetBpjs =  AntrianTrait::tambah_antrean($antreanadd)->getOriginalContent();
+
+
+            // 2 cek proses pada getHttp
+            if ($HttpGetBpjs['metadata']['code'] == 200 || $HttpGetBpjs['metadata']['code'] == 208) {
+                $this->emit('toastr-success', 'Tambah Antrian ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+            } else {
+                $this->emit('toastr-error', 'Tambah Antrian ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+            }
+        }
+
+
+
+        /////////////////////////
+        // Update TaskId 3
+        /////////////////////////
+        if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId3']) {
+            $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'])->timestamp * 1000; //waktu dalam timestamp milisecond
+            // DB Json
+            $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId3'] = $this->dataDaftarPoliRJ['rjDate'];
+            $this->updateDataRJ($rjNo);
+        }
+
+        $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId3'])->timestamp * 1000; //waktu dalam timestamp milisecond
+        $noBooking = $this->dataDaftarPoliRJ['noBooking'];
+        $this->pushDataTaskId($noBooking, 3, $waktu);
+    }
 
     // when new form instance
     public function mount()

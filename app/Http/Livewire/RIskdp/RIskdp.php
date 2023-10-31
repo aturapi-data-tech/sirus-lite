@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\RJskdp;
+namespace App\Http\Livewire\RIskdp;
 
 use Illuminate\Support\Facades\DB;
 
@@ -10,7 +10,7 @@ use Carbon\Carbon;
 
 
 
-class RJskdp extends Component
+class RIskdp extends Component
 {
     use WithPagination;
 
@@ -1034,33 +1034,34 @@ class RJskdp extends Component
         //////////////////////////////////////////
         // Query ///////////////////////////////
         //////////////////////////////////////////
-        $query = DB::table('rsview_rjkasir')
+        $query = DB::table('rsview_rihdrs')
             ->select(
-                DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
-                DB::raw("to_char(rj_date,'yyyymmddhh24miss') AS rj_date1"),
-                'rj_no',
+                DB::raw("to_char(exit_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
+                DB::raw("to_char(exit_date,'yyyymmddhh24miss') AS rj_date1"),
+                'rihdr_no',
                 'reg_no',
                 'reg_name',
                 'sex',
                 'address',
                 'thn',
                 DB::raw("to_char(birth_date,'dd/mm/yyyy') AS birth_date"),
-                'poli_id',
-                'poli_desc',
-                'dr_id',
-                'dr_name',
+                DB::raw("'poli_id' AS poli_id"),
+                DB::raw("'poli_desc' AS poli_desc"),
+                DB::raw("'dr_id' AS dr_id"),
+                DB::raw("'dr_name' AS dr_name"),
+
                 'klaim_id',
-                'shift',
+                DB::raw("'1' AS shift"),
                 'vno_sep',
-                'no_antrian',
-                'rj_status',
-                'nobooking',
+                DB::raw("'123' AS no_antrian"),
+                'ri_status',
+                DB::raw("'123' AS nobooking"),
                 'push_antrian_bpjs_status',
                 'push_antrian_bpjs_json',
-                'datadaftarpolirj_json'
+                'datadaftarri_json'
             )
             // ->whereNotIn('rj_status', ['A', 'F'])
-            ->where('rj_status', 'L')
+            ->where('ri_status', 'P')
             ->where('reg_no', '=', $this->regNoRef);
 
 
@@ -1072,14 +1073,10 @@ class RJskdp extends Component
 
         $query->where(function ($q) {
             $q->Where(DB::raw('upper(reg_name)'), 'like', '%' . strtoupper($this->search) . '%')
-                ->orWhere(DB::raw('upper(reg_no)'), 'like', '%' . strtoupper($this->search) . '%')
-                ->orWhere(DB::raw('upper(dr_name)'), 'like', '%' . strtoupper($this->search) . '%')
-                ->orWhere(DB::raw('upper(poli_desc)'), 'like', '%' . strtoupper($this->search) . '%');
+                ->orWhere(DB::raw('upper(reg_no)'), 'like', '%' . strtoupper($this->search) . '%');
         })
             ->orderBy('rj_date1',  'desc')
-            ->orderBy('dr_name',  'desc')
-            ->orderBy('poli_desc',  'desc')
-            ->orderBy('no_antrian',  'asc');
+            ->orderBy('dr_name',  'desc');
 
         ////////////////////////////////////////////////
         // end Query
@@ -1087,7 +1084,7 @@ class RJskdp extends Component
 
 
         return view(
-            'livewire.r-jskdp.r-jskdp',
+            'livewire.r-iskdp.r-iskdp',
             [
                 'RJpasiens' => $query->paginate($this->limitPerPage),
                 'myTitle' => 'Data SKDP Pasien Rawat Jalan',
