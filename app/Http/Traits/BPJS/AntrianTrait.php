@@ -552,6 +552,7 @@ trait AntrianTrait
             "waktu" =>  $waktu,
             "jenisresep" => $jenisresep //  "Tidak ada/Racikan/Non racikan" ---> khusus yang sudah implementasi antrean farmasi
         ];
+        // dd(Carbon::createFromTimestamp($waktu / 1000)->toDateTimeString());
 
 
         $rules = [
@@ -666,9 +667,9 @@ trait AntrianTrait
         // customErrorMessages
         $messages = customErrorMessagesTrait::messages();
 
-        $r = ["kodebooking" => "required"];
+        $r = ["kodebooking" => $kodebooking];
 
-        $rules = ["kodebooking" => $kodebooking];
+        $rules = ["kodebooking" => "required"];
 
         $validator = Validator::make($r, $rules, $messages);
 

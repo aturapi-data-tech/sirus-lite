@@ -28,8 +28,8 @@
                                     class="flex-none mr-3">
                                     <path d="m19 19-3.5-3.5" stroke="currentColor" stroke-width="2"
                                         stroke-linecap="round" stroke-linejoin="round"></path>
-                                    <circle cx="11" cy="11" r="6" stroke="currentColor"
-                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></circle>
+                                    <circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round"></circle>
                                 </svg>
                             </div>
                             <x-text-input id="simpleSearch" name="namesimpleSearch" type="text" class="p-2 pl-10"
@@ -276,10 +276,6 @@
                                                     <!-- Dropdown Action menu Flowbite-->
                                                     <div class="inline-flex">
 
-
-
-
-
                                                         <x-yellow-button
                                                             wire:click="masukPoli('{{ addslashes($RJp->rj_no) }}')"
                                                             wire:loading.remove>
@@ -307,6 +303,16 @@
                                                             <x-loading />
                                                         </div>
 
+                                                    </div>
+                                                    <div>
+                                                        <x-primary-button
+                                                            wire:click="getListTaskId('{{ addslashes($RJp->nobooking) }}')"
+                                                            wire:loading.remove>
+                                                            Get List Task Id BPJS
+                                                        </x-primary-button>
+                                                        <div wire:loading wire:target="getListTaskId">
+                                                            <x-loading />
+                                                        </div>
                                                     </div>
                                                     <!-- End Dropdown Action Open menu -->
 

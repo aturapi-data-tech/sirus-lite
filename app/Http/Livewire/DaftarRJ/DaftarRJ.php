@@ -1031,15 +1031,8 @@ class DaftarRJ extends Component
                     "tgl" => Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'])->format('dmY'),
                     "drId" => $this->dataDaftarPoliRJ['drId']
                 ]);
-                if ($noUrutAntrian == 0) {
-                    $noAntrian = 4;
-                } else if ($noUrutAntrian == 1) {
-                    $noAntrian = 5;
-                } else if ($noUrutAntrian == 2) {
-                    $noAntrian = 6;
-                } else if ($noUrutAntrian > 2) {
-                    $noAntrian = $noUrutAntrian + 3 + 1;
-                }
+
+                $noAntrian = $noUrutAntrian + 1;
             } else {
                 // Kronis
                 $noAntrian = 999;
@@ -1702,7 +1695,12 @@ class DaftarRJ extends Component
             // Pelayanan (Poli Tgl + Jam Layanan)
             $hariLayananJamLayanan = Carbon::createFromFormat('d/m/Y H:i:s', $rjdate->format('d/m/Y') . ' ' . $JadwalPraktek['mulai_praktek']);
             // $timestamp = $hariLayananJamLayanan->timestamp; //Timestemp Layanan
-            $jadwal_estimasi = $hariLayananJamLayanan->addMinutes(10 * ($this->dataDaftarPoliRJ['noAntrian'] + 1)); // Hari Layanan||JamPraktek + 10menit
+            // off kan semsntara dan atur ulang logic jadwal_estimasi (masalah pada penambahan 10 menit per pasien tidak jalan)
+            // $jadwal_estimasi = $hariLayananJamLayanan->addMinutes(10 * ($this->dataDaftarPoliRJ['noAntrian'] + 1)); // Hari Layanan||JamPraktek + 10menit
+
+            // $jadwal_estimasi = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'])->timestamp * 1000; //waktu dalam timestamp milisecond
+            $jadwal_estimasi = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'])->valueOf();
+
             // JamPraktek
             $jampraktek = Str::substr($JadwalPraktek['mulai_praktek'], 0, 5) . '-' . Str::substr($JadwalPraktek['selesai_praktek'], 0, 5); //'00:00-00:00'
 
@@ -1724,13 +1722,17 @@ class DaftarRJ extends Component
                 "nomorreferensi" => $this->dataDaftarPoliRJ['noReferensi'],
                 "nomorantrean" => $this->dataDaftarPoliRJ['noAntrian'],
                 "angkaantrean" => $this->dataDaftarPoliRJ['noAntrian'],
-                "estimasidilayani" => $jadwal_estimasi->timestamp,
+                "estimasidilayani" => $jadwal_estimasi,
                 "sisakuotajkn" => $JadwalPraktek['kuota'] - $this->dataDaftarPoliRJ['noAntrian'],
                 "kuotajkn" => $JadwalPraktek['kuota'],
                 "sisakuotanonjkn" => $JadwalPraktek['kuota'] - $this->dataDaftarPoliRJ['noAntrian'],
                 "kuotanonjkn" => $JadwalPraktek['kuota'],
                 "keterangan" => "Peserta harap 30 menit lebih awal guna pencatatan administrasi.",
             ];
+
+            // dd($jadwal_estimasi);
+            // dd(Carbon::createFromTimestamp($jadwal_estimasi / 1000)->toDateTimeString());
+            // dd($antreanadd);
         }
 
         // http Post
@@ -1807,6 +1809,8 @@ class DaftarRJ extends Component
         $noBooking = $this->dataDaftarPoliRJ['noBooking'];
         $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId3'] = $this->dataDaftarPoliRJ['rjDate'];
         $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId3'])->timestamp * 1000; //waktu dalam timestamp milisecond
+        // $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId3'])->valueOf(); //waktu dalam timestamp milisecond
+        $waktu = Carbon::now()->timestamp * 1000;
 
         $this->pushDataTaskId($noBooking, 3, $waktu);
     }

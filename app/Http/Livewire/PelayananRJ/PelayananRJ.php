@@ -8,9 +8,10 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
+use Illuminate\Support\Arr;
+
 
 use App\Http\Traits\BPJS\AntrianTrait;
-
 
 use Spatie\ArrayToXml\ArrayToXml;
 
@@ -530,8 +531,9 @@ class PelayananRJ extends Component
         // cari no Booking
         $noBooking =  $this->dataDaftarPoliRJ['noBooking'];
 
-        $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4'])->timestamp * 1000; //waktu dalam timestamp milisecond
 
+        $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4'])->timestamp * 1000; //waktu dalam timestamp milisecond
+        $waktu = Carbon::now()->timestamp * 1000;
         $this->pushDataTaskId($noBooking, 4, $waktu);
     }
 
@@ -586,11 +588,11 @@ class PelayananRJ extends Component
             // ulangi proses taskId start pushDataAntrian booking + task id 3
             // $this->pushDataAntrian($rjNo);
 
-            $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId3'])->timestamp * 1000; //waktu dalam timestamp milisecond
-            $this->pushDataTaskId($noBooking, 3, $waktu);
+            // $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId3'])->timestamp * 1000; //waktu dalam timestamp milisecond
+            // $this->pushDataTaskId($noBooking, 3, $waktu);
 
-            $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4'])->timestamp * 1000; //waktu dalam timestamp milisecond
-            $this->pushDataTaskId($noBooking, 4, $waktu);
+            // $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4'])->timestamp * 1000; //waktu dalam timestamp milisecond
+            // $this->pushDataTaskId($noBooking, 4, $waktu);
             // ulangi proses taskId end
 
             // //////////////////////////
@@ -599,6 +601,7 @@ class PelayananRJ extends Component
 
 
             $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5'])->timestamp * 1000; //waktu dalam timestamp milisecond
+            $waktu = Carbon::now()->timestamp * 1000;
             $this->pushDataTaskId($noBooking, 5, $waktu);
 
             $this->emit('toastr-success', "Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
@@ -637,6 +640,15 @@ class PelayananRJ extends Component
         }
     }
 
+
+    public function getListTaskId($noBooking): void
+    {
+
+        $HttpGetBpjs =  AntrianTrait::taskid_antrean($noBooking)->getOriginalContent();
+
+        dd($HttpGetBpjs);
+        $this->emit('toastr-success', 'Task Id' . $noBooking . ' ' . $HttpGetBpjs);
+    }
 
     private function pushDataTaskId($noBooking, $taskId, $time): void
     {
@@ -802,6 +814,8 @@ class PelayananRJ extends Component
         $noBooking = $this->dataDaftarPoliRJ['noBooking'];
         $this->pushDataTaskId($noBooking, 3, $waktu);
     }
+
+
 
     // when new form instance
     public function mount()
