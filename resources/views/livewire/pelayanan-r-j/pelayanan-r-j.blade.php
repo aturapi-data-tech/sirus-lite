@@ -176,6 +176,12 @@
                                                 </x-sort-link>
                                             </th>
 
+                                            <th scope="col" class="px-4 py-3 ">
+                                                <x-sort-link :active=false wire:click.prevent="" role="button"
+                                                    href="#">
+                                                    SEP
+                                                </x-sort-link>
+                                            </th>
 
 
                                             <th scope="col" class="px-4 py-3 ">
@@ -188,7 +194,7 @@
 
 
 
-                                            <th scope="col" class="w-8 px-4 py-3 text-center">Action
+                                            <th scope="col" class="px-4 py-3 text-center ">Action
                                             </th>
                                         </tr>
                                     </thead>
@@ -233,6 +239,18 @@
                                                             {{ 'Nomer Pelayanan ' . $RJp->no_antrian }}
                                                         </div>
                                                     </div>
+                                                </td>
+
+                                                <td
+                                                    class="px-4 py-3 break-all group-hover:bg-gray-100 dark:text-white w-52">
+
+                                                    <div class="mb-2 font-semibold text-primary">
+                                                        {{ $RJp->vno_sep }}
+                                                    </div>
+                                                    <div>
+                                                        {{ '' . $RJp->push_antrian_bpjs_status . $RJp->push_antrian_bpjs_json }}
+                                                    </div>
+
                                                 </td>
 
                                                 <td
@@ -325,6 +343,8 @@
 
                                     </tbody>
                                 </table>
+
+
 
 
 
