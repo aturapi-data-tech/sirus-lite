@@ -1759,7 +1759,9 @@ class DaftarRJ extends Component
 
             //ketika Push Tambah Antrean Berhasil buat SEP
             //////////////////////////////////////////////
-            $this->pushInsertSEP($this->SEPJsonReq);
+            if ($this->JenisKlaim['JenisKlaimId'] == 'JM') {
+                $this->pushInsertSEP($this->SEPJsonReq);
+            }
             //ketika Push Tambah Antrean Berhasil buat SEP
             //////////////////////////////////////////////
 
@@ -1780,7 +1782,9 @@ class DaftarRJ extends Component
 
                 //ketika Push Tambah Antrean Berhasil buat SEP
                 //////////////////////////////////////////////
-                $this->pushInsertSEP($this->SEPJsonReq);
+                if ($this->JenisKlaim['JenisKlaimId'] == 'JM') {
+                    $this->pushInsertSEP($this->SEPJsonReq);
+                }
                 //ketika Push Tambah Antrean Berhasil buat SEP
                 //////////////////////////////////////////////
             } else {
@@ -1800,10 +1804,9 @@ class DaftarRJ extends Component
         // Update TaskId 3
         /////////////////////////
 
-        $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'])->timestamp * 1000; //waktu dalam timestamp milisecond
-        // DB Json
-        $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId3'] = $this->dataDaftarPoliRJ['rjDate'];
         $noBooking = $this->dataDaftarPoliRJ['noBooking'];
+        $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId3'] = $this->dataDaftarPoliRJ['rjDate'];
+        $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId3'])->timestamp * 1000; //waktu dalam timestamp milisecond
 
         $this->pushDataTaskId($noBooking, 3, $waktu);
     }
