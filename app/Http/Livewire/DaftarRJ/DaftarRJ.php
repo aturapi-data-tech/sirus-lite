@@ -1151,11 +1151,17 @@ class DaftarRJ extends Component
                 if ($this->JenisKlaim['JenisKlaimId'] == 'JM' && $this->JenisKunjungan['JenisKunjunganId'] == 1) {
                     $this->rujukanPesertaFKTP($this->dataPasien['pasien']['identitas']['idbpjs']);
                 } else if ($this->JenisKlaim['JenisKlaimId'] == 'JM' && $this->JenisKunjungan['JenisKunjunganId'] == 2) {
-                    // if jenis klaim BPJS dan Kunjungan = Kontrol (2)
-                    $this->rujukanPesertaFKTP($this->dataPasien['pasien']['identitas']['idbpjs']);
-                } else if ($this->JenisKlaim['JenisKlaimId'] == 'JM' && $this->JenisKunjungan['JenisKunjunganId'] == 3) {
                     // if jenis klaim BPJS dan Kunjungan = Inernal (3)
                     $this->rujukanPesertaFKTP($this->dataPasien['pasien']['identitas']['idbpjs']);
+                } else if ($this->JenisKlaim['JenisKlaimId'] == 'JM' && $this->JenisKunjungan['JenisKunjunganId'] == 3) {
+                    // if jenis klaim BPJS dan Kunjungan = Kontrol (2) / Post Inap
+                    if ($this->dataDaftarPoliRJ['postInap']) {
+                        $tanggal = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'])->format('Y-m-d');
+                        $this->pesertaNomorKartu($this->dataPasien['pasien']['identitas']['idbpjs'], $tanggal);
+                    } else {
+                        // if jenis klaim BPJS dan Kunjungan = Kontrol (2)
+                        $this->rujukanPesertaFKTP($this->dataPasien['pasien']['identitas']['idbpjs']);
+                    }
                 } else if ($this->JenisKlaim['JenisKlaimId'] == 'JM' && $this->JenisKunjungan['JenisKunjunganId'] == 4) {
                     // if jenis klaim BPJS dan Kunjungan = FKTL antar rs(4)
                     $this->rujukanPesertaFKTL($this->dataPasien['pasien']['identitas']['idbpjs']);
@@ -1872,7 +1878,22 @@ class DaftarRJ extends Component
         }
     }
 
+    private function pesertaNomorKartu($idBpjs, $tanggal): void
+    {
+        $HttpGetBpjs =  VclaimTrait::peserta_nomorkartu($idBpjs, $tanggal)->getOriginalContent();
 
+        // metadata d kecil
+        if ($HttpGetBpjs['metadata']['code'] == 200) {
+            $peserta = $HttpGetBpjs['response'];
+            $this->setSEPJsonReqPostInap($peserta);
+            $this->formRujukanRefBPJSStatus = true;
+            $this->emit('toastr-success', $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+        } else {
+            $this->dataRefBPJSLovStatus = false;
+            $this->dataRefBPJSLov = [];
+            $this->emit('toastr-error', $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+        }
+    }
 
 
 
@@ -2151,6 +2172,125 @@ class DaftarRJ extends Component
                             ? $cariDataIdBpjs_dr_poli->kd_dr_bpjs : "") . "", //(tidak diisi jika jnsPelayanan = "1" (RANAP),
                     "dpjpLayanNama" => "" . $cariDataIdBpjs_dr_poli->dr_name . "", //(tidak diisi jika jnsPelayanan = "1" (RANAP),
                     "noTelp" => "" . $dataRefBPJSLov['peserta']['mr']['noTelepon'] . "",
+                    "user" => "sirus App",
+                ],
+            ],
+        ];
+    }
+
+    private function setSEPJsonReqPostInap($dataRefPeserta): void
+    {
+
+        // cari data Poli sesuai rujukan BPJS (mapping data poli dan dokter)
+        $cariDataIdBpjs_dr_poli = DB::table('rsmst_doctors')
+            ->select('kd_dr_bpjs', 'kd_poli_bpjs', 'rsmst_doctors.dr_id as dr_id', 'dr_name', 'rsmst_doctors.poli_id as poli_id', 'poli_desc')
+            ->join('rsmst_polis', 'rsmst_doctors.poli_id', 'rsmst_polis.poli_id')
+            ->where('kd_poli_bpjs', 'XXXXXXXXXX')
+            ->whereNotNull('kd_poli_bpjs')
+            ->whereNotNull('kd_dr_bpjs')
+            ->first();
+
+        // Jika cariDataIdBpjs_dr_poli true
+        if ($cariDataIdBpjs_dr_poli) {
+
+            // Jika Data doker dan poli bpjs true
+            if (isset($cariDataIdBpjs_dr_poli->kd_dr_bpjs) && isset($cariDataIdBpjs_dr_poli->kd_poli_bpjs)) {
+                // set data dokter RJ
+                $this->dataDaftarPoliRJ['drId'] = $cariDataIdBpjs_dr_poli->dr_id;
+                $this->dataDaftarPoliRJ['drDesc'] = $cariDataIdBpjs_dr_poli->dr_name;
+
+                $this->dataDaftarPoliRJ['poliId'] = $cariDataIdBpjs_dr_poli->poli_id;
+                $this->dataDaftarPoliRJ['poliDesc'] = $cariDataIdBpjs_dr_poli->poli_desc;
+
+                $this->dataDaftarPoliRJ['kddrbpjs'] = $cariDataIdBpjs_dr_poli->kd_dr_bpjs;
+                $this->dataDaftarPoliRJ['kdpolibpjs'] = $cariDataIdBpjs_dr_poli->kd_poli_bpjs;
+            } else {
+                // jika salah satu data kosong
+                $this->emit('toastr-error', "Data Dokter atau Poli mapping BPJS belum di set.");
+            }
+        } else {
+            $this->emit('toastr-error', "Data Dokter atau Poli mapping BPJS belum tidak di temukan.");
+        }
+
+        $this->SEPJsonReq = [
+            "request" =>  [
+                "t_sep" =>  [
+                    "noKartu" => "" . $dataRefPeserta['peserta']['noKartu'] . "",
+                    "tglSep" => "" . Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'])->format('Y-m-d') . "", //Y-m-d =tgl rj
+                    "ppkPelayanan" => "0184R006", //ppk rs
+                    "jnsPelayanan" => "2", // {jenis pelayanan = 1. r.inap 2. r.jalan}
+                    "klsRawat" =>  [
+                        "klsRawatHak" => "" . $dataRefPeserta['peserta']['hakKelas']['kode'] . "",
+                        "klsRawatHakNama" => "" . $dataRefPeserta['peserta']['hakKelas']['keterangan'] . "",
+                        "klsRawatNaik" => "", //{diisi jika naik kelas rawat, 1. VVIP, 2. VIP, 3. Kelas 1, 4. Kelas 2, 5. Kelas 3, 6. ICCU, 7. ICU, 8. Diatas Kelas 1}
+                        "pembiayaan" => "", //{1. Pribadi, 2. Pemberi Kerja, 3. Asuransi Kesehatan Tambahan. diisi jika naik kelas rawat}
+                        "penanggungJawab" => "", //{Contoh: jika pembiayaan 1 maka penanggungJawab=Pribadi. diisi jika naik kelas rawat}
+                    ],
+                    "noMR" => "" . $dataRefPeserta['peserta']['mr']['noMR'] . "",
+                    "rujukan" =>  [
+                        "asalRujukan" => "" . $this->JenisKunjungan['JenisKunjunganId'] == "1" ? "1" : ($this->JenisKunjungan['JenisKunjunganId'] == "4" ? "2" : "1") . "", //{asal rujukan ->1.Faskes 1, 2. Faskes 2(RS)}
+                        "asalRujukanNama" => "" . $this->JenisKunjungan['JenisKunjunganId'] == "1" ? "Faskes Tingkat 1" : ($this->JenisKunjungan['JenisKunjunganId'] == "4" ? "Faskes Tingkat 2 RS" : "Faskes Tingkat 1") . "", //{asal rujukan ->1.Faskes 1, 2. Faskes 2(RS)}
+                        "tglRujukan" => "" . Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'])->format('Y-m-d') . "", //Y-m-d
+                        "noRujukan" => "" . '' . "",
+                        "ppkRujukan" => "" . '' . "", //{kode faskes rujukam -> baca di referensi faskes}
+                        "ppkRujukanNama" => "" . '' . "", //{kode faskes rujukam -> baca di referensi faskes}
+                    ],
+                    "catatan" => "-",
+                    "diagAwal" => "" . '' . "",
+                    "diagAwalNama" => "" . '' . "",
+                    "poli" =>  [
+                        "tujuan" => "" . '' . "", //Untuk Kunjungan Internal beda poli dgn rujukan
+                        "tujuanNama" => "" . '' . "",
+                        "eksekutif" => "" . "0" . "", //{poli eksekutif -> 0. Tidak 1.Ya}
+                        "eksekutifRef" =>  $this->SEPJsonReq['request']['t_sep']['poli']['eksekutifRef'], //{poli eksekutif -> 0. Tidak 1.Ya}
+                    ],
+                    "cob" =>  [
+                        "cob" => "" . "0" . "", //{cob -> 0.Tidak 1. Ya}
+                        "cobRef" => $this->SEPJsonReq['request']['t_sep']['cob']['cobRef'], //{cob -> 0.Tidak 1. Ya}
+
+                    ],
+                    "katarak" =>  [
+                        "katarak" => "" . "0" . "", //{katarak --> 0.Tidak 1.Ya}
+                        "katarakRef" =>  $this->SEPJsonReq['request']['t_sep']['katarak']['katarakRef'], //{katarak --> 0.Tidak 1.Ya}
+
+                    ],
+
+                    // fitur jaminan laka blm dikerjakan
+                    "jaminan" =>  [
+                        "lakaLantas" => "0", //" 0 : Bukan Kecelakaan lalu lintas [BKLL], 1 : KLL dan bukan kecelakaan Kerja [BKK], 2 : KLL dan KK, 3 : KK",
+                        "noLP" => "",
+                        "penjamin" =>  [
+                            "tglKejadian" => "",
+                            "keterangan" => "",
+                            "suplesi" =>  [
+                                "suplesi" => "0",
+                                "noSepSuplesi" => "",
+                                "lokasiLaka" =>  [
+                                    "kdPropinsi" => "",
+                                    "kdKabupaten" => "",
+                                    "kdKecamatan" => "",
+                                ]
+                            ]
+                        ]
+                    ],
+                    "tujuanKunj" => "0", //{"0": Normal,"1": Prosedur,"2": Konsul Dokter}
+                    "tujuanKunjDesc" => "Normal",
+
+                    "flagProcedure" => "",
+                    "flagProcedureDesc" => "",
+
+                    "kdPenunjang" => "",
+                    "kdPenunjangDesc" => "",
+
+                    "assesmentPel" => "",
+                    "assesmentPelDesc" => "",
+                    "skdp" =>  [
+                        "noSurat" => "", //disi ketika wire model dan JenisKunjunganId == 3
+                        "kodeDPJP" => "", //tidak di isi jika jenis kunjungan selain KONTROL
+                    ],
+                    "dpjpLayan" =>  "", //(tidak diisi jika jnsPelayanan = "1" (RANAP),
+                    "dpjpLayanNama" => "", //(tidak diisi jika jnsPelayanan = "1" (RANAP),
+                    "noTelp" => "" . $dataRefPeserta['peserta']['mr']['noTelepon'] . "",
                     "user" => "sirus App",
                 ],
             ],
