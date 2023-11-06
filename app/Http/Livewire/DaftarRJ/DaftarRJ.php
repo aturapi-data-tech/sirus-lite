@@ -1575,6 +1575,7 @@ class DaftarRJ extends Component
                     )
                         ->Join('rsmst_polis', 'rsmst_polis.poli_id', 'rsmst_doctors.poli_id')
 
+                        ->where('rsmst_doctors.active_status', '1')
                         ->Where(DB::raw('upper(dr_name)'), 'like', '%' . strtoupper($search) . '%')
                         ->orWhere('poli_desc', 'like', '%' . strtoupper($search) . '%')
                         ->limit(10)
@@ -1962,6 +1963,8 @@ class DaftarRJ extends Component
             'kd_poli_bpjs'
         )
             ->Join('rsmst_polis', 'rsmst_polis.poli_id', 'rsmst_doctors.poli_id')
+
+            ->where('rsmst_doctors.active_status', '1')
             ->where('rsmst_doctors.dr_id', $search)
             ->first();
 
@@ -1995,6 +1998,7 @@ class DaftarRJ extends Component
                     )
                         ->Join('rsmst_polis', 'rsmst_polis.poli_id', 'rsmst_doctors.poli_id')
 
+                        ->where('rsmst_doctors.active_status', '1')
                         ->Where(DB::raw('upper(dr_name)'), 'like', '%' . strtoupper($search) . '%')
                         ->orWhere('poli_desc', 'like', '%' . strtoupper($search) . '%')
                         ->limit(10)
@@ -2223,6 +2227,7 @@ class DaftarRJ extends Component
                     )
                         ->Join('rsmst_polis', 'rsmst_polis.poli_id', 'rsmst_doctors.poli_id')
 
+                        ->where('rsmst_doctors.active_status', '1')
                         ->Where(DB::raw('upper(dr_name)'), 'like', '%' . strtoupper($search) . '%')
                         ->orWhere('poli_desc', 'like', '%' . strtoupper($search) . '%')
                         ->limit(10)
