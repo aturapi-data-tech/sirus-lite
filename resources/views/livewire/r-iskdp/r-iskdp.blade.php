@@ -103,7 +103,7 @@
                     </div>
 
                     @if ($isOpen)
-                        @include('livewire.r-jskdp.create')
+                        @include('livewire.r-iskdp.create')
                     @endif
 
 

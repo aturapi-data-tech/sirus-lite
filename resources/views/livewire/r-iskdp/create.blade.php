@@ -55,9 +55,8 @@
 
                     {{-- Transasi Rawat Jalan --}}
                     <div id="TransaksiRawatJalan" class="px-4">
-
                         {{-- call Program --}}
-                        @livewire('mr-r-j.skdpRI.skdpRI', [
+                        @livewire('mr-r-j.skdp-r-i.skdp-r-i', [
                             // 'isOpen' => true,
                             // 'isOpenMode' => 'insert',
                             'riNoRef' => isset($dataDaftarRi['riHdrNo']) ? $dataDaftarRi['riHdrNo'] : '1',
