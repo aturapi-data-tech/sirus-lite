@@ -862,6 +862,8 @@ class DaftarRJ extends Component
     // insert and update record start////////////////
     public function store()
     {
+
+        dd($this->SEPJsonReq);
         // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
         $this->setDataPrimer();
         // Validate RJ
@@ -2425,6 +2427,7 @@ class DaftarRJ extends Component
         // set dokter sep
         $this->SEPJsonReq['request']['t_sep']['dpjpLayan'] = $dataDokterBPJS->kd_dr_bpjs;
 
+        // ketika post inap
         if ($this->dataDaftarPoliRJ['postInap']) {
             $this->SEPJsonReq['request']['t_sep']['skdp']['kodeDPJP'] = $dataDokterBPJS->kd_dr_bpjs;
         }
