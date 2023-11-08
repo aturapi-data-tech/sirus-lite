@@ -1,8 +1,8 @@
 @php
     $disabledProperty = true;
-    
+
     $disabledPropertyRj = $isOpenMode === 'tampil' ? true : false;
-    
+
     $disabledPropertyRjStatus = $statusRjRef['statusId'] !== 'A' ? true : false;
 @endphp
 
@@ -163,7 +163,7 @@
 
                         <div class="flex items-center justify-end w-full mr-5">
                             <x-text-input placeholder="Isi dgn data yang sesuai" class="mx-2 mt-1" :errorshas="__($errors->has('SEPJsonReq.request.t_sep.rujukan.noRujukan'))"
-                                :disabled=$disabledProperty
+                                :disabled=false
                                 wire:model.debounce.500ms="SEPJsonReq.request.t_sep.rujukan.noRujukan" />
                             @error('SEPJsonReq.request.t_sep.rujukan.noRujukan')
                                 <x-input-error :messages=$message />
@@ -331,7 +331,7 @@
 
                         @php
                             $myTujuanKunj = isset($SEPJsonReq['request']['t_sep']['tujuanKunj']) ? $SEPJsonReq['request']['t_sep']['tujuanKunj'] : '0';
-                            
+
                         @endphp
 
                         @if ($myTujuanKunj != '0')
