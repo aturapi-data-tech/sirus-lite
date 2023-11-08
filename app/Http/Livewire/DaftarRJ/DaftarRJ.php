@@ -2165,13 +2165,9 @@ class DaftarRJ extends Component
                     "assesmentPelDesc" => "",
                     "skdp" =>  [
                         "noSurat" => "", //disi ketika wire model dan JenisKunjunganId == 3
-                        "kodeDPJP" => "" . $dataRefBPJSLov['pelayanan']['kode'] == 1
-                            ? "" : (($cariDataIdBpjs_dr_poli->kd_dr_bpjs && $this->JenisKunjungan['JenisKunjunganId'] == 3)
-                                ? $cariDataIdBpjs_dr_poli->kd_dr_bpjs : "") . "", //tidak di isi jika jenis kunjungan selain KONTROL
+                        "kodeDPJP" => "" .  $cariDataIdBpjs_dr_poli->kd_dr_bpjs  . "", //tidak di isi jika jenis kunjungan selain KONTROL
                     ],
-                    "dpjpLayan" => "" . $dataRefBPJSLov['pelayanan']['kode'] == 1
-                        ? "" : ($cariDataIdBpjs_dr_poli->kd_dr_bpjs
-                            ? $cariDataIdBpjs_dr_poli->kd_dr_bpjs : "") . "", //(tidak diisi jika jnsPelayanan = "1" (RANAP),
+                    "dpjpLayan" => "" . $cariDataIdBpjs_dr_poli->kd_dr_bpjs . "", //(tidak diisi jika jnsPelayanan = "1" (RANAP),
                     "dpjpLayanNama" => "" . $cariDataIdBpjs_dr_poli->dr_name . "", //(tidak diisi jika jnsPelayanan = "1" (RANAP),
                     "noTelp" => "" . $dataRefBPJSLov['peserta']['mr']['noTelepon'] . "",
                     "user" => "sirus App",
