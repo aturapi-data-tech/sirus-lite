@@ -863,7 +863,7 @@ class DaftarRJ extends Component
     public function store()
     {
 
-        // dd($this->SEPJsonReq);
+        dd($this->SEPJsonReq);
         // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
         $this->setDataPrimer();
         // Validate RJ
