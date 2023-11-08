@@ -862,7 +862,6 @@ class DaftarRJ extends Component
     // insert and update record start////////////////
     public function store()
     {
-        @dd($this->SEPJsonReq);
         // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
         $this->setDataPrimer();
         // Validate RJ
@@ -2165,9 +2164,13 @@ class DaftarRJ extends Component
                     "assesmentPelDesc" => "",
                     "skdp" =>  [
                         "noSurat" => "", //disi ketika wire model dan JenisKunjunganId == 3
-                        "kodeDPJP" => "" .  $cariDataIdBpjs_dr_poli->kd_dr_bpjs  . "", //tidak di isi jika jenis kunjungan selain KONTROL
+                        "kodeDPJP" => "" . $dataRefBPJSLov['pelayanan']['kode'] == 1
+                            ? "" : (($cariDataIdBpjs_dr_poli->kd_dr_bpjs && $this->JenisKunjungan['JenisKunjunganId'] == 3)
+                                ? $cariDataIdBpjs_dr_poli->kd_dr_bpjs : "") . "", //tidak di isi jika jenis kunjungan selain KONTROL
                     ],
-                    "dpjpLayan" => "" . $cariDataIdBpjs_dr_poli->kd_dr_bpjs . "", //(tidak diisi jika jnsPelayanan = "1" (RANAP),
+                    "dpjpLayan" => "" . $dataRefBPJSLov['pelayanan']['kode'] == 1
+                        ? "" : ($cariDataIdBpjs_dr_poli->kd_dr_bpjs
+                            ? $cariDataIdBpjs_dr_poli->kd_dr_bpjs : "") . "", //(tidak diisi jika jnsPelayanan = "1" (RANAP),
                     "dpjpLayanNama" => "" . $cariDataIdBpjs_dr_poli->dr_name . "", //(tidak diisi jika jnsPelayanan = "1" (RANAP),
                     "noTelp" => "" . $dataRefBPJSLov['peserta']['mr']['noTelepon'] . "",
                     "user" => "sirus App",
@@ -2421,7 +2424,11 @@ class DaftarRJ extends Component
 
         // set dokter sep
         $this->SEPJsonReq['request']['t_sep']['dpjpLayan'] = $dataDokterBPJS->kd_dr_bpjs;
-        $this->SEPJsonReq['request']['t_sep']['dpjpLayanNama'] = $dataDokterBPJS->dr_name;
+
+        if ($this->dataDaftarPoliRJ['postInap']) {
+            $this->SEPJsonReq['request']['t_sep']['skdp']['kodeDPJP'] = $dataDokterBPJS->kd_dr_bpjs;
+        }
+        $this->SEPJsonReq['request']['t_sep']['kodeDPJP']['dpjpLayanNama'] = $dataDokterBPJS->dr_name;
         $this->SEPJsonReq['request']['t_sep']['poli']['tujuan'] = $dataDokterBPJS->kd_poli_bpjs;
         $this->SEPJsonReq['request']['t_sep']['poli']['tujuanNama'] = $dataDokterBPJS->poli_desc;
 
