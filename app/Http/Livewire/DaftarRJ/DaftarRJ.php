@@ -1367,6 +1367,7 @@ class DaftarRJ extends Component
                 "cekLab" => "0",
                 "kunjunganInternalStatus" => "0",
                 "noReferensi" => "" . $dataDaftarPoliRJ->reg_no . "",
+                "postInap" => [],
                 "taskIdPelayanan" => [
                     "taskId1" => "",
                     "taskId2" => "",
