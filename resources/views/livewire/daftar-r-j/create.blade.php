@@ -1269,9 +1269,11 @@
                                 </div>
 
                                 <div class="flex items-center justify-end mb-2">
+                                    @php
+                                        $dataPasienRegNo = $dataPasien['pasien']['regNo'] ? $dataPasien['pasien']['regNo'] : '110750Z';
+                                    @endphp
 
-                                    <livewire:cetak.cetak-etiket :regNo="$dataPasien['pasien']['regNo']"
-                                        :wire:key="$dataPasien['pasien']['regNo']">
+                                    <livewire:cetak.cetak-etiket :regNo="$dataPasienRegNo" :wire:key="$dataPasienRegNo">
 
                                         <x-yellow-button wire:click.prevent="cetakSEP()" type="button"
                                             wire:loading.remove>
