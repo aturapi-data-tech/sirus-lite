@@ -290,7 +290,7 @@
                                                     <div class="inline-flex">
 
                                                         <livewire:cetak.cetak-etiket :regNo="$RJp->reg_no"
-                                                            :wire:key="$RJp->reg_no">
+                                                            :wire:key="$RJp->rj_no">
 
                                                             <!-- Dropdown Action menu Flowbite-->
                                                             <div>
