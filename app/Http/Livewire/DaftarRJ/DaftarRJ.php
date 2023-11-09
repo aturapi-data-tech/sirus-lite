@@ -863,7 +863,7 @@ class DaftarRJ extends Component
     public function store()
     {
 
-        // dd($this->SEPJsonReq);
+        dd($this->SEPJsonReq);
         // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
         $this->setDataPrimer();
         // Validate RJ
@@ -2184,36 +2184,7 @@ class DaftarRJ extends Component
     private function setSEPJsonReqPostInap($dataRefPeserta): void
     {
 
-        // cari data Poli sesuai rujukan BPJS (mapping data poli dan dokter)
-        $cariDataIdBpjs_dr_poli = DB::table('rsmst_doctors')
-            ->select('kd_dr_bpjs', 'kd_poli_bpjs', 'rsmst_doctors.dr_id as dr_id', 'dr_name', 'rsmst_doctors.poli_id as poli_id', 'poli_desc')
-            ->join('rsmst_polis', 'rsmst_doctors.poli_id', 'rsmst_polis.poli_id')
-            ->where('kd_poli_bpjs', 'XXXXXXXXXX')
-            ->whereNotNull('kd_poli_bpjs')
-            ->whereNotNull('kd_dr_bpjs')
-            ->first();
 
-        // Jika cariDataIdBpjs_dr_poli true
-        if ($cariDataIdBpjs_dr_poli) {
-
-            // Jika Data doker dan poli bpjs true
-            if (isset($cariDataIdBpjs_dr_poli->kd_dr_bpjs) && isset($cariDataIdBpjs_dr_poli->kd_poli_bpjs)) {
-                // set data dokter RJ
-                $this->dataDaftarPoliRJ['drId'] = $cariDataIdBpjs_dr_poli->dr_id;
-                $this->dataDaftarPoliRJ['drDesc'] = $cariDataIdBpjs_dr_poli->dr_name;
-
-                $this->dataDaftarPoliRJ['poliId'] = $cariDataIdBpjs_dr_poli->poli_id;
-                $this->dataDaftarPoliRJ['poliDesc'] = $cariDataIdBpjs_dr_poli->poli_desc;
-
-                $this->dataDaftarPoliRJ['kddrbpjs'] = $cariDataIdBpjs_dr_poli->kd_dr_bpjs;
-                $this->dataDaftarPoliRJ['kdpolibpjs'] = $cariDataIdBpjs_dr_poli->kd_poli_bpjs;
-            } else {
-                // jika salah satu data kosong
-                $this->emit('toastr-error', "Data Dokter atau Poli mapping BPJS belum di set.");
-            }
-        } else {
-            $this->emit('toastr-error', "Data Dokter atau Poli mapping BPJS belum tidak di temukan.");
-        }
 
         $this->SEPJsonReq = [
             "request" =>  [

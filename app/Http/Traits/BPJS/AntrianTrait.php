@@ -391,7 +391,9 @@ trait AntrianTrait
     {
 
         // customErrorMessages
-        $messages = customErrorMessagesTrait::messages();
+        // $messages = customErrorMessagesTrait::messages();
+        $messages = [];
+
 
         $r = [
             "kodebooking" => $antreanadd['kodebooking'],
