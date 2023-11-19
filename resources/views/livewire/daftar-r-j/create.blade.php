@@ -1169,6 +1169,16 @@
                                 @endif
                             </div>
 
+                            <div class="grid grid-cols-2">
+                                @if ($JenisKunjungan['JenisKunjunganId'] === '2')
+                                    @foreach ($dataDaftarPoliRJ['internal12Options'] as $internal12)
+                                        {{-- @dd($sRj) --}}
+                                        <x-radio-button :label="__($internal12['internal12Desc'])" value="{{ $internal12['internal12'] }}"
+                                            wire:model="dataDaftarPoliRJ.internal12" />
+                                    @endforeach
+                                @endif
+                            </div>
+
                             <div>
                                 <x-input-label :value="__('No Referensi')" :required="__(true)" />
                                 <div class="flex items-center mb-2">

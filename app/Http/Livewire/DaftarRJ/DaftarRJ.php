@@ -340,6 +340,20 @@ class DaftarRJ extends Component
         "kunjunganInternalStatus" => "0",
         "noReferensi" => '',
         "postInap" => [],
+        "internal12" => "1",
+        "internal12Desc" => "Faskes Tingkat 1",
+        "internal12Options" => [
+            [
+                "internal12" => "1",
+                "internal12Desc" => "Faskes Tingkat 1"
+            ],
+            [
+                "internal12" => "2",
+                "internal12Desc" => "Faskes Tingkat 2 RS"
+            ],
+        ],
+
+
         "taskIdPelayanan" => [
             "taskId1" => "",
             "taskId2" => "",
@@ -1152,18 +1166,31 @@ class DaftarRJ extends Component
                 // if jenis klaim BPJS dan Kunjungan = FKTP (1)
                 if ($this->JenisKlaim['JenisKlaimId'] == 'JM' && $this->JenisKunjungan['JenisKunjunganId'] == 1) {
                     $this->rujukanPesertaFKTP($this->dataPasien['pasien']['identitas']['idbpjs']);
+                    // 
+                    // 
+                    // 
                 } else if ($this->JenisKlaim['JenisKlaimId'] == 'JM' && $this->JenisKunjungan['JenisKunjunganId'] == 2) {
-                    // if jenis klaim BPJS dan Kunjungan = Inernal (3)
-                    $this->rujukanPesertaFKTP($this->dataPasien['pasien']['identitas']['idbpjs']);
+                    // if jenis klaim BPJS dan Kunjungan = Inernal (2) FKTP 1 atau FKTL 2
+                    if ($this->dataDaftarPoliRJ['internal12'] == "1") {
+                        $this->rujukanPesertaFKTP($this->dataPasien['pasien']['identitas']['idbpjs']);
+                    } else {
+                        $this->rujukanPesertaFKTL($this->dataPasien['pasien']['identitas']['idbpjs']);
+                    }
+                    // 
+                    // 
+                    // 
                 } else if ($this->JenisKlaim['JenisKlaimId'] == 'JM' && $this->JenisKunjungan['JenisKunjunganId'] == 3) {
-                    // if jenis klaim BPJS dan Kunjungan = Kontrol (2) / Post Inap
+                    // if jenis klaim BPJS dan Kunjungan = Kontrol (3) / Post Inap
                     if ($this->dataDaftarPoliRJ['postInap']) {
                         $tanggal = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'])->format('Y-m-d');
                         $this->pesertaNomorKartu($this->dataPasien['pasien']['identitas']['idbpjs'], $tanggal);
                     } else {
-                        // if jenis klaim BPJS dan Kunjungan = Kontrol (2)
+                        // if jenis klaim BPJS dan Kunjungan = Kontrol (3)
                         $this->rujukanPesertaFKTP($this->dataPasien['pasien']['identitas']['idbpjs']);
                     }
+                    // 
+                    // 
+                    // 
                 } else if ($this->JenisKlaim['JenisKlaimId'] == 'JM' && $this->JenisKunjungan['JenisKunjunganId'] == 4) {
                     // if jenis klaim BPJS dan Kunjungan = FKTL antar rs(4)
                     $this->rujukanPesertaFKTL($this->dataPasien['pasien']['identitas']['idbpjs']);
@@ -1370,6 +1397,18 @@ class DaftarRJ extends Component
                 "kunjunganInternalStatus" => "0",
                 "noReferensi" => "" . $dataDaftarPoliRJ->reg_no . "",
                 "postInap" => [],
+                "internal12" => "1",
+                "internal12Desc" => "Faskes Tingkat 1",
+                "internal12Options" => [
+                    [
+                        "internal12" => "1",
+                        "internal12Desc" => "Faskes Tingkat 1"
+                    ],
+                    [
+                        "internal12" => "2",
+                        "internal12Desc" => "Faskes Tingkat 2 RS"
+                    ]
+                ],
                 "taskIdPelayanan" => [
                     "taskId1" => "",
                     "taskId2" => "",
