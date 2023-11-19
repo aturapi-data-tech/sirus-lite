@@ -1167,6 +1167,15 @@
                                     <x-check-box value='1' :label="__('Post Inap')"
                                         wire:model="dataDaftarPoliRJ.postInap" />
                                 @endif
+                                <div class="grid grid-cols-2 mt-2">
+                                    @if ($JenisKunjungan['JenisKunjunganId'] === '3' && !$dataDaftarPoliRJ['postInap'])
+                                        @foreach ($dataDaftarPoliRJ['kontrol12Options'] as $kontrol12)
+                                            {{-- @dd($sRj) --}}
+                                            <x-radio-button :label="__($kontrol12['kontrol12Desc'])" value="{{ $kontrol12['kontrol12'] }}"
+                                                wire:model="dataDaftarPoliRJ.kontrol12" />
+                                        @endforeach
+                                    @endif
+                                </div>
                             </div>
 
                             <div class="grid grid-cols-2">

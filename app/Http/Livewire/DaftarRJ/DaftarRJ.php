@@ -352,8 +352,18 @@ class DaftarRJ extends Component
                 "internal12Desc" => "Faskes Tingkat 2 RS"
             ],
         ],
-
-
+        "kontrol12" => "1",
+        "kontrol12Desc" => "Faskes Tingkat 1",
+        "kontrol12Options" => [
+            [
+                "kontrol12" => "1",
+                "kontrol12Desc" => "Faskes Tingkat 1"
+            ],
+            [
+                "kontrol12" => "2",
+                "kontrol12Desc" => "Faskes Tingkat 2 RS"
+            ],
+        ],
         "taskIdPelayanan" => [
             "taskId1" => "",
             "taskId2" => "",
@@ -1186,7 +1196,11 @@ class DaftarRJ extends Component
                         $this->pesertaNomorKartu($this->dataPasien['pasien']['identitas']['idbpjs'], $tanggal);
                     } else {
                         // if jenis klaim BPJS dan Kunjungan = Kontrol (3)
-                        $this->rujukanPesertaFKTP($this->dataPasien['pasien']['identitas']['idbpjs']);
+                        if ($this->dataDaftarPoliRJ['kontrol12'] == "1") {
+                            $this->rujukanPesertaFKTP($this->dataPasien['pasien']['identitas']['idbpjs']);
+                        } else {
+                            $this->rujukanPesertaFKTL($this->dataPasien['pasien']['identitas']['idbpjs']);
+                        }
                     }
                     // 
                     // 
@@ -1408,6 +1422,18 @@ class DaftarRJ extends Component
                         "internal12" => "2",
                         "internal12Desc" => "Faskes Tingkat 2 RS"
                     ]
+                ],
+                "kontrol12" => "1",
+                "kontrol12Desc" => "Faskes Tingkat 1",
+                "kontrol12Options" => [
+                    [
+                        "kontrol12" => "1",
+                        "kontrol12Desc" => "Faskes Tingkat 1"
+                    ],
+                    [
+                        "kontrol12" => "2",
+                        "kontrol12Desc" => "Faskes Tingkat 2 RS"
+                    ],
                 ],
                 "taskIdPelayanan" => [
                     "taskId1" => "",
@@ -2130,6 +2156,50 @@ class DaftarRJ extends Component
             $this->emit('toastr-error', "Data Dokter atau Poli mapping BPJS belum tidak di temukan.");
         }
 
+        // Mencari asalRujukan
+        // if jenis klaim BPJS dan Kunjungan = FKTP (1)
+        if ($this->JenisKlaim['JenisKlaimId'] == 'JM' && $this->JenisKunjungan['JenisKunjunganId'] == 1) {
+            $asalRujukan = "1";
+            $asalRujukanNama = "Faskes Tingkat 1";
+            // 
+            // 
+            // 
+        } else if ($this->JenisKlaim['JenisKlaimId'] == 'JM' && $this->JenisKunjungan['JenisKunjunganId'] == 2) {
+            // if jenis klaim BPJS dan Kunjungan = Inernal (2) FKTP 1 atau FKTL 2
+            if ($this->dataDaftarPoliRJ['internal12'] == "1") {
+                $asalRujukan = "1";
+                $asalRujukanNama = "Faskes Tingkat 1";
+            } else {
+                $asalRujukan = "2";
+                $asalRujukanNama = "Faskes Tingkat 2 RS";
+            }
+            // 
+            // 
+            // 
+        } else if ($this->JenisKlaim['JenisKlaimId'] == 'JM' && $this->JenisKunjungan['JenisKunjunganId'] == 3) {
+            // if jenis klaim BPJS dan Kunjungan = Kontrol (3) / Post Inap
+            if ($this->dataDaftarPoliRJ['postInap']) {
+                $asalRujukan = "2";
+                $asalRujukanNama = "Faskes Tingkat 2 RS";
+            } else {
+                // if jenis klaim BPJS dan Kunjungan = Kontrol (3)
+                if ($this->dataDaftarPoliRJ['kontrol12'] == "1") {
+                    $asalRujukan = "1";
+                    $asalRujukanNama = "Faskes Tingkat 1";
+                } else {
+                    $asalRujukan = "2";
+                    $asalRujukanNama = "Faskes Tingkat 2 RS";
+                }
+            }
+            // 
+            // 
+            // 
+        } else if ($this->JenisKlaim['JenisKlaimId'] == 'JM' && $this->JenisKunjungan['JenisKunjunganId'] == 4) {
+            // if jenis klaim BPJS dan Kunjungan = FKTL antar rs(4)
+            $asalRujukan = "2";
+            $asalRujukanNama = "Faskes Tingkat 2 RS";
+        }
+
 
         $this->SEPJsonReq = [
             "request" =>  [
@@ -2147,19 +2217,8 @@ class DaftarRJ extends Component
                     ],
                     "noMR" => "" . $dataRefBPJSLov['peserta']['mr']['noMR'] . "",
                     "rujukan" =>  [
-                        "asalRujukan" =>  $this->JenisKunjungan['JenisKunjunganId'] == "1" ? "1"
-                            : ($this->JenisKunjungan['JenisKunjunganId'] == "2" && $this->JenisKunjungan['internal12'] == "1" ? "1"
-                                : ($this->JenisKunjungan['JenisKunjunganId'] == "2" && $this->JenisKunjungan['internal12'] == "2" ? "2"
-                                    : ($this->JenisKunjungan['JenisKunjunganId'] == "3" && $this->JenisKunjungan['postInap'] ? "2"
-                                        : ($this->JenisKunjungan['JenisKunjunganId'] == "4" ? "2"
-                                            : "1")))),
-                        //{asal rujukan ->1.Faskes 1, 2. Faskes 2(RS)}
-                        "asalRujukanNama" => $this->JenisKunjungan['JenisKunjunganId'] == "1" ? "Faskes Tingkat 1"
-                            : ($this->JenisKunjungan['JenisKunjunganId'] == "2" && $this->JenisKunjungan['internal12'] == "1" ? "Faskes Tingkat 1"
-                                : ($this->JenisKunjungan['JenisKunjunganId'] == "2" && $this->JenisKunjungan['internal12'] == "2" ? "Faskes Tingkat 2 RS"
-                                    : ($this->JenisKunjungan['JenisKunjunganId'] == "3" && $this->JenisKunjungan['postInap'] ? "Faskes Tingkat 2 RS"
-                                        : ($this->JenisKunjungan['JenisKunjunganId'] == "4" ? "Faskes Tingkat 2 RS"
-                                            :  "Faskes Tingkat 1")))), //{asal rujukan ->1.Faskes 1, 2. Faskes 2(RS)}
+                        "asalRujukan" =>  $asalRujukan, //{asal rujukan ->1.Faskes 1, 2. Faskes 2(RS)}
+                        "asalRujukanNama" => $asalRujukanNama, //{asal rujukan ->1.Faskes 1, 2. Faskes 2(RS)}
                         "tglRujukan" => "" . $dataRefBPJSLov['tglKunjungan'] . "", //Y-m-d
                         "noRujukan" => "" . $dataRefBPJSLov['noKunjungan'] . "",
                         "ppkRujukan" => "" . $dataRefBPJSLov['provPerujuk']['kode'] . "", //{kode faskes rujukam -> baca di referensi faskes}
