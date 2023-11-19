@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Livewire\MasterPasien\MasterPasien;
 use App\Http\Livewire\PendaftaranMandiriPasienPoli\PendaftaranMandiriPasienPoli;
 use App\Http\Livewire\DaftarRJ\DaftarRJ;
+use App\Http\Livewire\DaftarUGD\DaftarUGD;
+
+
 use App\Http\Livewire\RJskdp\RJskdp;
 use App\Http\Livewire\RIskdp\RIskdp;
 
@@ -73,6 +76,8 @@ Route::view('/cetak-tiket', 'livewire.pendaftaran-mandiri-pasien-poli.cetak-tike
 Route::get('MasterPasien', MasterPasien::class)->middleware('auth')->name('MasterPasien');
 
 Route::get('daftarRJ', DaftarRJ::class)->middleware('auth')->name('daftarRJ');
+Route::get('daftarUGD', DaftarUGD::class)->middleware('auth')->name('daftarUGD');
+
 
 Route::view('/cetak-sep', 'livewire.daftar-r-j.cetak-sep');
 Route::view('/cetak-etiket', 'livewire.daftar-r-j.cetak-etiket');
