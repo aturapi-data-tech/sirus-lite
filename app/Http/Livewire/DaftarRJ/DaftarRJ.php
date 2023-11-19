@@ -2173,6 +2173,7 @@ class DaftarRJ extends Component
                 $asalRujukan = "2";
                 $asalRujukanNama = "Faskes Tingkat 2 RS";
             }
+
             // 
             // 
             // 
