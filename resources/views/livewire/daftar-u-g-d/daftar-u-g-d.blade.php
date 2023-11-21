@@ -362,7 +362,7 @@
                 let cfn = confirm('Apakah anda ingin menghapus data ini ' + name + '?');
 
                 if (cfn) {
-                    window.livewire.emit('confirm_remove_record_RJp', key, name);
+                    window.livewire.emit('confirm_remove_record_UGDp', key, name);
                 }
             });
 

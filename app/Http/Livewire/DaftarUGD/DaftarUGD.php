@@ -34,7 +34,6 @@ class DaftarUGD extends Component
     // my Reg No
 
     public string $regNo = '';
-    public int $rjNo = 1;
 
 
 
@@ -145,6 +144,7 @@ class DaftarUGD extends Component
     // listener from blade////////////////
     protected $listeners = [
         'ListenerisOpenUgd' => 'ListenerisOpenUgd',
+        'confirm_remove_record_UGDp' => 'delete'
     ];
 
     public function ListenerisOpenUgd($ListenerisOpenUgd): void
@@ -165,6 +165,18 @@ class DaftarUGD extends Component
     {
         $this->openModal();
     }
+
+    public function tampil()
+    {
+        $this->emit('toastr-error', 'Fitur dalam masa pengembangan');
+    }
+
+    public function delete()
+    {
+        $this->emit('toastr-error', 'Fitur dalam masa pengembangan');
+    }
+
+
 
 
     // when new form instance

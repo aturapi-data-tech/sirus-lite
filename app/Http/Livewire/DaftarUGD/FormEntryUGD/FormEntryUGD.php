@@ -1017,7 +1017,6 @@ class FormEntryUGD extends Component
         $this->reset(
             [
                 'dataPasienLovSearch',
-                'rjNo',
                 'isOpenMode',
                 'forceInsertRecord',
                 'dataPasien',

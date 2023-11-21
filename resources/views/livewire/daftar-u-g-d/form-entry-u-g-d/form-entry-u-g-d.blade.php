@@ -266,7 +266,7 @@
 
                 <x-green-button :disabled=$disabledPropertyRjStatus wire:click.prevent="store()" type="button"
                     wire:loading.remove>
-                    Simpan
+                    {{ $isOpenMode == 'insert' ? 'Simpan' : 'Update' }}
                 </x-green-button>
             @endif
             <x-light-button wire:click="closeModal()" type="button">Keluar</x-light-button>
