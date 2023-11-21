@@ -35,6 +35,9 @@ class DaftarUGD extends Component
 
     public string $regNo = '';
 
+    public bool $callMasterPasien = false;
+
+
 
 
 
@@ -176,6 +179,12 @@ class DaftarUGD extends Component
         $this->emit('toastr-error', 'Fitur dalam masa pengembangan');
     }
 
+
+    public function callFormPasien(): void
+    {
+        // set Call MasterPasien True
+        $this->callMasterPasien = true;
+    }
 
 
 

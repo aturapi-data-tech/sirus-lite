@@ -79,6 +79,16 @@
 
             </div>
 
+            <div class="flex justify-end w-1/3">
+                <x-primary-button :disabled=false wire:click.prevent="callFormPasien()" type="button"
+                    wire:loading.remove>
+                    Master Pasien
+                </x-primary-button>
+                <div wire:loading wire:target="callFormPasien">
+                    <x-loading />
+                </div>
+            </div>
+
             <div class="flex justify-end w-1/2">
                 <x-primary-button wire:click="create()" class="flex justify-center ">
                     <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
@@ -286,6 +296,15 @@
 
 
     </div>
+
+    {{-- call MasterPasien --}}
+    @if ($callMasterPasien)
+        @livewire('master-pasien.master-pasien', [
+            'isOpen' => true,
+            'isOpenMode' => 'insert',
+            'dataPasienBPJSSearch' => isset($dataPasien['pasien']['cariDataPasien']) ? $dataPasien['pasien']['cariDataPasien'] : '',
+        ])
+    @endif
 
     {{-- Canvas 
     Main BgColor / 

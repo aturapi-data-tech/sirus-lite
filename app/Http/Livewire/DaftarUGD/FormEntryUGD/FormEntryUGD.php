@@ -37,6 +37,8 @@ class FormEntryUGD extends Component
     public bool $forceInsertRecord = false;
 
 
+
+
     public  $dataPasien = [
         "pasien" => [
             "pasientidakdikenal" => [],  //status pasien tdak dikenal 0 false 1 true
@@ -1813,6 +1815,8 @@ class FormEntryUGD extends Component
             }
         }
     }
+
+
 
 
     public function render()
