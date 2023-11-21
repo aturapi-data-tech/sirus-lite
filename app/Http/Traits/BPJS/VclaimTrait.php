@@ -333,7 +333,9 @@ trait VclaimTrait
     public static function peserta_nomorkartu($nomorKartu, $tanggal)
     {
         // customErrorMessages
-        $messages = customErrorMessagesTrait::messages();
+        // $messages = customErrorMessagesTrait::messages();
+        $messages = [];
+
         // Masukkan Nilai dari parameter
 
         $r = [

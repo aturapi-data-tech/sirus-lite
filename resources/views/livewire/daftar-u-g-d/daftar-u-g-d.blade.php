@@ -30,7 +30,7 @@
                     </div>
 
                     <x-text-input type="text" class="w-full p-2 pl-10" placeholder="Cari Data" autofocus
-                        wire:model="myTopBar.refSearch" />
+                        wire:model="refFilter" />
                 </div>
                 {{-- Cari Data --}}
 
@@ -61,7 +61,7 @@
                     </div>
 
                     <x-text-input type="text" class="w-full p-2 pl-10 " placeholder="[Shift 1/2/3]"
-                        wire:model="myTopBar.refShift" />
+                        wire:model="myTopBar.refShiftId" />
                 </div>
                 {{-- Shift --}}
 
@@ -108,13 +108,18 @@
                     <x-slot name="content">
 
                         @foreach ($myLimitPerPages as $myLimitPerPage)
-                            <x-dropdown-link wire:click="setLimitPerPage({{ $myLimitPerPage }})">
+                            <x-dropdown-link wire:click="$set('limitPerPage', '{{ $myLimitPerPage }}')">
                                 {{ __($myLimitPerPage) }}
                             </x-dropdown-link>
                         @endforeach
                     </x-slot>
                 </x-dropdown>
             </div>
+
+
+            @if ($isOpen)
+                @include('livewire.daftar-u-g-d.create')
+            @endif
 
         </div>
         {{-- Top Bar --}}
@@ -130,19 +135,19 @@
                 <thead class="sticky top-0 text-xs text-gray-900 uppercase bg-gray-100 ">
                     <tr>
                         <th scope="col" class="w-1/4 px-4 py-3 ">
-                            NIK
+                            Pasien
                         </th>
                         <th scope="col" class="w-1/4 px-4 py-3 ">
-                            Nama
+                            SEP
                         </th>
                         <th scope="col" class="w-1/4 px-4 py-3 ">
-                            Jabatan
+                            Poli
                         </th>
                         <th scope="col" class="w-1/4 px-4 py-3 ">
-                            Keterangan
+                            Status Layanan
                         </th>
                         <th scope="col" class="w-1/4 px-4 py-3 ">
-                            JamHadir
+                            Action
                         </th>
                     </tr>
                 </thead>
@@ -150,21 +155,110 @@
                 <tbody class="bg-white ">
 
                     @foreach ($myQueryData as $myQData)
-                        <tr class="border-b ">
-                            <td class="px-4 py-2">
-                                {{ $myQData->reg_name }}
+                        <tr class="border-b group dark:border-gray-700">
+
+
+                            <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
+                                <div class="">
+                                    <div class="font-semibold text-primary">
+                                        {{ $myQData->reg_no }}
+                                    </div>
+                                    <div class="font-semibold text-gray-900">
+                                        {{ $myQData->reg_name . ' / (' . $myQData->sex . ')' . ' / ' . $myQData->thn }}
+                                    </div>
+                                    <div class="font-normal text-gray-900">
+                                        {{ $myQData->address }}
+                                    </div>
+                                </div>
                             </td>
-                            <td class="px-4 py-2">
-                                {{ $myQData->reg_name }}
+
+
+                            <td
+                                class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-primary whitespace-nowrap dark:text-white">
+                                {{ $myQData->vno_sep }}
                             </td>
-                            <td class="px-4 py-2">
-                                {{ $myQData->reg_name }}
+
+
+                            <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
+                                <div class="">
+                                    <div class="font-semibold text-primary">{{ $myQData->poli_desc }}
+                                    </div>
+                                    <div class="font-semibold text-gray-900">
+                                        {{ $myQData->dr_name . ' / ' }}
+                                        {{ $myQData->klaim_id == 'UM'
+                                            ? 'UMUM'
+                                            : ($myQData->klaim_id == 'JM'
+                                                ? 'BPJS'
+                                                : ($myQData->klaim_id == 'KR'
+                                                    ? 'Kronis'
+                                                    : 'Asuransi Lain')) }}
+                                    </div>
+                                    <div class="font-normal text-gray-900">
+                                        {{ 'Nomer Pelayanan ' . $myQData->no_antrian }}
+                                    </div>
+                                </div>
                             </td>
-                            <td class="px-4 py-2">
-                                {{ $myQData->reg_name }}
+
+                            <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
+                                <div class="overflow-auto w-52">
+                                    <div class="font-semibold text-primary">{{ $myQData->rj_status }}
+                                    </div>
+                                    <div class="font-semibold text-gray-900">
+                                        {{ '' . $myQData->nobooking }}
+                                    </div>
+                                    <div class="font-normal text-gray-900 ">
+                                        {{ '' . $myQData->push_antrian_bpjs_status . $myQData->push_antrian_bpjs_json }}
+                                    </div>
+                                </div>
                             </td>
-                            <td class="px-4 py-2">
-                                {{ $myQData->reg_name }}
+
+                            <td class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-primary">
+
+
+                                <div class="inline-flex">
+
+                                    <livewire:cetak.cetak-etiket :regNo="$myQData->reg_no" :wire:key="$myQData->rj_no">
+
+                                        <!-- Dropdown Action menu Flowbite-->
+                                        <div>
+                                            <x-light-button id="dropdownButton{{ $myQData->rj_no }}"
+                                                class="inline-flex"
+                                                wire:click="$emit('pressDropdownButton','{{ $myQData->rj_no }}')">
+                                                <svg class="w-5 h-5" aria-hidden="true" fill="currentColor"
+                                                    viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                                    <path
+                                                        d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
+                                                </svg>
+                                            </x-light-button>
+
+                                            <!-- Dropdown Action Open menu -->
+                                            <div id="dropdownMenu{{ $myQData->rj_no }}"
+                                                class="z-10 hidden w-auto bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700">
+                                                <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
+                                                    aria-labelledby="dropdownButton{{ $myQData->rj_no }}">
+                                                    <li>
+                                                        <x-dropdown-link wire:click="tampil('{{ $myQData->rj_no }}')">
+                                                            {{ __('Tampil | ' . $myQData->reg_name) }}
+                                                        </x-dropdown-link>
+                                                    </li>
+                                                    <li>
+                                                        <x-dropdown-link wire:click="edit('{{ $myQData->rj_no }}')">
+                                                            {{ __('Ubah') }}
+                                                        </x-dropdown-link>
+                                                    </li>
+                                                    <li>
+                                                        <x-dropdown-link
+                                                            wire:click="$emit('confirm_remove_record', '{{ $myQData->rj_no }}', '{{ $myQData->reg_name }}')">
+                                                            {{ __('Hapus') }}
+                                                        </x-dropdown-link>
+                                                    </li>
+
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <!-- End Dropdown Action Open menu -->
+                                </div>
+
                             </td>
                         </tr>
                     @endforeach
@@ -376,6 +470,19 @@
             // });
         </script>
         {{-- Global Livewire JavaScript Object end --}}
+
+        {{-- Global Livewire JavaScript Object start --}}
+        <script type="text/javascript">
+            // confirmation message doble record
+            window.livewire.on('confirm_doble_recordUGD', (key, name) => {
+                console.log('x')
+                let cfn = confirm('Pasien Sudah terdaftar, Apakah anda ingin tetap menyimpan data ini ' + name + '?');
+
+                if (cfn) {
+                    window.livewire.emit('confirm_doble_record_UGDp', key, name);
+                }
+            });
+        </script>
     @endpush
 
 

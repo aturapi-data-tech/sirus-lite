@@ -18,7 +18,7 @@
 
 
         <!-- This element is to trick the browser into centering the modal contents. -->
-        <span class="hidden sm:inline-block sm:align-middle sm:h-screen"></span>​
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen"></span>
 
 
         <div class="inline-block overflow-auto text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:max-h-[35rem] sm:my-8 sm:align-middle sm:w-11/12"

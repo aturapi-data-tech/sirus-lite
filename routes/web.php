@@ -8,6 +8,7 @@ use App\Http\Livewire\MasterPasien\MasterPasien;
 use App\Http\Livewire\PendaftaranMandiriPasienPoli\PendaftaranMandiriPasienPoli;
 use App\Http\Livewire\DaftarRJ\DaftarRJ;
 use App\Http\Livewire\DaftarUGD\DaftarUGD;
+use App\Http\Livewire\DaftarUGD\DisplayPasien\DisplayPasien as DisplayPasienUGD;
 
 
 use App\Http\Livewire\RJskdp\RJskdp;
@@ -77,6 +78,7 @@ Route::get('MasterPasien', MasterPasien::class)->middleware('auth')->name('Maste
 
 Route::get('daftarRJ', DaftarRJ::class)->middleware('auth')->name('daftarRJ');
 Route::get('daftarUGD', DaftarUGD::class)->middleware('auth')->name('daftarUGD');
+Route::get('DisplayPasienUGD', DisplayPasienUGD::class)->middleware('auth')->name('DisplayPasienUGD');
 
 
 Route::view('/cetak-sep', 'livewire.daftar-r-j.cetak-sep');
