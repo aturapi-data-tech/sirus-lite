@@ -76,6 +76,9 @@
                                 <x-nav-link class="pl-4" :href="route('EmrRJ')" :active="request()->routeIs('EmrRJ')">
                                     {{ __('E Medical Record') }}
                                 </x-nav-link>
+                                <x-nav-link class="pl-4" :href="route('daftarUGD')" :active="request()->routeIs('daftarUGD')">
+                                    {{ __('Pendaftaran UGD') }}
+                                </x-nav-link>
                                 <x-nav-link class="pl-4" :href="route('SetupHfisBpjs')" :active="request()->routeIs('SetupHfisBpjs')">
                                     {{ __('SetupHfisBpjs') }}
                                 </x-nav-link>

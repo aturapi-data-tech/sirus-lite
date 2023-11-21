@@ -7,6 +7,9 @@ use Carbon\Carbon;
 use App\Http\Traits\customErrorMessagesTrait;
 use Spatie\ArrayToXml\ArrayToXml;
 
+use Barryvdh\DomPDF\Facade\Pdf;
+
+
 use App\Http\Traits\BPJS\VclaimTrait;
 
 
@@ -1759,6 +1762,58 @@ class FormEntryUGD extends Component
         //ketika Push Tambah Antrean Berhasil buat SEP
         //////////////////////////////////////////////
     }
+
+
+    public function cetakSEP()
+    {
+        // cek BPJS atau bukan
+        if ($this->JenisKlaim['JenisKlaimId'] != 'JM') {
+            $this->emit('toastr-error', 'Jenis Klaim ' . $this->JenisKlaim['JenisKlaimDesc']);
+        } else {
+            // cek ada resSep ada atau tidak
+            if (!$this->dataDaftarUgd['sep']['resSep']) {
+
+                // Http cek sep by no SEP
+                //////////////////////////////////////////////
+                $HttpGetBpjs =  VclaimTrait::sep_nomor($this->dataDaftarUgd['sep']['noSep'])->getOriginalContent();
+
+                if ($HttpGetBpjs['metadata']['code'] == 200) {
+
+                    $this->dataDaftarUgd['sep']['resSep'] = $HttpGetBpjs['response'];
+                    $this->dataDaftarUgd['sep']['noSep'] = $HttpGetBpjs['response']['noSep'];
+
+                    // update database
+                    DB::table('rstxn_rjhdrs')
+                        ->where('rj_no', $this->dataDaftarUgd['rjNo'])
+                        ->update([
+                            'datadaftarUgd_json' => json_encode($this->dataDaftarUgd, true),
+                            'datadaftarUgd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
+                        ]);
+
+
+                    $this->emit('toastr-success', 'CetakSEP ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+                } else {
+                    $this->emit('toastr-error', 'CetakSEP ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+                }
+            } else {
+
+                // cetak PDF
+                $data = [
+                    'data' => $this->dataDaftarUgd['sep']['resSep'],
+                    'reqData' => $this->dataDaftarUgd['sep']['reqSep'],
+
+                ];
+                $pdfContent = PDF::loadView('livewire.daftar-r-j.cetak-sep', $data)->output();
+                $this->emit('toastr-success', 'CetakSEP');
+
+                return response()->streamDownload(
+                    fn () => print($pdfContent),
+                    "filename.pdf"
+                );
+            }
+        }
+    }
+
 
     public function render()
     {

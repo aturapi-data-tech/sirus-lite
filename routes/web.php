@@ -78,7 +78,9 @@ Route::get('MasterPasien', MasterPasien::class)->middleware('auth')->name('Maste
 
 Route::get('daftarRJ', DaftarRJ::class)->middleware('auth')->name('daftarRJ');
 Route::get('daftarUGD', DaftarUGD::class)->middleware('auth')->name('daftarUGD');
-Route::get('DisplayPasienUGD', DisplayPasienUGD::class)->middleware('auth')->name('DisplayPasienUGD');
+
+// Develop view
+// Route::get('DisplayPasienUGD', DisplayPasienUGD::class)->middleware('auth')->name('DisplayPasienUGD');
 
 
 Route::view('/cetak-sep', 'livewire.daftar-r-j.cetak-sep');
