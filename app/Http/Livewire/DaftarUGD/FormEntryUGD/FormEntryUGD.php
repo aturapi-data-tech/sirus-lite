@@ -934,6 +934,13 @@ class FormEntryUGD extends Component
             'dr_id' => $this->dataDaftarUgd['drId'],
             'shift' => $this->dataDaftarUgd['shift'],
 
+            'death_on_igd_status' => 'N',
+            'before_after' => 'B',
+            'out_desc' => 'RAWAT',
+            'status_lanjutan' => 'BS',
+
+
+
             'txn_status' => $this->dataDaftarUgd['txnStatus'],
             'rj_status' => $this->dataDaftarUgd['rjStatus'],
             'erm_status' => $this->dataDaftarUgd['ermStatus'],
@@ -976,6 +983,11 @@ class FormEntryUGD extends Component
                 'poli_id' => $this->dataDaftarUgd['poliId'],
                 'dr_id' => $this->dataDaftarUgd['drId'],
                 'shift' => $this->dataDaftarUgd['shift'],
+
+                'death_on_igd_status' => 'N',
+                'before_after' => 'B',
+                'out_desc' => 'RAWAT',
+                'status_lanjutan' => 'BS',
 
                 'txn_status' => $this->dataDaftarUgd['txnStatus'],
                 'rj_status' => $this->dataDaftarUgd['rjStatus'],
