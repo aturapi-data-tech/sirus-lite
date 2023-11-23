@@ -1942,45 +1942,65 @@ class MasterPasien extends Component
     public function render()
     {
 
+        $myMultipleSearch = explode('%', $this->search);
+
+        $myQuery = DB::table('rsmst_pasiens')->select(
+            DB::raw("to_char(reg_date,'dd/mm/yyyy hh24:mi:ss') as reg_date"),
+            DB::raw("to_char(reg_date,'yyyymmddhh24miss') as reg_date1"),
+            'reg_no',
+            'reg_name',
+            DB::raw("nvl(nokartu_bpjs,'-') as nokartu_bpjs"),
+            DB::raw("nvl(nik_bpjs,'-') as nik_bpjs"),
+            'sex',
+            DB::raw("to_char(birth_date,'dd/mm/yyyy') as birth_date"),
+            DB::raw("(select trunc( months_between( sysdate, birth_date ) /12 ) from dual) as thn"),
+            'bln',
+            'hari',
+            'birth_place',
+            'blood',
+            'marital_status',
+            'rel_id',
+            'edu_id',
+            'job_id',
+            'kk',
+            'nyonya',
+            'no_kk',
+            'address',
+            'des_id',
+            'rt',
+            'rw',
+            'kec_id',
+            'kab_id',
+            'prop_id',
+            'phone'
+        );
+
+        foreach ($myMultipleSearch as $key => $myMS) {
+            // key 0  mencari regno dan reg name
+            if ($key == 0) {
+                $myQuery->where(function ($myQuery) use ($myMS) {
+                    $myQuery
+                        ->where(DB::raw('upper(reg_no)'), 'like', '%' . strtoupper($myMS) . '%')
+                        ->orWhere(DB::raw('upper(reg_name)'), 'like', '%' . strtoupper($myMS) . '%');
+                });
+            }
+            // key 1  mencari alamat
+            if ($key == 1) {
+                $myQuery->where(function ($myQuery) use ($myMS) {
+                    $myQuery
+                        ->where(DB::raw('upper(address)'), 'like', '%' . strtoupper($myMS) . '%');
+                });
+            }
+        }
+
+        $myQuery->orderBy('reg_date1', 'desc');
+
+
         return view(
             'livewire.master-pasien.master-pasien',
             [
                 'ruleDataPasien' => $this->ruleDataPasien,
-                'pasiens' => DB::table('rsmst_pasiens')
-                    ->select(
-                        DB::raw("to_char(reg_date,'dd/mm/yyyy hh24:mi:ss') as reg_date"),
-                        DB::raw("to_char(reg_date,'yyyymmddhh24miss') as reg_date1"),
-                        'reg_no',
-                        'reg_name',
-                        DB::raw("nvl(nokartu_bpjs,'-') as nokartu_bpjs"),
-                        DB::raw("nvl(nik_bpjs,'-') as nik_bpjs"),
-                        'sex',
-                        DB::raw("to_char(birth_date,'dd/mm/yyyy') as birth_date"),
-                        DB::raw("(select trunc( months_between( sysdate, birth_date ) /12 ) from dual) as thn"),
-                        'bln',
-                        'hari',
-                        'birth_place',
-                        'blood',
-                        'marital_status',
-                        'rel_id',
-                        'edu_id',
-                        'job_id',
-                        'kk',
-                        'nyonya',
-                        'no_kk',
-                        'address',
-                        'des_id',
-                        'rt',
-                        'rw',
-                        'kec_id',
-                        'kab_id',
-                        'prop_id',
-                        'phone'
-                    )
-                    ->where(DB::raw('upper(reg_name)'), 'like', '%' . strtoupper($this->search) . '%')
-                    ->orWhere('reg_no', 'like', '%' . strtoupper($this->search) . '%')
-                    ->orderBy('reg_date1', 'desc')
-                    ->paginate($this->limitPerPage),
+                'pasiens' => $myQuery->paginate($this->limitPerPage),
                 'myTitle' => 'Master Pasien',
                 'mySnipt' => 'Tambah Data Pasien',
                 'myProgram' => 'Pasien',
