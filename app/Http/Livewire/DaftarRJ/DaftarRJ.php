@@ -1517,7 +1517,9 @@ class DaftarRJ extends Component
                         $this->dataPasienLov = $cariDataPasienNokaBpjs;
                     } else {
                         // by name
-                        $cariDataPasienName = json_decode(DB::table('rsmst_pasiens')
+                        // $cariDataPasienName = json_decode(DB::table('rsmst_pasiens')
+
+                        $cariDataPasienName = DB::table('rsmst_pasiens')
                             ->select(
                                 DB::raw("to_char(reg_date,'dd/mm/yyyy hh24:mi:ss') as reg_date"),
                                 'reg_no',
@@ -1554,13 +1556,37 @@ class DaftarRJ extends Component
                             ->join('rsmst_desas', 'rsmst_desas.des_id', 'rsmst_pasiens.des_id')
                             ->join('rsmst_kecamatans', 'rsmst_kecamatans.kec_id', 'rsmst_desas.kec_id')
                             ->join('rsmst_kabupatens', 'rsmst_kabupatens.kab_id', 'rsmst_kecamatans.kab_id')
-                            ->join('rsmst_propinsis', 'rsmst_propinsis.prop_id', 'rsmst_kabupatens.prop_id')
-                            ->where(DB::raw('upper(reg_name)'), 'like', '%' . strtoupper($search) . '%')
-                            ->orWhere('reg_no', 'like', '%' . strtoupper($search) . '%')
-                            ->orWhere('address', 'like', '%' . strtoupper($search) . '%')
-                            ->orderBy('reg_name', 'desc')
-                            ->limit(50)
-                            ->get(), true);
+                            ->join('rsmst_propinsis', 'rsmst_propinsis.prop_id', 'rsmst_kabupatens.prop_id');
+
+
+                        // myMultipleSearch by more than one table
+                        $myMultipleSearch = explode('%', $search);
+
+                        foreach ($myMultipleSearch as $key => $myMS) {
+                            // key 0  mencari regno dan reg name
+                            if ($key == 0) {
+                                $cariDataPasienName->where(function ($cariDataPasienName) use ($myMS) {
+                                    $cariDataPasienName
+                                        ->where(DB::raw('upper(reg_no)'), 'like', '%' . strtoupper($myMS) . '%')
+                                        ->orWhere(DB::raw('upper(reg_name)'), 'like', '%' . strtoupper($myMS) . '%');
+                                });
+                            }
+                            // key 1  mencari alamat
+                            if ($key == 1) {
+                                $cariDataPasienName->where(function ($cariDataPasienName) use ($myMS) {
+                                    $cariDataPasienName
+                                        ->where(DB::raw('upper(address)'), 'like', '%' . strtoupper($myMS) . '%');
+                                });
+                            }
+                        }
+
+                        // limit 50 rec
+                        $cariDataPasienName->orderBy('reg_name', 'desc')
+                            ->limit(50);
+
+                        $cariDataPasienName = json_decode($cariDataPasienName->get(), true);
+
+
                         if ($cariDataPasienName) {
                             $this->dataPasienLov = $cariDataPasienName;
                         } else {

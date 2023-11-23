@@ -1942,7 +1942,6 @@ class MasterPasien extends Component
     public function render()
     {
 
-        $myMultipleSearch = explode('%', $this->search);
 
         $myQuery = DB::table('rsmst_pasiens')->select(
             DB::raw("to_char(reg_date,'dd/mm/yyyy hh24:mi:ss') as reg_date"),
@@ -1974,6 +1973,8 @@ class MasterPasien extends Component
             'prop_id',
             'phone'
         );
+
+        $myMultipleSearch = explode('%', $this->search);
 
         foreach ($myMultipleSearch as $key => $myMS) {
             // key 0  mencari regno dan reg name
