@@ -23,7 +23,7 @@ class EmrUGD extends Component
     use WithPagination;
 
     // primitive Variable
-    public string $myTitle = 'Data Pasien UGD';
+    public string $myTitle = 'Rekam Medis UGD';
     public string $mySnipt = 'Rekam Medis Pasien';
     public string $myProgram = 'Pasien UGD';
 
@@ -107,7 +107,14 @@ class EmrUGD extends Component
         $this->isOpen = true;
         $this->isOpenMode = 'update';
 
-        $this->emit('ListeneropenModalEditUgd', ['rjNo' => $rjNo, 'isOpen' => $this->isOpen, 'isOpenMode' => $this->isOpenMode]);
+        $this->emit(
+            'ListeneropenModalEditEmrUgd',
+            [
+                'rjNo' => $rjNo,
+                'isOpen' => $this->isOpen,
+                'isOpenMode' => $this->isOpenMode
+            ]
+        );
     }
 
     private function openModalTampil(): void
@@ -186,6 +193,52 @@ class EmrUGD extends Component
         $this->callMasterPasien = true;
     }
 
+    public string $activeTab = "anamnesa";
+
+    public array $EmrMenu = [
+        // [
+        //     'ermMenuId' => 'keperawatan',
+        //     'ermMenuName' => 'Keperawatan'
+        // ],
+        [
+            'ermMenuId' => 'anamnesa',
+            'ermMenuName' => 'Anamnesa'
+        ],
+        [
+            'ermMenuId' => 'pemeriksaan',
+            'ermMenuName' => 'Pemeriksaan'
+        ],
+        [
+            'ermMenuId' => 'penilaian',
+            'ermMenuName' => 'Penilaian'
+        ],
+        [
+            'ermMenuId' => 'diagnosis',
+            'ermMenuName' => 'Diagnosis (ICD)'
+        ],
+        // [
+        //     'ermMenuId' => 'penandaanGbr',
+        //     'ermMenuName' => 'Penandaan Gambar'
+        // ],
+        [
+            'ermMenuId' => 'perencanaan',
+            'ermMenuName' => 'Perencanaan'
+        ],
+        // [
+        //     'ermMenuId' => 'cppt',
+        //     'ermMenuName' => 'CPPT'
+        // ],
+        // [
+        //     'ermMenuId' => 'resumeMds',
+        //     'ermMenuName' => 'Resume Medis'
+        // ],
+        // [
+        //     'ermMenuId' => 'penerbitanSrt',
+        //     'ermMenuName' => 'Penerbitan Surat'
+        // ],
+
+    ];
+
 
 
     // when new form instance
@@ -236,7 +289,7 @@ class EmrUGD extends Component
                 'push_antrian_bpjs_status',
                 'push_antrian_bpjs_json'
             )
-            ->where('rj_status', '=', $myRefstatusId)
+            ->where('erm_status', '=', $myRefstatusId)
             ->where('shift', '=', $myRefshift)
             ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $myRefdate);
 

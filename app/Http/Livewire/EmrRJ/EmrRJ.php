@@ -285,7 +285,7 @@ class EmrRJ extends Component
 
 
 
-    public $activeTab = "anamnesia";
+    public $activeTab = "anamnesa";
     // Pendaftaran RJ
     public $dataDaftarPoliRJ = [];
 
@@ -295,8 +295,8 @@ class EmrRJ extends Component
         //     'ermMenuName' => 'Keperawatan'
         // ],
         [
-            'ermMenuId' => 'anamnesia',
-            'ermMenuName' => 'Anamnesia'
+            'ermMenuId' => 'anamnesa',
+            'ermMenuName' => 'Anamnesa'
         ],
         [
             'ermMenuId' => 'pemeriksaan',

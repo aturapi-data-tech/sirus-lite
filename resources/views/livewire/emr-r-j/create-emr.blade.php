@@ -114,7 +114,7 @@
 
 
                     {{-- Transasi Rawat Jalan --}}
-                    <div id="TransaksiRawatJalan" x-data="{ activeTab: 'anamnesia' }" class="flex">
+                    <div id="TransaksiRawatJalan" x-data="{ activeTab: 'anamnesa' }" class="flex">
 
                         <div class="px-4 mb-0 border-b border-gray-200 dark:border-gray-700 w-[250px] overflow-auto">
                             <ul
@@ -156,7 +156,7 @@
                             </div>
                         @endforeach --}}
 
-                        @if ($activeTab == 'anamnesia')
+                        @if ($activeTab == 'anamnesa')
                             <div class="p-0 rounded-lg bg-gray-50 dark:bg-gray-800">
                                 <livewire:mr-r-j.anamnesia.anamnesia :rjNoRef="$dataDaftarPoliRJ['rjNo']"
                                     :wire:key="'user-profile-two-anamnesia'">

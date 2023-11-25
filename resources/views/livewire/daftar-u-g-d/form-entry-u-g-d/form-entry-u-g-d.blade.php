@@ -66,10 +66,10 @@
 
 
             <div>
-                {{-- <div class="flex justify-end -mb-4">
+                <div class="flex justify-end -mb-4">
                     <x-check-box value='N' :label="__('Pasien Baru')"
                         wire:model.debounce.500ms="dataDaftarUgd.passStatus" />
-                </div> --}}
+                </div>
 
                 <x-input-label for="dataPasienLovSearch" :value="__('Cari Data Pasien dgn [ Nama / Reg No / NIK / Noka BPJS]')" :required="__(true)" />
 

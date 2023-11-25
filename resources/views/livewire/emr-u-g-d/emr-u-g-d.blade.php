@@ -79,26 +79,10 @@
 
             </div>
 
-            <div class="flex justify-end w-1/3">
-                <x-primary-button :disabled=false wire:click.prevent="callFormPasien()" type="button"
-                    wire:loading.remove>
-                    Master Pasien
-                </x-primary-button>
-                <div wire:loading wire:target="callFormPasien">
-                    <x-loading />
-                </div>
-            </div>
+
 
             <div class="flex justify-end w-1/2">
-                <x-primary-button wire:click="create()" class="flex justify-center ">
-                    <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd"
-                            d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                            clip-rule="evenodd"></path>
-                    </svg>
-                    Daftar {{ $myProgram }}
-                </x-primary-button>
+
 
 
 
@@ -128,7 +112,7 @@
 
 
             @if ($isOpen)
-                @include('livewire.daftar-u-g-d.create')
+                @include('livewire.emr-u-g-d.create')
             @endif
 
         </div>
@@ -253,7 +237,7 @@
                                                     </li>
                                                     <li>
                                                         <x-dropdown-link wire:click="edit('{{ $myQData->rj_no }}')">
-                                                            {{ __('Ubah') }}
+                                                            {{ __('Rekam Medis') }}
                                                         </x-dropdown-link>
                                                     </li>
                                                     <li>
@@ -297,14 +281,7 @@
 
     </div>
 
-    {{-- call MasterPasien --}}
-    @if ($callMasterPasien)
-        @livewire('master-pasien.master-pasien', [
-            'isOpen' => true,
-            'isOpenMode' => 'insert',
-            'dataPasienBPJSSearch' => isset($dataPasien['pasien']['cariDataPasien']) ? $dataPasien['pasien']['cariDataPasien'] : '',
-        ])
-    @endif
+
 
     {{-- Canvas 
     Main BgColor / 
