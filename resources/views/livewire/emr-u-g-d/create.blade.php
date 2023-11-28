@@ -64,8 +64,10 @@
                         <ul class="flex flex-col flex-wrap -mb-px text-sm font-medium text-gray-500 text-start ">
                             @foreach ($EmrMenu as $EmrM)
                                 <li wire:key="tab-{{ $EmrM['ermMenuId'] }}" class="mr-0 rounded-lg"
-                                    :class="activeTab === '{{ $EmrM['ermMenuId'] }}' ?
-                                        'text-primary border-primary bg-gray-100' : ''">
+                                    :class="'{{ $activeTab }}'
+                                    === '{{ $EmrM['ermMenuId'] }}' ?
+                                        'text-primary border-primary bg-gray-100' :
+                                        ''">
                                     <label
                                         class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
                                         @click="activeTab ='{{ $EmrM['ermMenuId'] }}'"
@@ -108,6 +110,29 @@
 
 
                             <livewire:emr-u-g-d.mr-u-g-d.penilaian.penilaian :wire:key="'content-penilaianUgd'"
+                                :rjNoRef="$rjNoRef">
+                        </div>
+                    @endif
+
+                    @if ($activeTab == 'diagnosis')
+                        <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50 ">
+                            {{-- <div>{{ $activeTab }}</div> --}}
+                            {{-- :rjNo="" disi dari emit ListeneropenModalEditUgd --}}
+
+
+                            <livewire:emr-u-g-d.mr-u-g-d.diagnosis.diagnosis :wire:key="'content-diagnosisUgd'"
+                                :rjNoRef="$rjNoRef">
+                        </div>
+                    @endif
+
+
+                    @if ($activeTab == 'perencanaan')
+                        <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50 ">
+                            {{-- <div>{{ $activeTab }}</div> --}}
+                            {{-- :rjNo="" disi dari emit ListeneropenModalEditUgd --}}
+
+
+                            <livewire:emr-u-g-d.mr-u-g-d.perencanaan.perencanaan :wire:key="'content-perencanaanUgd'"
                                 :rjNoRef="$rjNoRef">
                         </div>
                     @endif
