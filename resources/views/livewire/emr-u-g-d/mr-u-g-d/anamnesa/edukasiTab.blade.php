@@ -8,7 +8,7 @@
 
             <div class="pt-2 ">
 
-                <div class="flex items-center mt-2 ml-2">
+                <div class="grid grid-cols-4 gap-2 mt-2 ml-2">
                     <x-input-label for="" :value="__('Kesediaan Pasien / Keluarga Menerima Informasi')" :required="__(false)" class="px-2" />
 
                     @foreach ($dataDaftarUgd['anamnesa']['edukasi']['pasienKeluargaMenerimaInformasiOptions'] as $edukasiOption)
@@ -19,7 +19,7 @@
 
                 </div>
 
-                <div class="flex items-center mt-2 ml-2">
+                <div class="grid grid-cols-4 gap-2 mt-2 ml-2">
                     <x-input-label for="" :value="__('Terdapat Hambatan Terhadap Edukasi')" :required="__(false)" class="px-2" />
 
                     @foreach ($dataDaftarUgd['anamnesa']['edukasi']['hambatanEdukasiOptions'] as $edukasiOption)
@@ -29,12 +29,12 @@
                     @endforeach
 
                     <x-text-input id="dataDaftarUgd.anamnesa.edukasi.keteranganHambatanEdukasi"
-                        placeholder="Keterangan Hambatan Terhadap Edukasi" class="mt-1 ml-2 sm:w-1/2" :errorshas="__($errors->has('dataDaftarUgd.anamnesa.edukasi.keteranganHambatanEdukasi'))"
+                        placeholder="Keterangan Hambatan Terhadap Edukasi" class="mt-1 ml-2 " :errorshas="__($errors->has('dataDaftarUgd.anamnesa.edukasi.keteranganHambatanEdukasi'))"
                         :disabled=$disabledPropertyRjStatus
                         wire:model.debounce.500ms="dataDaftarUgd.anamnesa.edukasi.keteranganHambatanEdukasi" />
                 </div>
 
-                <div class="flex items-center mt-2 ml-2">
+                <div class="grid grid-cols-4 gap-2 mt-2 ml-2">
                     <x-input-label for="" :value="__('Dibutuhkan Penerjemah')" :required="__(false)" class="px-2" />
 
                     @foreach ($dataDaftarUgd['anamnesa']['edukasi']['penerjemahOptions'] as $edukasiOption)
@@ -44,7 +44,7 @@
                     @endforeach
 
                     <x-text-input id="dataDaftarUgd.anamnesa.edukasi.keteranganPenerjemah"
-                        placeholder="Keterangan Penerjemah" class="mt-1 ml-2 sm:w-1/2" :errorshas="__($errors->has('dataDaftarUgd.anamnesa.edukasi.keteranganPenerjemah'))"
+                        placeholder="Keterangan Penerjemah" class="mt-1 ml-2 " :errorshas="__($errors->has('dataDaftarUgd.anamnesa.edukasi.keteranganPenerjemah'))"
                         :disabled=$disabledPropertyRjStatus
                         wire:model.debounce.500ms="dataDaftarUgd.anamnesa.edukasi.keteranganPenerjemah" />
                 </div>

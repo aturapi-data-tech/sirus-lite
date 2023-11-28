@@ -16,14 +16,9 @@ class Anamnesa extends Component
     use WithPagination;
 
     // listener from blade////////////////
-    protected $listeners = [
-        'ListeneropenModalEditEmrUgd' => 'openModalEditEmrUgd', //Voice From EmrUGD | private function openModalEdit($rjNo): void
-    ];
+    protected $listeners = [];
 
-    public function openModalEditEmrUgd($openModalEditEmrUgd)
-    {
-        $this->findData($openModalEditEmrUgd['rjNo']);
-    }
+
 
     //////////////////////////////
     // Ref on top bar
@@ -32,11 +27,35 @@ class Anamnesa extends Component
 
 
     // dataDaftarUgd RJ
-    public $dataDaftarUgd = [];
+    public $rjNoRef;
 
-    // data SKDP / anamnesa=>[] 
-    public $anamnesa =
+    public array $dataDaftarUgd = [];
+
+    public array $rekonsiliasiObat = ["namaObat" => "", "dosis" => "", "rute" => ""];
+
+    public array $anamnesa =
     [
+        "pengkajianPerawatanTab" => "Pengkajian Perawatan",
+        "pengkajianPerawatan" => [
+            "perawatPenerima" => "",
+            "jamDatang" => "",
+            "caraMasukIgd" => "",
+            "caraMasukIgdDesc" => "",
+            "caraMasukIgdOption" => [
+                ["caraMasukIgd" => "Sendiri"],
+                ["caraMasukIgd" => "Rujuk"],
+                ["caraMasukIgd" => "Kasus Polisi"],
+            ],
+
+            "tingkatKegawatan" => "",
+            "tingkatKegawatanOption" => [
+                ["tingkatKegawatan" => "P1"],
+                ["tingkatKegawatan" => "P2"],
+                ["tingkatKegawatan" => "P3"],
+                ["tingkatKegawatan" => "P0"],
+            ],
+        ],
+
         "keluhanUtamaTab" => "Keluhan Utama",
         "keluhanUtama" => [
             "keluhanUtama" => ""
@@ -63,6 +82,9 @@ class Anamnesa extends Component
         "alergi" => [
             "alergi" => ""
         ],
+
+        "rekonsiliasiObatTab" => "Rekonsiliasi Obat",
+        "rekonsiliasiObat" => [],
 
         "lainLainTab" => "lain-Lain",
         "lainLain" => [
@@ -271,6 +293,9 @@ class Anamnesa extends Component
             "BBTurunTanpaSebab" => [],
             "keteranganBBTurunTanpaSebab" => "",
 
+            "pembesaranGetahBening" => [],
+            "keteranganPembesaranGetahBening" => "",
+
         ],
     ];
     //////////////////////////////////////////////////////////////////////
@@ -295,9 +320,7 @@ class Anamnesa extends Component
         // resert validation
         $this->resetValidation();
         // resert input kecuali
-        $this->resetExcept([
-            'rjNoRef'
-        ]);
+        $this->reset(['']);
     }
 
 
@@ -348,7 +371,7 @@ class Anamnesa extends Component
     {
 
         // update table trnsaksi
-        DB::table('rstxn_rjhdrs')
+        DB::table('rstxn_ugdhdrs')
             ->where('rj_no', $rjNo)
             ->update([
                 'datadaftarugd_json' => json_encode($this->dataDaftarUgd, true),
@@ -494,11 +517,45 @@ class Anamnesa extends Component
 
 
 
+    public function addRekonsiliasiObat()
+    {
+        if ($this->rekonsiliasiObat['namaObat']) {
+
+            // check exist
+            $cekRekonsiliasiObat = collect($this->dataDaftarUgd['anamnesa']['rekonsiliasiObat'])
+                ->where("namaObat", '=', $this->rekonsiliasiObat['namaObat'])
+                ->count();
+
+            if (!$cekRekonsiliasiObat) {
+                $this->dataDaftarUgd['anamnesa']['rekonsiliasiObat'][] = [
+                    "namaObat" => $this->rekonsiliasiObat['namaObat'],
+                    "dosis" => $this->rekonsiliasiObat['dosis'],
+                    "rute" => $this->rekonsiliasiObat['rute']
+                ];
+
+                // reset rekonsiliasiObat
+                $this->reset(['rekonsiliasiObat']);
+            } else {
+                $this->emit('toastr-error', "Nama Obat Sudah ada.");
+            }
+        } else {
+            $this->emit('toastr-error', "Nama Obat Kosong.");
+        }
+    }
+
+    public function removeRekonsiliasiObat($namaObat)
+    {
+
+        $rekonsiliasiObat = collect($this->dataDaftarUgd['anamnesa']['rekonsiliasiObat'])->where("namaObat", '!=', $namaObat)->toArray();
+        $this->dataDaftarUgd['anamnesa']['rekonsiliasiObat'] = $rekonsiliasiObat;
+    }
+
 
     // when new form instance
     public function mount()
     {
-        // $this->findData($this->rjNoRef);
+
+        $this->findData($this->rjNoRef);
     }
 
 

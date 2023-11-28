@@ -26,7 +26,7 @@
 
                         {{-- Close Modal --}}
                         <button wire:click="closeModal()"
-                            class="text-gray-400 bg-gray-50 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white">
+                            class="text-gray-400 bg-gray-50 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center">
                             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <path fill-rule="evenodd"
@@ -49,7 +49,8 @@
                     {{-- Display Pasien --}}
                     {{-- :rjNo="" disi dari emit ListeneropenModalEditUgd --}}
 
-                    <livewire:emr-u-g-d.display-pasien.display-pasien :wire:key="$regNo.'display-pasien'">
+                    <livewire:emr-u-g-d.display-pasien.display-pasien :wire:key="$regNo.'display-pasien'"
+                        :rjNoRef="$rjNoRef">
 
                         {{-- <livewire:emr-u-g-d.form-entry-u-g-d.form-entry-u-g-d :rjNo="$regNo"
                             :wire:key="$regNo.'form-entry-u-g-d'"> --}}
@@ -57,11 +58,10 @@
 
 
                 {{-- Transasi EMR --}}
-                <div id="TransaksiEMR" x-data="{ activeTab: 'anamnesia' }" class="flex">
+                <div id="TransaksiEMR" x-data="{ activeTab: '{{ $activeTab }}' }" class="flex">
 
-                    <div class="px-4 mb-0 border-b border-gray-200 dark:border-gray-700 w-[250px] overflow-auto">
-                        <ul
-                            class="flex flex-col flex-wrap -mb-px text-sm font-medium text-gray-500 text-start dark:text-gray-400">
+                    <div class="px-4 mb-0 border-b border-gray-200  w-[250px] overflow-auto ">
+                        <ul class="flex flex-col flex-wrap -mb-px text-sm font-medium text-gray-500 text-start ">
                             @foreach ($EmrMenu as $EmrM)
                                 <li wire:key="tab-{{ $EmrM['ermMenuId'] }}" class="mr-0 rounded-lg"
                                     :class="activeTab === '{{ $EmrM['ermMenuId'] }}' ?
@@ -80,14 +80,37 @@
 
 
                     @if ($activeTab == 'anamnesa')
-                        <div class="p-0 rounded-lg bg-gray-50 ">
-
+                        <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50 ">
+                            {{-- <div>{{ $activeTab }}</div> --}}
                             {{-- :rjNo="" disi dari emit ListeneropenModalEditUgd --}}
 
-                            <livewire:emr-u-g-d.mr-u-g-d.anamnesa.anamnesa :wire:key="'userProfileToAnamnesaUgd'">
+                            <livewire:emr-u-g-d.mr-u-g-d.anamnesa.anamnesa :wire:key="'content-anamnesaUgd'"
+                                :rjNoRef="$rjNoRef">
                         </div>
                     @endif
 
+                    @if ($activeTab == 'pemeriksaan')
+                        <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50 ">
+                            {{-- <div>{{ $activeTab }}</div> --}}
+                            {{-- :rjNo="" disi dari emit ListeneropenModalEditUgd --}}
+
+
+                            <livewire:emr-u-g-d.mr-u-g-d.pemeriksaan.pemeriksaan :wire:key="'content-pemeriksaanUgd'"
+                                :rjNoRef="$rjNoRef">
+                        </div>
+                    @endif
+
+
+                    @if ($activeTab == 'penilaian')
+                        <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50 ">
+                            {{-- <div>{{ $activeTab }}</div> --}}
+                            {{-- :rjNo="" disi dari emit ListeneropenModalEditUgd --}}
+
+
+                            <livewire:emr-u-g-d.mr-u-g-d.penilaian.penilaian :wire:key="'content-penilaianUgd'"
+                                :rjNoRef="$rjNoRef">
+                        </div>
+                    @endif
 
 
                 </div>

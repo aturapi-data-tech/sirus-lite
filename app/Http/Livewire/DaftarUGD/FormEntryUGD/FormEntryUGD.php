@@ -210,10 +210,10 @@ class FormEntryUGD extends Component
     ];
 
     public $entryUgd = [
-        'entryId' => '1',
+        'entryId' => '5',
         'entryDesc' => 'Datang Sendiri',
         'entryOptions' => [
-            ['entryId' => '1', 'entryDesc' => 'Datang Sendiri'],
+            ['entryId' => '5', 'entryDesc' => 'Datang Sendiri'],
         ]
     ];
 

@@ -6,16 +6,10 @@
 
         @php
             $disabledProperty = true;
-            
+
             $disabledPropertyRjStatus = false;
-            
+
         @endphp
-
-
-
-
-
-
 
 
         {{-- <form class="scroll-smooth hover:scroll-auto"> --}}
@@ -63,7 +57,8 @@
                                 <label
                                     class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
                                     :class="activeTab ===
-                                        '{{ $dataDaftarPoliRJ['penilaian']['resikoJatuhTab'] . $dataDaftarPoliRJ['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseTab'] }}' ?
+                                        '{{ $dataDaftarPoliRJ['penilaian']['resikoJatuhTab'] . $dataDaftarPoliRJ['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseTab'] }}'
+                                        ?
                                         'text-primary border-primary bg-gray-100' : ''"
                                     @click="activeTab ='{{ $dataDaftarPoliRJ['penilaian']['resikoJatuhTab'] . $dataDaftarPoliRJ['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseTab'] }}'">{{ $dataDaftarPoliRJ['penilaian']['resikoJatuhTab'] . ' / ' . $dataDaftarPoliRJ['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseTab'] }}</label>
                             </li>
@@ -72,7 +67,8 @@
                                 <label
                                     class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
                                     :class="activeTab ===
-                                        '{{ $dataDaftarPoliRJ['penilaian']['resikoJatuhTab'] . $dataDaftarPoliRJ['penilaian']['resikoJatuh']['skalaHumptyDumpty']['skalaHumptyDumptyTab'] }}' ?
+                                        '{{ $dataDaftarPoliRJ['penilaian']['resikoJatuhTab'] . $dataDaftarPoliRJ['penilaian']['resikoJatuh']['skalaHumptyDumpty']['skalaHumptyDumptyTab'] }}'
+                                        ?
                                         'text-primary border-primary bg-gray-100' : ''"
                                     @click="activeTab ='{{ $dataDaftarPoliRJ['penilaian']['resikoJatuhTab'] . $dataDaftarPoliRJ['penilaian']['resikoJatuh']['skalaHumptyDumpty']['skalaHumptyDumptyTab'] }}'">{{ $dataDaftarPoliRJ['penilaian']['resikoJatuhTab'] . ' / ' . $dataDaftarPoliRJ['penilaian']['resikoJatuh']['skalaHumptyDumpty']['skalaHumptyDumptyTab'] }}</label>
                             </li>
@@ -81,7 +77,8 @@
                                 <label
                                     class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
                                     :class="activeTab ===
-                                        '{{ $dataDaftarPoliRJ['penilaian']['resikoJatuhTab'] . $dataDaftarPoliRJ['penilaian']['resikoJatuh']['edmonson']['edmonsonTab'] }}' ?
+                                        '{{ $dataDaftarPoliRJ['penilaian']['resikoJatuhTab'] . $dataDaftarPoliRJ['penilaian']['resikoJatuh']['edmonson']['edmonsonTab'] }}'
+                                        ?
                                         'text-primary border-primary bg-gray-100' : ''"
                                     @click="activeTab ='{{ $dataDaftarPoliRJ['penilaian']['resikoJatuhTab'] . $dataDaftarPoliRJ['penilaian']['resikoJatuh']['edmonson']['edmonsonTab'] }}'">{{ $dataDaftarPoliRJ['penilaian']['resikoJatuhTab'] . ' / ' . $dataDaftarPoliRJ['penilaian']['resikoJatuh']['edmonson']['edmonsonTab'] }}</label>
                             </li>
@@ -90,7 +87,8 @@
                                 <label
                                     class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
                                     :class="activeTab ===
-                                        '{{ $dataDaftarPoliRJ['penilaian']['dekubitus']['dekubitusTab'] }}' ?
+                                        '{{ $dataDaftarPoliRJ['penilaian']['dekubitus']['dekubitusTab'] }}'
+                                        ?
                                         'text-primary border-primary bg-gray-100' : ''"
                                     @click="activeTab ='{{ $dataDaftarPoliRJ['penilaian']['dekubitus']['dekubitusTab'] }}'">{{ $dataDaftarPoliRJ['penilaian']['dekubitus']['dekubitusTab'] }}</label>
                             </li>

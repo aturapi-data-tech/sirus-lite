@@ -8,17 +8,14 @@ use Illuminate\Support\Facades\DB;
 
 class DisplayPasien extends Component
 {
-    protected $listeners = [
-        // 'listenerRegNo' => 'listenerRegNo',
-        'ListeneropenModalEditEmrUgd' => 'openModalEditEmrUgd' //Voice From EmrUGD | private function openModalEdit($rjNo): void
-
-    ];
+    protected $listeners = [];
 
     // public function listenerRegNo($newRegNo): void
     // {
     //     // $this->regNo = $newRegNo;
     //     $this->setDataPasien($newRegNo);
     // }
+    public $rjNoRef;
     public bool $isOpen = false;
     public string $isOpenMode = 'insert';
     public bool $forceInsertRecord = false;
@@ -26,12 +23,7 @@ class DisplayPasien extends Component
 
 
 
-    public function openModalEditEmrUgd($openModalEditEmrUgd): void
-    {
-        $this->isOpen = $openModalEditEmrUgd['isOpen'];
-        $this->isOpenMode =  $openModalEditEmrUgd['isOpenMode'];
-        $this->findData($openModalEditEmrUgd['rjNo']);
-    }
+
 
     public array $dataDaftarUgd = [
         "regNo" => '',
@@ -672,7 +664,7 @@ class DisplayPasien extends Component
 
     public function mount()
     {
-        // $this->setDataPasien($this->regNo);
+        $this->findData($this->rjNoRef);
     }
 
     public function render()

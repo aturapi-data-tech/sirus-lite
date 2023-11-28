@@ -1,7 +1,7 @@
 @props(['label' => 'Label'])
 
 
-<div class="flex items-center px-4 bg-white border border-gray-300 rounded-lg w-max dark:border-gray-700">
+<div class="flex items-center w-auto px-4 bg-white border border-gray-300 rounded-lg dark:border-gray-700">
     {{-- input --}}
     <input id="{{ $label }}" type="checkbox" {!! $attributes->merge([
         'class' =>

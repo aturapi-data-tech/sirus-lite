@@ -96,6 +96,7 @@ class EmrUGD extends Component
     public bool $isOpen = false;
     public string $isOpenMode = 'insert';
     public bool $forceInsertRecord = false;
+    public int $rjNoRef;
     // 
     private function openModal(): void
     {
@@ -106,15 +107,7 @@ class EmrUGD extends Component
     {
         $this->isOpen = true;
         $this->isOpenMode = 'update';
-
-        $this->emit(
-            'ListeneropenModalEditEmrUgd',
-            [
-                'rjNo' => $rjNo,
-                'isOpen' => $this->isOpen,
-                'isOpenMode' => $this->isOpenMode
-            ]
-        );
+        $this->rjNoRef = $rjNo;
     }
 
     private function openModalTampil(): void

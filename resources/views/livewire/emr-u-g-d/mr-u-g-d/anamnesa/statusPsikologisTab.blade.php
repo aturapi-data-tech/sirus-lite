@@ -5,7 +5,7 @@
 
         <div class="pt-2">
             <x-input-label for="dataDaftarUgd.anamnesa.statusPsikologis.statusPsikologis" :value="__('Status Psikologis')"
-                :required="__(false)" />
+                :required="__(false)" class="pt-2 sm:text-xl" />
 
             <div class="grid grid-cols-4 gap-2 pt-2">
                 <x-check-box value='1' :label="__('Tidak Ada Kelainan')"
@@ -23,10 +23,7 @@
                 <x-check-box value='1' :label="__('Sedih')"
                     wire:model.debounce.500ms="dataDaftarUgd.anamnesa.statusPsikologis.sedih" />
 
-                <x-check-box value='1' :label="__('Cenderung Bunuh Diri')"
-                    wire:model.debounce.500ms="dataDaftarUgd.anamnesa.statusPsikologis.cenderungBunuhDiri" />
-
-                <x-check-box value='1' :label="__('Cenderung Bunuh Diri')"
+                <x-check-box value='1' :label="__('Resiko Bunuh Diri')"
                     wire:model.debounce.500ms="dataDaftarUgd.anamnesa.statusPsikologis.cenderungBunuhDiri" />
             </div>
             <div class="mb-2 ">
@@ -38,8 +35,8 @@
         </div>
 
         <div class="pt-2">
-            <x-input-label for="dataDaftarUgd.anamnesa.statusMental.statusMental" :value="__('Status Psikologis')"
-                :required="__(false)" />
+            <x-input-label for="dataDaftarUgd.anamnesa.statusMental.statusMental" :value="__('Status Mental')" :required="__(false)"
+                class="pt-2 sm:text-xl" />
 
             <div class="pt-2 ">
 
@@ -60,12 +57,12 @@
             </div>
         </div>
 
-        <div class="pt-2">
+        {{-- <div class="pt-2">
             <x-input-label for="dataDaftarUgd.anamnesa.hubunganDgnKeluarga.hubunganDgnKeluarga" :value="__('Sosial')"
                 :required="__(false)" />
 
 
-
+            
             <div class="pt-2 ">
 
                 <div class="flex items-center mt-2 ml-2">
@@ -73,7 +70,6 @@
                         :value="__('Hubungan Dgn Keluarga')" :required="__(false)" class="mr-2" />
 
                     @foreach ($dataDaftarUgd['anamnesa']['hubunganDgnKeluarga']['hubunganDgnKeluargaOption'] as $hubunganDgnKeluargaOption)
-                        {{-- @dd($sRj) --}}
                         <x-radio-button :label="__($hubunganDgnKeluargaOption['hubunganDgnKeluarga'])"
                             value="{{ $hubunganDgnKeluargaOption['hubunganDgnKeluarga'] }}"
                             wire:model="dataDaftarUgd.anamnesa.hubunganDgnKeluarga.hubunganDgnKeluarga" />
@@ -86,7 +82,6 @@
                         :required="__(false)" class="mr-2" />
 
                     @foreach ($dataDaftarUgd['anamnesa']['tempatTinggal']['tempatTinggalOption'] as $tempatTinggalOption)
-                        {{-- @dd($sRj) --}}
                         <x-radio-button :label="__($tempatTinggalOption['tempatTinggal'])" value="{{ $tempatTinggalOption['tempatTinggal'] }}"
                             wire:model="dataDaftarUgd.anamnesa.tempatTinggal.tempatTinggal" />
                     @endforeach
@@ -109,7 +104,6 @@
 
 
                     @foreach ($dataDaftarUgd['anamnesa']['spiritual']['ibadahTeraturOptions'] as $ibadahTeraturOption)
-                        {{-- @dd($sRj) --}}
                         <x-radio-button :label="__($ibadahTeraturOption['ibadahTeratur'])" value="{{ $ibadahTeraturOption['ibadahTeratur'] }}"
                             wire:model="dataDaftarUgd.anamnesa.ibadahTeratur.ibadahTeratur" />
                     @endforeach
@@ -123,7 +117,6 @@
 
 
                     @foreach ($dataDaftarUgd['anamnesa']['spiritual']['nilaiKepercayaanOptions'] as $nilaiKepercayaanOption)
-                        {{-- @dd($sRj) --}}
                         <x-radio-button :label="__($nilaiKepercayaanOption['nilaiKepercayaan'])" value="{{ $nilaiKepercayaanOption['nilaiKepercayaan'] }}"
                             wire:model="dataDaftarUgd.anamnesa.nilaiKepercayaan.nilaiKepercayaan" />
                     @endforeach
@@ -151,7 +144,6 @@
                 <div class="flex items-center mt-2 ml-2">
 
                     @foreach ($dataDaftarUgd['anamnesa']['ekonomi']['penghasilanBlnOptions'] as $penghasilanBlnOptions)
-                        {{-- @dd($sRj) --}}
                         <x-radio-button :label="__($penghasilanBlnOptions['penghasilanBln'])" value="{{ $penghasilanBlnOptions['penghasilanBln'] }}"
                             wire:model="dataDaftarUgd.anamnesa.ekonomi.penghasilanBln" />
                     @endforeach
@@ -164,7 +156,7 @@
 
             </div>
 
-        </div>
+        </div> --}}
 
 
 
