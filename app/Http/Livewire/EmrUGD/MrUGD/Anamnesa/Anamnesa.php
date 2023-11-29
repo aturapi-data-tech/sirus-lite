@@ -513,6 +513,8 @@ class Anamnesa extends Component
                 $this->dataDaftarUgd['anamnesa'] = $this->anamnesa;
             }
         }
+        // menyamakan Variabel
+        $this->matchingMyVariable();
     }
 
 
@@ -550,6 +552,18 @@ class Anamnesa extends Component
         $this->dataDaftarUgd['anamnesa']['rekonsiliasiObat'] = $rekonsiliasiObat;
     }
 
+
+    private function matchingMyVariable()
+    {
+
+        // keluhanUtama
+        $this->dataDaftarUgd['anamnesa']['keluhanUtama']['keluhanUtama'] =
+            ($this->dataDaftarUgd['anamnesa']['keluhanUtama']['keluhanUtama'])
+            ? $this->dataDaftarUgd['anamnesa']['keluhanUtama']['keluhanUtama']
+            : ((isset($this->dataDaftarUgd['screening']['keluhanUtama']) && !$this->dataDaftarUgd['anamnesa']['keluhanUtama']['keluhanUtama'])
+                ? $this->dataDaftarUgd['screening']['keluhanUtama']
+                : "");
+    }
 
     // when new form instance
     public function mount()

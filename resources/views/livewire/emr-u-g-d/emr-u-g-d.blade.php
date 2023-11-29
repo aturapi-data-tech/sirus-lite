@@ -112,7 +112,11 @@
 
 
             @if ($isOpen)
-                @include('livewire.emr-u-g-d.create')
+                @include('livewire.emr-u-g-d.create-emr-u-g-d')
+            @endif
+
+            @if ($isOpenScreening)
+                @include('livewire.emr-u-g-d.create-screening-u-g-d')
             @endif
 
         </div>
@@ -235,6 +239,13 @@
                                                             {{ __('Tampil | ' . $myQData->reg_name) }}
                                                         </x-dropdown-link>
                                                     </li>
+                                                    <li>
+                                                        <x-dropdown-link
+                                                            wire:click="editScreening('{{ $myQData->rj_no }}')">
+                                                            {{ __('Screening') }}
+                                                        </x-dropdown-link>
+                                                    </li>
+
                                                     <li>
                                                         <x-dropdown-link wire:click="edit('{{ $myQData->rj_no }}')">
                                                             {{ __('Rekam Medis') }}

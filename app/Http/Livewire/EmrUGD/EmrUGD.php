@@ -95,6 +95,10 @@ class EmrUGD extends Component
     //  modal status////////////////
     public bool $isOpen = false;
     public string $isOpenMode = 'insert';
+
+    public bool $isOpenScreening = false;
+    public string $isOpenModeScreening = 'insert';
+
     public bool $forceInsertRecord = false;
     public int $rjNoRef;
     // 
@@ -110,6 +114,13 @@ class EmrUGD extends Component
         $this->rjNoRef = $rjNo;
     }
 
+    private function openModalEditScreening($rjNo): void
+    {
+        $this->isOpenScreening = true;
+        $this->isOpenModeScreening = 'update';
+        $this->rjNoRef = $rjNo;
+    }
+
     private function openModalTampil(): void
     {
         $this->isOpen = true;
@@ -120,6 +131,13 @@ class EmrUGD extends Component
     {
         $this->isOpen = false;
         $this->isOpenMode = 'insert';
+        $this->resetInputFields();
+    }
+
+    public function closeModalScreening(): void
+    {
+        $this->isOpenScreening = false;
+        $this->isOpenModeScreening = 'insert';
         $this->resetInputFields();
     }
     // open and close modal end////////////////
@@ -140,6 +158,12 @@ class EmrUGD extends Component
     public function edit($id)
     {
         $this->openModalEdit($id);
+        // $this->findData($id);
+    }
+
+    public function editScreening($id)
+    {
+        $this->openModalEditScreening($id);
         // $this->findData($id);
     }
 

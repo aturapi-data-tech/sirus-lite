@@ -1,5 +1,4 @@
 <div>
-
     @php
         $disabledProperty = true;
         $disabledPropertyRjStatus = false;
@@ -7,7 +6,6 @@
     {{-- jika anamnesa kosong ngak usah di render --}}
     @if (isset($dataDaftarUgd['anamnesa']))
         <div class="w-full mb-1">
-
 
             <div id="TransaksiRawatJalan" class="px-2">
                 <div id="TransaksiRawatJalan" x-data="{ activeTab: 'Pengkajian Perawatan' }">
