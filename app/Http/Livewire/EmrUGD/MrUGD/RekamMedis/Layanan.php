@@ -57,7 +57,9 @@ class Layanan extends Component
                 'erm_status',
                 'layanan_status',
                 'poli',
-                DB::raw("(CASE WHEN layanan_status='RJ' THEN (select datadaftarpolirj_json from rsview_rjkasir where rj_no=txn_no) ELSE null END) as datadaftar_json")
+                DB::raw("(CASE WHEN layanan_status='RJ' THEN (select datadaftarpolirj_json from rsview_rjkasir where rj_no=txn_no)
+                                        WHEN layanan_status='UGD' THEN (select datadaftarugd_json from rsview_ugdkasir where rj_no=txn_no)
+                                            ELSE null END) as datadaftar_json")
 
             )
             ->where('reg_no', $this->regNoRef)

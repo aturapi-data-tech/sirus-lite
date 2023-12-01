@@ -105,6 +105,13 @@
 
                                                 <td
                                                     class="px-4 py-3 text-gray-900 group-hover:bg-gray-100 whitespace-nowrap">
+                                                    <x-yellow-button wire:click.prevent="" type="button"
+                                                        wire:loading.remove>
+                                                        Rekam Medis
+                                                    </x-yellow-button>
+                                                    <div wire:loading wire:target="">
+                                                        <x-loading />
+                                                    </div>
                                                 </td>
 
 
