@@ -234,29 +234,30 @@
                                                 class="z-10 hidden w-auto bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700">
                                                 <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
                                                     aria-labelledby="dropdownButton{{ $myQData->rj_no }}">
-                                                    <li>
+                                                    {{-- <li>
                                                         <x-dropdown-link wire:click="tampil('{{ $myQData->rj_no }}')">
                                                             {{ __('Tampil | ' . $myQData->reg_name) }}
                                                         </x-dropdown-link>
-                                                    </li>
+                                                    </li> --}}
                                                     <li>
                                                         <x-dropdown-link
-                                                            wire:click="editScreening('{{ $myQData->rj_no }}')">
+                                                            wire:click="editScreening('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
                                                             {{ __('Screening') }}
                                                         </x-dropdown-link>
                                                     </li>
 
                                                     <li>
-                                                        <x-dropdown-link wire:click="edit('{{ $myQData->rj_no }}')">
+                                                        <x-dropdown-link
+                                                            wire:click="edit('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
                                                             {{ __('Rekam Medis') }}
                                                         </x-dropdown-link>
                                                     </li>
-                                                    <li>
+                                                    {{-- <li>
                                                         <x-dropdown-link
                                                             wire:click="$emit('confirm_remove_record', '{{ $myQData->rj_no }}', '{{ $myQData->reg_name }}')">
                                                             {{ __('Hapus') }}
                                                         </x-dropdown-link>
-                                                    </li>
+                                                    </li> --}}
 
                                                 </ul>
                                             </div>

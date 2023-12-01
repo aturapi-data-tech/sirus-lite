@@ -182,7 +182,7 @@ class DisplayPasien extends Component
 
                 // "kddrbpjs" => "" . $dataDaftarUgd->kd_dr_bpjs . "",
                 // "kdpolibpjs" => "" . $dataDaftarUgd->kd_poli_bpjs . "",
-
+                "klaimId" => $dataDaftarUgd->klaim_id == 'UM' ? 'UM' : 'JM',
                 "rjDate" => "" . $dataDaftarUgd->rj_date . "",
                 "rjNo" => "" . $dataDaftarUgd->rj_no . "",
                 "shift" => "" . $dataDaftarUgd->shift . "",

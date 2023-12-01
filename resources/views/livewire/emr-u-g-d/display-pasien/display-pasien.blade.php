@@ -2,7 +2,6 @@
     {{-- If you look to others for fulfillment, you will never truly be fulfilled. --}}
     <div id="DataPasien" class="sticky top-0 px-4 py-2 bg-white ">
 
-
         <div class="px-4 bg-white snap-mandatory snap-y">
 
             @php

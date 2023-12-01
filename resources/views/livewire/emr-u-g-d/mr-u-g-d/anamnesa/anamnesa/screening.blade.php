@@ -1,5 +1,4 @@
 <div>
-
     @php
         $disabledProperty = true;
         $disabledPropertyRjStatus = false;

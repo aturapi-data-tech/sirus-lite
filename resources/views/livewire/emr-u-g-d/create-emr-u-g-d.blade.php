@@ -137,6 +137,16 @@
                         </div>
                     @endif
 
+                    @if ($activeTab == 'rekamMedis')
+                        <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50 ">
+                            {{-- <div>{{ $activeTab }}</div> --}}
+                            {{-- :rjNo="" disi dari emit ListeneropenModalEditUgd --}}
+
+                            <livewire:emr-u-g-d.mr-u-g-d.rekam-medis.layanan :wire:key="'content-layananUgd'"
+                                :regNoRef="$regNoRef">
+                        </div>
+                    @endif
+
 
                 </div>
 

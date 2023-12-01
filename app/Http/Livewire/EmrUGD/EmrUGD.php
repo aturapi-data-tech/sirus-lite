@@ -100,25 +100,30 @@ class EmrUGD extends Component
     public string $isOpenModeScreening = 'insert';
 
     public bool $forceInsertRecord = false;
+
     public int $rjNoRef;
+    public string $regNoRef;
+
     // 
     private function openModal(): void
     {
         $this->isOpen = true;
         $this->isOpenMode = 'insert';
     }
-    private function openModalEdit($rjNo): void
+    private function openModalEdit($rjNo, $regNoRef): void
     {
         $this->isOpen = true;
         $this->isOpenMode = 'update';
         $this->rjNoRef = $rjNo;
+        $this->regNoRef = $regNoRef;
     }
 
-    private function openModalEditScreening($rjNo): void
+    private function openModalEditScreening($rjNo, $regNoRef): void
     {
         $this->isOpenScreening = true;
         $this->isOpenModeScreening = 'update';
         $this->rjNoRef = $rjNo;
+        $this->regNoRef = $regNoRef;
     }
 
     private function openModalTampil(): void
@@ -155,15 +160,15 @@ class EmrUGD extends Component
     // resert input private////////////////
 
     // is going to edit data/////////////////
-    public function edit($id)
+    public function edit($rjNo, $regNoRef)
     {
-        $this->openModalEdit($id);
+        $this->openModalEdit($rjNo, $regNoRef);
         // $this->findData($id);
     }
 
-    public function editScreening($id)
+    public function editScreening($rjNo, $regNoRef)
     {
-        $this->openModalEditScreening($id);
+        $this->openModalEditScreening($rjNo, $regNoRef);
         // $this->findData($id);
     }
 
@@ -253,6 +258,10 @@ class EmrUGD extends Component
         //     'ermMenuId' => 'penerbitanSrt',
         //     'ermMenuName' => 'Penerbitan Surat'
         // ],
+        [
+            'ermMenuId' => 'rekamMedis',
+            'ermMenuName' => 'Rekam Medis'
+        ],
 
     ];
 
