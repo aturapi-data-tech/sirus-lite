@@ -82,10 +82,6 @@
 
 
             <div class="flex justify-end w-1/2">
-
-
-
-
                 <x-dropdown align="right" :width="__('20')">
                     <x-slot name="trigger">
                         {{-- Button myLimitPerPage --}}

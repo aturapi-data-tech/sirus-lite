@@ -374,7 +374,7 @@ class Penilaian extends Component
     {
 
         // update table trnsaksi
-        DB::table('rstxn_rjhdrs')
+        DB::table('rstxn_ugdhdrs')
             ->where('rj_no', $rjNo)
             ->update([
                 'dataDaftarUgd_json' => json_encode($this->dataDaftarUgd, true),

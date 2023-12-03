@@ -191,12 +191,12 @@
                 </div>
 
                 <div class="grid grid-cols-2 gap-2">
-                    <x-text-input-mou id="dataDaftarUgd.pemeriksaan.tandaVital.suhu" placeholder="SPO2"
+                    <x-text-input-mou id="dataDaftarUgd.pemeriksaan.tandaVital.spo2" placeholder="SPO2"
                         class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.pemeriksaan.tandaVital.spo2'))" :disabled=$disabledPropertyRjStatus :mou_label="__('%')"
-                        wire:model.debounce.500ms="dataDaftarUgd.pemeriksaan.tandaVital.suhu" />
-                    <x-text-input-mou id="dataDaftarUgd.pemeriksaan.tandaVital.saturasiO2" placeholder="GDA"
+                        wire:model.debounce.500ms="dataDaftarUgd.pemeriksaan.tandaVital.spo2" />
+                    <x-text-input-mou id="dataDaftarUgd.pemeriksaan.tandaVital.gda" placeholder="GDA"
                         class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.pemeriksaan.tandaVital.gda'))" :disabled=$disabledPropertyRjStatus :mou_label="__('g/dl')"
-                        wire:model.debounce.500ms="dataDaftarUgd.pemeriksaan.tandaVital.saturasiO2" />
+                        wire:model.debounce.500ms="dataDaftarUgd.pemeriksaan.tandaVital.gda" />
                 </div>
             </div>
 

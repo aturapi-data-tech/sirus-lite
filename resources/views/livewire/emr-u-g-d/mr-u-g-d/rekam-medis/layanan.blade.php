@@ -4,8 +4,7 @@
         $disabledProperty = true;
         $disabledPropertyRjStatus = false;
     @endphp
-    {{-- jika anamnesa kosong ngak usah di render --}}
-    {{-- @if (isset($dataDaftarUgd['diagnosis'])) --}}
+
     <div class="w-full mb-1 ">
 
         <div class="grid grid-cols-1">
@@ -105,11 +104,15 @@
 
                                                 <td
                                                     class="px-4 py-3 text-gray-900 group-hover:bg-gray-100 whitespace-nowrap">
-                                                    <x-yellow-button wire:click.prevent="" type="button"
-                                                        wire:loading.remove>
-                                                        Rekam Medis
+                                                    <x-yellow-button
+                                                        wire:click.prevent="openModalLayanan('{{ $myQData->txn_no }}',
+                                                        '{{ $myQData->layanan_status }}',
+                                                        {{ $myQData->datadaftar_json }}
+                                                        )"
+                                                        type="button" wire:loading.remove>
+                                                        Rekam Medis {{ $isOpenLayanan }}
                                                     </x-yellow-button>
-                                                    <div wire:loading wire:target="">
+                                                    <div wire:loading wire:target="openModalLayanan">
                                                         <x-loading />
                                                     </div>
                                                 </td>
@@ -133,30 +136,16 @@
 
                             {{ $myQueryData->links() }}
 
-
-
-
-
-
-
                         </div>
                     </div>
+                    @if ($isOpenLayanan)
+                        @include('livewire.emr-u-g-d.mr-u-g-d.rekam-medis.create-layanan')
+                    @endif
                 </div>
             </div>
 
 
 
         </div>
-
-
-
-
-
-
     </div>
-
-
-</div>
-{{-- @endif --}}
-
 </div>

@@ -7,10 +7,10 @@
 
             <div class="mb-2 ">
                 <div class="mb-2 ">
-                    <x-text-input id="dataDaftarUgd.anamnesa.PengkajianPerawatan.perawatPenerima"
-                        placeholder="Perawat Penerima" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.anamnesa.PengkajianPerawatan.perawatPenerima'))"
+                    <x-text-input id="dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima"
+                        placeholder="Perawat Penerima" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima'))"
                         :disabled=$disabledPropertyRjStatus
-                        wire:model.debounce.500ms="dataDaftarUgd.anamnesa.PengkajianPerawatan.perawatPenerima" />
+                        wire:model.debounce.500ms="dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima" />
 
                 </div>
 
@@ -26,10 +26,10 @@
 
             <div class="mb-2 ">
                 <div class="mb-2 ">
-                    <x-text-input id="dataDaftarUgd.anamnesa.PengkajianPerawatan.jamDatang"
-                        placeholder="Jam Datang [hh24:mi]" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.anamnesa.PengkajianPerawatan.jamDatang'))"
+                    <x-text-input id="dataDaftarUgd.anamnesa.pengkajianPerawatan.jamDatang"
+                        placeholder="Jam Datang [hh24:mi]" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.anamnesa.pengkajianPerawatan.jamDatang'))"
                         :disabled=$disabledPropertyRjStatus
-                        wire:model.debounce.500ms="dataDaftarUgd.anamnesa.PengkajianPerawatan.jamDatang" />
+                        wire:model.debounce.500ms="dataDaftarUgd.anamnesa.pengkajianPerawatan.jamDatang" />
 
                 </div>
 
