@@ -44,7 +44,7 @@
 
                         <button type="button"
                             class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-                            aria-controls="dropdown-layouts" data-collapse-toggle="dropdown-layouts">
+                            aria-controls="dropdown-layoutsRJ" data-collapse-toggle="dropdown-layoutsRJ">
                             <svg class="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
                                 fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"
                                 aria-hidden="true">
@@ -52,8 +52,8 @@
                                     d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z">
                                 </path>
                             </svg>
-                            <span class="flex-1 ml-3 text-left whitespace-nowrap"
-                                sidebar-toggle-item="">Pendaftaran</span>
+                            <span class="flex-1 ml-3 text-left whitespace-nowrap" sidebar-toggle-item=""> Rawat
+                                Jalan</span>
                             <svg sidebar-toggle-item="" class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <path fill-rule="evenodd"
@@ -62,7 +62,7 @@
                             </svg>
                         </button>
 
-                        <ul id="dropdown-layouts" class="hidden py-2 space-y-2">
+                        <ul id="dropdown-layoutsRJ" class="hidden py-2 space-y-2">
                             <li>
                                 <x-nav-link class="pl-4" :href="route('MasterPasien')" :active="request()->routeIs('MasterPasien')">
                                     {{ __('Pendaftaran Pasien Baru') }}
@@ -76,18 +76,48 @@
                                 <x-nav-link class="pl-4" :href="route('EmrRJ')" :active="request()->routeIs('EmrRJ')">
                                     {{ __('Rekam Medis Rawat Jalan') }}
                                 </x-nav-link>
-                                <x-nav-link class="pl-4" :href="route('daftarUGD')" :active="request()->routeIs('daftarUGD')">
-                                    {{ __('Pendaftaran UGD') }}
-                                </x-nav-link>
-                                <x-nav-link class="pl-4" :href="route('EmrUGD')" :active="request()->routeIs('EmrUGD')">
-                                    {{ __('Rekam Medis UGD') }}
-                                </x-nav-link>
+
                                 <x-nav-link class="pl-4" :href="route('SetupHfisBpjs')" :active="request()->routeIs('SetupHfisBpjs')">
                                     {{ __('SetupHfisBpjs') }}
                                 </x-nav-link>
                                 <x-nav-link class="pl-4" :href="route('displayPelayananRJ')" :active="request()->routeIs('displayPelayananRJ')">
                                     {{ __('Display Pelayanan RJ') }}
                                 </x-nav-link>
+                            </li>
+                        </ul>
+
+                    </li>
+
+                    <li>
+
+                        <button type="button"
+                            class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+                            aria-controls="dropdown-layoutsUGD" data-collapse-toggle="dropdown-layoutsUGD">
+                            <svg class="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
+                                fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"
+                                aria-hidden="true">
+                                <path
+                                    d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z">
+                                </path>
+                            </svg>
+                            <span class="flex-1 ml-3 text-left whitespace-nowrap" sidebar-toggle-item=""> IGD</span>
+                            <svg sidebar-toggle-item="" class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd"
+                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                    clip-rule="evenodd"></path>
+                            </svg>
+                        </button>
+
+                        <ul id="dropdown-layoutsUGD" class="hidden py-2 space-y-2">
+                            <li>
+                                <x-nav-link class="pl-4" :href="route('daftarUGD')" :active="request()->routeIs('daftarUGD')">
+                                    {{ __('Pendaftaran UGD') }}
+                                </x-nav-link>
+                                <x-nav-link class="pl-4" :href="route('EmrUGD')" :active="request()->routeIs('EmrUGD')">
+                                    {{ __('Rekam Medis UGD') }}
+                                </x-nav-link>
+
                             </li>
                         </ul>
 

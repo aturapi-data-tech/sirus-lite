@@ -37,7 +37,7 @@
                     </div>
                 </div>
                 {{-- Content --}}
-                <div class="bg-red-300 ">
+                <div class="bg-white ">
                     <table class="w-full table-auto">
                         <tbody>
                             <tr>
