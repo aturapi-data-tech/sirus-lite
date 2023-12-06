@@ -873,7 +873,7 @@ class PelayananRJ extends Component
                 'datadaftarpolirj_json'
             )
             ->where('rj_status', '=', $this->statusRjRef['statusId'])
-            ->where('shift', '=', $this->shiftRjRef['shiftId'])
+            // ->where('shift', '=', $this->shiftRjRef['shiftId'])
             ->where('klaim_id', '!=', 'KR')
             ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $this->dateRjRef);
 
