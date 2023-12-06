@@ -283,7 +283,7 @@ class EmrUGD extends Component
         // set mySearch
         $mySearch = $this->refFilter;
         $myRefdate = $this->myTopBar['refDate'];
-        $myRefshift = $this->myTopBar['refShiftId'];
+        // $myRefshift = $this->myTopBar['refShiftId'];
         $myRefstatusId = $this->myTopBar['refStatusId'];
 
 
@@ -316,7 +316,7 @@ class EmrUGD extends Component
                 'push_antrian_bpjs_json'
             )
             ->where('erm_status', '=', $myRefstatusId)
-            ->where('shift', '=', $myRefshift)
+            // ->where('shift', '=', $myRefshift)
             ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $myRefdate);
 
         //Jika where dokter tidak kosong

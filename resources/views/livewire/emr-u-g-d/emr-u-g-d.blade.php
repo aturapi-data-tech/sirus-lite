@@ -51,7 +51,7 @@
                 {{-- Tanggal --}}
 
                 {{-- Shift --}}
-                <div class="relative w-[75px]">
+                {{-- <div class="relative w-[75px]">
                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                         <svg class="w-5 h-5 text-gray-800 dark:text-white" aria-hidden="true"
                             xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
@@ -62,7 +62,7 @@
 
                     <x-text-input type="text" class="w-full p-2 pl-10 " placeholder="[Shift 1/2/3]"
                         wire:model="myTopBar.refShiftId" />
-                </div>
+                </div> --}}
                 {{-- Shift --}}
 
                 {{-- Status Transaksi --}}
