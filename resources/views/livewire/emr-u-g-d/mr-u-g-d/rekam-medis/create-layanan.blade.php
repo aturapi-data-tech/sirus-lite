@@ -146,7 +146,7 @@
                                 <tr>
                                     <td
                                         class="p-2 m-2 text-2xl font-semibold text-center uppercase border-b-2 border-l-2 border-r-2 border-gray-900">
-                                        assesment awal pasien igd
+                                        assesment awal instalasi gawat darurat
                                     </td>
                                 </tr>
                             </tbody>
