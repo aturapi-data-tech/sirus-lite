@@ -172,11 +172,6 @@
                                         {{ isset($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['caraMasukIgd']) ? $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['caraMasukIgd'] : '-' }}
                                         /
                                         <span class="font-semibold">
-                                            Jam Datang :
-                                        </span>
-                                        {{ isset($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['jamDatang']) ? $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['jamDatang'] : '-' }}
-                                        /
-                                        <span class="font-semibold">
                                             Tingkat Kegawatan :
                                         </span>
                                         {{ isset($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['tingkatKegawatan']) ? $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['tingkatKegawatan'] : '-' }}
@@ -796,7 +791,11 @@
                                                             <br>
                                                             ttd
                                                             <br>
-                                                            {{ isset($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima']) ? strtoupper($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima']) : '-' }}
+                                                            {{ isset($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima'])
+                                                                ? ($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima']
+                                                                    ? strtoupper($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima'])
+                                                                    : 'Perawat Penerima')
+                                                                : 'Perawat Penerima' }}
                                                         </td>
                                                     </tr>
 
@@ -1174,6 +1173,46 @@
                                             : '-' }}
 
 
+                                        <br>
+                                        @inject('carbon', 'Carbon\Carbon')
+                                        <span class="font-semibold">
+                                            Waktu Datang :
+                                        </span>
+                                        {{ isset($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['jamDatang'])
+                                            ? ($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['jamDatang']
+                                                ? $carbon
+                                                    ::createFromFormat('d/m/Y H:i:s', $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['jamDatang'])->format('H:i:s')
+                                                : '-')
+                                            : '-' }}
+                                        /
+                                        <span class="font-semibold">
+                                            Waktu Pemeriksaan :
+                                        </span>
+                                        {{ isset($dataDaftarTxn['perencanaan']['pengkajianMedis']['waktuPemeriksaan'])
+                                            ? ($dataDaftarTxn['perencanaan']['pengkajianMedis']['waktuPemeriksaan']
+                                                ? $carbon
+                                                    ::createFromFormat('d/m/Y H:i:s', $dataDaftarTxn['perencanaan']['pengkajianMedis']['waktuPemeriksaan'])->format('H:i:s')
+                                                : '-')
+                                            : '-' }}
+                                        /
+                                        <span class="font-semibold">
+                                            Selesai Pemeriksaan :
+                                        </span>
+                                        {{ isset($dataDaftarTxn['perencanaan']['pengkajianMedis']['selesaiPemeriksaan'])
+                                            ? ($dataDaftarTxn['perencanaan']['pengkajianMedis']['selesaiPemeriksaan']
+                                                ? $carbon
+                                                    ::createFromFormat('d/m/Y H:i:s', $dataDaftarTxn['perencanaan']['pengkajianMedis']['selesaiPemeriksaan'])->format('H:i:s')
+                                                : '-')
+                                            : '-' }}
+                                        <br>
+                                        <span class="font-semibold">
+                                            Waktu Response untu pasien {{ $dataPasien['pasien']['regName'] }} adalah
+                                            {{ $carbon
+                                                ::createFromFormat('d/m/Y H:i:s', $dataDaftarTxn['perencanaan']['pengkajianMedis']['waktuPemeriksaan'])->diff($carbon::createFromFormat('d/m/Y H:i:s', $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['jamDatang']))->format('%H:%I:%S') }}
+                                        </span>
+
+
+
                                     </td>
                                 </tr>
                                 {{-- terapi --}}
@@ -1183,7 +1222,7 @@
                                         terapi
                                     </td>
                                     <td
-                                        class="p-2 m-2 text-sm uppercase border-b-2 border-l-2 border-r-2 border-gray-900 text-start">
+                                        class="p-2 m-2 text-sm border-b-2 border-l-2 border-r-2 border-gray-900 text-start">
 
                                         <table class="w-full text-sm table-auto">
                                             <tbody>
@@ -1200,13 +1239,26 @@
                                                     ) !!}
 
                                                 </td>
+                                                @inject('carbon', 'Carbon\Carbon')
                                                 <td class="w-1/4 text-center">
-                                                    Tulungagung, tgl rj jam
+                                                    Tulungagung,
+                                                    {{ isset($dataDaftarTxn['rjDate'])
+                                                        ? ($dataDaftarTxn['rjDate']
+                                                            ? $carbon::createFromFormat('d/m/Y H:i:s', $dataDaftarTxn['rjDate'])->format('d/m/Y')
+                                                            : 'Dokter Pemeriksa')
+                                                        : 'Dokter Pemeriksa' }}
+
+                                                    <br>
+                                                    <br>
                                                     <br>
                                                     <br>
                                                     ttd
                                                     <br>
-                                                    nama dokter
+                                                    {{ isset($dataDaftarTxn['perencanaan']['pengkajianMedis']['drPemeriksa'])
+                                                        ? ($dataDaftarTxn['perencanaan']['pengkajianMedis']['drPemeriksa']
+                                                            ? $dataDaftarTxn['perencanaan']['pengkajianMedis']['drPemeriksa']
+                                                            : 'Dokter Pemeriksa')
+                                                        : 'Dokter Pemeriksa' }}
                                                 </td>
                                             </tbody>
                                         </table>
