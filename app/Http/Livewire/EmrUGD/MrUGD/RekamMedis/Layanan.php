@@ -89,7 +89,7 @@ class Layanan extends Component
                 $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminId'] = ($findData->sex == 'L') ? 1 : 2;
                 $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] = ($findData->sex == 'L') ? 'Laki-laki' : 'Perempuan';
                 $this->dataPasien['pasien']['tglLahir'] = $findData->birth_date;
-                $this->dataPasien['pasien']['thn'] = $findData->thn;
+                $this->dataPasien['pasien']['thn'] = Carbon::createFromFormat('d/m/Y', $findData->birth_date)->diff(Carbon::now())->format('%y Thn, %m Bln %d Hr'); //$findData->thn;
                 $this->dataPasien['pasien']['bln'] = $findData->bln;
                 $this->dataPasien['pasien']['hari'] = $findData->hari;
                 $this->dataPasien['pasien']['tempatLahir'] = $findData->birth_place;
@@ -196,6 +196,9 @@ class Layanan extends Component
         } else {
             // ubah data Pasien
             $this->dataPasien = json_decode($findData->meta_data_pasien_json, true);
+            $this->dataPasien['pasien']['thn'] = Carbon::createFromFormat('d/m/Y', $this->dataPasien['pasien']['tglLahir'])->diff(Carbon::now())->format('%y Thn, %m Bln %d Hr'); //$findData->thn;
+
+
         }
     }
 

@@ -8,9 +8,11 @@
             <div class="mb-2 ">
                 <div class="mb-2 ">
                     <x-text-input id="dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima"
-                        placeholder="Perawat Penerima" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima'))"
-                        :disabled=$disabledPropertyRjStatus
-                        wire:model.debounce.500ms="dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima" />
+                        name="dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima" placeholder="Perawat Penerima"
+                        class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima'))" :disabled=$disabledPropertyRjStatus
+                        wire:model.debounce.500ms="dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima"
+                        autocomplete="dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima" />
+
 
                 </div>
 
@@ -21,16 +23,33 @@
         </div>
 
         <div>
-            <x-input-label for="dataDaftarUgd.anamnesa.pengkajianPerawatan.jamDatang" :value="__('Jam Datang')"
+            <x-input-label for="dataDaftarUgd.anamnesa.pengkajianPerawatan.jamDatang" :value="__('Waktu Datang')"
                 :required="__(true)" />
 
             <div class="mb-2 ">
-                <div class="mb-2 ">
+                <div class="flex items-center mb-2 ">
                     <x-text-input id="dataDaftarUgd.anamnesa.pengkajianPerawatan.jamDatang"
-                        placeholder="Jam Datang [hh24:mi]" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.anamnesa.pengkajianPerawatan.jamDatang'))"
+                        placeholder="Waktu Datang [dd/mm/yyyy hh24:mi:ss]" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.anamnesa.pengkajianPerawatan.jamDatang'))"
                         :disabled=$disabledPropertyRjStatus
                         wire:model.debounce.500ms="dataDaftarUgd.anamnesa.pengkajianPerawatan.jamDatang" />
 
+                    @if (!$dataDaftarUgd['anamnesa']['pengkajianPerawatan']['jamDatang'])
+                        <div class="w-1/2 ml-2">
+                            <div wire:loading wire:target="setJamDatang">
+                                <x-loading />
+                            </div>
+
+                            <x-green-button :disabled=false
+                                wire:click.prevent="setJamDatang('{{ date('d/m/Y H:i:s') }}')" type="button"
+                                wire:loading.remove>
+                                <div wire:poll>
+
+                                    Set Jam Datang: {{ date('d/m/Y H:i:s') }}
+
+                                </div>
+                            </x-green-button>
+                        </div>
+                    @endif
                 </div>
 
             </div>
@@ -80,6 +99,8 @@
             </div>
 
         </div>
+
+
 
 
     </div>

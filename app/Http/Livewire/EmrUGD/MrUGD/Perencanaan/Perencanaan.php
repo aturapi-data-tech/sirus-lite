@@ -47,6 +47,13 @@ class Perencanaan extends Component
             ],
 
         ],
+
+        "pengkajianMedisTab" => "Pengkajian Medis",
+        "pengkajianMedis" => [
+            "waktuPemeriksaan" => "",
+            "selesaiPemeriksaan" => "",
+            "drPemeriksa" => "",
+        ],
         // Kontrol pakai program lama
 
         "rawatInapTab" => "Rawat Inap",
@@ -240,30 +247,31 @@ class Perencanaan extends Component
                 ->first();
 
             $this->dataDaftarUgd = [
-                "regNo" => "" . $dataDaftarUgd->reg_no . "",
+                "regNo" =>  $dataDaftarUgd->reg_no,
 
-                "drId" => "" . $dataDaftarUgd->dr_id . "",
-                "drDesc" => "" . $dataDaftarUgd->dr_name . "",
+                "drId" =>  $dataDaftarUgd->dr_id,
+                "drDesc" =>  $dataDaftarUgd->dr_name,
 
-                "poliId" => "" . $dataDaftarUgd->poli_id . "",
-                // "poliDesc" => "" . $dataDaftarUgd->poli_desc . "",
+                "poliId" =>  $dataDaftarUgd->poli_id,
+                "klaimId" => $dataDaftarUgd->klaim_id,
+                // "poliDesc" =>  $dataDaftarUgd->poli_desc ,
 
-                // "kddrbpjs" => "" . $dataDaftarUgd->kd_dr_bpjs . "",
-                // "kdpolibpjs" => "" . $dataDaftarUgd->kd_poli_bpjs . "",
+                // "kddrbpjs" =>  $dataDaftarUgd->kd_dr_bpjs ,
+                // "kdpolibpjs" =>  $dataDaftarUgd->kd_poli_bpjs ,
 
-                "rjDate" => "" . $dataDaftarUgd->rj_date . "",
-                "rjNo" => "" . $dataDaftarUgd->rj_no . "",
-                "shift" => "" . $dataDaftarUgd->shift . "",
-                "noAntrian" => "" . $dataDaftarUgd->no_antrian . "",
-                "noBooking" => "" . $dataDaftarUgd->nobooking . "",
+                "rjDate" =>  $dataDaftarUgd->rj_date,
+                "rjNo" =>  $dataDaftarUgd->rj_no,
+                "shift" =>  $dataDaftarUgd->shift,
+                "noAntrian" =>  $dataDaftarUgd->no_antrian,
+                "noBooking" =>  $dataDaftarUgd->nobooking,
                 "slCodeFrom" => "02",
                 "passStatus" => "",
-                "rjStatus" => "" . $dataDaftarUgd->rj_status . "",
-                "txnStatus" => "" . $dataDaftarUgd->txn_status . "",
-                "ermStatus" => "" . $dataDaftarUgd->erm_status . "",
+                "rjStatus" =>  $dataDaftarUgd->rj_status,
+                "txnStatus" =>  $dataDaftarUgd->txn_status,
+                "ermStatus" =>  $dataDaftarUgd->erm_status,
                 "cekLab" => "0",
                 "kunjunganInternalStatus" => "0",
-                "noReferensi" => "" . $dataDaftarUgd->reg_no . "",
+                "noReferensi" =>  $dataDaftarUgd->reg_no,
                 "postInap" => [],
                 "internal12" => "1",
                 "internal12Desc" => "Faskes Tingkat 1",
@@ -292,7 +300,7 @@ class Perencanaan extends Component
                 "taskIdPelayanan" => [
                     "taskId1" => "",
                     "taskId2" => "",
-                    "taskId3" => "" . $dataDaftarUgd->rj_date . "",
+                    "taskId3" =>  $dataDaftarUgd->rj_date,
                     "taskId4" => "",
                     "taskId5" => "",
                     "taskId6" => "",
@@ -300,7 +308,7 @@ class Perencanaan extends Component
                     "taskId99" => "",
                 ],
                 'sep' => [
-                    "noSep" => "" . $dataDaftarUgd->vno_sep . "",
+                    "noSep" =>  $dataDaftarUgd->vno_sep,
                     "reqSep" => [],
                     "resSep" => [],
                 ]
@@ -319,11 +327,33 @@ class Perencanaan extends Component
     {
     }
 
+    public function setWaktuPemeriksaan($myTime)
+    {
+        $this->dataDaftarUgd['perencanaan']['pengkajianMedis']['waktuPemeriksaan'] = $myTime;
+    }
+
+    public function setSelesaiPemeriksaan($myTime)
+    {
+        $this->dataDaftarUgd['perencanaan']['pengkajianMedis']['selesaiPemeriksaan'] = $myTime;
+    }
+
+    public function setDrPemeriksa()
+    {
+        if (!$this->dataDaftarUgd['perencanaan']['pengkajianMedis']['drPemeriksa']) {
+            $this->dataDaftarUgd['perencanaan']['pengkajianMedis']['drPemeriksa'] = (isset($this->dataDaftarUgd['drDesc']) ?
+                ($this->dataDaftarUgd['drDesc'] ? $this->dataDaftarUgd['drDesc']
+                    : 'Dokter pemeriksa')
+                : 'Dokter pemeriksa-');
+        }
+    }
 
     // when new form instance
     public function mount()
     {
         $this->findData($this->rjNoRef);
+
+        // set dokter pemeriksa
+        $this->setDrPemeriksa();
     }
 
 

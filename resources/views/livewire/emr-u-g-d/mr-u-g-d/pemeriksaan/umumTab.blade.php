@@ -4,10 +4,9 @@
 
         <div class="pt-0">
 
-            <x-input-label for="dataDaftarUgd.pemeriksaan.tandaVital.keadaanUmum" :value="__('Tanda Vital')" :required="__(false)"
+            <x-input-label for="dataDaftarUgd.pemeriksaan.tandaVital.keadaanUmum" :value="__('Keadaan Umum')" :required="__(false)"
                 class="pt-2 sm:text-xl" />
 
-            <x-input-label for="dataDaftarUgd.pemeriksaan.tandaVital.keadaanUmum" :value="__('Keadaan Umum')" :required="__(false)" />
 
             <div class="mb-2 ">
                 <x-text-input id="dataDaftarUgd.pemeriksaan.tandaVital.keadaanUmum" placeholder="Keadaan Umum"
@@ -128,7 +127,7 @@
             </div>
 
 
-            <x-input-label for="dataDaftarUgd.pemeriksaan.tandaVital.sistolik" :value="__('Pemeriksaan Fisik')" :required="__(false)"
+            <x-input-label for="dataDaftarUgd.pemeriksaan.tandaVital.sistolik" :value="__('Tanda Vital')" :required="__(false)"
                 class="pt-2 sm:text-xl" />
 
             <div class="mb-2 ">
@@ -200,7 +199,7 @@
                 </div>
             </div>
 
-            <div class="mb-2 ">
+            {{-- <div class="mb-2 ">
                 <x-input-label for="dataDaftarUgd.pemeriksaan.tandaVital.waktuPemeriksaan" :value="__('Waktu Pemeriksaan')"
                     :required="__(false)" />
                 <div class="grid grid-cols-1 gap-0">
@@ -209,7 +208,7 @@
                         :disabled=$disabledPropertyRjStatus
                         wire:model.debounce.500ms="dataDaftarUgd.pemeriksaan.tandaVital.waktuPemeriksaan" />
                 </div>
-            </div>
+            </div> --}}
 
 
 

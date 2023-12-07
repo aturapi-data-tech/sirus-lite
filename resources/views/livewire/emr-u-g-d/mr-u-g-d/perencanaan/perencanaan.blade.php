@@ -33,6 +33,14 @@
                                         @click="activeTab ='{{ $dataDaftarUgd['perencanaan']['tindakLanjutTab'] }}'">{{ $dataDaftarUgd['perencanaan']['tindakLanjutTab'] }}</label>
                                 </li>
 
+                                <li class="mr-2">
+                                    <label
+                                        class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
+                                        :class="activeTab === '{{ $dataDaftarUgd['perencanaan']['pengkajianMedisTab'] }}' ?
+                                            'text-primary border-primary bg-gray-100' : ''"
+                                        @click="activeTab ='{{ $dataDaftarUgd['perencanaan']['pengkajianMedisTab'] }}'">{{ $dataDaftarUgd['perencanaan']['pengkajianMedisTab'] }}</label>
+                                </li>
+
 
                             </ul>
                         </div>
@@ -52,6 +60,15 @@
                             }"
                             x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarUgd['perencanaan']['tindakLanjutTab'] }}'">
                             @include('livewire.emr-u-g-d.mr-u-g-d.perencanaan.tindakLanjutTab')
+
+                        </div>
+
+                        <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800"
+                            :class="{
+                                'active': activeTab === '{{ $dataDaftarUgd['perencanaan']['pengkajianMedisTab'] }}'
+                            }"
+                            x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarUgd['perencanaan']['pengkajianMedisTab'] }}'">
+                            @include('livewire.emr-u-g-d.mr-u-g-d.perencanaan.pengkajianMedisTab')
 
                         </div>
 

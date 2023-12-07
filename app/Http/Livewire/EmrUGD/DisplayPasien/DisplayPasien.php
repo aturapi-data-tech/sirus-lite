@@ -4,6 +4,7 @@ namespace App\Http\Livewire\EmrUGD\DisplayPasien;
 
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 
 class DisplayPasien extends Component
@@ -182,7 +183,7 @@ class DisplayPasien extends Component
 
                 // "kddrbpjs" => "" . $dataDaftarUgd->kd_dr_bpjs . "",
                 // "kdpolibpjs" => "" . $dataDaftarUgd->kd_poli_bpjs . "",
-                "klaimId" => $dataDaftarUgd->klaim_id == 'UM' ? 'UM' : 'JM',
+                "klaimId" => $dataDaftarUgd->klaim_id,
                 "rjDate" => "" . $dataDaftarUgd->rj_date . "",
                 "rjNo" => "" . $dataDaftarUgd->rj_no . "",
                 "shift" => "" . $dataDaftarUgd->shift . "",
@@ -501,7 +502,7 @@ class DisplayPasien extends Component
                 $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminId'] = ($findData->sex == 'L') ? 1 : 2;
                 $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] = ($findData->sex == 'L') ? 'Laki-laki' : 'Perempuan';
                 $this->dataPasien['pasien']['tglLahir'] = $findData->birth_date;
-                $this->dataPasien['pasien']['thn'] = $findData->thn;
+                $this->dataPasien['pasien']['thn'] = Carbon::createFromFormat('d/m/Y', $findData->birth_date)->diff(Carbon::now())->format('%y Thn, %m Bln %d Hr'); //$findData->thn;
                 $this->dataPasien['pasien']['bln'] = $findData->bln;
                 $this->dataPasien['pasien']['hari'] = $findData->hari;
                 $this->dataPasien['pasien']['tempatLahir'] = $findData->birth_place;
@@ -608,6 +609,8 @@ class DisplayPasien extends Component
         } else {
             // ubah data Pasien
             $this->dataPasien = json_decode($findData->meta_data_pasien_json, true);
+            // replace thn to age
+            $this->dataPasien['pasien']['thn'] = Carbon::createFromFormat('d/m/Y', $this->dataPasien['pasien']['tglLahir'])->diff(Carbon::now())->format('%y Thn, %m Bln %d Hr'); //$findData->thn;
         }
     }
 

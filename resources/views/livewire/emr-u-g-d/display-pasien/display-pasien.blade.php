@@ -14,7 +14,7 @@
                     <div class="text-base font-semibold text-gray-700">
                         {{ $dataPasien['pasien']['regNo'] }}</div>
                     <div class="text-2xl font-semibold text-primary">
-                        {{ $dataPasien['pasien']['regName'] . ' / (' . $dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] . ')' . ' / ' . $dataPasien['pasien']['thn'] }}
+                        {{ strtoupper($dataPasien['pasien']['regName']) . ' / (' . $dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] . ')' . ' / ' . $dataPasien['pasien']['thn'] }}
                     </div>
                     <div class="font-normal text-gray-900">
                         {{ $dataPasien['pasien']['identitas']['alamat'] }}
