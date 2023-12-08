@@ -339,7 +339,16 @@ class Perencanaan extends Component
 
     public function setDrPemeriksa()
     {
-        if (!$this->dataDaftarUgd['perencanaan']['pengkajianMedis']['drPemeriksa']) {
+        if (isset($this->dataDaftarUgd['perencanaan']['pengkajianMedis']['drPemeriksa'])) {
+            if (!$this->dataDaftarUgd['perencanaan']['pengkajianMedis']['drPemeriksa']) {
+                $this->dataDaftarUgd['perencanaan']['pengkajianMedis']['drPemeriksa'] = (isset($this->dataDaftarUgd['drDesc']) ?
+                    ($this->dataDaftarUgd['drDesc'] ? $this->dataDaftarUgd['drDesc']
+                        : 'Dokter pemeriksa')
+                    : 'Dokter pemeriksa-');
+            }
+        } else {
+
+            $this->dataDaftarUgd['perencanaan']['pengkajianMedisTab'] = 'Pengkajian Medis';
             $this->dataDaftarUgd['perencanaan']['pengkajianMedis']['drPemeriksa'] = (isset($this->dataDaftarUgd['drDesc']) ?
                 ($this->dataDaftarUgd['drDesc'] ? $this->dataDaftarUgd['drDesc']
                     : 'Dokter pemeriksa')

@@ -22,24 +22,25 @@
                     placeholder="Waktu Pemeriksaan [dd/mm/yyyy hh24:mi:ss]" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.perencanaan.pengkajianMedis.waktuPemeriksaan'))"
                     :disabled=$disabledPropertyRjStatus
                     wire:model.debounce.500ms="dataDaftarUgd.perencanaan.pengkajianMedis.waktuPemeriksaan" />
-
-                @if (!$dataDaftarUgd['perencanaan']['pengkajianMedis']['waktuPemeriksaan'])
-                    <div class="w-1/2 ml-2">
-                        <div wire:loading wire:target="setWaktuPemeriksaan">
-                            <x-loading />
-                        </div>
-
-                        <x-green-button :disabled=false
-                            wire:click.prevent="setWaktuPemeriksaan('{{ date('d/m/Y H:i:s') }}')" type="button"
-                            wire:loading.remove>
-                            <div wire:poll>
-
-                                Waktu Pemeriksaan: {{ date('d/m/Y H:i:s') }}
-
+                @isset($dataDaftarUgd['perencanaan']['pengkajianMedis']['waktuPemeriksaan'])
+                    @if (!$dataDaftarUgd['perencanaan']['pengkajianMedis']['waktuPemeriksaan'])
+                        <div class="w-1/2 ml-2">
+                            <div wire:loading wire:target="setWaktuPemeriksaan">
+                                <x-loading />
                             </div>
-                        </x-green-button>
-                    </div>
-                @endif
+
+                            <x-green-button :disabled=false
+                                wire:click.prevent="setWaktuPemeriksaan('{{ date('d/m/Y H:i:s') }}')" type="button"
+                                wire:loading.remove>
+                                <div wire:poll>
+
+                                    Waktu Pemeriksaan: {{ date('d/m/Y H:i:s') }}
+
+                                </div>
+                            </x-green-button>
+                        </div>
+                    @endif
+                @endisset
             </div>
             @error('dataDaftarUgd.perencanaan.pengkajianMedis.waktuPemeriksaan')
                 <x-input-error :messages=$message />
@@ -56,24 +57,25 @@
                     placeholder="Selesai Pemeriksaan [dd/mm/yyyy hh24:mi:ss]" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.perencanaan.pengkajianMedis.selesaiPemeriksaan'))"
                     :disabled=$disabledPropertyRjStatus
                     wire:model.debounce.500ms="dataDaftarUgd.perencanaan.pengkajianMedis.selesaiPemeriksaan" />
-
-                @if (!$dataDaftarUgd['perencanaan']['pengkajianMedis']['selesaiPemeriksaan'])
-                    <div class="w-1/2 ml-2">
-                        <div wire:loading wire:target="setSelesaiPemeriksaan">
-                            <x-loading />
-                        </div>
-
-                        <x-green-button :disabled=false
-                            wire:click.prevent="setSelesaiPemeriksaan('{{ date('d/m/Y H:i:s') }}')" type="button"
-                            wire:loading.remove>
-                            <div wire:poll>
-
-                                Selesai Pemeriksaan: {{ date('d/m/Y H:i:s') }}
-
+                @isset($dataDaftarUgd['perencanaan']['pengkajianMedis']['selesaiPemeriksaan'])
+                    @if (!$dataDaftarUgd['perencanaan']['pengkajianMedis']['selesaiPemeriksaan'])
+                        <div class="w-1/2 ml-2">
+                            <div wire:loading wire:target="setSelesaiPemeriksaan">
+                                <x-loading />
                             </div>
-                        </x-green-button>
-                    </div>
-                @endif
+
+                            <x-green-button :disabled=false
+                                wire:click.prevent="setSelesaiPemeriksaan('{{ date('d/m/Y H:i:s') }}')" type="button"
+                                wire:loading.remove>
+                                <div wire:poll>
+
+                                    Selesai Pemeriksaan: {{ date('d/m/Y H:i:s') }}
+
+                                </div>
+                            </x-green-button>
+                        </div>
+                    @endif
+                @endisset
             </div>
             @error('dataDaftarUgd.perencanaan.pengkajianMedis.selesaiPemeriksaan')
                 <x-input-error :messages=$message />
@@ -95,20 +97,24 @@
             @enderror
 
         </div>
+        @isset($dataDaftarUgd['perencanaan']['pengkajianMedis']['waktuPemeriksaan'])
+            @isset($dataDaftarUgd['anamnesa']['pengkajianPerawatan']['jamDatang'])
+                @if (
+                    $dataDaftarUgd['perencanaan']['pengkajianMedis']['waktuPemeriksaan'] &&
+                        $dataDaftarUgd['anamnesa']['pengkajianPerawatan']['jamDatang']
+                )
+                    <div class="mb-2">
+                        @inject('carbon', 'Carbon\Carbon')
+                        <p class="text-sm font-medium text-gray-900">
+                            Waktu Response untu pasien {{ $dataDaftarUgd['regNo'] }} adalah
+                            {{ $carbon
+                                ::createFromFormat('d/m/Y H:i:s', $dataDaftarUgd['perencanaan']['pengkajianMedis']['waktuPemeriksaan'])->diff($carbon::createFromFormat('d/m/Y H:i:s', $dataDaftarUgd['anamnesa']['pengkajianPerawatan']['jamDatang']))->format('%H:%I:%S') }}
+                        </p>
+                    </div>
+                @endif
+            @endisset
+        @endisset
 
-        @if (
-            $dataDaftarUgd['perencanaan']['pengkajianMedis']['waktuPemeriksaan'] &&
-                $dataDaftarUgd['anamnesa']['pengkajianPerawatan']['jamDatang']
-        )
-            <div class="mb-2">
-                @inject('carbon', 'Carbon\Carbon')
-                <p class="text-sm font-medium text-gray-900">
-                    Waktu Response untu pasien {{ $dataDaftarUgd['regNo'] }} adalah
-                    {{ $carbon
-                        ::createFromFormat('d/m/Y H:i:s', $dataDaftarUgd['perencanaan']['pengkajianMedis']['waktuPemeriksaan'])->diff($carbon::createFromFormat('d/m/Y H:i:s', $dataDaftarUgd['anamnesa']['pengkajianPerawatan']['jamDatang']))->format('%H:%I:%S') }}
-                </p>
-            </div>
-        @endif
 
     </div>
 </div>
