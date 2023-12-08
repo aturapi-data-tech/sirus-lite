@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\DB;
 
 use Livewire\Component;
 use Livewire\WithPagination;
+use App\Http\Traits\customErrorMessagesTrait;
+
 use Carbon\Carbon;
 
 use Illuminate\Support\Str;
@@ -102,14 +104,23 @@ class Perencanaan extends Component
     //////////////////////////////////////////////////////////////////////
 
 
+    protected $rules = [
 
+        'dataDaftarUgd.perencanaan.pengkajianMedis.waktuPemeriksaan' => 'required|date_format:d/m/Y H:i:s',
+        'dataDaftarUgd.perencanaan.pengkajianMedis.selesaiPemeriksaan' => 'required|date_format:d/m/Y H:i:s'
+
+    ];
 
 
 
     ////////////////////////////////////////////////
     ///////////begin////////////////////////////////
     ////////////////////////////////////////////////
-
+    public function updated($propertyName)
+    {
+        // dd($propertyName);
+        $this->validateOnly($propertyName);
+    }
 
 
 
@@ -140,9 +151,7 @@ class Perencanaan extends Component
     {
         // customErrorMessages
         // $messages = customErrorMessagesTrait::messages();
-
-        // require nik ketika pasien tidak dikenal
-
+        $messages = [];
 
 
         // $rules = [];
@@ -150,13 +159,13 @@ class Perencanaan extends Component
 
 
         // Proses Validasi///////////////////////////////////////////
-        // try {
-        //     $this->validate($rules, $messages);
-        // } catch (\Illuminate\Validation\ValidationException $e) {
+        try {
+            $this->validate($this->rules, $messages);
+        } catch (\Illuminate\Validation\ValidationException $e) {
 
-        //     $this->emit('toastr-error', "Lakukan Pengecekan kembali Input Data.");
-        //     $this->validate($rules, $messages);
-        // }
+            $this->emit('toastr-error', "Lakukan Pengecekan kembali Input Data.");
+            $this->validate($this->rules, $messages);
+        }
     }
 
 

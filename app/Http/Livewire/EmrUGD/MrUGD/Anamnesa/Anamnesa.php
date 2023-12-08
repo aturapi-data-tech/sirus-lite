@@ -301,14 +301,22 @@ class Anamnesa extends Component
     //////////////////////////////////////////////////////////////////////
 
 
+    protected $rules = [
 
+        'dataDaftarUgd.anamnesa.pengkajianPerawatan.jamDatang' => 'required|date_format:d/m/Y H:i:s',
+
+    ];
 
 
 
     ////////////////////////////////////////////////
     ///////////begin////////////////////////////////
     ////////////////////////////////////////////////
-
+    public function updated($propertyName)
+    {
+        // dd($propertyName);
+        $this->validateOnly($propertyName);
+    }
 
 
 
@@ -337,9 +345,7 @@ class Anamnesa extends Component
     {
         // customErrorMessages
         // $messages = customErrorMessagesTrait::messages();
-
-        // require nik ketika pasien tidak dikenal
-
+        $messages = [];
 
 
         // $rules = [];
@@ -347,13 +353,13 @@ class Anamnesa extends Component
 
 
         // Proses Validasi///////////////////////////////////////////
-        // try {
-        //     $this->validate($rules, $messages);
-        // } catch (\Illuminate\Validation\ValidationException $e) {
+        try {
+            $this->validate($this->rules, $messages);
+        } catch (\Illuminate\Validation\ValidationException $e) {
 
-        //     $this->emit('toastr-error', "Lakukan Pengecekan kembali Input Data.");
-        //     $this->validate($rules, $messages);
-        // }
+            $this->emit('toastr-error', "Lakukan Pengecekan kembali Input Data.");
+            $this->validate($this->rules, $messages);
+        }
     }
 
 

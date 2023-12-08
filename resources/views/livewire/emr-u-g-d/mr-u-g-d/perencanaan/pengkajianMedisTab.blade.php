@@ -104,12 +104,26 @@
                         $dataDaftarUgd['anamnesa']['pengkajianPerawatan']['jamDatang']
                 )
                     <div class="mb-2">
-                        @inject('carbon', 'Carbon\Carbon')
-                        <p class="text-sm font-medium text-gray-900">
-                            Waktu Response untu pasien {{ $dataDaftarUgd['regNo'] }} adalah
-                            {{ $carbon
-                                ::createFromFormat('d/m/Y H:i:s', $dataDaftarUgd['perencanaan']['pengkajianMedis']['waktuPemeriksaan'])->diff($carbon::createFromFormat('d/m/Y H:i:s', $dataDaftarUgd['anamnesa']['pengkajianPerawatan']['jamDatang']))->format('%H:%I:%S') }}
-                        </p>
+                        @error('dataDaftarUgd.anamnesa.pengkajianPerawatan.jamDatang')
+                            <p class="text-sm font-medium text-gray-900">
+                                Waktu Response untu pasien {{ $dataDaftarUgd['regNo'] }} adalah
+                                {{ '-' }}
+                            </p>
+                        @else
+                            @error('dataDaftarUgd.perencanaan.pengkajianMedis.waktuPemeriksaan')
+                                <p class="text-sm font-medium text-gray-900">
+                                    Waktu Response untu pasien {{ $dataDaftarUgd['regNo'] }} adalah
+                                    {{ '-' }}
+                                </p>
+                            @else
+                                @inject('carbon', 'Carbon\Carbon')
+                                <p class="text-sm font-medium text-gray-900">
+                                    Waktu Response untu pasien {{ $dataDaftarUgd['regNo'] }} adalah
+                                    {{ $carbon
+                                        ::createFromFormat('d/m/Y H:i:s', $dataDaftarUgd['perencanaan']['pengkajianMedis']['waktuPemeriksaan'])->diff($carbon::createFromFormat('d/m/Y H:i:s', $dataDaftarUgd['anamnesa']['pengkajianPerawatan']['jamDatang']))->format('%H:%I:%S') }}
+                                </p>
+                            @enderror
+                        @enderror
                     </div>
                 @endif
             @endisset
