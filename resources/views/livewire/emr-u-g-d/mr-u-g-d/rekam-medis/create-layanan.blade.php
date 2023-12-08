@@ -472,7 +472,7 @@
                                                             Resiko Jatuh :
                                                         </td>
                                                         <td class="w-3/4">
-                                                            Resiko Jatuh
+                                                            -
 
 
 

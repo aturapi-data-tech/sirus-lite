@@ -184,6 +184,23 @@ class Perencanaan extends Component
 
     private function updateDataRJ($rjNo): void
     {
+        $p_status = (isset($this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['tingkatKegawatan']) ?
+            ($this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['tingkatKegawatan'] ?
+                $this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['tingkatKegawatan']
+                : 'P0')
+            : 'P0');
+
+        $waktu_pasien_datang = (isset($this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['jamDatang']) ?
+            ($this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['jamDatang'] ?
+                $this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['jamDatang']
+                : Carbon::now()->format('d/m/Y H:i:s'))
+            : Carbon::now()->format('d/m/Y H:i:s'));
+
+        $waktu_pasien_dilayani = (isset($this->dataDaftarUgd['perencanaan']['pengkajianMedis']['waktuPemeriksaan']) ?
+            ($this->dataDaftarUgd['perencanaan']['pengkajianMedis']['waktuPemeriksaan'] ?
+                $this->dataDaftarUgd['perencanaan']['pengkajianMedis']['waktuPemeriksaan']
+                : Carbon::now()->format('d/m/Y H:i:s'))
+            : Carbon::now()->format('d/m/Y H:i:s'));
 
         // update table trnsaksi
         DB::table('rstxn_ugdhdrs')
@@ -191,6 +208,9 @@ class Perencanaan extends Component
             ->update([
                 'dataDaftarUgd_json' => json_encode($this->dataDaftarUgd, true),
                 'dataDaftarUgd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
+                'p_status' => $p_status,
+                'waktu_pasien_datang' => DB::raw("to_date('" . $waktu_pasien_datang . "','dd/mm/yyyy hh24:mi:ss')"),
+                'waktu_pasien_dilayani' => DB::raw("to_date('" . $waktu_pasien_dilayani . "','dd/mm/yyyy hh24:mi:ss')"),
             ]);
 
         $this->emit('toastr-success', "Perencanaan berhasil disimpan.");
