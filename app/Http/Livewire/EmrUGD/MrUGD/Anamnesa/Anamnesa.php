@@ -369,6 +369,11 @@ class Anamnesa extends Component
 
     private function updateDataUgd($rjNo): void
     {
+        $p_status = (isset($this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['tingkatKegawatan']) ?
+            ($this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['tingkatKegawatan'] ?
+                $this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['tingkatKegawatan']
+                : 'P0')
+            : 'P0');
 
         // update table trnsaksi
         DB::table('rstxn_ugdhdrs')
@@ -376,6 +381,8 @@ class Anamnesa extends Component
             ->update([
                 'datadaftarugd_json' => json_encode($this->dataDaftarUgd, true),
                 'datadaftarUgd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
+                'p_status' => $p_status,
+
             ]);
 
         $this->emit('toastr-success', "Anamnesa berhasil disimpan.");

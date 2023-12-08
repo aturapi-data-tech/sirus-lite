@@ -1204,12 +1204,16 @@
                                                 : '-')
                                             : '-' }}
                                         <br>
-                                        <span class="font-semibold">
-                                            Waktu Response untu pasien {{ $dataPasien['pasien']['regName'] }} adalah
-                                            {{ $carbon
-                                                ::createFromFormat('d/m/Y H:i:s', $dataDaftarTxn['perencanaan']['pengkajianMedis']['waktuPemeriksaan'])->diff($carbon::createFromFormat('d/m/Y H:i:s', $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['jamDatang']))->format('%H:%I:%S') }}
-                                        </span>
-
+                                        @isset($dataDaftarTxn['perencanaan']['pengkajianMedis']['waktuPemeriksaan'])
+                                            @isset($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['jamDatang'])
+                                                <span class="font-semibold">
+                                                    Waktu Response untu pasien {{ $dataPasien['pasien']['regName'] }}
+                                                    adalah
+                                                    {{ $carbon
+                                                        ::createFromFormat('d/m/Y H:i:s', $dataDaftarTxn['perencanaan']['pengkajianMedis']['waktuPemeriksaan'])->diff($carbon::createFromFormat('d/m/Y H:i:s', $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['jamDatang']))->format('%H:%I:%S') }}
+                                                </span>
+                                            @endisset
+                                        @endisset
 
 
                                     </td>
