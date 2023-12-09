@@ -313,9 +313,12 @@ class EmrUGD extends Component
                 'rj_status',
                 'nobooking',
                 'push_antrian_bpjs_status',
-                'push_antrian_bpjs_json'
+                'push_antrian_bpjs_json',
+                'datadaftarugd_json'
             )
             ->where('erm_status', '=', $myRefstatusId)
+            ->where('rj_status', '!=', 'F')
+
             // ->where('shift', '=', $myRefshift)
             ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $myRefdate);
 

@@ -47,20 +47,27 @@ class Layanan extends Component
 
     public function openModalLayanan($txnNo = null, $layananStatus = null, $dataDaftarTxn = []): void
     {
-        $this->isOpenLayanan = true;
 
         if ($layananStatus === 'RJ') {
+            $this->emit('toastr-error', 'Rekam Medis (Rawat Jalan) Fitur dalam masa pengembangan');
             $this->dataDaftarTxn = $dataDaftarTxn;
-
             if (isset($this->dataDaftarTxn['regNo'])) {
                 $this->setDataPasien($this->dataDaftarTxn['regNo']);
             }
         } else if ($layananStatus === 'UGD') {
+            $this->isOpenLayanan = true;
             $this->dataDaftarTxn = $dataDaftarTxn;
 
             if (isset($this->dataDaftarTxn['regNo'])) {
                 $this->setDataPasien($this->dataDaftarTxn['regNo']);
             }
+        } else if ($layananStatus === 'RI') {
+            $this->emit('toastr-error', 'Rekam Medis (Rawat Inap) Fitur dalam masa pengembangan');
+            // $this->dataDaftarTxn = $dataDaftarTxn;
+
+            // if (isset($this->dataDaftarTxn['regNo'])) {
+            //     $this->setDataPasien($this->dataDaftarTxn['regNo']);
+            // }
         }
     }
 

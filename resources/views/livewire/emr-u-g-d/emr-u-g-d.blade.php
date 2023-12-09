@@ -195,13 +195,41 @@
 
                             <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
                                 <div class="overflow-auto w-52">
-                                    <div class="font-semibold text-primary">{{ $myQData->rj_status }}
+                                    <div class="font-semibold text-primary">
+                                        {{ $myQData->rj_date }}
                                     </div>
-                                    <div class="font-semibold text-gray-900">
+                                    <div class="italic font-semibold text-gray-900">
+                                        {{ isset($myQData->rj_status)
+                                            ? ($myQData->rj_status === 'A'
+                                                ? 'Pelayanan'
+                                                : ($myQData->rj_status === 'L'
+                                                    ? 'Selesai Pelayanan'
+                                                    : ($myQData->rj_status === 'I'
+                                                        ? 'Transfer Inap'
+                                                        : ($myQData->rj_status === 'F'
+                                                            ? 'Batal Transaksi'
+                                                            : ''))))
+                                            : '' }}
+                                    </div>
+                                    <div class="font-normal text-gray-900">
                                         {{ '' . $myQData->nobooking }}
                                     </div>
                                     <div class="font-normal text-gray-900 ">
                                         {{ '' . $myQData->push_antrian_bpjs_status . $myQData->push_antrian_bpjs_json }}
+                                    </div>
+                                    <div>
+                                        @php
+                                            $datadaftar_json = json_decode($myQData->datadaftarugd_json, true);
+                                            $anamnesa = isset($datadaftar_json['anamnesa']) ? 1 : 0;
+                                            $pemeriksaan = isset($datadaftar_json['pemeriksaan']) ? 1 : 0;
+                                            $penilaian = isset($datadaftar_json['penilaian']) ? 1 : 0;
+                                            $procedure = isset($datadaftar_json['procedure']) ? 1 : 0;
+                                            $diagnosis = isset($datadaftar_json['diagnosis']) ? 1 : 0;
+                                            $perencanaan = isset($datadaftar_json['perencanaan']) ? 1 : 0;
+                                            $prosentaseEMR = (($anamnesa + $pemeriksaan + $penilaian + $procedure + $diagnosis + $perencanaan) / 6) * 100;
+                                        @endphp
+                                        Emr: {{ $prosentaseEMR . '%' }}
+
                                     </div>
                                 </div>
                             </td>
