@@ -286,7 +286,7 @@ class Layanan extends Component
 
         ];
         $pdfContent = PDF::loadView('livewire.emr-u-g-d.mr-u-g-d.rekam-medis.cetak-layanan', $data)->output();
-        $this->emit('toastr-success', 'CetakSEP');
+        $this->emit('toastr-success', 'Cetak RM IGD');
 
         return response()->streamDownload(
             fn () => print($pdfContent),
