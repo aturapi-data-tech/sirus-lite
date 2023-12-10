@@ -4,108 +4,91 @@
 
         <div class="pt-0">
 
-            <div class="grid grid-flow-row gap-2 mt-2 ml-2">
+            <div class="my-4">
+                @php
+                    $mySkalaMoresColor = $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseScore'] >= 0 && $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseScore'] <= 24 ? 'text-green-500' : ($this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseScore'] >= 25 && $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseScore'] <= 50 ? 'text-yellow-400' : 'text-red-500');
+                @endphp
+                <p class="text-2xl font-bold {{ $mySkalaMoresColor }}">
+                    {{ 'Total Skor :  ' . $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseScore'] }}
+                    /
+                    {{ isset($this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseDesc']) ? $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseDesc'] : '' }}
+                </p>
+            </div>
+
+
+            <div class="grid grid-cols-5 gap-2 mt-2 ml-2">
                 <x-input-label for="" :value="__('Riwayat Jatuh (Baru Saja / 3 Bulan Terakhir)')" :required="__(false)" class="px-2" />
 
                 @foreach ($dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['riwayatJatuh3blnTerakhirOptions'] as $riwayatJatuh3blnTerakhirOptions)
                     {{-- @dd($sRj) --}}
                     <x-radio-button :label="__($riwayatJatuh3blnTerakhirOptions['riwayatJatuh3blnTerakhir'])"
                         value="{{ $riwayatJatuh3blnTerakhirOptions['riwayatJatuh3blnTerakhir'] }}"
-                        wire:model="dataDaftarUgd.penilaian.resikoJatuh.skalaMorse.riwayatJatuh3blnTerakhir" />
+                        wire:model="dataDaftarUgd.penilaian.resikoJatuh.skalaMorse.riwayatJatuh3blnTerakhir"
+                        wire:click="$set('dataDaftarUgd.penilaian.resikoJatuh.skalaMorse.riwayatJatuh3blnTerakhirScore', {{ $riwayatJatuh3blnTerakhirOptions['score'] }})" />
                 @endforeach
 
             </div>
 
-            <div class="grid grid-flow-row gap-2 mt-2 ml-2">
+            <div class="grid grid-cols-5 gap-2 mt-2 ml-2">
                 <x-input-label for="" :value="__('Diagnosa Lain / Diagnosa Sekunder')" :required="__(false)" class="px-2" />
 
                 @foreach ($dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['diagSekunderOptions'] as $diagSekunderOptions)
                     {{-- @dd($sRj) --}}
                     <x-radio-button :label="__($diagSekunderOptions['diagSekunder'])" value="{{ $diagSekunderOptions['diagSekunder'] }}"
-                        wire:model="dataDaftarUgd.penilaian.resikoJatuh.skalaMorse.diagSekunder" />
+                        wire:model="dataDaftarUgd.penilaian.resikoJatuh.skalaMorse.diagSekunder"
+                        wire:click="$set('dataDaftarUgd.penilaian.resikoJatuh.skalaMorse.diagSekunderScore', {{ $diagSekunderOptions['score'] }})" />
                 @endforeach
 
             </div>
 
-            <div class="grid grid-flow-row gap-2 mt-2 ml-2">
+            <div class="grid grid-cols-5 gap-2 mt-2 ml-2">
                 <x-input-label for="" :value="__('Alat Bantu')" :required="__(false)" class="px-2" />
 
                 @foreach ($dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['alatBantuOptions'] as $alatBantuOptions)
                     {{-- @dd($sRj) --}}
                     <x-radio-button :label="__($alatBantuOptions['alatBantu'])" value="{{ $alatBantuOptions['alatBantu'] }}"
-                        wire:model="dataDaftarUgd.penilaian.resikoJatuh.skalaMorse.alatBantu" />
+                        wire:model="dataDaftarUgd.penilaian.resikoJatuh.skalaMorse.alatBantu"
+                        wire:click="$set('dataDaftarUgd.penilaian.resikoJatuh.skalaMorse.alatBantuScore', {{ $alatBantuOptions['score'] }})" />
                 @endforeach
 
             </div>
 
-            <div class="grid grid-flow-row gap-2 mt-2 ml-2">
+            <div class="grid grid-cols-5 gap-2 mt-2 ml-2">
                 <x-input-label for="" :value="__('Heparin')" :required="__(false)" class="px-2" />
 
                 @foreach ($dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['heparinOptions'] as $heparinOptions)
                     {{-- @dd($sRj) --}}
                     <x-radio-button :label="__($heparinOptions['heparin'])" value="{{ $heparinOptions['heparin'] }}"
-                        wire:model="dataDaftarUgd.penilaian.resikoJatuh.skalaMorse.heparin" />
+                        wire:model="dataDaftarUgd.penilaian.resikoJatuh.skalaMorse.heparin"
+                        wire:click="$set('dataDaftarUgd.penilaian.resikoJatuh.skalaMorse.heparinScore', {{ $heparinOptions['score'] }})" />
                 @endforeach
 
             </div>
 
-            <div class="grid grid-flow-row gap-2 mt-2 ml-2">
+            <div class="grid grid-cols-5 gap-2 mt-2 ml-2">
                 <x-input-label for="" :value="__('Gaya Berjalan')" :required="__(false)" class="px-2" />
 
                 @foreach ($dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['gayaBerjalanOptions'] as $gayaBerjalanOptions)
                     {{-- @dd($sRj) --}}
                     <x-radio-button :label="__($gayaBerjalanOptions['gayaBerjalan'])" value="{{ $gayaBerjalanOptions['gayaBerjalan'] }}"
-                        wire:model="dataDaftarUgd.penilaian.resikoJatuh.skalaMorse.gayaBerjalan" />
+                        wire:model="dataDaftarUgd.penilaian.resikoJatuh.skalaMorse.gayaBerjalan"
+                        wire:click="$set('dataDaftarUgd.penilaian.resikoJatuh.skalaMorse.gayaBerjalanScore', {{ $gayaBerjalanOptions['score'] }})" />
                 @endforeach
 
             </div>
 
-            <div class="grid grid-flow-row gap-2 mt-2 ml-2">
+            <div class="grid grid-cols-5 gap-2 mt-2 ml-2">
                 <x-input-label for="" :value="__('Kesadaran')" :required="__(false)" class="px-2" />
 
                 @foreach ($dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['kesadaranOptions'] as $kesadaranOptions)
                     {{-- @dd($sRj) --}}
                     <x-radio-button :label="__($kesadaranOptions['kesadaran'])" value="{{ $kesadaranOptions['kesadaran'] }}"
-                        wire:model="dataDaftarUgd.penilaian.resikoJatuh.skalaMorse.kesadaran" />
+                        wire:model="dataDaftarUgd.penilaian.resikoJatuh.skalaMorse.kesadaran"
+                        wire:click="$set('dataDaftarUgd.penilaian.resikoJatuh.skalaMorse.kesadaranScore', {{ $kesadaranOptions['score'] }})" />
                 @endforeach
 
             </div>
 
-            <div class="grid grid-cols-6 mt-2 ml-2">
-                <x-input-label for="" :value="__('Petugas')" :required="__(false)" class="px-2" />
-
-                <x-input-label for="" :value="__('Tanggl & Jam')" :required="__(false)" class="px-2" />
-
-                <x-input-label for="" :value="__('Total Skor : 0')" :required="__(false)" class="px-2" />
-
-                <x-input-label for="" :value="__('Resiko Rendah | Tidak ada tindakan')" :required="__(false)" class="px-2" />
-
-                <div class="mb-2 ">
-
-                    <x-text-input id="" placeholder="" class="mt-1 ml-2" :errorshas="__($errors->has(''))" :disabled=true
-                        wire:model.debounce.500ms="" />
-                </div>
-
-                {{-- <div class="mb-2 ">
-                    <x-text-input id="" placeholder="" class="mt-1 ml-2" :errorshas="__($errors->has(''))" :disabled=true
-                        wire:model.debounce.500ms="" />
-                </div> --}}
-
-                {{-- <div class="mb-2 ">
-                    <x-text-input id="" placeholder="" class="mt-1 ml-2" :errorshas="__($errors->has(''))" :disabled=true
-                        wire:model.debounce.500ms="" />
-                </div> --}}
-
-                {{-- <div class="mb-2 ">
-                    <x-text-input id="" placeholder="" class="mt-1 ml-2" :errorshas="__($errors->has(''))" :disabled=true
-                        wire:model.debounce.500ms="" />
-                </div>
-
-                <div class="mb-2 ">
-                    <x-text-input id="" placeholder="" class="mt-1 ml-2" :errorshas="__($errors->has(''))" :disabled=true
-                        wire:model.debounce.500ms="" />
-                </div> --}}
-            </div>
 
 
 

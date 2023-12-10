@@ -107,39 +107,48 @@ class Penilaian extends Component
         "resikoJatuh" => [
             "skalaMorse" => [
                 "skalaMorseTab" => "Skala Morse Score",
-                "skalaMorseScore" => "",
+                "skalaMorseScore" => 0,
+                "skalaMorseDesc" => "",
+
 
                 "riwayatJatuh3blnTerakhir" => "",
+                "riwayatJatuh3blnTerakhirScore" => 0,
                 "riwayatJatuh3blnTerakhirOptions" => [
-                    ["riwayatJatuh3blnTerakhir" => "Ya"],
-                    ["riwayatJatuh3blnTerakhir" => "Tidak"],
+                    ["riwayatJatuh3blnTerakhir" => "Ya", "score" => 25],
+                    ["riwayatJatuh3blnTerakhir" => "Tidak", "score" => 0],
                 ],
                 "diagSekunder" => "",
+                "diagSekunderScore" => 0,
                 "diagSekunderOptions" => [
-                    ["diagSekunder" => "Ya"],
-                    ["diagSekunder" => "Tidak"],
+                    ["diagSekunder" => "Ya", "score" => 15],
+                    ["diagSekunder" => "Tidak", "score" => 0],
                 ],
                 "alatBantu" => "",
+                "alatBantuScore" => 0,
                 "alatBantuOptions" => [
-                    ["alatBantu" => "Tidak Ada / Bed Rest"],
-                    ["alatBantu" => "Tongkat / Alat Penopang / Walker"],
-                    ["alatBantu" => "Furnitur"],
+                    ["alatBantu" => "Tidak Ada / Bed Rest", "score" => 0],
+                    ["alatBantu" => "Tongkat / Alat Penopang / Walker", "score" => 15],
+                    ["alatBantu" => "Furnitur", "score" => 30],
 
                 ],
                 "heparin" => "",
+                "heparinScore" => 0,
                 "heparinOptions" => [
-                    ["heparin" => "Ya"],
-                    ["heparin" => "Tidak"],
+                    ["heparin" => "Ya", "score" => 20],
+                    ["heparin" => "Tidak", "score" => 0],
                 ],
                 "gayaBerjalan" => "",
+                "gayaBerjalanScore" => 0,
                 "gayaBerjalanOptions" => [
-                    ["gayaBerjalan" => "Lemah"],
-                    ["gayaBerjalan" => "Terganggu"],
+                    ["gayaBerjalan" => "Normal / Tirah Baring / Tidak Bergerak", "score" => 0],
+                    ["gayaBerjalan" => "Lemah", "score" => 10],
+                    ["gayaBerjalan" => "Terganggu", "score" => 20],
                 ],
                 "kesadaran" => "",
+                "kesadaranScore" => 0,
                 "kesadaranOptions" => [
-                    ["kesadaran" => "Baik"],
-                    ["kesadaran" => "Lupa / Pelupa"],
+                    ["kesadaran" => "Baik", "score" => 0],
+                    ["kesadaran" => "Lupa / Pelupa", "score" => 15],
                 ],
             ],
 
@@ -323,7 +332,12 @@ class Penilaian extends Component
     ////////////////////////////////////////////////
 
 
-
+    public function updated($propertyName)
+    {
+        // dd($propertyName);
+        // $this->validateOnly($propertyName);
+        $this->scoringSkalaMorse();
+    }
 
 
 
@@ -524,6 +538,25 @@ class Penilaian extends Component
     {
     }
 
+    private function scoringSkalaMorse(): void
+    {
+        $riwayatJatuh3blnTerakhirScore = $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['riwayatJatuh3blnTerakhirScore'];
+        $diagSekunderScore = $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['diagSekunderScore'];
+        $alatBantuScore = $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['alatBantuScore'];
+        $heparinScore = $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['heparinScore'];
+        $gayaBerjalanScore = $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['gayaBerjalanScore'];
+        $kesadaranScore = $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['kesadaranScore'];
+
+        $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseScore'] = $riwayatJatuh3blnTerakhirScore + $diagSekunderScore  + $alatBantuScore + $heparinScore + $gayaBerjalanScore + $kesadaranScore;
+        $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseDesc'] =
+            ($this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseScore'] >= 0
+                && $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseScore'] <= 24
+                ? 'Tidak Ada Risiko'
+                : ($this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseScore'] >= 25
+                    && $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseScore'] <= 50
+                    ? 'Risiko Rendah'
+                    : 'Risiko Tinggi'));
+    }
 
     // when new form instance
     public function mount()
