@@ -7,10 +7,9 @@ use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 
-use App\Http\Traits\customErrorMessagesTrait;
 
-use Illuminate\Support\Str;
 use Spatie\ArrayToXml\ArrayToXml;
 
 
@@ -264,6 +263,35 @@ class Layanan extends Component
     public function closeModalLayanan(): void
     {
         $this->isOpenLayanan = false;
+    }
+
+
+    public function cetakLayanan()
+    {
+        $queryIdentitas = DB::table('rsmst_identitases')
+            ->select(
+                'int_name',
+                'int_phone1',
+                'int_phone2',
+                'int_fax',
+                'int_address',
+                'int_city',
+            )
+            ->first();
+        // cetak PDF
+        $data = [
+            'myQueryIdentitas' => $queryIdentitas,
+            'dataPasien' => $this->dataPasien,
+            'dataDaftarTxn' => $this->dataDaftarTxn,
+
+        ];
+        $pdfContent = PDF::loadView('livewire.emr-u-g-d.mr-u-g-d.rekam-medis.cetak-layanan', $data)->output();
+        $this->emit('toastr-success', 'CetakSEP');
+
+        return response()->streamDownload(
+            fn () => print($pdfContent),
+            "rmUGD.pdf"
+        );
     }
 
     // when new form instance
