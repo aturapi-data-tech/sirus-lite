@@ -963,49 +963,59 @@
 
                                     <td
                                         class="p-2 m-2 text-sm text-center border-b-2 border-l-2 border-r-2 border-gray-900">
-                                        <span class="font-semibold">
-                                            Fisik :
-                                        </span>
-                                        <br>
-                                        {!! nl2br(
-                                            e(
-                                                isset($dataDaftarTxn['pemeriksaan']['fisik'])
-                                                    ? ($dataDaftarTxn['pemeriksaan']['fisik']
-                                                        ? $dataDaftarTxn['pemeriksaan']['fisik']
-                                                        : '-')
-                                                    : '-',
-                                            ),
-                                        ) !!}
-                                        <br>
-                                        <span class="font-semibold">
-                                            Anatomi :
-                                        </span>
-                                        <br>
-                                        @isset($dataDaftarTxn['pemeriksaan']['anatomi'])
-                                            @foreach ($dataDaftarTxn['pemeriksaan']['anatomi'] as $key => $pAnatomi)
-                                                @php
-                                                    $kelainan = isset($dataDaftarTxn['pemeriksaan']['anatomi'][$key]['kelainan']) ? ($dataDaftarTxn['pemeriksaan']['anatomi'][$key]['kelainan'] ? $dataDaftarTxn['pemeriksaan']['anatomi'][$key]['kelainan'] : false) : false;
-                                                @endphp
-                                                @if ($kelainan && $kelainan !== 'Tidak Diperiksa')
-                                                    <span class="font-semibold">
-                                                        {{ strtoupper($key) }} :
-                                                        {{ $kelainan }}
-                                                    </span>
-                                                    <br>
-                                                    {!! nl2br(
-                                                        e(
-                                                            isset($dataDaftarTxn['pemeriksaan']['anatomi'][$key]['desc'])
-                                                                ? ($dataDaftarTxn['pemeriksaan']['anatomi'][$key]['desc']
-                                                                    ? $dataDaftarTxn['pemeriksaan']['anatomi'][$key]['desc']
-                                                                    : '-')
-                                                                : '-',
-                                                        ),
-                                                    ) !!}
-                                                    <br>
-                                                @endif
-                                            @endforeach
-                                        @endisset
 
+
+                                        <table class="w-full table-auto">
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <span class="font-semibold">
+                                                            Fisik :
+                                                        </span>
+                                                        <br>
+                                                        {!! nl2br(
+                                                            e(
+                                                                isset($dataDaftarTxn['pemeriksaan']['fisik'])
+                                                                    ? ($dataDaftarTxn['pemeriksaan']['fisik']
+                                                                        ? $dataDaftarTxn['pemeriksaan']['fisik']
+                                                                        : '-')
+                                                                    : '-',
+                                                            ),
+                                                        ) !!}
+                                                    </td>
+                                                    <td>
+                                                        <span class="font-semibold">
+                                                            Anatomi :
+                                                        </span>
+                                                        <br>
+                                                        @isset($dataDaftarTxn['pemeriksaan']['anatomi'])
+                                                            @foreach ($dataDaftarTxn['pemeriksaan']['anatomi'] as $key => $pAnatomi)
+                                                                @php
+                                                                    $kelainan = isset($dataDaftarTxn['pemeriksaan']['anatomi'][$key]['kelainan']) ? ($dataDaftarTxn['pemeriksaan']['anatomi'][$key]['kelainan'] ? $dataDaftarTxn['pemeriksaan']['anatomi'][$key]['kelainan'] : false) : false;
+                                                                @endphp
+                                                                @if ($kelainan && $kelainan !== 'Tidak Diperiksa')
+                                                                    <span class="font-normal">
+                                                                        {{ strtoupper($key) }} :
+                                                                        {{ $kelainan }}
+                                                                    </span>
+                                                                    /
+                                                                    {!! nl2br(
+                                                                        e(
+                                                                            isset($dataDaftarTxn['pemeriksaan']['anatomi'][$key]['desc'])
+                                                                                ? ($dataDaftarTxn['pemeriksaan']['anatomi'][$key]['desc']
+                                                                                    ? $dataDaftarTxn['pemeriksaan']['anatomi'][$key]['desc']
+                                                                                    : '-')
+                                                                                : '-',
+                                                                        ),
+                                                                    ) !!}
+                                                                    <br>
+                                                                @endif
+                                                            @endforeach
+                                                        @endisset
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                     </td>
                                 </tr>
                                 {{-- pemeriksaan penunjang --}}

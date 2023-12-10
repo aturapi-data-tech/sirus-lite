@@ -121,7 +121,7 @@ class Pemeriksaan extends Component
                 "kelainan" => "Tidak Diperiksa",
                 "kelainanOptions" => [
                     ["kelainan" => "Tidak Diperiksa"],
-                    ["kelainan" => "Tidak Ada"],
+                    ["kelainan" => "Tidak Ada Kelainan"],
                     ["kelainan" => "Ada"],
                 ],
                 "desc" => "",
@@ -130,7 +130,7 @@ class Pemeriksaan extends Component
                 "kelainan" => "Tidak Diperiksa",
                 "kelainanOptions" => [
                     ["kelainan" => "Tidak Diperiksa"],
-                    ["kelainan" => "Tidak Ada"],
+                    ["kelainan" => "Tidak Ada Kelainan"],
                     ["kelainan" => "Ada"],
                 ],
                 "desc" => "",
@@ -139,7 +139,7 @@ class Pemeriksaan extends Component
                 "kelainan" => "Tidak Diperiksa",
                 "kelainanOptions" => [
                     ["kelainan" => "Tidak Diperiksa"],
-                    ["kelainan" => "Tidak Ada"],
+                    ["kelainan" => "Tidak Ada Kelainan"],
                     ["kelainan" => "Ada"],
                 ],
                 "desc" => "",
@@ -148,7 +148,7 @@ class Pemeriksaan extends Component
                 "kelainan" => "Tidak Diperiksa",
                 "kelainanOptions" => [
                     ["kelainan" => "Tidak Diperiksa"],
-                    ["kelainan" => "Tidak Ada"],
+                    ["kelainan" => "Tidak Ada Kelainan"],
                     ["kelainan" => "Ada"],
                 ],
                 "desc" => "",
@@ -157,7 +157,7 @@ class Pemeriksaan extends Component
                 "kelainan" => "Tidak Diperiksa",
                 "kelainanOptions" => [
                     ["kelainan" => "Tidak Diperiksa"],
-                    ["kelainan" => "Tidak Ada"],
+                    ["kelainan" => "Tidak Ada Kelainan"],
                     ["kelainan" => "Ada"],
                 ],
                 "desc" => "",
@@ -166,7 +166,7 @@ class Pemeriksaan extends Component
                 "kelainan" => "Tidak Diperiksa",
                 "kelainanOptions" => [
                     ["kelainan" => "Tidak Diperiksa"],
-                    ["kelainan" => "Tidak Ada"],
+                    ["kelainan" => "Tidak Ada Kelainan"],
                     ["kelainan" => "Ada"],
                 ],
                 "desc" => "",
@@ -175,7 +175,7 @@ class Pemeriksaan extends Component
                 "kelainan" => "Tidak Diperiksa",
                 "kelainanOptions" => [
                     ["kelainan" => "Tidak Diperiksa"],
-                    ["kelainan" => "Tidak Ada"],
+                    ["kelainan" => "Tidak Ada Kelainan"],
                     ["kelainan" => "Ada"],
                 ],
                 "desc" => "",
@@ -184,7 +184,7 @@ class Pemeriksaan extends Component
                 "kelainan" => "Tidak Diperiksa",
                 "kelainanOptions" => [
                     ["kelainan" => "Tidak Diperiksa"],
-                    ["kelainan" => "Tidak Ada"],
+                    ["kelainan" => "Tidak Ada Kelainan"],
                     ["kelainan" => "Ada"],
                 ],
                 "desc" => "",
@@ -193,7 +193,7 @@ class Pemeriksaan extends Component
                 "kelainan" => "Tidak Diperiksa",
                 "kelainanOptions" => [
                     ["kelainan" => "Tidak Diperiksa"],
-                    ["kelainan" => "Tidak Ada"],
+                    ["kelainan" => "Tidak Ada Kelainan"],
                     ["kelainan" => "Ada"],
                 ],
                 "desc" => "",
@@ -202,7 +202,7 @@ class Pemeriksaan extends Component
                 "kelainan" => "Tidak Diperiksa",
                 "kelainanOptions" => [
                     ["kelainan" => "Tidak Diperiksa"],
-                    ["kelainan" => "Tidak Ada"],
+                    ["kelainan" => "Tidak Ada Kelainan"],
                     ["kelainan" => "Ada"],
                 ],
                 "desc" => "",
@@ -211,7 +211,7 @@ class Pemeriksaan extends Component
                 "kelainan" => "Tidak Diperiksa",
                 "kelainanOptions" => [
                     ["kelainan" => "Tidak Diperiksa"],
-                    ["kelainan" => "Tidak Ada"],
+                    ["kelainan" => "Tidak Ada Kelainan"],
                     ["kelainan" => "Ada"],
                 ],
                 "desc" => "",
@@ -220,7 +220,7 @@ class Pemeriksaan extends Component
                 "kelainan" => "Tidak Diperiksa",
                 "kelainanOptions" => [
                     ["kelainan" => "Tidak Diperiksa"],
-                    ["kelainan" => "Tidak Ada"],
+                    ["kelainan" => "Tidak Ada Kelainan"],
                     ["kelainan" => "Ada"],
                 ],
                 "desc" => "",
@@ -229,7 +229,7 @@ class Pemeriksaan extends Component
                 "kelainan" => "Tidak Diperiksa",
                 "kelainanOptions" => [
                     ["kelainan" => "Tidak Diperiksa"],
-                    ["kelainan" => "Tidak Ada"],
+                    ["kelainan" => "Tidak Ada Kelainan"],
                     ["kelainan" => "Ada"],
                 ],
                 "desc" => "",
@@ -238,7 +238,7 @@ class Pemeriksaan extends Component
                 "kelainan" => "Tidak Diperiksa",
                 "kelainanOptions" => [
                     ["kelainan" => "Tidak Diperiksa"],
-                    ["kelainan" => "Tidak Ada"],
+                    ["kelainan" => "Tidak Ada Kelainan"],
                     ["kelainan" => "Ada"],
                 ],
                 "desc" => "",
@@ -247,7 +247,7 @@ class Pemeriksaan extends Component
                 "kelainan" => "Tidak Diperiksa",
                 "kelainanOptions" => [
                     ["kelainan" => "Tidak Diperiksa"],
-                    ["kelainan" => "Tidak Ada"],
+                    ["kelainan" => "Tidak Ada Kelainan"],
                     ["kelainan" => "Ada"],
                 ],
                 "desc" => "",
@@ -256,7 +256,7 @@ class Pemeriksaan extends Component
                 "kelainan" => "Tidak Diperiksa",
                 "kelainanOptions" => [
                     ["kelainan" => "Tidak Diperiksa"],
-                    ["kelainan" => "Tidak Ada"],
+                    ["kelainan" => "Tidak Ada Kelainan"],
                     ["kelainan" => "Ada"],
                 ],
                 "desc" => "",
@@ -265,7 +265,7 @@ class Pemeriksaan extends Component
                 "kelainan" => "Tidak Diperiksa",
                 "kelainanOptions" => [
                     ["kelainan" => "Tidak Diperiksa"],
-                    ["kelainan" => "Tidak Ada"],
+                    ["kelainan" => "Tidak Ada Kelainan"],
                     ["kelainan" => "Ada"],
                 ],
                 "desc" => "",
@@ -274,7 +274,7 @@ class Pemeriksaan extends Component
                 "kelainan" => "Tidak Diperiksa",
                 "kelainanOptions" => [
                     ["kelainan" => "Tidak Diperiksa"],
-                    ["kelainan" => "Tidak Ada"],
+                    ["kelainan" => "Tidak Ada Kelainan"],
                     ["kelainan" => "Ada"],
                 ],
                 "desc" => "",
@@ -283,7 +283,7 @@ class Pemeriksaan extends Component
                 "kelainan" => "Tidak Diperiksa",
                 "kelainanOptions" => [
                     ["kelainan" => "Tidak Diperiksa"],
-                    ["kelainan" => "Tidak Ada"],
+                    ["kelainan" => "Tidak Ada Kelainan"],
                     ["kelainan" => "Ada"],
                 ],
                 "desc" => "",
@@ -292,7 +292,7 @@ class Pemeriksaan extends Component
                 "kelainan" => "Tidak Diperiksa",
                 "kelainanOptions" => [
                     ["kelainan" => "Tidak Diperiksa"],
-                    ["kelainan" => "Tidak Ada"],
+                    ["kelainan" => "Tidak Ada Kelainan"],
                     ["kelainan" => "Ada"],
                 ],
                 "desc" => "",
@@ -301,7 +301,7 @@ class Pemeriksaan extends Component
                 "kelainan" => "Tidak Diperiksa",
                 "kelainanOptions" => [
                     ["kelainan" => "Tidak Diperiksa"],
-                    ["kelainan" => "Tidak Ada"],
+                    ["kelainan" => "Tidak Ada Kelainan"],
                     ["kelainan" => "Ada"],
                 ],
                 "desc" => "",
@@ -310,7 +310,7 @@ class Pemeriksaan extends Component
                 "kelainan" => "Tidak Diperiksa",
                 "kelainanOptions" => [
                     ["kelainan" => "Tidak Diperiksa"],
-                    ["kelainan" => "Tidak Ada"],
+                    ["kelainan" => "Tidak Ada Kelainan"],
                     ["kelainan" => "Ada"],
                 ],
                 "desc" => "",
@@ -319,7 +319,7 @@ class Pemeriksaan extends Component
                 "kelainan" => "Tidak Diperiksa",
                 "kelainanOptions" => [
                     ["kelainan" => "Tidak Diperiksa"],
-                    ["kelainan" => "Tidak Ada"],
+                    ["kelainan" => "Tidak Ada Kelainan"],
                     ["kelainan" => "Ada"],
                 ],
                 "desc" => "",
@@ -328,7 +328,7 @@ class Pemeriksaan extends Component
                 "kelainan" => "Tidak Diperiksa",
                 "kelainanOptions" => [
                     ["kelainan" => "Tidak Diperiksa"],
-                    ["kelainan" => "Tidak Ada"],
+                    ["kelainan" => "Tidak Ada Kelainan"],
                     ["kelainan" => "Ada"],
                 ],
                 "desc" => "",
@@ -337,7 +337,7 @@ class Pemeriksaan extends Component
                 "kelainan" => "Tidak Diperiksa",
                 "kelainanOptions" => [
                     ["kelainan" => "Tidak Diperiksa"],
-                    ["kelainan" => "Tidak Ada"],
+                    ["kelainan" => "Tidak Ada Kelainan"],
                     ["kelainan" => "Ada"],
                 ],
                 "desc" => "",
@@ -346,7 +346,7 @@ class Pemeriksaan extends Component
                 "kelainan" => "Tidak Diperiksa",
                 "kelainanOptions" => [
                     ["kelainan" => "Tidak Diperiksa"],
-                    ["kelainan" => "Tidak Ada"],
+                    ["kelainan" => "Tidak Ada Kelainan"],
                     ["kelainan" => "Ada"],
                 ],
                 "desc" => "",
@@ -355,7 +355,7 @@ class Pemeriksaan extends Component
                 "kelainan" => "Tidak Diperiksa",
                 "kelainanOptions" => [
                     ["kelainan" => "Tidak Diperiksa"],
-                    ["kelainan" => "Tidak Ada"],
+                    ["kelainan" => "Tidak Ada Kelainan"],
                     ["kelainan" => "Ada"],
                 ],
                 "desc" => "",
@@ -364,7 +364,7 @@ class Pemeriksaan extends Component
                 "kelainan" => "Tidak Diperiksa",
                 "kelainanOptions" => [
                     ["kelainan" => "Tidak Diperiksa"],
-                    ["kelainan" => "Tidak Ada"],
+                    ["kelainan" => "Tidak Ada Kelainan"],
                     ["kelainan" => "Ada"],
                 ],
                 "desc" => "",
@@ -373,7 +373,7 @@ class Pemeriksaan extends Component
                 "kelainan" => "Tidak Diperiksa",
                 "kelainanOptions" => [
                     ["kelainan" => "Tidak Diperiksa"],
-                    ["kelainan" => "Tidak Ada"],
+                    ["kelainan" => "Tidak Ada Kelainan"],
                     ["kelainan" => "Ada"],
                 ],
                 "desc" => "",

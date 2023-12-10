@@ -42,6 +42,7 @@ class Perencanaan extends Component
             "tindakLanjut" => "",
             "keteranganTindakLanjut" => "",
             "tindakLanjutOptions" => [
+                ["tindakLanjut" => "MRS"],
                 ["tindakLanjut" => "KRS"],
                 ["tindakLanjut" => "APS"],
                 ["tindakLanjut" => "Rujuk"],

@@ -9,12 +9,16 @@
 
             <div class="pt-2 ">
 
-                <div class="grid grid-cols-5 gap-2 mt-2 ml-2">
+                <div class="grid grid-cols-5 gap-2 mt-2 mb-2 ml-2">
                     @foreach ($dataDaftarUgd['perencanaan']['tindakLanjut']['tindakLanjutOptions'] as $tindakLanjutOptions)
                         <x-radio-button :label="__($tindakLanjutOptions['tindakLanjut'])" value="{{ $tindakLanjutOptions['tindakLanjut'] }}"
                             wire:model="dataDaftarUgd.perencanaan.tindakLanjut.tindakLanjut" />
                     @endforeach
 
+
+                </div>
+
+                <div>
                     <x-text-input id="" placeholder="Keterangan Tindak Lanjut" class="mt-1 ml-2"
                         :errorshas="__($errors->has(''))" :disabled=$disabledPropertyRjStatus
                         wire:model.debounce.500ms="dataDaftarUgd.perencanaan.tindakLanjut.keteranganTindakLanjut" />
