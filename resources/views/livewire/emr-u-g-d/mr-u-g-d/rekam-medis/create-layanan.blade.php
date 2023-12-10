@@ -472,10 +472,36 @@
                                                             Resiko Jatuh :
                                                         </td>
                                                         <td class="w-3/4">
-                                                            -
 
-
-
+                                                            Skala Humpty Dumpty
+                                                            /
+                                                            Total Skor :
+                                                            {{ isset($this->dataDaftarTxn['penilaian']['resikoJatuh']['skalaHumptyDumpty']['skalaHumptyDumptyScore'])
+                                                                ? ($this->dataDaftarTxn['penilaian']['resikoJatuh']['skalaHumptyDumpty']['skalaHumptyDumptyScore']
+                                                                    ? $this->dataDaftarTxn['penilaian']['resikoJatuh']['skalaHumptyDumpty']['skalaHumptyDumptyScore']
+                                                                    : '-')
+                                                                : '-' }}
+                                                            /
+                                                            {{ isset($this->dataDaftarTxn['penilaian']['resikoJatuh']['skalaHumptyDumpty']['skalaHumptyDumptyDesc'])
+                                                                ? ($this->dataDaftarTxn['penilaian']['resikoJatuh']['skalaHumptyDumpty']['skalaHumptyDumptyDesc']
+                                                                    ? $this->dataDaftarTxn['penilaian']['resikoJatuh']['skalaHumptyDumpty']['skalaHumptyDumptyDesc']
+                                                                    : '-')
+                                                                : '-' }}
+                                                            <br>
+                                                            Skala Morse
+                                                            /
+                                                            Total Skor :
+                                                            {{ isset($this->dataDaftarTxn['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseScore'])
+                                                                ? ($this->dataDaftarTxn['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseScore']
+                                                                    ? $this->dataDaftarTxn['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseScore']
+                                                                    : '-')
+                                                                : '-' }}
+                                                            /
+                                                            {{ isset($this->dataDaftarTxn['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseDesc'])
+                                                                ? ($this->dataDaftarTxn['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseDesc']
+                                                                    ? $this->dataDaftarTxn['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseDesc']
+                                                                    : '-')
+                                                                : '-' }}
                                                         </td>
                                                     </tr>
 
