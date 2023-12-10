@@ -4,7 +4,7 @@
 
         <div class="pt-0">
 
-            <div class="my-4">
+            <div class="flex justify-between my-4">
                 @php
                     $mySkalaMoresColor = $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseScore'] >= 0 && $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseScore'] <= 24 ? 'text-green-500' : ($this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseScore'] >= 25 && $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseScore'] <= 50 ? 'text-yellow-400' : 'text-red-500');
                 @endphp
@@ -12,6 +12,15 @@
                     {{ 'Total Skor :  ' . $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseScore'] }}
                     /
                     {{ isset($this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseDesc']) ? $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseDesc'] : '' }}
+                </p>
+                <br>
+                <p class="text-xs">
+                    Tidak Ada Risiko 0-24 Tidak ada
+                    <br>
+                    Risiko Rendah 25-50 Lakukan pencegahan jatuh standar
+                    <br>
+                    Risiko Tinggi ≥ 51 Lakukan intervensi pencegahan jatuh risiko-tinggi
+
                 </p>
             </div>
 

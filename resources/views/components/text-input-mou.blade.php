@@ -1,7 +1,9 @@
-@props(['disabled' => false, 'mou_label' => 'SetMou'])
+@props(['disabled' => false, 'mou_label' => 'SetMou', 'errorshas' => false])
 
 @php
-    $disabled ? ($class = 'rounded-none rounded-l-lg shadow-sm bg-gray-100 border border-gray-300 text-gray-900 sm:text-sm focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary dark:focus:border-primary') : ($class = 'rounded-none rounded-l-lg shadow-sm bg-white border border-gray-300 text-gray-900 sm:text-sm focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary dark:focus:border-primary');
+    $errorHasProperty = $errorshas ? 'border border-red-500' : 'border border-gray-300';
+
+    $disabled ? ($class = 'bg-gray-100 border rounded-none rounded-l-lg shadow-sm ' . $errorHasProperty . ' text-gray-900 sm:text-sm focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary dark:focus:border-primary') : ($class = 'bg-white border rounded-none rounded-l-lg shadow-sm ' . $errorHasProperty . ' text-gray-900 sm:text-sm focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary dark:focus:border-primary');
 @endphp
 
 <div class='flex'>

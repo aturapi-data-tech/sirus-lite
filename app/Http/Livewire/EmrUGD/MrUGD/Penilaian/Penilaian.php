@@ -154,41 +154,62 @@ class Penilaian extends Component
 
             "skalaHumptyDumpty" => [
                 "skalaHumptyDumptyTab" => "Skala Humpty Dumpty Score",
-                "skalaHumptyDumptyScore" => "",
-                "skalaHumptyDumptyket" => ">= 13 Tahun",
-                "skalaHumptyDumptysex" => "Perempuan",
+                "skalaHumptyDumptyScore" => 0,
+                "skalaHumptyDumptyDesc" => "",
+
+                "umur" => "",
+                "umurScore" => 0,
+                "umurOptions" => [
+                    ["umur" => "< 3 tahun", "score" => 4],
+                    ["umur" => "3-7 tahun", "score" => 3],
+                    ["umur" => "7-13 tahun", "score" => 2],
+                    ["umur" => "13-18 tahun", "score" => 1],
+
+                ],
+
+                "sex" => "",
+                "sexScore" => 0,
+                "sexOptions" => [
+                    ["sex" => "Laki-laki", "score" => 2],
+                    ["sex" => "Perempuan", "score" => 1],
+                ],
 
                 "diagnosa" => "",
+                "diagnosaScore" => 0,
                 "diagnosaOptions" => [
-                    ["diagnosa" => "Kelainan Neurologi"],
-                    ["diagnosa" => "Perubahan dalam Oksigenasi (Masalah Saluran Nafas, Dehidrasi, Anemia, Anoreksi, Slokop/sakit kepala, dll)"],
-                    ["diagnosa" => "Kelamin Priksi/Perilaku"],
-                    ["diagnosa" => "Diagnosa Lain"],
+                    ["diagnosa" => "Kelainan Neurologi", "score" => 4],
+                    ["diagnosa" => "Perubahan dalam Oksigenasi (Masalah Saluran Nafas, Dehidrasi, Anemia, Anoreksi, Slokop/sakit kepala, dll)", "score" => 3],
+                    ["diagnosa" => "Kelamin Priksi/Perilaku", "score" => 2],
+                    ["diagnosa" => "Diagnosa Lain", "score" => 1],
                 ],
                 "gangguanKognitif" => "",
+                "gangguanKognitifScore" => 0,
                 "gangguanKognitifOptions" => [
-                    ["gangguanKognitif" => "Tidak Sadar terhadap Keterbatasan"],
-                    ["gangguanKognitif" => "Lupa keterbatasan"],
-                    ["gangguanKognitif" => "Mengetahui Kemampuan Diri"],
+                    ["gangguanKognitif" => "Tidak Sadar terhadap Keterbatasan", "score" => 3],
+                    ["gangguanKognitif" => "Lupa keterbatasan", "score" => 2],
+                    ["gangguanKognitif" => "Mengetahui Kemampuan Diri", "score" => 1],
                 ],
                 "faktorLingkungan" => "",
+                "faktorLingkunganScore" => 0,
                 "faktorLingkunganOptions" => [
-                    ["faktorLingkungan" => "Riwayat jatuh dari tempat tidur saat bayi anak"],
-                    ["faktorLingkungan" => "Pasien menggunakan alat bantu box atau mobel"],
-                    ["faktorLingkungan" => "Pasien berada ditempat tidur"],
-                    ["faktorLingkungan" => "Diluar ruang rawat"],
+                    ["faktorLingkungan" => "Riwayat jatuh dari tempat tidur saat bayi anak", "score" => 4],
+                    ["faktorLingkungan" => "Pasien menggunakan alat bantu box atau mobel", "score" => 3],
+                    ["faktorLingkungan" => "Pasien berada ditempat tidur", "score" => 2],
+                    ["faktorLingkungan" => "Diluar ruang rawat", "score" => 1],
                 ],
                 "penggunaanObat" => "",
+                "penggunaanObatScore" => 0,
                 "penggunaanObatOptions" => [
-                    ["penggunaanObat" => "Bermacam-macam obat yang digunakan: obat sedarif (kecuali pasien ICU yang menggunakan sedasi dan paralisis), Hipnotik, Barbiturat, Fenotiazin, Antidepresan, Laksans/Diuretika,Narketik"],
-                    ["penggunaanObat" => "Salah satu pengobatan diatas"],
-                    ["penggunaanObat" => "Pengobatan lain"],
+                    ["penggunaanObat" => "Bermacam-macam obat yang digunakan: obat sedarif (kecuali pasien ICU yang menggunakan sedasi dan paralisis), Hipnotik, Barbiturat, Fenotiazin, Antidepresan, Laksans/Diuretika,Narketik", "score" => 3],
+                    ["penggunaanObat" => "Salah satu pengobatan diatas", "score" => 2],
+                    ["penggunaanObat" => "Pengobatan lain", "score" => 1],
                 ],
                 "responTerhadapOperasi" => "",
+                "responTerhadapOperasiScore" => 0,
                 "responTerhadapOperasiOptions" => [
-                    ["responTerhadapOperasi" => "Dalam 24 Jam"],
-                    ["responTerhadapOperasi" => "Dalam 48 jam riwayat jatuh"],
-                    ["responTerhadapOperasi" => "> 48 jam"],
+                    ["responTerhadapOperasi" => "Dalam 24 Jam", "score" => 3],
+                    ["responTerhadapOperasi" => "Dalam 48 jam riwayat jatuh", "score" => 2],
+                    ["responTerhadapOperasi" => "> 48 jam", "score" => 1],
                 ],
             ],
 
@@ -337,6 +358,7 @@ class Penilaian extends Component
         // dd($propertyName);
         // $this->validateOnly($propertyName);
         $this->scoringSkalaMorse();
+        $this->scoringSkalaHumptyDumpty();
     }
 
 
@@ -555,6 +577,28 @@ class Penilaian extends Component
                 : ($this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseScore'] >= 25
                     && $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseScore'] <= 50
                     ? 'Risiko Rendah'
+                    : 'Risiko Tinggi'));
+    }
+
+    private function scoringSkalaHumptyDumpty(): void
+    {
+        $umurScore = $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaHumptyDumpty']['umurScore'];
+        $sexScore = $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaHumptyDumpty']['sexScore'];
+        $diagnosaScore = $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaHumptyDumpty']['diagnosaScore'];
+        $gangguanKognitifScore = $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaHumptyDumpty']['gangguanKognitifScore'];
+        $faktorLingkunganScore = $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaHumptyDumpty']['faktorLingkunganScore'];
+        $penggunaanObatScore = $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaHumptyDumpty']['penggunaanObatScore'];
+        $responTerhadapOperasiScore = $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaHumptyDumpty']['responTerhadapOperasiScore'];
+
+        $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaHumptyDumpty']['skalaHumptyDumptyScore'] = $umurScore + $sexScore  + $diagnosaScore + $gangguanKognitifScore + $faktorLingkunganScore + $penggunaanObatScore +
+            $responTerhadapOperasiScore;
+        $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaHumptyDumpty']['skalaHumptyDumptyDesc'] =
+            ($this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaHumptyDumpty']['skalaHumptyDumptyScore'] >= 0
+                && $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaHumptyDumpty']['skalaHumptyDumptyScore'] <= 11
+                ? 'Risiko Rendah'
+                : ($this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaHumptyDumpty']['skalaHumptyDumptyScore'] >= 12
+                    && $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaHumptyDumpty']['skalaHumptyDumptyScore'] <= 12
+                    ? 'Risiko Tinggi'
                     : 'Risiko Tinggi'));
     }
 

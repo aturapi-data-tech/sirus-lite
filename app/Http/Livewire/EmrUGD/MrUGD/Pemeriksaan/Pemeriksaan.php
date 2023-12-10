@@ -107,6 +107,7 @@ class Pemeriksaan extends Component
             "tb" => "", //number
             "imt" => "", //number
             "lk" => "", //number
+            "lila" => "" //number
         ],
         "fungsional" => [
             "alatBantu" => "",
@@ -442,10 +443,26 @@ class Pemeriksaan extends Component
 
 
 
+    protected $rules = [
+
+        'dataDaftarUgd.pemeriksaan.nutrisi.bb' => 'numeric',
+        'dataDaftarUgd.pemeriksaan.nutrisi.tb' => 'numeric',
+        'dataDaftarUgd.pemeriksaan.nutrisi.imt' => 'numeric',
+        'dataDaftarUgd.pemeriksaan.nutrisi.lk' => 'numeric',
+        'dataDaftarUgd.pemeriksaan.nutrisi.lila' => 'numeric',
+
+    ];
+
     ////////////////////////////////////////////////
     ///////////begin////////////////////////////////
     ////////////////////////////////////////////////
 
+    public function updated($propertyName)
+    {
+        // dd($propertyName);
+        $this->validateOnly($propertyName);
+        $this->scoringIMT();
+    }
 
     // /////////tingkatKesadaran////////////
     public function clicktingkatKesadaranlov()
@@ -506,9 +523,7 @@ class Pemeriksaan extends Component
     {
         // customErrorMessages
         // $messages = customErrorMessagesTrait::messages();
-
-        // require nik ketika pasien tidak dikenal
-
+        $messages = [];
 
 
         // $rules = [];
@@ -516,13 +531,13 @@ class Pemeriksaan extends Component
 
 
         // Proses Validasi///////////////////////////////////////////
-        // try {
-        //     $this->validate($rules, $messages);
-        // } catch (\Illuminate\Validation\ValidationException $e) {
+        try {
+            $this->validate($this->rules, $messages);
+        } catch (\Illuminate\Validation\ValidationException $e) {
 
-        //     $this->emit('toastr-error', "Lakukan Pengecekan kembali Input Data.");
-        //     $this->validate($rules, $messages);
-        // }
+            $this->emit('toastr-error', "Lakukan Pengecekan kembali Input Data.");
+            $this->validate($this->rules, $messages);
+        }
     }
 
 
@@ -694,6 +709,14 @@ class Pemeriksaan extends Component
     {
     }
 
+    private function scoringIMT(): void
+    {
+        $bb = $this->dataDaftarUgd['pemeriksaan']['nutrisi']['bb'];
+        $tb = $this->dataDaftarUgd['pemeriksaan']['nutrisi']['tb'];
+
+
+        $this->dataDaftarUgd['pemeriksaan']['nutrisi']['imt'] = round($bb / (($tb / 100) * ($tb / 100)), 2);
+    }
 
     // when new form instance
     public function mount()

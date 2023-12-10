@@ -759,7 +759,7 @@
                                                                     ? $dataDaftarTxn['pemeriksaan']['nutrisi']['imt']
                                                                     : '-')
                                                                 : '-' }}
-
+                                                            Kg/M2
                                                         </td>
                                                     </tr>
                                                     <tr>
@@ -770,6 +770,19 @@
                                                             {{ isset($dataDaftarTxn['pemeriksaan']['nutrisi']['lk'])
                                                                 ? ($dataDaftarTxn['pemeriksaan']['nutrisi']['lk']
                                                                     ? $dataDaftarTxn['pemeriksaan']['nutrisi']['lk']
+                                                                    : '-')
+                                                                : '-' }}
+                                                            cm
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="pr-4 text-end">
+                                                            Lingkar Lengan Atas :
+                                                        </td>
+                                                        <td>
+                                                            {{ isset($dataDaftarTxn['pemeriksaan']['nutrisi']['lila'])
+                                                                ? ($dataDaftarTxn['pemeriksaan']['nutrisi']['lila']
+                                                                    ? $dataDaftarTxn['pemeriksaan']['nutrisi']['lila']
                                                                     : '-')
                                                                 : '-' }}
                                                             cm

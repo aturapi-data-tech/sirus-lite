@@ -219,14 +219,16 @@
         <x-input-label for="dataDaftarUgd.pemeriksaan.nutrisi.bb" :value="__('Nutrisi')" :required="__(false)"
             class="pt-2 sm:text-xl" />
 
-        <div class="grid grid-cols-4 gap-2 pt-2">
+        <div class="grid grid-cols-3 gap-2 pt-2">
 
             <div class="mb-2 ">
                 <x-input-label for="dataDaftarUgd.pemeriksaan.nutrisi.bb" :value="__('Berat Badan')" :required="__(false)" />
                 <x-text-input-mou id="dataDaftarUgd.pemeriksaan.nutrisi.bb" placeholder="Berat Badan"
                     class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.pemeriksaan.nutrisi.bb'))" :disabled=$disabledPropertyRjStatus
                     wire:model.debounce.500ms="dataDaftarUgd.pemeriksaan.nutrisi.bb" :mou_label="__('Kg')" />
-
+                @error('dataDaftarUgd.pemeriksaan.nutrisi.bb')
+                    <x-input-error :messages=$message />
+                @enderror
             </div>
 
             <div class="mb-2 ">
@@ -234,25 +236,45 @@
                 <x-text-input-mou id="dataDaftarUgd.pemeriksaan.nutrisi.tb" placeholder="Tinggi Badan"
                     class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.pemeriksaan.nutrisi.tb'))" :disabled=$disabledPropertyRjStatus
                     wire:model.debounce.500ms="dataDaftarUgd.pemeriksaan.nutrisi.tb" :mou_label="__('Cm')" />
-
+                @error('dataDaftarUgd.pemeriksaan.nutrisi.tb')
+                    <x-input-error :messages=$message />
+                @enderror
             </div>
 
             <div class="mb-2 ">
                 <x-input-label for="dataDaftarUgd.pemeriksaan.nutrisi.imt" :value="__('Index Masa Tubuh')" :required="__(false)" />
                 <x-text-input-mou id="dataDaftarUgd.pemeriksaan.nutrisi.imt" placeholder="Index Masa Tubuh"
                     class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.pemeriksaan.nutrisi.imt'))" :disabled=$disabledPropertyRjStatus
-                    wire:model.debounce.500ms="dataDaftarUgd.pemeriksaan.nutrisi.imt" :mou_label="__('-')" />
-
+                    wire:model.debounce.500ms="dataDaftarUgd.pemeriksaan.nutrisi.imt" :mou_label="__('Kg/M2')" />
+                @error('dataDaftarUgd.pemeriksaan.nutrisi.imt')
+                    <x-input-error :messages=$message />
+                @enderror
             </div>
 
+
+
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 pt-2">
             <div class="mb-2 ">
                 <x-input-label for="dataDaftarUgd.pemeriksaan.nutrisi.lk" :value="__('Lingkar Kepala')" :required="__(false)" />
                 <x-text-input-mou id="dataDaftarUgd.pemeriksaan.nutrisi.lk" placeholder="Lingkar Kepala"
                     class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.pemeriksaan.nutrisi.lk'))" :disabled=$disabledPropertyRjStatus
                     wire:model.debounce.500ms="dataDaftarUgd.pemeriksaan.nutrisi.lk" :mou_label="__('Cm')" />
-
+                @error('dataDaftarUgd.pemeriksaan.nutrisi.lk')
+                    <x-input-error :messages=$message />
+                @enderror
             </div>
 
+            <div class="mb-2 ">
+                <x-input-label for="dataDaftarUgd.pemeriksaan.nutrisi.lila" :value="__('Lingkar Lengan Atas')" :required="__(false)" />
+                <x-text-input-mou id="dataDaftarUgd.pemeriksaan.nutrisi.lila" placeholder="Lingkar Lengan Atas"
+                    class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.pemeriksaan.nutrisi.lila'))" :disabled=$disabledPropertyRjStatus
+                    wire:model.debounce.500ms="dataDaftarUgd.pemeriksaan.nutrisi.lila" :mou_label="__('Cm')" />
+                @error('dataDaftarUgd.pemeriksaan.nutrisi.lila')
+                    <x-input-error :messages=$message />
+                @enderror
+            </div>
         </div>
 
         <x-input-label for="dataDaftarUgd.pemeriksaan.fungsional.bb" :value="__('Fungsional')" :required="__(false)"
