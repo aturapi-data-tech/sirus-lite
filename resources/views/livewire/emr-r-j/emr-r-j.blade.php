@@ -108,11 +108,11 @@
 
 
             @if ($isOpen)
-                @include('livewire.emr-u-g-d.create-emr-u-g-d')
+                @include('livewire.emr-r-j.create-emr-r-j')
             @endif
 
             @if ($isOpenScreening)
-                @include('livewire.emr-u-g-d.create-screening-u-g-d')
+                @include('livewire.emr-r-j.create-screening-r-j')
             @endif
 
         </div>
@@ -394,7 +394,7 @@
                 let cfn = confirm('Apakah anda ingin menghapus data ini ' + name + '?');
 
                 if (cfn) {
-                    window.livewire.emit('confirm_remove_record_UGDp', key, name);
+                    window.livewire.emit('confirm_remove_record_RJp', key, name);
                 }
             });
 

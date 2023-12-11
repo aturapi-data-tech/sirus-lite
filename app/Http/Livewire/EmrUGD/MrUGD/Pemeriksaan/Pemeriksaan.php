@@ -711,8 +711,16 @@ class Pemeriksaan extends Component
 
     private function scoringIMT(): void
     {
-        $bb = $this->dataDaftarUgd['pemeriksaan']['nutrisi']['bb'];
-        $tb = $this->dataDaftarUgd['pemeriksaan']['nutrisi']['tb'];
+        $bb = (isset($this->dataDaftarUgd['pemeriksaan']['nutrisi']['bb'])
+            ? ($this->dataDaftarUgd['pemeriksaan']['nutrisi']['bb']
+                ? $this->dataDaftarUgd['pemeriksaan']['nutrisi']['bb']
+                : 1)
+            : 1);
+        $tb = (isset($this->dataDaftarUgd['pemeriksaan']['nutrisi']['tb'])
+            ? ($this->dataDaftarUgd['pemeriksaan']['nutrisi']['tb']
+                ? $this->dataDaftarUgd['pemeriksaan']['nutrisi']['tb']
+                : 1)
+            : 1);;
 
 
         $this->dataDaftarUgd['pemeriksaan']['nutrisi']['imt'] = round($bb / (($tb / 100) * ($tb / 100)), 2);
