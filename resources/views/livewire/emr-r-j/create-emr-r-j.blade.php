@@ -134,7 +134,7 @@
                             {{-- <div>{{ $activeTab }}</div> --}}
                             {{-- :rjNo="" disi dari emit ListeneropenModalEditUgd --}}
 
-                            <livewire:emr-r-j.mr-r-j.rekam-medis.layanan :wire:key="'content-layananRj'"
+                            <livewire:emr-u-g-d.mr-u-g-d.rekam-medis.layanan :wire:key="'content-layananRj'"
                                 :regNoRef="$regNoRef">
                         </div>
                     @endif

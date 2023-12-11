@@ -375,13 +375,12 @@ class Anamnesa extends Component
 
     private function updateDataRj($rjNo): void
     {
-
         // update table trnsaksi
         DB::table('rstxn_rjhdrs')
             ->where('rj_no', $rjNo)
             ->update([
-                'dataDaftarPoliRJ_json' => json_encode($this->dataDaftarPoliRJ, true),
-                'dataDaftarPoliRJ_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
+                'datadaftarpolirj_json' => json_encode($this->dataDaftarPoliRJ, true),
+                'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
             ]);
 
         $this->emit('toastr-success', "Anamnesa berhasil disimpan.");
@@ -394,17 +393,17 @@ class Anamnesa extends Component
 
 
         $findData = DB::table('rsview_rjkasir')
-            ->select('dataDaftarPoliRJ_json', 'vno_sep')
+            ->select('datadaftarpolirj_json', 'vno_sep')
             ->where('rj_no', $rjno)
             ->first();
 
-        $dataDaftarPoliRJ_json = isset($findData->dataDaftarPoliRJ_json) ? $findData->dataDaftarPoliRJ_json : null;
+        $dataDaftarPoliRJ_json = isset($findData->datadaftarpolirj_json) ? $findData->datadaftarpolirj_json : null;
         // if meta_data_pasien_json = null
         // then cari Data Pasien By Key Collection (exception when no data found)
         // 
         // else json_decode
         if ($dataDaftarPoliRJ_json) {
-            $this->dataDaftarPoliRJ = json_decode($findData->dataDaftarPoliRJ_json, true);
+            $this->dataDaftarPoliRJ = json_decode($findData->datadaftarpolirj_json, true);
 
             // jika anamnesa tidak ditemukan tambah variable anamnesa pda array
             if (isset($this->dataDaftarPoliRJ['anamnesa']) == false) {
