@@ -1221,7 +1221,7 @@
                                             : '-' }}
 
 
-                                        <br>
+                                        {{-- <br>
                                         @inject('carbon', 'Carbon\Carbon')
                                         <span class="font-semibold">
                                             Waktu Datang :
@@ -1262,7 +1262,7 @@
                                                         ::createFromFormat('d/m/Y H:i:s', $dataDaftarTxn['perencanaan']['pengkajianMedis']['waktuPemeriksaan'])->diff($carbon::createFromFormat('d/m/Y H:i:s', $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['jamDatang']))->format('%H:%I:%S') }}
                                                 </span>
                                             @endisset
-                                        @endisset
+                                        @endisset --}}
 
 
                                     </td>
@@ -1294,11 +1294,11 @@
                                                 @inject('carbon', 'Carbon\Carbon')
                                                 <td class="w-1/4 text-center">
                                                     Tulungagung,
-                                                    {{ isset($dataDaftarTxn['rjDate'])
-                                                        ? ($dataDaftarTxn['rjDate']
-                                                            ? $carbon::createFromFormat('d/m/Y H:i:s', $dataDaftarTxn['rjDate'])->format('d/m/Y')
-                                                            : 'Dokter Pemeriksa')
-                                                        : 'Dokter Pemeriksa' }}
+                                                    {{ isset($dataDaftarTxn['perencanaan']['pengkajianMedis']['selesaiPemeriksaan'])
+                                                        ? ($dataDaftarTxn['perencanaan']['pengkajianMedis']['selesaiPemeriksaan']
+                                                            ? $dataDaftarTxn['perencanaan']['pengkajianMedis']['selesaiPemeriksaan']
+                                                            : 'Tanggal')
+                                                        : 'Tanggal' }}
 
                                                     <br>
                                                     <br>

@@ -10,7 +10,7 @@
                     stroke-linecap="round" stroke-linejoin="round"></path>
             </svg>
             <x-text-input x-ref="dataProcedureICD9CmLovSearch" placeholder="Cari Data" class="mt-1 ml-2"
-                wire:model="dataProcedureICD9CmLovSearch" />
+                wire:model.lazy="dataProcedureICD9CmLovSearch" />
         </div>
 
 
