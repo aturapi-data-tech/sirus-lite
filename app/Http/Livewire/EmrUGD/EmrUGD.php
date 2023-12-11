@@ -60,7 +60,18 @@ class EmrUGD extends Component
         'page' => ['except' => 1, 'as' => 'p'],
     ];
 
+    // reset page when myTopBar Change
     public function updatedReffilter()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedMytopbarRefdate()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedMytopbarRefstatusid()
     {
         $this->resetPage();
     }
