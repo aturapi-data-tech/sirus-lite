@@ -8,15 +8,6 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
 
-use App\Http\Traits\customErrorMessagesTrait;
-use App\Http\Traits\BPJS\AntrianTrait;
-use App\Http\Traits\BPJS\VclaimTrait;
-
-
-use Illuminate\Support\Str;
-use Spatie\ArrayToXml\ArrayToXml;
-use Barryvdh\DomPDF\Facade\Pdf;
-
 
 class EmrUGD extends Component
 {
@@ -69,7 +60,10 @@ class EmrUGD extends Component
         'page' => ['except' => 1, 'as' => 'p'],
     ];
 
-
+    public function updatedReffilter()
+    {
+        $this->resetPage();
+    }
 
     // setter myTopBar Shift and myTopBar refDate
     private function settermyTopBarShiftandmyTopBarrefDate(): void

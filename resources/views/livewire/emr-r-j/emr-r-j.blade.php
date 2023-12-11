@@ -1,377 +1,329 @@
 <div>
 
-    <div class="px-1 pt-7">
-        <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
-            <!-- Card header -->
+    {{-- Start Coding  --}}
 
+    {{-- Canvas 
+    Main BgColor / 
+    Size H/W --}}
+    <div class="w-full h-[calc(100vh-68px)] bg-white border border-gray-200 px-4 pt-6">
 
+        {{-- Title  --}}
+        <div class="mb-2">
+            <h3 class="text-3xl font-bold text-gray-900 ">{{ $myTitle }}</h3>
+            <span class="text-base font-normal text-gray-700">{{ $mySnipt }}</span>
+        </div>
+        {{-- Title --}}
 
-            <div class="w-full mb-1">
-                <div class="">
+        {{-- Top Bar --}}
+        <div class="flex justify-between">
 
-
-                    {{-- text --}}
-                    <div class="mb-5">
-                        <h3 class="text-3xl font-bold text-gray-900 dark:text-white">{{ $myTitle }}</h3>
-                        <span class="text-base font-normal text-gray-900 dark:text-gray-400">{{ $mySnipt }}</span>
-                    </div>
-                    {{-- end text --}}
-
-
-
-                    <div class="md:flex md:justify-between">
-
-                        {{-- search --}}
-                        <div class="relative pointer-events-auto md:w-1/2">
-                            <div class="absolute inset-y-0 left-0 flex items-center p-5 pl-3 pointer-events-none">
-                                <svg width="24" height="24" fill="none" aria-hidden="true"
-                                    class="flex-none mr-3">
-                                    <path d="m19 19-3.5-3.5" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round"></path>
-                                    <circle cx="11" cy="11" r="6" stroke="currentColor"
-                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></circle>
-                                </svg>
-                            </div>
-                            <x-text-input id="simpleSearch" name="namesimpleSearch" type="text" class="p-2 pl-10"
-                                autofocus autocomplete="simpleSearch" placeholder="Cari Data"
-                                wire:model.lazy="search" />
-                        </div>
-                        {{-- end search --}}
-
-                        {{-- two button --}}
-                        <div class="flex justify-between mt-2 md:mt-0">
-                            {{-- <x-primary-button wire:click="create()" class="flex justify-center flex-auto">
-                                <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path fill-rule="evenodd"
-                                        d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                                        clip-rule="evenodd"></path>
-                                </svg>
-                                Daftar {{ $myProgram }}
-                            </x-primary-button> --}}
-
-
-
-                            <x-dropdown align="right" :width="__('20')">
-                                <x-slot name="trigger">
-                                    {{-- Button myLimitPerPage --}}
-                                    <x-alternative-button class="inline-flex">
-                                        <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
-                                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                            <path clip-rule="evenodd" fill-rule="evenodd"
-                                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-                                        </svg>
-                                        Tampil ({{ $limitPerPage }})
-                                    </x-alternative-button>
-                                </x-slot>
-                                {{-- Open myLimitPerPagecontent --}}
-                                <x-slot name="content">
-
-                                    @foreach ($myLimitPerPages as $myLimitPerPage)
-                                        <x-dropdown-link wire:click="setLimitPerPage({{ $myLimitPerPage }})">
-                                            {{ __($myLimitPerPage) }}
-                                        </x-dropdown-link>
-                                    @endforeach
-                                </x-slot>
-                            </x-dropdown>
-                        </div>
-                        {{-- end two button --}}
-
+            <div class="flex w-full">
+                {{-- Cari Data --}}
+                <div class="relative w-1/3 mr-2 pointer-events-auto">
+                    <div class="absolute inset-y-0 left-0 flex items-center p-5 pl-3 pointer-events-none ">
+                        <svg width="24" height="24" fill="none" aria-hidden="true" class="flex-none mr-3 ">
+                            <path d="m19 19-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round"></path>
+                            <circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round"></circle>
+                        </svg>
                     </div>
 
-
-                    <div class="flex rounded-lg bg-gray-50">
-
-                        {{-- date --}}
-                        <div class="relative w-1/5 mt-2 ">
-                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                <svg aria-hidden="true" class="w-5 h-5 text-gray-900 dark:text-gray-400"
-                                    fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                    <path fill-rule="evenodd"
-                                        d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                                        clip-rule="evenodd"></path>
-                                </svg>
-                            </div>
-
-
-                            <x-text-input id="dateRjRef" datepicker datepicker-autohide datepicker-format="dd/mm/yyyy"
-                                type="text" class="p-2 pl-10 " placeholder="dd/mm/yyyy" wire:model="dateRjRef" />
-                        </div>
-
-                        {{-- radio --}}
-                        <div class="flex mt-2 ml-2">
-                            @foreach ($statusRjRef['statusOptions'] as $sRj)
-                                {{-- @dd($sRj) --}}
-                                <x-radio-button :label="__($sRj['statusDesc'])" value="{{ $sRj['statusId'] }}"
-                                    wire:model="statusRjRef.statusId" />
-                            @endforeach
-                        </div>
-
-                        {{-- shift --}}
-                        {{-- <div class="mt-2 ml-0">
-                            <x-dropdown align="right" :width="__('20')" class="">
-                                <x-slot name="trigger">
-
-                                    <x-alternative-button class="inline-flex">
-                                        <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
-                                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                            <path clip-rule="evenodd" fill-rule="evenodd"
-                                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-                                        </svg>
-                                        <span>{{ 'Shift' . $shiftRjRef['shiftDesc'] }}</span>
-                                    </x-alternative-button>
-                                </x-slot>
-
-                                <x-slot name="content">
-
-                                    @foreach ($shiftRjRef['shiftOptions'] as $shift)
-                                        <x-dropdown-link
-                                            wire:click="setShift({{ $shift['shiftId'] }},{{ $shift['shiftDesc'] }})">
-                                            {{ __($shift['shiftDesc']) }}
-                                        </x-dropdown-link>
-                                    @endforeach
-                                </x-slot>
-                            </x-dropdown>
-                        </div> --}}
-
-                        {{-- Dokter --}}
-                        <div class="mt-2 ml-0">
-                            <x-dropdown align="right" :width="__('80')" :contentclasses="__('overflow-auto max-h-[150px] py-1 bg-white dark:bg-gray-700')">
-                                <x-slot name="trigger">
-                                    {{-- Button Dokter --}}
-                                    <x-alternative-button class="inline-flex">
-                                        <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
-                                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                            <path clip-rule="evenodd" fill-rule="evenodd"
-                                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-                                        </svg>
-                                        <span>{{ 'Dokter ( ' . $drRjRef['drName'] . ' )' }}</span>
-                                    </x-alternative-button>
-                                </x-slot>
-                                {{-- Open shiftcontent --}}
-                                <x-slot name="content">
-
-                                    @foreach ($drRjRef['drOptions'] as $dr)
-                                        <x-dropdown-link
-                                            wire:click="setdrRjRef('{{ $dr['drId'] }}','{{ $dr['drName'] }}')">
-                                            {{ __($dr['drName']) }}
-                                        </x-dropdown-link>
-                                    @endforeach
-                                </x-slot>
-                            </x-dropdown>
-                        </div>
-
-                    </div>
-
-                    @if ($isOpen)
-                        @include('livewire.emr-r-j.create')
-                    @endif
-
-                    @if ($isOpenEmr)
-                        @include('livewire.emr-r-j.create-emr')
-                    @endif
-
-
-
-
-
-
+                    <x-text-input type="text" class="w-full p-2 pl-10" placeholder="Cari Data" autofocus
+                        wire:model="refFilter" />
                 </div>
+                {{-- Cari Data --}}
 
-
-
-                <!-- Table -->
-                <div class="flex flex-col mt-2">
-                    <div class="overflow-x-auto rounded-lg">
-                        <div class="inline-block min-w-full align-middle">
-                            <div class="overflow-hidden shadow sm:rounded-lg">
-                                <table class="w-full text-sm text-left text-gray-900 table-auto dark:text-gray-400">
-                                    <thead
-                                        class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                                        <tr>
-                                            <th scope="col" class="w-1/3 px-4 py-3 ">
-                                                <x-sort-link :active=false wire:click.prevent="sortBy('RJp_id')"
-                                                    role="button" href="#">
-                                                    Pasien
-                                                </x-sort-link>
-                                            </th>
-
-                                            <th scope="col" class="w-1/3 px-4 py-3">
-                                                <x-sort-link :active=false wire:click.prevent="" role="button"
-                                                    href="#">
-                                                    SEP
-                                                </x-sort-link>
-                                            </th>
-                                            <th scope="col" class="w-1/3 px-4 py-3">
-                                                <x-sort-link :active=false wire:click.prevent="" role="button"
-                                                    href="#">
-                                                    Poli
-                                                </x-sort-link>
-                                            </th>
-                                            <th scope="col" class="w-1/3 px-4 py-3 ">
-                                                <x-sort-link :active=false wire:click.prevent="" role="button"
-                                                    href="#">
-                                                    Status Layanan
-                                                </x-sort-link>
-                                            </th>
-
-
-
-
-                                            <th scope="col" class="w-8 px-4 py-3 text-center">Action
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="bg-white dark:bg-gray-800">
-
-
-                                        @foreach ($RJpasiens as $RJp)
-                                            <tr class="border-b group dark:border-gray-700">
-
-                                                <td
-                                                    class="flex px-4 py-3 font-medium group-hover:bg-gray-100 group-hover:text-primary whitespace-nowrap dark:text-white">
-                                                    <img class="w-10 h-10 rounded-full" src="profile-picture-1.jpg"
-                                                        alt="Jese image">
-                                                    <div class="pl-3">
-                                                        <div class="text-base font-semibold text-gray-700">
-                                                            {{ $RJp->reg_no }}</div>
-                                                        <div class="font-semibold text-primary">
-                                                            {{ $RJp->reg_name . ' / (' . $RJp->sex . ')' . ' / ' . $RJp->thn }}
-                                                        </div>
-                                                        <div class="font-normal text-gray-900">
-                                                            {{ $RJp->address }}
-                                                        </div>
-                                                    </div>
-                                                </td>
-
-
-                                                <td
-                                                    class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-primary whitespace-nowrap dark:text-white">
-                                                    {{ $RJp->vno_sep }}
-                                                </td>
-
-
-                                                <td
-                                                    class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
-                                                    <div class="">
-                                                        <div class="font-semibold text-primary">{{ $RJp->poli_desc }}
-                                                        </div>
-                                                        <div class="font-semibold text-gray-900">
-                                                            {{ $RJp->dr_name . ' / ' }}
-                                                            {{ $RJp->klaim_id == 'UM'
-                                                                ? 'UMUM'
-                                                                : ($RJp->klaim_id == 'JM'
-                                                                    ? 'BPJS'
-                                                                    : ($RJp->klaim_id == 'KR'
-                                                                        ? 'Kronis'
-                                                                        : 'Asuransi Lain')) }}
-                                                        </div>
-                                                        <div class="font-normal text-gray-900">
-                                                            {{ 'Nomer Pelayanan ' . $RJp->no_antrian }}
-                                                        </div>
-                                                    </div>
-                                                </td>
-
-                                                <td
-                                                    class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
-                                                    <div class="overflow-auto w-52">
-                                                        <div class="font-semibold text-primary">{{ $RJp->rj_status }}
-                                                        </div>
-                                                        <div class="font-semibold text-gray-900">
-                                                            {{ '' . $RJp->nobooking }}
-                                                        </div>
-                                                        <div class="font-normal text-gray-900 ">
-                                                            {{ '' . $RJp->push_antrian_bpjs_status . $RJp->push_antrian_bpjs_json }}
-                                                        </div>
-                                                    </div>
-                                                </td>
-
-                                                <td class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-primary">
-
-
-
-                                                    <!-- Dropdown Action menu Flowbite-->
-                                                    <div>
-                                                        <x-light-button id="dropdownButton{{ $RJp->rj_no }}"
-                                                            class="inline-flex"
-                                                            wire:click="$emit('pressDropdownButton','{{ $RJp->rj_no }}')">
-                                                            <svg class="w-5 h-5" aria-hidden="true"
-                                                                fill="currentColor" viewbox="0 0 20 20"
-                                                                xmlns="http://www.w3.org/2000/svg">
-                                                                <path
-                                                                    d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
-                                                            </svg>
-                                                        </x-light-button>
-
-                                                        <!-- Dropdown Action Open menu -->
-                                                        <div id="dropdownMenu{{ $RJp->rj_no }}"
-                                                            class="z-10 hidden w-auto bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700">
-                                                            <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
-                                                                aria-labelledby="dropdownButton{{ $RJp->rj_no }}">
-                                                                <li>
-                                                                    <x-dropdown-link
-                                                                        wire:click="screening('{{ $RJp->rj_no }}')">
-                                                                        {{ __('Screening | ' . $RJp->reg_name) }}
-                                                                    </x-dropdown-link>
-                                                                </li>
-                                                                <li>
-                                                                    <x-dropdown-link
-                                                                        wire:click="emr('{{ $RJp->rj_no }}')">
-                                                                        {{ __('Rekam Medis') }}
-                                                                    </x-dropdown-link>
-                                                                </li>
-
-
-                                                            </ul>
-                                                        </div>
-                                                    </div>
-                                                    <!-- End Dropdown Action Open menu -->
-
-
-                                                </td>
-                                            </tr>
-                                        @endforeach
-
-
-
-                                    </tbody>
-                                </table>
-
-
-
-                                {{-- no data found start --}}
-                                @if ($RJpasiens->count() == 0)
-                                    <div class="w-full p-4 text-sm text-center text-gray-900 dark:text-gray-400">
-                                        {{ 'Data ' . $myProgram . ' Tidak ditemukan' }}
-                                    </div>
-                                @endif
-                                {{-- no data found end --}}
-
-
-
-                            </div>
-                        </div>
+                {{-- Tanggal --}}
+                <div class="relative w-[150px] mr-2">
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <svg aria-hidden="true" class="w-5 h-5 text-gray-900 dark:text-gray-400" fill="currentColor"
+                            viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd"
+                                d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                                clip-rule="evenodd"></path>
+                        </svg>
                     </div>
+
+                    <x-text-input type="text" class="p-2 pl-10 " placeholder="[dd/mm/yyyy]"
+                        wire:model="myTopBar.refDate" />
                 </div>
+                {{-- Tanggal --}}
 
+                {{-- Shift --}}
+                {{-- <div class="relative w-[75px]">
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <svg class="w-5 h-5 text-gray-800 dark:text-white" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                            <path
+                                d="M1 5h1.424a3.228 3.228 0 0 0 6.152 0H19a1 1 0 1 0 0-2H8.576a3.228 3.228 0 0 0-6.152 0H1a1 1 0 1 0 0 2Zm18 4h-1.424a3.228 3.228 0 0 0-6.152 0H1a1 1 0 1 0 0 2h10.424a3.228 3.228 0 0 0 6.152 0H19a1 1 0 0 0 0-2Zm0 6H8.576a3.228 3.228 0 0 0-6.152 0H1a1 1 0 0 0 0 2h1.424a3.228 3.228 0 0 0 6.152 0H19a1 1 0 0 0 0-2Z" />
+                        </svg>
+                    </div>
 
+                    <x-text-input type="text" class="w-full p-2 pl-10 " placeholder="[Shift 1/2/3]"
+                        wire:model="myTopBar.refShiftId" />
+                </div> --}}
+                {{-- Shift --}}
 
-                <!-- Pagination start -->
-                <div class="flex items-center justify-end pt-3 sm:pt-6">
-                    {{-- {{ $RJpasiens->links() }} --}}
-                    {{ $RJpasiens->links('vendor.livewire.tailwind') }}
+                {{-- Status Transaksi --}}
+                <div class="flex ml-2">
+                    @foreach ($myTopBar['refStatusOptions'] as $refStatus)
+                        {{-- @dd($refStatus) --}}
+                        <x-radio-button :label="__($refStatus['refStatusDesc'])" value="{{ $refStatus['refStatusId'] }}"
+                            wire:model="myTopBar.refStatusId" />
+                    @endforeach
                 </div>
-                <!-- Pagination end -->
+                {{-- Status Transaksi --}}
 
 
 
             </div>
+
+
+
+            <div class="flex justify-end w-1/2">
+                <x-dropdown align="right" :width="__('20')">
+                    <x-slot name="trigger">
+                        {{-- Button myLimitPerPage --}}
+                        <x-alternative-button class="inline-flex">
+                            <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
+                                xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path clip-rule="evenodd" fill-rule="evenodd"
+                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                            </svg>
+                            Tampil ({{ $limitPerPage }})
+                        </x-alternative-button>
+                    </x-slot>
+                    {{-- Open myLimitPerPagecontent --}}
+                    <x-slot name="content">
+
+                        @foreach ($myLimitPerPages as $myLimitPerPage)
+                            <x-dropdown-link wire:click="$set('limitPerPage', '{{ $myLimitPerPage }}')">
+                                {{ __($myLimitPerPage) }}
+                            </x-dropdown-link>
+                        @endforeach
+                    </x-slot>
+                </x-dropdown>
+            </div>
+
+
+            @if ($isOpen)
+                @include('livewire.emr-u-g-d.create-emr-u-g-d')
+            @endif
+
+            @if ($isOpenScreening)
+                @include('livewire.emr-u-g-d.create-screening-u-g-d')
+            @endif
+
         </div>
+        {{-- Top Bar --}}
+
+
+
+
+
+
+        <div class="h-[calc(100vh-250px)] mt-2 overflow-auto">
+            <!-- Table -->
+            <table class="w-full text-sm text-left text-gray-700 table-auto ">
+                <thead class="sticky top-0 text-xs text-gray-900 uppercase bg-gray-100 ">
+                    <tr>
+                        <th scope="col" class="w-1/4 px-4 py-3 ">
+                            Pasien
+                        </th>
+                        <th scope="col" class="w-1/4 px-4 py-3 ">
+                            SEP
+                        </th>
+                        <th scope="col" class="w-1/4 px-4 py-3 ">
+                            Poli
+                        </th>
+                        <th scope="col" class="w-1/4 px-4 py-3 ">
+                            Status Layanan
+                        </th>
+                        <th scope="col" class="w-1/4 px-4 py-3 ">
+                            Action
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody class="bg-white ">
+
+                    @foreach ($myQueryData as $myQData)
+                        <tr class="border-b group dark:border-gray-700">
+
+
+                            <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
+                                <div class="">
+                                    <div class="font-semibold text-primary">
+                                        {{ $myQData->reg_no }}
+                                    </div>
+                                    <div class="font-semibold text-gray-900">
+                                        {{ $myQData->reg_name . ' / (' . $myQData->sex . ')' . ' / ' . $myQData->thn }}
+                                    </div>
+                                    <div class="font-normal text-gray-900">
+                                        {{ $myQData->address }}
+                                    </div>
+                                </div>
+                            </td>
+
+
+                            <td
+                                class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-primary whitespace-nowrap dark:text-white">
+                                {{ $myQData->vno_sep }}
+                            </td>
+
+
+                            <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
+                                <div class="">
+                                    <div class="font-semibold text-primary">{{ $myQData->poli_desc }}
+                                    </div>
+                                    <div class="font-semibold text-gray-900">
+                                        {{ $myQData->dr_name . ' / ' }}
+                                        {{ $myQData->klaim_id == 'UM'
+                                            ? 'UMUM'
+                                            : ($myQData->klaim_id == 'JM'
+                                                ? 'BPJS'
+                                                : ($myQData->klaim_id == 'KR'
+                                                    ? 'Kronis'
+                                                    : 'Asuransi Lain')) }}
+                                    </div>
+                                    <div class="font-normal text-gray-900">
+                                        {{ 'Nomer Pelayanan ' . $myQData->no_antrian }}
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
+                                <div class="overflow-auto w-52">
+                                    <div class="font-semibold text-primary">
+                                        {{ $myQData->rj_date }}
+                                    </div>
+                                    <div class="italic font-semibold text-gray-900">
+                                        {{ isset($myQData->rj_status)
+                                            ? ($myQData->rj_status === 'A'
+                                                ? 'Pelayanan'
+                                                : ($myQData->rj_status === 'L'
+                                                    ? 'Selesai Pelayanan'
+                                                    : ($myQData->rj_status === 'I'
+                                                        ? 'Transfer Inap'
+                                                        : ($myQData->rj_status === 'F'
+                                                            ? 'Batal Transaksi'
+                                                            : ''))))
+                                            : '' }}
+                                    </div>
+                                    <div class="font-normal text-gray-900">
+                                        {{ '' . $myQData->nobooking }}
+                                    </div>
+                                    <div class="font-normal text-gray-900 ">
+                                        {{ '' . $myQData->push_antrian_bpjs_status . $myQData->push_antrian_bpjs_json }}
+                                    </div>
+                                    <div>
+                                        @php
+                                            $datadaftar_json = json_decode($myQData->datadaftarpolirj_json, true);
+                                            $anamnesa = isset($datadaftar_json['anamnesa']) ? 1 : 0;
+                                            $pemeriksaan = isset($datadaftar_json['pemeriksaan']) ? 1 : 0;
+                                            $penilaian = isset($datadaftar_json['penilaian']) ? 1 : 0;
+                                            $procedure = isset($datadaftar_json['procedure']) ? 1 : 0;
+                                            $diagnosis = isset($datadaftar_json['diagnosis']) ? 1 : 0;
+                                            $perencanaan = isset($datadaftar_json['perencanaan']) ? 1 : 0;
+                                            $prosentaseEMR = (($anamnesa + $pemeriksaan + $penilaian + $procedure + $diagnosis + $perencanaan) / 6) * 100;
+                                        @endphp
+                                        Emr: {{ $prosentaseEMR . '%' }}
+
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-primary">
+
+
+                                <div class="inline-flex">
+
+                                    <livewire:cetak.cetak-etiket :regNo="$myQData->reg_no" :wire:key="$myQData->rj_no">
+
+                                        <!-- Dropdown Action menu Flowbite-->
+                                        <div>
+                                            <x-light-button id="dropdownButton{{ $myQData->rj_no }}"
+                                                class="inline-flex"
+                                                wire:click="$emit('pressDropdownButton','{{ $myQData->rj_no }}')">
+                                                <svg class="w-5 h-5" aria-hidden="true" fill="currentColor"
+                                                    viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                                    <path
+                                                        d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
+                                                </svg>
+                                            </x-light-button>
+
+                                            <!-- Dropdown Action Open menu -->
+                                            <div id="dropdownMenu{{ $myQData->rj_no }}"
+                                                class="z-10 hidden w-auto bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700">
+                                                <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
+                                                    aria-labelledby="dropdownButton{{ $myQData->rj_no }}">
+                                                    {{-- <li>
+                                                        <x-dropdown-link wire:click="tampil('{{ $myQData->rj_no }}')">
+                                                            {{ __('Tampil | ' . $myQData->reg_name) }}
+                                                        </x-dropdown-link>
+                                                    </li> --}}
+                                                    <li>
+                                                        <x-dropdown-link
+                                                            wire:click="editScreening('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
+                                                            {{ __('Screening') }}
+                                                        </x-dropdown-link>
+                                                    </li>
+
+                                                    <li>
+                                                        <x-dropdown-link
+                                                            wire:click="edit('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
+                                                            {{ __('Rekam Medis') }}
+                                                        </x-dropdown-link>
+                                                    </li>
+                                                    {{-- <li>
+                                                        <x-dropdown-link
+                                                            wire:click="$emit('confirm_remove_record', '{{ $myQData->rj_no }}', '{{ $myQData->reg_name }}')">
+                                                            {{ __('Hapus') }}
+                                                        </x-dropdown-link>
+                                                    </li> --}}
+
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <!-- End Dropdown Action Open menu -->
+                                </div>
+
+                            </td>
+                        </tr>
+                    @endforeach
+
+                </tbody>
+            </table>
+
+            {{-- no data found start --}}
+            @if ($myQueryData->count() == 0)
+                <div class="w-full p-4 text-sm text-center text-gray-900 dark:text-gray-400">
+                    {{ 'Data ' . $myProgram . ' Tidak ditemukan' }}
+                </div>
+            @endif
+            {{-- no data found end --}}
+
+        </div>
+
+        {{ $myQueryData->links() }}
+
+
+
+
+
+
+
+
     </div>
 
 
 
+    {{-- Canvas 
+    Main BgColor / 
+    Size H/W --}}
 
+    {{-- End Coding --}}
 
 
 
@@ -406,11 +358,11 @@
 
 
         {{-- Disabling enter key for form --}}
-        {{-- <script type="text/javascript">
+        <script type="text/javascript">
             $(document).on("keydown", "form", function(event) {
                 return event.key != "Enter";
             });
-        </script> --}}
+        </script>
 
 
 
@@ -442,7 +394,18 @@
                 let cfn = confirm('Apakah anda ingin menghapus data ini ' + name + '?');
 
                 if (cfn) {
-                    window.livewire.emit('confirm_remove_record_RJp', key, name);
+                    window.livewire.emit('confirm_remove_record_UGDp', key, name);
+                }
+            });
+
+
+            // confirmation message doble record
+            window.livewire.on('confirm_doble_record', (key, name) => {
+
+                let cfn = confirm('Pasien Sudah terdaftar, Apakah anda ingin tetap menyimpan data ini ' + name + '?');
+
+                if (cfn) {
+                    window.livewire.emit('confirm_doble_record_RJp', key, name);
                 }
             });
 
@@ -539,6 +502,19 @@
             // });
         </script>
         {{-- Global Livewire JavaScript Object end --}}
+
+        {{-- Global Livewire JavaScript Object start --}}
+        <script type="text/javascript">
+            // confirmation message doble record
+            window.livewire.on('confirm_doble_recordUGD', (key, name) => {
+                console.log('x')
+                let cfn = confirm('Pasien Sudah terdaftar, Apakah anda ingin tetap menyimpan data ini ' + name + '?');
+
+                if (cfn) {
+                    window.livewire.emit('confirm_doble_record_UGDp', key, name);
+                }
+            });
+        </script>
     @endpush
 
 
@@ -560,4 +536,5 @@
         {{-- stylesheet end --}}
     @endpush
     {{-- push end --}}
+
 </div>
