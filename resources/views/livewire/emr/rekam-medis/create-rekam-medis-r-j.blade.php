@@ -146,7 +146,7 @@
                                 <tr>
                                     <td
                                         class="p-2 m-2 text-2xl font-semibold text-center uppercase border-b-2 border-l-2 border-r-2 border-gray-900">
-                                        assesment awal instalasi gawat darurat
+                                        assesment awal rawat jalan
                                     </td>
                                 </tr>
                             </tbody>
@@ -166,9 +166,9 @@
 
                                     <td class="p-2 m-2 text-sm border-b-2 border-r-2 border-gray-900 text-start">
                                         <span class="font-semibold">
-                                            Cara Masuk IGD :
+                                            Cara Masuk Rj :
                                         </span>
-                                        {{ isset($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['caraMasukIgd']) ? $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['caraMasukIgd'] : '-' }}
+                                        {{ isset($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['caraMasukRj']) ? $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['caraMasukRj'] : '-' }}
                                         /
                                         <span class="font-semibold">
                                             Tingkat Kegawatan :
@@ -1330,13 +1330,13 @@
                         {{-- null --}}
                     </div>
 
-                    <div wire:loading wire:target="cetakLayanan">
+                    <div wire:loading wire:target="cetakRekamMedisRJ">
                         <x-loading />
                     </div>
 
-                    <x-green-button :disabled=$disabledPropertyRjStatus wire:click.prevent="cetakLayanan()"
+                    <x-green-button :disabled=$disabledPropertyRjStatus wire:click.prevent="cetakRekamMedisRJ()"
                         type="button" wire:loading.remove>
-                        Cetak RM UGD
+                        Cetak RM RJ
                     </x-green-button>
                 </div>
             </div>

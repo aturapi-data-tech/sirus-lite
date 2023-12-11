@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\EmrUGD\MrUGD\RekamMedis;
+namespace App\Http\Livewire\Emr\RekamMedis;
 
 use Illuminate\Support\Facades\DB;
 
@@ -13,7 +13,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Spatie\ArrayToXml\ArrayToXml;
 
 
-class Layanan extends Component
+class RekamMedis extends Component
 {
     use WithPagination;
 
@@ -38,23 +38,26 @@ class Layanan extends Component
 
 
 
-    public bool $isOpenLayanan;
+    public bool $isOpenRekamMedisUGD;
+    public bool $isOpenRekamMedisRJ;
+
 
     ////////////////////////////////////////////////
     ///////////begin////////////////////////////////
     ////////////////////////////////////////////////
 
+    // Layanan RJ/RI/UGD
     public function openModalLayanan($txnNo = null, $layananStatus = null, $dataDaftarTxn = []): void
     {
 
         if ($layananStatus === 'RJ') {
-            $this->emit('toastr-error', 'Rekam Medis (Rawat Jalan) Fitur dalam masa pengembangan');
+            $this->isOpenRekamMedisRJ = true;
             $this->dataDaftarTxn = $dataDaftarTxn;
             if (isset($this->dataDaftarTxn['regNo'])) {
                 $this->setDataPasien($this->dataDaftarTxn['regNo']);
             }
         } else if ($layananStatus === 'UGD') {
-            $this->isOpenLayanan = true;
+            $this->isOpenRekamMedisUGD = true;
             $this->dataDaftarTxn = $dataDaftarTxn;
 
             if (isset($this->dataDaftarTxn['regNo'])) {
@@ -262,11 +265,12 @@ class Layanan extends Component
 
     public function closeModalLayanan(): void
     {
-        $this->isOpenLayanan = false;
+        $this->isOpenRekamMedisUGD = false;
+        $this->isOpenRekamMedisRJ = false;
     }
 
 
-    public function cetakLayanan()
+    public function cetakRekamMedisUGD()
     {
         $queryIdentitas = DB::table('rsmst_identitases')
             ->select(
@@ -285,12 +289,40 @@ class Layanan extends Component
             'dataDaftarTxn' => $this->dataDaftarTxn,
 
         ];
-        $pdfContent = PDF::loadView('livewire.emr-u-g-d.mr-u-g-d.rekam-medis.cetak-layanan', $data)->output();
+        $pdfContent = PDF::loadView('livewire.emr.rekam-medis.cetak-rekam-medis-u-g-d', $data)->output();
         $this->emit('toastr-success', 'Cetak RM IGD');
 
         return response()->streamDownload(
             fn () => print($pdfContent),
             "rmUGD.pdf"
+        );
+    }
+
+    public function cetakRekamMedisRJ()
+    {
+        $queryIdentitas = DB::table('rsmst_identitases')
+            ->select(
+                'int_name',
+                'int_phone1',
+                'int_phone2',
+                'int_fax',
+                'int_address',
+                'int_city',
+            )
+            ->first();
+        // cetak PDF
+        $data = [
+            'myQueryIdentitas' => $queryIdentitas,
+            'dataPasien' => $this->dataPasien,
+            'dataDaftarTxn' => $this->dataDaftarTxn,
+
+        ];
+        $pdfContent = PDF::loadView('livewire.emr.rekam-medis.cetak-rekam-medis-r-j', $data)->output();
+        $this->emit('toastr-success', 'Cetak RM RJ');
+
+        return response()->streamDownload(
+            fn () => print($pdfContent),
+            "rmRJ.pdf"
         );
     }
 
@@ -343,7 +375,7 @@ class Layanan extends Component
         ///////////////////////////////////////////////
 
         return view(
-            'livewire.emr-u-g-d.mr-u-g-d.rekam-medis.layanan',
+            'livewire.emr.rekam-medis.rekam-medis',
             [
                 'myQueryData' => $query->paginate(3),
                 'myQueryIdentitas' => $queryIdentitas

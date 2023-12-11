@@ -110,7 +110,7 @@
                                                         {{ $myQData->datadaftar_json }}
                                                         )"
                                                         type="button" wire:loading.remove>
-                                                        Rekam Medis {{ $isOpenLayanan }}
+                                                        Rekam Medis
                                                     </x-yellow-button>
                                                     <div wire:loading wire:target="openModalLayanan">
                                                         <x-loading />
@@ -138,8 +138,11 @@
 
                         </div>
                     </div>
-                    @if ($isOpenLayanan)
-                        @include('livewire.emr-u-g-d.mr-u-g-d.rekam-medis.create-layanan')
+                    @if ($isOpenRekamMedisUGD)
+                        @include('livewire.emr.rekam-medis.create-rekam-medis-u-g-d')
+                    @endif
+                    @if ($isOpenRekamMedisRJ)
+                        @include('livewire.emr.rekam-medis.create-rekam-medis-r-j')
                     @endif
                 </div>
             </div>
