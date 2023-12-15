@@ -50,6 +50,14 @@
                                                 </x-sort-link>
                                             </th>
 
+                                            <th scope="col" class="w-1/3 px-4 py-3 overflow-auto">
+
+                                                <x-sort-link :active=false wire:click.prevent="" role="button"
+                                                    href="#">
+                                                    TTV
+                                                </x-sort-link>
+                                            </th>
+
                                             <th scope="col" class="w-8 px-4 py-3 text-center">
                                                 RekamMedis
                                             </th>
@@ -104,6 +112,32 @@
 
                                                 <td
                                                     class="px-4 py-3 text-gray-900 group-hover:bg-gray-100 whitespace-nowrap">
+                                                    TD :
+                                                    {{ isset($datadaftar_json['pemeriksaan']['tandaVital']['sistolik'])
+                                                        ? $datadaftar_json['pemeriksaan']['tandaVital']['sistolik']
+                                                        : '' }}
+                                                    -
+                                                    {{ isset($datadaftar_json['pemeriksaan']['tandaVital']['distolik'])
+                                                        ? $datadaftar_json['pemeriksaan']['tandaVital']['distolik']
+                                                        : '' }}
+                                                    (mmHg)
+                                                    <br>
+                                                    SPO2 :
+                                                    {{ isset($datadaftar_json['pemeriksaan']['tandaVital']['spo2'])
+                                                        ? $datadaftar_json['pemeriksaan']['tandaVital']['spo2']
+                                                        : '' }}
+                                                    (%)
+                                                    <br>
+                                                    GDA :
+                                                    {{ isset($datadaftar_json['pemeriksaan']['tandaVital']['gda'])
+                                                        ? $datadaftar_json['pemeriksaan']['tandaVital']['gda']
+                                                        : '' }}
+                                                    (g/dl)
+
+                                                </td>
+
+                                                <td
+                                                    class="px-4 py-3 text-gray-900 group-hover:bg-gray-100 whitespace-nowrap">
                                                     <x-yellow-button
                                                         wire:click.prevent="openModalLayanan('{{ $myQData->txn_no }}',
                                                         '{{ $myQData->layanan_status }}',
@@ -116,6 +150,8 @@
                                                         <x-loading />
                                                     </div>
                                                 </td>
+
+
 
 
                                             </tr>
