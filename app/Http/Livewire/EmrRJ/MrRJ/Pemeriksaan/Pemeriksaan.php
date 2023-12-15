@@ -41,62 +41,62 @@ class Pemeriksaan extends Component
                 ["tingkatKesadaran" => "Acute Confusional States"],
             ],
             // jalan nafas
-            "jalanNafas" => [
-                "jalanNafas" => "",
-                "jalanNafasOptions" => [
-                    ["jalanNafas" => "Paten"],
-                    ["jalanNafas" => "Obstruksi Partial"],
-                    ["jalanNafas" => "Obstruksi Total"],
-                    ["jalanNafas" => "Stridor"],
-                ]
-            ],
+            // "jalanNafas" => [
+            //     "jalanNafas" => "",
+            //     "jalanNafasOptions" => [
+            //         ["jalanNafas" => "Paten"],
+            //         ["jalanNafas" => "Obstruksi Partial"],
+            //         ["jalanNafas" => "Obstruksi Total"],
+            //         ["jalanNafas" => "Stridor"],
+            //     ]
+            // ],
 
-            // pernafasan
-            "pernafasan" => [
-                "pernafasan" => "",
-                "pernafasanOptions" => [
-                    ["pernafasan" => "Normal"],
-                    ["pernafasan" => "Kusmaul"],
-                    ["pernafasan" => "Takipneu"],
-                    ["pernafasan" => "Retraktif"],
-                    ["pernafasan" => "Dangkal"],
+            // // pernafasan
+            // "pernafasan" => [
+            //     "pernafasan" => "",
+            //     "pernafasanOptions" => [
+            //         ["pernafasan" => "Normal"],
+            //         ["pernafasan" => "Kusmaul"],
+            //         ["pernafasan" => "Takipneu"],
+            //         ["pernafasan" => "Retraktif"],
+            //         ["pernafasan" => "Dangkal"],
 
-                ]
-            ],
+            //     ]
+            // ],
 
-            "gerakDada" => [
-                "gerakDada" => "",
-                "gerakDadaOptions" => [
-                    ["gerakDada" => "Simetris"],
-                    ["gerakDada" => "Asimetris"],
-                ]
-            ],
+            // "gerakDada" => [
+            //     "gerakDada" => "",
+            //     "gerakDadaOptions" => [
+            //         ["gerakDada" => "Simetris"],
+            //         ["gerakDada" => "Asimetris"],
+            //     ]
+            // ],
 
-            // sirkulasi
-            "sirkulasi" => [
-                "sirkulasi" => "",
-                "sirkulasiOptions" => [
-                    ["sirkulasi" => "Normal"],
-                    ["sirkulasi" => "Sianosis"],
-                    ["sirkulasi" => "Berkeringat"],
-                    ["sirkulasi" => "Joundise"],
-                    ["sirkulasi" => "Pucat"],
+            // // sirkulasi
+            // "sirkulasi" => [
+            //     "sirkulasi" => "",
+            //     "sirkulasiOptions" => [
+            //         ["sirkulasi" => "Normal"],
+            //         ["sirkulasi" => "Sianosis"],
+            //         ["sirkulasi" => "Berkeringat"],
+            //         ["sirkulasi" => "Joundise"],
+            //         ["sirkulasi" => "Pucat"],
 
-                ]
-            ],
+            //     ]
+            // ],
 
             // neurologis
 
-            "e" => "", //number
-            "m" => "", //number
-            "v" => "", //number
-            "gcs" => "", //number
+            // "e" => "", //number
+            // "m" => "", //number
+            // "v" => "", //number
+            // "gcs" => "", //number
             "sistolik" => "", //number
             "distolik" => "", //number
             "frekuensiNafas" => "", //number
             "frekuensiNadi" => "", //number
             "suhu" => "", //number
-            "saturasiO2" => "", //number
+            // "saturasiO2" => "", //number
             "spo2" => "", //number
             "gda" => "", //number
             "waktuPemeriksaan" => "", //date dd/mm/yyyy hh24:mi:ss

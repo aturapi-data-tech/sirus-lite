@@ -42,57 +42,53 @@
 
 
             {{-- Jalan Nafas A --}}
-            <x-input-label for="dataDaftarPoliRJ.pemeriksaan.tandaVital.e" :value="__('Jalan Nafas (A)')" :required="__(false)"
+            {{-- <x-input-label for="dataDaftarPoliRJ.pemeriksaan.tandaVital.e" :value="__('Jalan Nafas (A)')" :required="__(false)"
                 class="pt-2 sm:text-xl" />
 
             <div class="grid grid-cols-4 gap-2 my-2">
                 @foreach ($dataDaftarPoliRJ['pemeriksaan']['tandaVital']['jalanNafas']['jalanNafasOptions'] as $jalanNafasOptions)
-                    {{-- @dd($sRj) --}}
                     <x-radio-button :label="__($jalanNafasOptions['jalanNafas'])" value="{{ $jalanNafasOptions['jalanNafas'] }}"
                         wire:model="dataDaftarPoliRJ.pemeriksaan.tandaVital.jalanNafas.jalanNafas" />
                 @endforeach
 
-            </div>
+            </div> --}}
 
             {{-- Pernafasan B --}}
-            <x-input-label for="dataDaftarPoliRJ.pemeriksaan.tandaVital.e" :value="__('Pernafasan (B)')" :required="__(false)"
+            {{-- <x-input-label for="dataDaftarPoliRJ.pemeriksaan.tandaVital.e" :value="__('Pernafasan (B)')" :required="__(false)"
                 class="pt-2 sm:text-xl" />
 
             <div class="grid grid-cols-5 gap-2 my-2">
                 @foreach ($dataDaftarPoliRJ['pemeriksaan']['tandaVital']['pernafasan']['pernafasanOptions'] as $pernafasanOptions)
-                    {{-- @dd($sRj) --}}
                     <x-radio-button :label="__($pernafasanOptions['pernafasan'])" value="{{ $pernafasanOptions['pernafasan'] }}"
                         wire:model="dataDaftarPoliRJ.pemeriksaan.tandaVital.pernafasan.pernafasan" />
                 @endforeach
 
-            </div>
+            </div> --}}
 
-            <x-input-label for="dataDaftarPoliRJ.pemeriksaan.tandaVital.e" :value="__('Gerak Dada')" :required="__(false)" />
+            {{-- <x-input-label for="dataDaftarPoliRJ.pemeriksaan.tandaVital.e" :value="__('Gerak Dada')" :required="__(false)" />
 
             <div class="grid grid-cols-2 gap-2 my-2">
                 @foreach ($dataDaftarPoliRJ['pemeriksaan']['tandaVital']['gerakDada']['gerakDadaOptions'] as $gerakDadaOptions)
-                    {{-- @dd($sRj) --}}
                     <x-radio-button :label="__($gerakDadaOptions['gerakDada'])" value="{{ $gerakDadaOptions['gerakDada'] }}"
                         wire:model="dataDaftarPoliRJ.pemeriksaan.tandaVital.gerakDada.gerakDada" />
                 @endforeach
 
-            </div>
+            </div> --}}
 
             {{-- Sirkulasi C --}}
-            <x-input-label for="dataDaftarPoliRJ.pemeriksaan.tandaVital.e" :value="__('Sirkulasi (C)')" :required="__(false)"
+            {{-- <x-input-label for="dataDaftarPoliRJ.pemeriksaan.tandaVital.e" :value="__('Sirkulasi (C)')" :required="__(false)"
                 class="pt-2 sm:text-xl" />
 
             <div class="grid grid-cols-5 gap-2 my-2">
                 @foreach ($dataDaftarPoliRJ['pemeriksaan']['tandaVital']['sirkulasi']['sirkulasiOptions'] as $sirkulasiOptions)
-                    {{-- @dd($sRj) --}}
                     <x-radio-button :label="__($sirkulasiOptions['sirkulasi'])" value="{{ $sirkulasiOptions['sirkulasi'] }}"
                         wire:model="dataDaftarPoliRJ.pemeriksaan.tandaVital.sirkulasi.sirkulasi" />
                 @endforeach
 
-            </div>
+            </div> --}}
 
             {{-- Neurologis D --}}
-            <x-input-label for="dataDaftarPoliRJ.pemeriksaan.tandaVital.e" :value="__('Neurologis (D)')" :required="__(false)"
+            {{-- <x-input-label for="dataDaftarPoliRJ.pemeriksaan.tandaVital.e" :value="__('Neurologis (D)')" :required="__(false)"
                 class="pt-2 sm:text-xl" />
 
             <div class="grid grid-cols-4 gap-2 my-2">
@@ -127,7 +123,7 @@
                         :errorshas="__($errors->has('dataDaftarPoliRJ.pemeriksaan.tandaVital.gcs'))" :disabled=$disabledPropertyRjStatus
                         wire:model.debounce.500ms="dataDaftarPoliRJ.pemeriksaan.tandaVital.gcs" />
                 </div>
-            </div>
+            </div> --}}
 
 
             <x-input-label for="dataDaftarPoliRJ.pemeriksaan.tandaVital.sistolik" :value="__('Tanda Vital')" :required="__(false)"
@@ -170,18 +166,18 @@
                 <div class="grid grid-cols-2 gap-2">
                     <x-input-label for="dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNafas" :value="__('Suhu')"
                         :required="__(false)" />
-                    <x-input-label for="dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNafas" :value="__('Saturasi O2')"
-                        :required="__(false)" />
+                    {{-- <x-input-label for="dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNafas" :value="__('Saturasi O2')"
+                        :required="__(false)" /> --}}
                 </div>
 
                 <div class="grid grid-cols-2 gap-2">
                     <x-text-input-mou id="dataDaftarPoliRJ.pemeriksaan.tandaVital.suhu" placeholder="Suhu"
                         class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.pemeriksaan.tandaVital.suhu'))" :disabled=$disabledPropertyRjStatus :mou_label="__('0C')"
                         wire:model.debounce.500ms="dataDaftarPoliRJ.pemeriksaan.tandaVital.suhu" />
-                    <x-text-input-mou id="dataDaftarPoliRJ.pemeriksaan.tandaVital.saturasiO2"
+                    {{-- <x-text-input-mou id="dataDaftarPoliRJ.pemeriksaan.tandaVital.saturasiO2"
                         placeholder="Saturasi O2" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.pemeriksaan.tandaVital.saturasiO2'))"
                         :disabled=$disabledPropertyRjStatus :mou_label="__('Saturasi O2 ')"
-                        wire:model.debounce.500ms="dataDaftarPoliRJ.pemeriksaan.tandaVital.saturasiO2" />
+                        wire:model.debounce.500ms="dataDaftarPoliRJ.pemeriksaan.tandaVital.saturasiO2" /> --}}
                 </div>
             </div>
 
