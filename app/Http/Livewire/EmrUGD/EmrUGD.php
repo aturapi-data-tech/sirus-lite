@@ -50,6 +50,15 @@ class EmrUGD extends Component
             ['refStatusId' => 'A', 'refStatusDesc' => 'Antrian'],
             ['refStatusId' => 'L', 'refStatusDesc' => 'Selesai'],
             ['refStatusId' => 'I', 'refStatusDesc' => 'Transfer'],
+        ],
+
+        'drId' => 'All',
+        'drName' => 'All',
+        'drOptions' => [
+            [
+                'drId' => 'All',
+                'drName' => 'All'
+            ]
         ]
     ];
 
@@ -91,7 +100,36 @@ class EmrUGD extends Component
         $this->myTopBar['refShiftId'] = isset($findShift->shift) && $findShift->shift ? $findShift->shift : 3;
     }
 
+    private function gettermyTopBardrOptions(): void
+    {
+        $myRefdate = $this->myTopBar['refDate'];
 
+        // Query
+        $query = DB::table('rsview_ugdkasir')
+            ->select(
+                'dr_id',
+                'dr_name',
+            )
+            ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $myRefdate)
+            ->groupBy('dr_id')
+            ->groupBy('dr_name')
+            ->orderBy('dr_name', 'desc')
+            ->get();
+
+        // loop and set Ref
+        $query->each(function ($item, $key) {
+            $this->myTopBar['drOptions'][$key + 1]['drId'] = $item->dr_id;
+            $this->myTopBar['drOptions'][$key + 1]['drName'] = $item->dr_name;
+        })->toArray();
+    }
+
+    public function settermyTopBardrOptions($drId, $drName): void
+    {
+
+        $this->myTopBar['drId'] = $drId;
+        $this->myTopBar['drName'] = $drName;
+        $this->resetPage();
+    }
 
 
 
@@ -284,12 +322,14 @@ class EmrUGD extends Component
     // select data start////////////////
     public function render()
     {
+        $this->gettermyTopBardrOptions();
 
         // set mySearch
         $mySearch = $this->refFilter;
         $myRefdate = $this->myTopBar['refDate'];
         // $myRefshift = $this->myTopBar['refShiftId'];
         $myRefstatusId = $this->myTopBar['refStatusId'];
+        $myRefdrId = $this->myTopBar['drId'];
 
 
 
@@ -327,10 +367,11 @@ class EmrUGD extends Component
             // ->where('shift', '=', $myRefshift)
             ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $myRefdate);
 
-        //Jika where dokter tidak kosong
-        // if ($this->drRjRef['drId'] != 'All') {
-        //     $query->where('dr_id', $this->drRjRef['drId']);
-        // }
+        // Jika where dokter tidak kosong
+        if ($myRefdrId != 'All') {
+            $query->where('dr_id', $myRefdrId);
+        }
+
 
         $query->where(function ($q) use ($mySearch) {
             $q->Where(DB::raw('upper(reg_name)'), 'like', '%' . strtoupper($mySearch) . '%')
