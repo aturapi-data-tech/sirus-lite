@@ -4,7 +4,7 @@
 <head>
     <style>
         @page {
-            size: 22cm 36cm;
+            size: 21cm 32cm;
             margin: 4px;
         }
     </style>
@@ -134,7 +134,7 @@
                 <tbody>
                     <tr>
                         <td
-                            class="p-2 m-2 text-lg font-semibold text-center uppercase border-b-2 border-l-2 border-r-2 border-black">
+                            class="p-1 m-1 text-lg font-semibold text-center uppercase border-b-2 border-l-2 border-r-2 border-black">
                             assesment awal rawat jalan
                         </td>
                     </tr>
@@ -154,7 +154,7 @@
                         </td>
 
                         <td class="p-2 m-2 text-xs border-b-2 border-r-2 border-black text-start">
-                            <span class="font-semibold">
+                            {{-- <span class="font-semibold">
                                 Cara Masuk Rj :
                             </span>
                             {{ isset($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['caraMasukRj']) ? $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['caraMasukRj'] : '-' }}
@@ -164,7 +164,7 @@
                             </span>
                             {{ isset($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['tingkatKegawatan']) ? $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['tingkatKegawatan'] : '-' }}
 
-                            <br>
+                            <br> --}}
 
                             <span class="font-semibold">
                                 Status Psikologis :
@@ -283,133 +283,162 @@
                                                 Screening Batuk :
                                             </td>
                                             <td class="w-3/4">
-                                                Riwayat Demam? :
-                                                {!! nl2br(
-                                                    e(
-                                                        isset($dataDaftarTxn['anamnesa']['batuk']['riwayatDemam'])
-                                                            ? ($dataDaftarTxn['anamnesa']['batuk']['riwayatDemam']
-                                                                ? 'Ya'
-                                                                : '-')
-                                                            : '-',
-                                                    ),
-                                                ) !!}
-                                                /
-                                                {!! nl2br(
-                                                    e(
-                                                        isset($dataDaftarTxn['anamnesa']['batuk']['keteranganriwayatDemam'])
-                                                            ? ($dataDaftarTxn['anamnesa']['batuk']['keteranganriwayatDemam']
-                                                                ? 'Ya'
-                                                                : '-')
-                                                            : '-',
-                                                    ),
-                                                ) !!}
-                                                <br>
-                                                Riwayat Berkeringat Malam Hari Tanpa Aktifitas? :
-                                                {!! nl2br(
-                                                    e(
-                                                        isset($dataDaftarTxn['anamnesa']['batuk']['berkeringatMlmHari'])
-                                                            ? ($dataDaftarTxn['anamnesa']['batuk']['berkeringatMlmHari']
-                                                                ? 'Ya'
-                                                                : '-')
-                                                            : '-',
-                                                    ),
-                                                ) !!}
-                                                /
-                                                {!! nl2br(
-                                                    e(
-                                                        isset($dataDaftarTxn['anamnesa']['batuk']['keteranganberkeringatMlmHari'])
-                                                            ? ($dataDaftarTxn['anamnesa']['batuk']['keteranganberkeringatMlmHari']
-                                                                ? 'Ya'
-                                                                : '-')
-                                                            : '-',
-                                                    ),
-                                                ) !!}
-                                                <br>
-                                                Riwayat Bepergian Daerah Wabah? :
-                                                {!! nl2br(
-                                                    e(
-                                                        isset($dataDaftarTxn['anamnesa']['batuk']['bepergianDaerahWabah'])
-                                                            ? ($dataDaftarTxn['anamnesa']['batuk']['bepergianDaerahWabah']
-                                                                ? 'Ya'
-                                                                : '-')
-                                                            : '-',
-                                                    ),
-                                                ) !!}
-                                                /
-                                                {!! nl2br(
-                                                    e(
-                                                        isset($dataDaftarTxn['anamnesa']['batuk']['KeteranganbepergianDaerahWabah'])
-                                                            ? ($dataDaftarTxn['anamnesa']['batuk']['KeteranganbepergianDaerahWabah']
-                                                                ? 'Ya'
-                                                                : '-')
-                                                            : '-',
-                                                    ),
-                                                ) !!}
-                                                <br>
-                                                Riwayat Pemakaian Obat dalam Jangka Panjang? :
-                                                {!! nl2br(
-                                                    e(
-                                                        isset($dataDaftarTxn['anamnesa']['batuk']['riwayatPakaiObatJangkaPanjangan'])
-                                                            ? ($dataDaftarTxn['anamnesa']['batuk']['riwayatPakaiObatJangkaPanjangan']
-                                                                ? 'Ya'
-                                                                : '-')
-                                                            : '-',
-                                                    ),
-                                                ) !!}
-                                                /
-                                                {!! nl2br(
-                                                    e(
-                                                        isset($dataDaftarTxn['anamnesa']['batuk']['keteranganriwayatPakaiObatJangkaPanjangan'])
-                                                            ? ($dataDaftarTxn['anamnesa']['batuk']['keteranganriwayatPakaiObatJangkaPanjangan']
-                                                                ? 'Ya'
-                                                                : '-')
-                                                            : '-',
-                                                    ),
-                                                ) !!}
-                                                <br>
-                                                Riwayat Berat Badan Turun Tanpa Sebab? :
-                                                {!! nl2br(
-                                                    e(
-                                                        isset($dataDaftarTxn['anamnesa']['batuk']['BBTurunTanpaSebab'])
-                                                            ? ($dataDaftarTxn['anamnesa']['batuk']['BBTurunTanpaSebab']
-                                                                ? 'Ya'
-                                                                : '-')
-                                                            : '-',
-                                                    ),
-                                                ) !!}
-                                                /
-                                                {!! nl2br(
-                                                    e(
-                                                        isset($dataDaftarTxn['anamnesa']['batuk']['keteranganBBTurunTanpaSebab'])
-                                                            ? ($dataDaftarTxn['anamnesa']['batuk']['keteranganBBTurunTanpaSebab']
-                                                                ? 'Ya'
-                                                                : '-')
-                                                            : '-',
-                                                    ),
-                                                ) !!}
-                                                <br>
-                                                Ada Pembesaran Kelenjar Getah Bening? :
-                                                {!! nl2br(
-                                                    e(
-                                                        isset($dataDaftarTxn['anamnesa']['batuk']['pembesaranGetahBening'])
-                                                            ? ($dataDaftarTxn['anamnesa']['batuk']['pembesaranGetahBening']
-                                                                ? 'Ya'
-                                                                : '-')
-                                                            : '-',
-                                                    ),
-                                                ) !!}
-                                                /
-                                                {!! nl2br(
-                                                    e(
-                                                        isset($dataDaftarTxn['anamnesa']['batuk']['keteranganpembesaranGetahBening'])
-                                                            ? ($dataDaftarTxn['anamnesa']['batuk']['keteranganpembesaranGetahBening']
-                                                                ? 'Ya'
-                                                                : '-')
-                                                            : '-',
-                                                    ),
-                                                ) !!}
-                                                <br>
+                                                @isset($dataDaftarTxn['anamnesa']['batuk']['riwayatDemam'])
+                                                    @if ($dataDaftarTxn['anamnesa']['batuk']['riwayatDemam'])
+                                                        Riwayat Demam? :
+                                                        {!! nl2br(
+                                                            e(
+                                                                isset($dataDaftarTxn['anamnesa']['batuk']['riwayatDemam'])
+                                                                    ? ($dataDaftarTxn['anamnesa']['batuk']['riwayatDemam']
+                                                                        ? 'Ya'
+                                                                        : '-')
+                                                                    : '-',
+                                                            ),
+                                                        ) !!}
+                                                        /
+                                                        {!! nl2br(
+                                                            e(
+                                                                isset($dataDaftarTxn['anamnesa']['batuk']['keteranganriwayatDemam'])
+                                                                    ? ($dataDaftarTxn['anamnesa']['batuk']['keteranganriwayatDemam']
+                                                                        ? 'Ya'
+                                                                        : '-')
+                                                                    : '-',
+                                                            ),
+                                                        ) !!}
+                                                        <br>
+                                                    @endif
+                                                @endisset
 
+                                                @isset($dataDaftarTxn['anamnesa']['batuk']['berkeringatMlmHari'])
+                                                    @if ($dataDaftarTxn['anamnesa']['batuk']['berkeringatMlmHari'])
+                                                        Riwayat Berkeringat Malam Hari Tanpa Aktifitas? :
+                                                        {!! nl2br(
+                                                            e(
+                                                                isset($dataDaftarTxn['anamnesa']['batuk']['berkeringatMlmHari'])
+                                                                    ? ($dataDaftarTxn['anamnesa']['batuk']['berkeringatMlmHari']
+                                                                        ? 'Ya'
+                                                                        : '-')
+                                                                    : '-',
+                                                            ),
+                                                        ) !!}
+                                                        /
+                                                        {!! nl2br(
+                                                            e(
+                                                                isset($dataDaftarTxn['anamnesa']['batuk']['keteranganberkeringatMlmHari'])
+                                                                    ? ($dataDaftarTxn['anamnesa']['batuk']['keteranganberkeringatMlmHari']
+                                                                        ? 'Ya'
+                                                                        : '-')
+                                                                    : '-',
+                                                            ),
+                                                        ) !!}
+                                                        <br>
+                                                    @endif
+                                                @endisset
+
+                                                @isset($dataDaftarTxn['anamnesa']['batuk']['bepergianDaerahWabah'])
+                                                    @if ($dataDaftarTxn['anamnesa']['batuk']['bepergianDaerahWabah'])
+                                                        Riwayat Bepergian Daerah Wabah? :
+                                                        {!! nl2br(
+                                                            e(
+                                                                isset($dataDaftarTxn['anamnesa']['batuk']['bepergianDaerahWabah'])
+                                                                    ? ($dataDaftarTxn['anamnesa']['batuk']['bepergianDaerahWabah']
+                                                                        ? 'Ya'
+                                                                        : '-')
+                                                                    : '-',
+                                                            ),
+                                                        ) !!}
+                                                        /
+                                                        {!! nl2br(
+                                                            e(
+                                                                isset($dataDaftarTxn['anamnesa']['batuk']['KeteranganbepergianDaerahWabah'])
+                                                                    ? ($dataDaftarTxn['anamnesa']['batuk']['KeteranganbepergianDaerahWabah']
+                                                                        ? 'Ya'
+                                                                        : '-')
+                                                                    : '-',
+                                                            ),
+                                                        ) !!}
+                                                        <br>
+                                                    @endif
+                                                @endisset
+
+                                                @isset($dataDaftarTxn['anamnesa']['batuk']['riwayatPakaiObatJangkaPanjangan'])
+                                                    @if ($dataDaftarTxn['anamnesa']['batuk']['riwayatPakaiObatJangkaPanjangan'])
+                                                        Riwayat Pemakaian Obat dalam Jangka Panjang? :
+                                                        {!! nl2br(
+                                                            e(
+                                                                isset($dataDaftarTxn['anamnesa']['batuk']['riwayatPakaiObatJangkaPanjangan'])
+                                                                    ? ($dataDaftarTxn['anamnesa']['batuk']['riwayatPakaiObatJangkaPanjangan']
+                                                                        ? 'Ya'
+                                                                        : '-')
+                                                                    : '-',
+                                                            ),
+                                                        ) !!}
+                                                        /
+                                                        {!! nl2br(
+                                                            e(
+                                                                isset($dataDaftarTxn['anamnesa']['batuk']['keteranganriwayatPakaiObatJangkaPanjangan'])
+                                                                    ? ($dataDaftarTxn['anamnesa']['batuk']['keteranganriwayatPakaiObatJangkaPanjangan']
+                                                                        ? 'Ya'
+                                                                        : '-')
+                                                                    : '-',
+                                                            ),
+                                                        ) !!}
+                                                        <br>
+                                                    @endif
+                                                @endisset
+
+                                                @isset($dataDaftarTxn['anamnesa']['batuk']['BBTurunTanpaSebab'])
+                                                    @if ($dataDaftarTxn['anamnesa']['batuk']['BBTurunTanpaSebab'])
+                                                        Riwayat Berat Badan Turun Tanpa Sebab? :
+                                                        {!! nl2br(
+                                                            e(
+                                                                isset($dataDaftarTxn['anamnesa']['batuk']['BBTurunTanpaSebab'])
+                                                                    ? ($dataDaftarTxn['anamnesa']['batuk']['BBTurunTanpaSebab']
+                                                                        ? 'Ya'
+                                                                        : '-')
+                                                                    : '-',
+                                                            ),
+                                                        ) !!}
+                                                        /
+                                                        {!! nl2br(
+                                                            e(
+                                                                isset($dataDaftarTxn['anamnesa']['batuk']['keteranganBBTurunTanpaSebab'])
+                                                                    ? ($dataDaftarTxn['anamnesa']['batuk']['keteranganBBTurunTanpaSebab']
+                                                                        ? 'Ya'
+                                                                        : '-')
+                                                                    : '-',
+                                                            ),
+                                                        ) !!}
+                                                        <br>
+                                                    @endif
+                                                @endisset
+
+                                                @isset($dataDaftarTxn['anamnesa']['batuk']['pembesaranGetahBening'])
+                                                    @if ($dataDaftarTxn['anamnesa']['batuk']['pembesaranGetahBening'])
+                                                        Ada Pembesaran Kelenjar Getah Bening? :
+                                                        {!! nl2br(
+                                                            e(
+                                                                isset($dataDaftarTxn['anamnesa']['batuk']['pembesaranGetahBening'])
+                                                                    ? ($dataDaftarTxn['anamnesa']['batuk']['pembesaranGetahBening']
+                                                                        ? 'Ya'
+                                                                        : '-')
+                                                                    : '-',
+                                                            ),
+                                                        ) !!}
+                                                        /
+                                                        {!! nl2br(
+                                                            e(
+                                                                isset($dataDaftarTxn['anamnesa']['batuk']['keteranganpembesaranGetahBening'])
+                                                                    ? ($dataDaftarTxn['anamnesa']['batuk']['keteranganpembesaranGetahBening']
+                                                                        ? 'Ya'
+                                                                        : '-')
+                                                                    : '-',
+                                                            ),
+                                                        ) !!}
+                                                        <br>
+                                                    @endif
+                                                @endisset
+                                                -
                                             </td>
                                         </tr>
 
@@ -607,6 +636,27 @@
                                 <table class="w-full table-auto">
                                     <tbody>
                                         <tr>
+                                            <td class="w-1/2 font-semibold uppercase align-text-top">
+                                                {{-- Perawat / Terapis --}}
+                                                Perawat / Terapis :
+                                            </td>
+                                            <td class="w-1/2">
+                                                .
+                                                <br>
+                                                <br>
+                                                <br>
+                                                <br>
+                                                ttd
+                                                <br>
+                                                {{ isset($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima'])
+                                                    ? ($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima']
+                                                        ? strtoupper($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima'])
+                                                        : 'Perawat Penerima')
+                                                    : 'Perawat Penerima' }}
+                                            </td>
+                                        </tr>
+
+                                        <tr>
                                             <td class="w-1/2 font-semibold uppercase">
                                                 {{-- Tanda Vital --}}
                                                 Tanda Vital :
@@ -803,26 +853,7 @@
                                         </tr>
 
 
-                                        <tr>
-                                            <td class="w-1/2 font-semibold uppercase align-text-top">
-                                                {{-- Perawat / Terapis --}}
-                                                Perawat / Terapis :
-                                            </td>
-                                            <td class="w-1/2">
-                                                .
-                                                <br>
-                                                <br>
-                                                <br>
-                                                <br>
-                                                ttd
-                                                <br>
-                                                {{ isset($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima'])
-                                                    ? ($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima']
-                                                        ? strtoupper($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima'])
-                                                        : 'Perawat Penerima')
-                                                    : 'Perawat Penerima' }}
-                                            </td>
-                                        </tr>
+
 
                                     </tbody>
                                 </table>
@@ -865,7 +896,7 @@
 
                     </tr>
 
-                    <tr>
+                    {{-- <tr>
                         <td
                             class="w-1/4 p-2 m-2 text-xs font-semibold uppercase border-b-2 border-l-2 border-r-2 border-black text-start">
                             abcd
@@ -940,7 +971,7 @@
                                 : '-' }}
 
                         </td>
-                    </tr>
+                    </tr> --}}
                     {{-- fungsional --}}
                     <tr>
                         <td
@@ -1171,11 +1202,11 @@
                     <tr>
                         <td
                             class="p-2 m-2 text-xs font-semibold uppercase border-b-2 border-l-2 border-r-2 border-black text-start">
-                            status medik dan tindak lanjut
+                            tindak lanjut
                         </td>
 
                         <td class="p-2 m-2 text-xs text-center border-b-2 border-l-2 border-r-2 border-black">
-                            <span class="font-semibold">
+                            {{-- <span class="font-semibold">
                                 Status Medik :
                             </span>
                             {{ isset($dataDaftarTxn['penilaian']['statusMedik']['statusMedik'])
@@ -1183,7 +1214,7 @@
                                     ? $dataDaftarTxn['penilaian']['statusMedik']['statusMedik']
                                     : '-')
                                 : '-' }}
-                            <br>
+                            <br> --}}
                             <span class="font-semibold">
                                 Tindak Lanjut :
                             </span>

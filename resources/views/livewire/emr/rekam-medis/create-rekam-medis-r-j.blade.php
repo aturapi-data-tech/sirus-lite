@@ -165,7 +165,7 @@
                                     </td>
 
                                     <td class="p-2 m-2 text-sm border-b-2 border-r-2 border-gray-900 text-start">
-                                        <span class="font-semibold">
+                                        {{-- <span class="font-semibold">
                                             Cara Masuk Rj :
                                         </span>
                                         {{ isset($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['caraMasukRj']) ? $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['caraMasukRj'] : '-' }}
@@ -175,7 +175,7 @@
                                         </span>
                                         {{ isset($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['tingkatKegawatan']) ? $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['tingkatKegawatan'] : '-' }}
 
-                                        <br>
+                                        <br> --}}
 
                                         <span class="font-semibold">
                                             Status Psikologis :
@@ -656,9 +656,12 @@
                                                         <td class="w-1/2">
                                                             .
                                                             <br>
-                                                            <br>
-                                                            <br>
-                                                            <br>
+                                                            <div class="pl-[0px]">
+                                                                @php
+                                                                    $drPemeriksa = isset($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima']) ? ($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima'] ? $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima'] : 'Perawat Penerima') : 'Perawat Penerima';
+                                                                @endphp
+                                                                {!! DNS2D::getBarcodeHTML($drPemeriksa, 'QRCODE', 3, 3) !!}
+                                                            </div>
                                                             ttd
                                                             <br>
                                                             {{ isset($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima'])
@@ -1222,12 +1225,12 @@
                                 <tr>
                                     <td
                                         class="p-2 m-2 text-sm font-semibold uppercase border-b-2 border-l-2 border-r-2 border-gray-900 text-start">
-                                        status medik dan tindak lanjut
+                                        tindak lanjut
                                     </td>
 
                                     <td
                                         class="p-2 m-2 text-sm text-center border-b-2 border-l-2 border-r-2 border-gray-900">
-                                        <span class="font-semibold">
+                                        {{-- <span class="font-semibold">
                                             Status Medik :
                                         </span>
                                         {{ isset($dataDaftarTxn['penilaian']['statusMedik']['statusMedik'])
@@ -1235,7 +1238,7 @@
                                                 ? $dataDaftarTxn['penilaian']['statusMedik']['statusMedik']
                                                 : '-')
                                             : '-' }}
-                                        <br>
+                                        <br> --}}
                                         <span class="font-semibold">
                                             Tindak Lanjut :
                                         </span>
@@ -1332,9 +1335,12 @@
                                                         : 'Tanggal' }}
 
                                                     <br>
-                                                    <br>
-                                                    <br>
-                                                    <br>
+                                                    <div class="pl-[85px]">
+                                                        @php
+                                                            $drPemeriksa = isset($dataDaftarTxn['perencanaan']['pengkajianMedis']['drPemeriksa']) ? ($dataDaftarTxn['perencanaan']['pengkajianMedis']['drPemeriksa'] ? $dataDaftarTxn['perencanaan']['pengkajianMedis']['drPemeriksa'] : 'Dokter Pemeriksa') : 'Dokter Pemeriksa';
+                                                        @endphp
+                                                        {!! DNS2D::getBarcodeHTML($drPemeriksa, 'QRCODE', 3, 3) !!}
+                                                    </div>
                                                     ttd
                                                     <br>
                                                     {{ isset($dataDaftarTxn['perencanaan']['pengkajianMedis']['drPemeriksa'])

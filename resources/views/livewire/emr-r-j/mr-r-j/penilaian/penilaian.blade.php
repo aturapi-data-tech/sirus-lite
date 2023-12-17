@@ -16,7 +16,7 @@
             <div class="grid grid-cols-1">
 
                 <div id="TransaksiRawatJalan" class="px-2">
-                    <div id="TransaksiRawatJalan" x-data="{ activeTab: 'Status Medik' }">
+                    <div id="TransaksiRawatJalan" x-data="{ activeTab: 'Nyeri' }">
 
                         <div class="px-2 mb-2 border-b border-gray-200 dark:border-gray-700">
                             <ul
@@ -29,13 +29,13 @@
                                         @click="activeTab ='{{ $dataDaftarPoliRJ['penilaian']['fisikTab'] }}'">{{ $dataDaftarPoliRJ['penilaian']['fisikTab'] }}</label>
                                 </li> --}}
 
-                                <li class="mr-2">
+                                {{-- <li class="mr-2">
                                     <label
                                         class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
                                         :class="activeTab === '{{ $dataDaftarPoliRJ['penilaian']['statusMedikTab'] }}' ?
                                             'text-primary border-primary bg-gray-100' : ''"
                                         @click="activeTab ='{{ $dataDaftarPoliRJ['penilaian']['statusMedikTab'] }}'">{{ $dataDaftarPoliRJ['penilaian']['statusMedikTab'] }}</label>
-                                </li>
+                                </li> --}}
 
                                 <li class="mr-2">
                                     <label
@@ -116,14 +116,14 @@
 
                         </div>
 
-                        <div class="p-2 rounded-lg bg-gray-50 dark:bg-gray-800"
+                        {{-- <div class="p-2 rounded-lg bg-gray-50 dark:bg-gray-800"
                             :class="{
                                 'active': activeTab === '{{ $dataDaftarPoliRJ['penilaian']['statusMedikTab'] }}'
                             }"
                             x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarPoliRJ['penilaian']['statusMedikTab'] }}'">
                             @include('livewire.emr-r-j.mr-r-j.penilaian.statusMedikTab')
 
-                        </div>
+                        </div> --}}
 
                         <div class="p-2 rounded-lg bg-gray-50 dark:bg-gray-800"
                             :class="{

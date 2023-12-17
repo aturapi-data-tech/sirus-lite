@@ -33,16 +33,16 @@ class Penilaian extends Component
             "fisik" => ""
         ],
 
-        "statusMedikTab" => "Status Medik",
-        "statusMedik" => [
-            "statusMedik" => "",
-            "statusMedikOptions" => [
-                ["statusMedik" => "Emergency Trauma"],
-                ["statusMedik" => "Emergency Non Trauma"],
-                ["statusMedik" => "Non Emergency Trauma"],
-                ["statusMedik" => "Non Emergency Non Trauma"],
-            ]
-        ],
+        // "statusMedikTab" => "Status Medik",
+        // "statusMedik" => [
+        //     "statusMedik" => "",
+        //     "statusMedikOptions" => [
+        //         ["statusMedik" => "Emergency Trauma"],
+        //         ["statusMedik" => "Emergency Non Trauma"],
+        //         ["statusMedik" => "Non Emergency Trauma"],
+        //         ["statusMedik" => "Non Emergency Non Trauma"],
+        //     ]
+        // ],
 
         "nyeriTab" => "Nyeri",
         "nyeri" => [

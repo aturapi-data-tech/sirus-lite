@@ -151,14 +151,16 @@
                 </div>
 
                 <div class="grid grid-cols-2 gap-2">
-                    <x-text-input-mou id="dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNafas"
-                        placeholder="Frekuensi Nafas" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNafas'))"
-                        :disabled=$disabledPropertyRjStatus :mou_label="__('X/Menit')"
-                        wire:model.debounce.500ms="dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNafas" />
+
                     <x-text-input-mou id="dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNadi"
                         placeholder="Frekuensi Nadi" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNadi'))"
                         :disabled=$disabledPropertyRjStatus :mou_label="__('X/Menit')"
                         wire:model.debounce.500ms="dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNadi" />
+
+                    <x-text-input-mou id="dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNafas"
+                        placeholder="Frekuensi Nafas" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNafas'))"
+                        :disabled=$disabledPropertyRjStatus :mou_label="__('X/Menit')"
+                        wire:model.debounce.500ms="dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNafas" />
                 </div>
             </div>
 

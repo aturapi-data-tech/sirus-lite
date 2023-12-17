@@ -39,21 +39,21 @@ class Anamnesa extends Component
         "pengkajianPerawatan" => [
             "perawatPenerima" => "",
             "jamDatang" => "",
-            "caraMasukRj" => "",
-            "caraMasukRjDesc" => "",
-            "caraMasukRjOption" => [
-                ["caraMasukRj" => "Sendiri"],
-                ["caraMasukRj" => "Rujuk"],
-                ["caraMasukRj" => "Kasus Polisi"],
-            ],
+            // "caraMasukRj" => "",
+            // "caraMasukRjDesc" => "",
+            // "caraMasukRjOption" => [
+            //     ["caraMasukRj" => "Sendiri"],
+            //     ["caraMasukRj" => "Rujuk"],
+            //     ["caraMasukRj" => "Kasus Polisi"],
+            // ],
 
-            "tingkatKegawatan" => "",
-            "tingkatKegawatanOption" => [
-                ["tingkatKegawatan" => "P1"],
-                ["tingkatKegawatan" => "P2"],
-                ["tingkatKegawatan" => "P3"],
-                ["tingkatKegawatan" => "P0"],
-            ],
+            // "tingkatKegawatan" => "",
+            // "tingkatKegawatanOption" => [
+            //     ["tingkatKegawatan" => "P1"],
+            //     ["tingkatKegawatan" => "P2"],
+            //     ["tingkatKegawatan" => "P3"],
+            //     ["tingkatKegawatan" => "P0"],
+            // ],
         ],
 
         "keluhanUtamaTab" => "Keluhan Utama",

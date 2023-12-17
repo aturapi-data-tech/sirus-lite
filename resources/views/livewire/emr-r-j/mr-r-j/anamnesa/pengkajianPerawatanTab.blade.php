@@ -59,7 +59,7 @@
             @enderror
         </div>
 
-        <div class="mb-2">
+        {{-- <div class="mb-2">
             <x-input-label for="dataDaftarPoliRJ.anamnesa.pengkajianPerawatan.caraMasukRj" :value="__('Cara Masuk RJ')"
                 :required="__(true)" class="pt-2 sm:text-xl" />
 
@@ -67,7 +67,6 @@
 
                 <div class="grid grid-cols-4 gap-2 mt-2 ml-2">
                     @foreach ($dataDaftarPoliRJ['anamnesa']['pengkajianPerawatan']['caraMasukRjOption'] as $caraMasukRjOption)
-                        {{-- @dd($sRj) --}}
                         <x-radio-button :label="__($caraMasukRjOption['caraMasukRj'])" value="{{ $caraMasukRjOption['caraMasukRj'] }}"
                             wire:model="dataDaftarPoliRJ.anamnesa.pengkajianPerawatan.caraMasukRj" />
                     @endforeach
@@ -82,7 +81,7 @@
                 </div>
             </div>
 
-        </div>
+        </div> --}}
 
         {{-- <div class="mb-2">
             <x-input-label for="dataDaftarPoliRJ.anamnesa.pengkajianPerawatan.tingkatKegawatan" :value="__('Tingkat Kegawatan')"

@@ -138,17 +138,34 @@
 
                                                 <td
                                                     class="px-4 py-3 text-gray-900 group-hover:bg-gray-100 whitespace-nowrap">
-                                                    <x-yellow-button
-                                                        wire:click.prevent="openModalLayanan('{{ $myQData->txn_no }}',
+                                                    <div>
+                                                        <x-yellow-button
+                                                            wire:click.prevent="openModalLayanan('{{ $myQData->txn_no }}',
                                                         '{{ $myQData->layanan_status }}',
                                                         {{ $myQData->datadaftar_json }}
                                                         )"
-                                                        type="button" wire:loading.remove>
-                                                        Rekam Medis
-                                                    </x-yellow-button>
-                                                    <div wire:loading wire:target="openModalLayanan">
-                                                        <x-loading />
+                                                            type="button" wire:loading.remove>
+                                                            Rekam Medis
+                                                        </x-yellow-button>
+                                                        <div wire:loading wire:target="openModalLayanan">
+                                                            <x-loading />
+                                                        </div>
                                                     </div>
+
+                                                    <div>
+                                                        <x-green-button
+                                                            wire:click.prevent="cetakRekamMedisRJGrid('{{ $myQData->txn_no }}',
+                                                        '{{ $myQData->layanan_status }}',
+                                                        {{ $myQData->datadaftar_json }}
+                                                        )"
+                                                            type="button" wire:loading.remove>
+                                                            Cetak
+                                                        </x-green-button>
+                                                        <div wire:loading wire:target="cetakRekamMedisRJGrid">
+                                                            <x-loading />
+                                                        </div>
+                                                    </div>
+
                                                 </td>
 
 
