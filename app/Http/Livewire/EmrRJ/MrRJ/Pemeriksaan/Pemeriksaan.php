@@ -444,10 +444,17 @@ class Pemeriksaan extends Component
 
 
     protected $rules = [
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.sistolik' => 'required|numeric',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.distolik' => 'required|numeric',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNadi' => 'required|numeric',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNafas' => 'required|numeric',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.suhu' => 'required|numeric',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.spo2' => 'numeric',
+        'dataDaftarPoliRJ.pemeriksaan.tandaVital.gda' => 'numeric',
 
-        'dataDaftarPoliRJ.pemeriksaan.nutrisi.bb' => 'numeric',
-        'dataDaftarPoliRJ.pemeriksaan.nutrisi.tb' => 'numeric',
-        'dataDaftarPoliRJ.pemeriksaan.nutrisi.imt' => 'numeric',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.bb' => 'required|numeric',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.tb' => 'required|numeric',
+        'dataDaftarPoliRJ.pemeriksaan.nutrisi.imt' => 'required|numeric',
         'dataDaftarPoliRJ.pemeriksaan.nutrisi.lk' => 'numeric',
         'dataDaftarPoliRJ.pemeriksaan.nutrisi.lila' => 'numeric',
 
