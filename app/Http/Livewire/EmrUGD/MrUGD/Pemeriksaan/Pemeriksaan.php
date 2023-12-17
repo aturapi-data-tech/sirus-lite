@@ -96,7 +96,7 @@ class Pemeriksaan extends Component
             "frekuensiNafas" => "", //number
             "frekuensiNadi" => "", //number
             "suhu" => "", //number
-            "saturasiO2" => "", //number
+            // "saturasiO2" => "", //number
             "spo2" => "", //number
             "gda" => "", //number
             "waktuPemeriksaan" => "", //date dd/mm/yyyy hh24:mi:ss
@@ -444,13 +444,19 @@ class Pemeriksaan extends Component
 
 
     protected $rules = [
+        'dataDaftarUgd.pemeriksaan.tandaVital.sistolik' => 'required|numeric',
+        'dataDaftarUgd.pemeriksaan.tandaVital.distolik' => 'required|numeric',
+        'dataDaftarUgd.pemeriksaan.tandaVital.frekuensiNadi' => 'required|numeric',
+        'dataDaftarUgd.pemeriksaan.tandaVital.frekuensiNafas' => 'required|numeric',
+        'dataDaftarUgd.pemeriksaan.tandaVital.suhu' => 'required|numeric',
+        'dataDaftarUgd.pemeriksaan.tandaVital.spo2' => 'numeric',
+        'dataDaftarUgd.pemeriksaan.tandaVital.gda' => 'numeric',
 
-        'dataDaftarUgd.pemeriksaan.nutrisi.bb' => 'numeric',
-        'dataDaftarUgd.pemeriksaan.nutrisi.tb' => 'numeric',
-        'dataDaftarUgd.pemeriksaan.nutrisi.imt' => 'numeric',
+        'dataDaftarUgd.pemeriksaan.nutrisi.bb' => 'required|numeric',
+        'dataDaftarUgd.pemeriksaan.nutrisi.tb' => 'required|numeric',
+        'dataDaftarUgd.pemeriksaan.nutrisi.imt' => 'required|numeric',
         'dataDaftarUgd.pemeriksaan.nutrisi.lk' => 'numeric',
         'dataDaftarUgd.pemeriksaan.nutrisi.lila' => 'numeric',
-
     ];
 
     ////////////////////////////////////////////////

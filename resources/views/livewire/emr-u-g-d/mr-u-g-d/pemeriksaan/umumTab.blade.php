@@ -104,17 +104,17 @@
                 </div>
 
                 <div class="mb-2 ">
-                    <x-input-label for="dataDaftarUgd.pemeriksaan.tandaVital.m" :value="__('M [Motorik]')" :required="__(false)" />
-                    <x-text-input id="dataDaftarUgd.pemeriksaan.tandaVital.m" placeholder="M [Motorik]"
-                        class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.pemeriksaan.tandaVital.m'))" :disabled=$disabledPropertyRjStatus
-                        wire:model.debounce.500ms="dataDaftarUgd.pemeriksaan.tandaVital.m" />
-                </div>
-
-                <div class="mb-2 ">
                     <x-input-label for="dataDaftarUgd.pemeriksaan.tandaVital.v" :value="__('V [Verbal]')" :required="__(false)" />
                     <x-text-input id="dataDaftarUgd.pemeriksaan.tandaVital.v" placeholder="V [Verbal]" class="mt-1 ml-2"
                         :errorshas="__($errors->has('dataDaftarUgd.pemeriksaan.tandaVital.v'))" :disabled=$disabledPropertyRjStatus
                         wire:model.debounce.500ms="dataDaftarUgd.pemeriksaan.tandaVital.v" />
+                </div>
+
+                <div class="mb-2 ">
+                    <x-input-label for="dataDaftarUgd.pemeriksaan.tandaVital.m" :value="__('M [Motorik]')" :required="__(false)" />
+                    <x-text-input id="dataDaftarUgd.pemeriksaan.tandaVital.m" placeholder="M [Motorik]"
+                        class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.pemeriksaan.tandaVital.m'))" :disabled=$disabledPropertyRjStatus
+                        wire:model.debounce.500ms="dataDaftarUgd.pemeriksaan.tandaVital.m" />
                 </div>
 
                 <div class="mb-2 ">
@@ -152,14 +152,14 @@
                 </div>
 
                 <div class="grid grid-cols-2 gap-2">
-                    <x-text-input-mou id="dataDaftarUgd.pemeriksaan.tandaVital.frekuensiNafas"
-                        placeholder="Frekuensi Nafas" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.pemeriksaan.tandaVital.frekuensiNafas'))"
-                        :disabled=$disabledPropertyRjStatus :mou_label="__('X/Menit')"
-                        wire:model.debounce.500ms="dataDaftarUgd.pemeriksaan.tandaVital.frekuensiNafas" />
                     <x-text-input-mou id="dataDaftarUgd.pemeriksaan.tandaVital.frekuensiNadi"
                         placeholder="Frekuensi Nadi" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.pemeriksaan.tandaVital.frekuensiNadi'))"
                         :disabled=$disabledPropertyRjStatus :mou_label="__('X/Menit')"
                         wire:model.debounce.500ms="dataDaftarUgd.pemeriksaan.tandaVital.frekuensiNadi" />
+                    <x-text-input-mou id="dataDaftarUgd.pemeriksaan.tandaVital.frekuensiNafas"
+                        placeholder="Frekuensi Nafas" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.pemeriksaan.tandaVital.frekuensiNafas'))"
+                        :disabled=$disabledPropertyRjStatus :mou_label="__('X/Menit')"
+                        wire:model.debounce.500ms="dataDaftarUgd.pemeriksaan.tandaVital.frekuensiNafas" />
                 </div>
             </div>
 
@@ -167,17 +167,17 @@
                 <div class="grid grid-cols-2 gap-2">
                     <x-input-label for="dataDaftarUgd.pemeriksaan.tandaVital.frekuensiNafas" :value="__('Suhu')"
                         :required="__(false)" />
-                    <x-input-label for="dataDaftarUgd.pemeriksaan.tandaVital.frekuensiNafas" :value="__('Saturasi O2')"
-                        :required="__(false)" />
+                    {{-- <x-input-label for="dataDaftarUgd.pemeriksaan.tandaVital.frekuensiNafas" :value="__('Saturasi O2')"
+                        :required="__(false)" /> --}}
                 </div>
 
                 <div class="grid grid-cols-2 gap-2">
                     <x-text-input-mou id="dataDaftarUgd.pemeriksaan.tandaVital.suhu" placeholder="Suhu"
                         class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.pemeriksaan.tandaVital.suhu'))" :disabled=$disabledPropertyRjStatus :mou_label="__('0C')"
                         wire:model.debounce.500ms="dataDaftarUgd.pemeriksaan.tandaVital.suhu" />
-                    <x-text-input-mou id="dataDaftarUgd.pemeriksaan.tandaVital.saturasiO2" placeholder="Saturasi O2"
+                    {{-- <x-text-input-mou id="dataDaftarUgd.pemeriksaan.tandaVital.saturasiO2" placeholder="Saturasi O2"
                         class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.pemeriksaan.tandaVital.saturasiO2'))" :disabled=$disabledPropertyRjStatus :mou_label="__('Saturasi O2 ')"
-                        wire:model.debounce.500ms="dataDaftarUgd.pemeriksaan.tandaVital.saturasiO2" />
+                        wire:model.debounce.500ms="dataDaftarUgd.pemeriksaan.tandaVital.saturasiO2" /> --}}
                 </div>
             </div>
 
