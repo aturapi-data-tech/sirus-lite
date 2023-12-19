@@ -260,7 +260,7 @@ class EmrRJ extends Component
         $this->callMasterPasien = true;
     }
 
-    public string $activeTab = "anamnesa";
+    public string $activeTab = "rekamMedis";
 
     public array $EmrMenu = [
         // [

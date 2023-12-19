@@ -51,7 +51,7 @@ class Perencanaan extends Component
 
         ],
 
-        "pengkajianMedisTab" => "Pengkajian Medis",
+        "pengkajianMedisTab" => "Petugas Medis",
         "pengkajianMedis" => [
             "waktuPemeriksaan" => "",
             "selesaiPemeriksaan" => "",
