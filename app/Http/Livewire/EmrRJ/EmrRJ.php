@@ -363,7 +363,7 @@ class EmrRJ extends Component
                 'push_antrian_bpjs_json',
                 'datadaftarpolirj_json'
             )
-            ->where('erm_status', '=', $myRefstatusId)
+            ->where(DB::raw("nvl(erm_status,'A')"), '=', $myRefstatusId)
             ->where('rj_status', '!=', 'F')
 
             // ->where('shift', '=', $myRefshift)
