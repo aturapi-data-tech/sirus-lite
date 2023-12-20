@@ -26,14 +26,11 @@
                         {{ 'Instalasi Gawat Darurat' }}
                     </div>
                     <div class="px-2 font-semibold text-primary justify-self-end">
+                        @php
+                            $klaimId = isset($dataDaftarUgd['klaimId']) ? $dataDaftarUgd['klaimId'] : '-';
+                        @endphp
                         {{ $dataDaftarUgd['drDesc'] . ' / ' }}
-                        {{ $dataDaftarUgd['klaimId'] == 'UM'
-                            ? 'UMUM'
-                            : ($dataDaftarUgd['klaimId'] == 'JM'
-                                ? 'BPJS'
-                                : ($dataDaftarUgd['klaimId'] == 'KR'
-                                    ? 'Kronis'
-                                    : 'Asuransi Lain')) }}
+                        {{ $klaimId == 'UM' ? 'UMUM' : ($klaimId == 'JM' ? 'BPJS' : ($klaimId == 'KR' ? 'Kronis' : 'Asuransi Lain')) }}
                     </div>
                     <div class="px-2 font-normal text-gray-900 justify-self-end">
                         {{ 'Nomer Pelayanan ' . $dataDaftarUgd['noAntrian'] }}
