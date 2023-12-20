@@ -1162,6 +1162,7 @@ class FormEntryUGD extends Component
                 "drDesc" => "" . $dataDaftarUgd->dr_name . "",
 
                 "poliId" => "" . $dataDaftarUgd->poli_id . "",
+                "klaimId" => $dataDaftarUgd->klaim_id,
                 // "poliDesc" => "" . $dataDaftarUgd->poli_desc . "",
 
                 // "kddrbpjs" => "" . $dataDaftarUgd->kd_dr_bpjs . "",
