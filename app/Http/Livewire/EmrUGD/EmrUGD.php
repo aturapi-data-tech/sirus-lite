@@ -361,7 +361,7 @@ class EmrUGD extends Component
                 'push_antrian_bpjs_json',
                 'datadaftarugd_json'
             )
-            ->where('erm_status', '=', $myRefstatusId)
+            ->where(DB::raw("nvl(erm_status,'A')"), '=', $myRefstatusId)
             ->where('rj_status', '!=', 'F')
 
             // ->where('shift', '=', $myRefshift)
