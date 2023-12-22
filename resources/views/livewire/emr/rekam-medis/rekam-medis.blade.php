@@ -116,7 +116,7 @@
                                                     {{ isset($datadaftar_json['pemeriksaan']['tandaVital']['sistolik'])
                                                         ? $datadaftar_json['pemeriksaan']['tandaVital']['sistolik']
                                                         : '' }}
-                                                    -
+                                                    /
                                                     {{ isset($datadaftar_json['pemeriksaan']['tandaVital']['distolik'])
                                                         ? $datadaftar_json['pemeriksaan']['tandaVital']['distolik']
                                                         : '' }}
@@ -132,7 +132,7 @@
                                                     {{ isset($datadaftar_json['pemeriksaan']['tandaVital']['gda'])
                                                         ? $datadaftar_json['pemeriksaan']['tandaVital']['gda']
                                                         : '' }}
-                                                    (g/dl)
+                                                    (mg/dL)
 
                                                 </td>
 
