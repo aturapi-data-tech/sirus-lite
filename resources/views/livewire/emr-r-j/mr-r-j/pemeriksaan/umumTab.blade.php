@@ -174,7 +174,7 @@
 
                 <div class="grid grid-cols-2 gap-2">
                     <x-text-input-mou id="dataDaftarPoliRJ.pemeriksaan.tandaVital.suhu" placeholder="Suhu"
-                        class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.pemeriksaan.tandaVital.suhu'))" :disabled=$disabledPropertyRjStatus :mou_label="__('0C')"
+                        class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.pemeriksaan.tandaVital.suhu'))" :disabled=$disabledPropertyRjStatus :mou_label="__('°C')"
                         wire:model.debounce.500ms="dataDaftarPoliRJ.pemeriksaan.tandaVital.suhu" />
                     {{-- <x-text-input-mou id="dataDaftarPoliRJ.pemeriksaan.tandaVital.saturasiO2"
                         placeholder="Saturasi O2" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.pemeriksaan.tandaVital.saturasiO2'))"

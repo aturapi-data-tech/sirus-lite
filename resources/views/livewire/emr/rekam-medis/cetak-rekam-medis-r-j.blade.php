@@ -707,7 +707,7 @@
                                                         ? $dataDaftarTxn['pemeriksaan']['tandaVital']['suhu']
                                                         : '-')
                                                     : '-' }}
-                                                &degC
+                                                °C
                                             </td>
                                         </tr>
                                         <tr>
