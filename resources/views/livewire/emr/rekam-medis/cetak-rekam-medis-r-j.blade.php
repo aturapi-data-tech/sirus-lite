@@ -675,7 +675,7 @@
                                                         ? $dataDaftarTxn['pemeriksaan']['tandaVital']['sistolik']
                                                         : '-')
                                                     : '-' }}
-                                                -
+                                                /
                                                 {{ isset($dataDaftarTxn['pemeriksaan']['tandaVital']['distolik'])
                                                     ? ($dataDaftarTxn['pemeriksaan']['tandaVital']['distolik']
                                                         ? $dataDaftarTxn['pemeriksaan']['tandaVital']['distolik']
@@ -707,7 +707,7 @@
                                                         ? $dataDaftarTxn['pemeriksaan']['tandaVital']['suhu']
                                                         : '-')
                                                     : '-' }}
-                                                OC
+                                                &degC
                                             </td>
                                         </tr>
                                         <tr>
@@ -772,7 +772,7 @@
                                                         ? $dataDaftarTxn['pemeriksaan']['tandaVital']['gda']
                                                         : '-')
                                                     : '-' }}
-                                                g/dl
+                                                mg/dL
                                             </td>
                                         </tr>
 
