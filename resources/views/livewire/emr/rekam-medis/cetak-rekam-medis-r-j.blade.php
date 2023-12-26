@@ -94,10 +94,10 @@
                                         <td class="p-1 m-1">:</td>
                                         <td class="p-1 m-1"></td>
                                         <td class="p-1 m-1">-</td>
-                                        <td class="p-1 m-1">Klaim</td>
+                                        <td class="p-1 m-1"></td>
                                         <td class="p-1 m-1">:</td>
                                         <td class="p-1 m-1">
-                                            @isset($dataDaftarTxn['klaimId'])
+                                            {{-- @isset($dataDaftarTxn['klaimId'])
                                                 {{ $dataDaftarTxn['klaimId'] == 'UM'
                                                     ? 'UMUM'
                                                     : ($dataDaftarTxn['klaimId'] == 'JM'
@@ -105,7 +105,7 @@
                                                         : ($dataDaftarTxn['klaimId'] == 'KR'
                                                             ? 'Kronis'
                                                             : 'Asuransi Lain')) }}
-                                            @endisset
+                                            @endisset --}}
                                         </td>
                                     </tr>
                                     <tr>
