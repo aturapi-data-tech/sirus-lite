@@ -88,6 +88,19 @@
                                             {{ isset($dataPasien['pasien']['identitas']['idbpjs']) ? $dataPasien['pasien']['identitas']['idbpjs'] : '-' }}
                                         </td>
                                     </tr>
+
+                                    <tr>
+
+                                        <td class="p-1 m-1"></td>
+                                        <td class="p-1 m-1">:</td>
+                                        <td class="p-1 m-1"> </td>
+                                        <td class="p-1 m-1">-</td>
+                                        <td class="p-1 m-1">Tanggal Masuk</td>
+                                        <td class="p-1 m-1">:</td>
+                                        <td class="p-1 m-1">
+                                            {{ isset($dataDaftarTxn['rjDate']) ? $dataDaftarTxn['rjDate'] : '-' }}
+                                        </td>
+                                    </tr>
                                     <tr>
 
                                         <td class="p-1 m-1"></td>
@@ -106,18 +119,6 @@
                                                             ? 'Kronis'
                                                             : 'Asuransi Lain')) }}
                                             @endisset --}}
-                                        </td>
-                                    </tr>
-                                    <tr>
-
-                                        <td class="p-1 m-1"></td>
-                                        <td class="p-1 m-1">:</td>
-                                        <td class="p-1 m-1"> </td>
-                                        <td class="p-1 m-1">-</td>
-                                        <td class="p-1 m-1">Tanggal Masuk</td>
-                                        <td class="p-1 m-1">:</td>
-                                        <td class="p-1 m-1">
-                                            {{ isset($dataDaftarTxn['rjDate']) ? $dataDaftarTxn['rjDate'] : '-' }}
                                         </td>
                                     </tr>
                                 </tbody>
