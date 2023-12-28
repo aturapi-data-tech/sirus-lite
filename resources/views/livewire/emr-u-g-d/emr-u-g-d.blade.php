@@ -299,7 +299,14 @@
                                                     <li>
                                                         <x-dropdown-link
                                                             wire:click="edit('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
-                                                            {{ __('Rekam Medis') }}
+                                                            {{ __('UGD Rawat Jalan') }}
+                                                        </x-dropdown-link>
+                                                    </li>
+
+                                                    <li>
+                                                        <x-dropdown-link
+                                                            wire:click="edit('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
+                                                            {{ __('UGD Rawat Inap') }}
                                                         </x-dropdown-link>
                                                     </li>
                                                     {{-- <li>
