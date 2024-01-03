@@ -49,8 +49,8 @@
                     <livewire:daftar-u-g-d.display-pasien.display-pasien :regNo="$regNo"
                         :wire:key="$regNo.'display-pasien'">
 
-                        <livewire:daftar-u-g-d.form-entry-u-g-d.form-entry-u-g-d :rjNo="$regNo"
-                            :wire:key="$regNo.'form-entry-u-g-d'">
+                        <livewire:daftar-u-g-d.form-entry-u-g-d.form-entry-u-g-d :rjNo="$rjNo"
+                            :wire:key="$rjNo.'form-entry-u-g-d'">
 
                 </div>
             </div>

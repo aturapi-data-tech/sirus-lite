@@ -14,7 +14,6 @@ class DisplayPasien extends Component
 
     public function listenerRegNo($newRegNo): void
     {
-        // $this->regNo = $newRegNo;
         $this->setDataPasien($newRegNo);
     }
 

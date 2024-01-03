@@ -24,7 +24,9 @@ class DaftarUGD extends Component
 
     // my Reg No
 
-    public string $regNo = '';
+    public string $regNo;
+    public int $rjNo;
+
 
     public bool $callMasterPasien = false;
 
@@ -126,10 +128,12 @@ class DaftarUGD extends Component
     // resert input private////////////////
 
     // is going to edit data/////////////////
-    public function edit($id)
+    public function edit($rjNo, $regNo)
     {
-        $this->openModalEdit($id);
-        $this->findData($id);
+        $this->openModalEdit($rjNo);
+        $this->rjNo = $rjNo;
+        $this->regNo = $regNo;
+        $this->emit('listenerRegNo', $this->regNo);
     }
 
 
@@ -158,6 +162,7 @@ class DaftarUGD extends Component
     public function create()
     {
         $this->openModal();
+        $this->rjNo = 0;
     }
 
     public function tampil()

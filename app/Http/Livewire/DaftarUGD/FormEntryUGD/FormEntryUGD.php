@@ -21,20 +21,22 @@ class FormEntryUGD extends Component
     // listener from blade////////////////
     protected $listeners = [
         'confirm_doble_record_UGDp' => 'setforceInsertRecord',
-        'ListeneropenModalEditUgd' => 'openModalEditUgd'
+        // 'ListeneropenModalEditUgd' => 'openModalEditUgd'
     ];
 
-    public function openModalEditUgd($openModalEditUgd)
-    {
-        $this->isOpen = $openModalEditUgd['isOpen'];
-        $this->isOpenMode =  $openModalEditUgd['isOpenMode'];
-        $this->findData($openModalEditUgd['rjNo']);
-    }
+    // public function openModalEditUgd($openModalEditUgd)
+    // {
+    //     $this->isOpen = $openModalEditUgd['isOpen'];
+    //     $this->isOpenMode =  $openModalEditUgd['isOpenMode'];
+    //     $this->findData($openModalEditUgd['rjNo']);
+    // }
 
 
     public bool $isOpen = false;
     public string $isOpenMode = 'insert';
     public bool $forceInsertRecord = false;
+    public int $rjNo;
+
 
 
 
@@ -934,7 +936,7 @@ class FormEntryUGD extends Component
             $this->validate($rules, $messages);
         } catch (\Illuminate\Validation\ValidationException $e) {
 
-            $this->emit('toastr-error', "Lakukan Pengecekan kembali Input Data Pasien.");
+            $this->emit('toastr-error', "Lakukan Pengecekan kembali Input Data Pasien." . json_encode($e->errors(), true));
             $this->validate($rules, $messages);
         }
     }
@@ -1080,6 +1082,8 @@ class FormEntryUGD extends Component
     private function findData($rjno): void
     {
 
+
+
         $findData = DB::table('rsview_ugdkasir')
             ->select('datadaftarugd_json', 'vno_sep')
             ->where('rj_no', $rjno)
@@ -1090,6 +1094,7 @@ class FormEntryUGD extends Component
         // then cari Data Pasien By Key Collection (exception when no data found)
         // 
         // else json_decode
+
         if ($datadaftarugd_json) {
             $this->dataDaftarUgd = json_decode($findData->datadaftarugd_json, true);
 
@@ -1104,7 +1109,6 @@ class FormEntryUGD extends Component
 
             // jika sep ditemukan tetapi variable kosong set sep pda array
             $this->dataDaftarUgd['sep']['noSep'] = isset($findData->vno_sep) ? $findData->vno_sep : "";
-
             $this->emit('listenerRegNo', $this->dataDaftarUgd['regNo']);
             $this->setDataPasien($this->dataDaftarUgd['regNo']);
 
@@ -1120,7 +1124,6 @@ class FormEntryUGD extends Component
             $this->JenisKlaim['JenisKlaimId'] = isset($this->dataDaftarUgd['klaimId']) ? $this->dataDaftarUgd['klaimId'] : "UM";
             $this->JenisKunjungan['JenisKunjunganId'] = isset($this->dataDaftarUgd['kunjunganId']) ? $this->dataDaftarUgd['kunjunganId'] : '1';
         } else {
-
             $this->emit('toastr-error', "Data tidak dapat di proses json.");
             $dataDaftarUgd = DB::table('rsview_ugdkasir')
                 ->select(
@@ -1177,7 +1180,7 @@ class FormEntryUGD extends Component
                 "passStatus" => "",
                 "rjStatus" => "" . $dataDaftarUgd->rj_status . "",
                 "txnStatus" => "" . $dataDaftarUgd->txn_status . "",
-                "ermStatus" => "" . $dataDaftarUgd->erm_status . "",
+                "ermStatus" => "" . ($dataDaftarUgd->erm_status) ? $dataDaftarUgd->erm_status : 'A' . "",
                 "cekLab" => "0",
                 "kunjunganInternalStatus" => "0",
                 "noReferensi" => "" . $dataDaftarUgd->reg_no . "",
@@ -1222,7 +1225,6 @@ class FormEntryUGD extends Component
                     "resSep" => [],
                 ]
             ];
-
 
             $this->emit('listenerRegNo', $this->dataDaftarUgd['regNo']);
             $this->setDataPasien($this->dataDaftarUgd['regNo']);
@@ -1782,20 +1784,21 @@ class FormEntryUGD extends Component
 
     private function pushInsertSEP($SEPJsonReq)
     {
+        // if sep kosong
+        if (!$this->dataDaftarUgd['sep']['noSep']) {
+            //ketika Push Tambah Antrean Berhasil buat SEP
+            //////////////////////////////////////////////
+            $HttpGetBpjs =  VclaimTrait::sep_insert($SEPJsonReq)->getOriginalContent();
+            if ($HttpGetBpjs['metadata']['code'] == 200) {
+                // dd($HttpGetBpjs);
+                $this->dataDaftarUgd['sep']['resSep'] = $HttpGetBpjs['response']['sep'];
+                $this->dataDaftarUgd['sep']['noSep'] = $HttpGetBpjs['response']['sep']['noSep'];
 
-        //ketika Push Tambah Antrean Berhasil buat SEP
-        //////////////////////////////////////////////
-        $HttpGetBpjs =  VclaimTrait::sep_insert($SEPJsonReq)->getOriginalContent();
-        if ($HttpGetBpjs['metadata']['code'] == 200) {
-            // dd($HttpGetBpjs);
-            $this->dataDaftarUgd['sep']['resSep'] = $HttpGetBpjs['response']['sep'];
-            $this->dataDaftarUgd['sep']['noSep'] = $HttpGetBpjs['response']['sep']['noSep'];
-
-            $this->emit('toastr-success', 'SEP ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
-        } else {
-            $this->emit('toastr-error', 'SEP ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+                $this->emit('toastr-success', 'SEP ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+            } else {
+                $this->emit('toastr-error', 'SEP ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+            }
         }
-
         // response sep value
         //ketika Push Tambah Antrean Berhasil buat SEP
         //////////////////////////////////////////////
@@ -1853,12 +1856,18 @@ class FormEntryUGD extends Component
     }
 
 
+    public function mount()
+    {
 
+        $this->setShiftnCurrentDate();
+        if ($this->rjNo) {
+            $this->findData($this->rjNo);
+            $this->isOpenMode = 'update';
+        }
+    }
 
     public function render()
     {
-        $this->setShiftnCurrentDate();
-
         return view('livewire.daftar-u-g-d.form-entry-u-g-d.form-entry-u-g-d');
     }
 }
