@@ -914,7 +914,7 @@ class FormEntryUGD extends Component
 
             "dataDaftarUgd.rjStatus" => "required",
             "dataDaftarUgd.txnStatus" => "required",
-            // "dataDaftarUgd.ermStatus" => "required",
+            "dataDaftarUgd.ermStatus" => "required",
 
             "dataDaftarUgd.cekLab" => "required",
 
