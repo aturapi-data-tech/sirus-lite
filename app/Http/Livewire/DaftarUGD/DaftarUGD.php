@@ -129,8 +129,10 @@ class DaftarUGD extends Component
     public function edit($id)
     {
         $this->openModalEdit($id);
-        // $this->findData($id);
+        $this->findData($id);
     }
+
+
 
 
     // listener from blade////////////////
