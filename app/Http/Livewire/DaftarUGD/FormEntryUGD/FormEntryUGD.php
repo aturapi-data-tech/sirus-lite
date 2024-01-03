@@ -757,6 +757,7 @@ class FormEntryUGD extends Component
     public function store()
     {
 
+
         // dd($this->SEPJsonReq);
         // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
         $this->setDataPrimer();
@@ -810,6 +811,7 @@ class FormEntryUGD extends Component
     // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
     private function setDataPrimer(): void
     {
+
         // Klaim & Kunjungan 
         // dd($this->dataDaftarUgd['klaimId']);
         $this->dataDaftarUgd['klaimId'] = $this->JenisKlaim['JenisKlaimId'];
@@ -832,6 +834,11 @@ class FormEntryUGD extends Component
         if (!$this->dataDaftarUgd['rjNo']) {
             $sql = "select nvl(max(rj_no)+1,1) rjno_max from rstxn_ugdhdrs";
             $this->dataDaftarUgd['rjNo'] = DB::scalar($sql);
+        }
+
+        // ermStatus
+        if (!$this->dataDaftarUgd['ermStatus']) {
+            $this->dataDaftarUgd['ermStatus'] = $this->dataDaftarUgd['ermStatus'] ? $this->dataDaftarUgd['ermStatus'] : 'A';
         }
 
         // noUrutAntrian (count all kecuali KRonis) if KR 999
@@ -1094,7 +1101,6 @@ class FormEntryUGD extends Component
         // then cari Data Pasien By Key Collection (exception when no data found)
         // 
         // else json_decode
-
         if ($datadaftarugd_json) {
             $this->dataDaftarUgd = json_decode($findData->datadaftarugd_json, true);
 
