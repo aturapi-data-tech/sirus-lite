@@ -724,7 +724,7 @@
                                                 x/mnt
                                             </td>
                                         </tr>
-                                        <tr>
+                                        {{-- <tr>
                                             <td class="pr-4 text-end">
                                                 Saturasi O2 :
                                             </td>
@@ -736,7 +736,7 @@
                                                     : '-' }}
                                                 Saturasi
                                             </td>
-                                        </tr>
+                                        </tr> --}}
                                         {{-- <tr>
                                         <td class="pr-4 text-end">
                                             Berat Badan :
