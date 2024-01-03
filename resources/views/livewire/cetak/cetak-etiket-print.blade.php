@@ -55,7 +55,7 @@
                 </p>
             </td>
         </tr>
-        <tr class="font-bold">
+        {{-- <tr class="font-bold">
             <td>
                 <p><span>NIK</span></p>
             </td>
@@ -69,13 +69,13 @@
                     </span>
                 </p>
             </td>
-        </tr>
+        </tr> --}}
         <tr class="font-bold">
             <td>
                 <p><span>Pasien</span></p>
             </td>
             <td>
-                <p>
+                <p style="font-size: 11px">
                     <span>:
                         {{ isset($data['regName']) ? ($data['regName'] ? $data['regName'] : '-') : '--' }}
                     </span>
