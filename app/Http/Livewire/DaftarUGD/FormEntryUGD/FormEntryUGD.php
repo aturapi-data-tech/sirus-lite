@@ -968,7 +968,7 @@ class FormEntryUGD extends Component
 
             'txn_status' => $this->dataDaftarUgd['txnStatus'],
             'rj_status' => $this->dataDaftarUgd['rjStatus'],
-            'erm_status' => $this->dataDaftarUgd['ermStatus'],
+            'erm_status' => $this->dataDaftarUgd['ermStatus'] ? $this->dataDaftarUgd['ermStatus'] : 'A',
 
             'pass_status' => $this->dataDaftarUgd['passStatus'] == 'N' ? 'N' : 'O', //Baru lama
 
@@ -1016,7 +1016,7 @@ class FormEntryUGD extends Component
 
                 'txn_status' => $this->dataDaftarUgd['txnStatus'],
                 'rj_status' => $this->dataDaftarUgd['rjStatus'],
-                'erm_status' => $this->dataDaftarUgd['ermStatus'],
+                'erm_status' => $this->dataDaftarUgd['ermStatus'] ? $this->dataDaftarUgd['ermStatus'] : 'A',
 
                 'pass_status' => $this->dataDaftarUgd['passStatus'] == 'N' ? 'N' : 'O', //Baru lama
 
