@@ -444,8 +444,8 @@ class Pemeriksaan extends Component
 
 
     protected $rules = [
-        'dataDaftarUgd.pemeriksaan.tandaVital.sistolik' => 'required|numeric',
-        'dataDaftarUgd.pemeriksaan.tandaVital.distolik' => 'required|numeric',
+        // 'dataDaftarUgd.pemeriksaan.tandaVital.sistolik' => 'required|numeric',
+        // 'dataDaftarUgd.pemeriksaan.tandaVital.distolik' => 'required|numeric',
         'dataDaftarUgd.pemeriksaan.tandaVital.frekuensiNadi' => 'required|numeric',
         'dataDaftarUgd.pemeriksaan.tandaVital.frekuensiNafas' => 'required|numeric',
         'dataDaftarUgd.pemeriksaan.tandaVital.suhu' => 'required|numeric',
@@ -531,6 +531,17 @@ class Pemeriksaan extends Component
         // $messages = customErrorMessagesTrait::messages();
         $messages = [];
 
+        //Cek Usia Anak dibawah 13th tidak di cek tekanan darah
+        $sql = "select birth_date from rsmst_pasiens where reg_no=:regNo";
+        $birthDate = DB::scalar($sql, [
+            "regNo" => $this->dataDaftarPoliRJ['regNo'],
+        ]);
+        $cekUsia = Carbon::createFromFormat('Y-m-d H:i:s', $birthDate)->diff(Carbon::now())->format('%y');
+
+        if ($cekUsia > 13) {
+            $this->rules['dataDaftarPoliRJ.pemeriksaan.tandaVital.sistolik'] = 'required|numeric';
+            $this->rules['dataDaftarPoliRJ.pemeriksaan.tandaVital.distolik'] = 'required|numeric';
+        }
 
         // $rules = [];
 
