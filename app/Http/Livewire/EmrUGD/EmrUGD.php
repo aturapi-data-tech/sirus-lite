@@ -139,6 +139,9 @@ class EmrUGD extends Component
     public bool $isOpen = false;
     public string $isOpenMode = 'insert';
 
+    public bool $isOpenInap = false;
+    public string $isOpenModeInap = 'insert';
+
     public bool $isOpenScreening = false;
     public string $isOpenModeScreening = 'insert';
 
@@ -161,6 +164,14 @@ class EmrUGD extends Component
         $this->regNoRef = $regNoRef;
     }
 
+    private function openModalEditInap($rjNo, $regNoRef): void
+    {
+        $this->isOpenInap = true;
+        $this->isOpenModeInap = 'update';
+        $this->rjNoRef = $rjNo;
+        $this->regNoRef = $regNoRef;
+    }
+
     private function openModalEditScreening($rjNo, $regNoRef): void
     {
         $this->isOpenScreening = true;
@@ -179,6 +190,13 @@ class EmrUGD extends Component
     {
         $this->isOpen = false;
         $this->isOpenMode = 'insert';
+        $this->resetInputFields();
+    }
+
+    public function closeModalInap(): void
+    {
+        $this->isOpenInap = false;
+        $this->isOpenModeInap = 'insert';
         $this->resetInputFields();
     }
 
@@ -206,6 +224,13 @@ class EmrUGD extends Component
     public function edit($rjNo, $regNoRef)
     {
         $this->openModalEdit($rjNo, $regNoRef);
+        // $this->findData($id);
+    }
+
+    // is going to edit data/////////////////
+    public function editInap($rjNo, $regNoRef)
+    {
+        $this->openModalEditInap($rjNo, $regNoRef);
         // $this->findData($id);
     }
 

@@ -137,6 +137,10 @@
                 @include('livewire.emr-u-g-d.create-emr-u-g-d')
             @endif
 
+            @if ($isOpenInap)
+                @include('livewire.emr-u-g-d.create-emr-u-g-d-inap')
+            @endif
+
             @if ($isOpenScreening)
                 @include('livewire.emr-u-g-d.create-screening-u-g-d')
             @endif
@@ -305,7 +309,7 @@
 
                                                     <li>
                                                         <x-dropdown-link
-                                                            wire:click="edit('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
+                                                            wire:click="editInap('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
                                                             {{ __('UGD Rawat Inap') }}
                                                         </x-dropdown-link>
                                                     </li>
