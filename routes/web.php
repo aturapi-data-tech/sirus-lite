@@ -34,6 +34,8 @@ use App\Http\Livewire\DisplayPelayananRJ\DisplayPelayananRJ;
 
 use App\Http\Livewire\EmrRJ\EmrRJ;
 use App\Http\Livewire\EmrUGD\EmrUGD;
+// use App\Http\Livewire\Emr\Laborat\Laborat;
+
 
 
 use App\Http\Livewire\SetupHfisBpjs\SetupHfisBpjs;
@@ -114,6 +116,7 @@ Route::get('SetupHfisBpjs', SetupHfisBpjs::class)->middleware('auth')->name('Set
 
 Route::get('EmrRJ', EmrRJ::class)->middleware('auth')->name('EmrRJ');
 Route::get('EmrUGD', EmrUGD::class)->middleware('auth')->name('EmrUGD');
+// Route::get('Laborat', Laborat::class)->middleware('auth')->name('Laborat');
 
 
 

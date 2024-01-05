@@ -86,7 +86,16 @@
                         <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50 ">
 
                             <livewire:emr-r-j.mr-r-j-dokter.assessment-dokter.assessment-dokter
-                                :wire:key="'content-assessment-dokterRj'" :rjNoRef="$rjNoRef">
+                                :wire:key="'content-assessmentDokter'" :rjNoRef="$rjNoRef">
+                        </div>
+                    @endif
+
+                    @if ($activeTabDokter == 'pelayananPenunjang')
+                        <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50 ">
+                            {{-- <div>{{ $activeTabDokter }}</div> --}}
+                            {{-- :rjNo="" disi dari emit ListeneropenModalEditUgd --}}
+                            <livewire:emr.laborat.laborat :wire:key="'content-pelayananPenunjang'" :regNoRef="$regNoRef">
+
                         </div>
                     @endif
 
@@ -94,7 +103,7 @@
                         <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50 ">
                             {{-- <div>{{ $activeTabDokter }}</div> --}}
                             {{-- :rjNo="" disi dari emit ListeneropenModalEditUgd --}}
-                            <livewire:emr.rekam-medis.rekam-medis :wire:key="'content-layananUgd'" :regNoRef="$regNoRef">
+                            <livewire:emr.rekam-medis.rekam-medis :wire:key="'content-rekamMedis'" :regNoRef="$regNoRef">
 
                         </div>
                     @endif
