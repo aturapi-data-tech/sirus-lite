@@ -138,6 +138,10 @@
                 @include('livewire.emr-r-j.create-emr-r-j')
             @endif
 
+            @if ($isOpenDokter)
+                @include('livewire.emr-r-j.create-emr-r-j-dokter')
+            @endif
+
             @if ($isOpenScreening)
                 @include('livewire.emr-r-j.create-screening-r-j')
             @endif
@@ -299,10 +303,18 @@
 
                                                     <li>
                                                         <x-dropdown-link
-                                                            wire:click="edit('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
-                                                            {{ __('Rekam Medis') }}
+                                                            wire:click="editDokter('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
+                                                            {{ __('Assessment Dokter') }}
                                                         </x-dropdown-link>
                                                     </li>
+
+                                                    <li>
+                                                        <x-dropdown-link
+                                                            wire:click="edit('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
+                                                            {{ __('Assessment Perawat') }}
+                                                        </x-dropdown-link>
+                                                    </li>
+
                                                     {{-- <li>
                                                         <x-dropdown-link
                                                             wire:click="$emit('confirm_remove_record', '{{ $myQData->rj_no }}', '{{ $myQData->reg_name }}')">

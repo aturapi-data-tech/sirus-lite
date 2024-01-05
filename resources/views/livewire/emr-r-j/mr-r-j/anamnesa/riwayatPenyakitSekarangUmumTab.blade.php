@@ -12,7 +12,7 @@
                             'dataDaftarPoliRJ.anamnesa.riwayatPenyakitSekarangUmum.riwayatPenyakitSekarangUmum',
                         ),
                     )"
-                    :disabled=$disabledPropertyRjStatus :rows=7
+                    :disabled=$disabledPropertyRjStatus :rows=3
                     wire:model.debounce.500ms="dataDaftarPoliRJ.anamnesa.riwayatPenyakitSekarangUmum.riwayatPenyakitSekarangUmum" />
 
             </div>

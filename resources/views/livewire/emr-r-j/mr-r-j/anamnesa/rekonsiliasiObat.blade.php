@@ -66,10 +66,10 @@
                                 <x-loading />
                             </div>
 
-                            <x-green-button :disabled=$disabledPropertyRjStatus
+                            <x-yellow-button :disabled=$disabledPropertyRjStatus
                                 wire:click.prevent="addRekonsiliasiObat()" type="button" wire:loading.remove>
-                                Simpan
-                            </x-green-button>
+                                Rekonsiliasi Obat
+                            </x-yellow-button>
                         </div>
                     </div>
 

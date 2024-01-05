@@ -10,7 +10,7 @@
                     placeholder="Riwayat Perjalanan Penyakit" class="mt-1 ml-2" :errorshas="__(
                         $errors->has('dataDaftarPoliRJ.anamnesa.riwayatPenyakitDahulu.riwayatPenyakitDahulu'),
                     )"
-                    :disabled=$disabledPropertyRjStatus :rows=7
+                    :disabled=$disabledPropertyRjStatus :rows=3
                     wire:model.debounce.500ms="dataDaftarPoliRJ.anamnesa.riwayatPenyakitDahulu.riwayatPenyakitDahulu" />
 
             </div>
@@ -26,7 +26,7 @@
             <div class="mb-2 ">
                 <x-text-input-area id="dataDaftarPoliRJ.anamnesa.alergi.alergi"
                     placeholder="Jenis Alergi / Alergi [Makanan / Obat / Udara]" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.anamnesa.alergi.alergi'))"
-                    :disabled=$disabledPropertyRjStatus :rows=7
+                    :disabled=$disabledPropertyRjStatus :rows=3
                     wire:model.debounce.500ms="dataDaftarPoliRJ.anamnesa.alergi.alergi" />
 
             </div>
