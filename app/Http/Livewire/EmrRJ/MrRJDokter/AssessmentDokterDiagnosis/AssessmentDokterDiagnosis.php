@@ -469,6 +469,7 @@ class AssessmentDokterDiagnosis extends Component
 
         $diagnosis = collect($this->dataDaftarPoliRJ['diagnosis'])->where("diagId", '!=', $diagId)->toArray();
         $this->dataDaftarPoliRJ['diagnosis'] = $diagnosis;
+        $this->store();
     }
 
 
@@ -487,6 +488,7 @@ class AssessmentDokterDiagnosis extends Component
 
         $procedure = collect($this->dataDaftarPoliRJ['procedure'])->where("procedureId", '!=', $procedureId)->toArray();
         $this->dataDaftarPoliRJ['procedure'] = $procedure;
+        $this->store();
     }
 
 
