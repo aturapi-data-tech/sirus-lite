@@ -471,6 +471,8 @@ class AssessmentDokterPemeriksaan extends Component
         // dd($propertyName);
         $this->validateOnly($propertyName);
         $this->scoringIMT();
+        $this->store();
+        $this->findData($this->rjNoRef);
     }
 
     // /////////tingkatKesadaran////////////

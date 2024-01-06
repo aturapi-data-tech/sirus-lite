@@ -57,7 +57,13 @@ class AssessmentDokterDiagnosis extends Component
     ////////////////////////////////////////////////
     ///////////begin////////////////////////////////
     ////////////////////////////////////////////////
-
+    public function updated($propertyName)
+    {
+        // dd($propertyName);
+        // $this->validateOnly($propertyName);
+        $this->store();
+        $this->findData($this->rjNoRef);
+    }
 
 
     // ////////////////

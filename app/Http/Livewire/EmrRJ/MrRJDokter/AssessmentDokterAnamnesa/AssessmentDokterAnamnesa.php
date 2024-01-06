@@ -316,6 +316,8 @@ class AssessmentDokterAnamnesa extends Component
     {
         // dd($propertyName);
         $this->validateOnly($propertyName);
+        $this->store();
+        $this->findData($this->rjNoRef);
     }
 
 
@@ -375,6 +377,7 @@ class AssessmentDokterAnamnesa extends Component
 
     private function updateDataRj($rjNo): void
     {
+
         // update table trnsaksi
         DB::table('rstxn_rjhdrs')
             ->where('rj_no', $rjNo)

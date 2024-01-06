@@ -126,6 +126,8 @@ class AssessmentDokterPerencanaan extends Component
     {
         // dd($propertyName);
         $this->validateOnly($propertyName);
+        $this->store();
+        $this->findData($this->rjNoRef);
     }
 
 
