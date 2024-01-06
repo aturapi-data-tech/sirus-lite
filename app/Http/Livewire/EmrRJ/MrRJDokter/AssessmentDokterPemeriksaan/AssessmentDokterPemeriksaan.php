@@ -16,8 +16,10 @@ class AssessmentDokterPemeriksaan extends Component
     use WithPagination;
 
     // listener from blade////////////////
-    protected $listeners = ['storeAssessmentDokterRJ' => 'store'];
-
+    protected $listeners = [
+        'storeAssessmentDokterRJ' => 'store',
+        'syncronizeAssessmentDokterRJFindData' => 'mount'
+    ];
 
 
     //////////////////////////////
@@ -472,7 +474,6 @@ class AssessmentDokterPemeriksaan extends Component
         $this->validateOnly($propertyName);
         $this->scoringIMT();
         $this->store();
-        $this->findData($this->rjNoRef);
     }
 
     // /////////tingkatKesadaran////////////
@@ -573,6 +574,7 @@ class AssessmentDokterPemeriksaan extends Component
 
         // Logic update mode start //////////
         $this->updateDataRJ($this->dataDaftarPoliRJ['rjNo']);
+        $this->emit('syncronizeAssessmentDokterRJFindData');
     }
 
     private function updateDataRJ($rjNo): void

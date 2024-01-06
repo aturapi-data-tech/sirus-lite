@@ -20,7 +20,10 @@ class AssessmentDokterDiagnosis extends Component
 
 
     // listener from blade////////////////
-    protected $listeners = ['storeAssessmentDokterRJ' => 'store'];
+    protected $listeners = [
+        'storeAssessmentDokterRJ' => 'store',
+        'syncronizeAssessmentDokterRJFindData' => 'mount'
+    ];
 
 
     //////////////////////////////
@@ -62,7 +65,6 @@ class AssessmentDokterDiagnosis extends Component
         // dd($propertyName);
         // $this->validateOnly($propertyName);
         $this->store();
-        $this->findData($this->rjNoRef);
     }
 
 
@@ -284,6 +286,7 @@ class AssessmentDokterDiagnosis extends Component
 
         // Logic update mode start //////////
         $this->updateDataRJ($this->dataDaftarPoliRJ['rjNo']);
+        $this->emit('syncronizeAssessmentDokterRJFindData');
     }
 
     private function updateDataRJ($rjNo): void
