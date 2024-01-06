@@ -22,7 +22,7 @@
                 </div>
 
 
-                <div class="sticky bottom-0 flex justify-between px-4 py-3 bg-gray-50 sm:px-6">
+                {{-- <div class="sticky bottom-0 flex justify-between px-4 py-3 bg-gray-50 sm:px-6">
 
                     <div class="">
                     </div>
@@ -35,7 +35,7 @@
                             Simpan Plan
                         </x-green-button>
                     </div>
-                </div>
+                </div> --}}
 
 
             </div>

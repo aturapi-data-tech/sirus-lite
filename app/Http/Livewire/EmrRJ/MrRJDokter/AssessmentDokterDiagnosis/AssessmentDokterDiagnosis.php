@@ -64,7 +64,7 @@ class AssessmentDokterDiagnosis extends Component
     {
         // dd($propertyName);
         // $this->validateOnly($propertyName);
-        $this->store();
+        // $this->store();
     }
 
 
@@ -113,6 +113,7 @@ class AssessmentDokterDiagnosis extends Component
 
             $this->dataDiagnosaICD10LovStatus = false;
             $this->dataDiagnosaICD10LovSearch = '';
+            $this->store();
         } else {
             // if there is no id found and check (min 3 char on search)
             if (strlen($search) < 3) {
@@ -157,6 +158,7 @@ class AssessmentDokterDiagnosis extends Component
 
         $this->dataDiagnosaICD10LovStatus = false;
         $this->dataDiagnosaICD10LovSearch = '';
+        $this->store();
     }
     // LOV selected end
     /////////////////////////////////////////////////
@@ -199,6 +201,7 @@ class AssessmentDokterDiagnosis extends Component
 
             $this->dataProcedureICD9CmLovStatus = false;
             $this->dataProcedureICD9CmLovSearch = '';
+            $this->store();
         } else {
             // if there is no id found and check (min 3 char on search)
             if (strlen($search) < 3) {
@@ -240,6 +243,7 @@ class AssessmentDokterDiagnosis extends Component
 
         $this->dataProcedureICD9CmLovStatus = false;
         $this->dataProcedureICD9CmLovSearch = '';
+        $this->store();
     }
     // LOV selected end
     /////////////////////////////////////////////////
