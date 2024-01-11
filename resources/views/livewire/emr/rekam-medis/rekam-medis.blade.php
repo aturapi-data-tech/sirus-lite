@@ -145,7 +145,7 @@
                                                         {{ $myQData->datadaftar_json }}
                                                         )"
                                                             type="button" wire:loading.remove>
-                                                            Rekam Medis
+                                                            Resume Medis
                                                         </x-yellow-button>
                                                         <div wire:loading wire:target="openModalLayanan">
                                                             <x-loading />
@@ -159,9 +159,24 @@
                                                         {{ $myQData->datadaftar_json }}
                                                         )"
                                                             type="button" wire:loading.remove>
-                                                            Cetak
+                                                            Cetak Resume Medis
                                                         </x-green-button>
                                                         <div wire:loading wire:target="cetakRekamMedisRJGrid">
+                                                            <x-loading />
+                                                        </div>
+                                                    </div>
+
+                                                    <div>
+                                                        <x-green-button
+                                                            wire:click.prevent="cetakRekamMedisRJSuketIstirahatGrid('{{ $myQData->txn_no }}',
+                                                        '{{ $myQData->layanan_status }}',
+                                                        {{ $myQData->datadaftar_json }}
+                                                        )"
+                                                            type="button" wire:loading.remove>
+                                                            Cetak Surat Keterangan Istirahat
+                                                        </x-green-button>
+                                                        <div wire:loading
+                                                            wire:target="cetakRekamMedisRJSuketIstirahatGrid">
                                                             <x-loading />
                                                         </div>
                                                     </div>
