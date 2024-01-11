@@ -5,7 +5,9 @@
     <style>
         @page {
             size: 21cm 34cm;
-            margin: 4px;
+            margin-left: 2cm;
+            margin-right: 2cm;
+            margin-top: 1cm;
         }
     </style>
 
