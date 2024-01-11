@@ -16,7 +16,10 @@ class Anamnesa extends Component
     use WithPagination;
 
     // listener from blade////////////////
-    protected $listeners = [];
+    protected $listeners = [
+        'syncronizeAssessmentPerawatRJFindData' => 'mount'
+
+    ];
 
 
 
@@ -316,6 +319,7 @@ class Anamnesa extends Component
     {
         // dd($propertyName);
         $this->validateOnly($propertyName);
+        $this->store();
     }
 
 
@@ -371,6 +375,7 @@ class Anamnesa extends Component
 
         // Logic update mode start //////////
         $this->updateDataRj($this->dataDaftarPoliRJ['rjNo']);
+        $this->emit('syncronizeAssessmentPerawatRJFindData');
     }
 
     private function updateDataRj($rjNo): void

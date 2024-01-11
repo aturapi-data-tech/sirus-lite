@@ -20,7 +20,10 @@ class Diagnosis extends Component
 
 
     // listener from blade////////////////
-    protected $listeners = [];
+    protected $listeners = [
+        'syncronizeAssessmentPerawatRJFindData' => 'mount'
+    ];
+
 
     //////////////////////////////
     // Ref on top bar
@@ -104,6 +107,7 @@ class Diagnosis extends Component
 
             $this->dataDiagnosaICD10LovStatus = false;
             $this->dataDiagnosaICD10LovSearch = '';
+            $this->store();
         } else {
             // if there is no id found and check (min 3 char on search)
             if (strlen($search) < 3) {
@@ -148,6 +152,7 @@ class Diagnosis extends Component
 
         $this->dataDiagnosaICD10LovStatus = false;
         $this->dataDiagnosaICD10LovSearch = '';
+        $this->store();
     }
     // LOV selected end
     /////////////////////////////////////////////////
@@ -190,6 +195,7 @@ class Diagnosis extends Component
 
             $this->dataProcedureICD9CmLovStatus = false;
             $this->dataProcedureICD9CmLovSearch = '';
+            $this->store();
         } else {
             // if there is no id found and check (min 3 char on search)
             if (strlen($search) < 3) {
@@ -231,6 +237,7 @@ class Diagnosis extends Component
 
         $this->dataProcedureICD9CmLovStatus = false;
         $this->dataProcedureICD9CmLovSearch = '';
+        $this->store();
     }
     // LOV selected end
     /////////////////////////////////////////////////
@@ -277,6 +284,7 @@ class Diagnosis extends Component
 
         // Logic update mode start //////////
         $this->updateDataRJ($this->dataDaftarPoliRJ['rjNo']);
+        $this->emit('syncronizeAssessmentPerawatRJFindData');
     }
 
     private function updateDataRJ($rjNo): void
@@ -455,6 +463,7 @@ class Diagnosis extends Component
 
         $diagnosis = collect($this->dataDaftarPoliRJ['diagnosis'])->where("diagId", '!=', $diagId)->toArray();
         $this->dataDaftarPoliRJ['diagnosis'] = $diagnosis;
+        $this->store();
     }
 
 
@@ -473,6 +482,7 @@ class Diagnosis extends Component
 
         $procedure = collect($this->dataDaftarPoliRJ['procedure'])->where("procedureId", '!=', $procedureId)->toArray();
         $this->dataDaftarPoliRJ['procedure'] = $procedure;
+        $this->store();
     }
 
 

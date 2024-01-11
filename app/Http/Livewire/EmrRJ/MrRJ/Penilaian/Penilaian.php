@@ -15,7 +15,10 @@ class Penilaian extends Component
 {
     use WithPagination;
     // listener from blade////////////////
-    protected $listeners = [];
+    protected $listeners = [
+        'syncronizeAssessmentPerawatRJFindData' => 'mount'
+
+    ];
 
     //////////////////////////////
     // Ref on top bar
@@ -359,6 +362,7 @@ class Penilaian extends Component
         // $this->validateOnly($propertyName);
         $this->scoringSkalaMorse();
         $this->scoringSkalaHumptyDumpty();
+        $this->store();
     }
 
 
@@ -404,6 +408,7 @@ class Penilaian extends Component
 
         // Logic update mode start //////////
         $this->updateDataRJ($this->dataDaftarPoliRJ['rjNo']);
+        $this->emit('syncronizeAssessmentPerawatRJFindData');
     }
 
     private function updateDataRJ($rjNo): void

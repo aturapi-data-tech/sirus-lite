@@ -16,7 +16,10 @@ class Pemeriksaan extends Component
     use WithPagination;
 
     // listener from blade////////////////
-    protected $listeners = [];
+    protected $listeners = [
+        'syncronizeAssessmentPerawatRJFindData' => 'mount'
+
+    ];
 
     //////////////////////////////
     // Ref on top bar
@@ -469,6 +472,7 @@ class Pemeriksaan extends Component
         // dd($propertyName);
         $this->validateOnly($propertyName);
         $this->scoringIMT();
+        $this->store();
     }
 
     // /////////tingkatKesadaran////////////
@@ -569,6 +573,7 @@ class Pemeriksaan extends Component
 
         // Logic update mode start //////////
         $this->updateDataRJ($this->dataDaftarPoliRJ['rjNo']);
+        $this->emit('syncronizeAssessmentPerawatRJFindData');
     }
 
     private function updateDataRJ($rjNo): void

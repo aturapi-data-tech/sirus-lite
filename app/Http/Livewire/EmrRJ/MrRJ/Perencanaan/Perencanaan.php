@@ -19,7 +19,10 @@ class Perencanaan extends Component
     use WithPagination;
 
     // listener from blade////////////////
-    protected $listeners = [];
+    protected $listeners = [
+        'syncronizeAssessmentPerawatRJFindData' => 'mount'
+
+    ];
 
     //////////////////////////////
     // Ref on top bar
@@ -125,6 +128,7 @@ class Perencanaan extends Component
     {
         // dd($propertyName);
         $this->validateOnly($propertyName);
+        $this->store();
     }
 
 
@@ -185,6 +189,7 @@ class Perencanaan extends Component
 
         // Logic update mode start //////////
         $this->updateDataRJ($this->dataDaftarPoliRJ['rjNo']);
+        $this->emit('syncronizeAssessmentPerawatRJFindData');
     }
 
     private function updateDataRJ($rjNo): void
