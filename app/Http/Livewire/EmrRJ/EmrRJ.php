@@ -316,6 +316,10 @@ class EmrRJ extends Component
             'ermMenuId' => 'perencanaan',
             'ermMenuName' => 'Perencanaan'
         ],
+        [
+            'ermMenuId' => 'suket',
+            'ermMenuName' => 'Surat Keterangan (Sehat/Istirahat)'
+        ],
         // [
         //     'ermMenuId' => 'cppt',
         //     'ermMenuName' => 'CPPT'

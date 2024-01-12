@@ -29,7 +29,7 @@
     {{-- Content --}}
     <div class="bg-white ">
 
-        {{-- surat keterangan istirahat isi --}}
+        {{-- surat keterangan sehat isi --}}
         <div>
             <div>
                 <table class="w-full table-auto">
@@ -51,7 +51,7 @@
 
                         <tr>
                             <td class="p-1 m-1 text-lg font-semibold text-center uppercase ">
-                                surat keterangan istirahat
+                                surat keterangan sehat
                             </td>
                         </tr>
                     </tbody>
@@ -172,24 +172,20 @@
                                 @php
                                     $tglRj = isset($dataDaftarTxn['rjDate']) ? $carbon::createFromFormat('d/m/Y H:i:s', $dataDaftarTxn['rjDate']) : $carbon::now()->format('d/m/Y H:i:s');
 
-                                    $suketIstirahatHari = isset($dataDaftarTxn['suket']['suketIstirahat']['suketIstirahatHari']) ? $dataDaftarTxn['suket']['suketIstirahat']['suketIstirahatHari'] : 3;
-
                                     $tglRjAwal = $tglRj->format('d/m/Y');
-                                    $tglRjAkhir = $tglRj->addDays($suketIstirahatHari)->format('d/m/Y');
+                                    $tglRjAkhir = $tglRj->addDays(3)->format('d/m/Y');
+
                                 @endphp
                                 <br>
                                 <p>
                                     Pada pemeriksa saya tanggal
                                     {{ isset($tglRjAwal) ? $tglRjAwal : '-' }} secara klinis
-                                    dalam keadaan sakit
+                                    dalam keadaan sehat.
                                     <br>
-                                    dan perlu istirahat selama {{ $suketIstirahatHari }} (hari)
-                                    <br>
-                                    dari tanggal {{ isset($tglRjAwal) ? $tglRjAwal : '-' }} s/d
-                                    {{ isset($tglRjAkhir) ? $tglRjAkhir : '-' }}
+                                    Surat keterangan ini dibuat untuk
+                                    {{ isset($dataDaftarTxn['suket']['suketSehat']['suketSehat']) ? $dataDaftarTxn['suket']['suketSehat']['suketSehat'] : '-' }}.
                                     <br>
                                     <br>
-
                                     Demikian surat keterangan ini saya buat untuk dipergunakan
                                     sebagaimana mestinya.
                                 </p>
@@ -219,7 +215,7 @@
                 </table>
             </div>
         </div>
-        {{-- surat keterangan istirahat isi --}}
+        {{-- surat keterangan sehat isi --}}
 
     </div>
     {{-- End Content --}}

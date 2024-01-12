@@ -181,6 +181,20 @@
                                                         </div>
                                                     </div>
 
+                                                    <div>
+                                                        <x-green-button
+                                                            wire:click.prevent="cetakRekamMedisRJSuketSehatGrid('{{ $myQData->txn_no }}',
+                                                        '{{ $myQData->layanan_status }}',
+                                                        {{ $myQData->datadaftar_json }}
+                                                        )"
+                                                            type="button" wire:loading.remove>
+                                                            Cetak Surat Keterangan Sehat
+                                                        </x-green-button>
+                                                        <div wire:loading wire:target="cetakRekamMedisRJSuketSehatGrid">
+                                                            <x-loading />
+                                                        </div>
+                                                    </div>
+
                                                 </td>
 
 

@@ -465,6 +465,77 @@ class RekamMedis extends Component
         }
     }
 
+
+    public function cetakRekamMedisRJSuketSehatGrid($txnNo = null, $layananStatus = null, $dataDaftarTxn = [])
+    {
+        $queryIdentitas = DB::table('rsmst_identitases')
+            ->select(
+                'int_name',
+                'int_phone1',
+                'int_phone2',
+                'int_fax',
+                'int_address',
+                'int_city',
+            )
+            ->first();
+
+        if ($dataDaftarTxn) {
+            if ($layananStatus === 'RJ') {
+                $this->dataDaftarTxn = $dataDaftarTxn;
+                if (isset($this->dataDaftarTxn['regNo'])) {
+                    $this->setDataPasien($this->dataDaftarTxn['regNo']);
+                }
+
+                // cetak PDF
+                $data = [
+                    'myQueryIdentitas' => $queryIdentitas,
+                    'dataPasien' => $this->dataPasien,
+                    'dataDaftarTxn' => $this->dataDaftarTxn,
+
+                ];
+                $pdfContent = PDF::loadView('livewire.emr.rekam-medis.cetak-rekam-medis-r-j-suket-sehat', $data)->output();
+                $this->emit('toastr-success', 'Cetak Suket Sehat');
+
+
+                return response()->streamDownload(
+                    fn () => print($pdfContent),
+                    "rmRJ.pdf"
+                );
+            } else if ($layananStatus === 'UGD') {
+                $this->dataDaftarTxn = $dataDaftarTxn;
+
+                if (isset($this->dataDaftarTxn['regNo'])) {
+                    $this->setDataPasien($this->dataDaftarTxn['regNo']);
+                }
+
+                // cetak PDF
+                $data = [
+                    'myQueryIdentitas' => $queryIdentitas,
+                    'dataPasien' => $this->dataPasien,
+                    'dataDaftarTxn' => $this->dataDaftarTxn,
+
+                ];
+                $pdfContent = PDF::loadView('livewire.emr.rekam-medis.cetak-rekam-medis-u-g-d', $data)->output();
+                $this->emit('toastr-success', 'Cetak RM IGD');
+
+                return response()->streamDownload(
+                    fn () => print($pdfContent),
+                    "rmUGD.pdf"
+                );
+            } else if ($layananStatus === 'RI') {
+                $this->emit('toastr-error', 'Rekam Medis (Rawat Inap) Fitur dalam masa pengembangan');
+                // $this->dataDaftarTxn = $dataDaftarTxn;
+
+                // if (isset($this->dataDaftarTxn['regNo'])) {
+                //     $this->setDataPasien($this->dataDaftarTxn['regNo']);
+                // }
+            }
+        } else {
+            $this->emit('toastr-error', 'Data Rekam Medis Tidak di Temukan');
+        }
+    }
+
+
     // when new form instance
     public function mount()
     {

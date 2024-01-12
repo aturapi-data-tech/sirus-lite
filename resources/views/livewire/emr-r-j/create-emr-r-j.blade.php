@@ -47,7 +47,7 @@
                 {{-- Display Pasien Componen --}}
                 <div class="">
                     {{-- Display Pasien --}}
-                    {{-- :rjNo="" disi dari emit ListeneropenModalEditUgd --}}
+                    {{-- :rjNo="" disi dari emit ListeneropenModalEditRj --}}
 
                     <livewire:emr-r-j.display-pasien.display-pasien :wire:key="$regNo.'display-pasien'"
                         :rjNoRef="$rjNoRef">
@@ -109,7 +109,7 @@
                     @if ($activeTab == 'diagnosis')
                         <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50 ">
                             {{-- <div>{{ $activeTab }}</div> --}}
-                            {{-- :rjNo="" disi dari emit ListeneropenModalEditUgd --}}
+                            {{-- :rjNo="" disi dari emit ListeneropenModalEditRj --}}
 
 
                             <livewire:emr-r-j.mr-r-j.diagnosis.diagnosis :wire:key="'content-diagnosisRj'"
@@ -121,7 +121,7 @@
                     @if ($activeTab == 'perencanaan')
                         <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50 ">
                             {{-- <div>{{ $activeTab }}</div> --}}
-                            {{-- :rjNo="" disi dari emit ListeneropenModalEditUgd --}}
+                            {{-- :rjNo="" disi dari emit ListeneropenModalEditRj --}}
 
 
                             <livewire:emr-r-j.mr-r-j.perencanaan.perencanaan :wire:key="'content-perencanaanRj'"
@@ -132,8 +132,17 @@
                     @if ($activeTab == 'rekamMedis')
                         <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50 ">
                             {{-- <div>{{ $activeTab }}</div> --}}
-                            {{-- :rjNo="" disi dari emit ListeneropenModalEditUgd --}}
-                            <livewire:emr.rekam-medis.rekam-medis :wire:key="'content-layananUgd'" :regNoRef="$regNoRef">
+                            {{-- :rjNo="" disi dari emit ListeneropenModalEditRj --}}
+                            <livewire:emr.rekam-medis.rekam-medis :wire:key="'content-layananRj'" :regNoRef="$regNoRef">
+
+                        </div>
+                    @endif
+
+                    @if ($activeTab == 'suket')
+                        <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50 ">
+                            {{-- <div>{{ $activeTab }}</div> --}}
+                            {{-- :rjNo="" disi dari emit ListeneropenModalEditRj --}}
+                            <livewire:emr-r-j.mr-r-j.suket.suket :wire:key="'content-suketRj'" :rjNoRef="$rjNoRef">
 
                         </div>
                     @endif
