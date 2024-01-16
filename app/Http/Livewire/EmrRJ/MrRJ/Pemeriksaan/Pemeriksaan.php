@@ -432,12 +432,35 @@ class Pemeriksaan extends Component
 
 
         ],
-        "penunjang" => ""
+        "penunjang" => "",
+        "pemeriksaanPenunjang" =>
+        [
+            "lab" => [],
+            "rad" => [
+                "radHdr" => [
+                    "radHdrNo" => "",
+                    "radDtl" => [],
+                ],
+
+            ],
+        ]
 
     ];
     //////////////////////////////////////////////////////////////////////
 
+    // open and close modal start////////////////
+    //  modal status////////////////
 
+    public bool $isOpenLaboratorium = false;
+    public string $isOpenModeLaboratorium = 'insert';
+
+    public  $isPemeriksaanLaboraorium = [];
+    public  $isPemeriksaanLaboraoriumSelected = [];
+    public int $isPemeriksaanLaboraoriumSelectedKeyHdr = 0;
+    public int $isPemeriksaanLaboraoriumSelectedKeyDtl = 0;
+
+    // open and close modal start////////////////
+    //  modal status////////////////
 
 
     public $tingkatKesadaranLov = [];
@@ -474,6 +497,156 @@ class Pemeriksaan extends Component
         $this->scoringIMT();
         $this->store();
     }
+
+    private function openModalLaboratorium(): void
+    {
+        $this->isOpenLaboratorium = true;
+        $this->isOpenModeLaboratorium = 'insert';
+    }
+
+    public function pemeriksaanLaboratorium()
+    {
+        $this->openModalLaboratorium();
+        $this->renderisPemeriksaanLaboraorium();
+        // $this->findData($id);
+    }
+
+    public function closeModalLaboratorium(): void
+    {
+        $this->reset(['isOpenLaboratorium', 'isOpenModeLaboratorium', 'isPemeriksaanLaboraorium', 'isPemeriksaanLaboraoriumSelected', 'isPemeriksaanLaboraoriumSelectedKeyHdr', 'isPemeriksaanLaboraoriumSelectedKeyDtl']);
+    }
+
+    private function renderisPemeriksaanLaboraorium()
+    {
+        if (empty($this->isPemeriksaanLaboraorium)) {
+            $isPemeriksaanLaboraorium = DB::table('lbmst_clabitems')
+                ->select('clabitem_desc', 'clabitem_id', 'price', 'clabitem_group', 'item_code')
+                ->whereNull('clabitem_group')
+                ->whereNotNull('clabitem_desc')
+                ->orderBy('clabitem_desc', 'asc')
+                ->get();
+
+            $this->isPemeriksaanLaboraorium = json_decode(
+                $isPemeriksaanLaboraorium->map(function ($isPemeriksaanLaboraorium) {
+                    $isPemeriksaanLaboraorium->labStatus = 0;
+
+                    return $isPemeriksaanLaboraorium;
+                }),
+                true
+            );
+        }
+    }
+
+    public function PemeriksaanLaboraoriumIsSelectedFor($key): void
+    {
+        $this->isPemeriksaanLaboraorium[$key]['labStatus'] = $this->isPemeriksaanLaboraorium[$key]['labStatus'] ? 0 : 1;
+        $this->renderPemeriksaanLaboraoriumIsSelected($key);
+    }
+
+    public function RemovePemeriksaanLaboraoriumIsSelectedFor($key): void
+    {
+        $this->isPemeriksaanLaboraorium[$key]['labStatus'] = $this->isPemeriksaanLaboraorium[$key]['labStatus'] ? 0 : 1;
+        $this->renderPemeriksaanLaboraoriumIsSelected($key);
+    }
+
+    private function renderPemeriksaanLaboraoriumIsSelected($key): void
+    {
+        $this->isPemeriksaanLaboraoriumSelected = collect($this->isPemeriksaanLaboraorium)
+            ->where('labStatus', 1);
+    }
+
+    public function kirimLaboratorium()
+    {
+
+        $this->isPemeriksaanLaboraoriumSelectedKeyHdr = collect(isset($this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['lab']) ? $this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['lab'] : [])->count();
+
+        $sql = "select nvl(max(to_number(checkup_no))+1,1) from LBTXN_CHECKUPHDRS";
+        $checkupNo = DB::scalar($sql);
+
+        $this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['lab'][$this->isPemeriksaanLaboraoriumSelectedKeyHdr]['labHdr']['labHdrNo'] =  $checkupNo;
+        $this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['lab'][$this->isPemeriksaanLaboraoriumSelectedKeyHdr]['labHdr']['labHdrDate'] = Carbon::now()->format('d/m/Y H:i:s');
+
+
+
+        DB::table('lbtxn_checkuphdrs')->insert([
+            'reg_no' => $this->dataDaftarPoliRJ['regNo'],
+            'dr_id' => $this->dataDaftarPoliRJ['drId'],
+            'checkup_date' => DB::raw("to_date('" . Carbon::now()->format('d/m/Y H:i:s') . "','dd/mm/yyyy hh24:mi:ss')"),
+            'status_rjri' => 'RJ',
+            'checkup_status' => 'P',
+            'ref_no' => $this->dataDaftarPoliRJ['rjNo'],
+            'checkup_no' => $checkupNo,
+
+        ]);
+
+
+        // mencari key 
+        $this->isPemeriksaanLaboraoriumSelectedKeyDtl = collect($this->isPemeriksaanLaboraoriumSelected)->count() - 1;
+
+
+        // looping proses membentuk array checkup lab DTL
+        $this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['lab'][$this->isPemeriksaanLaboraoriumSelectedKeyHdr]['labHdr']['labDtl'] =  collect($this->isPemeriksaanLaboraorium)
+            ->where('labStatus', 1)
+            ->toArray();
+
+        // insert Prise checkup dtl
+        foreach ($this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['lab'][$this->isPemeriksaanLaboraoriumSelectedKeyHdr]['labHdr']['labDtl'] as $labDtl) {
+            $sql = "select nvl(to_number(max(checkup_dtl))+1,1) from LBTXN_CHECKUPDTLS";
+            $checkupDtl = DB::scalar($sql);
+
+            DB::table('lbtxn_checkupdtls')->insert([
+                'clabitem_id' => $labDtl['clabitem_id'],
+                'checkup_no' => $checkupNo,
+                'checkup_dtl' => $checkupDtl,
+                'lab_item_code' => $labDtl['item_code'],
+                'price' => $labDtl['price']
+            ]);
+
+            $this->emit('toastr-error', $labDtl['price']);
+
+            $this->isPemeriksaanLaboraoriumSelectedKeyDtl = $this->isPemeriksaanLaboraoriumSelectedKeyDtl + 1;
+        }
+
+        // insert No Prise checkup dtl
+        foreach ($this->isPemeriksaanLaboraoriumSelected as $isPemeriksaanLaboraoriumSelected) {
+            DB::table('lbmst_clabitems')->select('clabitem_desc', 'clabitem_id', 'price', 'clabitem_group', 'item_code')
+                ->where('clabitem_group', $isPemeriksaanLaboraoriumSelected['clabitem_id'])
+                ->orderBy('item_seq', 'asc')
+                ->orderBy('clabitem_desc', 'asc')
+                ->get()
+                ->each(
+                    function ($item) use ($checkupNo) {
+                        $sql = "select nvl(to_number(max(checkup_dtl))+1,1) from LBTXN_CHECKUPDTLS";
+                        $checkupDtl = DB::scalar($sql);
+
+                        DB::table('lbtxn_checkupdtls')->insert([
+                            'clabitem_id' => $item->clabitem_id,
+                            'checkup_no' => $checkupNo,
+                            'checkup_dtl' => $checkupDtl,
+                            'lab_item_code' => $item->item_code,
+                            'price' => $item->price
+                        ]);
+
+                        $this->emit('toastr-error', $item->price);
+
+                        $this->isPemeriksaanLaboraoriumSelectedKeyDtl = $this->isPemeriksaanLaboraoriumSelectedKeyDtl + 1;
+                        // $this->isPemeriksaanLaboraoriumSelected[$this->isPemeriksaanLaboraoriumSelectedKeyDtl] = [
+                        //     "clabitem_desc" => $item->clabitem_desc,
+                        //     "clabitem_id" => $item->clabitem_id,
+                        //     "price" => $item->price,
+                        //     "clabitem_group" => $item->clabitem_group,
+                        //     "labStatus" => 1,
+                        //     "checkupDtl" => $checkupDtl
+                        // ];
+                    }
+                );
+        }
+
+        $this->updateDataRJ($this->dataDaftarPoliRJ['rjNo']);
+        $this->closeModalLaboratorium();
+    }
+
+
 
     // /////////tingkatKesadaran////////////
     public function clicktingkatKesadaranlov()
