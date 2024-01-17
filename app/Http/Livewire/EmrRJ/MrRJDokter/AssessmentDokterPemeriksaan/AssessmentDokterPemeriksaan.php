@@ -617,7 +617,6 @@ class AssessmentDokterPemeriksaan extends Component
                                 'price' => $item->price
                             ]);
 
-                            $this->emit('toastr-error', $item->price);
 
                             $this->isPemeriksaanLaboraoriumSelectedKeyDtl = $this->isPemeriksaanLaboraoriumSelectedKeyDtl + 1;
                         }

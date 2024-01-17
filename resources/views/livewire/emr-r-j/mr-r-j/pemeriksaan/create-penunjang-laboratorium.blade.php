@@ -59,7 +59,7 @@
 
                 {{-- Transasi EMR --}}
                 {{-- headier --}}
-                <div class="grid w-full gap-1 mx-10 rounded-lg md:grid-cols-9 min-h-[75px]">
+                <div class="grid w-full gap-1 mx-10 rounded-lg grid-cols-10 min-h-[75px]">
                     @foreach ($isPemeriksaanLaboraoriumSelected as $key => $isPemeriksaanLab)
                         <div
                             class="inline-flex items-center justify-between w-auto p-1 my-2 text-gray-900 bg-green-100 border-2 rounded-lg cursor-pointer border-grey-200 peer-checked:border-blue-600 hover:text-gray-600 dark:peer-checked:text-gray-300 peer-checked:text-gray-600 hover:bg-gray-50 ">
