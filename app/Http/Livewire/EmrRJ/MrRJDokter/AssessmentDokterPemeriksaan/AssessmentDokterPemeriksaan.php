@@ -549,16 +549,18 @@ class AssessmentDokterPemeriksaan extends Component
     public function kirimLaboratorium()
     {
 
+        // hasil Key = 0 atau urutan pemeriksan lab lebih dari 1
         $this->isPemeriksaanLaboraoriumSelectedKeyHdr = collect(isset($this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['lab']) ? $this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['lab'] : [])->count();
 
-        $sql = "select nvl(max(to_number(checkup_no))+1,1) from LBTXN_CHECKUPHDRS";
+        $sql = "select nvl(max(to_number(checkup_no))+1,1) from lbtxn_checkuphdrs";
         $checkupNo = DB::scalar($sql);
 
+        // array Hdr
         $this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['lab'][$this->isPemeriksaanLaboraoriumSelectedKeyHdr]['labHdr']['labHdrNo'] =  $checkupNo;
         $this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['lab'][$this->isPemeriksaanLaboraoriumSelectedKeyHdr]['labHdr']['labHdrDate'] = Carbon::now()->format('d/m/Y H:i:s');
 
 
-
+        // insert Hdr
         DB::table('lbtxn_checkuphdrs')->insert([
             'reg_no' => $this->dataDaftarPoliRJ['regNo'],
             'dr_id' => $this->dataDaftarPoliRJ['drId'],
@@ -571,20 +573,21 @@ class AssessmentDokterPemeriksaan extends Component
         ]);
 
 
-        // mencari key 
+        // hasil Key Dtl dari jml yang selected -1 karena array dimulai dari 0
         $this->isPemeriksaanLaboraoriumSelectedKeyDtl = collect($this->isPemeriksaanLaboraoriumSelected)->count() - 1;
 
 
-        // looping proses membentuk array checkup lab DTL
+        // array Dtl
         $this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['lab'][$this->isPemeriksaanLaboraoriumSelectedKeyHdr]['labHdr']['labDtl'] =  collect($this->isPemeriksaanLaboraorium)
             ->where('labStatus', 1)
             ->toArray();
 
-        // insert Prise checkup dtl
+        // insert Dtl
         foreach ($this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['lab'][$this->isPemeriksaanLaboraoriumSelectedKeyHdr]['labHdr']['labDtl'] as $labDtl) {
             $sql = "select nvl(to_number(max(checkup_dtl))+1,1) from LBTXN_CHECKUPDTLS";
             $checkupDtl = DB::scalar($sql);
 
+            // insert Prise checkup dtl
             DB::table('lbtxn_checkupdtls')->insert([
                 'clabitem_id' => $labDtl['clabitem_id'],
                 'checkup_no' => $checkupNo,
@@ -593,45 +596,39 @@ class AssessmentDokterPemeriksaan extends Component
                 'price' => $labDtl['price']
             ]);
 
-            $this->emit('toastr-error', $labDtl['price']);
+            foreach ($this->isPemeriksaanLaboraoriumSelected as $isPemeriksaanLaboraoriumSelected) {
+
+                // insert No Prise checkup dtl
+                DB::table('lbmst_clabitems')->select('clabitem_desc', 'clabitem_id', 'price', 'clabitem_group', 'item_code')
+                    ->where('clabitem_group', $labDtl['clabitem_id'])
+                    ->orderBy('item_seq', 'asc')
+                    ->orderBy('clabitem_desc', 'asc')
+                    ->get()
+                    ->each(
+                        function ($item) use ($checkupNo) {
+                            $sql = "select nvl(to_number(max(checkup_dtl))+1,1) from LBTXN_CHECKUPDTLS";
+                            $checkupDtl = DB::scalar($sql);
+
+                            DB::table('lbtxn_checkupdtls')->insert([
+                                'clabitem_id' => $item->clabitem_id,
+                                'checkup_no' => $checkupNo,
+                                'checkup_dtl' => $checkupDtl,
+                                'lab_item_code' => $item->item_code,
+                                'price' => $item->price
+                            ]);
+
+                            $this->emit('toastr-error', $item->price);
+
+                            $this->isPemeriksaanLaboraoriumSelectedKeyDtl = $this->isPemeriksaanLaboraoriumSelectedKeyDtl + 1;
+                        }
+                    );
+            }
+
 
             $this->isPemeriksaanLaboraoriumSelectedKeyDtl = $this->isPemeriksaanLaboraoriumSelectedKeyDtl + 1;
         }
 
-        // insert No Prise checkup dtl
-        foreach ($this->isPemeriksaanLaboraoriumSelected as $isPemeriksaanLaboraoriumSelected) {
-            DB::table('lbmst_clabitems')->select('clabitem_desc', 'clabitem_id', 'price', 'clabitem_group', 'item_code')
-                ->where('clabitem_group', $isPemeriksaanLaboraoriumSelected['clabitem_id'])
-                ->orderBy('item_seq', 'asc')
-                ->orderBy('clabitem_desc', 'asc')
-                ->get()
-                ->each(
-                    function ($item) use ($checkupNo) {
-                        $sql = "select nvl(to_number(max(checkup_dtl))+1,1) from LBTXN_CHECKUPDTLS";
-                        $checkupDtl = DB::scalar($sql);
 
-                        DB::table('lbtxn_checkupdtls')->insert([
-                            'clabitem_id' => $item->clabitem_id,
-                            'checkup_no' => $checkupNo,
-                            'checkup_dtl' => $checkupDtl,
-                            'lab_item_code' => $item->item_code,
-                            'price' => $item->price
-                        ]);
-
-                        $this->emit('toastr-error', $item->price);
-
-                        $this->isPemeriksaanLaboraoriumSelectedKeyDtl = $this->isPemeriksaanLaboraoriumSelectedKeyDtl + 1;
-                        // $this->isPemeriksaanLaboraoriumSelected[$this->isPemeriksaanLaboraoriumSelectedKeyDtl] = [
-                        //     "clabitem_desc" => $item->clabitem_desc,
-                        //     "clabitem_id" => $item->clabitem_id,
-                        //     "price" => $item->price,
-                        //     "clabitem_group" => $item->clabitem_group,
-                        //     "labStatus" => 1,
-                        //     "checkupDtl" => $checkupDtl
-                        // ];
-                    }
-                );
-        }
 
         $this->updateDataRJ($this->dataDaftarPoliRJ['rjNo']);
         $this->closeModalLaboratorium();
