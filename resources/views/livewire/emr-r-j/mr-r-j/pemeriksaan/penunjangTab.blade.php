@@ -7,13 +7,13 @@
             <x-input-label for="dataDaftarPoliRJ.pemeriksaan.penunjang" :value="__('Penunjang')" :required="__(false)"
                 class="pt-2 sm:text-xl" />
 
-            <div class="mb-2">
+            {{-- <div class="mb-2">
                 <x-input-label for="dataDaftarPoliRJ.pemeriksaan.penunjang" :value="__('Pemeriksaan Penunjang Lab / Foto / EKG / Lan-lain')" :required="__(false)" />
 
                 <x-text-input-area id="dataDaftarPoliRJ.pemeriksaan.penunjang" placeholder="Penunjang" class="mt-1 ml-2"
                     :errorshas="__($errors->has('dataDaftarPoliRJ.pemeriksaan.penunjang'))" :disabled=$disabledPropertyRjStatus
                     wire:model.debounce.500ms="dataDaftarPoliRJ.pemeriksaan.penunjang" :rows="__('3')" />
-            </div>
+            </div> --}}
 
             {{-- tab Penunjang --}}
 
@@ -104,6 +104,7 @@
                 </div>
             </div> --}}
 
+            {{-- Lab --}}
             <div>
                 <!-- Table -->
                 <div class="grid grid-cols-1 ml-2">
@@ -170,6 +171,92 @@
                                     <td
                                         class="w-1/4 px-2 py-2 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap">
                                         {{ implode(',', array_column($pemeriksaanPenunjangLab['labHdr']['labDtl'], 'clabitem_desc')) }}
+                                    </td>
+
+                                    <td
+                                        class="w-1/4 px-2 py-2 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap">
+                                        -
+                                    </td>
+
+
+
+
+                                </tr>
+                            @endforeach
+                        @endisset
+
+
+                    </tbody>
+                </table>
+            </div>
+
+            {{-- Rad --}}
+            <div>
+                <!-- Table -->
+                <div class="grid grid-cols-1 ml-2">
+                    <div wire:loading wire:target="pemeriksaanRadiologi">
+                        <x-loading />
+                    </div>
+
+                    <x-yellow-button :disabled=$disabledPropertyRjStatus wire:click.prevent="pemeriksaanRadiologi()"
+                        type="button" wire:loading.remove>
+                        Pemeriksaan Radiologi
+                    </x-yellow-button>
+                </div>
+
+                @if ($isOpenRadiologi)
+                    @include('livewire.emr-r-j.mr-r-j.pemeriksaan.create-penunjang-radiologi')
+                @endif
+
+
+                <table class="w-full text-sm text-left text-gray-500 table-auto ">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-100 ">
+                        <tr>
+                            <th scope="col" class="px-4 py-3">
+
+
+                                <x-sort-link :active=false wire:click.prevent="" role="button" href="#">
+                                    No Radiologi
+                                </x-sort-link>
+
+                            </th>
+
+                            <th scope="col" class="px-4 py-3 ">
+                                <x-sort-link :active=false wire:click.prevent="" role="button" href="#">
+                                    Tgl Radiologi
+                                </x-sort-link>
+                            </th>
+
+                            <th scope="col" class="px-4 py-3">
+
+                                <x-sort-link :active=false wire:click.prevent="" role="button" href="#">
+                                    Pemeriksaan Radiologi
+                                </x-sort-link>
+                            </th>
+
+                            <th scope="col" class="w-8 px-4 py-3 text-center">
+                                Status
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white ">
+                        @isset($dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['rad'])
+                            @foreach ($dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['rad'] as $key => $pemeriksaanPenunjangRad)
+                                <tr class="border-b group ">
+
+                                    <td
+                                        class="w-1/4 px-2 py-2 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap">
+                                        {{ $pemeriksaanPenunjangRad['radHdr']['radHdrNo'] }}
+                                    </td>
+
+                                    <td
+                                        class="w-1/4 px-2 py-2 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap">
+                                        {{ $pemeriksaanPenunjangRad['radHdr']['radHdrDate'] }}
+                                    </td>
+
+                                    <td
+                                        class="w-1/4 px-2 py-2 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap">
+                                        {{ implode(',', array_column($pemeriksaanPenunjangRad['radHdr']['radDtl'], 'rad_desc')) }}
                                     </td>
 
                                     <td

@@ -433,17 +433,17 @@ class Pemeriksaan extends Component
 
         ],
         "penunjang" => "",
-        "pemeriksaanPenunjang" =>
-        [
-            "lab" => [],
-            "rad" => [
-                "radHdr" => [
-                    "radHdrNo" => "",
-                    "radDtl" => [],
-                ],
+        // "pemeriksaanPenunjang" =>
+        // [
+        //     "lab" => [],
+        //     "rad" => [
+        //         "radHdr" => [
+        //             "radHdrNo" => "",
+        //             "radDtl" => [],
+        //         ],
 
-            ],
-        ]
+        //     ],
+        // ]
 
     ];
     //////////////////////////////////////////////////////////////////////
@@ -454,10 +454,22 @@ class Pemeriksaan extends Component
     public bool $isOpenLaboratorium = false;
     public string $isOpenModeLaboratorium = 'insert';
 
-    public  $isPemeriksaanLaboraorium = [];
-    public  $isPemeriksaanLaboraoriumSelected = [];
-    public int $isPemeriksaanLaboraoriumSelectedKeyHdr = 0;
-    public int $isPemeriksaanLaboraoriumSelectedKeyDtl = 0;
+    public  $isPemeriksaanLaboratorium = [];
+    public  $isPemeriksaanLaboratoriumSelected = [];
+    public int $isPemeriksaanLaboratoriumSelectedKeyHdr = 0;
+    public int $isPemeriksaanLaboratoriumSelectedKeyDtl = 0;
+
+
+
+    public bool $isOpenRadiologi = false;
+    public string $isOpenModeRadiologi = 'insert';
+
+    public  $isPemeriksaanRadiologi = [];
+    public  $isPemeriksaanRadiologiSelected = [];
+    public int $isPemeriksaanRadiologiSelectedKeyHdr = 0;
+    public int $isPemeriksaanRadiologiSelectedKeyDtl = 0;
+
+
 
     // open and close modal start////////////////
     //  modal status////////////////
@@ -498,6 +510,7 @@ class Pemeriksaan extends Component
         $this->store();
     }
 
+    // lab
     private function openModalLaboratorium(): void
     {
         $this->isOpenLaboratorium = true;
@@ -507,140 +520,277 @@ class Pemeriksaan extends Component
     public function pemeriksaanLaboratorium()
     {
         $this->openModalLaboratorium();
-        $this->renderisPemeriksaanLaboraorium();
+        $this->renderisPemeriksaanLaboratorium();
         // $this->findData($id);
     }
 
     public function closeModalLaboratorium(): void
     {
-        $this->reset(['isOpenLaboratorium', 'isOpenModeLaboratorium', 'isPemeriksaanLaboraorium', 'isPemeriksaanLaboraoriumSelected', 'isPemeriksaanLaboraoriumSelectedKeyHdr', 'isPemeriksaanLaboraoriumSelectedKeyDtl']);
+        $this->reset(['isOpenLaboratorium', 'isOpenModeLaboratorium', 'isPemeriksaanLaboratorium', 'isPemeriksaanLaboratoriumSelected', 'isPemeriksaanLaboratoriumSelectedKeyHdr', 'isPemeriksaanLaboratoriumSelectedKeyDtl']);
     }
 
-    private function renderisPemeriksaanLaboraorium()
+    private function renderisPemeriksaanLaboratorium()
     {
-        if (empty($this->isPemeriksaanLaboraorium)) {
-            $isPemeriksaanLaboraorium = DB::table('lbmst_clabitems')
+        if (empty($this->isPemeriksaanLaboratorium)) {
+            $isPemeriksaanLaboratorium = DB::table('lbmst_clabitems')
                 ->select('clabitem_desc', 'clabitem_id', 'price', 'clabitem_group', 'item_code')
                 ->whereNull('clabitem_group')
                 ->whereNotNull('clabitem_desc')
                 ->orderBy('clabitem_desc', 'asc')
                 ->get();
 
-            $this->isPemeriksaanLaboraorium = json_decode(
-                $isPemeriksaanLaboraorium->map(function ($isPemeriksaanLaboraorium) {
-                    $isPemeriksaanLaboraorium->labStatus = 0;
+            $this->isPemeriksaanLaboratorium = json_decode(
+                $isPemeriksaanLaboratorium->map(function ($isPemeriksaanLaboratorium) {
+                    $isPemeriksaanLaboratorium->labStatus = 0;
 
-                    return $isPemeriksaanLaboraorium;
+                    return $isPemeriksaanLaboratorium;
                 }),
                 true
             );
         }
     }
 
-    public function PemeriksaanLaboraoriumIsSelectedFor($key): void
+    public function PemeriksaanLaboratoriumIsSelectedFor($key): void
     {
-        $this->isPemeriksaanLaboraorium[$key]['labStatus'] = $this->isPemeriksaanLaboraorium[$key]['labStatus'] ? 0 : 1;
-        $this->renderPemeriksaanLaboraoriumIsSelected($key);
+        $this->isPemeriksaanLaboratorium[$key]['labStatus'] = $this->isPemeriksaanLaboratorium[$key]['labStatus'] ? 0 : 1;
+        $this->renderPemeriksaanLaboratoriumIsSelected($key);
     }
 
-    public function RemovePemeriksaanLaboraoriumIsSelectedFor($key): void
+    public function RemovePemeriksaanLaboratoriumIsSelectedFor($key): void
     {
-        $this->isPemeriksaanLaboraorium[$key]['labStatus'] = $this->isPemeriksaanLaboraorium[$key]['labStatus'] ? 0 : 1;
-        $this->renderPemeriksaanLaboraoriumIsSelected($key);
+        $this->isPemeriksaanLaboratorium[$key]['labStatus'] = $this->isPemeriksaanLaboratorium[$key]['labStatus'] ? 0 : 1;
+        $this->renderPemeriksaanLaboratoriumIsSelected($key);
     }
 
-    private function renderPemeriksaanLaboraoriumIsSelected($key): void
+    private function renderPemeriksaanLaboratoriumIsSelected($key): void
     {
-        $this->isPemeriksaanLaboraoriumSelected = collect($this->isPemeriksaanLaboraorium)
+        $this->isPemeriksaanLaboratoriumSelected = collect($this->isPemeriksaanLaboratorium)
             ->where('labStatus', 1);
     }
 
     public function kirimLaboratorium()
     {
-
-        // hasil Key = 0 atau urutan pemeriksan lab lebih dari 1
-        $this->isPemeriksaanLaboraoriumSelectedKeyHdr = collect(isset($this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['lab']) ? $this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['lab'] : [])->count();
-
-        $sql = "select nvl(max(to_number(checkup_no))+1,1) from lbtxn_checkuphdrs";
-        $checkupNo = DB::scalar($sql);
-
-        // array Hdr
-        $this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['lab'][$this->isPemeriksaanLaboraoriumSelectedKeyHdr]['labHdr']['labHdrNo'] =  $checkupNo;
-        $this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['lab'][$this->isPemeriksaanLaboraoriumSelectedKeyHdr]['labHdr']['labHdrDate'] = Carbon::now()->format('d/m/Y H:i:s');
-
-
-        // insert Hdr
-        DB::table('lbtxn_checkuphdrs')->insert([
-            'reg_no' => $this->dataDaftarPoliRJ['regNo'],
-            'dr_id' => $this->dataDaftarPoliRJ['drId'],
-            'checkup_date' => DB::raw("to_date('" . Carbon::now()->format('d/m/Y H:i:s') . "','dd/mm/yyyy hh24:mi:ss')"),
-            'status_rjri' => 'RJ',
-            'checkup_status' => 'P',
-            'ref_no' => $this->dataDaftarPoliRJ['rjNo'],
-            'checkup_no' => $checkupNo,
-
+        $sql = "select rj_status  from rstxn_rjhdrs where rj_no=:rjNo";
+        $checkStatusRJ = DB::scalar($sql, [
+            "rjNo" => $this->dataDaftarPoliRJ['rjNo'],
         ]);
 
+        if ($checkStatusRJ == 'A') {
+            // hasil Key = 0 atau urutan pemeriksan lab lebih dari 1
+            $this->isPemeriksaanLaboratoriumSelectedKeyHdr = collect(isset($this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['lab']) ? $this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['lab'] : [])->count();
 
-        // hasil Key Dtl dari jml yang selected -1 karena array dimulai dari 0
-        $this->isPemeriksaanLaboraoriumSelectedKeyDtl = collect($this->isPemeriksaanLaboraoriumSelected)->count() - 1;
+            $sql = "select nvl(max(to_number(checkup_no))+1,1) from lbtxn_checkuphdrs";
+            $checkupNo = DB::scalar($sql);
+
+            // array Hdr
+            $this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['lab'][$this->isPemeriksaanLaboratoriumSelectedKeyHdr]['labHdr']['labHdrNo'] =  $checkupNo;
+            $this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['lab'][$this->isPemeriksaanLaboratoriumSelectedKeyHdr]['labHdr']['labHdrDate'] = Carbon::now()->format('d/m/Y H:i:s');
 
 
-        // array Dtl
-        $this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['lab'][$this->isPemeriksaanLaboraoriumSelectedKeyHdr]['labHdr']['labDtl'] =  collect($this->isPemeriksaanLaboraorium)
-            ->where('labStatus', 1)
-            ->toArray();
-
-        // insert Dtl
-        foreach ($this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['lab'][$this->isPemeriksaanLaboraoriumSelectedKeyHdr]['labHdr']['labDtl'] as $labDtl) {
-            $sql = "select nvl(to_number(max(checkup_dtl))+1,1) from LBTXN_CHECKUPDTLS";
-            $checkupDtl = DB::scalar($sql);
-
-            // insert Prise checkup dtl
-            DB::table('lbtxn_checkupdtls')->insert([
-                'clabitem_id' => $labDtl['clabitem_id'],
+            // insert Hdr
+            DB::table('lbtxn_checkuphdrs')->insert([
+                'reg_no' => $this->dataDaftarPoliRJ['regNo'],
+                'dr_id' => $this->dataDaftarPoliRJ['drId'],
+                'checkup_date' => DB::raw("to_date('" . Carbon::now()->format('d/m/Y H:i:s') . "','dd/mm/yyyy hh24:mi:ss')"),
+                'status_rjri' => 'RJ',
+                'checkup_status' => 'P',
+                'ref_no' => $this->dataDaftarPoliRJ['rjNo'],
                 'checkup_no' => $checkupNo,
-                'checkup_dtl' => $checkupDtl,
-                'lab_item_code' => $labDtl['item_code'],
-                'price' => $labDtl['price']
+
             ]);
 
-            foreach ($this->isPemeriksaanLaboraoriumSelected as $isPemeriksaanLaboraoriumSelected) {
 
-                // insert No Prise checkup dtl
-                DB::table('lbmst_clabitems')->select('clabitem_desc', 'clabitem_id', 'price', 'clabitem_group', 'item_code')
-                    ->where('clabitem_group', $labDtl['clabitem_id'])
-                    ->orderBy('item_seq', 'asc')
-                    ->orderBy('clabitem_desc', 'asc')
-                    ->get()
-                    ->each(
-                        function ($item) use ($checkupNo) {
-                            $sql = "select nvl(to_number(max(checkup_dtl))+1,1) from LBTXN_CHECKUPDTLS";
-                            $checkupDtl = DB::scalar($sql);
-
-                            DB::table('lbtxn_checkupdtls')->insert([
-                                'clabitem_id' => $item->clabitem_id,
-                                'checkup_no' => $checkupNo,
-                                'checkup_dtl' => $checkupDtl,
-                                'lab_item_code' => $item->item_code,
-                                'price' => $item->price
-                            ]);
+            // hasil Key Dtl dari jml yang selected -1 karena array dimulai dari 0
+            $this->isPemeriksaanLaboratoriumSelectedKeyDtl = collect($this->isPemeriksaanLaboratoriumSelected)->count() - 1;
 
 
-                            $this->isPemeriksaanLaboraoriumSelectedKeyDtl = $this->isPemeriksaanLaboraoriumSelectedKeyDtl + 1;
-                        }
-                    );
+            // array Dtl
+            $this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['lab'][$this->isPemeriksaanLaboratoriumSelectedKeyHdr]['labHdr']['labDtl'] =  collect($this->isPemeriksaanLaboratorium)
+                ->where('labStatus', 1)
+                ->toArray();
+
+            // insert Dtl
+            foreach ($this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['lab'][$this->isPemeriksaanLaboratoriumSelectedKeyHdr]['labHdr']['labDtl'] as $labDtl) {
+                $sql = "select nvl(to_number(max(checkup_dtl))+1,1) from LBTXN_CHECKUPDTLS";
+                $checkupDtl = DB::scalar($sql);
+
+                // insert Prise checkup dtl
+                DB::table('lbtxn_checkupdtls')->insert([
+                    'clabitem_id' => $labDtl['clabitem_id'],
+                    'checkup_no' => $checkupNo,
+                    'checkup_dtl' => $checkupDtl,
+                    'lab_item_code' => $labDtl['item_code'],
+                    'price' => $labDtl['price']
+                ]);
+
+                foreach ($this->isPemeriksaanLaboratoriumSelected as $isPemeriksaanLaboratoriumSelected) {
+
+                    // insert No Prise checkup dtl
+                    DB::table('lbmst_clabitems')->select('clabitem_desc', 'clabitem_id', 'price', 'clabitem_group', 'item_code')
+                        ->where('clabitem_group', $labDtl['clabitem_id'])
+                        ->orderBy('item_seq', 'asc')
+                        ->orderBy('clabitem_desc', 'asc')
+                        ->get()
+                        ->each(
+                            function ($item) use ($checkupNo) {
+                                $sql = "select nvl(to_number(max(checkup_dtl))+1,1) from LBTXN_CHECKUPDTLS";
+                                $checkupDtl = DB::scalar($sql);
+
+                                DB::table('lbtxn_checkupdtls')->insert([
+                                    'clabitem_id' => $item->clabitem_id,
+                                    'checkup_no' => $checkupNo,
+                                    'checkup_dtl' => $checkupDtl,
+                                    'lab_item_code' => $item->item_code,
+                                    'price' => $item->price
+                                ]);
+
+
+                                $this->isPemeriksaanLaboratoriumSelectedKeyDtl = $this->isPemeriksaanLaboratoriumSelectedKeyDtl + 1;
+                            }
+                        );
+                }
+
+
+                $this->isPemeriksaanLaboratoriumSelectedKeyDtl = $this->isPemeriksaanLaboratoriumSelectedKeyDtl + 1;
             }
 
 
-            $this->isPemeriksaanLaboraoriumSelectedKeyDtl = $this->isPemeriksaanLaboraoriumSelectedKeyDtl + 1;
+
+            $this->updateDataRJ($this->dataDaftarPoliRJ['rjNo']);
+            $this->closeModalLaboratorium();
+        } else {
+            $this->emit('toastr-error', "Pasien Sudah Pulang, Anda tidak bisa meneruskan pemeriksaan ini.");
         }
-
-
-
-        $this->updateDataRJ($this->dataDaftarPoliRJ['rjNo']);
-        $this->closeModalLaboratorium();
     }
+    // Lab
+
+    // Rad
+    private function openModalRadiologi(): void
+    {
+        $this->isOpenRadiologi = true;
+        $this->isOpenModeRadiologi = 'insert';
+    }
+
+    public function pemeriksaanRadiologi()
+    {
+        $this->openModalRadiologi();
+        $this->renderisPemeriksaanRadiologi();
+        // $this->findData($id);
+    }
+
+    public function closeModalRadiologi(): void
+    {
+        $this->reset(['isOpenRadiologi', 'isOpenModeRadiologi', 'isPemeriksaanRadiologi', 'isPemeriksaanRadiologiSelected', 'isPemeriksaanRadiologiSelectedKeyHdr', 'isPemeriksaanRadiologiSelectedKeyDtl']);
+    }
+
+    private function renderisPemeriksaanRadiologi()
+    {
+        if (empty($this->isPemeriksaanRadiologi)) {
+            $isPemeriksaanRadiologi = DB::table('rsmst_radiologis ')
+                ->select('rad_desc', 'rad_price', 'rad_id')
+                ->orderBy('rad_desc', 'asc')
+                ->get();
+
+            $this->isPemeriksaanRadiologi = json_decode(
+                $isPemeriksaanRadiologi->map(function ($isPemeriksaanRadiologi) {
+                    $isPemeriksaanRadiologi->radStatus = 0;
+
+                    return $isPemeriksaanRadiologi;
+                }),
+                true
+            );
+        }
+    }
+
+    public function PemeriksaanRadiologiIsSelectedFor($key): void
+    {
+        $this->isPemeriksaanRadiologi[$key]['radStatus'] = $this->isPemeriksaanRadiologi[$key]['radStatus'] ? 0 : 1;
+        $this->renderPemeriksaanRadiologiIsSelected($key);
+    }
+
+    public function RemovePemeriksaanRadiologiIsSelectedFor($key): void
+    {
+        $this->isPemeriksaanRadiologi[$key]['radStatus'] = $this->isPemeriksaanRadiologi[$key]['radStatus'] ? 0 : 1;
+        $this->renderPemeriksaanRadiologiIsSelected($key);
+    }
+
+    private function renderPemeriksaanRadiologiIsSelected($key): void
+    {
+        $this->isPemeriksaanRadiologiSelected = collect($this->isPemeriksaanRadiologi)
+            ->where('radStatus', 1);
+    }
+
+    public function kirimRadiologi()
+    {
+
+        $sql = "select rj_status  from rstxn_rjhdrs where rj_no=:rjNo";
+        $checkStatusRJ = DB::scalar($sql, [
+            "rjNo" => $this->dataDaftarPoliRJ['rjNo'],
+        ]);
+
+        if ($checkStatusRJ == 'A') {
+            // hasil Key = 0 atau urutan pemeriksan lab lebih dari 1
+            $this->isPemeriksaanRadiologiSelectedKeyHdr = collect(isset($this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['rad']) ? $this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['rad'] : [])->count();
+
+            // $sql = "select nvl(max(rad_dtl)+1,1) from rstxn_rjrads";
+            // $checkupNo = DB::scalar($sql);
+
+            // array Hdr
+            $this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['rad'][$this->isPemeriksaanRadiologiSelectedKeyHdr]['radHdr']['radHdrNo'] =  $this->dataDaftarPoliRJ['rjNo'];
+            $this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['rad'][$this->isPemeriksaanRadiologiSelectedKeyHdr]['radHdr']['radHdrDate'] = Carbon::now()->format('d/m/Y H:i:s');
+
+
+            // insert Hdr (Radiologi tidak di insert header / ikut txn rj)
+            // DB::table('lbtxn_checkuphdrs')->insert([
+            //     'reg_no' => $this->dataDaftarPoliRJ['regNo'],
+            //     'dr_id' => $this->dataDaftarPoliRJ['drId'],
+            //     'checkup_date' => DB::raw("to_date('" . Carbon::now()->format('d/m/Y H:i:s') . "','dd/mm/yyyy hh24:mi:ss')"),
+            //     'status_rjri' => 'RJ',
+            //     'checkup_status' => 'P',
+            //     'ref_no' => $this->dataDaftarPoliRJ['rjNo'],
+            //     'checkup_no' => $checkupNo,
+
+            // ]);
+
+
+            // hasil Key Dtl dari jml yang selected -1 karena array dimulai dari 0
+            $this->isPemeriksaanRadiologiSelectedKeyDtl = collect($this->isPemeriksaanRadiologiSelected)->count() - 1;
+
+
+            // array Dtl
+            $this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['rad'][$this->isPemeriksaanRadiologiSelectedKeyHdr]['radHdr']['radDtl'] =  collect($this->isPemeriksaanRadiologi)
+                ->where('radStatus', 1)
+                ->toArray();
+
+            // insert Dtl
+            foreach ($this->dataDaftarPoliRJ['pemeriksaan']['pemeriksaanPenunjang']['rad'][$this->isPemeriksaanRadiologiSelectedKeyHdr]['radHdr']['radDtl'] as $radDtl) {
+                $sql = "select nvl(max(rad_dtl)+1,1) from rstxn_rjrads";
+                $checkupDtl = DB::scalar($sql);
+
+                // insert Prise checkup dtl
+                DB::table('rstxn_rjrads')->insert([
+                    'rad_dtl' => $checkupDtl,
+                    'rad_id' => $radDtl['rad_id'],
+                    'rj_no' => $this->dataDaftarPoliRJ['rjNo'],
+                    'rad_price' => $radDtl['rad_price'],
+                    'dr_radiologi' => 'dr. M.A. Budi Purwito, Sp.Rad.',
+                    'waktu_entry' => DB::raw("to_date('" . Carbon::now()->format('d/m/Y H:i:s') . "','dd/mm/yyyy hh24:mi:ss')"),
+                ]);
+
+
+                $this->isPemeriksaanRadiologiSelectedKeyDtl = $this->isPemeriksaanRadiologiSelectedKeyDtl + 1;
+            }
+
+
+
+            $this->updateDataRJ($this->dataDaftarPoliRJ['rjNo']);
+            $this->closeModalRadiologi();
+        } else {
+            $this->emit('toastr-error', "Pasien Sudah Pulang, Anda tidak bisa meneruskan pemeriksaan ini.");
+        }
+    }
+    // Rad
+
 
 
 
