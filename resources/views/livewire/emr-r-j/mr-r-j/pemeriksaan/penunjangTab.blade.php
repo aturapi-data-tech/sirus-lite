@@ -246,17 +246,17 @@
 
                                     <td
                                         class="w-1/4 px-2 py-2 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap">
-                                        {{ $pemeriksaanPenunjangRad['radHdr']['radHdrNo'] ? $pemeriksaanPenunjangRad['radHdr']['radHdrNo'] : '-' }}
+                                        {{ isset($pemeriksaanPenunjangRad['radHdr']['radHdrNo']) ? $pemeriksaanPenunjangRad['radHdr']['radHdrNo'] : '-' }}
                                     </td>
 
                                     <td
                                         class="w-1/4 px-2 py-2 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap">
-                                        {{ $pemeriksaanPenunjangRad['radHdr']['radHdrDate'] ? $pemeriksaanPenunjangRad['radHdr']['radHdrDate'] : '-' }}
+                                        {{ isset($pemeriksaanPenunjangRad['radHdr']['radHdrDate']) ? $pemeriksaanPenunjangRad['radHdr']['radHdrDate'] : '-' }}
                                     </td>
 
                                     <td
                                         class="w-1/4 px-2 py-2 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap">
-                                        {{ $pemeriksaanPenunjangRad['radHdr']['radDtl'] ? implode(',', array_column($pemeriksaanPenunjangRad['radHdr']['radDtl'], 'rad_desc')) : '-' }}
+                                        {{ isset($pemeriksaanPenunjangRad['radHdr']['radDtl']) ? implode(',', array_column($pemeriksaanPenunjangRad['radHdr']['radDtl'], 'rad_desc')) : '-' }}
                                     </td>
 
                                     <td
