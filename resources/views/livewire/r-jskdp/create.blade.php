@@ -1,8 +1,8 @@
 @php
     $disabledProperty = true;
-    
+
     $disabledPropertyRjStatus = false;
-    
+
 @endphp
 
 
@@ -62,6 +62,8 @@
                             // 'isOpenMode' => 'insert',
                             'rjNoRef' => isset($dataDaftarPoliRJ['rjNo']) ? $dataDaftarPoliRJ['rjNo'] : '1',
                         ])
+
+
 
                     </div>
 

@@ -88,7 +88,15 @@
                                 'active': activeTab === '{{ 'Kontrol' }}'
                             }"
                             x-show.transition.in.opacity.duration.600="activeTab === '{{ 'Kontrol' }}'">
-                            <div>Program Kontrol Pasien Dalam Pengembangan</div>
+
+
+                            <div id="TransaksiRawatJalanskdp" class="px-4">
+
+                                <livewire:emr-r-j.mr-r-j.skdp-r-j.skdp-r-j :wire:key="'content-skdpRj'"
+                                    :rjNoRef="$rjNoRef">
+
+                            </div>
+
 
                         </div>
 
@@ -101,7 +109,8 @@
 
 
 
-                <div class="sticky bottom-0 flex justify-between px-4 py-3 bg-gray-50 sm:px-6">
+                <div class="sticky bottom-0 flex justify-between px-4 py-3 bg-gray-50 sm:px-6"
+                    x-show.transition.in.opacity.duration.600="activeTab !== '{{ 'Kontrol' }}'">
 
                     <div class="">
                         {{-- null --}}

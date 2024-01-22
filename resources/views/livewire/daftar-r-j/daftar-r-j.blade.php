@@ -406,7 +406,7 @@
                             class="sticky top-0 flex items-center justify-between p-4 bg-opacity-75 border-b rounded-t bg-primary dark:border-gray-600">
 
                             <h3 class="text-2xl font-semibold text-white dark:text-white">
-                                Data SKDP Rawat Inap
+                                Data SKDP Rawat Jalan Post Inap
                             </h3>
 
                             {{-- Close Modal --}}
