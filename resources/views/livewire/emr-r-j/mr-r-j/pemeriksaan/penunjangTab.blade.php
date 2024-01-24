@@ -7,13 +7,13 @@
             <x-input-label for="dataDaftarPoliRJ.pemeriksaan.penunjang" :value="__('Penunjang')" :required="__(false)"
                 class="pt-2 sm:text-xl" />
 
-            {{-- <div class="mb-2">
+            <div class="mb-2">
                 <x-input-label for="dataDaftarPoliRJ.pemeriksaan.penunjang" :value="__('Pemeriksaan Penunjang Lab / Foto / EKG / Lan-lain')" :required="__(false)" />
 
                 <x-text-input-area id="dataDaftarPoliRJ.pemeriksaan.penunjang" placeholder="Penunjang" class="mt-1 ml-2"
                     :errorshas="__($errors->has('dataDaftarPoliRJ.pemeriksaan.penunjang'))" :disabled=$disabledPropertyRjStatus
                     wire:model.debounce.500ms="dataDaftarPoliRJ.pemeriksaan.penunjang" :rows="__('3')" />
-            </div> --}}
+            </div>
 
             {{-- tab Penunjang --}}
 
