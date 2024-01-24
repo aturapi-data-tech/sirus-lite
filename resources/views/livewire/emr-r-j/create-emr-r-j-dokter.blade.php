@@ -91,10 +91,12 @@
                     @endif
 
                     @if ($activeTabDokter == 'pelayananPenunjang')
-                        <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50 ">
+                        <div class="grid w-full grid-cols-2 gap-2 mx-2 mr-2 rounded-lg bg-gray-50">
                             {{-- <div>{{ $activeTabDokter }}</div> --}}
                             {{-- :rjNo="" disi dari emit ListeneropenModalEditUgd --}}
-                            <livewire:emr.laborat.laborat :wire:key="'content-pelayananPenunjang'" :regNoRef="$regNoRef">
+                            <livewire:emr.laborat.laborat :wire:key="'content-pelayananPenunjangLab'" :regNoRef="$regNoRef">
+                                <livewire:emr.radiologi.radiologi :wire:key="'content-pelayananPenunjangRad'"
+                                    :regNoRef="$regNoRef">
 
                         </div>
                     @endif

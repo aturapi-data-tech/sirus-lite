@@ -35,7 +35,7 @@
                                             <th scope="col" class="w-8 px-4 py-3 text-center">
                                                 <x-sort-link :active=false wire:click.prevent="" role="button"
                                                     href="#">
-                                                    Hasil Lab
+                                                    Hasil Radiologi
                                                 </x-sort-link>
                                             </th>
                                         </tr>
@@ -47,30 +47,29 @@
                                                 <td
                                                     class="px-4 py-3 text-gray-900 group-hover:bg-gray-100 whitespace-nowrap">
                                                     <div class="italic">
-                                                        {{ 'Lab ' }}{{ $myQData->checkup_rjri === 'RI'
+                                                        {{ 'Radiologi ' }}{{ $myQData->rad_rjri === 'RI'
                                                             ? 'Rawat Inap'
-                                                            : ($myQData->checkup_rjri === 'UGD'
+                                                            : ($myQData->rad_rjri === 'UGD'
                                                                 ? 'UGD'
-                                                                : ($myQData->checkup_rjri === 'RJ'
+                                                                : ($myQData->rad_rjri === 'RJ'
                                                                     ? 'Rawat Jalan'
                                                                     : '-')) }}
                                                     </div>
                                                     <div class="font-semibold text-primary">
-                                                        {{ 'Tanggal Checkup :' }} {{ $myQData->checkup_date }}
+                                                        {{ 'Tanggal rad :' }} {{ $myQData->rad_date }}
                                                     </div>
 
                                                     <div class="font-semibold text-gray-900">
-                                                        {{ $myQData->checkup_dtl_pasien }}
+                                                        {{ $myQData->rad_desc }}
+                                                    </div>
+
+                                                    <div class="font-semibold text-gray-900">
+                                                        {{ $myQData->txn_no_dtl }}
+                                                        {{ $myQData->rad_upload_pdf }}
                                                     </div>
 
                                                     <div class="text-gray-900 ">
-                                                        {{ $myQData->checkup_status == 'P'
-                                                            ? 'Terdaftar'
-                                                            : ($myQData->checkup_status == 'C'
-                                                                ? 'Proses'
-                                                                : ($myQData->checkup_status == 'H'
-                                                                    ? 'Selesai'
-                                                                    : '')) }}
+                                                        {{ $myQData->rad_upload_pdf ? 'Selesai' : 'Proses' }}
                                                     </div>
 
 
@@ -80,10 +79,9 @@
                                                     class="px-4 py-3 text-gray-900 group-hover:bg-gray-100 whitespace-nowrap">
                                                     <div class="grid justify-center">
                                                         <x-yellow-button
-                                                            wire:click.prevent="openModalLayanan('{{ $myQData->checkup_no }}',
-                                                        '{{ $myQData->reg_no }}')"
+                                                            wire:click.prevent="openModalLayanan('{{ $myQData->rad_upload_pdf }}')"
                                                             type="button" wire:loading.remove>
-                                                            Hasil Laboratorium
+                                                            Hasil Radiologi
                                                         </x-yellow-button>
                                                         <div wire:loading wire:target="openModalLayanan">
                                                             <x-loading />
@@ -117,8 +115,8 @@
 
                         </div>
                     </div>
-                    @if ($isOpenRekamMedisLaborat)
-                        @include('livewire.emr.laborat.create-laborat')
+                    @if ($isOpenRekamMedisRadiologi)
+                        @include('livewire.emr.radiologi.create-radiologi')
                     @endif
 
                 </div>
