@@ -18,7 +18,7 @@
                 <div class="flex flex-col my-2">
                     <div class="overflow-x-auto rounded-lg">
                         <div class="inline-block min-w-full align-middle">
-                            <div class="overflow-hidden shadow sm:rounded-lg">
+                            <div class="mb-2 overflow-hidden shadow sm:rounded-lg">
                                 <table class="w-full text-sm text-left text-gray-500 table-auto dark:text-gray-400">
                                     <thead
                                         class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
