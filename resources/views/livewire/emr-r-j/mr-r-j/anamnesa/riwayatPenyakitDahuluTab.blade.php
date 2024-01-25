@@ -36,15 +36,19 @@
         </div>
 
 
-        <div class="pt-2">
-            {{-- <x-input-label for="dataDaftarPoliRJ.anamnesa.obat.obat" :value="__('Pemberian Obat')" :required="__(false)" /> --}}
+        <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50 ">
+            {{-- <div>{{ $activeTabDokter }}</div> --}}
+            {{-- :rjNo="" disi dari emit ListeneropenModalEditUgd --}}
+            <livewire:emr.rekam-medis.rekam-medis-display :wire:key="'content-rekamMedisDisplay'" :regNoRef="$dataDaftarPoliRJ['regNo']">
+
+        </div>
+
+        {{-- <div class="pt-2">
             <x-input-label for="dataDaftarPoliRJ.anamnesa.obat.obat" :value="__('Rekonsiliasi Obat')" :required="__(false)"
                 class="pt-2 sm:text-xl" />
 
             @include('livewire.emr-r-j.mr-r-j.anamnesa.rekonsiliasiObat')
-
-
-        </div>
+        </div> --}}
 
         {{-- <div class="pt-2">
             <x-input-label for="dataDaftarPoliRJ.anamnesa.lainLain.lainLain" :value="__('Lain-Lain')" :required="__(false)" />
