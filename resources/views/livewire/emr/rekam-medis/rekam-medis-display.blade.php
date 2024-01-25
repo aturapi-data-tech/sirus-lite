@@ -65,7 +65,7 @@
                                                     </div>
                                                     <br>
                                                     <div class="ml-8">
-                                                        <span class="font-semibold">TTV:</span>
+                                                        {{-- <span class="font-semibold">TTV:</span>
                                                         <br>
                                                         TD :
                                                         {{ isset($datadaftar_json['pemeriksaan']['tandaVital']['sistolik'])
@@ -88,7 +88,7 @@
                                                             ? $datadaftar_json['pemeriksaan']['tandaVital']['gda']
                                                             : '' }}
                                                         (mg/dL)
-                                                        <br>
+                                                        <br> --}}
                                                         <br>
                                                         <span class="font-semibold"> Diagnosis :</span>
                                                         <br>
