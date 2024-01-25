@@ -128,7 +128,7 @@
 
                             </div>
 
-                            {{ $myQueryData->links() }}
+                            {{ $myQueryData->links('vendor.livewire.simple-tailwind') }}
 
                         </div>
                     </div>
