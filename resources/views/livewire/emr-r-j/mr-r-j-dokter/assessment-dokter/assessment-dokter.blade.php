@@ -33,6 +33,12 @@
 
             </div>
 
+
+
+        </div>
+
+        <div class="grid grid-cols-3">
+
             <div id="TransaksiRawatJalan" class="px-4">
                 <x-input-label for="" :value="__('Assesment')" :required="__(false)" class="pt-2 sm:text-xl" />
 
@@ -53,6 +59,18 @@
 
                     <livewire:emr-r-j.mr-r-j-dokter.assessment-dokter-perencanaan.assessment-dokter-perencanaan
                         :wire:key="'content-assessment-dokter-perencanaanRj'" :rjNoRef="$rjNoRef">
+                </div>
+
+            </div>
+
+            <div id="TransaksiRawatJalan" class="px-4">
+                <x-input-label for="" :value="__('Resume Medis')" :required="__(false)" class="pt-2 sm:text-xl" />
+
+                {{-- Plan /Perencanaan --}}
+                <div class="w-full mx-2 mr-2 bg-gray-400 rounded-lg ">
+
+                    <livewire:emr.rekam-medis.rekam-medis-display :wire:key="'content-rekamMedisDisplay'"
+                        :regNoRef="$regNoRef">
                 </div>
 
             </div>

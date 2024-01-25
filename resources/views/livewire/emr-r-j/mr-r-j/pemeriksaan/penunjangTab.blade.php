@@ -216,21 +216,21 @@
 
 
                                 <x-sort-link :active=false wire:click.prevent="" role="button" href="#">
-                                    No Radiologi
+                                    No Rad
                                 </x-sort-link>
 
                             </th>
 
                             <th scope="col" class="px-4 py-3 ">
                                 <x-sort-link :active=false wire:click.prevent="" role="button" href="#">
-                                    Tgl Radiologi
+                                    Tgl Rad
                                 </x-sort-link>
                             </th>
 
                             <th scope="col" class="px-4 py-3">
 
                                 <x-sort-link :active=false wire:click.prevent="" role="button" href="#">
-                                    Pemeriksaan Radiologi
+                                    Pemeriksaan Rad
                                 </x-sort-link>
                             </th>
 

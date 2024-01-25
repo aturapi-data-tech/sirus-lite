@@ -86,7 +86,7 @@
                         <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50 ">
 
                             <livewire:emr-r-j.mr-r-j-dokter.assessment-dokter.assessment-dokter
-                                :wire:key="'content-assessmentDokter'" :rjNoRef="$rjNoRef">
+                                :wire:key="'content-assessmentDokter'" :rjNoRef="$rjNoRef" :regNoRef="$regNoRef">
                         </div>
                     @endif
 

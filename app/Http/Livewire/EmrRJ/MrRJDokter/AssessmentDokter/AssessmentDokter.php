@@ -26,6 +26,8 @@ class AssessmentDokter extends Component
     // Ref on top bar
     //////////////////////////////
     public $rjNoRef;
+    public $regNoRef;
+
 
     public function storeAssessmentDokterRJ()
     {

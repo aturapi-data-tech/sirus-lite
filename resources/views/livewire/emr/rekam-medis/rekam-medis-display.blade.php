@@ -9,8 +9,8 @@
 
         <div class="grid grid-cols-1">
 
-            <div id="TransaksiRawatJalan" class="px-4">
-                <x-input-label for="" :value="__($myTitle)" :required="__(false)" class="pt-2 sm:text-xl" />
+            <div id="TransaksiRawatJalan" class="px-2">
+                {{-- <x-input-label for="" :value="__($myTitle)" :required="__(false)" class="pt-2 sm:text-xl" /> --}}
 
 
 
@@ -92,7 +92,7 @@
                                                         <br>
                                                         @isset($datadaftar_json['diagnosis'])
                                                             @foreach ($datadaftar_json['diagnosis'] as $diagnosis)
-                                                                {!! nl2br(e($diagnosis['diagId'] . ' ' . $diagnosis['diagDesc'])) . '</br>' !!}
+                                                                {!! nl2br(e($diagnosis['diagId'] . ' - ' . $diagnosis['diagDesc'])) . '</br>' !!}
                                                             @endforeach
                                                         @endisset
                                                         <span class="font-semibold"> Terapi :</span>
