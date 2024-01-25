@@ -63,7 +63,6 @@
                                                             {{ $myQData->poli }}
                                                         </div>
                                                     </div>
-                                                    <br>
                                                     <div class="ml-8">
                                                         {{-- <span class="font-semibold">TTV:</span>
                                                         <br>
@@ -89,7 +88,6 @@
                                                             : '' }}
                                                         (mg/dL)
                                                         <br> --}}
-                                                        <br>
                                                         <span class="font-semibold"> Diagnosis :</span>
                                                         <br>
                                                         @isset($datadaftar_json['diagnosis'])
