@@ -12,7 +12,8 @@ use App\Http\Traits\customErrorMessagesTrait;
 use App\Http\Traits\BPJS\VclaimTrait;
 
 
-
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class MasterPasien extends Component
 {
