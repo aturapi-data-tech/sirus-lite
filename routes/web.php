@@ -66,6 +66,15 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+use App\Http\Livewire\MyAdmin\Users\Users;
+use App\Http\Livewire\MyAdmin\Roles\Roles;
+use App\Http\Livewire\MyAdmin\Permissions\Permissions;
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/MyUsers', Users::class)->name('MyUsers');
+    Route::get('/MyRoles', Roles::class)->name('MyRoles');
+    Route::get('/MyPermissions', Permissions::class)->name('MyPermissions');
+});
 
 // Route::resource('posts', Post::class)
 //     ->only(['index', 'store'])
