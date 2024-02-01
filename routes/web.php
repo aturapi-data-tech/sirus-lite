@@ -70,6 +70,7 @@ use App\Http\Livewire\MyAdmin\Users\Users;
 use App\Http\Livewire\MyAdmin\Roles\Roles;
 use App\Http\Livewire\MyAdmin\Permissions\Permissions;
 
+// Role Group
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/MyUsers', Users::class)->name('MyUsers');
     Route::get('/MyRoles', Roles::class)->name('MyRoles');

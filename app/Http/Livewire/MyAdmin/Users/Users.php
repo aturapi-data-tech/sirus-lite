@@ -112,6 +112,23 @@ class Users extends Component
         $user = $user->where('id', $id)->first();
         $user->assignRole('Dokter');
     }
+    public function assignRoleMr($id)
+    {
+        $user = new User;
+        $user = $user->where('id', $id)->first();
+        $user->assignRole('Mr');
+    }
+    public function assignRoleAdmin($id)
+    {
+        $user = new User;
+        $user = $user->where('id', $id)->first();
+        $user->assignRole('Admin');
+    }
+
+
+
+
+
     public function removeRolePerawat($id)
     {
         $user = new User;
@@ -123,6 +140,18 @@ class Users extends Component
         $user = new User;
         $user = $user->where('id', $id)->first();
         $user->removeRole('Dokter');
+    }
+    public function removeRoleMr($id)
+    {
+        $user = new User;
+        $user = $user->where('id', $id)->first();
+        $user->removeRole('Mr');
+    }
+    public function removeRoleAdmin($id)
+    {
+        $user = new User;
+        $user = $user->where('id', $id)->first();
+        $user->removeRole('Admin');
     }
 
     public function mount()
@@ -144,6 +173,7 @@ class Users extends Component
                 'password',
                 'created_at',
                 'updated_at',
+                DB::raw('(select string_agg(roles.name) as myrole from roles,model_has_roles where roles.id=model_has_roles.role_id and model_id=users.id) as myrole'),
 
             );
 

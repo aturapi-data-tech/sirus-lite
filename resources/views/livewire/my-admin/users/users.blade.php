@@ -96,15 +96,6 @@
                         <th scope="col" class="w-1/5 px-4 py-3 ">
                             User
                         </th>
-                        <th scope="col" class="w-1/5 px-4 py-3 ">
-                            Email
-                        </th>
-                        {{-- <th scope="col" class="w-1/5 px-4 py-3 ">
-                            Password
-                        </th> --}}
-                        <th scope="col" class="w-1/5 px-4 py-3 ">
-                            Has Role
-                        </th>
                         {{-- <th scope="col" class="w-1/5 px-4 py-3 ">
                             Update
                         </th> --}}
@@ -125,50 +116,78 @@
                                 {{ $myQData->id }}
                             </td> --}}
                             <td class="px-4 py-2">
-                                {{ $myQData->name }}
+                                Name : {{ $myQData->name }}
+                                <br>
+                                <span class="text-lg font-semibold text-primary"> User : {{ $myQData->email }}</span>
+                                <br>
+                                <span class="italic font-semibold"> Role : {{ $myQData->myrole }}</span>
+                                <br>
+                                Create : {{ $myQData->updated_at }}
                             </td>
                             <td class="px-4 py-2">
-                                {{ $myQData->email }}
-                            </td>
-                            {{-- <td class="px-4 py-2">
-                                {{ $myQData->password }}
-                            </td> --}}
-                            <td class="px-4 py-2">
-                                {{ $myQData->created_at }}
-                            </td>
-                            <td class="px-4 py-2">
-                                {{ $myQData->updated_at }}
+                                R/W
                             </td>
                             {{-- <td class="px-4 py-2">
                                 {{ $myQData->updated_at }}
                             </td> --}}
                             <td class="px-4 py-2">
-                                <div>
+
+
+
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <form wire:submit.prevent="assignRolePerawat({{ $myQData->id }})">
+                                            <x-primary-button type="submit">RolePerawat</x-primary-button>
+                                        </form>
+                                    </div>
+                                    <div>
+                                        <form wire:submit.prevent="assignRoleDokter({{ $myQData->id }})">
+                                            <x-primary-button type="submit">RoleDokter</x-primary-button>
+                                        </form>
+                                    </div>
+                                    <div>
+                                        <form wire:submit.prevent="assignRoleMr({{ $myQData->id }})">
+                                            <x-primary-button type="submit">RoleMr</x-primary-button>
+                                        </form>
+                                    </div>
+                                    <div>
+                                        <form wire:submit.prevent="assignRoleAdmin({{ $myQData->id }})">
+                                            <x-primary-button type="submit">RoleAdmin</x-primary-button>
+                                        </form>
+                                    </div>
+
+
+
+
+
+                                    <div>
+                                        <form wire:submit.prevent="removeRolePerawat({{ $myQData->id }})">
+                                            <x-light-button type="submit">HapusRolePerawat</x-light-button>
+                                        </form>
+                                    </div>
+                                    <div>
+                                        <form wire:submit.prevent="removeRoleDokter({{ $myQData->id }})">
+                                            <x-light-button type="submit">HapusRoleDokter</x-light-button>
+                                        </form>
+                                    </div>
+                                    <div>
+                                        <form wire:submit.prevent="removeRoleMr({{ $myQData->id }})">
+                                            <x-light-button type="submit">HapusRoleMr</x-light-button>
+                                        </form>
+                                    </div>
+                                    <div>
+                                        <form wire:submit.prevent="removeRoleAdmin({{ $myQData->id }})">
+                                            <x-light-button type="submit">HapusRoleAdmin</x-light-button>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <div class="my-2">
                                     <form wire:submit.prevent="deleteUser('{{ $myQData->email }}')">
-                                        <x-primary-button type="submit">Hapus User</x-primary-button>
-                                    </form>
-                                </div>
-                                <div>
-                                    <form wire:submit.prevent="assignRolePerawat({{ $myQData->id }})">
-                                        <x-primary-button type="submit">RolePerawat</x-primary-button>
-                                    </form>
-                                </div>
-                                <div>
-                                    <form wire:submit.prevent="assignRoleDokter({{ $myQData->id }})">
-                                        <x-primary-button type="submit">RoleDokter</x-primary-button>
+                                        <x-danger-button type="submit">Hapus User</x-danger-button>
                                     </form>
                                 </div>
 
-                                <div>
-                                    <form wire:submit.prevent="removeRolePerawat({{ $myQData->id }})">
-                                        <x-primary-button type="submit">HapusRolePerawat</x-primary-button>
-                                    </form>
-                                </div>
-                                <div>
-                                    <form wire:submit.prevent="removeRoleDokter({{ $myQData->id }})">
-                                        <x-primary-button type="submit">HapusRoleDokter</x-primary-button>
-                                    </form>
-                                </div>
                             </td>
                         </tr>
                     @endforeach
