@@ -182,11 +182,22 @@
                                     </div>
                                 </div>
 
-                                <div class="my-2">
-                                    <form wire:submit.prevent="deleteUser('{{ $myQData->email }}')">
-                                        <x-danger-button type="submit">Hapus User</x-danger-button>
-                                    </form>
+                                <div class="grid grid-cols-2 gap-2">
+
+
+                                    <div class="my-2">
+                                        <form wire:submit.prevent="editUser('{{ $myQData->email }}')">
+                                            <x-yellow-button type="submit">Edit User</x-yellow-button>
+                                        </form>
+                                    </div>
+
+                                    <div class="my-2">
+                                        <form wire:submit.prevent="deleteUser('{{ $myQData->email }}')">
+                                            <x-danger-button type="submit">Hapus User</x-danger-button>
+                                        </form>
+                                    </div>
                                 </div>
+
 
                             </td>
                         </tr>
@@ -219,7 +230,20 @@
             @role('Perawat')
                 <div> I am a Perawat!</div>
             @endrole
-
+            @role('Admin')
+                <div> I am a Admin!</div>
+            @endrole
+            @php
+                $myRoles = json_decode(auth()->user()->roles, true);
+            @endphp
+            @isset($myRoles)
+                @foreach ($myRoles as $myRole)
+                    <div>
+                        {{ 'My role is ' . $myRole['name'] }}
+                        {{ auth()->user()->myuser_ttd_image }}
+                    </div>
+                @endforeach
+            @endisset
         </div>
     </div>
 

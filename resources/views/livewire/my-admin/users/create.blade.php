@@ -62,41 +62,90 @@
                         <!-- Email Address -->
                         <div class="mt-4">
                             <x-input-label for="myData.email" :value="__('Email')" />
-                            <x-text-input id="myData.email" class="block w-full mt-1" type="email" name="myData.email"
-                                :value="old('email')" required autocomplete="username" wire:model="myData.email" />
+                            @if ($isOpenMode == 'insert')
+                                <x-text-input id="myData.email" class="block w-full mt-1 " type="email"
+                                    name="myData.email" :value="old('email')" required autocomplete="username"
+                                    wire:model="myData.email" />
+                            @else
+                                <x-text-input id="myData.email" class="block w-full mt-1 " type="email"
+                                    name="myData.email" :value="old('email')" required autocomplete="username"
+                                    wire:model="myData.email" disabled />
+                            @endif
                             <x-input-error :messages="$errors->get('myData.email')" class="mt-2" />
                         </div>
 
                         <!-- Password -->
-                        <div class="mt-4">
-                            <x-input-label for="myData.password" :value="__('Password')" />
+                        @if ($isOpenMode == 'insert')
+                            <div class="mt-4">
+                                <x-input-label for="myData.password" :value="__('Password')" />
 
-                            <x-text-input id="myData.password" class="block w-full mt-1" type="password"
-                                name="myData.password" required autocomplete="new-password"
-                                wire:model="myData.password" />
-                            <x-input-error :messages="$errors->get('myData.password')" class="mt-2" />
+                                <x-text-input id="myData.password" class="block w-full mt-1" type="password"
+                                    name="myData.password" required autocomplete="new-password"
+                                    wire:model="myData.password" />
+                                <x-input-error :messages="$errors->get('myData.password')" class="mt-2" />
+                            </div>
+
+                            <!-- Confirm Password -->
+                            <div class="mt-4">
+                                <x-input-label for="myData.password_confirmation" :value="__('Confirm Password')" />
+
+                                <x-text-input id="myData.password_confirmation" class="block w-full mt-1"
+                                    type="password" name="myData.password_confirmation" required
+                                    autocomplete="new-password" wire:model="myData.password_confirmation" />
+
+                                <x-input-error :messages="$errors->get('myData.password_confirmation')" class="mt-2" />
+                            </div>
+                        @endif
+
+                        <div>
+                            <div class="mt-4">
+                                <x-input-label for="myUserCode" :value="__('myUsreCode')" />
+                                <x-text-input id="myUserCode" class="block w-full mt-1"
+                                    wire:model="myData.myUserCode" />
+                                <x-input-error :messages="$errors->get('myData.myUserCode')" class="mt-2" />
+                            </div>
+
+                            <div class="mt-4">
+                                <x-input-label for="myUserName" :value="__('myUsreName')" />
+                                <x-text-input id="myUserName" class="block w-full mt-1"
+                                    wire:model="myData.myUserName" />
+                                <x-input-error :messages="$errors->get('myData.myUserName')" class="mt-2" />
+                            </div>
+
+                            <div class="mt-4">
+                                <x-input-label for="myUserTtdImage" :value="__('myUserTtdImage')" />
+                                <x-text-input id="myUserTtdImage" class="block w-full mt-1"
+                                    wire:model="myData.myUserTtdImage" type="file" />
+                                {{-- photo Old --}}
+                                <x-text-input id="myUserTtdImageOld" class="hidden w-full mt-1 "
+                                    wire:model="myData.myUserTtdImage" />
+
+                                <x-input-error :messages="$errors->get('myData.myUserTtdImage')" class="mt-2" />
+
+                            </div>
+
+                            <div class="my-4">
+                                <img class="h-auto max-w-full rounded-lg"
+                                    src="{{ asset('storage/' . $myData['myUserTtdImage']) }}" alt="">
+                            </div>
+
                         </div>
 
-                        <!-- Confirm Password -->
-                        <div class="mt-4">
-                            <x-input-label for="myData.password_confirmation" :value="__('Confirm Password')" />
-
-                            <x-text-input id="myData.password_confirmation" class="block w-full mt-1" type="password"
-                                name="myData.password_confirmation" required autocomplete="new-password"
-                                wire:model="myData.password_confirmation" />
-
-                            <x-input-error :messages="$errors->get('myData.password_confirmation')" class="mt-2" />
-                        </div>
 
                         <div class="flex items-center justify-end mt-4">
                             <a class="text-sm text-gray-600 underline rounded-md dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
                                 href="{{ route('login') }}">
                                 {{ __('Already registered?') }}
                             </a>
-
-                            <x-primary-button class="ml-4">
-                                {{ __('Register') }}
-                            </x-primary-button>
+                            @if ($isOpenMode == 'insert')
+                                <x-primary-button class="ml-4">
+                                    {{ __('Register') }}
+                                </x-primary-button>
+                            @else
+                                <x-primary-button class="ml-4">
+                                    {{ __('Update User') }}
+                                </x-primary-button>
+                            @endif
                         </div>
                     </form>
                 </div>

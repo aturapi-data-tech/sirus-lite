@@ -8,19 +8,30 @@ use Illuminate\Validation\Rules;
 
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Livewire\WithFileUploads;
+
 
 use Livewire\Component;
 
 
 class Users extends Component
 {
-    use WithPagination;
+    use WithPagination, WithFileUploads;
 
     // primitive Variable
     public string $myTitle = 'User SIRus';
     public string $mySnipet = 'Data User ';
 
-    public array $myData = ['name' => '', 'email' => '', 'password' => '', 'password_confirmation' => ''];
+    public array $myData = [
+        'name' => '',
+        'email' => '',
+        'password' => '',
+        'password_confirmation' => '',
+        'myUserCode' => '',
+        'myUserName' => '',
+        'myUserTtdImage' => '',
+    ];
 
     // TopBar
     public array $myTopBar = [];
@@ -54,10 +65,23 @@ class Users extends Component
         $this->isOpen = true;
         $this->isOpenMode = 'insert';
     }
-    private function openModalEdit($rjNo): void
+    private function openModalEdit($id): void
     {
         $this->isOpen = true;
         $this->isOpenMode = 'update';
+        $this->findData($id);
+    }
+    private function findData($id): void
+    {
+
+        $findData = User::Where('email', $id)->first();
+        $this->myData['name'] = $findData->name;
+        $this->myData['email'] = $findData->email;
+        // $this->myData['password'] = $findData->name;
+        // $this->myData['password_confirmation'] = $findData->name;
+        $this->myData['myUserCode'] = $findData->myuser_code;
+        $this->myData['myUserName'] = $findData->myuser_name;
+        $this->myData['myUserTtdImage'] = $findData->myuser_ttd_image;
     }
 
     private function openModalTampil(): void
@@ -68,7 +92,7 @@ class Users extends Component
 
     public function closeModal(): void
     {
-        $this->reset(['isOpen', 'isOpenMode']);
+        $this->reset(['isOpen', 'isOpenMode', 'myData']);
     }
     // open and close modal end////////////////
 
@@ -84,19 +108,72 @@ class Users extends Component
         // $deleted = User::Where('email', $id)->delete();
     }
 
+    public function editUser($id): void
+    {
+        $this->openModalEdit($id);
+    }
+
     public function store()
     {
-        $this->validate([
+        $rules = [
             'myData.name' => ['required', 'string', 'max:255'],
-            'myData.email' => ['required', 'string', 'email', 'max:255', 'unique:' . User::class . ',email'],
-            'myData.password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
+        ];
 
-        $user = User::create([
-            'name' => $this->myData['name'],
-            'email' => $this->myData['email'],
-            'password' => Hash::make($this->myData['password']),
-        ]);
+
+        if ($this->isOpenMode == 'insert') {
+
+            $rulse['myData.password'] = ['required', 'confirmed', Rules\Password::defaults()];
+            $rulse['myData.email'] = ['required', 'string', 'email', 'max:255', 'unique:' . User::class . ',email'];
+
+            $this->validate($rules);
+
+            if ($this->myData['myUserTtdImage']) {
+                // upload photo
+                $myUserTtdImage = $this->myData['myUserTtdImage']->store('UserTtd');
+            } else {
+                $myUserTtdImage = '';
+            }
+
+            $user = User::create([
+                'name' => $this->myData['name'],
+                'email' => $this->myData['email'],
+                'password' => Hash::make($this->myData['password']),
+                'myuser_code' => $this->myData['myUserCode'],
+                'myuser_name' => $this->myData['myUserName'],
+                'myuser_ttd_image' => $myUserTtdImage,
+            ]);
+            //
+            //
+        } else {
+            $rulse['myData.email'] = ['required', 'string', 'email', 'max:255'];
+
+            $this->validate($rules);
+            $user = User::where('email', $this->myData['email']);
+
+            // Foto/////////////////////////////////////////////////////////////////////////
+            if ($user->first()->myuser_ttd_image !== $this->myData['myUserTtdImage']) {
+                // delte photo
+                if ($user->first()->myuser_ttd_image) {
+                    Storage::delete($user->first()->myuser_ttd_image);
+                }
+                // upload photo
+                $myUserTtdImage = $this->myData['myUserTtdImage']->store('UserTtd');
+                $user->update([
+                    'myuser_ttd_image' => $myUserTtdImage,
+                ]);
+            }
+            // uploadphoto if foto false/////////////////////////////////////////////////////
+
+            $user->update([
+                'name' => $this->myData['name'],
+                'email' => $this->myData['email'],
+                'myuser_code' => $this->myData['myUserCode'],
+                'myuser_name' => $this->myData['myUserName'],
+            ]);
+        }
+
+
+
         $this->closeModal();
         $this->reset(['myData']);
     }
