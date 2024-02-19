@@ -411,6 +411,7 @@ class EmrRJ extends Component
             )
             ->where(DB::raw("nvl(erm_status,'A')"), '=', $myRefstatusId)
             ->where('rj_status', '!=', 'F')
+            ->where('klaim_id', '!=', 'KR')
 
             // ->where('shift', '=', $myRefshift)
             ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $myRefdate);
