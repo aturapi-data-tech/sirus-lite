@@ -245,7 +245,31 @@
                                 </li>
                             </ul>
                         @endrole
+                        <ul id="dropdown-layoutsUGD" class="hidden py-2 space-y-2">
+                            <li>
+                                <x-nav-link class="pl-4" :href="route('daftarUGD')" :active="request()->routeIs('daftarUGD')">
+                                    {{ __('Pendaftaran UGD') }}
+                                </x-nav-link>
+                                <x-nav-link class="pl-4" :href="route('EmrUGD')" :active="request()->routeIs('EmrUGD')">
+                                    {{ __('Rekam Medis UGD') }}
+                                </x-nav-link>
 
+
+
+
+
+                                <x-nav-link class="pl-4" :href="route('MyUsers')" :active="request()->routeIs('MyUses')">
+                                    {{ __('MyUsers') }}
+                                </x-nav-link>
+                                <x-nav-link class="pl-4" :href="route('MyRoles')" :active="request()->routeIs('MyRoles')">
+                                    {{ __('MyRoles') }}
+                                </x-nav-link>
+                                <x-nav-link class="pl-4" :href="route('MyPermissions')" :active="request()->routeIs('MyPermissions')">
+                                    {{ __('MyPermissions') }}
+                                </x-nav-link>
+
+                            </li>
+                        </ul>
 
                     </li>
 

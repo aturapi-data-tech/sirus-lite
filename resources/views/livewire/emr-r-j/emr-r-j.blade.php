@@ -294,26 +294,74 @@
                                                             {{ __('Tampil | ' . $myQData->reg_name) }}
                                                         </x-dropdown-link>
                                                     </li> --}}
-                                                    <li>
-                                                        <x-dropdown-link
-                                                            wire:click="editScreening('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
-                                                            {{ __('Screening') }}
-                                                        </x-dropdown-link>
-                                                    </li>
 
-                                                    <li>
-                                                        <x-dropdown-link
-                                                            wire:click="editDokter('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
-                                                            {{ __('Assessment Dokter') }}
-                                                        </x-dropdown-link>
-                                                    </li>
 
-                                                    <li>
-                                                        <x-dropdown-link
-                                                            wire:click="edit('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
-                                                            {{ __('Assessment Perawat') }}
-                                                        </x-dropdown-link>
-                                                    </li>
+                                                    @role('Admin')
+                                                        <li>
+                                                            <x-dropdown-link
+                                                                wire:click="editScreening('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
+                                                                {{ __('Screening') }}
+                                                            </x-dropdown-link>
+                                                        </li>
+
+                                                        <li>
+                                                            <x-dropdown-link
+                                                                wire:click="editDokter('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
+                                                                {{ __('Assessment Dokter') }}
+                                                            </x-dropdown-link>
+                                                        </li>
+
+                                                        <li>
+                                                            <x-dropdown-link
+                                                                wire:click="edit('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
+                                                                {{ __('Assessment Perawat') }}
+                                                            </x-dropdown-link>
+                                                        </li>
+                                                    @endrole
+                                                    @role('Mr')
+                                                        <li>
+                                                            <x-dropdown-link
+                                                                wire:click="editScreening('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
+                                                                {{ __('Screening') }}
+                                                            </x-dropdown-link>
+                                                        </li>
+
+                                                        <li>
+                                                            <x-dropdown-link
+                                                                wire:click="editDokter('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
+                                                                {{ __('Assessment Dokter') }}
+                                                            </x-dropdown-link>
+                                                        </li>
+
+                                                        <li>
+                                                            <x-dropdown-link
+                                                                wire:click="edit('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
+                                                                {{ __('Assessment Perawat') }}
+                                                            </x-dropdown-link>
+                                                        </li>
+                                                    @endrole
+                                                    @role('Perawat')
+                                                        <li>
+                                                            <x-dropdown-link
+                                                                wire:click="editScreening('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
+                                                                {{ __('Screening') }}
+                                                            </x-dropdown-link>
+                                                        </li>
+                                                        <li>
+                                                            <x-dropdown-link
+                                                                wire:click="edit('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
+                                                                {{ __('Assessment Perawat') }}
+                                                            </x-dropdown-link>
+                                                        </li>
+                                                    @endrole
+                                                    @role('Dokter')
+                                                        <li>
+                                                            <x-dropdown-link
+                                                                wire:click="editDokter('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
+                                                                {{ __('Assessment Dokter') }}
+                                                            </x-dropdown-link>
+                                                        </li>
+                                                    @endrole
 
                                                     {{-- <li>
                                                         <x-dropdown-link

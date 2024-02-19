@@ -291,6 +291,7 @@ class AssessmentDokterDiagnosis extends Component
         // Logic update mode start //////////
         $this->updateDataRJ($this->dataDaftarPoliRJ['rjNo']);
         $this->emit('syncronizeAssessmentDokterRJFindData');
+        $this->insertDiagICD10toSIMRS();
     }
 
     private function updateDataRJ($rjNo): void
@@ -472,6 +473,34 @@ class AssessmentDokterDiagnosis extends Component
         $this->store();
     }
 
+
+    private function insertDiagICD10toSIMRS()
+    {
+
+        // delete dtl diagnosa
+        DB::table('rstxn_rjdtls')
+            ->where('rj_no',  $this->dataDaftarPoliRJ['rjNo'])
+            ->delete();
+
+        foreach ($this->dataDaftarPoliRJ['diagnosis'] as $diagnosis) {
+            $sql = "select nvl(max(rjdtl_dtl)+1,1) from rstxn_rjdtls";
+            $rjDtlDtl = DB::scalar($sql);
+
+            // insert rstxn_rjdtls 
+            DB::table('rstxn_rjdtls')->insert([
+                'rjdtl_dtl' => $rjDtlDtl,
+                'rj_no' =>  $this->dataDaftarPoliRJ['rjNo'],
+                'diag_id' => $diagnosis['diagId'],
+
+            ]);
+        }
+        // update status diagnosa rstxn_rjhdrs
+        DB::table('rstxn_rjhdrs')
+            ->where('rj_no',  $this->dataDaftarPoliRJ['rjNo'])
+            ->update([
+                'rj_diagnosa' => 'D',
+            ]);
+    }
 
 
 
