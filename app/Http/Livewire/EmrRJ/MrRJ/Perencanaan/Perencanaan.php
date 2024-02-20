@@ -357,22 +357,71 @@ class Perencanaan extends Component
         $this->dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['selesaiPemeriksaan'] = $myTime;
     }
 
+
+    private function validateDrPemeriksa()
+    {
+        // Validasi dulu
+        $messages = [];
+        $myRules = [
+            // 'dataDaftarPoliRJ.pemeriksaan.tandaVital.sistolik' => 'required|numeric',
+            // 'dataDaftarPoliRJ.pemeriksaan.tandaVital.distolik' => 'required|numeric',
+            'dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNadi' => 'required|numeric',
+            'dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNafas' => 'required|numeric',
+            'dataDaftarPoliRJ.pemeriksaan.tandaVital.suhu' => 'required|numeric',
+            'dataDaftarPoliRJ.pemeriksaan.tandaVital.spo2' => 'numeric',
+            'dataDaftarPoliRJ.pemeriksaan.tandaVital.gda' => 'numeric',
+
+            'dataDaftarPoliRJ.pemeriksaan.nutrisi.bb' => 'required|numeric',
+            'dataDaftarPoliRJ.pemeriksaan.nutrisi.tb' => 'required|numeric',
+            'dataDaftarPoliRJ.pemeriksaan.nutrisi.imt' => 'required|numeric',
+            'dataDaftarPoliRJ.pemeriksaan.nutrisi.lk' => 'numeric',
+            'dataDaftarPoliRJ.pemeriksaan.nutrisi.lila' => 'numeric',
+
+
+            'dataDaftarPoliRJ.anamnesa.pengkajianPerawatan.jamDatang' => 'required|date_format:d/m/Y H:i:s',
+        ];
+        // Proses Validasi///////////////////////////////////////////
+        try {
+            $this->validate($myRules, $messages);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+
+            $this->emit('toastr-error', "Anda tidak dapat melakukan TTD-E karena data pemeriksaan belum lengkap.");
+            $this->validate($myRules, $messages);
+        }
+        // Validasi dulu
+    }
     public function setDrPemeriksa()
     {
-        if (isset($this->dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa'])) {
-            if (!$this->dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa']) {
+
+        $myRoles = json_decode(auth()->user()->roles, true);
+        $myUserCodeActive = auth()->user()->myuser_code;
+        $myUserNameActive = auth()->user()->myuser_name;
+        // $myUserTtdActive = auth()->user()->myuser_ttd_image;
+
+        // Validasi dulu
+        // cek apakah data pemeriksaan sudah dimasukkan atau blm
+        $this->validateDrPemeriksa();
+
+        if ($this->dataDaftarPoliRJ['drId'] == $myUserCodeActive && $myRoles[0]['name'] == 'Dokter') {
+
+            if (isset($this->dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa'])) {
+                if (!$this->dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa']) {
+                    $this->dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa'] = (isset($this->dataDaftarPoliRJ['drDesc']) ?
+                        ($this->dataDaftarPoliRJ['drDesc'] ? $this->dataDaftarPoliRJ['drDesc']
+                            : 'Dokter pemeriksa')
+                        : 'Dokter pemeriksa-');
+                }
+            } else {
+
+                $this->dataDaftarPoliRJ['perencanaan']['pengkajianMedisTab'] = 'Pengkajian Medis';
                 $this->dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa'] = (isset($this->dataDaftarPoliRJ['drDesc']) ?
                     ($this->dataDaftarPoliRJ['drDesc'] ? $this->dataDaftarPoliRJ['drDesc']
                         : 'Dokter pemeriksa')
                     : 'Dokter pemeriksa-');
             }
+            $this->store();
         } else {
-
-            $this->dataDaftarPoliRJ['perencanaan']['pengkajianMedisTab'] = 'Pengkajian Medis';
-            $this->dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa'] = (isset($this->dataDaftarPoliRJ['drDesc']) ?
-                ($this->dataDaftarPoliRJ['drDesc'] ? $this->dataDaftarPoliRJ['drDesc']
-                    : 'Dokter pemeriksa')
-                : 'Dokter pemeriksa-');
+            $this->emit('toastr-error', "Anda tidak dapat melakukan TTD-E karena User Role " . $myRoles[0]['name'] . " Bukan Pasien " . $myUserNameActive);
         }
     }
 
@@ -382,7 +431,7 @@ class Perencanaan extends Component
         $this->findData($this->rjNoRef);
 
         // set dokter pemeriksa
-        $this->setDrPemeriksa();
+        // $this->setDrPemeriksa();
     }
 
 

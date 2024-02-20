@@ -2,28 +2,6 @@
     <div class="w-full mb-1">
 
         <div>
-            <x-input-label for="dataDaftarPoliRJ.anamnesa.pengkajianPerawatan.perawatPenerima" :value="__('Perawat Penerima')"
-                :required="__(true)" class="pt-2 sm:text-xl" />
-
-            <div class="mb-2 ">
-                <div class="mb-2 ">
-                    <x-text-input id="dataDaftarPoliRJ.anamnesa.pengkajianPerawatan.perawatPenerima"
-                        name="dataDaftarPoliRJ.anamnesa.pengkajianPerawatan.perawatPenerima"
-                        placeholder="Perawat Penerima" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.anamnesa.pengkajianPerawatan.perawatPenerima'))"
-                        :disabled=$disabledPropertyRjStatus
-                        wire:model.debounce.500ms="dataDaftarPoliRJ.anamnesa.pengkajianPerawatan.perawatPenerima"
-                        autocomplete="dataDaftarPoliRJ.anamnesa.pengkajianPerawatan.perawatPenerima" />
-
-
-                </div>
-
-            </div>
-            @error('dataDaftarPoliRJ.anamnesa.pengkajianPerawatan.perawatPenerima')
-                <x-input-error :messages=$message />
-            @enderror
-        </div>
-
-        <div>
             <x-input-label for="dataDaftarPoliRJ.anamnesa.pengkajianPerawatan.jamDatang" :value="__('Waktu Datang')"
                 :required="__(true)" />
 
@@ -58,6 +36,32 @@
                 <x-input-error :messages=$message />
             @enderror
         </div>
+
+        <div>
+            <x-input-label for="dataDaftarPoliRJ.anamnesa.pengkajianPerawatan.perawatPenerima" :value="__('Perawat Penerima')"
+                :required="__(true)" class="pt-2 sm:text-xl" />
+
+            <div class="mb-2 ">
+                <div class="grid gap-2 mb-2">
+                    <x-text-input id="dataDaftarPoliRJ.anamnesa.pengkajianPerawatan.perawatPenerima"
+                        name="dataDaftarPoliRJ.anamnesa.pengkajianPerawatan.perawatPenerima"
+                        placeholder="Perawat Penerima" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.anamnesa.pengkajianPerawatan.perawatPenerima'))" :disabled=true
+                        wire:model.debounce.500ms="dataDaftarPoliRJ.anamnesa.pengkajianPerawatan.perawatPenerima"
+                        autocomplete="dataDaftarPoliRJ.anamnesa.pengkajianPerawatan.perawatPenerima" />
+
+                    <x-yellow-button :disabled=false wire:click.prevent="setPerawatPenerima()" type="button"
+                        wire:loading.remove>
+                        ttd Perawat
+                    </x-yellow-button>
+                </div>
+
+            </div>
+            @error('dataDaftarPoliRJ.anamnesa.pengkajianPerawatan.perawatPenerima')
+                <x-input-error :messages=$message />
+            @enderror
+        </div>
+
+
 
         {{-- <div class="mb-2">
             <x-input-label for="dataDaftarPoliRJ.anamnesa.pengkajianPerawatan.caraMasukRj" :value="__('Cara Masuk RJ')"

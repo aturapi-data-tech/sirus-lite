@@ -6,13 +6,17 @@
                 :required="__(true)" class="pt-2 sm:text-xl" />
 
             <div class="mb-2 ">
-                <div class="mb-2 ">
+                <div class="grid gap-2 mb-2">
                     <x-text-input id="dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima"
                         name="dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima" placeholder="Perawat Penerima"
                         class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima'))" :disabled=$disabledPropertyRjStatus
                         wire:model.debounce.500ms="dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima"
                         autocomplete="dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima" />
 
+                    <x-yellow-button :disabled=false wire:click.prevent="setPerawatPenerima()" type="button"
+                        wire:loading.remove>
+                        ttd Perawat
+                    </x-yellow-button>
 
                 </div>
 

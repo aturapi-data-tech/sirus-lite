@@ -600,6 +600,10 @@ class Anamnesa extends Component
         $this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['jamDatang'] = $myTime;
     }
 
+    public function setPerawatPenerima()
+    {
+    }
+
     // when new form instance
     public function mount()
     {

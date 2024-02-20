@@ -653,22 +653,32 @@
                                                             {{-- Perawat / Terapis --}}
                                                             Perawat / Terapis :
                                                         </td>
-                                                        <td class="w-1/2">
-                                                            .
-                                                            <br>
-                                                            <div class="pl-[0px]">
-                                                                @php
-                                                                    $drPemeriksa = isset($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima']) ? ($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima'] ? $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima'] : 'Perawat Penerima') : 'Perawat Penerima';
+                                                        <td class="w-1/2 text-start">
+                                                            <div class="">
+                                                                <br>
+
+                                                                {{-- @php
+                                                                    $perawatPenerima = isset($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima']) ? ($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima'] ? $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima'] : 'Perawat Penerima') : 'Perawat Penerima';
                                                                 @endphp
-                                                                {!! DNS2D::getBarcodeHTML($drPemeriksa, 'QRCODE', 3, 3) !!}
+                                                                {!! DNS2D::getBarcodeHTML($perawatPenerima, 'QRCODE', 3, 3) !!} --}}
+
+                                                                @isset($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima'])
+                                                                    @if ($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima'])
+                                                                        <img class="h-24"
+                                                                            src="{{ asset('storage/' . App\Models\User::where('myuser_code', $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerimaCode'])->first()->myuser_ttd_image) }}"
+                                                                            alt="">
+                                                                    @endif
+                                                                @endisset
+                                                                ttd
+                                                                <br>
+                                                                {{ isset($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima'])
+                                                                    ? ($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima']
+                                                                        ? strtoupper($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima'])
+                                                                        : 'Perawat Penerima')
+                                                                    : 'Perawat Penerima' }}
+
                                                             </div>
-                                                            ttd
-                                                            <br>
-                                                            {{ isset($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima'])
-                                                                ? ($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima']
-                                                                    ? strtoupper($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima'])
-                                                                    : 'Perawat Penerima')
-                                                                : 'Perawat Penerima' }}
+
                                                         </td>
                                                     </tr>
 
@@ -1335,11 +1345,19 @@
                                                         : 'Tanggal' }}
 
                                                     <br>
-                                                    <div class="pl-[85px]">
-                                                        @php
+                                                    <div class="">
+                                                        {{-- @php
                                                             $drPemeriksa = isset($dataDaftarTxn['perencanaan']['pengkajianMedis']['drPemeriksa']) ? ($dataDaftarTxn['perencanaan']['pengkajianMedis']['drPemeriksa'] ? $dataDaftarTxn['perencanaan']['pengkajianMedis']['drPemeriksa'] : 'Dokter Pemeriksa') : 'Dokter Pemeriksa';
-                                                        @endphp
-                                                        {!! DNS2D::getBarcodeHTML($drPemeriksa, 'QRCODE', 3, 3) !!}
+                                                        @endphp --}}
+
+                                                        {{-- {!! DNS2D::getBarcodeHTML($drPemeriksa, 'QRCODE', 3, 3) !!} --}}
+                                                        @isset($dataDaftarTxn['perencanaan']['pengkajianMedis']['drPemeriksa'])
+                                                            @if ($dataDaftarTxn['perencanaan']['pengkajianMedis']['drPemeriksa'])
+                                                                <img class="h-24 mx-auto"
+                                                                    src="{{ asset('storage/' . App\Models\User::where('myuser_code', $dataDaftarTxn['drId'])->first()->myuser_ttd_image) }}"
+                                                                    alt="">
+                                                            @endif
+                                                        @endisset
                                                     </div>
                                                     ttd
                                                     <br>

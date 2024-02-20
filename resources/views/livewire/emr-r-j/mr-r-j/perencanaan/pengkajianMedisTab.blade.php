@@ -86,10 +86,14 @@
         <div class="mb-2 ">
             <x-input-label for="dataDaftarPoliRJ.perencanaan.pengkajianMedis.drPemeriksa" :value="__('Dokter Pemeriksa')"
                 :required="__(true)" />
-            <div class="flex items-center mb-2 ">
+            <div class="grid grid-cols-1 gap-2 ">
                 <x-text-input id="dataDaftarPoliRJ.perencanaan.pengkajianMedis.drPemeriksa" placeholder="Dokter Pemeriksa"
-                    class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.perencanaan.pengkajianMedis.drPemeriksa'))" :disabled=$disabledPropertyRjStatus
+                    class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.perencanaan.pengkajianMedis.drPemeriksa'))" :disabled=true
                     wire:model.debounce.500ms="dataDaftarPoliRJ.perencanaan.pengkajianMedis.drPemeriksa" />
+
+                <x-yellow-button :disabled=false wire:click.prevent="setDrPemeriksa()" type="button" wire:loading.remove>
+                    ttd Dokter
+                </x-yellow-button>
 
             </div>
             @error('dataDaftarPoliRJ.perencanaan.pengkajianMedis.drPemeriksa')

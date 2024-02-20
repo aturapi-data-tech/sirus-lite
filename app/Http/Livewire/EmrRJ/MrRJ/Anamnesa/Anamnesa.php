@@ -925,6 +925,43 @@ class Anamnesa extends Component
         }
     }
 
+    private function validatePerawatPenerima()
+    {
+        // Validasi dulu
+        $messages = [];
+        $myRules = ['dataDaftarPoliRJ.pemeriksaan.tandaVital.gda' => '',];
+        // Proses Validasi///////////////////////////////////////////
+        try {
+            $this->validate($myRules, $messages);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+
+            $this->emit('toastr-error', "Anda tidak dapat melakukan TTD-E karena data pemeriksaan belum lengkap.");
+            $this->validate($myRules, $messages);
+        }
+        // Validasi dulu
+    }
+
+    public function setPerawatPenerima()
+    {
+        $myRoles = json_decode(auth()->user()->roles, true);
+        $myUserCodeActive = auth()->user()->myuser_code;
+        $myUserNameActive = auth()->user()->myuser_name;
+        // $myUserTtdActive = auth()->user()->myuser_ttd_image;
+
+        // Validasi dulu
+        // cek apakah data pemeriksaan sudah dimasukkan atau blm
+        $this->validatePerawatPenerima();
+        $this->emit('toastr-error', "Role " . $myUserNameActive);
+
+        if ($myRoles[0]['name'] == 'Perawat') {
+            $this->dataDaftarPoliRJ['anamnesa']['pengkajianPerawatan']['perawatPenerima'] = $myUserNameActive;
+            $this->dataDaftarPoliRJ['anamnesa']['pengkajianPerawatan']['perawatPenerimaCode'] = $myUserCodeActive;
+            $this->store();
+        } else {
+
+            $this->emit('toastr-error', "Role " . $myRoles[0]['name'] . ' tidak dapat melakukan TTD-E.');
+        }
+    }
 
     // when new form instance
     public function mount()
