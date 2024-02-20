@@ -53,7 +53,7 @@
                 {{-- Shift --}}
                 {{-- <div class="relative w-[75px]">
                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                        <svg class="w-5 h-5 text-gray-800 dark:text-white" aria-hidden="true"
+                        <svg class="w-5 h-5 text-gray-800 " aria-hidden="true"
                             xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                             <path
                                 d="M1 5h1.424a3.228 3.228 0 0 0 6.152 0H19a1 1 0 1 0 0-2H8.576a3.228 3.228 0 0 0-6.152 0H1a1 1 0 1 0 0 2Zm18 4h-1.424a3.228 3.228 0 0 0-6.152 0H1a1 1 0 1 0 0 2h10.424a3.228 3.228 0 0 0 6.152 0H19a1 1 0 0 0 0-2Zm0 6H8.576a3.228 3.228 0 0 0-6.152 0H1a1 1 0 0 0 0 2h1.424a3.228 3.228 0 0 0 6.152 0H19a1 1 0 0 0 0-2Z" />
@@ -180,10 +180,24 @@
                 <tbody class="bg-white ">
 
                     @foreach ($myQueryData as $myQData)
-                        <tr class="border-b group dark:border-gray-700">
+                        @php
+                            $datadaftar_json = json_decode($myQData->datadaftarpolirj_json, true);
+                            $anamnesa = isset($datadaftar_json['anamnesa']) ? 1 : 0;
+                            $pemeriksaan = isset($datadaftar_json['pemeriksaan']) ? 1 : 0;
+                            $penilaian = isset($datadaftar_json['penilaian']) ? 1 : 0;
+                            $procedure = isset($datadaftar_json['procedure']) ? 1 : 0;
+                            $diagnosis = isset($datadaftar_json['diagnosis']) ? 1 : 0;
+                            $perencanaan = isset($datadaftar_json['perencanaan']) ? 1 : 0;
+                            $prosentaseEMR = (($anamnesa + $pemeriksaan + $penilaian + $procedure + $diagnosis + $perencanaan) / 6) * 100;
+
+                            $bgSelesaiPemeriksaan = isset($datadaftar_json['perencanaan']['pengkajianMedis']['drPemeriksa']) ? ($datadaftar_json['perencanaan']['pengkajianMedis']['drPemeriksa'] ? 'bg-green-100' : '') : '';
+                        @endphp
 
 
-                            <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
+                        <tr class="border-b group {{ $bgSelesaiPemeriksaan }}">
+
+
+                            <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap ">
                                 <div class="">
                                     <div class="font-semibold text-primary">
                                         {{ $myQData->reg_no }}
@@ -198,13 +212,12 @@
                             </td>
 
 
-                            <td
-                                class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-primary whitespace-nowrap dark:text-white">
+                            <td class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-primary whitespace-nowrap ">
                                 {{ $myQData->vno_sep }}
                             </td>
 
 
-                            <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
+                            <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap ">
                                 <div class="">
                                     <div class="font-semibold text-primary">{{ $myQData->poli_desc }}
                                     </div>
@@ -224,7 +237,7 @@
                                 </div>
                             </td>
 
-                            <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
+                            <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap ">
                                 <div class="overflow-auto w-52">
                                     <div class="font-semibold text-primary">
                                         {{ $myQData->rj_date }}
@@ -249,16 +262,7 @@
                                         {{ '' . $myQData->push_antrian_bpjs_status . $myQData->push_antrian_bpjs_json }}
                                     </div>
                                     <div>
-                                        @php
-                                            $datadaftar_json = json_decode($myQData->datadaftarpolirj_json, true);
-                                            $anamnesa = isset($datadaftar_json['anamnesa']) ? 1 : 0;
-                                            $pemeriksaan = isset($datadaftar_json['pemeriksaan']) ? 1 : 0;
-                                            $penilaian = isset($datadaftar_json['penilaian']) ? 1 : 0;
-                                            $procedure = isset($datadaftar_json['procedure']) ? 1 : 0;
-                                            $diagnosis = isset($datadaftar_json['diagnosis']) ? 1 : 0;
-                                            $perencanaan = isset($datadaftar_json['perencanaan']) ? 1 : 0;
-                                            $prosentaseEMR = (($anamnesa + $pemeriksaan + $penilaian + $procedure + $diagnosis + $perencanaan) / 6) * 100;
-                                        @endphp
+
                                         Emr: {{ $prosentaseEMR . '%' }}
 
                                     </div>
