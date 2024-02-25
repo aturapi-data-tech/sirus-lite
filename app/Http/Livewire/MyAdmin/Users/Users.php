@@ -105,7 +105,7 @@ class Users extends Component
 
     public function deleteUser($id): void
     {
-        // $deleted = User::Where('email', $id)->delete();
+        $deleted = User::Where('email', $id)->delete();
     }
 
     public function editUser($id): void
