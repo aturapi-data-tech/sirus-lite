@@ -653,9 +653,13 @@
 
                                                         @isset($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima'])
                                                             @if ($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima'])
-                                                                <img class="h-24"
-                                                                    src="{{ 'storage/' . App\Models\User::where('myuser_code', $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerimaCode'])->first()->myuser_ttd_image }}"
-                                                                    alt="">
+                                                                @isset($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerimaCode'])
+                                                                    @if ($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerimaCode'])
+                                                                        <img class="h-24"
+                                                                            src="{{ 'storage/' . App\Models\User::where('myuser_code', $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerimaCode'])->first()->myuser_ttd_image }}"
+                                                                            alt="">
+                                                                    @endif
+                                                                @endisset
                                                             @endif
                                                         @endisset
                                                         <br>
