@@ -259,7 +259,7 @@ class Users extends Component
                 ->orWhere(DB::raw('upper(id)'), 'like', '%' . strtoupper($mySearch) . '%')
                 ->orWhere(DB::raw('upper(email)'), 'like', '%' . strtoupper($mySearch) . '%');
         })
-
+            ->orderBy('myrole', 'asc')
             ->orderBy('name', 'asc');
         // myQuery
 

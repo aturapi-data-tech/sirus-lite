@@ -116,7 +116,7 @@
                                 {{ $myQData->id }}
                             </td> --}}
                             <td class="px-4 py-2">
-                                Name : {{ $myQData->name }}
+                                Name : {{ $myQData->name . ' / ' . $myQData->myuser_code }}
                                 <br>
                                 <span class="text-lg font-semibold text-primary"> User : {{ $myQData->email }}</span>
                                 <br>
@@ -125,7 +125,10 @@
                                 Create : {{ $myQData->updated_at }}
                             </td>
                             <td class="px-4 py-2">
-                                R/W
+                                <div>
+                                    <img class="h-24" src="{{ asset('storage/' . $myQData->myuser_ttd_image) }}"
+                                        alt="">
+                                </div>
                             </td>
                             {{-- <td class="px-4 py-2">
                                 {{ $myQData->updated_at }}
