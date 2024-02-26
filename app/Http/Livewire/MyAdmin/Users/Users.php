@@ -248,6 +248,8 @@ class Users extends Component
                 'email',
                 'email_verified_at',
                 'password',
+                'myuser_code',
+                'myuser_ttd_image',
                 'created_at',
                 'updated_at',
                 DB::raw('(select string_agg(roles.name) as myrole from roles,model_has_roles where roles.id=model_has_roles.role_id and model_id=users.id) as myrole'),
