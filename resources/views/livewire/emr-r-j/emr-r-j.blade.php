@@ -365,6 +365,12 @@
                                                                 {{ __('Assessment Dokter') }}
                                                             </x-dropdown-link>
                                                         </li>
+                                                        <li>
+                                                            <x-dropdown-link
+                                                                wire:click="edit('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
+                                                                {{ __('Assessment') }}
+                                                            </x-dropdown-link>
+                                                        </li>
                                                     @endrole
 
                                                     {{-- <li>
