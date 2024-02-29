@@ -174,13 +174,23 @@
                                             @php
                                                 $jenisKelamin = isset($dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc']) ? $dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] : '-';
 
+                                                // if decimal true
                                                 if ($dataDaftarTxn->lowhigh_status == 'Y') {
                                                     $unit_convert = $dataDaftarTxn->unit_convert ? $dataDaftarTxn->unit_convert : 1;
-                                                    $lab_result = number_format($dataDaftarTxn->lab_result * $unit_convert);
-                                                    $low_limit_m = number_format($dataDaftarTxn->low_limit_m * $unit_convert);
-                                                    $low_limit_f = number_format($dataDaftarTxn->low_limit_f * $unit_convert);
-                                                    $high_limit_m = number_format($dataDaftarTxn->high_limit_m * $unit_convert);
-                                                    $high_limit_f = number_format($dataDaftarTxn->high_limit_f * $unit_convert);
+                                                    $lab_result = $dataDaftarTxn->lab_result * $unit_convert;
+                                                    $lab_result = fmod($lab_result, 1) !== 0.0 ? $lab_result : number_format($lab_result);
+
+                                                    $low_limit_m = $dataDaftarTxn->low_limit_m * $unit_convert;
+                                                    $low_limit_m = fmod($low_limit_m, 1) !== 0.0 ? $low_limit_m : number_format($low_limit_m);
+
+                                                    $low_limit_f = $dataDaftarTxn->low_limit_f * $unit_convert;
+                                                    $low_limit_f = fmod($low_limit_f, 1) !== 0.0 ? $low_limit_f : number_format($low_limit_f);
+
+                                                    $high_limit_m = $dataDaftarTxn->high_limit_m * $unit_convert;
+                                                    $high_limit_m = fmod($high_limit_m, 1) !== 0.0 ? $high_limit_m : number_format($high_limit_m);
+
+                                                    $high_limit_f = $dataDaftarTxn->high_limit_f * $unit_convert;
+                                                    $high_limit_f = fmod($high_limit_f, 1) !== 0.0 ? $high_limit_f : number_format($high_limit_f);
                                                 } else {
                                                     $lab_result = $dataDaftarTxn->lab_result;
                                                     $low_limit_m = $dataDaftarTxn->low_limit_m;
