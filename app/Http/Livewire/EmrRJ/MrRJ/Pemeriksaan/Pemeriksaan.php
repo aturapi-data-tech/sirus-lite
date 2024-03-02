@@ -389,6 +389,18 @@ class Pemeriksaan extends Component
             "prothesa" => "",
             "cacatTubuh" => "",
         ],
+        "suspekAkibatKerja" => [
+            "suspekAkibatKerja" => "",
+            "keteranganSuspekAkibatKerja" => "",
+            "suspekAkibatKerjaOptions" => [
+                ["suspekAkibatKerja" => "Ya"],
+                ["suspekAkibatKerja" => "Tidak"],
+            ]
+        ],
+        "FisikujiFungsi" => [
+            "FisikujiFungsi" => "",
+
+        ],
         "eeg" => [
             "hasilPemeriksaan" => "",
             "hasilPemeriksaanSebelumnya" => "",

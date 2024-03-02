@@ -47,6 +47,14 @@
                                 <li class="mr-2">
                                     <label
                                         class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
+                                        :class="activeTab === '{{ 'UjiFungsi' }}' ?
+                                            'text-primary border-primary bg-gray-100' : ''"
+                                        @click="activeTab ='{{ 'UjiFungsi' }}'">{{ 'UjiFungsi' }}</label>
+                                </li>
+
+                                <li class="mr-2">
+                                    <label
+                                        class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
                                         :class="activeTab === '{{ 'Penunjang' }}' ?
                                             'text-primary border-primary bg-gray-100' : ''"
                                         @click="activeTab ='{{ 'Penunjang' }}'">{{ 'Penunjang' }}</label>
@@ -83,6 +91,15 @@
                             }"
                             x-show.transition.in.opacity.duration.600="activeTab === '{{ 'Anatomi' }}'">
                             @include('livewire.emr-r-j.mr-r-j.pemeriksaan.anatomiTab')
+
+                        </div>
+
+                        <div class="p-2 rounded-lg bg-gray-50 dark:bg-gray-800"
+                            :class="{
+                                'active': activeTab === '{{ 'UjiFungsi' }}'
+                            }"
+                            x-show.transition.in.opacity.duration.600="activeTab === '{{ 'UjiFungsi' }}'">
+                            @include('livewire.emr-r-j.mr-r-j.pemeriksaan.UjiFungsiTab')
 
                         </div>
 

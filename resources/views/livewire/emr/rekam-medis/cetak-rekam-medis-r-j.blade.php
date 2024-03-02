@@ -655,9 +655,13 @@
                                                             @if ($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima'])
                                                                 @isset($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerimaCode'])
                                                                     @if ($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerimaCode'])
-                                                                        <img class="h-24"
-                                                                            src="{{ 'storage/' . App\Models\User::where('myuser_code', $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerimaCode'])->first()->myuser_ttd_image }}"
-                                                                            alt="">
+                                                                        @isset(App\Models\User::where(
+                                                                                'myuser_code',
+                                                                                $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerimaCode'])->first()->myuser_ttd_image)
+                                                                            <img class="h-24"
+                                                                                src="{{ 'storage/' . App\Models\User::where('myuser_code', $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerimaCode'])->first()->myuser_ttd_image }}"
+                                                                                alt="">
+                                                                        @endisset
                                                                     @endif
                                                                 @endisset
                                                             @endif
@@ -1027,13 +1031,28 @@
                                     ? $dataDaftarTxn['pemeriksaan']['fungsional']['cacatTubuh']
                                     : '-')
                                 : '-' }}
+                            /
+                            <span class="font-semibold">
+                                Suspek Akibat Kecelakaan Kerja :
+                            </span>
+                            {{ isset($dataDaftarTxn['pemeriksaan']['suspekAkibatKerja']['suspekAkibatKerja'])
+                                ? ($dataDaftarTxn['pemeriksaan']['suspekAkibatKerja']['suspekAkibatKerja']
+                                    ? $dataDaftarTxn['pemeriksaan']['suspekAkibatKerja']['suspekAkibatKerja']
+                                    : '-')
+                                : '-' }}
+
+                            {{ isset($dataDaftarTxn['pemeriksaan']['suspekAkibatKerja']['keteranganSuspekAkibatKerja'])
+                                ? ($dataDaftarTxn['pemeriksaan']['suspekAkibatKerja']['keteranganSuspekAkibatKerja']
+                                    ? $dataDaftarTxn['pemeriksaan']['suspekAkibatKerja']['keteranganSuspekAkibatKerja']
+                                    : '-')
+                                : '-' }}
                         </td>
                     </tr>
                     {{-- pemeriksaan fisik --}}
                     <tr>
                         <td
                             class="p-2 m-2 text-xs font-semibold uppercase border-b-2 border-l-2 border-r-2 border-black text-start">
-                            pemeriksaan fisik
+                            pemeriksaan fisik dan uji fungsi
                         </td>
 
                         <td class="p-2 m-2 text-xs text-center border-b-2 border-l-2 border-r-2 border-black">
@@ -1044,7 +1063,7 @@
                                     <tr>
                                         <td>
                                             <span class="font-semibold">
-                                                Fisik :
+                                                Fisik dan Uji Fungsi:
                                             </span>
                                             <br>
                                             {!! nl2br(
@@ -1052,6 +1071,16 @@
                                                     isset($dataDaftarTxn['pemeriksaan']['fisik'])
                                                         ? ($dataDaftarTxn['pemeriksaan']['fisik']
                                                             ? $dataDaftarTxn['pemeriksaan']['fisik']
+                                                            : '-')
+                                                        : '-',
+                                                ),
+                                            ) !!}
+                                            <br>
+                                            {!! nl2br(
+                                                e(
+                                                    isset($dataDaftarTxn['pemeriksaan']['FisikujiFungsi']['FisikujiFungsi'])
+                                                        ? ($dataDaftarTxn['pemeriksaan']['FisikujiFungsi']['FisikujiFungsi']
+                                                            ? $dataDaftarTxn['pemeriksaan']['FisikujiFungsi']['FisikujiFungsi']
                                                             : '-')
                                                         : '-',
                                                 ),
@@ -1065,7 +1094,17 @@
                                             @isset($dataDaftarTxn['pemeriksaan']['anatomi'])
                                                 @foreach ($dataDaftarTxn['pemeriksaan']['anatomi'] as $key => $pAnatomi)
                                                     @php
-                                                        $kelainan = isset($dataDaftarTxn['pemeriksaan']['anatomi'][$key]['kelainan']) ? ($dataDaftarTxn['pemeriksaan']['anatomi'][$key]['kelainan'] ? $dataDaftarTxn['pemeriksaan']['anatomi'][$key]['kelainan'] : false) : false;
+                                                        $kelainan = isset(
+                                                            $dataDaftarTxn['pemeriksaan']['anatomi'][$key]['kelainan'],
+                                                        )
+                                                            ? ($dataDaftarTxn['pemeriksaan']['anatomi'][$key][
+                                                                'kelainan'
+                                                            ]
+                                                                ? $dataDaftarTxn['pemeriksaan']['anatomi'][$key][
+                                                                    'kelainan'
+                                                                ]
+                                                                : false)
+                                                            : false;
                                                     @endphp
                                                     @if ($kelainan && $kelainan !== 'Tidak Diperiksa')
                                                         <span class="font-normal">
@@ -1334,9 +1373,11 @@
                                             <div>
                                                 @isset($dataDaftarTxn['perencanaan']['pengkajianMedis']['drPemeriksa'])
                                                     @if ($dataDaftarTxn['perencanaan']['pengkajianMedis']['drPemeriksa'])
-                                                        <img class="h-24 mx-auto"
-                                                            src="{{ 'storage/' . App\Models\User::where('myuser_code', $dataDaftarTxn['drId'])->first()->myuser_ttd_image }}"
-                                                            alt="">
+                                                        @isset(App\Models\User::where('myuser_code', $dataDaftarTxn['drId'])->first()->myuser_ttd_image)
+                                                            <img class="h-24 mx-auto"
+                                                                src="{{ 'storage/' . App\Models\User::where('myuser_code', $dataDaftarTxn['drId'])->first()->myuser_ttd_image }}"
+                                                                alt="">
+                                                        @endisset
                                                     @endif
                                                 @endisset
                                             </div>
