@@ -241,8 +241,43 @@
                             </table>
 
                         </div>
+
+
+
                         {{-- @include('livewire.emr-r-j.mr-r-j.pemeriksaan.umumTab') --}}
                         @include('livewire.emr-r-j.mr-r-j.pemeriksaan.fisikTab')
+
+                        {{-- suspekAkibatKerja --}}
+                        <div class="mb-2 ">
+                            <x-input-label
+                                for="dataDaftarPoliRJ.pemeriksaan.suspekAkibatKerja.KeteranganSuspekAkibatKerja"
+                                :value="__('Suspek Penyakit Akibat Kecelakaan Kerja')" :required="__(false)" />
+
+                            <div class="grid grid-cols-3 gap-2 mb-2">
+                                @isset($dataDaftarPoliRJ['pemeriksaan']['suspekAkibatKerja']['suspekAkibatKerjaOptions'])
+                                    @foreach ($dataDaftarPoliRJ['pemeriksaan']['suspekAkibatKerja']['suspekAkibatKerjaOptions'] as $suspekAkibatKerjaOptions)
+                                        {{-- @dd($sRj) --}}
+                                        <x-radio-button :label="__($suspekAkibatKerjaOptions['suspekAkibatKerja'])"
+                                            value="{{ $suspekAkibatKerjaOptions['suspekAkibatKerja'] }}"
+                                            wire:model="dataDaftarPoliRJ.pemeriksaan.suspekAkibatKerja.suspekAkibatKerja" />
+                                    @endforeach
+                                @endisset
+
+                                <x-text-input
+                                    id="dataDaftarPoliRJ.pemeriksaan.suspekAkibatKerja.keteranganSuspekAkibatKerja"
+                                    placeholder="Keterangan" class="mt-1 ml-2" :errorshas="__(
+                                        $errors->has(
+                                            'dataDaftarPoliRJ.pemeriksaan.suspekAkibatKerja.keteranganSuspekAkibatKerja',
+                                        ),
+                                    )"
+                                    :disabled=$disabledPropertyRjStatus
+                                    wire:model.debounce.500ms="dataDaftarPoliRJ.pemeriksaan.suspekAkibatKerja.keteranganSuspekAkibatKerja" />
+                            </div>
+
+                        </div>
+                        {{-- Ujifungsi --}}
+                        @include('livewire.emr-r-j.mr-r-j.pemeriksaan.UjiFungsiTab')
+
                         {{-- @include('livewire.emr-r-j.mr-r-j.pemeriksaan.anatomiTab') --}}
                         @include('livewire.emr-r-j.mr-r-j.pemeriksaan.penunjangTab')
 
