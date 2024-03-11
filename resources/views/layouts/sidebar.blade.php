@@ -73,90 +73,47 @@
                             </svg>
                         </button>
 
-                        @role('Dokter')
-                            <ul id="dropdown-layoutsRJ" class="hidden py-2 space-y-2">
-                                <li>
-                                    <x-nav-link class="pl-4" :href="route('EmrRJ')" :active="request()->routeIs('EmrRJ')">
-                                        {{ __('Rekam Medis Rawat Jalan') }}
-                                    </x-nav-link>
-                                </li>
-                            </ul>
-                        @endrole
-                        @role('Perawat')
-                            <ul id="dropdown-layoutsRJ" class="hidden py-2 space-y-2">
-                                <li>
+
+                        <ul id="dropdown-layoutsRJ" class="hidden py-2 space-y-2">
+                            <li>
+                                @role(['Perawat', 'Mr', 'Admin'])
                                     <x-nav-link class="pl-4" :href="route('MasterPasien')" :active="request()->routeIs('MasterPasien')">
                                         {{ __('Pendaftaran Pasien Baru') }}
                                     </x-nav-link>
+                                @endrole
+
+                                @role(['Perawat', 'Mr', 'Admin'])
                                     <x-nav-link class="pl-4" :href="route('daftarRJ')" :active="request()->routeIs('daftarRJ')">
                                         {{ __('Pendaftaran Rawat Jalan') }}
                                     </x-nav-link>
+                                @endrole
+
+                                @role(['Perawat', 'Mr', 'Admin'])
                                     <x-nav-link class="pl-4" :href="route('pelayananRJ')" :active="request()->routeIs('pelayananRJ')">
                                         {{ __('Pelayanan Rawat Jalan') }}
                                     </x-nav-link>
+                                @endrole
+
+                                @role(['Dokter', 'Perawat', 'Mr', 'Admin'])
                                     <x-nav-link class="pl-4" :href="route('EmrRJ')" :active="request()->routeIs('EmrRJ')">
                                         {{ __('Rekam Medis Rawat Jalan') }}
                                     </x-nav-link>
+                                @endrole
 
+                                @role(['Perawat', 'Mr', 'Admin'])
                                     <x-nav-link class="pl-4" :href="route('SetupHfisBpjs')" :active="request()->routeIs('SetupHfisBpjs')">
                                         {{ __('SetupHfisBpjs') }}
                                     </x-nav-link>
-                                    <x-nav-link class="pl-4" :href="route('displayPelayananRJ')" :active="request()->routeIs('displayPelayananRJ')">
-                                        {{ __('Display Pelayanan RJ') }}
-                                    </x-nav-link>
-                                </li>
-                            </ul>
-                        @endrole
-                        @role('Mr')
-                            <ul id="dropdown-layoutsRJ" class="hidden py-2 space-y-2">
-                                <li>
-                                    <x-nav-link class="pl-4" :href="route('MasterPasien')" :active="request()->routeIs('MasterPasien')">
-                                        {{ __('Pendaftaran Pasien Baru') }}
-                                    </x-nav-link>
-                                    <x-nav-link class="pl-4" :href="route('daftarRJ')" :active="request()->routeIs('daftarRJ')">
-                                        {{ __('Pendaftaran Rawat Jalan') }}
-                                    </x-nav-link>
-                                    <x-nav-link class="pl-4" :href="route('pelayananRJ')" :active="request()->routeIs('pelayananRJ')">
-                                        {{ __('Pelayanan Rawat Jalan') }}
-                                    </x-nav-link>
-                                    <x-nav-link class="pl-4" :href="route('EmrRJ')" :active="request()->routeIs('EmrRJ')">
-                                        {{ __('Rekam Medis Rawat Jalan') }}
-                                    </x-nav-link>
+                                @endrole
 
-                                    <x-nav-link class="pl-4" :href="route('SetupHfisBpjs')" :active="request()->routeIs('SetupHfisBpjs')">
-                                        {{ __('SetupHfisBpjs') }}
-                                    </x-nav-link>
+                                @role(['Perawat', 'Mr', 'Admin'])
                                     <x-nav-link class="pl-4" :href="route('displayPelayananRJ')" :active="request()->routeIs('displayPelayananRJ')">
                                         {{ __('Display Pelayanan RJ') }}
                                     </x-nav-link>
-                                </li>
-                            </ul>
-                        @endrole
-                        @role('Admin')
-                            <ul id="dropdown-layoutsRJ" class="hidden py-2 space-y-2">
-                                <li>
-                                    <x-nav-link class="pl-4" :href="route('MasterPasien')" :active="request()->routeIs('MasterPasien')">
-                                        {{ __('Pendaftaran Pasien Baru') }}
-                                    </x-nav-link>
-                                    <x-nav-link class="pl-4" :href="route('daftarRJ')" :active="request()->routeIs('daftarRJ')">
-                                        {{ __('Pendaftaran Rawat Jalan') }}
-                                    </x-nav-link>
-                                    <x-nav-link class="pl-4" :href="route('pelayananRJ')" :active="request()->routeIs('pelayananRJ')">
-                                        {{ __('Pelayanan Rawat Jalan') }}
-                                    </x-nav-link>
-                                    <x-nav-link class="pl-4" :href="route('EmrRJ')" :active="request()->routeIs('EmrRJ')">
-                                        {{ __('Rekam Medis Rawat Jalan') }}
-                                    </x-nav-link>
+                                @endrole
 
-                                    <x-nav-link class="pl-4" :href="route('SetupHfisBpjs')" :active="request()->routeIs('SetupHfisBpjs')">
-                                        {{ __('SetupHfisBpjs') }}
-                                    </x-nav-link>
-                                    <x-nav-link class="pl-4" :href="route('displayPelayananRJ')" :active="request()->routeIs('displayPelayananRJ')">
-                                        {{ __('Display Pelayanan RJ') }}
-                                    </x-nav-link>
-                                </li>
-                            </ul>
-                        @endrole
+                            </li>
+                        </ul>
 
 
                     </li>
@@ -182,94 +139,45 @@
                             </svg>
                         </button>
 
-                        @role('Dokter')
-                            <ul id="dropdown-layoutsUGD" class="hidden py-2 space-y-2">
-                                <li>
-                                    <x-nav-link class="pl-4" :href="route('EmrUGD')" :active="request()->routeIs('EmrUGD')">
-                                        {{ __('Rekam Medis UGD') }}
-                                    </x-nav-link>
 
-                                </li>
-                            </ul>
-                        @endrole
-                        @role('Perawat')
-                            <ul id="dropdown-layoutsUGD" class="hidden py-2 space-y-2">
-                                <li>
+
+                        <ul id="dropdown-layoutsUGD" class="hidden py-2 space-y-2">
+                            <li>
+                                @role(['Perawat', 'Mr', 'Admin'])
                                     <x-nav-link class="pl-4" :href="route('daftarUGD')" :active="request()->routeIs('daftarUGD')">
                                         {{ __('Pendaftaran UGD') }}
                                     </x-nav-link>
+                                @endrole
+
+                                @role(['Dokter', 'Perawat', 'Mr', 'Admin'])
                                     <x-nav-link class="pl-4" :href="route('EmrUGD')" :active="request()->routeIs('EmrUGD')">
                                         {{ __('Rekam Medis UGD') }}
                                     </x-nav-link>
-
-                                </li>
-                            </ul>
-                        @endrole
-                        @role('Mr')
-                            <ul id="dropdown-layoutsUGD" class="hidden py-2 space-y-2">
-                                <li>
-                                    <x-nav-link class="pl-4" :href="route('daftarUGD')" :active="request()->routeIs('daftarUGD')">
-                                        {{ __('Pendaftaran UGD') }}
-                                    </x-nav-link>
-                                    <x-nav-link class="pl-4" :href="route('EmrUGD')" :active="request()->routeIs('EmrUGD')">
-                                        {{ __('Rekam Medis UGD') }}
-                                    </x-nav-link>
-
-                                </li>
-                            </ul>
-                        @endrole
-                        @role('Admin')
-                            <ul id="dropdown-layoutsUGD" class="hidden py-2 space-y-2">
-                                <li>
-                                    <x-nav-link class="pl-4" :href="route('daftarUGD')" :active="request()->routeIs('daftarUGD')">
-                                        {{ __('Pendaftaran UGD') }}
-                                    </x-nav-link>
-                                    <x-nav-link class="pl-4" :href="route('EmrUGD')" :active="request()->routeIs('EmrUGD')">
-                                        {{ __('Rekam Medis UGD') }}
-                                    </x-nav-link>
+                                @endrole
 
 
 
-
-
+                                @role(['Admin'])
                                     <x-nav-link class="pl-4" :href="route('MyUsers')" :active="request()->routeIs('MyUses')">
                                         {{ __('MyUsers') }}
                                     </x-nav-link>
+                                @endrole
+
+                                @role(['Admin'])
                                     <x-nav-link class="pl-4" :href="route('MyRoles')" :active="request()->routeIs('MyRoles')">
                                         {{ __('MyRoles') }}
                                     </x-nav-link>
+                                @endrole
+
+                                @role(['Admin'])
                                     <x-nav-link class="pl-4" :href="route('MyPermissions')" :active="request()->routeIs('MyPermissions')">
                                         {{ __('MyPermissions') }}
                                     </x-nav-link>
-
-                                </li>
-                            </ul>
-                        @endrole
-                        <ul id="dropdown-layoutsUGD" class="hidden py-2 space-y-2">
-                            <li>
-                                <x-nav-link class="pl-4" :href="route('daftarUGD')" :active="request()->routeIs('daftarUGD')">
-                                    {{ __('Pendaftaran UGD') }}
-                                </x-nav-link>
-                                <x-nav-link class="pl-4" :href="route('EmrUGD')" :active="request()->routeIs('EmrUGD')">
-                                    {{ __('Rekam Medis UGD') }}
-                                </x-nav-link>
-
-
-
-
-
-                                <x-nav-link class="pl-4" :href="route('MyUsers')" :active="request()->routeIs('MyUses')">
-                                    {{ __('MyUsers') }}
-                                </x-nav-link>
-                                <x-nav-link class="pl-4" :href="route('MyRoles')" :active="request()->routeIs('MyRoles')">
-                                    {{ __('MyRoles') }}
-                                </x-nav-link>
-                                <x-nav-link class="pl-4" :href="route('MyPermissions')" :active="request()->routeIs('MyPermissions')">
-                                    {{ __('MyPermissions') }}
-                                </x-nav-link>
+                                @endrole
 
                             </li>
                         </ul>
+
 
                     </li>
 
