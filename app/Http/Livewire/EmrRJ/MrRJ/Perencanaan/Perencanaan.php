@@ -393,7 +393,7 @@ class Perencanaan extends Component
     public function setDrPemeriksa()
     {
 
-        $myRoles = json_decode(auth()->user()->roles, true);
+        // $myRoles = json_decode(auth()->user()->roles, true);
         $myUserCodeActive = auth()->user()->myuser_code;
         $myUserNameActive = auth()->user()->myuser_name;
         // $myUserTtdActive = auth()->user()->myuser_ttd_image;
@@ -402,26 +402,30 @@ class Perencanaan extends Component
         // cek apakah data pemeriksaan sudah dimasukkan atau blm
         $this->validateDrPemeriksa();
 
-        if ($this->dataDaftarPoliRJ['drId'] == $myUserCodeActive && $myRoles[0]['name'] == 'Dokter') {
+        if (auth()->user()->hasRole('Dokter')) {
+            if ($this->dataDaftarPoliRJ['drId'] == $myUserCodeActive) {
 
-            if (isset($this->dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa'])) {
-                if (!$this->dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa']) {
+                if (isset($this->dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa'])) {
+                    if (!$this->dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa']) {
+                        $this->dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa'] = (isset($this->dataDaftarPoliRJ['drDesc']) ?
+                            ($this->dataDaftarPoliRJ['drDesc'] ? $this->dataDaftarPoliRJ['drDesc']
+                                : 'Dokter pemeriksa')
+                            : 'Dokter pemeriksa-');
+                    }
+                } else {
+
+                    $this->dataDaftarPoliRJ['perencanaan']['pengkajianMedisTab'] = 'Pengkajian Medis';
                     $this->dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa'] = (isset($this->dataDaftarPoliRJ['drDesc']) ?
                         ($this->dataDaftarPoliRJ['drDesc'] ? $this->dataDaftarPoliRJ['drDesc']
                             : 'Dokter pemeriksa')
                         : 'Dokter pemeriksa-');
                 }
+                $this->store();
             } else {
-
-                $this->dataDaftarPoliRJ['perencanaan']['pengkajianMedisTab'] = 'Pengkajian Medis';
-                $this->dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa'] = (isset($this->dataDaftarPoliRJ['drDesc']) ?
-                    ($this->dataDaftarPoliRJ['drDesc'] ? $this->dataDaftarPoliRJ['drDesc']
-                        : 'Dokter pemeriksa')
-                    : 'Dokter pemeriksa-');
+                $this->emit('toastr-error', "Anda tidak dapat melakukan TTD-E karena Bukan Pasien " . $myUserNameActive);
             }
-            $this->store();
         } else {
-            $this->emit('toastr-error', "Anda tidak dapat melakukan TTD-E karena User Role " . $myRoles[0]['name'] . " Bukan Pasien " . $myUserNameActive);
+            $this->emit('toastr-error', "Anda tidak dapat melakukan TTD-E karena User Role " . $myUserNameActive . " Bukan Dokter");
         }
     }
 
