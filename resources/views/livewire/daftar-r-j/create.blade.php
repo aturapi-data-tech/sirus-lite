@@ -1,7 +1,8 @@
 @php
     $disabledProperty = true;
 
-    $disabledPropertyRjStatus = $statusRjRef['statusId'] !== 'A' ? true : false;
+    // $disabledPropertyRjStatus = $statusRjRef['statusId'] !== 'A' ? true : false;
+    $disabledPropertyRjStatus = false;
 
 @endphp
 
@@ -114,7 +115,11 @@
                                     wire:model.debounce.500ms="dataPasien.pasien.pasientidakdikenal" />
                             </div>
                             @php
-                                $pasieenTitle = 'Pasien RegNo : ' . $dataPasien['pasien']['regNo'] . ' Nomer Pelayanan :' . $dataDaftarPoliRJ['noAntrian'];
+                                $pasieenTitle =
+                                    'Pasien RegNo : ' .
+                                    $dataPasien['pasien']['regNo'] .
+                                    ' Nomer Pelayanan :' .
+                                    $dataDaftarPoliRJ['noAntrian'];
                             @endphp
                             <x-border-form :title="__($pasieenTitle)" :align="__('start')" class="">
                                 <div>
@@ -1289,7 +1294,9 @@
 
                                 <div class="flex items-center justify-end mb-2">
                                     @php
-                                        $dataPasienRegNo = $dataPasien['pasien']['regNo'] ? $dataPasien['pasien']['regNo'] : '110750Z';
+                                        $dataPasienRegNo = $dataPasien['pasien']['regNo']
+                                            ? $dataPasien['pasien']['regNo']
+                                            : '110750Z';
                                     @endphp
 
                                     <livewire:cetak.cetak-etiket :regNo="$dataPasienRegNo" :wire:key="$dataPasienRegNo">
