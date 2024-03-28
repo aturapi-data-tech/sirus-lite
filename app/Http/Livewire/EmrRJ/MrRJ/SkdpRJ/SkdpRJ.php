@@ -23,6 +23,11 @@ class SkdpRJ extends Component
 {
     use WithPagination;
 
+    // listener from blade////////////////
+    protected $listeners = [
+        'syncronizeAssessmentPerawatRJFindData' => 'mount'
+
+    ];
 
     //////////////////////////////
     // Ref on top bar
@@ -60,8 +65,6 @@ class SkdpRJ extends Component
     public $dataDokterLovSearch = '';
 
 
-    // listener from blade////////////////
-    protected $listeners = [];
 
 
 
@@ -93,16 +96,6 @@ class SkdpRJ extends Component
     // RJ Logic
     // ////////////////
 
-    //////////////////////////////////////////////
-    // updated when change Record ////////////////
-    ///////////////////////////////////////////////
-
-
-
-    //////////////////////////////////////////////
-    // updated when change Record ////////////////
-    ///////////////////////////////////////////////
-
     /////////////////////////////////////////////////
     // Lov dataDokterRJ //////////////////////
     ////////////////////////////////////////////////
@@ -132,14 +125,14 @@ class SkdpRJ extends Component
             ->first();
 
         if ($dataDokter) {
-            $this->dataDaftarPoliRJ['drId'] = $dataDokter->dr_id;
-            $this->dataDaftarPoliRJ['drDesc'] = $dataDokter->dr_name;
+            $this->dataDaftarPoliRJ['kontrol']['drKontrol'] = $dataDokter->dr_id;
+            $this->dataDaftarPoliRJ['kontrol']['drKontrolDesc'] = $dataDokter->dr_name;
 
-            $this->dataDaftarPoliRJ['poliId'] = $dataDokter->poli_id;
-            $this->dataDaftarPoliRJ['poliDesc'] = $dataDokter->poli_desc;
+            $this->dataDaftarPoliRJ['kontrol']['poliKontrol'] = $dataDokter->poli_id;
+            $this->dataDaftarPoliRJ['kontrol']['poliKontrolDesc'] = $dataDokter->poli_desc;
 
-            $this->dataDaftarPoliRJ['kddrbpjs'] = $dataDokter->kd_dr_bpjs;
-            $this->dataDaftarPoliRJ['kdpolibpjs'] = $dataDokter->kd_poli_bpjs;
+            $this->dataDaftarPoliRJ['kontrol']['drKontrolBPJS'] = $dataDokter->kd_dr_bpjs;
+            $this->dataDaftarPoliRJ['kontrol']['poliKontrolBPJS'] = $dataDokter->kd_poli_bpjs;
 
             $this->dataDokterLovStatus = false;
             $this->dataDokterLovSearch = '';
@@ -171,12 +164,14 @@ class SkdpRJ extends Component
                 );
             }
             $this->dataDokterLovStatus = true;
-            $this->dataDaftarPoliRJ['drId'] = '';
-            $this->dataDaftarPoliRJ['drDesc'] = '';
-            $this->dataDaftarPoliRJ['poliId'] = '';
-            $this->dataDaftarPoliRJ['poliDesc'] = '';
-            $this->dataDaftarPoliRJ['kddrbpjs'] = '';
-            $this->dataDaftarPoliRJ['kdpolibpjs'] = '';
+            $this->dataDaftarPoliRJ['kontrol']['drKontrol'] = '';
+            $this->dataDaftarPoliRJ['kontrol']['drKontrolDesc'] = '';
+
+            $this->dataDaftarPoliRJ['kontrol']['poliKontrol'] = '';
+            $this->dataDaftarPoliRJ['kontrol']['poliKontrolDesc'] = '';
+
+            $this->dataDaftarPoliRJ['kontrol']['drKontrolBPJS'] = '';
+            $this->dataDaftarPoliRJ['kontrol']['poliKontrolBPJS'] = '';
         }
     }
     // /////////////////////
@@ -272,6 +267,7 @@ class SkdpRJ extends Component
 
         // Logic update mode start //////////
         $this->updateDataRJ($this->dataDaftarPoliRJ['rjNo']);
+        $this->emit('syncronizeAssessmentPerawatRJFindData');
     }
 
     private function updateDataRJ($rjNo): void

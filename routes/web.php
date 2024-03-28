@@ -1,14 +1,14 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use App\Http\Livewire\Post\PostTable;
+// use App\Http\Livewire\Post\PostTable;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Livewire\MasterPasien\MasterPasien;
 use App\Http\Livewire\PendaftaranMandiriPasienPoli\PendaftaranMandiriPasienPoli;
 use App\Http\Livewire\DaftarRJ\DaftarRJ;
 use App\Http\Livewire\DaftarUGD\DaftarUGD;
-use App\Http\Livewire\DaftarUGD\DisplayPasien\DisplayPasien as DisplayPasienUGD;
+// use App\Http\Livewire\DaftarUGD\DisplayPasien\DisplayPasien as DisplayPasienUGD;
 
 
 use App\Http\Livewire\RJskdp\RJskdp;
@@ -18,14 +18,15 @@ use App\Http\Livewire\MrRJ\Skdp\Skdp;
 use App\Http\Livewire\MrRJ\SkdpRI\SkdpRI;
 
 
-use App\Http\Livewire\MrRJ\Screening\Screening;
-use App\Http\Livewire\MrRJ\Anamnesia\Anamnesia;
-use App\Http\Livewire\MrRJ\Pemeriksaan\Pemeriksaan;
-use App\Http\Livewire\MrRJ\Penilaian\Penilaian;
-use App\Http\Livewire\MrRJ\Diagnosis\Diagnosis;
-use App\Http\Livewire\MrRJ\Perencanaan\Perencanaan;
+// use App\Http\Livewire\MrRJ\Screening\Screening;
+// use App\Http\Livewire\MrRJ\Anamnesia\Anamnesia;
+// use App\Http\Livewire\MrRJ\Pemeriksaan\Pemeriksaan;
+// use App\Http\Livewire\MrRJ\Penilaian\Penilaian;
+// use App\Http\Livewire\MrRJ\Diagnosis\Diagnosis;
+// use App\Http\Livewire\MrRJ\Perencanaan\Perencanaan;
 
 
+use App\Http\Livewire\EmrRJ\EresepRJ\EresepRJ;
 
 
 
@@ -105,16 +106,22 @@ Route::get('RJskdp', RJskdp::class)->middleware('auth')->name('RJskdp');
 Route::get('RIskdp', RIskdp::class)->middleware('auth')->name('RIskdp');
 
 // MR
-Route::get('MrRJ/Skdp', Skdp::class)->middleware('auth')->name('MRRJskdp');
-Route::get('MrRJ/SkdpRI', SkdpRI::class)->middleware('auth')->name('MRRJskdpRI');
+// Route::get('MrRJ/Skdp', Skdp::class)->middleware('auth')->name('MRRJskdp');
+// Route::get('MrRJ/SkdpRI', SkdpRI::class)->middleware('auth')->name('MRRJskdpRI');
 
 
-Route::get('MrRJ/Screening', Screening::class)->middleware('auth')->name('MRRJScreening');
-Route::get('MrRJ/Anamnesia', Anamnesia::class)->middleware('auth')->name('MRRJAnamnesia');
-Route::get('MrRJ/Pemeriksaan', Pemeriksaan::class)->middleware('auth')->name('MRRJPemeriksaan');
-Route::get('MrRJ/Penilaian', Penilaian::class)->middleware('auth')->name('MRRJPenilaian');
-Route::get('MrRJ/Diagnosis', Diagnosis::class)->middleware('auth')->name('MRRJDiagnosis');
-Route::get('MrRJ/Perencanaan', Perencanaan::class)->middleware('auth')->name('MRRJPerencanaan');
+// Route::get('MrRJ/Screening', Screening::class)->middleware('auth')->name('MRRJScreening');
+// Route::get('MrRJ/Anamnesia', Anamnesia::class)->middleware('auth')->name('MRRJAnamnesia');
+// Route::get('MrRJ/Pemeriksaan', Pemeriksaan::class)->middleware('auth')->name('MRRJPemeriksaan');
+// Route::get('MrRJ/Penilaian', Penilaian::class)->middleware('auth')->name('MRRJPenilaian');
+// Route::get('MrRJ/Diagnosis', Diagnosis::class)->middleware('auth')->name('MRRJDiagnosis');
+// Route::get('MrRJ/Perencanaan', Perencanaan::class)->middleware('auth')->name('MRRJPerencanaan');
+
+
+// Eresep
+Route::get('EmrRJ/Eresep', EresepRJ::class)->middleware('auth')->name('EmrRJEresepRJ');
+
+
 
 
 Route::get('pelayananRJ', PelayananRJ::class)->middleware('auth')->name('pelayananRJ');
