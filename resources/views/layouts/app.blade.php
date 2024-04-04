@@ -169,7 +169,7 @@
 
 
 
-    <script src="https://flowbite-admin-dashboard.vercel.app//app.bundle.js"></script>
+    <script src="assets/flowbite/dist/app.bundle.js"></script>
     <script src="assets/flowbite/dist/flowbite.min.js"></script>
 
 
