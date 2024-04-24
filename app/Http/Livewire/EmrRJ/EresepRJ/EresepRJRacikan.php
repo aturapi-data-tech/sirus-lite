@@ -293,8 +293,13 @@ class EresepRJRacikan extends Component
                     // 'price' => $this->collectingMyProduct['productPrice'],
                     // 'rj_carapakai' => $this->collectingMyProduct['signaX'],
                     // 'rj_kapsul' => $this->collectingMyProduct['signaHari'],
+                    'sedia' => $this->collectingMyProduct['sedia'],
+                    'catatan' => $this->collectingMyProduct['catatan'],
+                    'qty' => $this->collectingMyProduct['qty'],
+                    'catatan_khusus' => $this->collectingMyProduct['catatanKhusus'],
+                    'no_racikan' => $this->noRacikan,
+
                     'rj_takar' => 'Tablet',
-                    'rj_ket' => $this->collectingMyProduct['catatanKhusus'],
                     'exp_date' => DB::raw("to_date('" . $this->dataDaftarPoliRJ['rjDate'] . "','dd/mm/yyyy hh24:mi:ss')+30"),
                     'etiket_status' => 1,
                 ]);

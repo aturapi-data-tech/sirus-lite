@@ -172,7 +172,7 @@
 
                                 <x-alternative-button class="inline-flex ml-2"
                                     wire:click.prevent="resetcollectingMyProduct()"
-                                    x-on:click="$refs.collectingMyProductproductName.focus()">>
+                                    x-on:click="$refs.collectingMyProductproductName.focus()">
                                     <svg class="w-5 h-5 text-gray-800 dark:text-white" aria-hidden="true"
                                         xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 20">
                                         <path
