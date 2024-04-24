@@ -15,7 +15,7 @@ use Spatie\ArrayToXml\ArrayToXml;
 use Exception;
 
 
-class EresepRJ extends Component
+class EresepRJRacikan extends Component
 {
     use WithPagination;
 
@@ -44,12 +44,14 @@ class EresepRJ extends Component
 
 
 
-    public $dataProductLov = [];
-    public $dataProductLovStatus = 0;
+    public array $dataProductLov = [];
+    public int $dataProductLovStatus = 0;
     public $dataProductLovSearch = '';
-    public $selecteddataProductLovIndex = 0;
+    public int $selecteddataProductLovIndex = 0;
 
-    public $collectingMyProduct = [];
+    public array $collectingMyProduct = [];
+
+    public string $noRacikan = 'R1';
 
 
 
@@ -69,130 +71,7 @@ class EresepRJ extends Component
 
 
 
-    /////////////////////////////////////////////////
-    // Lov dataProductLov //////////////////////
-    ////////////////////////////////////////////////
-    public function clickdataProductLov()
-    {
-        $this->dataProductLovStatus = true;
-        $this->dataProductLov = [];
-    }
 
-    public function updateddataProductLovsearch()
-    {
-
-        // Reset index of LoV
-        $this->reset(['selecteddataProductLovIndex', 'dataProductLov']);
-        // Variable Search
-        $search = $this->dataProductLovSearch;
-
-        // check LOV by dr_id rs id 
-        $dataProductLovs = DB::table('immst_products')->select(
-            'product_id',
-            'product_name',
-            'sales_price'
-        )
-            ->where('product_id', $search)
-            ->first();
-
-        if ($dataProductLovs) {
-
-            // set product sep
-            $this->addProduct($dataProductLovs->product_id, $dataProductLovs->product_name, $dataProductLovs->sales_price);
-            $this->resetdataProductLov();
-        } else {
-
-            // if there is no id found and check (min 3 char on search)
-            if (strlen($search) < 3) {
-                $this->dataProductLov = [];
-            } else {
-                $this->dataProductLov = json_decode(
-                    DB::table('immst_products')->select(
-                        'product_id',
-                        'product_name',
-                        'sales_price'
-                    )
-                        ->where('active_status', '1')
-                        ->where(DB::raw('upper(product_name)'), 'like', '%' . strtoupper($search) . '%')
-                        ->limit(10)
-                        ->orderBy('product_id', 'ASC')
-                        ->orderBy('product_name', 'ASC')
-                        ->get(),
-                    true
-                );
-            }
-            $this->dataProductLovStatus = true;
-            // set doing nothing
-        }
-    }
-    // /////////////////////
-    // LOV selected start
-    public function setMydataProductLov($id)
-    {
-        $this->checkRjStatus();
-        $dataProductLovs = DB::table('immst_products')->select(
-            'product_id',
-            'product_name',
-            'sales_price'
-        )
-            ->where('active_status', '1')
-            ->where('product_id', $this->dataProductLov[$id]['product_id'])
-            ->first();
-
-        // set dokter sep
-        $this->addProduct($dataProductLovs->product_id, $dataProductLovs->product_name, $dataProductLovs->sales_price);
-        $this->resetdataProductLov();
-    }
-
-    public function resetdataProductLov()
-    {
-        $this->reset(['dataProductLov', 'dataProductLovStatus', 'dataProductLovSearch', 'selecteddataProductLovIndex']);
-    }
-
-    public function selectNextdataProductLov()
-    {
-        if ($this->selecteddataProductLovIndex === "") {
-            $this->selecteddataProductLovIndex = 0;
-        } else {
-            $this->selecteddataProductLovIndex++;
-        }
-
-        if ($this->selecteddataProductLovIndex === count($this->dataProductLov)) {
-            $this->selecteddataProductLovIndex = 0;
-        }
-    }
-
-    public function selectPreviousdataProductLov()
-    {
-
-        if ($this->selecteddataProductLovIndex === "") {
-            $this->selecteddataProductLovIndex = count($this->dataProductLov) - 1;
-        } else {
-            $this->selecteddataProductLovIndex--;
-        }
-
-        if ($this->selecteddataProductLovIndex === -1) {
-            $this->selecteddataProductLovIndex = count($this->dataProductLov) - 1;
-        }
-    }
-
-    public function enterMydataProductLov($id)
-    {
-        $this->checkRjStatus();
-        // jika data obat belum siap maka toaster error
-        if (isset($this->dataProductLov[$id]['product_id'])) {
-            $this->addProduct($this->dataProductLov[$id]['product_id'], $this->dataProductLov[$id]['product_name'], $this->dataProductLov[$id]['sales_price']);
-            $this->resetdataProductLov();
-        } else {
-            $this->emit('toastr-error', "Data Obat belum tersedia.");
-        }
-    }
-
-
-    // LOV selected end
-    /////////////////////////////////////////////////
-    // Lov dataProductLov //////////////////////
-    ////////////////////////////////////////////////
 
 
 
@@ -222,7 +101,7 @@ class EresepRJ extends Component
                 'dataDaftarPoliRJ_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
             ]);
 
-        $this->emit('toastr-success', "Eresep berhasil disimpan.");
+        $this->emit('toastr-success', "Eresep Racikan berhasil disimpan.");
     }
     // insert and update record end////////////////
 
@@ -365,36 +244,27 @@ class EresepRJ extends Component
 
 
 
-    private function addProduct($productId, $productName, $salesPrice): void
-    {
-
-        $this->collectingMyProduct = [
-            'productId' => $productId,
-            'productName' => $productName,
-            'jenisKeterangan' => 'NonRacikan', //Racikan non racikan
-            'signaX' => 1,
-            'signaHari' => 1,
-            'qty' => 1,
-            'productPrice' => $salesPrice,
-            'catatanKhusus' => '-',
-        ];
-    }
 
     public function insertProduct(): void
     {
 
         // validate
+        $this->checkRjStatus();
         // customErrorMessages
         $messages = customErrorMessagesTrait::messages();
         // require nik ketika pasien tidak dikenal
         $rules = [
-            "collectingMyProduct.productId" => 'bail|required|',
+            "collectingMyProduct.productId" => 'bail|',
             "collectingMyProduct.productName" => 'bail|required|',
-            "collectingMyProduct.signaX" => 'bail|required|numeric|min:1|max:5',
-            "collectingMyProduct.signaHari" => 'bail|required|numeric|min:1|max:5',
+            "collectingMyProduct.signaX" => 'bail|numeric|min:1|max:5',
+            "collectingMyProduct.signaHari" => 'bail|numeric|min:1|max:5',
             "collectingMyProduct.qty" => 'bail|required|digits_between:1,3|',
-            "collectingMyProduct.productPrice" => 'bail|required|numeric|',
-            "collectingMyProduct.catatanKhusus" => 'bail|',
+            "collectingMyProduct.productPrice" => 'bail|numeric|',
+            "collectingMyProduct.catatanKhusus" => 'bail|required|max:150',
+            "collectingMyProduct.catatan" => 'bail|required|max:150',
+            "collectingMyProduct.sedia" => 'bail|required|max:150',
+
+
 
         ];
 
@@ -407,37 +277,41 @@ class EresepRJ extends Component
         // pengganti race condition
         // start:
         try {
-            // select nvl(max(rjobat_dtl)+1,1) into :rstxn_rjobats.rjobat_dtl from rstxn_rjobats;
+            // select nvl(max(rjobat_dtl)+1,1) into :rstxn_rjobatracikans.rjobat_dtl from rstxn_rjobatracikans;
 
-            $lastInserted = DB::table('rstxn_rjobats')
+            $lastInserted = DB::table('rstxn_rjobatracikans')
                 ->select(DB::raw("nvl(max(rjobat_dtl)+1,1) as rjobat_dtl_max"))
                 ->first();
             // insert into table transaksi
-            DB::table('rstxn_rjobats')
+            DB::table('rstxn_rjobatracikans')
                 ->insert([
                     'rjobat_dtl' => $lastInserted->rjobat_dtl_max,
                     'rj_no' => $this->rjNoRef,
-                    'product_id' => $this->collectingMyProduct['productId'],
+                    // 'product_id' => $this->collectingMyProduct['productId'],
+                    'product_name' => $this->collectingMyProduct['productName'],
                     'qty' => $this->collectingMyProduct['qty'],
-                    'price' => $this->collectingMyProduct['productPrice'],
-                    'rj_carapakai' => $this->collectingMyProduct['signaX'],
-                    'rj_kapsul' => $this->collectingMyProduct['signaHari'],
+                    // 'price' => $this->collectingMyProduct['productPrice'],
+                    // 'rj_carapakai' => $this->collectingMyProduct['signaX'],
+                    // 'rj_kapsul' => $this->collectingMyProduct['signaHari'],
                     'rj_takar' => 'Tablet',
-                    'catatan_khusus' => $this->collectingMyProduct['catatanKhusus'],
+                    'rj_ket' => $this->collectingMyProduct['catatanKhusus'],
                     'exp_date' => DB::raw("to_date('" . $this->dataDaftarPoliRJ['rjDate'] . "','dd/mm/yyyy hh24:mi:ss')+30"),
                     'etiket_status' => 1,
                 ]);
 
 
-            $this->dataDaftarPoliRJ['eresep'][] = [
-                'productId' => $this->collectingMyProduct['productId'],
+            $this->dataDaftarPoliRJ['eresepRacikan'][] = [
+                'jenisKeterangan' => 'Racikan', //Racikan non racikan
+                // 'productId' => $this->collectingMyProduct['productId'],
                 'productName' => $this->collectingMyProduct['productName'],
-                'jenisKeterangan' => 'NonRacikan', //Racikan non racikan
-                'signaX' => $this->collectingMyProduct['signaX'],
-                'signaHari' => $this->collectingMyProduct['signaHari'],
+                'sedia' => $this->collectingMyProduct['sedia'],
+                'catatan' => $this->collectingMyProduct['catatan'],
                 'qty' => $this->collectingMyProduct['qty'],
-                'productPrice' => $this->collectingMyProduct['productPrice'],
                 'catatanKhusus' => $this->collectingMyProduct['catatanKhusus'],
+                'noRacikan' => $this->noRacikan,
+                'signaX' => 1,
+                'signaHari' => 1,
+                'productPrice' => 0,
                 'rjObatDtl' => $lastInserted->rjobat_dtl_max,
                 'rjNo' => $this->rjNoRef,
             ];
@@ -458,19 +332,21 @@ class EresepRJ extends Component
     {
 
         $this->checkRjStatus();
+        $this->resetValidation();
+
 
 
         // pengganti race condition
         // start:
         try {
             // remove into table transaksi
-            DB::table('rstxn_rjobats')
+            DB::table('rstxn_rjobatracikans')
                 ->where('rjobat_dtl', $rjObatDtl)
                 ->delete();
 
 
-            $Product = collect($this->dataDaftarPoliRJ['eresep'])->where("rjObatDtl", '!=', $rjObatDtl)->toArray();
-            $this->dataDaftarPoliRJ['eresep'] = $Product;
+            $Product = collect($this->dataDaftarPoliRJ['eresepRacikan'])->where("rjObatDtl", '!=', $rjObatDtl)->toArray();
+            $this->dataDaftarPoliRJ['eresepRacikan'] = $Product;
             $this->store();
 
 
@@ -487,6 +363,7 @@ class EresepRJ extends Component
     public function resetcollectingMyProduct()
     {
         $this->reset(['collectingMyProduct']);
+        $this->resetValidation();
     }
 
     public function checkRjStatus()
@@ -497,8 +374,10 @@ class EresepRJ extends Component
             ->first();
 
         if ($lastInserted->rj_status !== 'A') {
-            $this->emit('toastr-error', "Pasien Sudah Pulang, Trasaksi Terkunci.");
-            return (dd('Pasien Sudah Pulang, Trasaksi Terkuncixx.'));
+            // throw new Exception('Pasien Sudah Pulang, Trasaksi Terkunci.');
+            $this->emit('toastr-error', "Pasien Sudah Pulang, Trasaksi Terkunci.xx");
+            exit();
+            // return (dd('Pasien Sudah Pulang, Trasaksi Terkunci.'));
         }
     }
 
@@ -517,7 +396,7 @@ class EresepRJ extends Component
     {
 
         return view(
-            'livewire.emr-r-j.eresep-r-j.eresep-r-j',
+            'livewire.emr-r-j.eresep-r-j.eresep-r-j-racikan',
             [
                 // 'RJpasiens' => $query->paginate($this->limitPerPage),
                 'myTitle' => 'Data Pasien Rawat Jalan',

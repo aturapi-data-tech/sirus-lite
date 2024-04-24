@@ -241,6 +241,9 @@ class EmrRJ extends Component
     }
 
 
+
+
+
     // listener from blade////////////////
     protected $listeners = [
         // 'ListenerisOpenRJ' => 'ListenerisOpenRJ',
@@ -285,6 +288,8 @@ class EmrRJ extends Component
 
     public string $activeTab = "rekamMedis";
     public string $activeTabDokter = "assessmentDokter";
+
+
 
 
     public array $EmrMenu = [
@@ -355,6 +360,8 @@ class EmrRJ extends Component
         ],
 
     ];
+
+
 
 
 

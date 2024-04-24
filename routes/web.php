@@ -27,6 +27,7 @@ use App\Http\Livewire\MrRJ\SkdpRI\SkdpRI;
 
 
 use App\Http\Livewire\EmrRJ\EresepRJ\EresepRJ;
+use App\Http\Livewire\EmrRJ\EresepRJ\EresepRJRacikan;
 
 
 
@@ -120,6 +121,7 @@ Route::get('RIskdp', RIskdp::class)->middleware('auth')->name('RIskdp');
 
 // Eresep
 Route::get('EmrRJ/Eresep', EresepRJ::class)->middleware('auth')->name('EmrRJEresepRJ');
+Route::get('EmrRJ/EresepRacikan', EresepRJRacikan::class)->middleware('auth')->name('EmrRJEresepRJ');
 
 
 

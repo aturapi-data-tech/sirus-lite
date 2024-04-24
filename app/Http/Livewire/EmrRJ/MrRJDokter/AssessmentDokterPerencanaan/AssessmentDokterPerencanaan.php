@@ -21,7 +21,7 @@ class AssessmentDokterPerencanaan extends Component
     // listener from blade////////////////
     protected $listeners = [
         'storeAssessmentDokterRJ' => 'store',
-        'syncronizeAssessmentDokterRJFindData' => 'mount'
+        'syncronizeAssessmentDokterRJFindData' => 'mount',
     ];
 
 
@@ -115,7 +115,7 @@ class AssessmentDokterPerencanaan extends Component
 
         // 'dataDaftarPoliRJ.perencanaan.pengkajianMedis.waktuPemeriksaan' => 'required|date_format:d/m/Y H:i:s',
         // 'dataDaftarPoliRJ.perencanaan.pengkajianMedis.selesaiPemeriksaan' => 'required|date_format:d/m/Y H:i:s'
-        'dataDaftarPoliRJ.perencanaan.pengkajianMedis.drPemeriksa' => 'required'
+        'dataDaftarPoliRJ.perencanaan.pengkajianMedis.drPemeriksa' => ''
 
 
     ];
@@ -129,7 +129,9 @@ class AssessmentDokterPerencanaan extends Component
     {
         // dd($propertyName);
         $this->validateOnly($propertyName);
-        $this->store();
+        if ($propertyName != 'activeTabRacikanNonRacikan') {
+            $this->store();
+        }
     }
 
 
@@ -389,6 +391,7 @@ class AssessmentDokterPerencanaan extends Component
         }
         // Validasi dulu
     }
+
     public function setDrPemeriksa()
     {
 
@@ -427,6 +430,68 @@ class AssessmentDokterPerencanaan extends Component
             $this->emit('toastr-error', "Anda tidak dapat melakukan TTD-E karena User Role " . $myUserNameActive . " Bukan Dokter");
         }
     }
+
+    // /////////////////eresep open////////////////////////
+    public bool $isOpenEresepRJ = false;
+    public string $isOpenModeEresepRJ = 'insert';
+
+    public function openModalEresepRJ(): void
+    {
+        $this->isOpenEresepRJ = true;
+        $this->isOpenModeEresepRJ = 'insert';
+    }
+
+    public function closeModalEresepRJ(): void
+    {
+        $this->isOpenEresepRJ = false;
+        $this->isOpenModeEresepRJ = 'insert';
+    }
+
+
+    public string $activeTabRacikanNonRacikan = "NonRacikan";
+    public array $EmrMenuRacikanNonRacikan = [
+        [
+            'ermMenuId' => 'NonRacikan',
+            'ermMenuName' => 'NonRacikan'
+        ],
+        [
+            'ermMenuId' => 'Racikan',
+            'ermMenuName' => 'Racikan'
+        ],
+    ];
+
+    public function simpanTerapi(): void
+    {
+        if (isset($this->dataDaftarPoliRJ['eresep'])) {
+            $eresep = '';
+            foreach ($this->dataDaftarPoliRJ['eresep'] as $key => $value) {
+                $racikanNonRacikan = $value['jenisKeterangan'] == 'NonRacikan' ? 'N' : '';
+                $eresep .=  '(' . $racikanNonRacikan . ')' . ' ' . $value['productName'] . ' /' . $value['qty'] . ' /' . $value['catatanKhusus'] . PHP_EOL;
+
+                $this->dataDaftarPoliRJ['perencanaan']['terapi']['terapi'] = $this->dataDaftarPoliRJ['perencanaan']['terapi']['terapi']
+                    . $eresep;
+            }
+        }
+
+        if (isset($this->dataDaftarPoliRJ['eresepRacikan'])) {
+            $eresepRacikan = '' . PHP_EOL;
+            foreach ($this->dataDaftarPoliRJ['eresepRacikan'] as $key => $value) {
+                $racikanNonRacikan = $value['jenisKeterangan'] == 'NonRacikan' ? 'N' : '';
+                $eresepRacikan .= $racikanNonRacikan . '(' . $value['noRacikan'] . ') ' . $value['productName'] . ' ' . $value['sedia'] . ' /' . $value['catatan'] . ' /' . $value['qty'] . ' /' . $value['catatanKhusus'] . PHP_EOL;
+            };
+
+            $this->dataDaftarPoliRJ['perencanaan']['terapi']['terapi'] = $this->dataDaftarPoliRJ['perencanaan']['terapi']['terapi']
+                . $eresepRacikan;
+        }
+
+        $this->store();
+        $this->closeModalEresepRJ();
+    }
+    // /////////////////////////////////////////
+
+
+
+
 
     // when new form instance
     public function mount()
