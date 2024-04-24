@@ -26,8 +26,8 @@ use App\Http\Livewire\MrRJ\SkdpRI\SkdpRI;
 // use App\Http\Livewire\MrRJ\Perencanaan\Perencanaan;
 
 
-use App\Http\Livewire\EmrRJ\EresepRJ\EresepRJ;
-use App\Http\Livewire\EmrRJ\EresepRJ\EresepRJRacikan;
+// use App\Http\Livewire\EmrRJ\EresepRJ\EresepRJ;
+// use App\Http\Livewire\EmrRJ\EresepRJ\EresepRJRacikan;
 
 
 
@@ -118,10 +118,9 @@ Route::get('RIskdp', RIskdp::class)->middleware('auth')->name('RIskdp');
 // Route::get('MrRJ/Diagnosis', Diagnosis::class)->middleware('auth')->name('MRRJDiagnosis');
 // Route::get('MrRJ/Perencanaan', Perencanaan::class)->middleware('auth')->name('MRRJPerencanaan');
 
-
 // Eresep
-Route::get('EmrRJ/Eresep', EresepRJ::class)->middleware('auth')->name('EmrRJEresepRJ');
-Route::get('EmrRJ/EresepRacikan', EresepRJRacikan::class)->middleware('auth')->name('EmrRJEresepRJ');
+// Route::get('EmrRJ/Eresep', EresepRJ::class)->middleware('auth')->name('EmrRJEresepRJ');
+// Route::get('EmrRJ/EresepRacikan', EresepRJRacikan::class)->middleware('auth')->name('EmrRJEresepRJ');
 
 
 
