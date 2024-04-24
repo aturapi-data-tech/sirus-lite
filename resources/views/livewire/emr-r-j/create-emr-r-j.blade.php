@@ -138,6 +138,16 @@
                         </div>
                     @endif
 
+                    @if ($activeTab == 'administrasi')
+                        <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50 ">
+                            {{-- <div>{{ $activeTab }}</div> --}}
+                            {{-- :rjNo="" disi dari emit ListeneropenModalEditRj --}}
+                            <livewire:emr-r-j.administrasi-r-j.administrasi-r-j :wire:key="'content-administrasi-r-j'"
+                                :rjNoRef="$rjNoRef">
+
+                        </div>
+                    @endif
+
                     @if ($activeTab == 'suket')
                         <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50 ">
                             {{-- <div>{{ $activeTab }}</div> --}}

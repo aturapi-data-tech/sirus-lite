@@ -322,6 +322,10 @@ class EmrRJ extends Component
             'ermMenuName' => 'Perencanaan'
         ],
         [
+            'ermMenuId' => 'administrasi',
+            'ermMenuName' => 'Administrasi'
+        ],
+        [
             'ermMenuId' => 'suket',
             'ermMenuName' => 'Surat Keterangan (Sehat/Istirahat)'
         ],
@@ -360,6 +364,7 @@ class EmrRJ extends Component
         ],
 
     ];
+
 
 
 
