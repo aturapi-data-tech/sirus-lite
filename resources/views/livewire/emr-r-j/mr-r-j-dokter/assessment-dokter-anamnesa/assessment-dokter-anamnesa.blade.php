@@ -10,7 +10,7 @@
             <div id="TransaksiRawatJalan" class="p-2">
                 <div id="TransaksiRawatJalan">
 
-                    <div class="p-2 rounded-lg bg-gray-50">
+                    <div class="p-2 rounded-lg  bg-gray-50">
                         {{-- @include('livewire.emr-r-j.mr-r-j.anamnesa.pengkajianPerawatanTab') --}}
                         {{-- @include('livewire.emr-r-j.mr-r-j.anamnesa.keluhanUtamaTab') --}}
 
@@ -18,13 +18,17 @@
 
                             <x-input-label :value="__('Keluhan Utama')" :required="__(true)" class="pt-2 sm:text-xl" />
 
-                            <x-text-input placeholder="Isi dgn data yang sesuai" class="mt-1 ml-2" :errorshas="__($errors->has('SEPJsonReq.request.t_sep.diagAwal'))"
-                                :disabled=$disabledProperty
-                                value="{{ isset($dataDaftarPoliRJ['anamnesa']['keluhanUtama']['keluhanUtama'])
-                                    ? ($dataDaftarPoliRJ['anamnesa']['keluhanUtama']['keluhanUtama']
-                                        ? $dataDaftarPoliRJ['anamnesa']['keluhanUtama']['keluhanUtama']
-                                        : '-')
-                                    : '-' }}" />
+                            <p class="w-full ml-2 text-sm">
+                                {!! nl2br(
+                                    e(
+                                        isset($dataDaftarPoliRJ['anamnesa']['keluhanUtama']['keluhanUtama'])
+                                            ? ($dataDaftarPoliRJ['anamnesa']['keluhanUtama']['keluhanUtama']
+                                                ? $dataDaftarPoliRJ['anamnesa']['keluhanUtama']['keluhanUtama']
+                                                : '-')
+                                            : '-',
+                                    ),
+                                ) !!}
+                            </p>
 
                         </div>
                         {{-- @include('livewire.emr-r-j.mr-r-j.anamnesa.anamnesaDiperolehTab') --}}
