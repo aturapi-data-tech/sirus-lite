@@ -13,7 +13,7 @@
                             <li class="mr-2">
                                 <label
                                     class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
-                                    :class="activeTabAdministrasi === '{{ $EmrMenu['ermMenuId'] }}'
+                                    x-bind:class="activeTabAdministrasi === '{{ $EmrMenu['ermMenuId'] }}'
                                         ?
                                         'text-primary border-primary bg-gray-100' : ''"
                                     x-on:click="activeTabAdministrasi ='{{ $EmrMenu['ermMenuId'] }}'">{{ $EmrMenu['ermMenuName'] }}</label>
