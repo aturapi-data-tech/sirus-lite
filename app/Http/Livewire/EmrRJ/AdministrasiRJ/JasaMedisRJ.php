@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
 // use Carbon\Carbon;
+use Illuminate\Support\Facades\Validator;
+
 
 use App\Http\Traits\customErrorMessagesTrait;
 
@@ -380,6 +382,7 @@ class JasaMedisRJ extends Component
     {
 
         // validate
+        $this->checkRjStatus();
         // customErrorMessages
         $messages = customErrorMessagesTrait::messages();
         // require nik ketika pasien tidak dikenal
@@ -421,6 +424,9 @@ class JasaMedisRJ extends Component
                 'rjNo' => $this->rjNoRef,
             ];
 
+            $this->paketLainLainJasaMedis($this->collectingMyJasaMedis['JasaMedisId'], $this->rjNoRef, $lastInserted->pact_dtl_max);
+            $this->paketObatJasaMedis($this->collectingMyJasaMedis['JasaMedisId'], $this->rjNoRef, $lastInserted->pact_dtl_max);
+
             $this->store();
             $this->reset(['collectingMyJasaMedis']);
 
@@ -442,6 +448,10 @@ class JasaMedisRJ extends Component
         // pengganti race condition
         // start:
         try {
+
+            $this->removepaketLainLainJasaMedis($rjpactDtl);
+            $this->removepaketObatJasaMedis($rjpactDtl);
+
             // remove into table transaksi
             DB::table('rstxn_rjactparams')
                 ->where('pact_dtl', $rjpactDtl)
@@ -467,6 +477,289 @@ class JasaMedisRJ extends Component
     {
         $this->reset(['collectingMyJasaMedis']);
     }
+
+    // /////////////////////////////////////////////////////////////////
+    // Paket JasaMedis -> Lain lain
+    private function paketLainLainJasaMedis($pactId, $rjNo, $pactDtl): void
+    {
+        $collection = DB::table('rsmst_actparothers')
+            ->select('other_id', 'acto_price')
+            ->where('pact_id', $pactId)
+            ->orderBy('pact_id')
+            ->get();
+
+        foreach ($collection as $item) {
+            $this->insertLainLain($pactId, $rjNo, $pactDtl, $item->other_id, 'Paket JM', $item->acto_price);
+        }
+    }
+
+    private function insertLainLain($pactId, $rjNo, $pactDtl, $otherId, $otherDesc, $otherPrice): void
+    {
+
+        // validate
+        // customErrorMessages
+        $messages = customErrorMessagesTrait::messages();
+        // require nik ketika pasien tidak dikenal
+        $collectingMyLainLain =
+            [
+                "LainLainId" => $otherId,
+                "LainLainDesc" => $otherDesc,
+                "LainLainPrice" => $otherPrice,
+                "pactId" => $pactId,
+                "pactDtl" => $pactDtl,
+                "rjNo" => $rjNo,
+
+            ];
+
+        $rules = [
+            "LainLainId" => 'bail|required|exists:rsmst_others ,other_id',
+            "LainLainDesc" => 'bail|required|',
+            "LainLainPrice" => 'bail|required|numeric|',
+            "pactId" => 'bail|required||',
+            "pactDtl" => 'bail|required|numeric|',
+            "rjNo" => 'bail|required|numeric|',
+
+
+
+        ];
+
+        // Proses Validasi///////////////////////////////////////////
+        $validator = Validator::make($collectingMyLainLain, $rules, $messages);
+
+        if ($validator->fails()) {
+            dd($validator->validated());
+        }
+
+
+        // pengganti race condition
+        // start:
+        try {
+
+            $lastInserted = DB::table('rstxn_rjothers')
+                ->select(DB::raw("nvl(max(rjo_dtl)+1,1) as rjo_dtl_max"))
+                ->first();
+            // insert into table transaksi
+            DB::table('rstxn_rjothers')
+                ->insert([
+                    'rjo_dtl' => $lastInserted->rjo_dtl_max,
+                    'pact_dtl' => $collectingMyLainLain['pactDtl'],
+                    'rj_no' => $collectingMyLainLain['rjNo'],
+                    'other_id' => $collectingMyLainLain['LainLainId'],
+                    'other_price' => $collectingMyLainLain['LainLainPrice'],
+                ]);
+
+
+            $this->dataDaftarPoliRJ['LainLain'][] = [
+                'LainLainId' => $collectingMyLainLain['LainLainId'],
+                'LainLainDesc' => $collectingMyLainLain['LainLainDesc'],
+                'LainLainPrice' => $collectingMyLainLain['LainLainPrice'],
+                'rjotherDtl' => $lastInserted->rjo_dtl_max,
+                'rjNo' => $collectingMyLainLain['rjNo'],
+                'pact_dtl' => $collectingMyLainLain['pactDtl']
+            ];
+
+            $this->store();
+            //
+        } catch (Exception $e) {
+            // display an error to user
+            dd($e->getMessage());
+        }
+        // goto start;
+    }
+
+    private function removepaketLainLainJasaMedis($rjpactDtl): void
+    {
+        $collection = DB::table('rstxn_rjothers')
+            ->select('rjo_dtl')
+            ->where('pact_dtl', $rjpactDtl)
+            ->orderBy('pact_dtl')
+            ->get();
+
+        foreach ($collection as $item) {
+            $this->removeLainLain($item->rjo_dtl);
+        }
+    }
+
+    private function removeLainLain($rjotherDtl): void
+    {
+
+        $this->checkRjStatus();
+
+
+        // pengganti race condition
+        // start:
+        try {
+            // remove into table transaksi
+            DB::table('rstxn_rjothers')
+                ->where('rjo_dtl', $rjotherDtl)
+                ->delete();
+
+
+            $LainLain = collect($this->dataDaftarPoliRJ['LainLain'])->where("rjotherDtl", '!=', $rjotherDtl)->toArray();
+            $this->dataDaftarPoliRJ['LainLain'] = $LainLain;
+
+            $this->store();
+            //
+        } catch (Exception $e) {
+            // display an error to user
+            dd($e->getMessage());
+        }
+        // goto start;
+    }
+
+
+    // /////////////////////////////////////////////////////////////////
+    // Paket JasaMedis -> Obat
+    private function paketObatJasaMedis($pactId, $rjNo, $pactDtl): void
+    {
+        $collection = DB::table('rsmst_actparproducts')
+            ->select(
+                'immst_products.product_id as product_id',
+                'pact_id',
+                'actprod_qty',
+                'immst_products.product_name as product_name',
+                'immst_products.sales_price as sales_price',
+
+            )
+            ->where('pact_id', $pactId)
+            ->join('immst_products', 'immst_products.product_id', 'rsmst_actparproducts.product_id')
+            ->orderBy('pact_id')
+            ->get();
+
+        foreach ($collection as $item) {
+            $this->insertObat($pactId, $rjNo, $pactDtl, $item->product_id, 'Paket JM' . $item->product_name, $item->sales_price, $item->actprod_qty);
+        }
+    }
+
+    private function insertObat($pactId, $rjNo, $pactDtl, $ObatId, $ObatDesc, $ObatPrice, $Obatqty): void
+    {
+
+        // validate
+        // customErrorMessages
+        $messages = customErrorMessagesTrait::messages();
+        // require nik ketika pasien tidak dikenal
+        $collectingMyObat = [
+            "productId" => $ObatId,
+            "productName" => $ObatDesc,
+            "signaX" => 1,
+            "signaHari" => 1,
+            "qty" => $Obatqty,
+            "productPrice" => $ObatPrice,
+            "catatanKhusus" => '-',
+            "pactDtl" => $pactDtl,
+            "pactId" => $pactId,
+            "rjNo" => $rjNo
+        ];
+
+        $rules = [
+            "productId" => 'bail|required|exists:immst_products ,product_id',
+            "productName" => 'bail|required|',
+            "signaX" => 'bail|required|numeric|min:1|max:5',
+            "signaHari" => 'bail|required|numeric|min:1|max:5',
+            "qty" => 'bail|required|digits_between:1,3|',
+            "productPrice" => 'bail|required|numeric|',
+            "catatanKhusus" => 'bail|',
+            "pactDtl" => 'bail|required|numeric|',
+            "pactId" => 'bail|required|',
+            "rjNo" => 'bail|required|numeric|',
+        ];
+
+        // Proses Validasi///////////////////////////////////////////
+        $validator = Validator::make($collectingMyObat, $rules, $messages);
+
+        if ($validator->fails()) {
+            dd($validator->validated());
+        }
+
+
+        // pengganti race condition
+        // start:
+        try {
+
+            $lastInserted = DB::table('rstxn_rjobats')
+                ->select(DB::raw("nvl(max(rjobat_dtl)+1,1) as rjobat_dtl_max"))
+                ->first();
+            // insert into table transaksi
+            DB::table('rstxn_rjobats')
+                ->insert([
+                    'rjobat_dtl' => $lastInserted->rjobat_dtl_max,
+                    'pact_dtl' => $collectingMyObat['pactDtl'],
+                    'rj_no' => $collectingMyObat['rjNo'],
+                    'product_id' => $collectingMyObat['productId'],
+                    'qty' => $collectingMyObat['qty'],
+                    'price' => $collectingMyObat['productPrice'],
+                    'rj_carapakai' => $collectingMyObat['signaX'],
+                    'rj_kapsul' => $collectingMyObat['signaHari'],
+                    'rj_takar' => 'Tablet',
+                    'catatan_khusus' => $collectingMyObat['catatanKhusus'],
+                    'exp_date' => DB::raw("to_date('" . $this->dataDaftarPoliRJ['rjDate'] . "','dd/mm/yyyy hh24:mi:ss')+30"),
+                    'etiket_status' => 0,
+                ]);
+
+
+            // $this->dataDaftarPoliRJ['eresep'][] = [
+            //     'productId' => $this->collectingMyProduct['productId'],
+            //     'productName' => $this->collectingMyProduct['productName'],
+            //     'jenisKeterangan' => 'NonRacikan', //Racikan non racikan
+            //     'signaX' => $this->collectingMyProduct['signaX'],
+            //     'signaHari' => $this->collectingMyProduct['signaHari'],
+            //     'qty' => $this->collectingMyProduct['qty'],
+            //     'productPrice' => $this->collectingMyProduct['productPrice'],
+            //     'catatanKhusus' => $this->collectingMyProduct['catatanKhusus'],
+            //     'rjObatDtl' => $lastInserted->rjobat_dtl_max,
+            //     'rjNo' => $this->rjNoRef,
+            // ];
+
+            $this->store();
+            //
+        } catch (Exception $e) {
+            // display an error to user
+            dd($e->getMessage());
+        }
+        // goto start;
+    }
+
+    private function removepaketObatJasaMedis($rjpactDtl): void
+    {
+        $collection = DB::table('rstxn_rjobats')
+            ->select('rjobat_dtl')
+            ->where('pact_dtl', $rjpactDtl)
+            ->orderBy('pact_dtl')
+            ->get();
+
+        foreach ($collection as $item) {
+            $this->removeObat($item->rjobat_dtl);
+        }
+    }
+
+    private function removeObat($rjObatDtl): void
+    {
+
+        $this->checkRjStatus();
+
+
+        // pengganti race condition
+        // start:
+        try {
+            // remove into table transaksi
+            DB::table('rstxn_rjobats')
+                ->where('rjobat_dtl', $rjObatDtl)
+                ->delete();
+
+
+            // $LainLain = collect($this->dataDaftarPoliRJ['LainLain'])->where("rjotherDtl", '!=', $rjotherDtl)->toArray();
+            // $this->dataDaftarPoliRJ['LainLain'] = $LainLain;
+
+            $this->store();
+            //
+        } catch (Exception $e) {
+            // display an error to user
+            dd($e->getMessage());
+        }
+        // goto start;
+    }
+    // Paket JasaMedis -> Obat
+    // /////////////////////////////////////////////////////////////////
 
     public function checkRjStatus()
     {

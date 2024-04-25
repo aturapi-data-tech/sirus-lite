@@ -380,6 +380,7 @@ class LainLainRJ extends Component
     {
 
         // validate
+        $this->checkRjStatus();
         // customErrorMessages
         $messages = customErrorMessagesTrait::messages();
         // require nik ketika pasien tidak dikenal
