@@ -36,41 +36,30 @@
                         </button>
                     </div>
 
-                    {{-- Pasien --}}
-
-
-
-
-
                 </div>
 
-                {{-- Display Pasien Componen --}}
-                <div class="">
-                    {{-- Display Pasien --}}
-                    {{-- :rjNo="" disi dari emit ListeneropenModalEditRj --}}
 
+                {{-- Display Pasien Componen --}}
+                <div>
                     <livewire:emr-r-j.display-pasien.display-pasien :wire:key="$regNo.'display-pasienEresep'"
                         :rjNoRef="$rjNoRef">
-
-                        {{-- <livewire:emr-r-j.form-entry-r-j.form-entry-r-j :rjNo="$regNo"
-                            :wire:key="$regNo.'form-entry-r-j'"> --}}
                 </div>
 
 
                 {{-- Transasi EMR --}}
-                <div id="TransaksiEMR" x-data="{ activeTab: '{{ $activeTab }}' }" class="flex">
+                <div id="TransaksiEMR" x-data="{ activeTab: @entangle('activeTab') }" class="flex">
 
                     <div class="px-4 mb-0 border-b border-gray-200  w-[250px] overflow-auto ">
                         <ul class="flex flex-col flex-wrap -mb-px text-sm font-medium text-gray-500 text-start ">
                             @foreach ($EmrMenu as $EmrM)
                                 <li wire:key="tab-{{ $EmrM['ermMenuId'] }}" class="mr-0 rounded-lg"
-                                    :class="'{{ $activeTab }}'
+                                    x-bind:class="activeTab
                                     === '{{ $EmrM['ermMenuId'] }}' ?
                                         'text-primary border-primary bg-gray-100' :
                                         ''">
                                     <label
                                         class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
-                                        @click="activeTab ='{{ $EmrM['ermMenuId'] }}'"
+                                        x-on:click="activeTab ='{{ $EmrM['ermMenuId'] }}'"
                                         wire:click="$set('activeTab', '{{ $EmrM['ermMenuId'] }}')">{{ $EmrM['ermMenuName'] }}</label>
                                 </li>
                             @endforeach
@@ -80,93 +69,89 @@
                     </div>
 
 
+                    <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50"
+                        :class="{
+                            'active': activeTab === 'anamnesa'
+                        }"
+                        x-show.transition.in.opacity.duration.600="activeTab === 'anamnesa'">
+                        <livewire:emr-r-j.mr-r-j.anamnesa.anamnesa :wire:key="'content-anamnesaRj'" :rjNoRef="$rjNoRef">
 
-                    @if ($activeTab == 'anamnesa')
-                        <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50 ">
+                    </div>
 
-                            <livewire:emr-r-j.mr-r-j.anamnesa.anamnesa :wire:key="'content-anamnesaRj'"
-                                :rjNoRef="$rjNoRef">
-                        </div>
-                    @endif
+                    <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50"
+                        :class="{
+                            'active': activeTab === 'pemeriksaan'
+                        }"
+                        x-show.transition.in.opacity.duration.600="activeTab === 'pemeriksaan'">
+                        <livewire:emr-r-j.mr-r-j.pemeriksaan.pemeriksaan :wire:key="'content-pemeriksaanRj'"
+                            :rjNoRef="$rjNoRef">
 
-                    @if ($activeTab == 'pemeriksaan')
-                        <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50 ">
+                    </div>
 
-                            <livewire:emr-r-j.mr-r-j.pemeriksaan.pemeriksaan :wire:key="'content-pemeriksaanRj'"
-                                :rjNoRef="$rjNoRef">
-                        </div>
-                    @endif
+                    <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50"
+                        :class="{
+                            'active': activeTab === 'diagnosis'
+                        }"
+                        x-show.transition.in.opacity.duration.600="activeTab === 'penilaian'">
+                        <livewire:emr-r-j.mr-r-j.penilaian.penilaian :wire:key="'content-penilaianRj'"
+                            :rjNoRef="$rjNoRef">
 
+                    </div>
 
-                    @if ($activeTab == 'penilaian')
-                        <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50 ">
+                    <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50"
+                        :class="{
+                            'active': activeTab === 'diagnosis'
+                        }"
+                        x-show.transition.in.opacity.duration.600="activeTab === 'diagnosis'">
+                        <livewire:emr-r-j.mr-r-j.diagnosis.diagnosis :wire:key="'content-diagnosisRj'"
+                            :rjNoRef="$rjNoRef">
 
-                            <livewire:emr-r-j.mr-r-j.penilaian.penilaian :wire:key="'content-penilaianRj'"
-                                :rjNoRef="$rjNoRef">
-                        </div>
-                    @endif
+                    </div>
 
-                    @if ($activeTab == 'diagnosis')
-                        <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50 ">
-                            {{-- <div>{{ $activeTab }}</div> --}}
-                            {{-- :rjNo="" disi dari emit ListeneropenModalEditRj --}}
+                    <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50"
+                        :class="{
+                            'active': activeTab === 'perencanaan'
+                        }"
+                        x-show.transition.in.opacity.duration.600="activeTab === 'perencanaan'">
+                        <livewire:emr-r-j.mr-r-j.perencanaan.perencanaan :wire:key="'content-perencanaanRj'"
+                            :rjNoRef="$rjNoRef">
 
+                    </div>
 
-                            <livewire:emr-r-j.mr-r-j.diagnosis.diagnosis :wire:key="'content-diagnosisRj'"
-                                :rjNoRef="$rjNoRef">
-                        </div>
-                    @endif
+                    <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50"
+                        :class="{
+                            'active': activeTab === 'rekamMedis'
+                        }"
+                        x-show.transition.in.opacity.duration.600="activeTab === 'rekamMedis'">
+                        <livewire:emr.rekam-medis.rekam-medis :wire:key="'content-rekamMedisRj'" :regNoRef="$regNoRef">
 
+                    </div>
 
-                    @if ($activeTab == 'perencanaan')
-                        <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50 ">
-                            {{-- <div>{{ $activeTab }}</div> --}}
-                            {{-- :rjNo="" disi dari emit ListeneropenModalEditRj --}}
+                    <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50"
+                        :class="{
+                            'active': activeTab === 'administrasi'
+                        }"
+                        x-show.transition.in.opacity.duration.600="activeTab === 'administrasi'">
 
+                        <livewire:emr-r-j.administrasi-r-j.administrasi-r-j :wire:key="'content-administrasiRj'"
+                            :rjNoRef="$rjNoRef">
 
-                            <livewire:emr-r-j.mr-r-j.perencanaan.perencanaan :wire:key="'content-perencanaanRj'"
-                                :rjNoRef="$rjNoRef">
-                        </div>
-                    @endif
+                    </div>
 
-                    @if ($activeTab == 'rekamMedis')
-                        <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50 ">
-                            {{-- <div>{{ $activeTab }}</div> --}}
-                            {{-- :rjNo="" disi dari emit ListeneropenModalEditRj --}}
-                            <livewire:emr.rekam-medis.rekam-medis :wire:key="'content-layananRj'" :regNoRef="$regNoRef">
+                    <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50"
+                        :class="{
+                            'active': activeTab === 'suket'
+                        }"
+                        x-show.transition.in.opacity.duration.600="activeTab === 'suket'">
+                        <livewire:emr-r-j.mr-r-j.suket.suket :wire:key="'content-suketRj'" :rjNoRef="$rjNoRef">
 
-                        </div>
-                    @endif
+                    </div>
 
-                    @if ($activeTab == 'administrasi')
-                        <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50 ">
-                            {{-- <div>{{ $activeTab }}</div> --}}
-                            {{-- :rjNo="" disi dari emit ListeneropenModalEditRj --}}
-                            <livewire:emr-r-j.administrasi-r-j.administrasi-r-j :wire:key="'content-administrasi-r-j'"
-                                :rjNoRef="$rjNoRef">
-
-                        </div>
-                    @endif
-
-                    @if ($activeTab == 'suket')
-                        <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50 ">
-                            {{-- <div>{{ $activeTab }}</div> --}}
-                            {{-- :rjNo="" disi dari emit ListeneropenModalEditRj --}}
-                            <livewire:emr-r-j.mr-r-j.suket.suket :wire:key="'content-suketRj'" :rjNoRef="$rjNoRef">
-
-                        </div>
-                    @endif
 
 
                 </div>
-
             </div>
-
-
-
         </div>
-
-
 
 
     </div>

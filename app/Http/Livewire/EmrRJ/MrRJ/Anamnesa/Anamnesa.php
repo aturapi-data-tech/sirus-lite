@@ -965,7 +965,6 @@ class Anamnesa extends Component
     // when new form instance
     public function mount()
     {
-
         $this->findData($this->rjNoRef);
     }
 

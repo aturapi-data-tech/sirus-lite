@@ -519,8 +519,6 @@ class Diagnosis extends Component
     public function mount()
     {
         $this->findData($this->rjNoRef);
-        // set data dokter ref
-        // $this->store();
     }
 
 

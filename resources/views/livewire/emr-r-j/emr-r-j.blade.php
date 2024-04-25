@@ -188,9 +188,17 @@
                             $procedure = isset($datadaftar_json['procedure']) ? 1 : 0;
                             $diagnosis = isset($datadaftar_json['diagnosis']) ? 1 : 0;
                             $perencanaan = isset($datadaftar_json['perencanaan']) ? 1 : 0;
-                            $prosentaseEMR = (($anamnesa + $pemeriksaan + $penilaian + $procedure + $diagnosis + $perencanaan) / 6) * 100;
+                            $prosentaseEMR =
+                                (($anamnesa + $pemeriksaan + $penilaian + $procedure + $diagnosis + $perencanaan) / 6) *
+                                100;
 
-                            $bgSelesaiPemeriksaan = isset($datadaftar_json['perencanaan']['pengkajianMedis']['drPemeriksa']) ? ($datadaftar_json['perencanaan']['pengkajianMedis']['drPemeriksa'] ? 'bg-green-100' : '') : '';
+                            $bgSelesaiPemeriksaan = isset(
+                                $datadaftar_json['perencanaan']['pengkajianMedis']['drPemeriksa'],
+                            )
+                                ? ($datadaftar_json['perencanaan']['pengkajianMedis']['drPemeriksa']
+                                    ? 'bg-green-100'
+                                    : '')
+                                : '';
                         @endphp
 
 

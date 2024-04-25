@@ -89,52 +89,52 @@
                                         </tr>
                                     </thead>
                                     <tbody class="bg-white dark:bg-gray-800">
+                                        @isset($dataDaftarPoliRJ['diagnosis'])
+                                            @foreach ($dataDaftarPoliRJ['diagnosis'] as $key => $diag)
+                                                <tr class="border-b group dark:border-gray-700">
 
-                                        @foreach ($dataDaftarPoliRJ['diagnosis'] as $key => $diag)
-                                            <tr class="border-b group dark:border-gray-700">
+                                                    <td
+                                                        class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
+                                                        {{ $diag['icdX'] }}
+                                                    </td>
 
-                                                <td
-                                                    class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                    {{ $diag['icdX'] }}
-                                                </td>
+                                                    <td
+                                                        class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
+                                                        {{ $diag['diagDesc'] }}
+                                                    </td>
 
-                                                <td
-                                                    class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                    {{ $diag['diagDesc'] }}
-                                                </td>
+                                                    <td
+                                                        class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
+                                                        {{ $diag['ketdiagnosa'] }}
+                                                    </td>
 
-                                                <td
-                                                    class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                    {{ $diag['ketdiagnosa'] }}
-                                                </td>
+                                                    <td
+                                                        class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
+                                                        {{ $diag['kategoriDiagnosa'] }}
+                                                    </td>
 
-                                                <td
-                                                    class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                    {{ $diag['kategoriDiagnosa'] }}
-                                                </td>
+                                                    <td
+                                                        class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
 
-                                                <td
-                                                    class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
+                                                        <x-alternative-button class="inline-flex"
+                                                            wire:click.prevent="removeDiagICD10('{{ $diag['diagId'] }}')">
+                                                            <svg class="w-5 h-5 text-gray-800 dark:text-white"
+                                                                aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                                                fill="currentColor" viewBox="0 0 18 20">
+                                                                <path
+                                                                    d="M17 4h-4V2a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v2H1a1 1 0 0 0 0 2h1v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1a1 1 0 1 0 0-2ZM7 2h4v2H7V2Zm1 14a1 1 0 1 1-2 0V8a1 1 0 0 1 2 0v8Zm4 0a1 1 0 0 1-2 0V8a1 1 0 0 1 2 0v8Z" />
+                                                            </svg>
+                                                            {{ 'Hapus ' . $diag['icdX'] }}
+                                                        </x-alternative-button>
 
-                                                    <x-alternative-button class="inline-flex"
-                                                        wire:click.prevent="removeDiagICD10('{{ $diag['diagId'] }}')">
-                                                        <svg class="w-5 h-5 text-gray-800 dark:text-white"
-                                                            aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                                            fill="currentColor" viewBox="0 0 18 20">
-                                                            <path
-                                                                d="M17 4h-4V2a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v2H1a1 1 0 0 0 0 2h1v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1a1 1 0 1 0 0-2ZM7 2h4v2H7V2Zm1 14a1 1 0 1 1-2 0V8a1 1 0 0 1 2 0v8Zm4 0a1 1 0 0 1-2 0V8a1 1 0 0 1 2 0v8Z" />
-                                                        </svg>
-                                                        {{ 'Hapus ' . $diag['icdX'] }}
-                                                    </x-alternative-button>
-
-                                                </td>
-
-
+                                                    </td>
 
 
-                                            </tr>
-                                        @endforeach
 
+
+                                                </tr>
+                                            @endforeach
+                                        @endisset
 
 
                                     </tbody>
@@ -228,52 +228,52 @@
                                     </thead>
                                     <tbody class="bg-white dark:bg-gray-800">
 
+                                        @isset($dataDaftarPoliRJ['procedure'])
+                                            @foreach ($dataDaftarPoliRJ['procedure'] as $key => $procedure)
+                                                <tr class="border-b group dark:border-gray-700">
 
-                                        @foreach ($dataDaftarPoliRJ['procedure'] as $key => $procedure)
-                                            <tr class="border-b group dark:border-gray-700">
+                                                    <td
+                                                        class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
+                                                        {{ $procedure['procedureId'] }}
+                                                    </td>
 
-                                                <td
-                                                    class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                    {{ $procedure['procedureId'] }}
-                                                </td>
+                                                    <td
+                                                        class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
+                                                        {{ $procedure['procedureDesc'] }}
+                                                    </td>
 
-                                                <td
-                                                    class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                    {{ $procedure['procedureDesc'] }}
-                                                </td>
+                                                    <td
+                                                        class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
+                                                        {{ $procedure['ketProcedure'] }}
+                                                    </td>
 
-                                                <td
-                                                    class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                    {{ $procedure['ketProcedure'] }}
-                                                </td>
-
-                                                {{-- <td
+                                                    {{-- <td
                                                         class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
                                                         {{ $procedure['kategoriprocedurenosa'] }}
                                                     </td> --}}
 
-                                                <td
-                                                    class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
+                                                    <td
+                                                        class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
 
-                                                    <x-alternative-button class="inline-flex"
-                                                        wire:click.prevent="removeProcedureICD9Cm('{{ $procedure['procedureId'] }}')">
-                                                        <svg class="w-5 h-5 text-gray-800 dark:text-white"
-                                                            aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                                            fill="currentColor" viewBox="0 0 18 20">
-                                                            <path
-                                                                d="M17 4h-4V2a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v2H1a1 1 0 0 0 0 2h1v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1a1 1 0 1 0 0-2ZM7 2h4v2H7V2Zm1 14a1 1 0 1 1-2 0V8a1 1 0 0 1 2 0v8Zm4 0a1 1 0 0 1-2 0V8a1 1 0 0 1 2 0v8Z" />
-                                                        </svg>
-                                                        {{ 'Hapus ' . $procedure['procedureId'] }}
-                                                    </x-alternative-button>
+                                                        <x-alternative-button class="inline-flex"
+                                                            wire:click.prevent="removeProcedureICD9Cm('{{ $procedure['procedureId'] }}')">
+                                                            <svg class="w-5 h-5 text-gray-800 dark:text-white"
+                                                                aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                                                fill="currentColor" viewBox="0 0 18 20">
+                                                                <path
+                                                                    d="M17 4h-4V2a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v2H1a1 1 0 0 0 0 2h1v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1a1 1 0 1 0 0-2ZM7 2h4v2H7V2Zm1 14a1 1 0 1 1-2 0V8a1 1 0 0 1 2 0v8Zm4 0a1 1 0 0 1-2 0V8a1 1 0 0 1 2 0v8Z" />
+                                                            </svg>
+                                                            {{ 'Hapus ' . $procedure['procedureId'] }}
+                                                        </x-alternative-button>
 
-                                                </td>
-
-
+                                                    </td>
 
 
-                                            </tr>
-                                        @endforeach
 
+
+                                                </tr>
+                                            @endforeach
+                                        @endisset
 
 
                                     </tbody>

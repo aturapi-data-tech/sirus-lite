@@ -20,7 +20,6 @@
                     E-resep
                 </x-yellow-button>
             </div>
-
             @if ($isOpenEresepRJ)
                 @include('livewire.emr-r-j.create-emr-r-j-racikan-nonracikan')
             @endif

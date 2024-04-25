@@ -58,7 +58,7 @@
 
 
                 {{-- Transasi EMR --}}
-                <div id="TransaksiEMR" x-data="{ activeTabRacikanNonRacikan: '{{ $activeTabRacikanNonRacikan }}' }" class="grid grid-cols-1">
+                <div id="TransaksiEMR" x-data="{ activeTabRacikanNonRacikan: @entangle('activeTabRacikanNonRacikan') }" class="grid grid-cols-1">
 
                     <div class="px-2 mb-0 overflow-auto border-b border-gray-200">
                         <ul
@@ -71,7 +71,7 @@
                                         'border border-gray-200'">
                                     <label
                                         class="inline-block p-2 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
-                                        @click="activeTab ='{{ $EmrM['ermMenuId'] }}'"
+                                        x-on:click="activeTabRacikanNonRacikan ='{{ $EmrM['ermMenuId'] }}'"
                                         wire:click="$set('activeTabRacikanNonRacikan', '{{ $EmrM['ermMenuId'] }}')">{{ $EmrM['ermMenuName'] }}</label>
                                 </li>
                             @endforeach
@@ -82,22 +82,26 @@
 
 
 
+                    <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50"
+                        :class="{
+                            'active': activeTabRacikanNonRacikan === 'NonRacikan'
+                        }"
+                        x-show.transition.in.opacity.duration.600="activeTabRacikanNonRacikan === 'NonRacikan'">
+                        <livewire:emr-r-j.eresep-r-j.eresep-r-j :wire:key="'eresep-r-j'" :rjNoRef="$rjNoRef">
+
+                    </div>
+
+                    <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50"
+                        :class="{
+                            'active': activeTabRacikanNonRacikan === 'Racikan'
+                        }"
+                        x-show.transition.in.opacity.duration.600="activeTabRacikanNonRacikan === 'Racikan'">
+                        <livewire:emr-r-j.eresep-r-j.eresep-r-j-racikan :wire:key="'eresep-r-j-racikan'"
+                            :rjNoRef="$rjNoRef">
+
+                    </div>
 
 
-                    @if ($activeTabRacikanNonRacikan == 'NonRacikan')
-                        <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50 ">
-
-                            <livewire:emr-r-j.eresep-r-j.eresep-r-j :wire:key="'eresep-r-j'" :rjNoRef="$rjNoRef">
-                        </div>
-                    @endif
-
-                    @if ($activeTabRacikanNonRacikan == 'Racikan')
-                        <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50 ">
-
-                            <livewire:emr-r-j.eresep-r-j.eresep-r-j-racikan :wire:key="'eresep-r-j-racikan'"
-                                :rjNoRef="$rjNoRef">
-                        </div>
-                    @endif
 
 
 

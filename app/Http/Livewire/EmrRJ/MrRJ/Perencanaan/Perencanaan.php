@@ -495,9 +495,6 @@ class Perencanaan extends Component
     public function mount()
     {
         $this->findData($this->rjNoRef);
-
-        // set dokter pemeriksa
-        // $this->setDrPemeriksa();
     }
 
 

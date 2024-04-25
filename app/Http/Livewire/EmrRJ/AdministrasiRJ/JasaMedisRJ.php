@@ -779,7 +779,6 @@ class JasaMedisRJ extends Component
     public function mount()
     {
         $this->findData($this->rjNoRef);
-        // set data dokter ref
     }
 
 
