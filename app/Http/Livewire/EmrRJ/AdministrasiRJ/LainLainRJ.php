@@ -23,14 +23,15 @@ class LainLainRJ extends Component
     // listener from blade////////////////
     protected $listeners = [
         'storeAssessmentDokterRJ' => 'store',
-        'syncronizeAssessmentDokterRJFindData' => 'mount'
+        'syncronizeAssessmentDokterRJFindData' => 'mount',
+        'syncronizeAssessmentPerawatRJFindData' => 'mount'
     ];
 
 
     //////////////////////////////
     // Ref on top bar
     //////////////////////////////
-    public $rjNoRef = 472309;
+    public $rjNoRef;
 
 
 
@@ -210,6 +211,7 @@ class LainLainRJ extends Component
         // Logic update mode start //////////
         $this->updateDataRJ($this->dataDaftarPoliRJ['rjNo']);
         $this->emit('syncronizeAssessmentDokterRJFindData');
+        $this->emit('syncronizeAssessmentPerawatRJFindData');
     }
 
     private function updateDataRJ($rjNo): void

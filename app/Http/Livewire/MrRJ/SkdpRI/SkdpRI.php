@@ -20,7 +20,11 @@ use Spatie\ArrayToXml\ArrayToXml;
 class SkdpRI extends Component
 {
     use WithPagination;
+    // listener from blade////////////////
+    protected $listeners = [
+        'syncronizeAssessmentPerawatRJFindData' => 'mount'
 
+    ];
 
     //////////////////////////////
     // Ref on top bar
@@ -57,10 +61,7 @@ class SkdpRI extends Component
     public $dataDokterLovSearch = '';
 
 
-    // listener from blade////////////////
-    protected $listeners = [
-        'xxxxx' => 'xxxxx',
-    ];
+
 
 
 
@@ -276,6 +277,7 @@ class SkdpRI extends Component
 
         // Logic update mode start //////////
         $this->updateDataRJ($this->dataDaftarRi['riHdrNo']);
+        $this->emit('syncronizeAssessmentPerawatRJFindData');
     }
 
     private function updateDataRJ($riNo): void
