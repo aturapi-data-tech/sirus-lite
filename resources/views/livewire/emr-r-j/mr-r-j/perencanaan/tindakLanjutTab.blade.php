@@ -9,7 +9,7 @@
 
             <div class="pt-2 ">
 
-                <div class="grid grid-cols-5 gap-2 mt-2 mb-2 ml-2">
+                <div class="grid grid-cols-3 gap-2 mt-2 mb-2 ml-2">
                     @foreach ($dataDaftarPoliRJ['perencanaan']['tindakLanjut']['tindakLanjutOptions'] as $tindakLanjutOptions)
                         <x-radio-button :label="__($tindakLanjutOptions['tindakLanjut'])" value="{{ $tindakLanjutOptions['tindakLanjut'] }}"
                             wire:model="dataDaftarPoliRJ.perencanaan.tindakLanjut.tindakLanjut" />

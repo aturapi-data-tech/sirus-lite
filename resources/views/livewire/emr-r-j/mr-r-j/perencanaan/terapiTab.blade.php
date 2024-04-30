@@ -15,12 +15,12 @@
             @enderror
         </div>
         @role(['Dokter', 'Admin'])
-            <div class="grid grid-cols-2 gap-2 ">
+            <div class="grid grid-cols-1 gap-2 ">
                 <x-yellow-button :disabled=false wire:click.prevent="openModalEresepRJ()" type="button" wire:loading.remove>
                     E-resep
                 </x-yellow-button>
 
-                <livewire:cetak.cetak-eresep-r-j :rjNoRef="$rjNoRef" wire:key="cetak.cetak-eresep-r-j-{{ $rjNoRef }}">
+
             </div>
             @if ($isOpenEresepRJ)
                 @include('livewire.emr-r-j.create-emr-r-j-racikan-nonracikan')

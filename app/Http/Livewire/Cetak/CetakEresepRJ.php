@@ -480,25 +480,28 @@ class CetakEresepRJ extends Component
             )
             ->first();
 
+        if (isset($this->dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa']) && $this->dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa']) {
+            if ($this->dataDaftarPoliRJ['eresep'] || $this->dataDaftarPoliRJ['eresepRacikan']) {
+                // cetak PDF
+                $data = [
+                    'myQueryIdentitas' => $queryIdentitas,
+                    'dataPasien' => $this->dataPasien,
+                    'dataDaftarPoliRJ' => $this->dataDaftarPoliRJ,
 
-        if ($this->dataDaftarPoliRJ['eresep'] || $this->dataDaftarPoliRJ['eresepRacikan']) {
-            // cetak PDF
-            $data = [
-                'myQueryIdentitas' => $queryIdentitas,
-                'dataPasien' => $this->dataPasien,
-                'dataDaftarPoliRJ' => $this->dataDaftarPoliRJ,
-
-            ];
-            $pdfContent = PDF::loadView('livewire.cetak.cetak-eresep-r-j-print', $data)->output();
-            $this->emit('toastr-success', 'Cetak Eresep RJ');
+                ];
+                $pdfContent = PDF::loadView('livewire.cetak.cetak-eresep-r-j-print', $data)->output();
+                $this->emit('toastr-success', 'Cetak Eresep RJ');
 
 
-            return response()->streamDownload(
-                fn () => print($pdfContent),
-                "eresep.pdf"
-            );
+                return response()->streamDownload(
+                    fn () => print($pdfContent),
+                    "eresep.pdf"
+                );
+            } else {
+                $this->emit('toastr-error', 'Data Resep Tidak ditemukan');
+            }
         } else {
-            $this->emit('toastr-error', 'Data Resep Tidak ditemukan');
+            $this->emit('toastr-error', 'Belum ada TTD pada Data Resep');
         }
     }
 

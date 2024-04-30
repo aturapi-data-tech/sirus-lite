@@ -22,17 +22,18 @@
 
                             {{-- Lov dataProductLov --}}
                             <div x-data="{ selecteddataProductLovIndex: @entangle('selecteddataProductLovIndex') }" @click.outside="$wire.dataProductLovSearch = ''">
-                                <x-text-input id="dataProductLovSearch" placeholder="Nama Obat" class="mt-1 ml-2"
-                                    :errorshas="__($errors->has('dataProductLovSearch'))" :disabled=$disabledPropertyRjStatus
+                                <x-text-input id="dataProductLovSearchxxx" placeholder="Nama Obat" class="mt-1 ml-2"
+                                    :errorshas="__($errors->has('dataProductLovSearchxxx'))" :disabled=$disabledPropertyRjStatus
                                     wire:model.debounce.500ms="dataProductLovSearch"
                                     x-on:click.outside="$wire.resetdataProductLov()"
                                     x-on:keyup.escape="$wire.resetdataProductLov()"
                                     x-on:keyup.down="$wire.selectNextdataProductLov()"
                                     x-on:keyup.up="$wire.selectPreviousdataProductLov()"
                                     x-on:keyup.enter="$wire.enterMydataProductLov(selecteddataProductLovIndex)"
-                                    x-init="$watch('selecteddataProductLovIndex', (value, oldValue) => $refs.dataProductLovSearch.children[selecteddataProductLovIndex + 1].scrollIntoView({
+                                    x-ref="dataProductLovSearchxxx" x-init="$watch('selecteddataProductLovIndex', (value, oldValue) => $refs.dataProductLovSearch.children[selecteddataProductLovIndex + 1].scrollIntoView({
                                         block: 'nearest'
-                                    }))" />
+                                    }))
+                                    $refs.dataProductLovSearchxxx.focus()" />
 
                                 {{-- Lov --}}
                                 <div class="py-2 mt-1 overflow-y-auto bg-white border rounded-md shadow-lg max-h-64"

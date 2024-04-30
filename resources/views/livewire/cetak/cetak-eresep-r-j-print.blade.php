@@ -152,19 +152,19 @@
                 @isset($dataDaftarPoliRJ['eresep'])
                     @foreach ($dataDaftarPoliRJ['eresep'] as $key => $eresep)
                         <tr>
-                            <td class="w-1/5 text-center">
+                            <td class="w-1/5 text-center uppercase">
                                 {{ '(N)' }}
                             </td>
 
-                            <td class="w-2/5 text-start">
+                            <td class="w-2/5 uppercase text-start">
                                 {{ $eresep['productName'] }}
                             </td>
 
-                            <td class="w-1/5 text-center">
+                            <td class="w-1/5 text-center uppercase">
                                 {{ $eresep['qty'] }}
                             </td>
 
-                            <td class="w-1/5 text-center">
+                            <td class="w-1/5 text-center uppercase">
                                 {{ $eresep['catatanKhusus'] }}
                             </td>
                         </tr>
@@ -176,19 +176,19 @@
                 @isset($dataDaftarPoliRJ['eresepRacikan'])
                     @foreach ($dataDaftarPoliRJ['eresepRacikan'] as $key => $eresepRacikan)
                         <tr>
-                            <td class="w-1/5 text-center">
+                            <td class="w-1/5 text-center uppercase">
                                 {{ '(' . $eresepRacikan['noRacikan'] . ')' }}
                             </td>
 
-                            <td class="w-2/5 text-start">
+                            <td class="w-2/5 uppercase text-start">
                                 {{ $eresepRacikan['productName'] . ' ' . $eresepRacikan['sedia'] }}
                             </td>
 
-                            <td class="w-1/5 text-center">
+                            <td class="w-1/5 text-center uppercase">
                                 {{ $eresepRacikan['qty'] }}
                             </td>
 
-                            <td class="w-1/5 text-center">
+                            <td class="w-1/5 text-center uppercase">
                                 {{ $eresepRacikan['catatan'] . '  ' . $eresepRacikan['catatanKhusus'] }}
                             </td>
                         </tr>
