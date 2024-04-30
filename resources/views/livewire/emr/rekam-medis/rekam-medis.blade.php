@@ -23,7 +23,7 @@
                                     <thead
                                         class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
                                         <tr>
-                                            <th scope="col" class="w-1/3 px-4 py-3 overflow-auto">
+                                            <th scope="col" class="px-2 py-2 ">
 
 
                                                 <x-sort-link :active=false wire:click.prevent="" role="button"
@@ -34,7 +34,7 @@
                                             </th>
 
 
-                                            <th scope="col" class="w-1/3 px-4 py-3 overflow-auto">
+                                            <th scope="col" class="px-2 py-2 ">
 
                                                 <x-sort-link :active=false wire:click.prevent="" role="button"
                                                     href="#">
@@ -42,7 +42,7 @@
                                                 </x-sort-link>
                                             </th>
 
-                                            <th scope="col" class="w-1/3 px-4 py-3 overflow-auto">
+                                            <th scope="col" class="px-2 py-2 ">
 
                                                 <x-sort-link :active=false wire:click.prevent="" role="button"
                                                     href="#">
@@ -50,7 +50,7 @@
                                                 </x-sort-link>
                                             </th>
 
-                                            <th scope="col" class="w-1/3 px-4 py-3 overflow-auto">
+                                            <th scope="col" class="px-2 py-2 ">
 
                                                 <x-sort-link :active=false wire:click.prevent="" role="button"
                                                     href="#">
@@ -58,7 +58,7 @@
                                                 </x-sort-link>
                                             </th>
 
-                                            <th scope="col" class="w-8 px-4 py-3 text-center">
+                                            <th scope="col" class="w-8 px-2 py-2 text-center">
                                                 RekamMedis
                                             </th>
                                         </tr>
@@ -69,8 +69,8 @@
                                             <tr class="border-b group dark:border-gray-700">
 
 
-                                                <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap">
-                                                    <div class="">
+                                                <td class="w-1/5 px-2 py-2 whitespace-nowrap group-hover:bg-gray-100">
+                                                    <div class="w-full overflow-auto whitespace-nowrap">
                                                         <div class="font-semibold text-primary">
                                                             {{ $myQData->layanan_status === 'RI'
                                                                 ? 'Rawat Inap'
@@ -88,56 +88,75 @@
                                                         </div>
                                                     </div>
                                                 </td>
+
                                                 @php
                                                     $datadaftar_json = json_decode($myQData->datadaftar_json, true);
                                                 @endphp
-                                                <td
-                                                    class="px-4 py-3 text-gray-900 group-hover:bg-gray-100 whitespace-nowrap">
-                                                    {!! nl2br(
-                                                        e(
-                                                            isset($datadaftar_json['perencanaan']['terapi']['terapi'])
-                                                                ? $datadaftar_json['perencanaan']['terapi']['terapi']
-                                                                : '',
-                                                        ),
-                                                    ) !!}
-                                                </td>
-                                                <td
-                                                    class="px-4 py-3 text-gray-900 group-hover:bg-gray-100 whitespace-nowrap">
-                                                    @isset($datadaftar_json['diagnosis'])
-                                                        @foreach ($datadaftar_json['diagnosis'] as $diagnosis)
-                                                            {!! nl2br(e($diagnosis['diagId'] . ' ' . $diagnosis['diagDesc'])) . '</br>' !!}
-                                                        @endforeach
-                                                    @endisset
+
+                                                <td class="w-1/5 px-2 py-2 text-gray-900 group-hover:bg-gray-100">
+                                                    <div class="w-full overflow-auto whitespace-nowrap">
+
+                                                        {!! nl2br(
+                                                            e(
+                                                                isset($datadaftar_json['perencanaan']['terapi']['terapi'])
+                                                                    ? $datadaftar_json['perencanaan']['terapi']['terapi']
+                                                                    : '',
+                                                            ),
+                                                        ) !!}
+                                                    </div>
                                                 </td>
 
-                                                <td
-                                                    class="px-4 py-3 text-gray-900 group-hover:bg-gray-100 whitespace-nowrap">
-                                                    TD :
-                                                    {{ isset($datadaftar_json['pemeriksaan']['tandaVital']['sistolik'])
-                                                        ? $datadaftar_json['pemeriksaan']['tandaVital']['sistolik']
-                                                        : '' }}
-                                                    /
-                                                    {{ isset($datadaftar_json['pemeriksaan']['tandaVital']['distolik'])
-                                                        ? $datadaftar_json['pemeriksaan']['tandaVital']['distolik']
-                                                        : '' }}
-                                                    (mmHg)
-                                                    <br>
-                                                    SPO2 :
-                                                    {{ isset($datadaftar_json['pemeriksaan']['tandaVital']['spo2'])
-                                                        ? $datadaftar_json['pemeriksaan']['tandaVital']['spo2']
-                                                        : '' }}
-                                                    (%)
-                                                    <br>
-                                                    GDA :
-                                                    {{ isset($datadaftar_json['pemeriksaan']['tandaVital']['gda'])
-                                                        ? $datadaftar_json['pemeriksaan']['tandaVital']['gda']
-                                                        : '' }}
-                                                    (mg/dL)
+                                                <td class="w-1/5 px-2 py-2 text-gray-900 group-hover:bg-gray-100">
+                                                    <div class="overflow-auto w-52 whitespace-nowrap">
+                                                        @isset($datadaftar_json['diagnosis'])
+                                                            @foreach ($datadaftar_json['diagnosis'] as $diagnosis)
+                                                                {!! nl2br(e($diagnosis['diagId'] . ' - ' . $diagnosis['diagDesc'])) . '</br>' !!}
+                                                            @endforeach
+                                                        @endisset
 
+                                                        <br>
+                                                        Tindak Lanjut :
+                                                        {{ isset($dataDaftarTxn['perencanaan']['tindakLanjut']['tindakLanjut'])
+                                                            ? ($dataDaftarTxn['perencanaan']['tindakLanjut']['tindakLanjut']
+                                                                ? $dataDaftarTxn['perencanaan']['tindakLanjut']['tindakLanjut']
+                                                                : '-')
+                                                            : '-' }}
+                                                        /
+                                                        {{ isset($dataDaftarTxn['perencanaan']['tindakLanjut']['keteranganTindakLanjut'])
+                                                            ? ($dataDaftarTxn['perencanaan']['tindakLanjut']['keteranganTindakLanjut']
+                                                                ? $dataDaftarTxn['perencanaan']['tindakLanjut']['keteranganTindakLanjut']
+                                                                : '-')
+                                                            : '-' }}
+                                                    </div>
                                                 </td>
 
-                                                <td
-                                                    class="px-4 py-3 text-gray-900 group-hover:bg-gray-100 whitespace-nowrap">
+                                                <td class="w-1/5 px-2 py-2 text-gray-900 group-hover:bg-gray-100">
+                                                    <div class="w-full overflow-auto whitespace-nowrap">
+                                                        TD :
+                                                        {{ isset($datadaftar_json['pemeriksaan']['tandaVital']['sistolik'])
+                                                            ? $datadaftar_json['pemeriksaan']['tandaVital']['sistolik']
+                                                            : '' }}
+                                                        /
+                                                        {{ isset($datadaftar_json['pemeriksaan']['tandaVital']['distolik'])
+                                                            ? $datadaftar_json['pemeriksaan']['tandaVital']['distolik']
+                                                            : '' }}
+                                                        (mmHg)
+                                                        <br>
+                                                        SPO2 :
+                                                        {{ isset($datadaftar_json['pemeriksaan']['tandaVital']['spo2'])
+                                                            ? $datadaftar_json['pemeriksaan']['tandaVital']['spo2']
+                                                            : '' }}
+                                                        (%)
+                                                        <br>
+                                                        GDA :
+                                                        {{ isset($datadaftar_json['pemeriksaan']['tandaVital']['gda'])
+                                                            ? $datadaftar_json['pemeriksaan']['tandaVital']['gda']
+                                                            : '' }}
+                                                        (mg/dL)
+                                                    </div>
+                                                </td>
+
+                                                <td class="w-1/5 px-2 py-2 text-gray-900 group-hover:bg-gray-100">
                                                     <div>
                                                         <x-yellow-button
                                                             wire:click.prevent="openModalLayanan('{{ $myQData->txn_no }}',
