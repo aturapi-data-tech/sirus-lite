@@ -19,7 +19,9 @@ class RekamMedisDisplay extends Component
 
 
     // listener from blade////////////////
-    protected $listeners = [];
+    protected $listeners = [
+        'syncronizeAssessmentDokterRJFindData' => 'mount'
+    ];
 
     // primitive Variable
     public string $myTitle = 'Resume Medis Pasien';
@@ -34,6 +36,7 @@ class RekamMedisDisplay extends Component
 
     public array $dataDaftarTxn;
     public array $dataPasien;
+
 
 
 
@@ -241,6 +244,7 @@ class RekamMedisDisplay extends Component
     // when new form instance
     public function mount()
     {
+        $this->render();
     }
 
 
