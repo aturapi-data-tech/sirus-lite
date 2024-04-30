@@ -497,7 +497,7 @@ class Diagnosis extends Component
 
 
     // insert and update record start////////////////
-    private function store()
+    public function store()
     {
         // Logic update mode start //////////
         $this->updateDataRJ($this->dataDaftarPoliRJ['rjNo']);
