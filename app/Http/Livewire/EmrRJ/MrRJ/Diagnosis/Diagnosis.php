@@ -94,7 +94,7 @@ class Diagnosis extends Component
             'diag_desc',
             'icdx'
         )
-            ->where('diag_id', $search)
+            ->where('icdx', $search)
             // ->where('active_status', '1')
             ->first();
 
@@ -118,6 +118,7 @@ class Diagnosis extends Component
                         // ->where('active_status', '1')
                         ->Where(DB::raw('upper(diag_desc)'), 'like', '%' . strtoupper($search) . '%')
                         ->orWhere(DB::raw('upper(diag_id)'), 'like', '%' . strtoupper($search) . '%')
+                        ->orWhere(DB::raw('upper(icdx)'), 'like', '%' . strtoupper($search) . '%')
                         ->limit(10)
                         ->orderBy('diag_id', 'ASC')
                         ->orderBy('diag_desc', 'ASC')
