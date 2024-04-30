@@ -116,15 +116,15 @@
 
                                                         <br>
                                                         Tindak Lanjut :
-                                                        {{ isset($dataDaftarTxn['perencanaan']['tindakLanjut']['tindakLanjut'])
-                                                            ? ($dataDaftarTxn['perencanaan']['tindakLanjut']['tindakLanjut']
-                                                                ? $dataDaftarTxn['perencanaan']['tindakLanjut']['tindakLanjut']
+                                                        {{ isset($datadaftar_json['perencanaan']['tindakLanjut']['tindakLanjut'])
+                                                            ? ($datadaftar_json['perencanaan']['tindakLanjut']['tindakLanjut']
+                                                                ? $datadaftar_json['perencanaan']['tindakLanjut']['tindakLanjut']
                                                                 : '-')
                                                             : '-' }}
                                                         /
-                                                        {{ isset($dataDaftarTxn['perencanaan']['tindakLanjut']['keteranganTindakLanjut'])
-                                                            ? ($dataDaftarTxn['perencanaan']['tindakLanjut']['keteranganTindakLanjut']
-                                                                ? $dataDaftarTxn['perencanaan']['tindakLanjut']['keteranganTindakLanjut']
+                                                        {{ isset($datadaftar_json['perencanaan']['tindakLanjut']['keteranganTindakLanjut'])
+                                                            ? ($datadaftar_json['perencanaan']['tindakLanjut']['keteranganTindakLanjut']
+                                                                ? $datadaftar_json['perencanaan']['tindakLanjut']['keteranganTindakLanjut']
                                                                 : '-')
                                                             : '-' }}
                                                     </div>
