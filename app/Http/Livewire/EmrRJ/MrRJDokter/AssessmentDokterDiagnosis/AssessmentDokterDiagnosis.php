@@ -12,6 +12,8 @@ use App\Http\Traits\customErrorMessagesTrait;
 
 use Illuminate\Support\Str;
 use Spatie\ArrayToXml\ArrayToXml;
+use Exception;
+
 
 
 class AssessmentDokterDiagnosis extends Component
@@ -47,10 +49,14 @@ class AssessmentDokterDiagnosis extends Component
     public $dataDiagnosaICD10Lov = [];
     public $dataDiagnosaICD10LovStatus = 0;
     public $dataDiagnosaICD10LovSearch = '';
+    public $selecteddataDiagnosaICD10LovIndex = 0;
+    public $collectingMyDiagnosaICD10 = [];
 
     public $dataProcedureICD9CmLov = [];
     public $dataProcedureICD9CmLovStatus = 0;
     public $dataProcedureICD9CmLovSearch = '';
+    public $selecteddataProcedureICD9CmLovIndex = 0;
+    public $collectingMyProcedureICD9Cm = [];
 
 
 
@@ -68,66 +74,53 @@ class AssessmentDokterDiagnosis extends Component
     }
 
 
-    // ////////////////
-    // RJ Logic
-    // ////////////////
-
-    //////////////////////////////////////////////
-    // updated when change Record ////////////////
-    ///////////////////////////////////////////////
-
-
-
-    //////////////////////////////////////////////
-    // updated when change Record ////////////////
-    ///////////////////////////////////////////////
-
     /////////////////////////////////////////////////
-    // Lov dataDiagnosaICD10SEP //////////////////////
+    // Lov dataDiagnosaICD10Lov //////////////////////
     ////////////////////////////////////////////////
-    public function clickdataDiagnosaICD10lov()
+    public function clickdataDiagnosaICD10Lov()
     {
         $this->dataDiagnosaICD10LovStatus = true;
         $this->dataDiagnosaICD10Lov = [];
     }
 
-    public function updateddataDiagnosaICD10lovsearch()
+    public function updateddataDiagnosaICD10Lovsearch()
     {
+
+        // Reset index of LoV
+        $this->reset(['selecteddataDiagnosaICD10LovIndex', 'dataDiagnosaICD10Lov']);
         // Variable Search
         $search = $this->dataDiagnosaICD10LovSearch;
 
         // check LOV by dr_id rs id 
-        $dataDiagnosaICD10 = DB::table('rsmst_mstdiags')->select(
+        $dataDiagnosaICD10Lovs = DB::table('rsmst_mstdiags ')->select(
             'diag_id',
             'diag_desc',
-            'icdx',
+            'icdx'
         )
             ->where('diag_id', $search)
+            // ->where('active_status', '1')
             ->first();
 
-        if ($dataDiagnosaICD10) {
+        if ($dataDiagnosaICD10Lovs) {
 
-            // set dokter sep
-            $this->addDiagICD10($dataDiagnosaICD10->diag_id, $dataDiagnosaICD10->diag_desc, $dataDiagnosaICD10->icdx);
-
-
-            $this->dataDiagnosaICD10LovStatus = false;
-            $this->dataDiagnosaICD10LovSearch = '';
-            $this->store();
+            // set DiagnosaICD10 sep
+            $this->addDiagnosaICD10($dataDiagnosaICD10Lovs->diag_id, $dataDiagnosaICD10Lovs->diag_desc, $dataDiagnosaICD10Lovs->icdx);
+            $this->resetdataDiagnosaICD10Lov();
         } else {
+
             // if there is no id found and check (min 3 char on search)
-            if (strlen($search) < 3) {
+            if (strlen($search) < 1) {
                 $this->dataDiagnosaICD10Lov = [];
             } else {
                 $this->dataDiagnosaICD10Lov = json_decode(
                     DB::table('rsmst_mstdiags')->select(
                         'diag_id',
                         'diag_desc',
-                        'icdx',
+                        'icdx'
                     )
-
+                        // ->where('active_status', '1')
                         ->Where(DB::raw('upper(diag_desc)'), 'like', '%' . strtoupper($search) . '%')
-                        ->orWhere(DB::raw('upper(icdx)'), 'like', '%' . strtoupper($search) . '%')
+                        ->orWhere(DB::raw('upper(diag_id)'), 'like', '%' . strtoupper($search) . '%')
                         ->limit(10)
                         ->orderBy('diag_id', 'ASC')
                         ->orderBy('diag_desc', 'ASC')
@@ -141,79 +134,233 @@ class AssessmentDokterDiagnosis extends Component
     }
     // /////////////////////
     // LOV selected start
-    public function setMydataDiagnosaICD10Lov($id, $name)
+    public function setMydataDiagnosaICD10Lov($id)
     {
-        $dataDiagnosaICD10 = DB::table('rsmst_mstdiags')->select(
+        // $this->checkRjStatus();
+        $dataDiagnosaICD10Lovs = DB::table('rsmst_mstdiags')->select(
             'diag_id',
             'diag_desc',
-            'icdx',
+            'icdx'
         )
-            ->where('diag_id', $id)
+            // ->where('active_status', '1')
+            ->where('diag_id', $this->dataDiagnosaICD10Lov[$id]['diag_id'])
             ->first();
 
         // set dokter sep
-        $this->addDiagICD10($dataDiagnosaICD10->diag_id, $dataDiagnosaICD10->diag_desc, $dataDiagnosaICD10->icdx);
+        $this->addDiagnosaICD10($dataDiagnosaICD10Lovs->diag_id, $dataDiagnosaICD10Lovs->diag_desc, $dataDiagnosaICD10Lovs->icdx);
+        $this->resetdataDiagnosaICD10Lov();
+    }
+
+    public function resetdataDiagnosaICD10Lov()
+    {
+        $this->reset(['dataDiagnosaICD10Lov', 'dataDiagnosaICD10LovStatus', 'dataDiagnosaICD10LovSearch', 'selecteddataDiagnosaICD10LovIndex']);
+    }
+
+    public function selectNextdataDiagnosaICD10Lov()
+    {
+        if ($this->selecteddataDiagnosaICD10LovIndex === "") {
+            $this->selecteddataDiagnosaICD10LovIndex = 0;
+        } else {
+            $this->selecteddataDiagnosaICD10LovIndex++;
+        }
+
+        if ($this->selecteddataDiagnosaICD10LovIndex === count($this->dataDiagnosaICD10Lov)) {
+            $this->selecteddataDiagnosaICD10LovIndex = 0;
+        }
+    }
+
+    public function selectPreviousdataDiagnosaICD10Lov()
+    {
+
+        if ($this->selecteddataDiagnosaICD10LovIndex === "") {
+            $this->selecteddataDiagnosaICD10LovIndex = count($this->dataDiagnosaICD10Lov) - 1;
+        } else {
+            $this->selecteddataDiagnosaICD10LovIndex--;
+        }
+
+        if ($this->selecteddataDiagnosaICD10LovIndex === -1) {
+            $this->selecteddataDiagnosaICD10LovIndex = count($this->dataDiagnosaICD10Lov) - 1;
+        }
+    }
+
+    public function enterMydataDiagnosaICD10Lov($id)
+    {
+        // $this->checkRjStatus();
+        // jika JK belum siap maka toaster error
+        if (isset($this->dataDiagnosaICD10Lov[$id]['diag_id'])) {
+            $this->addDiagnosaICD10($this->dataDiagnosaICD10Lov[$id]['diag_id'], $this->dataDiagnosaICD10Lov[$id]['diag_desc'], $this->dataDiagnosaICD10Lov[$id]['icdx']);
+            $this->resetdataDiagnosaICD10Lov();
+        } else {
+            $this->emit('toastr-error', "Kode Diagnosa belum tersedia.");
+        }
+    }
 
 
+    private function addDiagnosaICD10($DiagnosaICD10Id, $DiagnosaICD10Desc, $icdx): void
+    {
+        $this->collectingMyDiagnosaICD10 = [
+            'DiagnosaICD10Id' => $DiagnosaICD10Id,
+            'DiagnosaICD10Desc' => $DiagnosaICD10Desc,
+            'DiagnosaICD10icdx' => $icdx,
+        ];
 
-        $this->dataDiagnosaICD10LovStatus = false;
-        $this->dataDiagnosaICD10LovSearch = '';
-        $this->store();
+        $this->insertDiagnosaICD10();
+    }
+
+    private function insertDiagnosaICD10(): void
+    {
+
+        // validate
+        // $this->checkRjStatus();
+        // customErrorMessages
+        $messages = customErrorMessagesTrait::messages();
+        // require nik ketika pasien tidak dikenal
+        $rules = [
+            "collectingMyDiagnosaICD10.DiagnosaICD10Id" => 'bail|required|exists:rsmst_mstdiags,diag_id',
+            "collectingMyDiagnosaICD10.DiagnosaICD10Desc" => 'bail|required|',
+            "collectingMyDiagnosaICD10.DiagnosaICD10icdx" => 'bail|required|',
+
+        ];
+
+        // Proses Validasi///////////////////////////////////////////
+        $this->validate($rules, $messages);
+
+        // validate
+
+
+        // pengganti race condition
+        // start:
+        try {
+
+            $lastInserted = DB::table('rstxn_rjdtls')
+                ->select(DB::raw("nvl(max(rjdtl_dtl)+1,1) as rjdtl_dtl_max"))
+                ->first();
+            // insert into table transaksi
+            DB::table('rstxn_rjdtls')
+                ->insert([
+                    'rjdtl_dtl' => $lastInserted->rjdtl_dtl_max,
+                    'rj_no' => $this->rjNoRef,
+                    'diag_id' => $this->collectingMyDiagnosaICD10['DiagnosaICD10Id'],
+                ]);
+
+            // update status diagnosa rstxn_rjhdrs
+            DB::table('rstxn_rjhdrs')
+                ->where('rj_no',  $this->rjNoRef)
+                ->update([
+                    'rj_diagnosa' => 'D',
+                ]);
+
+            $checkDiagnosaCount = collect($this->dataDaftarPoliRJ['diagnosis'])->count();
+            $kategoriDiagnosa = $checkDiagnosaCount ? 'Secondary' : 'Primary';
+
+            $this->dataDaftarPoliRJ['diagnosis'][] = [
+                'diagId' => $this->collectingMyDiagnosaICD10['DiagnosaICD10Id'],
+                'diagDesc' => $this->collectingMyDiagnosaICD10['DiagnosaICD10Desc'],
+                'icdX' => $this->collectingMyDiagnosaICD10['DiagnosaICD10icdx'],
+                'ketdiagnosa' => 'Keterangan Diagnosa',
+                'kategoriDiagnosa' => $kategoriDiagnosa,
+                'rjDtlDtl' => $lastInserted->rjdtl_dtl_max,
+                'rjNo' => $this->rjNoRef,
+            ];
+
+            $this->store();
+            $this->reset(['collectingMyDiagnosaICD10']);
+
+
+            //
+        } catch (Exception $e) {
+            // display an error to user
+            dd($e->getMessage());
+        }
+        // goto start;
+    }
+
+    public function removeDiagnosaICD10($rjDtlDtl)
+    {
+
+        // $this->checkRjStatus();
+
+
+        // pengganti race condition
+        // start:
+        try {
+
+
+            // remove into table transaksi
+            DB::table('rstxn_rjdtls')
+                ->where('rjdtl_dtl', $rjDtlDtl)
+                ->delete();
+
+
+            $DiagnosaICD10 = collect($this->dataDaftarPoliRJ['diagnosis'])->where("rjDtlDtl", '!=', $rjDtlDtl)->toArray();
+            $this->dataDaftarPoliRJ['diagnosis'] = $DiagnosaICD10;
+
+
+            $this->store();
+
+
+            //
+        } catch (Exception $e) {
+            // display an error to user
+            dd($e->getMessage());
+        }
+        // goto start;
+
+
     }
     // LOV selected end
     /////////////////////////////////////////////////
-    // Lov dataDiagnosaRJ //////////////////////
+    // Lov dataDiagnosaICD10Lov //////////////////////
     ////////////////////////////////////////////////
-
-
-
-
-
 
 
     /////////////////////////////////////////////////
-    // Lov dataProcedureICD9CmSEP //////////////////////
+    // Lov dataProcedureICD9CmLov //////////////////////
     ////////////////////////////////////////////////
-    public function clickdataProcedureICD9Cmlov()
+    public function clickdataProcedureICD9CmLov()
     {
         $this->dataProcedureICD9CmLovStatus = true;
         $this->dataProcedureICD9CmLov = [];
     }
 
-    public function updateddataProcedureICD9Cmlovsearch()
+    public function updateddataProcedureICD9CmLovsearch()
     {
+
+        // Reset index of LoV
+        $this->reset(['selecteddataProcedureICD9CmLovIndex', 'dataProcedureICD9CmLov']);
         // Variable Search
         $search = $this->dataProcedureICD9CmLovSearch;
 
         // check LOV by dr_id rs id 
-        $dataProcedureICD9Cm = DB::table('rsmst_mstprocedures')->select(
+        $dataProcedureICD9CmLovs = DB::table('rsmst_mstprocedures ')->select(
             'proc_id',
             'proc_desc',
+
         )
             ->where('proc_id', $search)
+            // ->where('active_status', '1')
             ->first();
 
-        if ($dataProcedureICD9Cm) {
+        if ($dataProcedureICD9CmLovs) {
 
-            // set dokter sep
-            $this->addProcedureICD9Cm($dataProcedureICD9Cm->proc_id, $dataProcedureICD9Cm->proc_desc);
-
-
-            $this->dataProcedureICD9CmLovStatus = false;
-            $this->dataProcedureICD9CmLovSearch = '';
-            $this->store();
+            // set ProcedureICD9Cm sep
+            $this->addProcedureICD9Cm($dataProcedureICD9CmLovs->proc_id, $dataProcedureICD9CmLovs->proc_desc);
+            $this->resetdataProcedureICD9CmLov();
         } else {
+
             // if there is no id found and check (min 3 char on search)
-            if (strlen($search) < 3) {
+            if (strlen($search) < 1) {
                 $this->dataProcedureICD9CmLov = [];
             } else {
                 $this->dataProcedureICD9CmLov = json_decode(
                     DB::table('rsmst_mstprocedures')->select(
                         'proc_id',
                         'proc_desc',
-                    )
 
+                    )
+                        // ->where('active_status', '1')
                         ->Where(DB::raw('upper(proc_desc)'), 'like', '%' . strtoupper($search) . '%')
+                        ->orWhere(DB::raw('upper(proc_id)'), 'like', '%' . strtoupper($search) . '%')
                         ->limit(10)
                         ->orderBy('proc_id', 'ASC')
                         ->orderBy('proc_desc', 'ASC')
@@ -227,71 +374,136 @@ class AssessmentDokterDiagnosis extends Component
     }
     // /////////////////////
     // LOV selected start
-    public function setMydataProcedureICD9CmLov($id, $name)
+    public function setMydataProcedureICD9CmLov($id)
     {
-        $dataProcedureICD9Cm = DB::table('rsmst_mstprocedures')->select(
+        // $this->checkRjStatus();
+        $dataProcedureICD9CmLovs = DB::table('rsmst_mstprocedures')->select(
             'proc_id',
             'proc_desc',
+
         )
-            ->where('proc_id', $id)
+            // ->where('active_status', '1')
+            ->where('proc_id', $this->dataProcedureICD9CmLov[$id]['proc_id'])
             ->first();
 
         // set dokter sep
-        $this->addProcedureICD9Cm($dataProcedureICD9Cm->proc_id, $dataProcedureICD9Cm->proc_desc);
-
-
-
-        $this->dataProcedureICD9CmLovStatus = false;
-        $this->dataProcedureICD9CmLovSearch = '';
-        $this->store();
+        $this->addProcedureICD9Cm($dataProcedureICD9CmLovs->proc_id, $dataProcedureICD9CmLovs->proc_desc);
+        $this->resetdataProcedureICD9CmLov();
     }
-    // LOV selected end
-    /////////////////////////////////////////////////
-    // Lov dataDiagnosaRJ //////////////////////
-    ////////////////////////////////////////////////
 
-
-
-    // validate Data RJ//////////////////////////////////////////////////
-    private function validateDataRJ(): void
+    public function resetdataProcedureICD9CmLov()
     {
-        // customErrorMessages
-        $messages = customErrorMessagesTrait::messages();
+        $this->reset(['dataProcedureICD9CmLov', 'dataProcedureICD9CmLovStatus', 'dataProcedureICD9CmLovSearch', 'selecteddataProcedureICD9CmLovIndex']);
+    }
 
-        // require nik ketika pasien tidak dikenal
+    public function selectNextdataProcedureICD9CmLov()
+    {
+        if ($this->selecteddataProcedureICD9CmLovIndex === "") {
+            $this->selecteddataProcedureICD9CmLovIndex = 0;
+        } else {
+            $this->selecteddataProcedureICD9CmLovIndex++;
+        }
 
+        if ($this->selecteddataProcedureICD9CmLovIndex === count($this->dataProcedureICD9CmLov)) {
+            $this->selecteddataProcedureICD9CmLovIndex = 0;
+        }
+    }
 
+    public function selectPreviousdataProcedureICD9CmLov()
+    {
 
-        $rules = [
-            "dataDaftarPoliRJ.diagnosis" => "",
-        ];
+        if ($this->selecteddataProcedureICD9CmLovIndex === "") {
+            $this->selecteddataProcedureICD9CmLovIndex = count($this->dataProcedureICD9CmLov) - 1;
+        } else {
+            $this->selecteddataProcedureICD9CmLovIndex--;
+        }
 
+        if ($this->selecteddataProcedureICD9CmLovIndex === -1) {
+            $this->selecteddataProcedureICD9CmLovIndex = count($this->dataProcedureICD9CmLov) - 1;
+        }
+    }
 
-
-        // Proses Validasi///////////////////////////////////////////
-        try {
-            $this->validate($rules, $messages);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-
-            $this->emit('toastr-error', "Lakukan Pengecekan kembali Input Data Diagnosis." .  json_encode($e->errors(), true));
-            $this->validate($rules, $messages);
+    public function enterMydataProcedureICD9CmLov($id)
+    {
+        // $this->checkRjStatus();
+        // jika JK belum siap maka toaster error
+        if (isset($this->dataProcedureICD9CmLov[$id]['proc_id'])) {
+            $this->addProcedureICD9Cm($this->dataProcedureICD9CmLov[$id]['proc_id'], $this->dataProcedureICD9CmLov[$id]['proc_desc']);
+            $this->resetdataProcedureICD9CmLov();
+        } else {
+            $this->emit('toastr-error', "Kode Diagnosa belum tersedia.");
         }
     }
 
 
-    // insert and update record start////////////////
-    public function store()
+    private function addProcedureICD9Cm($ProcedureICD9CmId, $ProcedureICD9CmDesc): void
     {
-        // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
-        $this->setDataPrimer();
+        $this->collectingMyProcedureICD9Cm = [
+            'ProcedureICD9CmId' => $ProcedureICD9CmId,
+            'ProcedureICD9CmDesc' => $ProcedureICD9CmDesc,
+        ];
 
-        // Validate RJ
-        $this->validateDataRJ();
+        $this->insertProcedureICD9Cm();
+    }
 
+    private function insertProcedureICD9Cm(): void
+    {
+
+        // validate
+        // $this->checkRjStatus();
+        // customErrorMessages
+        $messages = customErrorMessagesTrait::messages();
+        // require nik ketika pasien tidak dikenal
+        $rules = [
+            "collectingMyProcedureICD9Cm.ProcedureICD9CmId" => 'bail|required|exists:rsmst_mstprocedures,proc_id',
+            "collectingMyProcedureICD9Cm.ProcedureICD9CmDesc" => 'bail|required|',
+        ];
+
+        // Proses Validasi///////////////////////////////////////////
+        $this->validate($rules, $messages);
+
+        // validate
+
+
+        // pengganti race condition
+
+        $this->dataDaftarPoliRJ['procedure'][] = [
+            'procedureId' => $this->collectingMyProcedureICD9Cm['ProcedureICD9CmId'],
+            'procedureDesc' => $this->collectingMyProcedureICD9Cm['ProcedureICD9CmDesc'],
+            'ketProcedure' => 'Keterangan Procedure',
+            'rjNo' => $this->rjNoRef,
+        ];
+
+        $this->store();
+        $this->reset(['collectingMyProcedureICD9Cm']);
+
+
+        //
+
+        // goto start;
+    }
+
+    public function removeProcedureICD9Cm($procedureId)
+    {
+
+        // $this->checkRjStatus();
+
+        $ProcedureICD9Cm = collect($this->dataDaftarPoliRJ['procedure'])->where("procedureId", '!=', $procedureId)->toArray();
+        $this->dataDaftarPoliRJ['procedure'] = $ProcedureICD9Cm;
+        $this->store();
+    }
+    // LOV selected end
+    /////////////////////////////////////////////////
+    // Lov dataProcedureICD9CmLov //////////////////////
+    ////////////////////////////////////////////////
+
+
+    // insert and update record start////////////////
+    private function store()
+    {
         // Logic update mode start //////////
         $this->updateDataRJ($this->dataDaftarPoliRJ['rjNo']);
         $this->emit('syncronizeAssessmentDokterRJFindData');
-        $this->insertDiagICD10toSIMRS();
     }
 
     private function updateDataRJ($rjNo): void
@@ -450,74 +662,6 @@ class AssessmentDokterDiagnosis extends Component
                 $this->dataDaftarPoliRJ['procedure'] = $this->procedure;
             }
         }
-    }
-
-
-    private function setDataPrimer(): void
-    {
-    }
-
-    private function addDiagICD10($diagId, $diagDesc, $icdX): void
-    {
-        $checkDiagnosaCount = collect($this->dataDaftarPoliRJ['diagnosis'])->count();
-        $kategoriDiagnosa = $checkDiagnosaCount ? 'Secondary' : 'Primary';
-
-        $this->dataDaftarPoliRJ['diagnosis'][] = ['diagId' => $diagId, 'diagDesc' => $diagDesc, 'icdX' => $icdX, 'ketdiagnosa' => 'Keterangan Diagnosa', 'kategoriDiagnosa' => $kategoriDiagnosa];
-    }
-
-    public function removeDiagICD10($diagId)
-    {
-
-        $diagnosis = collect($this->dataDaftarPoliRJ['diagnosis'])->where("diagId", '!=', $diagId)->toArray();
-        $this->dataDaftarPoliRJ['diagnosis'] = $diagnosis;
-        $this->store();
-    }
-
-
-    private function insertDiagICD10toSIMRS()
-    {
-
-        // delete dtl diagnosa
-        DB::table('rstxn_rjdtls')
-            ->where('rj_no',  $this->dataDaftarPoliRJ['rjNo'])
-            ->delete();
-
-        foreach ($this->dataDaftarPoliRJ['diagnosis'] as $diagnosis) {
-            $sql = "select nvl(max(rjdtl_dtl)+1,1) from rstxn_rjdtls";
-            $rjDtlDtl = DB::scalar($sql);
-
-            // insert rstxn_rjdtls 
-            DB::table('rstxn_rjdtls')->insert([
-                'rjdtl_dtl' => $rjDtlDtl,
-                'rj_no' =>  $this->dataDaftarPoliRJ['rjNo'],
-                'diag_id' => $diagnosis['diagId'],
-
-            ]);
-        }
-        // update status diagnosa rstxn_rjhdrs
-        DB::table('rstxn_rjhdrs')
-            ->where('rj_no',  $this->dataDaftarPoliRJ['rjNo'])
-            ->update([
-                'rj_diagnosa' => 'D',
-            ]);
-    }
-
-
-
-
-    private function addProcedureICD9Cm($procedureId, $procedureDesc): void
-    {
-        $checkProcedurenosaCount = collect($this->dataDaftarPoliRJ['procedure'])->count();
-
-        $this->dataDaftarPoliRJ['procedure'][] = ['procedureId' => $procedureId, 'procedureDesc' => $procedureDesc, 'ketProcedure' => 'Keterangan Procedure'];
-    }
-
-    public function removeProcedureICD9Cm($procedureId)
-    {
-
-        $procedure = collect($this->dataDaftarPoliRJ['procedure'])->where("procedureId", '!=', $procedureId)->toArray();
-        $this->dataDaftarPoliRJ['procedure'] = $procedure;
-        $this->store();
     }
 
 

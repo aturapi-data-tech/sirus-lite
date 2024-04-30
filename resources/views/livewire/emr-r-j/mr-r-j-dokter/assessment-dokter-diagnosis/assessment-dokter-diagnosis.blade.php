@@ -19,30 +19,8 @@
 
                             {{-- ICD10 --}}
                             <div>
-                                <div class="flex">
-                                    <div class="flex items-center justify-end w-full mr-5">
-                                        <x-text-input placeholder="Isi dgn data yang sesuai"
-                                            class="mt-1 ml-2 sm:rounded-none sm:rounded-l-lg" :errorshas="__($errors->has('SEPJsonReq.request.t_sep.diagAwal'))"
-                                            :disabled=$disabledProperty value="{{ 'Masukkan Diagnosa ICD 10' }}" />
-
-                                        <x-green-button :disabled=false
-                                            class="mt-1 sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
-                                            wire:click.prevent="clickdataDiagnosaICD10lov()">
-                                            <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
-                                                xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                                <path clip-rule="evenodd" fill-rule="evenodd"
-                                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-                                            </svg>
-                                        </x-green-button>
-                                        @error('SEPJsonReq.request.t_sep.diagAwal')
-                                            <x-input-error :messages=$message />
-                                        @enderror
-                                    </div>
-                                </div>
                                 {{-- LOV Diagnosa --}}
-                                <div class="relative mt-0 bg-red-300">
-                                    @include('livewire.emr-r-j.mr-r-j.diagnosis.list-of-value-caridataDiagnosaICD10')
-                                </div>
+                                @include('livewire.emr-r-j.mr-r-j.diagnosis.list-of-value-caridataDiagnosaICD10')
                             </div>
 
                             <!-- Table -->
@@ -72,13 +50,13 @@
                                                             </x-sort-link>
                                                         </th>
 
-                                                        <th scope="col" class="px-4 py-3">
+                                                        {{-- <th scope="col" class="px-4 py-3">
 
                                                             <x-sort-link :active=false wire:click.prevent=""
                                                                 role="button" href="#">
                                                                 Keterangan Diagnosa
                                                             </x-sort-link>
-                                                        </th>
+                                                        </th> --}}
 
                                                         <th scope="col" class="px-4 py-3">
 
@@ -108,10 +86,10 @@
                                                                 {{ $diag['diagDesc'] }}
                                                             </td>
 
-                                                            <td
+                                                            {{-- <td
                                                                 class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
                                                                 {{ $diag['ketdiagnosa'] }}
-                                                            </td>
+                                                            </td> --}}
 
                                                             <td
                                                                 class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
@@ -122,7 +100,7 @@
                                                                 class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
 
                                                                 <x-alternative-button class="inline-flex"
-                                                                    wire:click.prevent="removeDiagICD10('{{ $diag['diagId'] }}')">
+                                                                    wire:click.prevent="removeDiagnosaICD10('{{ isset($diag['rjDtlDtl']) ? $diag['rjDtlDtl'] : 0 }}')">
                                                                     <svg class="w-5 h-5 text-gray-800 dark:text-white"
                                                                         aria-hidden="true"
                                                                         xmlns="http://www.w3.org/2000/svg"
@@ -159,30 +137,8 @@
 
                             {{-- ICD 9 CM --}}
                             <div>
-                                <div class="flex">
-                                    <div class="flex items-center justify-end w-full mr-5">
-                                        <x-text-input placeholder="Isi dgn data yang sesuai"
-                                            class="mt-1 ml-2 sm:rounded-none sm:rounded-l-lg" :errorshas="__($errors->has('SEPJsonReq.request.t_sep.diagAwal'))"
-                                            :disabled=$disabledProperty value="{{ 'Masukkan Procedure ICD 9 CM' }}" />
-
-                                        <x-green-button :disabled=false
-                                            class="mt-1 sm:rounded-none sm:rounded-r-lg sm:mb-0 sm:mr-0 sm:px-2"
-                                            wire:click.prevent="clickdataProcedureICD9Cmlov()">
-                                            <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
-                                                xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                                <path clip-rule="evenodd" fill-rule="evenodd"
-                                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-                                            </svg>
-                                        </x-green-button>
-                                        @error('SEPJsonReq.request.t_sep.diagAwal')
-                                            <x-input-error :messages=$message />
-                                        @enderror
-                                    </div>
-                                </div>
                                 {{-- LOV Diagnosa --}}
-                                <div class="relative mt-0 bg-red-300">
-                                    @include('livewire.emr-r-j.mr-r-j.diagnosis.list-of-value-caridataProcedureICD9Cm')
-                                </div>
+                                @include('livewire.emr-r-j.mr-r-j.diagnosis.list-of-value-caridataProcedureICD9Cm')
                             </div>
 
                             <!-- Table -->

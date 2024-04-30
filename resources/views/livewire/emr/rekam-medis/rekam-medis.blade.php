@@ -69,8 +69,8 @@
                                             <tr class="border-b group dark:border-gray-700">
 
 
-                                                <td class="w-1/5 px-2 py-2 whitespace-nowrap group-hover:bg-gray-100">
-                                                    <div class="w-full overflow-auto whitespace-nowrap">
+                                                <td class="w-1/5 px-2 py-2 group-hover:bg-gray-100">
+                                                    <div class="overflow-auto w-52 ">
                                                         <div class="font-semibold text-primary">
                                                             {{ $myQData->layanan_status === 'RI'
                                                                 ? 'Rawat Inap'
