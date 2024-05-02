@@ -70,7 +70,7 @@
                 <div class="w-full mx-2 mr-2 bg-gray-400 rounded-lg ">
 
                     <livewire:emr.rekam-medis.rekam-medis-display :wire:key="'content-rekamMedisDisplay'"
-                        :regNoRef="$regNoRef">
+                        :rjNoRefCopyTo="$rjNoRef" :regNoRef="$regNoRef">
                 </div>
 
             </div>

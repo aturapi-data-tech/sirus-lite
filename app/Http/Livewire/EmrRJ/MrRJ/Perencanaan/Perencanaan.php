@@ -464,14 +464,13 @@ class Perencanaan extends Component
     public function simpanTerapi(): void
     {
         if (isset($this->dataDaftarPoliRJ['eresep'])) {
-            $eresep = '';
+            $eresep = '' . PHP_EOL;
             foreach ($this->dataDaftarPoliRJ['eresep'] as $key => $value) {
                 $racikanNonRacikan = $value['jenisKeterangan'] == 'NonRacikan' ? 'N' : '';
                 $eresep .=  '(' . $racikanNonRacikan . ')' . ' ' . $value['productName'] . ' /' . $value['qty'] . ' /' . $value['catatanKhusus'] . PHP_EOL;
-
-                $this->dataDaftarPoliRJ['perencanaan']['terapi']['terapi'] = $this->dataDaftarPoliRJ['perencanaan']['terapi']['terapi']
-                    . $eresep;
             }
+            $this->dataDaftarPoliRJ['perencanaan']['terapi']['terapi'] = $this->dataDaftarPoliRJ['perencanaan']['terapi']['terapi']
+                . $eresep;
         }
 
         if (isset($this->dataDaftarPoliRJ['eresepRacikan'])) {
