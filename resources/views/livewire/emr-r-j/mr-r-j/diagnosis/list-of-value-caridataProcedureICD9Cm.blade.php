@@ -5,7 +5,7 @@
         {{-- Lov dataProcedureICD9CmLov --}}
         <div x-data="{ selecteddataProcedureICD9CmLovIndex: @entangle('selecteddataProcedureICD9CmLovIndex') }" @click.outside="$wire.dataProcedureICD9CmLovSearch = ''">
             <x-text-input id="dataProcedureICD9CmLovSearch" placeholder="Kode ICD9Cm" class="mt-1 ml-2" :errorshas="__($errors->has('dataProcedureICD9CmLovSearch'))"
-                :disabled=$disabledPropertyRjStatus wire:model.debounce.500ms="dataProcedureICD9CmLovSearch"
+                :disabled=$disabledPropertyRjStatus wire:model.lazy="dataProcedureICD9CmLovSearch"
                 x-on:click.outside="$wire.resetdataProcedureICD9CmLov()"
                 x-on:keyup.escape="$wire.resetdataProcedureICD9CmLov()"
                 x-on:keyup.down="$wire.selectNextdataProcedureICD9CmLov()"
