@@ -56,7 +56,10 @@
                                             <x-dropdown-link wire:click="setMydataProductLov('{{ $key }}')"
                                                 class="text-base font-normal {{ $key === $selecteddataProductLovIndex ? 'bg-gray-100 outline-none' : '' }}">
                                                 <div>
-                                                    {{ $lov['product_name'] . '. ' . $lov['product_name'] }}
+                                                    {{ $lov['product_name'] . ' / ' . number_format($lov['sales_price']) }}
+                                                </div>
+                                                <div class="text-xs">
+                                                    {{ '(' . $lov['product_content'] . ')' }}
                                                 </div>
                                             </x-dropdown-link>
                                         </li>

@@ -14,7 +14,6 @@ use App\Http\Traits\customErrorMessagesTrait;
 use Spatie\ArrayToXml\ArrayToXml;
 use Exception;
 
-
 class EresepRJ extends Component
 {
     use WithPagination;
@@ -90,8 +89,17 @@ class EresepRJ extends Component
         $dataProductLovs = DB::table('immst_products')->select(
             'product_id',
             'product_name',
-            'sales_price'
+            'sales_price',
+            DB::raw("(select replace(string_agg(cont_desc),',','')||product_name 
+                                            from immst_productcontents z,immst_contents x 
+                                            where z.product_id=immst_products.product_id 
+                                            and z.cont_id=x.cont_id) as elasticSearch"),
+            DB::raw("(select string_agg(cont_desc) 
+                                            from immst_productcontents z,immst_contents x 
+                                            where z.product_id=immst_products.product_id 
+                                            and z.cont_id=x.cont_id) as product_content")
         )
+            ->where('active_status', '1')
             ->where('product_id', $search)
             ->first();
 
@@ -106,20 +114,31 @@ class EresepRJ extends Component
             if (strlen($search) < 3) {
                 $this->dataProductLov = [];
             } else {
-                $this->dataProductLov = json_decode(
-                    DB::table('immst_products')->select(
-                        'product_id',
-                        'product_name',
-                        'sales_price'
-                    )
-                        ->where('active_status', '1')
-                        ->where(DB::raw('upper(product_name)'), 'like', '%' . strtoupper($search) . '%')
-                        ->limit(10)
-                        ->orderBy('product_id', 'ASC')
-                        ->orderBy('product_name', 'ASC')
-                        ->get(),
-                    true
-                );
+
+                $this->dataProductLov = DB::select("select * from (
+                    select product_id,
+                    product_name,
+                    sales_price,
+
+                    (select replace(string_agg(cont_desc),',','')||product_name 
+                    from immst_productcontents z,immst_contents x 
+                    where z.product_id=a.product_id 
+                    and z.cont_id=x.cont_id)elasticsearch,
+
+                    (select string_agg(cont_desc)
+                    from immst_productcontents z,immst_contents x 
+                    where z.product_id=a.product_id 
+                    and z.cont_id=x.cont_id)product_content
+
+                    from immst_products a
+                    where active_status='1' 
+                    group by product_id,product_name, sales_price 
+                    order by product_name)
+
+                where upper(elasticsearch) like '%'||:search||'%'
+                    ", ['search' => strtoupper($search)]);
+
+                $this->dataProductLov = json_decode(json_encode($this->dataProductLov, true), true);
             }
             $this->dataProductLovStatus = true;
             // set doing nothing
@@ -133,7 +152,15 @@ class EresepRJ extends Component
         $dataProductLovs = DB::table('immst_products')->select(
             'product_id',
             'product_name',
-            'sales_price'
+            'sales_price',
+            DB::raw("(select replace(string_agg(cont_desc),',','')||product_name 
+                                                            from immst_productcontents z,immst_contents x 
+                                                            where z.product_id=immst_products.product_id 
+                                                            and z.cont_id=x.cont_id) as elasticSearch"),
+            DB::raw("(select string_agg(cont_desc) 
+                                                            from immst_productcontents z,immst_contents x 
+                                                            where z.product_id=immst_products.product_id 
+                                                            and z.cont_id=x.cont_id) as product_content")
         )
             ->where('active_status', '1')
             ->where('product_id', $this->dataProductLov[$id]['product_id'])
