@@ -75,11 +75,11 @@
                 {{-- null --}}
             </div>
             <div>
-                <div wire:loading wire:target="store">
+                <div wire:loading wire:target="">
                     <x-loading />
                 </div>
 
-                <x-green-button :disabled=false wire:click.prevent="store()" type="button" wire:loading.remove>
+                <x-green-button :disabled=false wire:click.prevent="" type="button" wire:loading.remove>
                     Simpan
                 </x-green-button>
             </div>
