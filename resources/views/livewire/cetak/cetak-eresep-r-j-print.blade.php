@@ -126,7 +126,7 @@
                 </tr>
 
                 <tr>
-                    <td class="p-1 m-1">NIK/Id BPJS</td>
+                    <td class="p-1 m-1">No SEP</td>
                     <td class="p-1 m-1">:</td>
                     <td class="p-1 m-1 font-semibold">
                         {{ isset($dataDaftarPoliRJ['sep']['noSep']) ? $dataDaftarPoliRJ['sep']['noSep'] : '-' }}
