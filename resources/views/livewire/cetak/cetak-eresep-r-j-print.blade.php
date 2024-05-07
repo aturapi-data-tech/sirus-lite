@@ -64,64 +64,76 @@
         <table style="font-size: 10px "class="w-full table-auto ">
             <tbody>
                 <tr>
+                    <td class="p-1 m-1">No. Resep / Tanggal</td>
+                    <td class="p-1 m-1">:</td>
+                    <td class="p-1 m-1 font-semibold">
+                        {{ isset($dataDaftarPoliRJ['rjNo']) ? $dataDaftarPoliRJ['rjNo'] : '-' }} /
+                        {{ isset($dataDaftarPoliRJ['rjDate']) ? $dataDaftarPoliRJ['rjDate'] : '-' }}
+                    </td>
+                </tr>
 
-                    <td class="p-1 m-1">Nama Pasien</td>
+                <tr>
+
+                    <td class="p-1 m-1">Pasien</td>
                     <td class="p-1 m-1">:</td>
                     <td class="p-1 m-1 font-semibold">
                         {{ isset($dataPasien['pasien']['regName']) ? strtoupper($dataPasien['pasien']['regName']) : '-' }}
                         <br>
                         {{ isset($dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc']) ? $dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] : '-' }}/
-                        {{ isset($dataPasien['pasien']['thn']) ? $dataPasien['pasien']['thn'] : '-' }}
-                    </td>
-                    <td class="p-1 m-1">-</td>
-                    <td class="p-1 m-1">No RM</td>
-                    <td class="p-1 m-1">:</td>
-                    <td class="p-1 m-1 font-semibold">
+                        {{ isset($dataPasien['pasien']['thn']) ? $dataPasien['pasien']['thn'] : '-' }}/
                         {{ isset($dataPasien['pasien']['regNo']) ? $dataPasien['pasien']['regNo'] : '-' }}
                     </td>
                 </tr>
-                <tr>
 
+                <tr>
                     <td class="p-1 m-1">Tanggal Lahir</td>
                     <td class="p-1 m-1">:</td>
-                    <td class="p-1 m-1">
+                    <td class="p-1 m-1 font-semibold">
                         {{ isset($dataPasien['pasien']['tglLahir']) ? $dataPasien['pasien']['tglLahir'] : '-' }}
                     </td>
-                    <td class="p-1 m-1">-</td>
-                    <td class="p-1 m-1">NIK</td>
-                    <td class="p-1 m-1">:</td>
-                    <td class="p-1 m-1">
-                        {{ isset($dataPasien['pasien']['identitas']['nik']) ? $dataPasien['pasien']['identitas']['nik'] : '-' }}
-
-                    </td>
                 </tr>
-                <tr>
 
+                <tr>
                     <td class="p-1 m-1">Alamat</td>
                     <td class="p-1 m-1">:</td>
-                    <td class="p-1 m-1">
+                    <td class="p-1 m-1 font-semibold">
                         {{ isset($dataPasien['pasien']['identitas']['alamat']) ? $dataPasien['pasien']['identitas']['alamat'] : '-' }}
                     </td>
-                    <td class="p-1 m-1">-</td>
-                    <td class="p-1 m-1">Id BPJS</td>
+                </tr>
+
+                <tr>
+                    <td class="p-1 m-1">Klaim</td>
                     <td class="p-1 m-1">:</td>
-                    <td class="p-1 m-1">
+                    <td class="p-1 m-1 font-semibold">
+                        {{ $dataDaftarPoliRJ['klaimId'] == 'UM'
+                            ? 'UMUM'
+                            : ($dataDaftarPoliRJ['klaimId'] == 'JM'
+                                ? 'BPJS'
+                                : ($dataDaftarPoliRJ['klaimId'] == 'KR'
+                                    ? 'Kronis'
+                                    : 'Asuransi Lain')) }}
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="p-1 m-1">NIK/Id BPJS</td>
+                    <td class="p-1 m-1">:</td>
+                    <td class="p-1 m-1 font-semibold">
+                        {{ isset($dataPasien['pasien']['identitas']['nik']) ? $dataPasien['pasien']['identitas']['nik'] : '-' }}
+                        /
                         {{ isset($dataPasien['pasien']['identitas']['idbpjs']) ? $dataPasien['pasien']['identitas']['idbpjs'] : '-' }}
                     </td>
                 </tr>
 
                 <tr>
-
-                    <td class="p-1 m-1"></td>
+                    <td class="p-1 m-1">NIK/Id BPJS</td>
                     <td class="p-1 m-1">:</td>
-                    <td class="p-1 m-1"> </td>
-                    <td class="p-1 m-1">-</td>
-                    <td class="p-1 m-1">Tanggal Resep</td>
-                    <td class="p-1 m-1">:</td>
-                    <td class="p-1 m-1">
-                        {{ isset($dataDaftarTxn['rjDate']) ? $dataDaftarTxn['rjDate'] : '-' }}
+                    <td class="p-1 m-1 font-semibold">
+                        {{ isset($dataDaftarPoliRJ['sep']['noSep']) ? $dataDaftarPoliRJ['sep']['noSep'] : '-' }}
                     </td>
                 </tr>
+
+
 
             </tbody>
         </table>
@@ -153,7 +165,7 @@
                     @foreach ($dataDaftarPoliRJ['eresep'] as $key => $eresep)
                         <tr>
                             <td class="w-1/5 text-center uppercase">
-                                {{ '(N)' }}
+                                {{ 'R/' }}
                             </td>
 
                             <td class="w-2/5 uppercase text-start">
@@ -161,11 +173,11 @@
                             </td>
 
                             <td class="w-1/5 text-center uppercase">
-                                {{ $eresep['qty'] }}
+                                {{ 'No. ' . $eresep['qty'] }}
                             </td>
 
                             <td class="w-1/5 text-center uppercase">
-                                {{ $eresep['catatanKhusus'] }}
+                                {{ 'S ' . $eresep['catatanKhusus'] }}
                             </td>
                         </tr>
                     @endforeach
@@ -177,7 +189,7 @@
                     @foreach ($dataDaftarPoliRJ['eresepRacikan'] as $key => $eresepRacikan)
                         <tr>
                             <td class="w-1/5 text-center uppercase">
-                                {{ '(' . $eresepRacikan['noRacikan'] . ')' }}
+                                {{ $eresepRacikan['noRacikan'] . '/' }}
                             </td>
 
                             <td class="w-2/5 uppercase text-start">
@@ -185,11 +197,11 @@
                             </td>
 
                             <td class="w-1/5 text-center uppercase">
-                                {{ $eresepRacikan['qty'] }}
+                                {{ 'No. ' . $eresepRacikan['qty'] }}
                             </td>
 
                             <td class="w-1/5 text-center uppercase">
-                                {{ $eresepRacikan['catatan'] . '  ' . $eresepRacikan['catatanKhusus'] }}
+                                {{ 'S ' . $eresepRacikan['catatan'] . '  ' . $eresepRacikan['catatanKhusus'] }}
                             </td>
                         </tr>
                     @endforeach
@@ -211,18 +223,18 @@
                 <td class="w-1/4 ">
                     <div class ="text-center">
                         <span>
-                            Tulungagung,{{ isset($dataDaftarTxn['perencanaan']['pengkajianMedis']['selesaiPemeriksaan'])
-                                ? ($dataDaftarTxn['perencanaan']['pengkajianMedis']['selesaiPemeriksaan']
-                                    ? $dataDaftarTxn['perencanaan']['pengkajianMedis']['selesaiPemeriksaan']
+                            Tulungagung,{{ isset($dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['selesaiPemeriksaan'])
+                                ? ($dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['selesaiPemeriksaan']
+                                    ? $dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['selesaiPemeriksaan']
                                     : 'Tanggal')
                                 : 'Tanggal' }}
                         </span>
                         <div>
-                            @isset($dataDaftarTxn['perencanaan']['pengkajianMedis']['drPemeriksa'])
-                                @if ($dataDaftarTxn['perencanaan']['pengkajianMedis']['drPemeriksa'])
-                                    @isset(App\Models\User::where('myuser_code', $dataDaftarTxn['drId'])->first()->myuser_ttd_image)
+                            @isset($dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa'])
+                                @if ($dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa'])
+                                    @isset(App\Models\User::where('myuser_code', $dataDaftarPoliRJ['drId'])->first()->myuser_ttd_image)
                                         <img class="h-24 mx-auto"
-                                            src="{{ 'storage/' . App\Models\User::where('myuser_code', $dataDaftarTxn['drId'])->first()->myuser_ttd_image }}"
+                                            src="{{ 'storage/' . App\Models\User::where('myuser_code', $dataDaftarPoliRJ['drId'])->first()->myuser_ttd_image }}"
                                             alt="">
                                     @endisset
                                 @endif
@@ -230,9 +242,9 @@
                         </div>
 
                         <span>
-                            {{ isset($dataDaftarTxn['perencanaan']['pengkajianMedis']['drPemeriksa'])
-                                ? ($dataDaftarTxn['perencanaan']['pengkajianMedis']['drPemeriksa']
-                                    ? $dataDaftarTxn['perencanaan']['pengkajianMedis']['drPemeriksa']
+                            {{ isset($dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa'])
+                                ? ($dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa']
+                                    ? $dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa']
                                     : 'Dokter Pemeriksa')
                                 : 'Dokter Pemeriksa' }}
                         </span>

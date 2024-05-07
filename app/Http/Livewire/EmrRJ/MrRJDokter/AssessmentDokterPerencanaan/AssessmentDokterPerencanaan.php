@@ -466,8 +466,9 @@ class AssessmentDokterPerencanaan extends Component
             $eresep = '' . PHP_EOL;
 
             foreach ($this->dataDaftarPoliRJ['eresep'] as $key => $value) {
-                $racikanNonRacikan = $value['jenisKeterangan'] == 'NonRacikan' ? 'N' : '';
-                $eresep .=  '(' . $racikanNonRacikan . ')' . ' ' . $value['productName'] . ' /' . $value['qty'] . ' /' . $value['catatanKhusus'] . PHP_EOL;
+                // NonRacikan
+
+                $eresep .=  'R/' . ' ' . $value['productName'] . ' No.' . $value['qty'] . ' S' . $value['catatanKhusus'] . PHP_EOL;
             }
             $this->dataDaftarPoliRJ['perencanaan']['terapi']['terapi'] = $this->dataDaftarPoliRJ['perencanaan']['terapi']['terapi']
                 . $eresep;
@@ -475,9 +476,9 @@ class AssessmentDokterPerencanaan extends Component
 
         if (isset($this->dataDaftarPoliRJ['eresepRacikan'])) {
             $eresepRacikan = '' . PHP_EOL;
+            // Racikan
             foreach ($this->dataDaftarPoliRJ['eresepRacikan'] as $key => $value) {
-                $racikanNonRacikan = $value['jenisKeterangan'] == 'NonRacikan' ? 'N' : '';
-                $eresepRacikan .= $racikanNonRacikan . '(' . $value['noRacikan'] . ') ' . $value['productName'] . ' ' . $value['sedia'] . ' /' . $value['catatan'] . ' /' . $value['qty'] . ' /' . $value['catatanKhusus'] . PHP_EOL;
+                $eresepRacikan .=  $value['noRacikan'] . '/ ' . $value['productName'] . ' ' . $value['sedia'] . ' - ' . $value['catatan'] . ' No.' . $value['qty'] . ' S' . $value['catatanKhusus'] . PHP_EOL;
             };
 
             $this->dataDaftarPoliRJ['perencanaan']['terapi']['terapi'] = $this->dataDaftarPoliRJ['perencanaan']['terapi']['terapi']
