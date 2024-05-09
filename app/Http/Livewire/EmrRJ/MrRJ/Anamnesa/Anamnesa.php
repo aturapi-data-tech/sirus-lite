@@ -526,6 +526,7 @@ class Anamnesa extends Component
         // then cari Data Pasien By Key Collection (exception when no data found)
         // 
         // else json_decode
+
         if ($dataDaftarPoliRJ_json) {
             $this->dataDaftarPoliRJ = json_decode($findData->datadaftarpolirj_json, true);
 

@@ -296,7 +296,13 @@ class SkdpRJ extends Component
             ->first();
 
 
-        if ($findData->datadaftarpolirj_json) {
+        $dataDaftarPoliRJ_json = isset($findData->datadaftarpolirj_json) ? $findData->datadaftarpolirj_json : null;
+        // if meta_data_pasien_json = null
+        // then cari Data Pasien By Key Collection (exception when no data found)
+        // 
+        // else json_decode
+
+        if ($dataDaftarPoliRJ_json) {
             $this->dataDaftarPoliRJ = json_decode($findData->datadaftarpolirj_json, true);
 
             // jika kontrol tidak ditemukan tambah variable kontrol pda array
@@ -329,6 +335,8 @@ class SkdpRJ extends Component
                 ? $this->dataDaftarPoliRJ['kontrol']['noSEP']
                 : $findData->vno_sep;
         } else {
+
+
 
             $this->emit('toastr-error', "Json Tidak ditemukan, Data sedang diproses ulang.");
             $dataDaftarPoliRJ = DB::table('rsview_rjkasir')
@@ -404,12 +412,6 @@ class SkdpRJ extends Component
                     "resSep" => [],
                 ]
             ];
-
-            $this->dataDaftarPoliRJ['klaimId'] = $dataDaftarPoliRJ->klaim_id == 'JM' ? 'JM' : 'UM';
-            $this->dataDaftarPoliRJ['JenisKlaimDesc'] = $dataDaftarPoliRJ->klaim_id == 'JM' ? 'BPJS' : 'UMUM';
-
-            $this->dataDaftarPoliRJ['kunjunganId'] = '1';
-            $this->dataDaftarPoliRJ['JenisKunjunganDesc'] = 'Rujukan FKTP';
 
 
             // jika kontrol tidak ditemukan tambah variable kontrol pda array
