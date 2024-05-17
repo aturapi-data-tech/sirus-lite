@@ -305,38 +305,56 @@ class SkdpRI extends Component
             ->where('rihdr_no', $rino)
             ->first();
 
-        if ($findData->datadaftarri_json) {
+        $datadaftarRI_json = isset($findData->datadaftarri_json) ? $findData->datadaftarri_json : null;
+        // if meta_data_pasien_json = null
+        // then cari Data Pasien By Key Collection (exception when no data found)
+        // 
+        // else json_decode
+
+        if ($datadaftarRI_json) {
             $this->dataDaftarRi = json_decode($findData->datadaftarri_json, true);
+
+
 
             // jika kontrol tidak ditemukan tambah variable kontrol pda array
             if (isset($this->dataDaftarRi['kontrol']) == false) {
-                $this->dataDaftarRi['kontrol'] = $this->kontrol;
+                $this->dataDaftarRi['kontrol']['tglKontrol'] =  Carbon::now()->addDays(8)->format('d/m/Y');
+                $this->dataDaftarRi['kontrol']['drKontrol'] =  (isset($this->dataDaftarRi['drId'])
+                    ? ($this->dataDaftarRi['drId']
+                        ? $this->dataDaftarRi['drId']
+                        : '')
+                    : '');
+                $this->dataDaftarRi['kontrol']['drKontrolDesc'] = (isset($this->dataDaftarRi['drDesc'])
+                    ? ($this->dataDaftarRi['drDesc']
+                        ? $this->dataDaftarRi['drDesc']
+                        : '')
+                    : '');
+                $this->dataDaftarRi['kontrol']['drKontrolBPJS'] = (isset($this->dataDaftarRi['kddrbpjs'])
+                    ? ($this->dataDaftarRi['kddrbpjs']
+                        ? $this->dataDaftarRi['kddrbpjs']
+                        : '')
+                    : '');
+                $this->dataDaftarRi['kontrol']['poliKontrol'] = (isset($this->dataDaftarRi['poliId'])
+                    ? ($this->dataDaftarRi['poliId']
+                        ? $this->dataDaftarRi['poliId']
+                        : '')
+                    : '');
+                $this->dataDaftarRi['kontrol']['poliKontrolDesc'] = (isset($this->dataDaftarRi['poliDesc'])
+                    ? ($this->dataDaftarRi['poliDesc']
+                        ? $this->dataDaftarRi['poliDesc']
+                        : '')
+                    : '');
+                $this->dataDaftarRi['kontrol']['poliKontrolBPJS'] = (isset($this->dataDaftarRi['kdpolibpjs'])
+                    ? ($this->dataDaftarRi['kdpolibpjs']
+                        ? $this->dataDaftarRi['kdpolibpjs']
+                        : '')
+                    : '');
+                $this->dataDaftarRi['kontrol']['noSEP'] = (isset($findData->vno_sep)
+                    ? ($findData->vno_sep
+                        ? $findData->vno_sep
+                        : '')
+                    : '');
             }
-
-            $this->dataDaftarRi['kontrol']['tglKontrol'] = $this->dataDaftarRi['kontrol']['tglKontrol']
-                ? $this->dataDaftarRi['kontrol']['tglKontrol']
-                : Carbon::now()->addDays(8)->format('d/m/Y');
-            $this->dataDaftarRi['kontrol']['drKontrol'] = $this->dataDaftarRi['kontrol']['drKontrol']
-                ? $this->dataDaftarRi['kontrol']['drKontrol']
-                : $this->dataDaftarRi['drId'];
-            $this->dataDaftarRi['kontrol']['drKontrolDesc'] = $this->dataDaftarRi['kontrol']['drKontrolDesc']
-                ? $this->dataDaftarRi['kontrol']['drKontrolDesc']
-                : $this->dataDaftarRi['drDesc'];
-            $this->dataDaftarRi['kontrol']['drKontrolBPJS'] =  $this->dataDaftarRi['kontrol']['drKontrolBPJS']
-                ? $this->dataDaftarRi['kontrol']['drKontrolBPJS']
-                : $this->dataDaftarRi['kddrbpjs'];
-            $this->dataDaftarRi['kontrol']['poliKontrol'] = $this->dataDaftarRi['kontrol']['poliKontrol']
-                ? $this->dataDaftarRi['kontrol']['poliKontrol']
-                : $this->dataDaftarRi['poliId'];
-            $this->dataDaftarRi['kontrol']['poliKontrolDesc'] = $this->dataDaftarRi['kontrol']['poliKontrolDesc']
-                ? $this->dataDaftarRi['kontrol']['poliKontrolDesc']
-                : $this->dataDaftarRi['poliDesc'];
-            $this->dataDaftarRi['kontrol']['poliKontrolBPJS'] = $this->dataDaftarRi['kontrol']['poliKontrolBPJS']
-                ? $this->dataDaftarRi['kontrol']['poliKontrolBPJS']
-                : $this->dataDaftarRi['kdpolibpjs'];
-            $this->dataDaftarRi['kontrol']['noSEP'] = $this->dataDaftarRi['kontrol']['noSEP']
-                ? $this->dataDaftarRi['kontrol']['noSEP']
-                : $findData->vno_sep;
         } else {
 
             $this->emit('toastr-error', "Json Tidak ditemukan, Data sedang diproses ulang.");
@@ -415,24 +433,43 @@ class SkdpRI extends Component
 
             // jika kontrol tidak ditemukan tambah variable kontrol pda array
             if (isset($this->dataDaftarRi['kontrol']) == false) {
-                $this->dataDaftarRi['kontrol'] = $this->kontrol;
+                $this->dataDaftarRi['kontrol']['tglKontrol'] =  Carbon::now()->addDays(8)->format('d/m/Y');
+                $this->dataDaftarRi['kontrol']['drKontrol'] =  (isset($this->dataDaftarRi['drId'])
+                    ? ($this->dataDaftarRi['drId']
+                        ? $this->dataDaftarRi['drId']
+                        : '')
+                    : '');
+                $this->dataDaftarRi['kontrol']['drKontrolDesc'] = (isset($this->dataDaftarRi['drDesc'])
+                    ? ($this->dataDaftarRi['drDesc']
+                        ? $this->dataDaftarRi['drDesc']
+                        : '')
+                    : '');
+                $this->dataDaftarRi['kontrol']['drKontrolBPJS'] = (isset($this->dataDaftarRi['kddrbpjs'])
+                    ? ($this->dataDaftarRi['kddrbpjs']
+                        ? $this->dataDaftarRi['kddrbpjs']
+                        : '')
+                    : '');
+                $this->dataDaftarRi['kontrol']['poliKontrol'] = (isset($this->dataDaftarRi['poliId'])
+                    ? ($this->dataDaftarRi['poliId']
+                        ? $this->dataDaftarRi['poliId']
+                        : '')
+                    : '');
+                $this->dataDaftarRi['kontrol']['poliKontrolDesc'] = (isset($this->dataDaftarRi['poliDesc'])
+                    ? ($this->dataDaftarRi['poliDesc']
+                        ? $this->dataDaftarRi['poliDesc']
+                        : '')
+                    : '');
+                $this->dataDaftarRi['kontrol']['poliKontrolBPJS'] = (isset($this->dataDaftarRi['kdpolibpjs'])
+                    ? ($this->dataDaftarRi['kdpolibpjs']
+                        ? $this->dataDaftarRi['kdpolibpjs']
+                        : '')
+                    : '');
+                $this->dataDaftarRi['kontrol']['noSEP'] = (isset($dataDaftarRi->vno_sep)
+                    ? ($dataDaftarRi->vno_sep
+                        ? $dataDaftarRi->vno_sep
+                        : '')
+                    : '');
             }
-
-
-
-            // setDataKontrol
-            $this->dataDaftarRi['kontrol']['tglKontrol'] = $this->dataDaftarRi['kontrol']['tglKontrol']
-                ? $this->dataDaftarRi['kontrol']['tglKontrol']
-                : Carbon::now()->addDays(0)->format('d/m/Y');
-            $this->dataDaftarRi['kontrol']['drKontrol'] = "";
-            $this->dataDaftarRi['kontrol']['drKontrolDesc'] = "";
-            $this->dataDaftarRi['kontrol']['drKontrolBPJS'] =  "";
-            $this->dataDaftarRi['kontrol']['poliKontrol'] = "";
-            $this->dataDaftarRi['kontrol']['poliKontrolDesc'] = "";
-            $this->dataDaftarRi['kontrol']['poliKontrolBPJS'] = "";
-            $this->dataDaftarRi['kontrol']['noSEP'] = $this->dataDaftarRi['kontrol']['noSEP']
-                ? $this->dataDaftarRi['kontrol']['noSEP']
-                : $dataDaftarRi->vno_sep;
         }
     }
 
