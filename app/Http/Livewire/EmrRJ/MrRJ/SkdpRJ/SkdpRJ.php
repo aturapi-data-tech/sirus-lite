@@ -42,18 +42,18 @@ class SkdpRJ extends Component
 
     // data SKDP / kontrol=>[] 
     public $kontrol = [
-        'noKontrolRS' => "",
-        'noSKDPBPJS' => "",
-        'noAntrian' => "",
-        'tglKontrol' => "",
-        'poliKontrol' => "",
-        'poliKontrolBPJS' => "",
-        'poliKontrolDesc' => "",
-        'drKontrol' => "",
-        'drKontrolBPJS' => "",
-        'drKontrolDesc' => "",
-        'catatan' => "",
-        'noSEP' => "",
+        // 'noKontrolRS' => "",
+        // 'noSKDPBPJS' => "",
+        // 'noAntrian' => "",
+        // 'tglKontrol' => "",
+        // 'poliKontrol' => "",
+        // 'poliKontrolBPJS' => "",
+        // 'poliKontrolDesc' => "",
+        // 'drKontrol' => "",
+        // 'drKontrolBPJS' => "",
+        // 'drKontrolDesc' => "",
+        // 'catatan' => "",
+        // 'noSEP' => "",
     ];
     //////////////////////////////////////////////////////////////////////
 
@@ -307,35 +307,45 @@ class SkdpRJ extends Component
 
             // jika kontrol tidak ditemukan tambah variable kontrol pda array
             if (isset($this->dataDaftarPoliRJ['kontrol']) == false) {
-                $this->dataDaftarPoliRJ['kontrol'] = $this->kontrol;
+
+                $this->dataDaftarPoliRJ['kontrol']['tglKontrol'] =  Carbon::now()->addDays(8)->format('d/m/Y');
+                $this->dataDaftarPoliRJ['kontrol']['drKontrol'] =  (isset($this->dataDaftarPoliRJ['drId'])
+                    ? ($this->dataDaftarPoliRJ['drId']
+                        ? $this->dataDaftarPoliRJ['drId']
+                        : '')
+                    : '');
+                $this->dataDaftarPoliRJ['kontrol']['drKontrolDesc'] = (isset($this->dataDaftarPoliRJ['drDesc'])
+                    ? ($this->dataDaftarPoliRJ['drDesc']
+                        ? $this->dataDaftarPoliRJ['drDesc']
+                        : '')
+                    : '');
+                $this->dataDaftarPoliRJ['kontrol']['drKontrolBPJS'] = (isset($this->dataDaftarPoliRJ['kddrbpjs'])
+                    ? ($this->dataDaftarPoliRJ['kddrbpjs']
+                        ? $this->dataDaftarPoliRJ['kddrbpjs']
+                        : '')
+                    : '');
+                $this->dataDaftarPoliRJ['kontrol']['poliKontrol'] = (isset($this->dataDaftarPoliRJ['poliId'])
+                    ? ($this->dataDaftarPoliRJ['poliId']
+                        ? $this->dataDaftarPoliRJ['poliId']
+                        : '')
+                    : '');
+                $this->dataDaftarPoliRJ['kontrol']['poliKontrolDesc'] = (isset($this->dataDaftarPoliRJ['poliDesc'])
+                    ? ($this->dataDaftarPoliRJ['poliDesc']
+                        ? $this->dataDaftarPoliRJ['poliDesc']
+                        : '')
+                    : '');
+                $this->dataDaftarPoliRJ['kontrol']['poliKontrolBPJS'] = (isset($this->dataDaftarPoliRJ['kdpolibpjs'])
+                    ? ($this->dataDaftarPoliRJ['kdpolibpjs']
+                        ? $this->dataDaftarPoliRJ['kdpolibpjs']
+                        : '')
+                    : '');
+                $this->dataDaftarPoliRJ['kontrol']['noSEP'] = (isset($findData->vno_sep)
+                    ? ($findData->vno_sep
+                        ? $findData->vno_sep
+                        : '')
+                    : '');
             }
-
-            $this->dataDaftarPoliRJ['kontrol']['tglKontrol'] = $this->dataDaftarPoliRJ['kontrol']['tglKontrol']
-                ? $this->dataDaftarPoliRJ['kontrol']['tglKontrol']
-                : Carbon::now()->addDays(8)->format('d/m/Y');
-            $this->dataDaftarPoliRJ['kontrol']['drKontrol'] = $this->dataDaftarPoliRJ['kontrol']['drKontrol']
-                ? $this->dataDaftarPoliRJ['kontrol']['drKontrol']
-                : $this->dataDaftarPoliRJ['drId'];
-            $this->dataDaftarPoliRJ['kontrol']['drKontrolDesc'] = $this->dataDaftarPoliRJ['kontrol']['drKontrolDesc']
-                ? $this->dataDaftarPoliRJ['kontrol']['drKontrolDesc']
-                : $this->dataDaftarPoliRJ['drDesc'];
-            $this->dataDaftarPoliRJ['kontrol']['drKontrolBPJS'] =  $this->dataDaftarPoliRJ['kontrol']['drKontrolBPJS']
-                ? $this->dataDaftarPoliRJ['kontrol']['drKontrolBPJS']
-                : $this->dataDaftarPoliRJ['kddrbpjs'];
-            $this->dataDaftarPoliRJ['kontrol']['poliKontrol'] = $this->dataDaftarPoliRJ['kontrol']['poliKontrol']
-                ? $this->dataDaftarPoliRJ['kontrol']['poliKontrol']
-                : $this->dataDaftarPoliRJ['poliId'];
-            $this->dataDaftarPoliRJ['kontrol']['poliKontrolDesc'] = $this->dataDaftarPoliRJ['kontrol']['poliKontrolDesc']
-                ? $this->dataDaftarPoliRJ['kontrol']['poliKontrolDesc']
-                : $this->dataDaftarPoliRJ['poliDesc'];
-            $this->dataDaftarPoliRJ['kontrol']['poliKontrolBPJS'] = $this->dataDaftarPoliRJ['kontrol']['poliKontrolBPJS']
-                ? $this->dataDaftarPoliRJ['kontrol']['poliKontrolBPJS']
-                : $this->dataDaftarPoliRJ['kdpolibpjs'];
-            $this->dataDaftarPoliRJ['kontrol']['noSEP'] = $this->dataDaftarPoliRJ['kontrol']['noSEP']
-                ? $this->dataDaftarPoliRJ['kontrol']['noSEP']
-                : $findData->vno_sep;
         } else {
-
 
 
             $this->emit('toastr-error', "Json Tidak ditemukan, Data sedang diproses ulang.");
@@ -416,36 +426,44 @@ class SkdpRJ extends Component
 
             // jika kontrol tidak ditemukan tambah variable kontrol pda array
             if (isset($this->dataDaftarPoliRJ['kontrol']) == false) {
-                $this->dataDaftarPoliRJ['kontrol'] = $this->kontrol;
+
+                $this->dataDaftarPoliRJ['kontrol']['tglKontrol'] =  Carbon::now()->addDays(8)->format('d/m/Y');
+                $this->dataDaftarPoliRJ['kontrol']['drKontrol'] =  (isset($this->dataDaftarPoliRJ['drId'])
+                    ? ($this->dataDaftarPoliRJ['drId']
+                        ? $this->dataDaftarPoliRJ['drId']
+                        : '')
+                    : '');
+                $this->dataDaftarPoliRJ['kontrol']['drKontrolDesc'] = (isset($this->dataDaftarPoliRJ['drDesc'])
+                    ? ($this->dataDaftarPoliRJ['drDesc']
+                        ? $this->dataDaftarPoliRJ['drDesc']
+                        : '')
+                    : '');
+                $this->dataDaftarPoliRJ['kontrol']['drKontrolBPJS'] = (isset($this->dataDaftarPoliRJ['kddrbpjs'])
+                    ? ($this->dataDaftarPoliRJ['kddrbpjs']
+                        ? $this->dataDaftarPoliRJ['kddrbpjs']
+                        : '')
+                    : '');
+                $this->dataDaftarPoliRJ['kontrol']['poliKontrol'] = (isset($this->dataDaftarPoliRJ['poliId'])
+                    ? ($this->dataDaftarPoliRJ['poliId']
+                        ? $this->dataDaftarPoliRJ['poliId']
+                        : '')
+                    : '');
+                $this->dataDaftarPoliRJ['kontrol']['poliKontrolDesc'] = (isset($this->dataDaftarPoliRJ['poliDesc'])
+                    ? ($this->dataDaftarPoliRJ['poliDesc']
+                        ? $this->dataDaftarPoliRJ['poliDesc']
+                        : '')
+                    : '');
+                $this->dataDaftarPoliRJ['kontrol']['poliKontrolBPJS'] = (isset($this->dataDaftarPoliRJ['kdpolibpjs'])
+                    ? ($this->dataDaftarPoliRJ['kdpolibpjs']
+                        ? $this->dataDaftarPoliRJ['kdpolibpjs']
+                        : '')
+                    : '');
+                $this->dataDaftarPoliRJ['kontrol']['noSEP'] = (isset($dataDaftarPoliRJ->vno_sep)
+                    ? ($dataDaftarPoliRJ->vno_sep
+                        ? $dataDaftarPoliRJ->vno_sep
+                        : '')
+                    : '');
             }
-
-
-
-            // setDataKontrol
-            $this->dataDaftarPoliRJ['kontrol']['tglKontrol'] = $this->dataDaftarPoliRJ['kontrol']['tglKontrol']
-                ? $this->dataDaftarPoliRJ['kontrol']['tglKontrol']
-                : Carbon::now()->addDays(8)->format('d/m/Y');
-            $this->dataDaftarPoliRJ['kontrol']['drKontrol'] = $this->dataDaftarPoliRJ['kontrol']['drKontrol']
-                ? $this->dataDaftarPoliRJ['kontrol']['drKontrol']
-                : $dataDaftarPoliRJ->dr_id;
-            $this->dataDaftarPoliRJ['kontrol']['drKontrolDesc'] = $this->dataDaftarPoliRJ['kontrol']['drKontrolDesc']
-                ? $this->dataDaftarPoliRJ['kontrol']['drKontrolDesc']
-                : $dataDaftarPoliRJ->dr_name;
-            $this->dataDaftarPoliRJ['kontrol']['drKontrolBPJS'] =  $this->dataDaftarPoliRJ['kontrol']['drKontrolBPJS']
-                ? $this->dataDaftarPoliRJ['kontrol']['drKontrolBPJS']
-                : $dataDaftarPoliRJ->kd_dr_bpjs;
-            $this->dataDaftarPoliRJ['kontrol']['poliKontrol'] = $this->dataDaftarPoliRJ['kontrol']['poliKontrol']
-                ? $this->dataDaftarPoliRJ['kontrol']['poliKontrol']
-                : $dataDaftarPoliRJ->poli_id;
-            $this->dataDaftarPoliRJ['kontrol']['poliKontrolDesc'] = $this->dataDaftarPoliRJ['kontrol']['poliKontrolDesc']
-                ? $this->dataDaftarPoliRJ['kontrol']['poliKontrolDesc']
-                : $dataDaftarPoliRJ->poli_desc;
-            $this->dataDaftarPoliRJ['kontrol']['poliKontrolBPJS'] = $this->dataDaftarPoliRJ['kontrol']['poliKontrolBPJS']
-                ? $this->dataDaftarPoliRJ['kontrol']['poliKontrolBPJS']
-                : $dataDaftarPoliRJ->kd_poli_bpjs;
-            $this->dataDaftarPoliRJ['kontrol']['noSEP'] = $this->dataDaftarPoliRJ['kontrol']['noSEP']
-                ? $this->dataDaftarPoliRJ['kontrol']['noSEP']
-                : $dataDaftarPoliRJ->vno_sep;
         }
     }
 
