@@ -471,7 +471,11 @@ class SkdpRJ extends Component
     private function setDataPrimer(): void
     {
         $noKontrol = Carbon::now()->addDays(8)->format('dmY') . $this->dataDaftarPoliRJ['kontrol']['drKontrol'] . $this->dataDaftarPoliRJ['kontrol']['poliKontrol'];
-        $this->dataDaftarPoliRJ['kontrol']['noKontrolRS'] =  $this->dataDaftarPoliRJ['kontrol']['noKontrolRS'] ? $this->dataDaftarPoliRJ['kontrol']['noKontrolRS'] : $noKontrol;
+        $this->dataDaftarPoliRJ['kontrol']['noKontrolRS'] = (isset($this->dataDaftarPoliRJ['kontrol']['noKontrolRS'])
+            ? ($this->dataDaftarPoliRJ['kontrol']['noKontrolRS']
+                ? $this->dataDaftarPoliRJ['kontrol']['noKontrolRS']
+                : $noKontrol)
+            : $noKontrol);
     }
 
 

@@ -477,7 +477,11 @@ class SkdpRI extends Component
     private function setDataPrimer(): void
     {
         $noKontrol = Carbon::now()->addDays(8)->format('dmY') . $this->dataDaftarRi['kontrol']['drKontrol'] . $this->dataDaftarRi['kontrol']['poliKontrol'];
-        $this->dataDaftarRi['kontrol']['noKontrolRS'] =  $this->dataDaftarRi['kontrol']['noKontrolRS'] ? $this->dataDaftarRi['kontrol']['noKontrolRS'] : $noKontrol;
+        $this->dataDaftarRi['kontrol']['noKontrolRS'] = (isset($this->dataDaftarRi['kontrol']['noKontrolRS'])
+            ? ($this->dataDaftarRi['kontrol']['noKontrolRS']
+                ? $this->dataDaftarRi['kontrol']['noKontrolRS']
+                : $noKontrol)
+            : $noKontrol);
     }
 
 
