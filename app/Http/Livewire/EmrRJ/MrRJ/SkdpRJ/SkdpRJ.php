@@ -495,17 +495,19 @@ class SkdpRJ extends Component
 
             // jika SKDP kosong lakukan push data
             // insert
-            if (!$this->dataDaftarPoliRJ['kontrol']['noSKDPBPJS']) {
-                $HttpGetBpjs =  VclaimTrait::suratkontrol_insert($this->dataDaftarPoliRJ['kontrol'])->getOriginalContent();
+            if (!isset($this->dataDaftarPoliRJ['kontrol']['noSKDPBPJS'])) {
+                if (!$this->dataDaftarPoliRJ['kontrol']['noSKDPBPJS']) {
+                    $HttpGetBpjs =  VclaimTrait::suratkontrol_insert($this->dataDaftarPoliRJ['kontrol'])->getOriginalContent();
 
-                // 2 cek proses pada getHttp
-                if ($HttpGetBpjs['metadata']['code'] == 200) {
-                    $this->emit('toastr-success', 'KONTROL ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
-                    $this->dataDaftarPoliRJ['kontrol']['noSKDPBPJS'] = $HttpGetBpjs['response']['noSuratKontrol']; //status 200 201 400 ..
+                    // 2 cek proses pada getHttp
+                    if ($HttpGetBpjs['metadata']['code'] == 200) {
+                        $this->emit('toastr-success', 'KONTROL ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+                        $this->dataDaftarPoliRJ['kontrol']['noSKDPBPJS'] = $HttpGetBpjs['response']['noSuratKontrol']; //status 200 201 400 ..
 
-                    $this->emit('toastr-success', 'KONTROL ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
-                } else {
-                    $this->emit('toastr-error', 'KONTROL ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+                        $this->emit('toastr-success', 'KONTROL ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+                    } else {
+                        $this->emit('toastr-error', 'KONTROL ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+                    }
                 }
             } else {
                 // update

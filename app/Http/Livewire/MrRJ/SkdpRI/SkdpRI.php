@@ -502,17 +502,19 @@ class SkdpRI extends Component
 
             // jika SKDP kosong lakukan push data
             // insert
-            if (!$this->dataDaftarRi['kontrol']['noSKDPBPJS']) {
-                $HttpGetBpjs =  VclaimTrait::suratkontrol_insert($this->dataDaftarRi['kontrol'])->getOriginalContent();
+            if (!isset($this->dataDaftarRi['kontrol']['noSKDPBPJS'])) {
+                if (!$this->dataDaftarRi['kontrol']['noSKDPBPJS']) {
+                    $HttpGetBpjs =  VclaimTrait::suratkontrol_insert($this->dataDaftarRi['kontrol'])->getOriginalContent();
 
-                // 2 cek proses pada getHttp
-                if ($HttpGetBpjs['metadata']['code'] == 200) {
-                    $this->emit('toastr-success', 'KONTROL Post Inap' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
-                    $this->dataDaftarRi['kontrol']['noSKDPBPJS'] = $HttpGetBpjs['response']['noSuratKontrol']; //status 200 201 400 ..
+                    // 2 cek proses pada getHttp
+                    if ($HttpGetBpjs['metadata']['code'] == 200) {
+                        $this->emit('toastr-success', 'KONTROL Post Inap' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+                        $this->dataDaftarRi['kontrol']['noSKDPBPJS'] = $HttpGetBpjs['response']['noSuratKontrol']; //status 200 201 400 ..
 
-                    $this->emit('toastr-success', 'KONTROL Post Inap' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
-                } else {
-                    $this->emit('toastr-error', 'KONTROL Post Inap' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+                        $this->emit('toastr-success', 'KONTROL Post Inap' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+                    } else {
+                        $this->emit('toastr-error', 'KONTROL Post Inap' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+                    }
                 }
             } else {
                 // update
