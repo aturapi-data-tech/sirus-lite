@@ -503,6 +503,9 @@ class SkdpRI extends Component
             // jika SKDP kosong lakukan push data
             // insert
             if (!isset($this->dataDaftarRi['kontrol']['noSKDPBPJS'])) {
+
+                $this->dataDaftarRi['kontrol']['noSKDPBPJS'] = '';
+
                 if (!$this->dataDaftarRi['kontrol']['noSKDPBPJS']) {
                     $HttpGetBpjs =  VclaimTrait::suratkontrol_insert($this->dataDaftarRi['kontrol'])->getOriginalContent();
 

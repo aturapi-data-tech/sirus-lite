@@ -496,6 +496,9 @@ class SkdpRJ extends Component
             // jika SKDP kosong lakukan push data
             // insert
             if (!isset($this->dataDaftarPoliRJ['kontrol']['noSKDPBPJS'])) {
+
+                $this->dataDaftarPoliRJ['kontrol']['noSKDPBPJS'] = '';
+
                 if (!$this->dataDaftarPoliRJ['kontrol']['noSKDPBPJS']) {
                     $HttpGetBpjs =  VclaimTrait::suratkontrol_insert($this->dataDaftarPoliRJ['kontrol'])->getOriginalContent();
 
