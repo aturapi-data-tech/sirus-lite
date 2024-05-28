@@ -13,14 +13,8 @@
 
 
 
-
-
-
-
-
         <form class="scroll-smooth hover:scroll-auto">
             <div class="grid grid-cols-1">
-
 
 
 
@@ -116,8 +110,8 @@
                                 </div>
 
                                 {{-- <div wire:loading wire:target="dataDokterLovSearch">
-                                        <x-loading />
-                                    </div> --}}
+                                    <x-loading />
+                                </div> --}}
                                 {{-- LOV Dokter --}}
                                 <div class="mt-2">
                                     @include('livewire.mr-r-j.skdp-r-i.list-of-value-caridatadokter')

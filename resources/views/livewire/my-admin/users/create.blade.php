@@ -113,6 +113,12 @@
                             </div>
 
                             <div class="mt-4">
+                                <x-input-label for="myUserSIP" :value="__('myUsreSIP')" />
+                                <x-text-input id="myUserSIP" class="block w-full mt-1" wire:model="myData.myUserSIP" />
+                                <x-input-error :messages="$errors->get('myData.myUserSIP')" class="mt-2" />
+                            </div>
+
+                            <div class="mt-4">
                                 <x-input-label for="myUserTtdImage" :value="__('myUserTtdImage')" />
                                 <x-text-input id="myUserTtdImage" class="block w-full mt-1"
                                     wire:model="myData.myUserTtdImage" type="file" />

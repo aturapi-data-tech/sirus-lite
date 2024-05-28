@@ -249,6 +249,18 @@
                                 : 'Dokter Pemeriksa' }}
                         </span>
 
+                        <div>
+                            @isset($dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa'])
+                                @if ($dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa'])
+                                    @isset(App\Models\User::where('myuser_code', $dataDaftarPoliRJ['drId'])->first()->myuser_sip)
+                                        <span>
+                                            {{ App\Models\User::where('myuser_code', $dataDaftarPoliRJ['drId'])->first()->myuser_sip }}"
+                                        </span>
+                                    @endisset
+                                @endif
+                            @endisset
+                        </div>
+
                     </div>
                 </td>
             </tbody>

@@ -30,6 +30,7 @@ class Users extends Component
         'password_confirmation' => '',
         'myUserCode' => '',
         'myUserName' => '',
+        'myUserSIP' => '',
         'myUserTtdImage' => '',
     ];
 
@@ -59,7 +60,7 @@ class Users extends Component
     public bool $isOpen = false;
     public string $isOpenMode = 'insert';
     public bool $forceInsertRecord = false;
-    // 
+    //
     private function openModal(): void
     {
         $this->isOpen = true;
@@ -81,6 +82,7 @@ class Users extends Component
         // $this->myData['password_confirmation'] = $findData->name;
         $this->myData['myUserCode'] = $findData->myuser_code;
         $this->myData['myUserName'] = $findData->myuser_name;
+        $this->myData['myUserSIP'] = $findData->myuser_sip;
         $this->myData['myUserTtdImage'] = $findData->myuser_ttd_image;
     }
 
@@ -140,6 +142,7 @@ class Users extends Component
                 'password' => Hash::make($this->myData['password']),
                 'myuser_code' => $this->myData['myUserCode'],
                 'myuser_name' => $this->myData['myUserName'],
+                'myuser_sip' => $this->myData['myUserSIP'],
                 'myuser_ttd_image' => $myUserTtdImage,
             ]);
             //
@@ -169,6 +172,8 @@ class Users extends Component
                 'email' => $this->myData['email'],
                 'myuser_code' => $this->myData['myUserCode'],
                 'myuser_name' => $this->myData['myUserName'],
+                'myuser_sip' => $this->myData['myUserSIP'],
+
             ]);
         }
 
@@ -250,6 +255,7 @@ class Users extends Component
                 'password',
                 'myuser_code',
                 'myuser_ttd_image',
+                'myuser_sip',
                 'created_at',
                 'updated_at',
                 DB::raw('(select string_agg(roles.name) as myrole from roles,model_has_roles where roles.id=model_has_roles.role_id and model_id=users.id) as myrole'),

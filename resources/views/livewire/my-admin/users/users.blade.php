@@ -2,8 +2,8 @@
 
     {{-- Start Coding  --}}
 
-    {{-- Canvas 
-    Main BgColor / 
+    {{-- Canvas
+    Main BgColor /
     Size H/W --}}
     <div class="w-full h-[calc(100vh-68px)] bg-white border border-gray-200 px-16 pt-2">
 
@@ -117,6 +117,8 @@
                             </td> --}}
                             <td class="px-4 py-2">
                                 Name : {{ $myQData->name . ' / ' . $myQData->myuser_code }}
+                                <br>
+                                SIP : {{ $myQData->myuser_sip }}
                                 <br>
                                 <span class="text-lg font-semibold text-primary"> User : {{ $myQData->email }}</span>
                                 <br>
@@ -250,8 +252,8 @@
         </div>
     </div>
 
-    {{-- Canvas 
-    Main BgColor / 
+    {{-- Canvas
+    Main BgColor /
     Size H/W --}}
 
     {{-- End Coding --}}
