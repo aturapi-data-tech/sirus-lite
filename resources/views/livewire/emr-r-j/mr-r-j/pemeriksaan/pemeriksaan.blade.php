@@ -60,6 +60,14 @@
                                         @click="activeTab ='{{ 'Penunjang' }}'">{{ 'Penunjang' }}</label>
                                 </li>
 
+                                <li class="mr-2">
+                                    <label
+                                        class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
+                                        :class="activeTab === '{{ 'PenunjangHasil' }}' ?
+                                            'text-primary border-primary bg-gray-100' : ''"
+                                        @click="activeTab ='{{ 'PenunjangHasil' }}'">{{ 'Pelayanan Penunjang' }}</label>
+                                </li>
+
 
 
 
@@ -109,6 +117,15 @@
                             }"
                             x-show.transition.in.opacity.duration.600="activeTab === '{{ 'Penunjang' }}'">
                             @include('livewire.emr-r-j.mr-r-j.pemeriksaan.penunjangTab')
+
+                        </div>
+
+                        <div class="p-2 rounded-lg bg-gray-50 dark:bg-gray-800"
+                            :class="{
+                                'active': activeTab === '{{ 'PenunjangHasil' }}'
+                            }"
+                            x-show.transition.in.opacity.duration.600="activeTab === '{{ 'PenunjangHasil' }}'">
+                            @include('livewire.emr-r-j.mr-r-j.pemeriksaan.penunjangHasilTab')
 
                         </div>
 
