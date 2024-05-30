@@ -256,7 +256,7 @@
                                 @if ($dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa'])
                                     @isset(App\Models\User::where('myuser_code', $dataDaftarPoliRJ['drId'])->first()->myuser_sip)
                                         <span>
-                                            {{ App\Models\User::where('myuser_code', $dataDaftarPoliRJ['drId'])->first()->myuser_sip }}"
+                                            {{ App\Models\User::where('myuser_code', $dataDaftarPoliRJ['drId'])->first()->myuser_sip }}
                                         </span>
                                     @endisset
                                 @endif
