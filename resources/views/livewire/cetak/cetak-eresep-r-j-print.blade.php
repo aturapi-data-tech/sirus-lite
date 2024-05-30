@@ -112,6 +112,8 @@
                                 : ($dataDaftarPoliRJ['klaimId'] == 'KR'
                                     ? 'Kronis'
                                     : 'Asuransi Lain')) }}
+                        /
+                        {{ isset($dataDaftarPoliRJ['poliDesc']) ? $dataDaftarPoliRJ['poliDesc'] : '-' }}
                     </td>
                 </tr>
 
