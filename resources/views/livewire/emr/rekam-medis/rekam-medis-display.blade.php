@@ -108,14 +108,14 @@
 
                                                     @role(['Dokter', 'Admin'])
                                                         <div>
-                                                            <x-yellow-button
+                                                            {{-- <x-yellow-button
                                                                 wire:click.prevent="copyResep({{ $myQData->txn_no }},'{{ $myQData->layanan_status }}')"
                                                                 type="button" wire:loading.remove>
                                                                 Copy Terapi
                                                             </x-yellow-button>
                                                             <div wire:loading wire:target="copyResep">
                                                                 <x-loading />
-                                                            </div>
+                                                            </div> --}}
                                                         </div>
                                                     @endrole
                                                 </td>

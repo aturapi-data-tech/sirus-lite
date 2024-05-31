@@ -33,7 +33,7 @@ class AssessmentDokterPerencanaan extends Component
     // dataDaftarPoliRJ RJ
     public array $dataDaftarPoliRJ = [];
 
-    // data SKDP / perencanaan=>[] 
+    // data SKDP / perencanaan=>[]
     public array $perencanaan =
     [
         "terapiTab" => "Terapi",
@@ -224,7 +224,7 @@ class AssessmentDokterPerencanaan extends Component
         $dataDaftarPoliRJ_json = isset($findData->datadaftarpolirj_json) ? $findData->datadaftarpolirj_json   : null;
         // if meta_data_pasien_json = null
         // then cari Data Pasien By Key Collection (exception when no data found)
-        // 
+        //
         // else json_decode
         if ($dataDaftarPoliRJ_json) {
             $this->dataDaftarPoliRJ = json_decode($findData->datadaftarpolirj_json, true);
