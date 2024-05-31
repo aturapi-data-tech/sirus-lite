@@ -13,15 +13,13 @@ use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Spatie\ArrayToXml\ArrayToXml;
 
-
 class Perencanaan extends Component
 {
     use WithPagination;
 
     // listener from blade////////////////
     protected $listeners = [
-        'syncronizeAssessmentPerawatRJFindData' => 'mount'
-
+        'syncronizeAssessmentPerawatRJFindData' => 'mount',
     ];
 
     //////////////////////////////
@@ -32,94 +30,72 @@ class Perencanaan extends Component
     // dataDaftarPoliRJ RJ
     public array $dataDaftarPoliRJ = [];
 
-    // data SKDP / perencanaan=>[] 
-    public array $perencanaan =
-    [
-        "terapiTab" => "Terapi",
-        "terapi" => [
-            "terapi" => ""
+    // data SKDP / perencanaan=>[]
+    public array $perencanaan = [
+        'terapiTab' => 'Terapi',
+        'terapi' => [
+            'terapi' => '',
         ],
 
-        "tindakLanjutTab" => "Tindak Lanjut",
-        "tindakLanjut" => [
-            "tindakLanjut" => "",
-            "keteranganTindakLanjut" => "",
-            "tindakLanjutOptions" => [
-                ["tindakLanjut" => "MRS"],
-                ["tindakLanjut" => "Kontrol"],
-                ["tindakLanjut" => "Rujuk"],
-                ["tindakLanjut" => "Perawatan Selesai"],
-                ["tindakLanjut" => "Lain-lain"],
-            ],
-
+        'tindakLanjutTab' => 'Tindak Lanjut',
+        'tindakLanjut' => [
+            'tindakLanjut' => '',
+            'keteranganTindakLanjut' => '',
+            'tindakLanjutOptions' => [['tindakLanjut' => 'MRS'], ['tindakLanjut' => 'Kontrol'], ['tindakLanjut' => 'Rujuk'], ['tindakLanjut' => 'Perawatan Selesai'], ['tindakLanjut' => 'Lain-lain']],
         ],
 
-        "pengkajianMedisTab" => "Petugas Medis",
-        "pengkajianMedis" => [
-            "waktuPemeriksaan" => "",
-            "selesaiPemeriksaan" => "",
-            "drPemeriksa" => "",
+        'pengkajianMedisTab' => 'Petugas Medis',
+        'pengkajianMedis' => [
+            'waktuPemeriksaan' => '',
+            'selesaiPemeriksaan' => '',
+            'drPemeriksa' => '',
         ],
         // Kontrol pakai program lama
 
-        "rawatInapTab" => "Rawat Inap",
-        "rawatInap" => [
-            "noRef" => "",
-            "tanggal" => "", //dd/mm/yyyy
-            "keterangan" => "",
+        'rawatInapTab' => 'Rawat Inap',
+        'rawatInap' => [
+            'noRef' => '',
+            'tanggal' => '', //dd/mm/yyyy
+            'keterangan' => '',
         ],
 
-
-
-        "dischargePlanningTab" => "Discharge Planning",
-        "dischargePlanning" => [
-            "pelayananBerkelanjutan" => [
-                "pelayananBerkelanjutan" => "Tidak Ada",
-                "pelayananBerkelanjutanOption" => [
-                    ["pelayananBerkelanjutan" => "Tidak Ada"],
-                    ["pelayananBerkelanjutan" => "Ada"],
-                ],
+        'dischargePlanningTab' => 'Discharge Planning',
+        'dischargePlanning' => [
+            'pelayananBerkelanjutan' => [
+                'pelayananBerkelanjutan' => 'Tidak Ada',
+                'pelayananBerkelanjutanOption' => [['pelayananBerkelanjutan' => 'Tidak Ada'], ['pelayananBerkelanjutan' => 'Ada']],
             ],
-            "pelayananBerkelanjutanOpsi" => [
-                "rawatLuka" => [],
-                "dm" => [],
-                "ppok" => [],
-                "hivAids" => [],
-                "dmTerapiInsulin" => [],
-                "ckd" => [],
-                "tb" => [],
-                "stroke" => [],
-                "kemoterapi" => [],
+            'pelayananBerkelanjutanOpsi' => [
+                'rawatLuka' => [],
+                'dm' => [],
+                'ppok' => [],
+                'hivAids' => [],
+                'dmTerapiInsulin' => [],
+                'ckd' => [],
+                'tb' => [],
+                'stroke' => [],
+                'kemoterapi' => [],
             ],
 
-            "penggunaanAlatBantu" => [
-                "penggunaanAlatBantu" => "Tidak Ada",
-                "penggunaanAlatBantuOption" => [
-                    ["penggunaanAlatBantu" => "Tidak Ada"],
-                    ["penggunaanAlatBantu" => "Ada"],
-                ],
+            'penggunaanAlatBantu' => [
+                'penggunaanAlatBantu' => 'Tidak Ada',
+                'penggunaanAlatBantuOption' => [['penggunaanAlatBantu' => 'Tidak Ada'], ['penggunaanAlatBantu' => 'Ada']],
             ],
-            "penggunaanAlatBantuOpsi" => [
-                "kateterUrin" => [],
-                "ngt" => [],
-                "traechotomy" => [],
-                "colostomy" => [],
+            'penggunaanAlatBantuOpsi' => [
+                'kateterUrin' => [],
+                'ngt' => [],
+                'traechotomy' => [],
+                'colostomy' => [],
             ],
-        ]
+        ],
     ];
     //////////////////////////////////////////////////////////////////////
 
-
     protected $rules = [
-
         // 'dataDaftarPoliRJ.perencanaan.pengkajianMedis.waktuPemeriksaan' => 'required|date_format:d/m/Y H:i:s',
         // 'dataDaftarPoliRJ.perencanaan.pengkajianMedis.selesaiPemeriksaan' => 'required|date_format:d/m/Y H:i:s'
-        'dataDaftarPoliRJ.perencanaan.pengkajianMedis.drPemeriksa' => ''
-
-
+        'dataDaftarPoliRJ.perencanaan.pengkajianMedis.drPemeriksa' => '',
     ];
-
-
 
     ////////////////////////////////////////////////
     ///////////begin////////////////////////////////
@@ -133,29 +109,18 @@ class Perencanaan extends Component
         }
     }
 
-
-
-
     // resert input private////////////////
     private function resetInputFields(): void
     {
-
         // resert validation
         $this->resetValidation();
         // resert input kecuali
-        $this->resetExcept([
-            'rjNoRef'
-        ]);
+        $this->resetExcept(['rjNoRef']);
     }
-
-
-
-
 
     // ////////////////
     // RJ Logic
     // ////////////////
-
 
     // validate Data RJ//////////////////////////////////////////////////
     private function validateDataRJ(): void
@@ -164,21 +129,16 @@ class Perencanaan extends Component
         // $messages = customErrorMessagesTrait::messages();
         $messages = [];
 
-
         // $rules = [];
-
-
 
         // Proses Validasi///////////////////////////////////////////
         try {
             $this->validate($this->rules, $messages);
         } catch (\Illuminate\Validation\ValidationException $e) {
-
-            $this->emit('toastr-error', "Lakukan Pengecekan kembali Input Data.");
+            $this->emit('toastr-error', 'Lakukan Pengecekan kembali Input Data.');
             $this->validate($this->rules, $messages);
         }
     }
-
 
     // insert and update record start////////////////
     public function store()
@@ -196,34 +156,26 @@ class Perencanaan extends Component
 
     private function updateDataRJ($rjNo): void
     {
-
         // update table trnsaksi
         DB::table('rstxn_rjhdrs')
             ->where('rj_no', $rjNo)
             ->update([
                 'dataDaftarPoliRJ_json' => json_encode($this->dataDaftarPoliRJ, true),
                 'dataDaftarPoliRJ_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
-
             ]);
 
-        $this->emit('toastr-success', "Perencanaan berhasil disimpan.");
+        $this->emit('toastr-success', 'Perencanaan berhasil disimpan.');
     }
     // insert and update record end////////////////
 
-
     private function findData($rjno): void
     {
+        $findData = DB::table('rsview_rjkasir')->select('datadaftarpolirj_json', 'vno_sep')->where('rj_no', $rjno)->first();
 
-
-        $findData = DB::table('rsview_rjkasir')
-            ->select('datadaftarpolirj_json', 'vno_sep')
-            ->where('rj_no', $rjno)
-            ->first();
-
-        $dataDaftarPoliRJ_json = isset($findData->datadaftarpolirj_json) ? $findData->datadaftarpolirj_json   : null;
+        $dataDaftarPoliRJ_json = isset($findData->datadaftarpolirj_json) ? $findData->datadaftarpolirj_json : null;
         // if meta_data_pasien_json = null
         // then cari Data Pasien By Key Collection (exception when no data found)
-        // 
+        //
         // else json_decode
         if ($dataDaftarPoliRJ_json) {
             $this->dataDaftarPoliRJ = json_decode($findData->datadaftarpolirj_json, true);
@@ -233,8 +185,7 @@ class Perencanaan extends Component
                 $this->dataDaftarPoliRJ['perencanaan'] = $this->perencanaan;
             }
         } else {
-
-            $this->emit('toastr-error', "Data tidak dapat di proses json.");
+            $this->emit('toastr-error', 'Data tidak dapat di proses json.');
             $dataDaftarPoliRJ = DB::table('rsview_rjkasir')
                 ->select(
                     DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
@@ -269,73 +220,72 @@ class Perencanaan extends Component
                 ->first();
 
             $this->dataDaftarPoliRJ = [
-                "regNo" =>  $dataDaftarPoliRJ->reg_no,
+                'regNo' => $dataDaftarPoliRJ->reg_no,
 
-                "drId" =>  $dataDaftarPoliRJ->dr_id,
-                "drDesc" =>  $dataDaftarPoliRJ->dr_name,
+                'drId' => $dataDaftarPoliRJ->dr_id,
+                'drDesc' => $dataDaftarPoliRJ->dr_name,
 
-                "poliId" =>  $dataDaftarPoliRJ->poli_id,
-                "klaimId" => $dataDaftarPoliRJ->klaim_id,
-                "poliDesc" =>  $dataDaftarPoliRJ->poli_desc,
+                'poliId' => $dataDaftarPoliRJ->poli_id,
+                'klaimId' => $dataDaftarPoliRJ->klaim_id,
+                'poliDesc' => $dataDaftarPoliRJ->poli_desc,
 
-                "kddrbpjs" =>  $dataDaftarPoliRJ->kd_dr_bpjs,
-                "kdpolibpjs" =>  $dataDaftarPoliRJ->kd_poli_bpjs,
+                'kddrbpjs' => $dataDaftarPoliRJ->kd_dr_bpjs,
+                'kdpolibpjs' => $dataDaftarPoliRJ->kd_poli_bpjs,
 
-                "rjDate" =>  $dataDaftarPoliRJ->rj_date,
-                "rjNo" =>  $dataDaftarPoliRJ->rj_no,
-                "shift" =>  $dataDaftarPoliRJ->shift,
-                "noAntrian" =>  $dataDaftarPoliRJ->no_antrian,
-                "noBooking" =>  $dataDaftarPoliRJ->nobooking,
-                "slCodeFrom" => "02",
-                "passStatus" => "",
-                "rjStatus" =>  $dataDaftarPoliRJ->rj_status,
-                "txnStatus" =>  $dataDaftarPoliRJ->txn_status,
-                "ermStatus" =>  $dataDaftarPoliRJ->erm_status,
-                "cekLab" => "0",
-                "kunjunganInternalStatus" => "0",
-                "noReferensi" =>  $dataDaftarPoliRJ->reg_no,
-                "postInap" => [],
-                "internal12" => "1",
-                "internal12Desc" => "Faskes Tingkat 1",
-                "internal12Options" => [
+                'rjDate' => $dataDaftarPoliRJ->rj_date,
+                'rjNo' => $dataDaftarPoliRJ->rj_no,
+                'shift' => $dataDaftarPoliRJ->shift,
+                'noAntrian' => $dataDaftarPoliRJ->no_antrian,
+                'noBooking' => $dataDaftarPoliRJ->nobooking,
+                'slCodeFrom' => '02',
+                'passStatus' => '',
+                'rjStatus' => $dataDaftarPoliRJ->rj_status,
+                'txnStatus' => $dataDaftarPoliRJ->txn_status,
+                'ermStatus' => $dataDaftarPoliRJ->erm_status,
+                'cekLab' => '0',
+                'kunjunganInternalStatus' => '0',
+                'noReferensi' => $dataDaftarPoliRJ->reg_no,
+                'postInap' => [],
+                'internal12' => '1',
+                'internal12Desc' => 'Faskes Tingkat 1',
+                'internal12Options' => [
                     [
-                        "internal12" => "1",
-                        "internal12Desc" => "Faskes Tingkat 1"
+                        'internal12' => '1',
+                        'internal12Desc' => 'Faskes Tingkat 1',
                     ],
                     [
-                        "internal12" => "2",
-                        "internal12Desc" => "Faskes Tingkat 2 RS"
-                    ]
-                ],
-                "kontrol12" => "1",
-                "kontrol12Desc" => "Faskes Tingkat 1",
-                "kontrol12Options" => [
-                    [
-                        "kontrol12" => "1",
-                        "kontrol12Desc" => "Faskes Tingkat 1"
-                    ],
-                    [
-                        "kontrol12" => "2",
-                        "kontrol12Desc" => "Faskes Tingkat 2 RS"
+                        'internal12' => '2',
+                        'internal12Desc' => 'Faskes Tingkat 2 RS',
                     ],
                 ],
-                "taskIdPelayanan" => [
-                    "taskId1" => "",
-                    "taskId2" => "",
-                    "taskId3" =>  $dataDaftarPoliRJ->rj_date,
-                    "taskId4" => "",
-                    "taskId5" => "",
-                    "taskId6" => "",
-                    "taskId7" => "",
-                    "taskId99" => "",
+                'kontrol12' => '1',
+                'kontrol12Desc' => 'Faskes Tingkat 1',
+                'kontrol12Options' => [
+                    [
+                        'kontrol12' => '1',
+                        'kontrol12Desc' => 'Faskes Tingkat 1',
+                    ],
+                    [
+                        'kontrol12' => '2',
+                        'kontrol12Desc' => 'Faskes Tingkat 2 RS',
+                    ],
+                ],
+                'taskIdPelayanan' => [
+                    'taskId1' => '',
+                    'taskId2' => '',
+                    'taskId3' => $dataDaftarPoliRJ->rj_date,
+                    'taskId4' => '',
+                    'taskId5' => '',
+                    'taskId6' => '',
+                    'taskId7' => '',
+                    'taskId99' => '',
                 ],
                 'sep' => [
-                    "noSep" =>  $dataDaftarPoliRJ->vno_sep,
-                    "reqSep" => [],
-                    "resSep" => [],
-                ]
+                    'noSep' => $dataDaftarPoliRJ->vno_sep,
+                    'reqSep' => [],
+                    'resSep' => [],
+                ],
             ];
-
 
             // jika perencanaan tidak ditemukan tambah variable perencanaan pda array
             if (isset($this->dataDaftarPoliRJ['perencanaan']) == false) {
@@ -359,7 +309,6 @@ class Perencanaan extends Component
         $this->dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['selesaiPemeriksaan'] = $myTime;
     }
 
-
     private function validateDrPemeriksa()
     {
         // Validasi dulu
@@ -379,22 +328,19 @@ class Perencanaan extends Component
             'dataDaftarPoliRJ.pemeriksaan.nutrisi.lk' => 'numeric',
             'dataDaftarPoliRJ.pemeriksaan.nutrisi.lila' => 'numeric',
 
-
             'dataDaftarPoliRJ.anamnesa.pengkajianPerawatan.jamDatang' => 'required|date_format:d/m/Y H:i:s',
         ];
         // Proses Validasi///////////////////////////////////////////
         try {
             $this->validate($myRules, $messages);
         } catch (\Illuminate\Validation\ValidationException $e) {
-
-            $this->emit('toastr-error', "Anda tidak dapat melakukan TTD-E karena data pemeriksaan belum lengkap.");
+            $this->emit('toastr-error', 'Anda tidak dapat melakukan TTD-E karena data pemeriksaan belum lengkap.');
             $this->validate($myRules, $messages);
         }
         // Validasi dulu
     }
     public function setDrPemeriksa()
     {
-
         // $myRoles = json_decode(auth()->user()->roles, true);
         $myUserCodeActive = auth()->user()->myuser_code;
         $myUserNameActive = auth()->user()->myuser_name;
@@ -406,31 +352,22 @@ class Perencanaan extends Component
 
         if (auth()->user()->hasRole('Dokter')) {
             if ($this->dataDaftarPoliRJ['drId'] == $myUserCodeActive) {
-
                 if (isset($this->dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa'])) {
                     if (!$this->dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa']) {
-                        $this->dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa'] = (isset($this->dataDaftarPoliRJ['drDesc']) ?
-                            ($this->dataDaftarPoliRJ['drDesc'] ? $this->dataDaftarPoliRJ['drDesc']
-                                : 'Dokter pemeriksa')
-                            : 'Dokter pemeriksa-');
+                        $this->dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa'] = isset($this->dataDaftarPoliRJ['drDesc']) ? ($this->dataDaftarPoliRJ['drDesc'] ? $this->dataDaftarPoliRJ['drDesc'] : 'Dokter pemeriksa') : 'Dokter pemeriksa-';
                     }
                 } else {
-
                     $this->dataDaftarPoliRJ['perencanaan']['pengkajianMedisTab'] = 'Pengkajian Medis';
-                    $this->dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa'] = (isset($this->dataDaftarPoliRJ['drDesc']) ?
-                        ($this->dataDaftarPoliRJ['drDesc'] ? $this->dataDaftarPoliRJ['drDesc']
-                            : 'Dokter pemeriksa')
-                        : 'Dokter pemeriksa-');
+                    $this->dataDaftarPoliRJ['perencanaan']['pengkajianMedis']['drPemeriksa'] = isset($this->dataDaftarPoliRJ['drDesc']) ? ($this->dataDaftarPoliRJ['drDesc'] ? $this->dataDaftarPoliRJ['drDesc'] : 'Dokter pemeriksa') : 'Dokter pemeriksa-';
                 }
                 $this->store();
             } else {
-                $this->emit('toastr-error', "Anda tidak dapat melakukan TTD-E karena Bukan Pasien " . $myUserNameActive);
+                $this->emit('toastr-error', 'Anda tidak dapat melakukan TTD-E karena Bukan Pasien ' . $myUserNameActive);
             }
         } else {
-            $this->emit('toastr-error', "Anda tidak dapat melakukan TTD-E karena User Role " . $myUserNameActive . " Bukan Dokter");
+            $this->emit('toastr-error', 'Anda tidak dapat melakukan TTD-E karena User Role ' . $myUserNameActive . ' Bukan Dokter');
         }
     }
-
 
     // /////////////////eresep open////////////////////////
     public bool $isOpenEresepRJ = false;
@@ -448,16 +385,15 @@ class Perencanaan extends Component
         $this->isOpenModeEresepRJ = 'insert';
     }
 
-
-    public string $activeTabRacikanNonRacikan = "NonRacikan";
+    public string $activeTabRacikanNonRacikan = 'NonRacikan';
     public array $EmrMenuRacikanNonRacikan = [
         [
             'ermMenuId' => 'NonRacikan',
-            'ermMenuName' => 'NonRacikan'
+            'ermMenuName' => 'NonRacikan',
         ],
         [
             'ermMenuId' => 'Racikan',
-            'ermMenuName' => 'Racikan'
+            'ermMenuName' => 'Racikan',
         ],
     ];
 
@@ -468,21 +404,20 @@ class Perencanaan extends Component
 
             foreach ($this->dataDaftarPoliRJ['eresep'] as $key => $value) {
                 // NonRacikan
-                $eresep .=  'R/' . ' ' . $value['productName'] . ' | No. ' . $value['qty'] . ' | S ' . $value['catatanKhusus'] . PHP_EOL;
+
+                $eresep .= 'R/' . ' ' . $value['productName'] . ' | No. ' . $value['qty'] . ' | S ' . $value['signaX'] . 'dd' . $value['signaHari'] . ' (' . $value['catatanKhusus'] . ')' . PHP_EOL;
             }
-            $this->dataDaftarPoliRJ['perencanaan']['terapi']['terapi'] = $this->dataDaftarPoliRJ['perencanaan']['terapi']['terapi']
-                . $eresep;
+            $this->dataDaftarPoliRJ['perencanaan']['terapi']['terapi'] = $this->dataDaftarPoliRJ['perencanaan']['terapi']['terapi'] . $eresep;
         }
 
         if (isset($this->dataDaftarPoliRJ['eresepRacikan'])) {
             $eresepRacikan = '' . PHP_EOL;
             // Racikan
             foreach ($this->dataDaftarPoliRJ['eresepRacikan'] as $key => $value) {
-                $eresepRacikan .=  $value['noRacikan'] . '/ ' . $value['productName'] . ' ' . $value['sedia'] . ' | ' . $value['catatan'] . ' | No. ' . $value['qty'] . ' | S ' . $value['catatanKhusus'] . PHP_EOL;
-            };
+                $eresepRacikan .= $value['noRacikan'] . '/ ' . $value['productName'] . ' ' . $value['sedia'] . ' | ' . $value['catatan'] . ' | No. ' . $value['qty'] . ' | S ' . $value['catatanKhusus'] . PHP_EOL;
+            }
 
-            $this->dataDaftarPoliRJ['perencanaan']['terapi']['terapi'] = $this->dataDaftarPoliRJ['perencanaan']['terapi']['terapi']
-                . $eresepRacikan;
+            $this->dataDaftarPoliRJ['perencanaan']['terapi']['terapi'] = $this->dataDaftarPoliRJ['perencanaan']['terapi']['terapi'] . $eresepRacikan;
         }
 
         $this->store();
@@ -490,30 +425,21 @@ class Perencanaan extends Component
     }
     // /////////////////////////////////////////
 
-
     // when new form instance
     public function mount()
     {
         $this->findData($this->rjNoRef);
     }
 
-
-
     // select data start////////////////
     public function render()
     {
-
-        return view(
-            'livewire.emr-r-j.mr-r-j.perencanaan.perencanaan',
-            [
-                // 'RJpasiens' => $query->paginate($this->limitPerPage),
-                'myTitle' => 'Perencanaan',
-                'mySnipt' => 'Rekam Medis Pasien',
-                'myProgram' => 'Pasien Rawat Jalan',
-            ]
-        );
+        return view('livewire.emr-r-j.mr-r-j.perencanaan.perencanaan', [
+            // 'RJpasiens' => $query->paginate($this->limitPerPage),
+            'myTitle' => 'Perencanaan',
+            'mySnipt' => 'Rekam Medis Pasien',
+            'myProgram' => 'Pasien Rawat Jalan',
+        ]);
     }
     // select data end////////////////
-
-
 }

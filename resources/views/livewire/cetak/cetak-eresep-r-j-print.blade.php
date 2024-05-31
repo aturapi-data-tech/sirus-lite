@@ -179,7 +179,7 @@
                             </td>
 
                             <td class="w-1/5 text-center uppercase">
-                                {{ 'S ' . $eresep['catatanKhusus'] }}
+                                {{ 'S ' . $eresep['signaX'] . 'dd' . $eresep['signaHari'] . '  (' . $eresep['catatanKhusus'] . ')' }}
                             </td>
                         </tr>
                     @endforeach

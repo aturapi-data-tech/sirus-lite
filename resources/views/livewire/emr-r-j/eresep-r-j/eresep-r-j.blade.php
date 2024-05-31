@@ -91,8 +91,9 @@
 
                     @if ($collectingMyProduct)
                         {{-- collectingMyProduct / obat --}}
-                        <div class="grid grid-cols-12 gap-2 " x-data>
-                            <div class="col-span-1">
+                        <div class="flex items-baseline space-x-2" x-data>
+
+                            <div class="hidden">
                                 <x-input-label for="collectingMyProduct.productId" :value="__('Kode Obat')"
                                     :required="__(true)" />
 
@@ -107,7 +108,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-span-3">
+                            <div class="basis-3/6">
                                 <x-input-label for="collectingMyProduct.productName" :value="__('Nama Obat')"
                                     :required="__(true)" />
 
@@ -122,15 +123,15 @@
                                 </div>
                             </div>
 
-                            <div class="col-span-1">
-                                <x-input-label for="collectingMyProduct.qty" :value="__('Jml Obat')" :required="__(true)" />
+                            <div class="basis-1/12">
+                                <x-input-label for="collectingMyProduct.qty" :value="__('Jml')" :required="__(true)" />
 
                                 <div>
                                     <x-text-input id="collectingMyProduct.qty" placeholder="Jml Obat" class="mt-1 ml-2"
                                         :errorshas="__($errors->has('collectingMyProduct.qty'))" :disabled=$disabledPropertyRjStatus
                                         wire:model.debounce.500ms="collectingMyProduct.qty" x-init="$refs.collectingMyProductqty.focus()"
                                         x-ref="collectingMyProductqty"
-                                        x-on:keyup.enter="$refs.collectingMyProductcatatanKhusus.focus()" />
+                                        x-on:keyup.enter="$refs.collectingMyProductsignaX.focus()" />
 
                                     @error('collectingMyProduct.qty')
                                         <x-input-error :messages=$message />
@@ -138,7 +139,8 @@
                                 </div>
                             </div>
 
-                            <div class="hidden col-span-1">
+
+                            <div class="hidden ">
                                 <x-input-label for="collectingMyProduct.productPrice" :value="__('Harga Obat')"
                                     :required="__(true)" />
 
@@ -153,8 +155,47 @@
                                 </div>
                             </div>
 
-                            <div class="col-span-3">
-                                <x-input-label for="collectingMyProduct.catatanKhusus" :value="__('Signa')"
+                            <div class="basis-1/12">
+                                <x-input-label for="collectingMyProduct.signaX" :value="__('Signa')" :required="__(false)" />
+
+                                <div>
+                                    <x-text-input id="collectingMyProduct.signaX" placeholder="Signa1" class="mt-1 ml-2"
+                                        :errorshas="__($errors->has('collectingMyProduct.signaX'))" :disabled=$disabledPropertyRjStatus
+                                        wire:model="collectingMyProduct.signaX" x-ref="collectingMyProductsignaX"
+                                        x-on:keyup.enter="$refs.collectingMyProductsignaHari.focus()" />
+
+                                    @error('collectingMyProduct.signaX')
+                                        <x-input-error :messages=$message />
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="basis-[4%]">
+                                <x-input-label for="" :value="__('*')" :required="__(false)" />
+
+                                <div>
+                                    <span class="text-sm">{{ 'dd' }}</span>
+                                </div>
+                            </div>
+
+                            <div class="basis-1/12">
+                                <x-input-label for="collectingMyProduct.signaHari" :value="__('*')"
+                                    :required="__(false)" />
+
+                                <div>
+                                    <x-text-input id="collectingMyProduct.signaHari" placeholder="Signa2"
+                                        class="mt-1 ml-2" :errorshas="__($errors->has('collectingMyProduct.signaHari'))" :disabled=$disabledPropertyRjStatus
+                                        wire:model="collectingMyProduct.signaHari" x-ref="collectingMyProductsignaHari"
+                                        x-on:keyup.enter="$refs.collectingMyProductcatatanKhusus.focus()" />
+
+                                    @error('collectingMyProduct.signaHari')
+                                        <x-input-error :messages=$message />
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="basis-3/6">
+                                <x-input-label for="collectingMyProduct.catatanKhusus" :value="__('Catatan Khusus')"
                                     :required="__(true)" />
 
                                 <div>
@@ -171,7 +212,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-span-1">
+                            <div class="basis-1/6">
                                 <x-input-label for="" :value="__('Hapus')" :required="__(true)" />
 
                                 <x-alternative-button class="inline-flex ml-2"
@@ -196,7 +237,8 @@
                         <div class="overflow-x-auto rounded-lg">
                             <div class="inline-block min-w-full align-middle">
                                 <div class="overflow-hidden shadow sm:rounded-lg">
-                                    <table class="w-full text-sm text-left text-gray-500 table-auto dark:text-gray-400">
+                                    <table
+                                        class="w-full text-sm text-left text-gray-500 table-auto dark:text-gray-400">
                                         <thead
                                             class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
                                             <tr>
@@ -271,7 +313,7 @@
 
                                                         <td
                                                             class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                            {{ $eresep['catatanKhusus'] }}
+                                                            {{ $eresep['signaX'] . 'dd' . $eresep['signaHari'] . ' (' . $eresep['catatanKhusus'] . ')' }}
                                                         </td>
 
 

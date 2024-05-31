@@ -18,30 +18,23 @@ class EresepRJ extends Component
 {
     use WithPagination;
 
-
     // listener from blade////////////////
     protected $listeners = [
         'storeAssessmentDokterRJ' => 'store',
-        'syncronizeAssessmentDokterRJFindData' => 'mount'
+        'syncronizeAssessmentDokterRJFindData' => 'mount',
     ];
-
 
     //////////////////////////////
     // Ref on top bar
     //////////////////////////////
     public $rjNoRef = 472309;
 
-
-
     // dataDaftarPoliRJ RJ
     public array $dataDaftarPoliRJ = [];
 
     //////////////////////////////////////////////////////////////////////
 
-
     //  table LOV////////////////
-
-
 
     public $dataProductLov = [];
     public $dataProductLovStatus = 0;
@@ -49,12 +42,6 @@ class EresepRJ extends Component
     public $selecteddataProductLovIndex = 0;
 
     public $collectingMyProduct = [];
-
-
-
-
-
-
 
     ////////////////////////////////////////////////
     ///////////begin////////////////////////////////
@@ -64,9 +51,6 @@ class EresepRJ extends Component
         // dd($propertyName);
         // $this->validateOnly($propertyName);
     }
-
-
-
 
     /////////////////////////////////////////////////
     // Lov dataProductLov //////////////////////
@@ -79,64 +63,64 @@ class EresepRJ extends Component
 
     public function updateddataProductLovsearch()
     {
-
         // Reset index of LoV
         $this->reset(['selecteddataProductLovIndex', 'dataProductLov']);
         // Variable Search
         $search = $this->dataProductLovSearch;
 
-        // check LOV by dr_id rs id 
-        $dataProductLovs = DB::table('immst_products')->select(
-            'product_id',
-            'product_name',
-            'sales_price',
-            DB::raw("(select replace(string_agg(cont_desc),',','')||product_name 
-                                            from immst_productcontents z,immst_contents x 
-                                            where z.product_id=immst_products.product_id 
+        // check LOV by dr_id rs id
+        $dataProductLovs = DB::table('immst_products')
+            ->select(
+                'product_id',
+                'product_name',
+                'sales_price',
+                DB::raw("(select replace(string_agg(cont_desc),',','')||product_name
+                                            from immst_productcontents z,immst_contents x
+                                            where z.product_id=immst_products.product_id
                                             and z.cont_id=x.cont_id) as elasticSearch"),
-            DB::raw("(select string_agg(cont_desc) 
-                                            from immst_productcontents z,immst_contents x 
-                                            where z.product_id=immst_products.product_id 
-                                            and z.cont_id=x.cont_id) as product_content")
-        )
+                DB::raw("(select string_agg(cont_desc)
+                                            from immst_productcontents z,immst_contents x
+                                            where z.product_id=immst_products.product_id
+                                            and z.cont_id=x.cont_id) as product_content"),
+            )
             ->where('active_status', '1')
             ->where('product_id', $search)
             ->first();
 
         if ($dataProductLovs) {
-
             // set product sep
             $this->addProduct($dataProductLovs->product_id, $dataProductLovs->product_name, $dataProductLovs->sales_price);
             $this->resetdataProductLov();
         } else {
-
             // if there is no id found and check (min 3 char on search)
             if (strlen($search) < 3) {
                 $this->dataProductLov = [];
             } else {
-
-                $this->dataProductLov = DB::select("select * from (
+                $this->dataProductLov = DB::select(
+                    "select * from (
                     select product_id,
                     product_name,
                     sales_price,
 
-                    (select replace(string_agg(cont_desc),',','')||product_name 
-                    from immst_productcontents z,immst_contents x 
-                    where z.product_id=a.product_id 
+                    (select replace(string_agg(cont_desc),',','')||product_name
+                    from immst_productcontents z,immst_contents x
+                    where z.product_id=a.product_id
                     and z.cont_id=x.cont_id)elasticsearch,
 
                     (select string_agg(cont_desc)
-                    from immst_productcontents z,immst_contents x 
-                    where z.product_id=a.product_id 
+                    from immst_productcontents z,immst_contents x
+                    where z.product_id=a.product_id
                     and z.cont_id=x.cont_id)product_content
 
                     from immst_products a
-                    where active_status='1' 
-                    group by product_id,product_name, sales_price 
+                    where active_status='1'
+                    group by product_id,product_name, sales_price
                     order by product_name)
 
                 where upper(elasticsearch) like '%'||:search||'%'
-                    ", ['search' => strtoupper($search)]);
+                    ",
+                    ['search' => strtoupper($search)],
+                );
 
                 $this->dataProductLov = json_decode(json_encode($this->dataProductLov, true), true);
             }
@@ -149,19 +133,20 @@ class EresepRJ extends Component
     public function setMydataProductLov($id)
     {
         $this->checkRjStatus();
-        $dataProductLovs = DB::table('immst_products')->select(
-            'product_id',
-            'product_name',
-            'sales_price',
-            DB::raw("(select replace(string_agg(cont_desc),',','')||product_name 
-                                                            from immst_productcontents z,immst_contents x 
-                                                            where z.product_id=immst_products.product_id 
+        $dataProductLovs = DB::table('immst_products')
+            ->select(
+                'product_id',
+                'product_name',
+                'sales_price',
+                DB::raw("(select replace(string_agg(cont_desc),',','')||product_name
+                                                            from immst_productcontents z,immst_contents x
+                                                            where z.product_id=immst_products.product_id
                                                             and z.cont_id=x.cont_id) as elasticSearch"),
-            DB::raw("(select string_agg(cont_desc) 
-                                                            from immst_productcontents z,immst_contents x 
-                                                            where z.product_id=immst_products.product_id 
-                                                            and z.cont_id=x.cont_id) as product_content")
-        )
+                DB::raw("(select string_agg(cont_desc)
+                                                            from immst_productcontents z,immst_contents x
+                                                            where z.product_id=immst_products.product_id
+                                                            and z.cont_id=x.cont_id) as product_content"),
+            )
             ->where('active_status', '1')
             ->where('product_id', $this->dataProductLov[$id]['product_id'])
             ->first();
@@ -178,7 +163,7 @@ class EresepRJ extends Component
 
     public function selectNextdataProductLov()
     {
-        if ($this->selecteddataProductLovIndex === "") {
+        if ($this->selecteddataProductLovIndex === '') {
             $this->selecteddataProductLovIndex = 0;
         } else {
             $this->selecteddataProductLovIndex++;
@@ -191,8 +176,7 @@ class EresepRJ extends Component
 
     public function selectPreviousdataProductLov()
     {
-
-        if ($this->selecteddataProductLovIndex === "") {
+        if ($this->selecteddataProductLovIndex === '') {
             $this->selecteddataProductLovIndex = count($this->dataProductLov) - 1;
         } else {
             $this->selecteddataProductLovIndex--;
@@ -211,21 +195,14 @@ class EresepRJ extends Component
             $this->addProduct($this->dataProductLov[$id]['product_id'], $this->dataProductLov[$id]['product_name'], $this->dataProductLov[$id]['sales_price']);
             $this->resetdataProductLov();
         } else {
-            $this->emit('toastr-error', "Data Obat belum tersedia.");
+            $this->emit('toastr-error', 'Data Obat belum tersedia.');
         }
     }
-
 
     // LOV selected end
     /////////////////////////////////////////////////
     // Lov dataProductLov //////////////////////
     ////////////////////////////////////////////////
-
-
-
-
-
-
 
     // insert and update record start////////////////
     public function store()
@@ -240,7 +217,6 @@ class EresepRJ extends Component
 
     private function updateDataRJ($rjNo): void
     {
-
         // update table trnsaksi
         DB::table('rstxn_rjhdrs')
             ->where('rj_no', $rjNo)
@@ -249,22 +225,18 @@ class EresepRJ extends Component
                 'dataDaftarPoliRJ_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
             ]);
 
-        $this->emit('toastr-success', "Eresep berhasil disimpan.");
+        $this->emit('toastr-success', 'Eresep berhasil disimpan.');
     }
     // insert and update record end////////////////
 
-
     private function findData($rjno): void
     {
-        $findData = DB::table('rsview_rjkasir')
-            ->select('datadaftarpolirj_json', 'vno_sep')
-            ->where('rj_no', $rjno)
-            ->first();
+        $findData = DB::table('rsview_rjkasir')->select('datadaftarpolirj_json', 'vno_sep')->where('rj_no', $rjno)->first();
 
-        $dataDaftarPoliRJ_json = isset($findData->datadaftarpolirj_json) ? $findData->datadaftarpolirj_json   : null;
+        $dataDaftarPoliRJ_json = isset($findData->datadaftarpolirj_json) ? $findData->datadaftarpolirj_json : null;
         // if meta_data_pasien_json = null
         // then cari Data Pasien By Key Collection (exception when no data found)
-        // 
+        //
         // else json_decode
         if ($dataDaftarPoliRJ_json) {
             $this->dataDaftarPoliRJ = json_decode($findData->datadaftarpolirj_json, true);
@@ -274,8 +246,7 @@ class EresepRJ extends Component
                 $this->dataDaftarPoliRJ['eresep'] = [];
             }
         } else {
-
-            $this->emit('toastr-error', "Data tidak dapat di proses json.");
+            $this->emit('toastr-error', 'Data tidak dapat di proses json.');
             $dataDaftarPoliRJ = DB::table('rsview_rjkasir')
                 ->select(
                     DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
@@ -310,73 +281,72 @@ class EresepRJ extends Component
                 ->first();
 
             $this->dataDaftarPoliRJ = [
-                "regNo" =>  $dataDaftarPoliRJ->reg_no,
+                'regNo' => $dataDaftarPoliRJ->reg_no,
 
-                "drId" =>  $dataDaftarPoliRJ->dr_id,
-                "drDesc" =>  $dataDaftarPoliRJ->dr_name,
+                'drId' => $dataDaftarPoliRJ->dr_id,
+                'drDesc' => $dataDaftarPoliRJ->dr_name,
 
-                "poliId" =>  $dataDaftarPoliRJ->poli_id,
-                "klaimId" => $dataDaftarPoliRJ->klaim_id,
+                'poliId' => $dataDaftarPoliRJ->poli_id,
+                'klaimId' => $dataDaftarPoliRJ->klaim_id,
                 // "poliDesc" =>  $dataDaftarPoliRJ->poli_desc ,
 
                 // "kddrbpjs" =>  $dataDaftarPoliRJ->kd_dr_bpjs ,
                 // "kdpolibpjs" =>  $dataDaftarPoliRJ->kd_poli_bpjs ,
 
-                "rjDate" =>  $dataDaftarPoliRJ->rj_date,
-                "rjNo" =>  $dataDaftarPoliRJ->rj_no,
-                "shift" =>  $dataDaftarPoliRJ->shift,
-                "noAntrian" =>  $dataDaftarPoliRJ->no_antrian,
-                "noBooking" =>  $dataDaftarPoliRJ->nobooking,
-                "slCodeFrom" => "02",
-                "passStatus" => "",
-                "rjStatus" =>  $dataDaftarPoliRJ->rj_status,
-                "txnStatus" =>  $dataDaftarPoliRJ->txn_status,
-                "ermStatus" =>  $dataDaftarPoliRJ->erm_status,
-                "cekLab" => "0",
-                "kunjunganInternalStatus" => "0",
-                "noReferensi" =>  $dataDaftarPoliRJ->reg_no,
-                "postInap" => [],
-                "internal12" => "1",
-                "internal12Desc" => "Faskes Tingkat 1",
-                "internal12Options" => [
+                'rjDate' => $dataDaftarPoliRJ->rj_date,
+                'rjNo' => $dataDaftarPoliRJ->rj_no,
+                'shift' => $dataDaftarPoliRJ->shift,
+                'noAntrian' => $dataDaftarPoliRJ->no_antrian,
+                'noBooking' => $dataDaftarPoliRJ->nobooking,
+                'slCodeFrom' => '02',
+                'passStatus' => '',
+                'rjStatus' => $dataDaftarPoliRJ->rj_status,
+                'txnStatus' => $dataDaftarPoliRJ->txn_status,
+                'ermStatus' => $dataDaftarPoliRJ->erm_status,
+                'cekLab' => '0',
+                'kunjunganInternalStatus' => '0',
+                'noReferensi' => $dataDaftarPoliRJ->reg_no,
+                'postInap' => [],
+                'internal12' => '1',
+                'internal12Desc' => 'Faskes Tingkat 1',
+                'internal12Options' => [
                     [
-                        "internal12" => "1",
-                        "internal12Desc" => "Faskes Tingkat 1"
+                        'internal12' => '1',
+                        'internal12Desc' => 'Faskes Tingkat 1',
                     ],
                     [
-                        "internal12" => "2",
-                        "internal12Desc" => "Faskes Tingkat 2 RS"
-                    ]
-                ],
-                "kontrol12" => "1",
-                "kontrol12Desc" => "Faskes Tingkat 1",
-                "kontrol12Options" => [
-                    [
-                        "kontrol12" => "1",
-                        "kontrol12Desc" => "Faskes Tingkat 1"
-                    ],
-                    [
-                        "kontrol12" => "2",
-                        "kontrol12Desc" => "Faskes Tingkat 2 RS"
+                        'internal12' => '2',
+                        'internal12Desc' => 'Faskes Tingkat 2 RS',
                     ],
                 ],
-                "taskIdPelayanan" => [
-                    "taskId1" => "",
-                    "taskId2" => "",
-                    "taskId3" =>  $dataDaftarPoliRJ->rj_date,
-                    "taskId4" => "",
-                    "taskId5" => "",
-                    "taskId6" => "",
-                    "taskId7" => "",
-                    "taskId99" => "",
+                'kontrol12' => '1',
+                'kontrol12Desc' => 'Faskes Tingkat 1',
+                'kontrol12Options' => [
+                    [
+                        'kontrol12' => '1',
+                        'kontrol12Desc' => 'Faskes Tingkat 1',
+                    ],
+                    [
+                        'kontrol12' => '2',
+                        'kontrol12Desc' => 'Faskes Tingkat 2 RS',
+                    ],
+                ],
+                'taskIdPelayanan' => [
+                    'taskId1' => '',
+                    'taskId2' => '',
+                    'taskId3' => $dataDaftarPoliRJ->rj_date,
+                    'taskId4' => '',
+                    'taskId5' => '',
+                    'taskId6' => '',
+                    'taskId7' => '',
+                    'taskId99' => '',
                 ],
                 'sep' => [
-                    "noSep" =>  $dataDaftarPoliRJ->vno_sep,
-                    "reqSep" => [],
-                    "resSep" => [],
-                ]
+                    'noSep' => $dataDaftarPoliRJ->vno_sep,
+                    'reqSep' => [],
+                    'resSep' => [],
+                ],
             ];
-
 
             // jika eresep tidak ditemukan tambah variable eresep pda array
             if (isset($this->dataDaftarPoliRJ['eresep']) == false) {
@@ -385,16 +355,12 @@ class EresepRJ extends Component
         }
     }
 
-
     private function setDataPrimer(): void
     {
     }
 
-
-
     private function addProduct($productId, $productName, $salesPrice): void
     {
-
         $this->collectingMyProduct = [
             'productId' => $productId,
             'productName' => $productName,
@@ -403,26 +369,24 @@ class EresepRJ extends Component
             'signaHari' => 1,
             'qty' => 1,
             'productPrice' => $salesPrice,
-            'catatanKhusus' => '-',
+            'catatanKhusus' => '',
         ];
     }
 
     public function insertProduct(): void
     {
-
         // validate
         // customErrorMessages
         $messages = customErrorMessagesTrait::messages();
         // require nik ketika pasien tidak dikenal
         $rules = [
-            "collectingMyProduct.productId" => 'bail|required|',
-            "collectingMyProduct.productName" => 'bail|required|',
-            "collectingMyProduct.signaX" => 'bail|required|numeric|min:1|max:5',
-            "collectingMyProduct.signaHari" => 'bail|required|numeric|min:1|max:5',
-            "collectingMyProduct.qty" => 'bail|required|digits_between:1,3|',
-            "collectingMyProduct.productPrice" => 'bail|required|numeric|',
-            "collectingMyProduct.catatanKhusus" => 'bail|',
-
+            'collectingMyProduct.productId' => 'bail|required|',
+            'collectingMyProduct.productName' => 'bail|required|',
+            'collectingMyProduct.signaX' => 'bail|required|',
+            'collectingMyProduct.signaHari' => 'bail|required|',
+            'collectingMyProduct.qty' => 'bail|required|digits_between:1,3|',
+            'collectingMyProduct.productPrice' => 'bail|required|numeric|',
+            'collectingMyProduct.catatanKhusus' => 'bail|',
         ];
 
         // Proses Validasi///////////////////////////////////////////
@@ -430,31 +394,27 @@ class EresepRJ extends Component
 
         // validate
 
-
         // pengganti race condition
         // start:
         try {
             // select nvl(max(rjobat_dtl)+1,1) into :rstxn_rjobats.rjobat_dtl from rstxn_rjobats;
 
-            $lastInserted = DB::table('rstxn_rjobats')
-                ->select(DB::raw("nvl(max(rjobat_dtl)+1,1) as rjobat_dtl_max"))
-                ->first();
+            $lastInserted = DB::table('rstxn_rjobats')->select(DB::raw('nvl(max(rjobat_dtl)+1,1) as rjobat_dtl_max'))->first();
             // insert into table transaksi
-            DB::table('rstxn_rjobats')
-                ->insert([
-                    'rjobat_dtl' => $lastInserted->rjobat_dtl_max,
-                    'rj_no' => $this->rjNoRef,
-                    'product_id' => $this->collectingMyProduct['productId'],
-                    'qty' => $this->collectingMyProduct['qty'],
-                    'price' => $this->collectingMyProduct['productPrice'],
-                    'rj_carapakai' => $this->collectingMyProduct['signaX'],
-                    'rj_kapsul' => $this->collectingMyProduct['signaHari'],
-                    'rj_takar' => 'Tablet',
-                    'catatan_khusus' => $this->collectingMyProduct['catatanKhusus'],
-                    'exp_date' => DB::raw("to_date('" . $this->dataDaftarPoliRJ['rjDate'] . "','dd/mm/yyyy hh24:mi:ss')+30"),
-                    'etiket_status' => 1,
-                ]);
-
+            DB::table('rstxn_rjobats')->insert([
+                'rjobat_dtl' => $lastInserted->rjobat_dtl_max,
+                'rj_no' => $this->rjNoRef,
+                'product_id' => $this->collectingMyProduct['productId'],
+                'qty' => $this->collectingMyProduct['qty'],
+                'price' => $this->collectingMyProduct['productPrice'],
+                'rj_carapakai' => $this->collectingMyProduct['signaX'],
+                'rj_kapsul' => $this->collectingMyProduct['signaHari'],
+                'rj_takar' => 'Tablet',
+                'catatan_khusus' => $this->collectingMyProduct['catatanKhusus'],
+                'rj_ket' => $this->collectingMyProduct['catatanKhusus'],
+                'exp_date' => DB::raw("to_date('" . $this->dataDaftarPoliRJ['rjDate'] . "','dd/mm/yyyy hh24:mi:ss')+30"),
+                'etiket_status' => 1,
+            ]);
 
             $this->dataDaftarPoliRJ['eresep'][] = [
                 'productId' => $this->collectingMyProduct['productId'],
@@ -472,7 +432,6 @@ class EresepRJ extends Component
             $this->store();
             $this->reset(['collectingMyProduct']);
 
-
             //
         } catch (Exception $e) {
             // display an error to user
@@ -483,23 +442,19 @@ class EresepRJ extends Component
 
     public function removeProduct($rjObatDtl)
     {
-
         $this->checkRjStatus();
-
 
         // pengganti race condition
         // start:
         try {
             // remove into table transaksi
-            DB::table('rstxn_rjobats')
-                ->where('rjobat_dtl', $rjObatDtl)
-                ->delete();
+            DB::table('rstxn_rjobats')->where('rjobat_dtl', $rjObatDtl)->delete();
 
-
-            $Product = collect($this->dataDaftarPoliRJ['eresep'])->where("rjObatDtl", '!=', $rjObatDtl)->toArray();
+            $Product = collect($this->dataDaftarPoliRJ['eresep'])
+                ->where('rjObatDtl', '!=', $rjObatDtl)
+                ->toArray();
             $this->dataDaftarPoliRJ['eresep'] = $Product;
             $this->store();
-
 
             //
         } catch (Exception $e) {
@@ -507,8 +462,6 @@ class EresepRJ extends Component
             dd($e->getMessage());
         }
         // goto start;
-
-
     }
 
     public function resetcollectingMyProduct()
@@ -524,11 +477,10 @@ class EresepRJ extends Component
             ->first();
 
         if ($lastInserted->rj_status !== 'A') {
-            $this->emit('toastr-error', "Pasien Sudah Pulang, Trasaksi Terkunci.");
-            return (dd('Pasien Sudah Pulang, Trasaksi Terkuncixx.'));
+            $this->emit('toastr-error', 'Pasien Sudah Pulang, Trasaksi Terkunci.');
+            return dd('Pasien Sudah Pulang, Trasaksi Terkuncixx.');
         }
     }
-
 
     // when new form instance
     public function mount()
@@ -537,23 +489,15 @@ class EresepRJ extends Component
         // set data dokter ref
     }
 
-
-
     // select data start////////////////
     public function render()
     {
-
-        return view(
-            'livewire.emr-r-j.eresep-r-j.eresep-r-j',
-            [
-                // 'RJpasiens' => $query->paginate($this->limitPerPage),
-                'myTitle' => 'Data Pasien Rawat Jalan',
-                'mySnipt' => 'Rekam Medis Pasien',
-                'myProgram' => 'ICD 10',
-            ]
-        );
+        return view('livewire.emr-r-j.eresep-r-j.eresep-r-j', [
+            // 'RJpasiens' => $query->paginate($this->limitPerPage),
+            'myTitle' => 'Data Pasien Rawat Jalan',
+            'mySnipt' => 'Rekam Medis Pasien',
+            'myProgram' => 'ICD 10',
+        ]);
     }
     // select data end////////////////
-
-
 }

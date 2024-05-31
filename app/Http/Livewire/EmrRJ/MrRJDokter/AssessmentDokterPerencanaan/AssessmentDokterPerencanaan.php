@@ -467,7 +467,7 @@ class AssessmentDokterPerencanaan extends Component
 
             foreach ($this->dataDaftarPoliRJ['eresep'] as $key => $value) {
                 // NonRacikan
-                $eresep .=  'R/' . ' ' . $value['productName'] . ' | No. ' . $value['qty'] . ' | S ' . $value['catatanKhusus'] . PHP_EOL;
+                $eresep .=  'R/' . ' ' . $value['productName'] . ' | No. ' . $value['qty'] . ' | S ' .  $value['signaX'] . 'dd' . $value['signaHari'] . ' (' . $value['catatanKhusus'] . ')' . PHP_EOL;
             }
             $this->dataDaftarPoliRJ['perencanaan']['terapi']['terapi'] = $this->dataDaftarPoliRJ['perencanaan']['terapi']['terapi']
                 . $eresep;
