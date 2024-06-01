@@ -156,6 +156,11 @@
                                         </form>
                                     </div>
                                     <div>
+                                        <form wire:submit.prevent="assignRoleApoteker({{ $myQData->id }})">
+                                            <x-primary-button type="submit">RoleApoteker</x-primary-button>
+                                        </form>
+                                    </div>
+                                    <div>
                                         <form wire:submit.prevent="assignRoleAdmin({{ $myQData->id }})">
                                             <x-primary-button type="submit">RoleAdmin</x-primary-button>
                                         </form>
@@ -178,6 +183,11 @@
                                     <div>
                                         <form wire:submit.prevent="removeRoleMr({{ $myQData->id }})">
                                             <x-light-button type="submit">HapusRoleMr</x-light-button>
+                                        </form>
+                                    </div>
+                                    <div>
+                                        <form wire:submit.prevent="removeRoleApoteker({{ $myQData->id }})">
+                                            <x-light-button type="submit">HapusRoleApoteker</x-light-button>
                                         </form>
                                     </div>
                                     <div>

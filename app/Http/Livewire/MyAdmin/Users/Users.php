@@ -200,6 +200,12 @@ class Users extends Component
         $user = $user->where('id', $id)->first();
         $user->assignRole('Mr');
     }
+    public function assignRoleApoteker($id)
+    {
+        $user = new User;
+        $user = $user->where('id', $id)->first();
+        $user->assignRole('Apoteker');
+    }
     public function assignRoleAdmin($id)
     {
         $user = new User;
@@ -228,6 +234,12 @@ class Users extends Component
         $user = new User;
         $user = $user->where('id', $id)->first();
         $user->removeRole('Mr');
+    }
+    public function removeRoleApoteker($id)
+    {
+        $user = new User;
+        $user = $user->where('id', $id)->first();
+        $user->removeRole('Apoteker');
     }
     public function removeRoleAdmin($id)
     {
