@@ -145,9 +145,19 @@ class TelaahResepRJ extends Component
 
     public int $rjNoRef;
     public string $regNoRef;
+
+    public int $sumRsAdmin;
+    public int $sumRjAdmin;
+    public int $sumPoliPrice;
+
+    public int $sumJasaKaryawan;
     public int $sumJasaDokter;
     public int $sumJasaMedis;
-    public int $sumJasaKaryawan;
+
+    public int $sumObat;
+    public int $sumLaboratorium;
+    public int $sumRadiologi;
+
     public int $sumLainLain;
 
     public int $sumTotalRJ;
@@ -222,6 +232,10 @@ class TelaahResepRJ extends Component
             'ermMenuName' => 'Jasa Medis'
         ],
         [
+            'ermMenuId' => 'Obat',
+            'ermMenuName' => 'Obat'
+        ],
+        [
             'ermMenuId' => 'Laboratorium',
             'ermMenuName' => 'Laboratorium'
         ],
@@ -246,36 +260,41 @@ class TelaahResepRJ extends Component
 
     public function sumAll()
     {
-        $this->sumJD();
-        $this->sumJM();
-        $this->sumJK();
-        $this->sumLainLain();
-        $this->sumTotalRJ = $this->sumJasaDokter + $this->sumJasaMedis + $this->sumJasaKaryawan + $this->sumLainLain;
+        $this->sumAdmin();
     }
 
-    private function sumJD()
+    private function sumAdmin()
     {
-        $sumJasaDokter = $this->findData($this->rjNoRef);
-        $this->sumJasaDokter = collect($sumJasaDokter['JasaDokter'])->sum('JasaDokterPrice');
+        $sumAdmin = $this->findData($this->rjNoRef);
+
+        $this->sumRsAdmin = $sumAdmin['rsAdmin'];
+        $this->sumRjAdmin = $sumAdmin['rjAdmin'];
+        $this->sumPoliPrice = $sumAdmin['poliPrice'];
+
+        $this->sumJasaKaryawan = collect($sumAdmin['JasaKaryawan'])->sum('JasaKaryawanPrice');
+        $this->sumJasaMedis = collect($sumAdmin['JasaMedis'])->sum('JasaMedisPrice');
+        $this->sumJasaDokter = collect($sumAdmin['JasaDokter'])->sum('JasaDokterPrice');
+
+        $this->sumObat = collect($sumAdmin['rjObat'])->sum((function ($obat) {
+            return $obat['qty'] * $obat['price'];
+        }));
+
+        $this->sumLaboratorium = collect($sumAdmin['rjLab'])->sum((function ($obat) {
+            return $obat['lab_price'];
+        }));
+
+        $this->sumRadiologi = collect($sumAdmin['rjRad'])->sum((function ($obat) {
+            return $obat['rad_price'];
+        }));
+
+        $this->sumLainLain = collect($sumAdmin['LainLain'])->sum('LainLainPrice');
+
+
+        $this->sumTotalRJ = $this->sumPoliPrice + $this->sumRjAdmin + $this->sumRsAdmin  + $this->sumJasaKaryawan + $this->sumJasaDokter + $this->sumJasaMedis + $this->sumLainLain + $this->sumObat + $this->sumLaboratorium + $this->sumRadiologi;
     }
 
-    private function sumJM()
-    {
-        $sumJasaMedis = $this->findData($this->rjNoRef);
-        $this->sumJasaMedis = collect($sumJasaMedis['JasaMedis'])->sum('JasaMedisPrice');
-    }
 
-    private function sumJK()
-    {
-        $sumJasaKaryawan = $this->findData($this->rjNoRef);
-        $this->sumJasaKaryawan = collect($sumJasaKaryawan['JasaKaryawan'])->sum('JasaKaryawanPrice');
-    }
 
-    private function sumLainLain()
-    {
-        $sumLainLain = $this->findData($this->rjNoRef);
-        $this->sumLainLain = collect($sumLainLain['LainLain'])->sum('LainLainPrice');
-    }
 
     private function findData($rjno): array
     {
@@ -284,13 +303,45 @@ class TelaahResepRJ extends Component
             ->where('rj_no', $rjno)
             ->first();
 
+
         $dataDaftarPoliRJ_json = isset($findData->datadaftarpolirj_json) ? $findData->datadaftarpolirj_json   : null;
         // if meta_data_pasien_json = null
         // then cari Data Pasien By Key Collection (exception when no data found)
         //
         // else json_decode
         if ($dataDaftarPoliRJ_json) {
-            return (json_decode($findData->datadaftarpolirj_json, true));
+            $rsAdmin = DB::table('rstxn_rjhdrs')
+                ->select('rs_admin', 'rj_admin', 'poli_price')
+                ->where('rj_no', $rjno)
+                ->first();
+
+            $rsObat = DB::table('rstxn_rjobats')
+                ->join('immst_products', 'immst_products.product_id', 'rstxn_rjobats.product_id')
+                ->select('rstxn_rjobats.product_id as product_id', 'product_name', 'qty', 'price', 'rjobat_dtl')
+                ->where('rj_no', $rjno)
+                ->get();
+
+            $rsLab = DB::table('rstxn_rjlabs')
+                ->select('lab_desc', 'lab_price', 'lab_dtl')
+                ->where('rj_no', $rjno)
+                ->get();
+
+            $rsRad = DB::table('rstxn_rjrads')
+                ->join('rsmst_radiologis', 'rsmst_radiologis.rad_id', 'rstxn_rjrads.rad_id')
+                ->select('rad_desc', 'rstxn_rjrads.rad_price as rad_price', 'rad_dtl')
+                ->where('rj_no', $rjno)
+                ->get();
+
+            $dataRawatJalan = json_decode($findData->datadaftarpolirj_json, true);
+            $dataRawatJalan['rsAdmin'] = $rsAdmin->rs_admin ? $rsAdmin->rs_admin : 0;
+            $dataRawatJalan['rjAdmin'] = $rsAdmin->rj_admin ? $rsAdmin->rj_admin : 0;
+            $dataRawatJalan['poliPrice'] = $rsAdmin->poli_price ? $rsAdmin->poli_price : 0;
+            $dataRawatJalan['rjObat'] = json_decode(json_encode($rsObat, true), true);
+            $dataRawatJalan['rjLab'] = json_decode(json_encode($rsLab, true), true);
+            $dataRawatJalan['rjRad'] = json_decode(json_encode($rsRad, true), true);
+
+
+            return ($dataRawatJalan);
         }
 
         return [];
