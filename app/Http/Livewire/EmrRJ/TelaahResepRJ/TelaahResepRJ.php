@@ -288,7 +288,7 @@ class TelaahResepRJ extends Component
             return $obat['rad_price'];
         }));
 
-        $this->sumLainLain = collect($sumAdmin['LainLain'])->sum('LainLainPrice');
+        $this->sumLainLain = isset($sumAdmin['LainLain']) ? collect($sumAdmin['LainLain'])->sum('LainLainPrice') : 0;
 
 
         $this->sumTotalRJ = $this->sumPoliPrice + $this->sumRjAdmin + $this->sumRsAdmin  + $this->sumJasaKaryawan + $this->sumJasaDokter + $this->sumJasaMedis + $this->sumLainLain + $this->sumObat + $this->sumLaboratorium + $this->sumRadiologi;
