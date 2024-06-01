@@ -271,9 +271,10 @@ class TelaahResepRJ extends Component
         $this->sumRjAdmin = $sumAdmin['rjAdmin'];
         $this->sumPoliPrice = $sumAdmin['poliPrice'];
 
-        $this->sumJasaKaryawan = collect($sumAdmin['JasaKaryawan'])->sum('JasaKaryawanPrice');
-        $this->sumJasaMedis = collect($sumAdmin['JasaMedis'])->sum('JasaMedisPrice');
-        $this->sumJasaDokter = collect($sumAdmin['JasaDokter'])->sum('JasaDokterPrice');
+        $this->sumJasaKaryawan = isset($sumAdmin['JasaKaryawan']) ? collect($sumAdmin['JasaKaryawan'])->sum('JasaKaryawanPrice') : 0;
+        $this->sumJasaMedis = isset($sumAdmin['JasaMedis']) ? collect($sumAdmin['JasaMedis'])->sum('JasaMedisPrice') : 0;
+        $this->sumJasaDokter = isset($sumAdmin['JasaDokter']) ? collect($sumAdmin['JasaDokter'])->sum('JasaDokterPrice') : 0;
+
 
         $this->sumObat = collect($sumAdmin['rjObat'])->sum((function ($obat) {
             return $obat['qty'] * $obat['price'];
