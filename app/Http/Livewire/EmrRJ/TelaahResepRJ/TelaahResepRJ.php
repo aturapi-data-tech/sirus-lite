@@ -288,6 +288,7 @@ class TelaahResepRJ extends Component
             return $obat['rad_price'];
         }));
 
+
         $this->sumLainLain = isset($sumAdmin['LainLain']) ? collect($sumAdmin['LainLain'])->sum('LainLainPrice') : 0;
 
 
@@ -299,53 +300,50 @@ class TelaahResepRJ extends Component
 
     private function findData($rjno): array
     {
+        $dataRawatJalan = [];
+
         $findData = DB::table('rsview_rjkasir')
             ->select('datadaftarpolirj_json', 'vno_sep')
             ->where('rj_no', $rjno)
             ->first();
 
-
         $dataDaftarPoliRJ_json = isset($findData->datadaftarpolirj_json) ? $findData->datadaftarpolirj_json   : null;
-        // if meta_data_pasien_json = null
-        // then cari Data Pasien By Key Collection (exception when no data found)
-        //
-        // else json_decode
+
         if ($dataDaftarPoliRJ_json) {
-            $rsAdmin = DB::table('rstxn_rjhdrs')
-                ->select('rs_admin', 'rj_admin', 'poli_price')
-                ->where('rj_no', $rjno)
-                ->first();
-
-            $rsObat = DB::table('rstxn_rjobats')
-                ->join('immst_products', 'immst_products.product_id', 'rstxn_rjobats.product_id')
-                ->select('rstxn_rjobats.product_id as product_id', 'product_name', 'qty', 'price', 'rjobat_dtl')
-                ->where('rj_no', $rjno)
-                ->get();
-
-            $rsLab = DB::table('rstxn_rjlabs')
-                ->select('lab_desc', 'lab_price', 'lab_dtl')
-                ->where('rj_no', $rjno)
-                ->get();
-
-            $rsRad = DB::table('rstxn_rjrads')
-                ->join('rsmst_radiologis', 'rsmst_radiologis.rad_id', 'rstxn_rjrads.rad_id')
-                ->select('rad_desc', 'rstxn_rjrads.rad_price as rad_price', 'rad_dtl')
-                ->where('rj_no', $rjno)
-                ->get();
-
             $dataRawatJalan = json_decode($findData->datadaftarpolirj_json, true);
-            $dataRawatJalan['rsAdmin'] = $rsAdmin->rs_admin ? $rsAdmin->rs_admin : 0;
-            $dataRawatJalan['rjAdmin'] = $rsAdmin->rj_admin ? $rsAdmin->rj_admin : 0;
-            $dataRawatJalan['poliPrice'] = $rsAdmin->poli_price ? $rsAdmin->poli_price : 0;
-            $dataRawatJalan['rjObat'] = json_decode(json_encode($rsObat, true), true);
-            $dataRawatJalan['rjLab'] = json_decode(json_encode($rsLab, true), true);
-            $dataRawatJalan['rjRad'] = json_decode(json_encode($rsRad, true), true);
-
-
-            return ($dataRawatJalan);
         }
 
-        return [];
+        $rsAdmin = DB::table('rstxn_rjhdrs')
+            ->select('rs_admin', 'rj_admin', 'poli_price')
+            ->where('rj_no', $rjno)
+            ->first();
+
+        $rsObat = DB::table('rstxn_rjobats')
+            ->join('immst_products', 'immst_products.product_id', 'rstxn_rjobats.product_id')
+            ->select('rstxn_rjobats.product_id as product_id', 'product_name', 'qty', 'price', 'rjobat_dtl')
+            ->where('rj_no', $rjno)
+            ->get();
+
+        $rsLab = DB::table('rstxn_rjlabs')
+            ->select('lab_desc', 'lab_price', 'lab_dtl')
+            ->where('rj_no', $rjno)
+            ->get();
+
+        $rsRad = DB::table('rstxn_rjrads')
+            ->join('rsmst_radiologis', 'rsmst_radiologis.rad_id', 'rstxn_rjrads.rad_id')
+            ->select('rad_desc', 'rstxn_rjrads.rad_price as rad_price', 'rad_dtl')
+            ->where('rj_no', $rjno)
+            ->get();
+
+        $dataRawatJalan['rsAdmin'] = $rsAdmin->rs_admin ? $rsAdmin->rs_admin : 0;
+        $dataRawatJalan['rjAdmin'] = $rsAdmin->rj_admin ? $rsAdmin->rj_admin : 0;
+        $dataRawatJalan['poliPrice'] = $rsAdmin->poli_price ? $rsAdmin->poli_price : 0;
+        $dataRawatJalan['rjObat'] = json_decode(json_encode($rsObat, true), true);
+        $dataRawatJalan['rjLab'] = json_decode(json_encode($rsLab, true), true);
+        $dataRawatJalan['rjRad'] = json_decode(json_encode($rsRad, true), true);
+
+
+        return ($dataRawatJalan);
     }
 
 
