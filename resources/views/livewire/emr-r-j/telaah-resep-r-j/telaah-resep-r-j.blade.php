@@ -138,9 +138,9 @@
                 @include('livewire.emr-r-j.telaah-resep-r-j.create-administrasi-rj')
             @endif
 
-            {{-- @if ($isOpenDokter)
-                @include('livewire.emr-r-j.create-emr-r-j-dokter')
-            @endif --}}
+            @if ($isOpenTelaahResep)
+                @include('livewire.emr-r-j.telaah-resep-r-j.create-telaahresep-rj')
+            @endif
 
 
 
@@ -288,7 +288,7 @@
 
                                 <div class="inline-flex">
 
-                                    <x-light-button wire:click="checkTelaahResepStatus('{{ $eresep }}')">Telaah
+                                    <x-light-button wire:click="editTelaahResep('{{ $eresep }}','{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">Telaah
                                         Resep</x-light-button>
                                     <x-green-button
                                         wire:click="editAdministrasi('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">Admin

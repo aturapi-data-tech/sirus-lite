@@ -139,6 +139,9 @@ class TelaahResepRJ extends Component
     public bool $isOpenAdministrasi = false;
     public string $isOpenModeAdministrasi = 'insert';
 
+    public bool $isOpenTelaahResep = false;
+    public string $isOpenModeTelaahResep = 'insert';
+
 
 
     public bool $forceInsertRecord = false;
@@ -187,6 +190,33 @@ class TelaahResepRJ extends Component
     {
         $this->openModalEditAdministrasi($rjNo, $regNoRef);
         // $this->findData($id);
+    }
+
+
+    private function openModalEditTelaahResep($rjNo, $regNoRef): void
+    {
+        $this->isOpenTelaahResep = true;
+        $this->isOpenModeTelaahResep = 'update';
+        $this->rjNoRef = $rjNo;
+        $this->regNoRef = $regNoRef;
+    }
+
+
+    public function closeModalTelaahResep(): void
+    {
+        $this->isOpenTelaahResep = false;
+        $this->isOpenModeTelaahResep = 'insert';
+        $this->resetInputFields();
+    }
+
+    public function editTelaahResep($eresep,$rjNo, $regNoRef)
+    {
+        if (!$eresep) {
+            $this->emit('toastr-error', 'E-Resep Tidak ditemukan');
+        }else
+        {
+            $this->openModalEditTelaahResep($rjNo, $regNoRef);
+        }
     }
 
     // open and close modal end////////////////
@@ -251,12 +281,7 @@ class TelaahResepRJ extends Component
     ];
 
 
-    public function checkTelaahResepStatus($eresep)
-    {
-        if (!$eresep) {
-            $this->emit('toastr-error', 'E-Resep Tidak ditemukan');
-        }
-    }
+   
 
     public function sumAll()
     {
@@ -387,7 +412,17 @@ class TelaahResepRJ extends Component
         return ($dataRawatJalan);
     }
 
-
+    public string $activeTabRacikanNonRacikan = "NonRacikan";
+    public array $EmrMenuRacikanNonRacikan = [
+        [
+            'ermMenuId' => 'NonRacikan',
+            'ermMenuName' => 'NonRacikan'
+        ],
+        [
+            'ermMenuId' => 'Racikan',
+            'ermMenuName' => 'Racikan'
+        ],
+    ];
 
     // when new form instance
     public function mount()

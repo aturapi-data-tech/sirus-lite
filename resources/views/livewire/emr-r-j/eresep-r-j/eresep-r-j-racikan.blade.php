@@ -17,124 +17,124 @@
                     <x-input-label for="" :value="__('Racikan')" :required="__(false)" class="pt-2 sm:text-xl" />
 
 
+                    @role(['Dokter', 'Admin'])
+                        {{-- collectingMyProduct / obat --}}
+                        <div class="grid grid-cols-12 gap-2 " x-data>
+                            <div class="col-span-1">
+                                <x-input-label for="collectingMyProduct.noRacikan" :value="__('Racikan')" :required="__(true)" />
 
-                    {{-- collectingMyProduct / obat --}}
-                    <div class="grid grid-cols-12 gap-2 " x-data>
-                        <div class="col-span-1">
-                            <x-input-label for="collectingMyProduct.noRacikan" :value="__('Racikan')" :required="__(true)" />
+                                <div>
+                                    <x-text-input id="collectingMyProduct.noRacikan" placeholder="Racikan" class="mt-1 ml-2"
+                                        :errorshas="__($errors->has('collectingMyProduct.noRacikan'))" :disabled=$disabledPropertyRjStatus
+                                        wire:model.debounce.500ms="noRacikan" x-ref="collectingMyProductnoRacikan"
+                                        x-on:keyup.enter="$refs.collectingMyProductproductName.focus()" />
 
-                            <div>
-                                <x-text-input id="collectingMyProduct.noRacikan" placeholder="Racikan" class="mt-1 ml-2"
-                                    :errorshas="__($errors->has('collectingMyProduct.noRacikan'))" :disabled=$disabledPropertyRjStatus
-                                    wire:model.debounce.500ms="noRacikan" x-ref="collectingMyProductnoRacikan"
-                                    x-on:keyup.enter="$refs.collectingMyProductproductName.focus()" />
-
-                                @error('collectingMyProduct.noRacikan')
-                                    <x-input-error :messages=$message />
-                                @enderror
+                                    @error('collectingMyProduct.noRacikan')
+                                        <x-input-error :messages=$message />
+                                    @enderror
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="col-span-3">
-                            <x-input-label for="collectingMyProduct.productName" :value="__('Nama Obat')" :required="__(true)" />
+                            <div class="col-span-3">
+                                <x-input-label for="collectingMyProduct.productName" :value="__('Nama Obat')" :required="__(true)" />
 
-                            <div>
-                                <x-text-input id="collectingMyProduct.productName" placeholder="Nama Obat"
-                                    class="mt-1 ml-2" :errorshas="__($errors->has('collectingMyProduct.productName'))" :disabled=$disabledPropertyRjStatus
-                                    x-init="$refs.collectingMyProductproductName.focus()" x-ref="collectingMyProductproductName"
-                                    x-on:keyup.enter="$refs.collectingMyProductsedia.focus()"
-                                    wire:model.debounce.500ms="collectingMyProduct.productName" />
+                                <div>
+                                    <x-text-input id="collectingMyProduct.productName" placeholder="Nama Obat"
+                                        class="mt-1 ml-2" :errorshas="__($errors->has('collectingMyProduct.productName'))" :disabled=$disabledPropertyRjStatus
+                                        x-init="$refs.collectingMyProductproductName.focus()" x-ref="collectingMyProductproductName"
+                                        x-on:keyup.enter="$refs.collectingMyProductsedia.focus()"
+                                        wire:model.debounce.500ms="collectingMyProduct.productName" />
 
-                                @error('collectingMyProduct.productName')
-                                    <x-input-error :messages=$message />
-                                @enderror
+                                    @error('collectingMyProduct.productName')
+                                        <x-input-error :messages=$message />
+                                    @enderror
+                                </div>
                             </div>
-                        </div>
 
 
 
-                        <div class="col-span-1">
-                            <x-input-label for="collectingMyProduct.sedia" :value="__('Sedia')" :required="__(true)" />
+                            <div class="col-span-1">
+                                <x-input-label for="collectingMyProduct.sedia" :value="__('Sedia')" :required="__(true)" />
 
-                            <div>
-                                <x-text-input id="collectingMyProduct.sedia" placeholder="Sedia" class="mt-1 ml-2"
-                                    :errorshas="__($errors->has('collectingMyProduct.sedia'))" :disabled=$disabledPropertyRjStatus
-                                    x-ref="collectingMyProductsedia"
-                                    x-on:keyup.enter="$refs.collectingMyProductcatatan.focus()"
-                                    wire:model.debounce.500ms="collectingMyProduct.sedia" />
+                                <div>
+                                    <x-text-input id="collectingMyProduct.sedia" placeholder="Sedia" class="mt-1 ml-2"
+                                        :errorshas="__($errors->has('collectingMyProduct.sedia'))" :disabled=$disabledPropertyRjStatus
+                                        x-ref="collectingMyProductsedia"
+                                        x-on:keyup.enter="$refs.collectingMyProductcatatan.focus()"
+                                        wire:model.debounce.500ms="collectingMyProduct.sedia" />
 
-                                @error('collectingMyProduct.sedia')
-                                    <x-input-error :messages=$message />
-                                @enderror
+                                    @error('collectingMyProduct.sedia')
+                                        <x-input-error :messages=$message />
+                                    @enderror
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="col-span-1">
-                            <x-input-label for="collectingMyProduct.catatan" :value="__('Catatan')" :required="__(true)" />
+                            <div class="col-span-1">
+                                <x-input-label for="collectingMyProduct.catatan" :value="__('Catatan')" :required="__(true)" />
 
-                            <div>
-                                <x-text-input id="collectingMyProduct.catatan" placeholder="Jml Racikan"
-                                    class="mt-1 ml-2" :errorshas="__($errors->has('collectingMyProduct.catatan'))" :disabled=$disabledPropertyRjStatus
-                                    x-ref="collectingMyProductcatatan"
-                                    x-on:keyup.enter="$refs.collectingMyProductqty.focus()"
-                                    wire:model.debounce.500ms="collectingMyProduct.catatan" />
+                                <div>
+                                    <x-text-input id="collectingMyProduct.catatan" placeholder="Jml Racikan"
+                                        class="mt-1 ml-2" :errorshas="__($errors->has('collectingMyProduct.catatan'))" :disabled=$disabledPropertyRjStatus
+                                        x-ref="collectingMyProductcatatan"
+                                        x-on:keyup.enter="$refs.collectingMyProductqty.focus()"
+                                        wire:model.debounce.500ms="collectingMyProduct.catatan" />
 
-                                @error('collectingMyProduct.catatan')
-                                    <x-input-error :messages=$message />
-                                @enderror
+                                    @error('collectingMyProduct.catatan')
+                                        <x-input-error :messages=$message />
+                                    @enderror
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="col-span-1">
-                            <x-input-label for="collectingMyProduct.qty" :value="__('Jml Racikan')" :required="__(true)" />
+                            <div class="col-span-1">
+                                <x-input-label for="collectingMyProduct.qty" :value="__('Jml Racikan')" :required="__(true)" />
 
-                            <div>
-                                <x-text-input id="collectingMyProduct.qty" placeholder="Jml Racikan" class="mt-1 ml-2"
-                                    :errorshas="__($errors->has('collectingMyProduct.qty'))" :disabled=$disabledPropertyRjStatus
-                                    wire:model.debounce.500ms="collectingMyProduct.qty" x-ref="collectingMyProductqty"
-                                    x-on:keyup.enter="$refs.collectingMyProductcatatanKhusus.focus()" />
+                                <div>
+                                    <x-text-input id="collectingMyProduct.qty" placeholder="Jml Racikan" class="mt-1 ml-2"
+                                        :errorshas="__($errors->has('collectingMyProduct.qty'))" :disabled=$disabledPropertyRjStatus
+                                        wire:model.debounce.500ms="collectingMyProduct.qty" x-ref="collectingMyProductqty"
+                                        x-on:keyup.enter="$refs.collectingMyProductcatatanKhusus.focus()" />
 
-                                @error('collectingMyProduct.qty')
-                                    <x-input-error :messages=$message />
-                                @enderror
+                                    @error('collectingMyProduct.qty')
+                                        <x-input-error :messages=$message />
+                                    @enderror
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="col-span-3">
-                            <x-input-label for="collectingMyProduct.catatanKhusus" :value="__('Signa')"
-                                :required="__(true)" />
+                            <div class="col-span-3">
+                                <x-input-label for="collectingMyProduct.catatanKhusus" :value="__('Signa')"
+                                    :required="__(true)" />
 
-                            <div>
-                                <x-text-input id="collectingMyProduct.catatanKhusus" placeholder="Catatan Khusus"
-                                    class="mt-1 ml-2" :errorshas="__($errors->has('collectingMyProduct.catatanKhusus'))" :disabled=$disabledPropertyRjStatus
-                                    wire:model="collectingMyProduct.catatanKhusus"
-                                    x-on:keyup.enter="$wire.insertProduct() 
+                                <div>
+                                    <x-text-input id="collectingMyProduct.catatanKhusus" placeholder="Catatan Khusus"
+                                        class="mt-1 ml-2" :errorshas="__($errors->has('collectingMyProduct.catatanKhusus'))" :disabled=$disabledPropertyRjStatus
+                                        wire:model="collectingMyProduct.catatanKhusus"
+                                        x-on:keyup.enter="$wire.insertProduct()
                                     $refs.collectingMyProductproductName.focus()"
-                                    x-ref="collectingMyProductcatatanKhusus" />
+                                        x-ref="collectingMyProductcatatanKhusus" />
 
-                                @error('collectingMyProduct.catatanKhusus')
-                                    <x-input-error :messages=$message />
-                                @enderror
+                                    @error('collectingMyProduct.catatanKhusus')
+                                        <x-input-error :messages=$message />
+                                    @enderror
+                                </div>
                             </div>
+
+                            <div class="col-span-1">
+                                <x-input-label for="" :value="__('Hapus')" :required="__(true)" />
+
+                                <x-alternative-button class="inline-flex ml-2"
+                                    wire:click.prevent="resetcollectingMyProduct()"
+                                    x-on:click="$refs.collectingMyProductproductName.focus()">
+                                    <svg class="w-5 h-5 text-gray-800 dark:text-white" aria-hidden="true"
+                                        xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 20">
+                                        <path
+                                            d="M17 4h-4V2a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v2H1a1 1 0 0 0 0 2h1v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1a1 1 0 1 0 0-2ZM7 2h4v2H7V2Zm1 14a1 1 0 1 1-2 0V8a1 1 0 0 1 2 0v8Zm4 0a1 1 0 0 1-2 0V8a1 1 0 0 1 2 0v8Z" />
+                                    </svg>
+                                </x-alternative-button>
+                            </div>
+
                         </div>
-
-                        <div class="col-span-1">
-                            <x-input-label for="" :value="__('Hapus')" :required="__(true)" />
-
-                            <x-alternative-button class="inline-flex ml-2"
-                                wire:click.prevent="resetcollectingMyProduct()"
-                                x-on:click="$refs.collectingMyProductproductName.focus()">
-                                <svg class="w-5 h-5 text-gray-800 dark:text-white" aria-hidden="true"
-                                    xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 20">
-                                    <path
-                                        d="M17 4h-4V2a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v2H1a1 1 0 0 0 0 2h1v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1a1 1 0 1 0 0-2ZM7 2h4v2H7V2Zm1 14a1 1 0 1 1-2 0V8a1 1 0 0 1 2 0v8Zm4 0a1 1 0 0 1-2 0V8a1 1 0 0 1 2 0v8Z" />
-                                </svg>
-                            </x-alternative-button>
-                        </div>
-
-                    </div>
-                    {{-- collectingMyProduct / obat --}}
-
+                        {{-- collectingMyProduct / obat --}}
+                    @endrole
 
 
                     {{-- ///////////////////////////////// --}}
@@ -235,18 +235,18 @@
 
                                                         <td
                                                             class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-
-                                                            <x-alternative-button class="inline-flex"
-                                                                wire:click.prevent="removeProduct('{{ $eresep['rjObatDtl'] }}')">
-                                                                <svg class="w-5 h-5 text-gray-800 dark:text-white"
-                                                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                                                    fill="currentColor" viewBox="0 0 18 20">
-                                                                    <path
-                                                                        d="M17 4h-4V2a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v2H1a1 1 0 0 0 0 2h1v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1a1 1 0 1 0 0-2ZM7 2h4v2H7V2Zm1 14a1 1 0 1 1-2 0V8a1 1 0 0 1 2 0v8Zm4 0a1 1 0 0 1-2 0V8a1 1 0 0 1 2 0v8Z" />
-                                                                </svg>
-                                                                {{ 'Hapus ' }}
-                                                            </x-alternative-button>
-
+                                                            @role(['Dokter', 'Admin'])
+                                                                <x-alternative-button class="inline-flex"
+                                                                    wire:click.prevent="removeProduct('{{ $eresep['rjObatDtl'] }}')">
+                                                                    <svg class="w-5 h-5 text-gray-800 dark:text-white"
+                                                                        aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                                                        fill="currentColor" viewBox="0 0 18 20">
+                                                                        <path
+                                                                            d="M17 4h-4V2a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v2H1a1 1 0 0 0 0 2h1v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1a1 1 0 1 0 0-2ZM7 2h4v2H7V2Zm1 14a1 1 0 1 1-2 0V8a1 1 0 0 1 2 0v8Zm4 0a1 1 0 0 1-2 0V8a1 1 0 0 1 2 0v8Z" />
+                                                                    </svg>
+                                                                    {{ 'Hapus ' }}
+                                                                </x-alternative-button>
+                                                            @endrole
                                                         </td>
 
 
