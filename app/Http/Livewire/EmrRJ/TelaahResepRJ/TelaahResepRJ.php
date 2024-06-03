@@ -314,7 +314,7 @@ class TelaahResepRJ extends Component
         }
 
         $rsAdmin = DB::table('rstxn_rjhdrs')
-            ->select('rs_admin', 'rj_admin', 'poli_price')
+            ->select('rs_admin', 'rj_admin', 'poli_price', 'klaim_id', 'pass_status')
             ->where('rj_no', $rjno)
             ->first();
 
@@ -335,9 +335,50 @@ class TelaahResepRJ extends Component
             ->where('rj_no', $rjno)
             ->get();
 
-        $dataRawatJalan['rsAdmin'] = $rsAdmin->rs_admin ? $rsAdmin->rs_admin : 0;
-        $dataRawatJalan['rjAdmin'] = $rsAdmin->rj_admin ? $rsAdmin->rj_admin : 0;
-        $dataRawatJalan['poliPrice'] = $rsAdmin->poli_price ? $rsAdmin->poli_price : 0;
+
+
+        // RJ Admin
+        if ($rsAdmin->pass_status == 'N') {
+            $rsAdminParameter = DB::table('rsmst_parameters')
+                ->select('par_value')
+                ->where('par_id', '1')
+                ->first();
+            if (isset($dataRawatJalan['rjAdmin'])) {
+                $dataRawatJalan['rjAdmin'] = $rsAdmin->rj_admin;
+            } else {
+                $dataRawatJalan['rjAdmin'] = $rsAdminParameter->par_value;
+            }
+        } else {
+            $dataRawatJalan['rjAdmin'] = 0;
+        }
+
+        // RS Admin
+        $rsAdminDokter = DB::table('rsmst_doctors')
+            ->select('rs_admin', 'poli_price')
+            ->where('dr_id', $dataRawatJalan['drId'])
+            ->first();
+
+
+        if (isset($dataRawatJalan['rsAdmin'])) {
+            $dataRawatJalan['rsAdmin'] = $rsAdmin->rs_admin ? $rsAdmin->rs_admin : 0;
+        } else {
+            $dataRawatJalan['rsAdmin'] = $rsAdminDokter->rs_admin ? $rsAdminDokter->rs_admin : 0;
+        }
+
+        // PoliPrice
+        if (isset($dataRawatJalan['poliPrice'])) {
+            $dataRawatJalan['poliPrice'] = $rsAdmin->poli_price ? $rsAdmin->poli_price : 0;
+        } else {
+            $dataRawatJalan['poliPrice'] = $rsAdminDokter->poli_price ? $rsAdminDokter->poli_price : 0;
+        }
+
+        // Ketika Kronis
+        if ($rsAdmin->klaim_id == 'KR') {
+            $dataRawatJalan['rjAdmin'] = 0;
+            $dataRawatJalan['rsAdmin'] = 0;
+            $dataRawatJalan['poliPrice'] = 0;
+        }
+
         $dataRawatJalan['rjObat'] = json_decode(json_encode($rsObat, true), true);
         $dataRawatJalan['rjLab'] = json_decode(json_encode($rsLab, true), true);
         $dataRawatJalan['rjRad'] = json_decode(json_encode($rsRad, true), true);
