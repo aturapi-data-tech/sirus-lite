@@ -164,7 +164,7 @@
                         <th scope="col" class="w-1/4 px-4 py-3 ">
                             Poli
                         </th>
-                        <th scope="col" class="w-1/4 px-4 py-3 ">
+                        <th scope="col" class="w-1/4 px-2 py-3 ">
                             Status Layanan
                         </th>
                         <th scope="col" class="w-1/4 px-4 py-3 ">
@@ -253,7 +253,7 @@
                             </td>
 
                             <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap ">
-                                <div class="overflow-auto w-52">
+                                <div class="w-full overflow-auto">
 
                                     <div class="font-semibold text-gray-900">
                                         {{ 'Nomer Pelayanan : ' . $myQData->rj_no }}
