@@ -6,6 +6,11 @@ use Illuminate\Support\Facades\DB;
 
 use Livewire\Component;
 use Livewire\WithPagination;
+
+use Illuminate\Pagination\Paginator;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
+
 use Carbon\Carbon;
 
 
@@ -209,12 +214,11 @@ class TelaahResepRJ extends Component
         $this->resetInputFields();
     }
 
-    public function editTelaahResep($eresep,$rjNo, $regNoRef)
+    public function editTelaahResep($eresep, $rjNo, $regNoRef)
     {
         if (!$eresep) {
             $this->emit('toastr-error', 'E-Resep Tidak ditemukan');
-        }else
-        {
+        } else {
             $this->openModalEditTelaahResep($rjNo, $regNoRef);
         }
     }
@@ -281,7 +285,7 @@ class TelaahResepRJ extends Component
     ];
 
 
-   
+
 
     public function sumAll()
     {
@@ -431,7 +435,14 @@ class TelaahResepRJ extends Component
     }
 
 
+    private function paginate($items, $perPage = 5, $page = null, $options = [])
 
+    {
+
+        $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
+        $items = $items instanceof Collection ? $items : Collection::make($items);
+        return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, $options);
+    }
 
     // select data start////////////////
     public function render()
@@ -477,10 +488,12 @@ class TelaahResepRJ extends Component
             )
             ->where(DB::raw("nvl(rj_status,'A')"), '=', $myRefstatusId)
             // ->where('rj_status', '!=', 'F')
-            ->where('klaim_id', '!=', 'KR')
+            // ->where('klaim_id', '!=', 'KR')
 
             // ->where('shift', '=', $myRefshift)
             ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $myRefdate);
+
+
 
         // Jika where dokter tidak kosong
         if ($myRefdrId != 'All') {
@@ -492,8 +505,22 @@ class TelaahResepRJ extends Component
                 ->orWhere(DB::raw('upper(reg_no)'), 'like', '%' . strtoupper($mySearch) . '%')
                 ->orWhere(DB::raw('upper(dr_name)'), 'like', '%' . strtoupper($mySearch) . '%');
         })
-            ->orderBy('rj_date1',  'desc')
-            ->orderBy('rj_no',  'desc');
+            // ->orderBy('rj_date1',  'desc')
+            // ->orderBy('rj_no',  'desc')
+        ;
+
+        // 1 urutkan berdasarkan json table
+        $myQueryPagination = $query->get()
+            ->sortByDesc(
+                function ($mySortByJson) {
+                    $myQueryPagination = isset(json_decode($mySortByJson->datadaftarpolirj_json, true)['eresep']) ? 1 : 0;
+                    return ($myQueryPagination . $mySortByJson->rj_date1);
+                }
+            );
+
+
+        $myQueryPagination = $this->paginate($myQueryPagination, $this->limitPerPage);
+
 
         ////////////////////////////////////////////////
         // end Query
@@ -503,7 +530,10 @@ class TelaahResepRJ extends Component
 
         return view(
             'livewire.emr-r-j.telaah-resep-r-j.telaah-resep-r-j',
-            ['myQueryData' => $query->paginate($this->limitPerPage)]
+            // ['myQueryData' => $query->paginate($this->limitPerPage)],
+            ['myQueryData' => $myQueryPagination],
+
+
         );
     }
     // select data end////////////////

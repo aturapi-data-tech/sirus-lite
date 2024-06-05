@@ -197,6 +197,15 @@
                                 : '';
 
                             $badgecolorEresep = $eresep ? 'green' : 'red';
+
+                            $badgecolorKlaim =
+                                $myQData->klaim_id == 'UM'
+                                    ? 'green'
+                                    : ($myQData->klaim_id == 'JM'
+                                        ? 'default'
+                                        : ($myQData->klaim_id == 'KR'
+                                            ? 'yellow'
+                                            : 'red'));
                         @endphp
 
 
@@ -229,13 +238,15 @@
                                     </div>
                                     <div class="font-semibold text-gray-900">
                                         {{ $myQData->dr_name . ' / ' }}
-                                        {{ $myQData->klaim_id == 'UM'
-                                            ? 'UMUM'
-                                            : ($myQData->klaim_id == 'JM'
-                                                ? 'BPJS'
-                                                : ($myQData->klaim_id == 'KR'
-                                                    ? 'Kronis'
-                                                    : 'Asuransi Lain')) }}
+                                        <x-badge :badgecolor="__($badgecolorKlaim)">
+                                            {{ $myQData->klaim_id == 'UM'
+                                                ? 'UMUM'
+                                                : ($myQData->klaim_id == 'JM'
+                                                    ? 'BPJS'
+                                                    : ($myQData->klaim_id == 'KR'
+                                                        ? 'Kronis'
+                                                        : 'Asuransi Lain')) }}
+                                        </x-badge>
                                     </div>
 
                                 </div>
@@ -273,6 +284,7 @@
 
                                     <div class="font-normal text-gray-700">
                                         {{ $myQData->rj_date }}
+                                        {{ '| Shift : ' . $myQData->shift }}
                                     </div>
 
                                     <div class="font-normal text-gray-700">
@@ -288,7 +300,8 @@
 
                                 <div class="inline-flex">
 
-                                    <x-light-button wire:click="editTelaahResep('{{ $eresep }}','{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">Telaah
+                                    <x-light-button
+                                        wire:click="editTelaahResep('{{ $eresep }}','{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">Telaah
                                         Resep</x-light-button>
                                     <x-green-button
                                         wire:click="editAdministrasi('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">Admin
