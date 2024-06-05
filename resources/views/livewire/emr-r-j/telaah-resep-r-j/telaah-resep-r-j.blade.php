@@ -313,7 +313,7 @@
                             <td class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-primary">
 
 
-                                <div class="inline-flex">
+                                <div class="">
 
                                     <x-light-button
                                         wire:click="editTelaahResep('{{ $eresep }}','{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">Telaah
@@ -321,6 +321,11 @@
                                     <x-green-button
                                         wire:click="editAdministrasi('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">Admin
                                         RJ</x-green-button>
+                                    <div>
+                                        <livewire:cetak.cetak-eresep-r-j :rjNoRef="$myQData->rj_no"
+                                            wire:key="cetak.cetak-eresep-r-j-{{ $myQData->rj_no }}">
+
+                                    </div>
 
                                 </div>
 
