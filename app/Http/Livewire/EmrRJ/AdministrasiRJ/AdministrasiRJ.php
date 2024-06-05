@@ -115,27 +115,26 @@ class AdministrasiRJ extends Component
     public function setSelesaiAdministrasiStatus($rjNo)
     {
 
-        // $dataDaftarPoliRJ = $this->findData($rjNo);
-        // if (isset($dataDaftarPoliRJ['AdministrasiRj']) == false) {
-        //     $dataDaftarPoliRJ['AdministrasiRj'] = [
-        //         'userLog' => auth()->user()->myuser_name,
-        //         'userLogDate' => Carbon::now()->format('d/m/Y H:i:s')
-        //     ];
-        //     DB::table('rstxn_rjhdrs')
-        //         ->where('rj_no', $rjNo)
-        //         ->update([
-        //             'dataDaftarPoliRJ_json' => json_encode($dataDaftarPoliRJ, true),
-        //             'dataDaftarPoliRJ_xml' => ArrayToXml::convert($dataDaftarPoliRJ),
-        //         ]);
+        $dataDaftarPoliRJ = $this->findData($rjNo);
+        if (isset($dataDaftarPoliRJ['AdministrasiRj']) == false) {
+            $dataDaftarPoliRJ['AdministrasiRj'] = [
+                'userLog' => auth()->user()->myuser_name,
+                'userLogDate' => Carbon::now()->format('d/m/Y H:i:s')
+            ];
 
-        //     $this->emit('toastr-success', "Administrasi berhasil disimpan.");
-        //     $this->emit('syncronizeAssessmentDokterRJFindData');
-        //     $this->emit('syncronizeAssessmentPerawatRJFindData');
-        // } else {
-        //     $this->emit('toastr-error', "Administrasi sudah tersimpan oleh." . $dataDaftarPoliRJ['AdministrasiRj']['userLog']);
-        // }
-        // update table trnsaksi
+            DB::table('rstxn_rjhdrs')
+                ->where('rj_no', $rjNo)
+                ->update([
+                    'dataDaftarPoliRJ_json' => json_encode($dataDaftarPoliRJ, true),
+                    'dataDaftarPoliRJ_xml' => ArrayToXml::convert($dataDaftarPoliRJ),
+                ]);
 
+            $this->emit('toastr-success', "Administrasi berhasil disimpan.");
+            $this->emit('syncronizeAssessmentDokterRJFindData');
+            $this->emit('syncronizeAssessmentPerawatRJFindData');
+        } else {
+            $this->emit('toastr-error', "Administrasi sudah tersimpan oleh." . $dataDaftarPoliRJ['AdministrasiRj']['userLog']);
+        }
     }
 
     private function findData($rjNo): array
@@ -290,7 +289,7 @@ class AdministrasiRJ extends Component
                 ->where('par_id', '1')
                 ->first();
             if (isset($dataRawatJalan['rjAdmin'])) {
-                $dataRawatJalan['rjAdmin'] = $rsAdmin->rj_admin;
+                $dataRawatJalan['rjAdmin'] = $dataRawatJalan['rjAdmin'];
             } else {
                 $dataRawatJalan['rjAdmin'] = $rsAdminParameter->par_value;
             }
@@ -306,14 +305,14 @@ class AdministrasiRJ extends Component
 
 
         if (isset($dataRawatJalan['rsAdmin'])) {
-            $dataRawatJalan['rsAdmin'] = $rsAdmin->rs_admin ? $rsAdmin->rs_admin : 0;
+            $dataRawatJalan['rsAdmin'] = $dataRawatJalan['rsAdmin'] ? $dataRawatJalan['rsAdmin'] : 0;
         } else {
             $dataRawatJalan['rsAdmin'] = $rsAdminDokter->rs_admin ? $rsAdminDokter->rs_admin : 0;
         }
 
         // PoliPrice
         if (isset($dataRawatJalan['poliPrice'])) {
-            $dataRawatJalan['poliPrice'] = $rsAdmin->poli_price ? $rsAdmin->poli_price : 0;
+            $dataRawatJalan['poliPrice'] = $dataRawatJalan['poliPrice'] ? $dataRawatJalan['poliPrice'] : 0;
         } else {
             $dataRawatJalan['poliPrice'] = $rsAdminDokter->poli_price ? $rsAdminDokter->poli_price : 0;
         }
