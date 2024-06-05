@@ -115,25 +115,25 @@ class AdministrasiRJ extends Component
     public function setSelesaiAdministrasiStatus($rjNo)
     {
 
-        $dataDaftarPoliRJ = $this->findData($rjNo);
-        if (isset($dataDaftarPoliRJ['AdministrasiRj']) == false) {
-            $dataDaftarPoliRJ['AdministrasiRj'] = [
-                'userLog' => auth()->user()->myuser_name,
-                'userLogDate' => Carbon::now()->format('d/m/Y H:i:s')
-            ];
-            DB::table('rstxn_rjhdrs')
-                ->where('rj_no', $rjNo)
-                ->update([
-                    'dataDaftarPoliRJ_json' => json_encode($dataDaftarPoliRJ, true),
-                    'dataDaftarPoliRJ_xml' => ArrayToXml::convert($dataDaftarPoliRJ),
-                ]);
+        // $dataDaftarPoliRJ = $this->findData($rjNo);
+        // if (isset($dataDaftarPoliRJ['AdministrasiRj']) == false) {
+        //     $dataDaftarPoliRJ['AdministrasiRj'] = [
+        //         'userLog' => auth()->user()->myuser_name,
+        //         'userLogDate' => Carbon::now()->format('d/m/Y H:i:s')
+        //     ];
+        //     DB::table('rstxn_rjhdrs')
+        //         ->where('rj_no', $rjNo)
+        //         ->update([
+        //             'dataDaftarPoliRJ_json' => json_encode($dataDaftarPoliRJ, true),
+        //             'dataDaftarPoliRJ_xml' => ArrayToXml::convert($dataDaftarPoliRJ),
+        //         ]);
 
-            $this->emit('toastr-success', "Administrasi berhasil disimpan.");
-            $this->emit('syncronizeAssessmentDokterRJFindData');
-            $this->emit('syncronizeAssessmentPerawatRJFindData');
-        } else {
-            $this->emit('toastr-error', "Administrasi sudah tersimpan oleh." . $dataDaftarPoliRJ['AdministrasiRj']['userLog']);
-        }
+        //     $this->emit('toastr-success', "Administrasi berhasil disimpan.");
+        //     $this->emit('syncronizeAssessmentDokterRJFindData');
+        //     $this->emit('syncronizeAssessmentPerawatRJFindData');
+        // } else {
+        //     $this->emit('toastr-error', "Administrasi sudah tersimpan oleh." . $dataDaftarPoliRJ['AdministrasiRj']['userLog']);
+        // }
         // update table trnsaksi
 
     }
