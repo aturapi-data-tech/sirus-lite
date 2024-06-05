@@ -151,6 +151,9 @@ class TelaahResepRJ extends Component
 
     public bool $forceInsertRecord = false;
 
+    public int $eresepRacikan;
+    public int $eresep;
+
     public int $rjNoRef;
     public string $regNoRef;
 
@@ -204,6 +207,7 @@ class TelaahResepRJ extends Component
         $this->isOpenModeTelaahResep = 'update';
         $this->rjNoRef = $rjNo;
         $this->regNoRef = $regNoRef;
+        $this->sumAll();
     }
 
 
@@ -295,6 +299,11 @@ class TelaahResepRJ extends Component
     private function sumAdmin()
     {
         $sumAdmin = $this->findData($this->rjNoRef);
+
+
+        $this->eresepRacikan = collect(isset($sumAdmin['eresepRacikan']) ? $sumAdmin['eresepRacikan'] : [])->count();
+        $this->eresep = collect(isset($sumAdmin['eresep']) ? $sumAdmin['eresep'] : [])->count();
+
 
         $this->sumRsAdmin = $sumAdmin['rsAdmin'];
         $this->sumRjAdmin = $sumAdmin['rjAdmin'];

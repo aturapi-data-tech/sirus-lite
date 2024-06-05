@@ -75,7 +75,24 @@
                                             <label
                                                 class="inline-block p-2 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
                                                 x-on:click="activeTabRacikanNonRacikan ='{{ $EmrM['ermMenuId'] }}'"
-                                                wire:click="$set('activeTabRacikanNonRacikan', '{{ $EmrM['ermMenuId'] }}')">{{ $EmrM['ermMenuName'] }}</label>
+                                                wire:click="$set('activeTabRacikanNonRacikan', '{{ $EmrM['ermMenuId'] }}')">{{ $EmrM['ermMenuName'] }}
+
+                                                @if ($EmrM['ermMenuId'] === 'NonRacikan')
+                                                    @if ($eresep)
+                                                        <span
+                                                            class="inline-flex items-center justify-center w-4 h-4 text-xs font-semibold text-red-800 bg-red-200 rounded-full ms-2">
+                                                            {{ $eresep }}
+                                                        </span>
+                                                    @endif
+                                                @else
+                                                    @if ($eresepRacikan)
+                                                        <span
+                                                            class="inline-flex items-center justify-center w-4 h-4 text-xs font-semibold text-red-800 bg-red-200 rounded-full ms-2">
+                                                            {{ $eresepRacikan }}
+                                                        </span>
+                                                    @endif
+                                                @endif
+                                            </label>
                                         </li>
                                     @endforeach
 
