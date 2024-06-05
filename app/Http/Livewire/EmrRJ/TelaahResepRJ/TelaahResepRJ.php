@@ -327,13 +327,13 @@ class TelaahResepRJ extends Component
 
 
 
-    private function findData($rjno): array
+    private function findData($rjNo): array
     {
         $dataRawatJalan = [];
 
         $findData = DB::table('rsview_rjkasir')
             ->select('datadaftarpolirj_json', 'vno_sep')
-            ->where('rj_no', $rjno)
+            ->where('rj_no', $rjNo)
             ->first();
 
         $dataDaftarPoliRJ_json = isset($findData->datadaftarpolirj_json) ? $findData->datadaftarpolirj_json   : null;
@@ -344,24 +344,24 @@ class TelaahResepRJ extends Component
 
         $rsAdmin = DB::table('rstxn_rjhdrs')
             ->select('rs_admin', 'rj_admin', 'poli_price', 'klaim_id', 'pass_status')
-            ->where('rj_no', $rjno)
+            ->where('rj_no', $rjNo)
             ->first();
 
         $rsObat = DB::table('rstxn_rjobats')
             ->join('immst_products', 'immst_products.product_id', 'rstxn_rjobats.product_id')
             ->select('rstxn_rjobats.product_id as product_id', 'product_name', 'qty', 'price', 'rjobat_dtl')
-            ->where('rj_no', $rjno)
+            ->where('rj_no', $rjNo)
             ->get();
 
         $rsLab = DB::table('rstxn_rjlabs')
             ->select('lab_desc', 'lab_price', 'lab_dtl')
-            ->where('rj_no', $rjno)
+            ->where('rj_no', $rjNo)
             ->get();
 
         $rsRad = DB::table('rstxn_rjrads')
             ->join('rsmst_radiologis', 'rsmst_radiologis.rad_id', 'rstxn_rjrads.rad_id')
             ->select('rad_desc', 'rstxn_rjrads.rad_price as rad_price', 'rad_dtl')
-            ->where('rj_no', $rjno)
+            ->where('rj_no', $rjNo)
             ->get();
 
 

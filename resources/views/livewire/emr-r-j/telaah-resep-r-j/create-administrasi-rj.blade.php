@@ -60,7 +60,7 @@
                 {{-- Transasi EMR --}}
                 <div class="flex justify-between m-4 m-x-auto">
 
-                    <div class="grid grid-cols-10 gap-2 mx-2">
+                    <div class="grid grid-cols-5 gap-2 mx-2">
 
                         <div class="relative">
                             <input type="text" id="RsAdmin" disabled

@@ -180,6 +180,7 @@
                     @foreach ($myQueryData as $myQData)
                         @php
                             $datadaftar_json = json_decode($myQData->datadaftarpolirj_json, true);
+
                             $eresep = isset($datadaftar_json['eresep']) ? 1 : 0;
 
                             $prosentaseEMR = ($eresep / 1) * 100;
@@ -206,6 +207,9 @@
                                         : ($myQData->klaim_id == 'KR'
                                             ? 'yellow'
                                             : 'red'));
+
+                            $badgecolorAdministrasiRj = isset($datadaftar_json['AdministrasiRj']) ? 'green' : 'red';
+
                         @endphp
 
 
@@ -289,6 +293,17 @@
 
                                     <div class="font-normal text-gray-700">
                                         {{ '' . $myQData->nobooking }}
+                                    </div>
+
+                                    <div class="font-normal text-gray-700">
+                                        <x-badge :badgecolor="__($badgecolorAdministrasiRj)">
+                                            Administrasi :
+                                            @isset($datadaftar_json['AdministrasiRj'])
+                                                {{ $datadaftar_json['AdministrasiRj']['userLog'] }}
+                                            @else
+                                                {{ '---' }}
+                                            @endisset
+                                        </x-badge>
                                     </div>
 
 

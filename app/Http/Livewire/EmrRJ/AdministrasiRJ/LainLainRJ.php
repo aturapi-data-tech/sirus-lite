@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\DB;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-// use Carbon\Carbon;
+use Carbon\Carbon;
 
 use App\Http\Traits\customErrorMessagesTrait;
 
@@ -87,7 +87,7 @@ class LainLainRJ extends Component
         // Variable Search
         $search = $this->dataLainLainLovSearch;
 
-        // check LOV by dr_id rs id 
+        // check LOV by dr_id rs id
         $dataLainLainLovs = DB::table('rsmst_others  ')->select(
             'other_id',
             'other_desc',
@@ -240,7 +240,7 @@ class LainLainRJ extends Component
         $dataDaftarPoliRJ_json = isset($findData->datadaftarpolirj_json) ? $findData->datadaftarpolirj_json   : null;
         // if meta_data_pasien_json = null
         // then cari Data Pasien By Key Collection (exception when no data found)
-        // 
+        //
         // else json_decode
         if ($dataDaftarPoliRJ_json) {
             $this->dataDaftarPoliRJ = json_decode($findData->datadaftarpolirj_json, true);
@@ -422,6 +422,8 @@ class LainLainRJ extends Component
                 'LainLainPrice' => $this->collectingMyLainLain['LainLainPrice'],
                 'rjotherDtl' => $lastInserted->rjo_dtl_max,
                 'rjNo' => $this->rjNoRef,
+                'userLog' => auth()->user()->myuser_name,
+                'userLogDate' => Carbon::now()->format('d/m/Y H:i:s')
             ];
 
             $this->store();

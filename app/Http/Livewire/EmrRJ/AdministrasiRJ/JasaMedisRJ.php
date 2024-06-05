@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\DB;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-// use Carbon\Carbon;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 
 
@@ -89,7 +89,7 @@ class JasaMedisRJ extends Component
         // Variable Search
         $search = $this->dataJasaMedisLovSearch;
 
-        // check LOV by dr_id rs id 
+        // check LOV by dr_id rs id
         $dataJasaMedisLovs = DB::table('rsmst_actparamedics  ')->select(
             'pact_id',
             'pact_desc',
@@ -242,7 +242,7 @@ class JasaMedisRJ extends Component
         $dataDaftarPoliRJ_json = isset($findData->datadaftarpolirj_json) ? $findData->datadaftarpolirj_json   : null;
         // if meta_data_pasien_json = null
         // then cari Data Pasien By Key Collection (exception when no data found)
-        // 
+        //
         // else json_decode
         if ($dataDaftarPoliRJ_json) {
             $this->dataDaftarPoliRJ = json_decode($findData->datadaftarpolirj_json, true);
@@ -424,6 +424,8 @@ class JasaMedisRJ extends Component
                 'JasaMedisPrice' => $this->collectingMyJasaMedis['JasaMedisPrice'],
                 'rjpactDtl' => $lastInserted->pact_dtl_max,
                 'rjNo' => $this->rjNoRef,
+                'userLog' => auth()->user()->myuser_name,
+                'userLogDate' => Carbon::now()->format('d/m/Y H:i:s')
             ];
 
             $this->paketLainLainJasaMedis($this->collectingMyJasaMedis['JasaMedisId'], $this->rjNoRef, $lastInserted->pact_dtl_max);
