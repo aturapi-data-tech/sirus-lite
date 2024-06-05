@@ -160,9 +160,7 @@
                         <th scope="col" class="w-1/4 px-4 py-3 ">
                             Pasien
                         </th>
-                        <th scope="col" class="w-1/4 px-4 py-3 ">
-                            SEP
-                        </th>
+
                         <th scope="col" class="w-1/4 px-4 py-3 ">
                             Poli
                         </th>
@@ -230,12 +228,6 @@
                                 </div>
                             </td>
 
-
-                            <td class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-primary whitespace-nowrap ">
-                                {{ $myQData->vno_sep }}
-                            </td>
-
-
                             <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap ">
                                 <div class="">
                                     <div class="font-semibold text-primary">{{ $myQData->poli_desc }}
@@ -252,6 +244,10 @@
                                                         : 'Asuransi Lain')) }}
                                         </x-badge>
                                     </div>
+                                    <div class="font-normal">
+                                        {{ $myQData->vno_sep }}
+                                    </div>
+
 
                                 </div>
                             </td>
@@ -313,7 +309,7 @@
                             <td class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-primary">
 
 
-                                <div class="">
+                                <div class="grid grid-cols-2 gap-2">
 
                                     <x-light-button
                                         wire:click="editTelaahResep('{{ $eresep }}','{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">Telaah
@@ -321,13 +317,14 @@
                                     <x-green-button
                                         wire:click="editAdministrasi('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">Admin
                                         RJ</x-green-button>
-                                    <div>
-                                        <livewire:cetak.cetak-eresep-r-j :rjNoRef="$myQData->rj_no"
-                                            wire:key="cetak.cetak-eresep-r-j-{{ $myQData->rj_no }}">
-
-                                    </div>
 
                                 </div>
+                                <div>
+                                    <livewire:cetak.cetak-eresep-r-j :rjNoRef="$myQData->rj_no"
+                                        wire:key="cetak.cetak-eresep-r-j-{{ $myQData->rj_no }}">
+
+                                </div>
+
 
                             </td>
                         </tr>
