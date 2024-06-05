@@ -305,7 +305,7 @@ class TelaahResepRJ extends Component
         $this->eresep = collect(isset($sumAdmin['eresep']) ? $sumAdmin['eresep'] : [])->count();
 
 
-        $this->sumRsAdmin = $sumAdmin['rsAdmin' ? $sumAdmin['rsAdmin'] : 0];
+        $this->sumRsAdmin = $sumAdmin['rsAdmin'] ? $sumAdmin['rsAdmin'] : 0;
         $this->sumRjAdmin = $sumAdmin['rjAdmin'] ? $sumAdmin['rjAdmin'] : 0;
         $this->sumPoliPrice = $sumAdmin['poliPrice'] ? $sumAdmin['poliPrice'] : 0;
 
