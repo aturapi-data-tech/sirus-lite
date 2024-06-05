@@ -523,7 +523,8 @@ class TelaahResepRJ extends Component
             ->sortByDesc(
                 function ($mySortByJson) {
                     $myQueryPagination = isset(json_decode($mySortByJson->datadaftarpolirj_json, true)['eresep']) ? 1 : 0;
-                    return ($myQueryPagination . $mySortByJson->rj_date1);
+                    $myQueryPagination1 = isset(json_decode($mySortByJson->datadaftarpolirj_json, true)['AdministrasiRj']) ? 1 : 0;
+                    return ($myQueryPagination . $myQueryPagination1 . $mySortByJson->rj_date1);
                 }
             );
 
