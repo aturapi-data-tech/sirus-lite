@@ -116,7 +116,7 @@ class EresepRJRacikan extends Component
         $dataDaftarPoliRJ_json = isset($findData->datadaftarpolirj_json) ? $findData->datadaftarpolirj_json   : null;
         // if meta_data_pasien_json = null
         // then cari Data Pasien By Key Collection (exception when no data found)
-        // 
+        //
         // else json_decode
         if ($dataDaftarPoliRJ_json) {
             $this->dataDaftarPoliRJ = json_decode($findData->datadaftarpolirj_json, true);
@@ -258,10 +258,10 @@ class EresepRJRacikan extends Component
             "collectingMyProduct.productName" => 'bail|required|',
             "collectingMyProduct.signaX" => 'bail|numeric|min:1|max:5',
             "collectingMyProduct.signaHari" => 'bail|numeric|min:1|max:5',
-            "collectingMyProduct.qty" => 'bail|required|digits_between:1,3|',
+            "collectingMyProduct.qty" => 'bail|digits_between:1,3|',
             "collectingMyProduct.productPrice" => 'bail|numeric|',
-            "collectingMyProduct.catatanKhusus" => 'bail|required|max:150',
-            "collectingMyProduct.catatan" => 'bail|required|max:150',
+            "collectingMyProduct.catatanKhusus" => 'bail|max:150',
+            "collectingMyProduct.catatan" => 'bail|max:150',
             "collectingMyProduct.sedia" => 'bail|required|max:150',
 
 
@@ -289,14 +289,13 @@ class EresepRJRacikan extends Component
                     'rj_no' => $this->rjNoRef,
                     // 'product_id' => $this->collectingMyProduct['productId'],
                     'product_name' => $this->collectingMyProduct['productName'],
-                    'qty' => $this->collectingMyProduct['qty'],
+                    'sedia' => $this->collectingMyProduct['sedia'],
+                    'qty' => isset($this->collectingMyProduct['qty']) ? $this->collectingMyProduct['qty'] : null,
                     // 'price' => $this->collectingMyProduct['productPrice'],
                     // 'rj_carapakai' => $this->collectingMyProduct['signaX'],
                     // 'rj_kapsul' => $this->collectingMyProduct['signaHari'],
-                    'sedia' => $this->collectingMyProduct['sedia'],
-                    'catatan' => $this->collectingMyProduct['catatan'],
-                    'qty' => $this->collectingMyProduct['qty'],
-                    'catatan_khusus' => $this->collectingMyProduct['catatanKhusus'],
+                    'catatan' => isset($this->collectingMyProduct['catatan']) ? $this->collectingMyProduct['catatan'] : null,
+                    'catatan_khusus' => isset($this->collectingMyProduct['catatanKhusus']) ? $this->collectingMyProduct['catatanKhusus'] : null,
                     'no_racikan' => $this->noRacikan,
 
                     'rj_takar' => 'Tablet',
@@ -310,9 +309,9 @@ class EresepRJRacikan extends Component
                 // 'productId' => $this->collectingMyProduct['productId'],
                 'productName' => $this->collectingMyProduct['productName'],
                 'sedia' => $this->collectingMyProduct['sedia'],
-                'catatan' => $this->collectingMyProduct['catatan'],
-                'qty' => $this->collectingMyProduct['qty'],
-                'catatanKhusus' => $this->collectingMyProduct['catatanKhusus'],
+                'catatan' => isset($this->collectingMyProduct['catatan']) ? $this->collectingMyProduct['catatan'] : '',
+                'qty' => isset($this->collectingMyProduct['qty']) ? $this->collectingMyProduct['qty'] : '',
+                'catatanKhusus' => isset($this->collectingMyProduct['catatanKhusus']) ? $this->collectingMyProduct['catatanKhusus'] : '',
                 'noRacikan' => $this->noRacikan,
                 'signaX' => 1,
                 'signaHari' => 1,

@@ -19,8 +19,8 @@
 
                     @role(['Dokter', 'Admin'])
                         {{-- collectingMyProduct / obat --}}
-                        <div class="grid grid-cols-12 gap-2 " x-data>
-                            <div class="col-span-1">
+                        <div class="inline-flex space-x-0.5" x-data>
+                            <div class="basis-1/4">
                                 <x-input-label for="collectingMyProduct.noRacikan" :value="__('Racikan')" :required="__(true)" />
 
                                 <div>
@@ -35,7 +35,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-span-3">
+                            <div class="basis-3/4">
                                 <x-input-label for="collectingMyProduct.productName" :value="__('Nama Obat')" :required="__(true)" />
 
                                 <div>
@@ -53,14 +53,14 @@
 
 
 
-                            <div class="col-span-1">
+                            <div class="basis-1/4">
                                 <x-input-label for="collectingMyProduct.sedia" :value="__('Sedia')" :required="__(true)" />
 
                                 <div>
                                     <x-text-input id="collectingMyProduct.sedia" placeholder="Sedia" class="mt-1 ml-2"
                                         :errorshas="__($errors->has('collectingMyProduct.sedia'))" :disabled=$disabledPropertyRjStatus
                                         x-ref="collectingMyProductsedia"
-                                        x-on:keyup.enter="$refs.collectingMyProductcatatan.focus()"
+                                        x-on:keyup.enter="$refs.collectingMyProductqty.focus()"
                                         wire:model.debounce.500ms="collectingMyProduct.sedia" />
 
                                     @error('collectingMyProduct.sedia')
@@ -69,14 +69,31 @@
                                 </div>
                             </div>
 
-                            <div class="col-span-1">
-                                <x-input-label for="collectingMyProduct.catatan" :value="__('Catatan')" :required="__(true)" />
+
+
+                            <div class="basis-2/4">
+                                <x-input-label for="collectingMyProduct.qty" :value="__('Jml Racikan')" :required="__(false)" />
 
                                 <div>
-                                    <x-text-input id="collectingMyProduct.catatan" placeholder="Jml Racikan"
-                                        class="mt-1 ml-2" :errorshas="__($errors->has('collectingMyProduct.catatan'))" :disabled=$disabledPropertyRjStatus
+                                    <x-text-input id="collectingMyProduct.qty" placeholder="Jml Racikan" class="mt-1 ml-2"
+                                        :errorshas="__($errors->has('collectingMyProduct.qty'))" :disabled=$disabledPropertyRjStatus
+                                        wire:model.debounce.500ms="collectingMyProduct.qty" x-ref="collectingMyProductqty"
+                                        x-on:keyup.enter="$refs.collectingMyProductcatatan.focus()" />
+
+                                    @error('collectingMyProduct.qty')
+                                        <x-input-error :messages=$message />
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="basis-1/4">
+                                <x-input-label for="collectingMyProduct.catatan" :value="__('Catatan')" :required="__(false)" />
+
+                                <div>
+                                    <x-text-input id="collectingMyProduct.catatan" placeholder="Catatan" class="mt-1 ml-2"
+                                        :errorshas="__($errors->has('collectingMyProduct.catatan'))" :disabled=$disabledPropertyRjStatus
                                         x-ref="collectingMyProductcatatan"
-                                        x-on:keyup.enter="$refs.collectingMyProductqty.focus()"
+                                        x-on:keyup.enter="$refs.collectingMyProductcatatanKhusus.focus()"
                                         wire:model.debounce.500ms="collectingMyProduct.catatan" />
 
                                     @error('collectingMyProduct.catatan')
@@ -85,27 +102,12 @@
                                 </div>
                             </div>
 
-                            <div class="col-span-1">
-                                <x-input-label for="collectingMyProduct.qty" :value="__('Jml Racikan')" :required="__(true)" />
-
-                                <div>
-                                    <x-text-input id="collectingMyProduct.qty" placeholder="Jml Racikan" class="mt-1 ml-2"
-                                        :errorshas="__($errors->has('collectingMyProduct.qty'))" :disabled=$disabledPropertyRjStatus
-                                        wire:model.debounce.500ms="collectingMyProduct.qty" x-ref="collectingMyProductqty"
-                                        x-on:keyup.enter="$refs.collectingMyProductcatatanKhusus.focus()" />
-
-                                    @error('collectingMyProduct.qty')
-                                        <x-input-error :messages=$message />
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="col-span-3">
+                            <div class="basis-3/4">
                                 <x-input-label for="collectingMyProduct.catatanKhusus" :value="__('Signa')"
-                                    :required="__(true)" />
+                                    :required="__(false)" />
 
                                 <div>
-                                    <x-text-input id="collectingMyProduct.catatanKhusus" placeholder="Catatan Khusus"
+                                    <x-text-input id="collectingMyProduct.catatanKhusus" placeholder="Signa"
                                         class="mt-1 ml-2" :errorshas="__($errors->has('collectingMyProduct.catatanKhusus'))" :disabled=$disabledPropertyRjStatus
                                         wire:model="collectingMyProduct.catatanKhusus"
                                         x-on:keyup.enter="$wire.insertProduct()
@@ -118,8 +120,8 @@
                                 </div>
                             </div>
 
-                            <div class="col-span-1">
-                                <x-input-label for="" :value="__('Hapus')" :required="__(true)" />
+                            <div class="basis-1/4">
+                                <x-input-label for="" :value="__('Hapus')" :required="__(false)" />
 
                                 <x-alternative-button class="inline-flex ml-2"
                                     wire:click.prevent="resetcollectingMyProduct()"
@@ -172,13 +174,6 @@
                                                 <th scope="col" class="px-4 py-3 ">
                                                     <x-sort-link :active=false wire:click.prevent="" role="button"
                                                         href="#">
-                                                        Catatan
-                                                    </x-sort-link>
-                                                </th>
-
-                                                <th scope="col" class="px-4 py-3 ">
-                                                    <x-sort-link :active=false wire:click.prevent="" role="button"
-                                                        href="#">
                                                         Jml Racikan
                                                     </x-sort-link>
                                                 </th>
@@ -186,7 +181,14 @@
                                                 <th scope="col" class="px-4 py-3 ">
                                                     <x-sort-link :active=false wire:click.prevent="" role="button"
                                                         href="#">
-                                                        Catatan Khusus
+                                                        Catatan
+                                                    </x-sort-link>
+                                                </th>
+
+                                                <th scope="col" class="px-4 py-3 ">
+                                                    <x-sort-link :active=false wire:click.prevent="" role="button"
+                                                        href="#">
+                                                        Signa
                                                     </x-sort-link>
                                                 </th>
 
@@ -219,12 +221,12 @@
 
                                                         <td
                                                             class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                            {{ $eresep['catatan'] }}
+                                                            {{ $eresep['qty'] }}
                                                         </td>
 
                                                         <td
                                                             class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                            {{ $eresep['qty'] }}
+                                                            {{ $eresep['catatan'] }}
                                                         </td>
 
                                                         <td

@@ -179,9 +179,14 @@
                             </td>
 
                             <td class="w-1/5 text-center uppercase">
-                                {{ 'S ' . $eresep['signaX'] . 'dd' . $eresep['signaHari'] . '  (' . $eresep['catatanKhusus'] . ')' }}
-                            </td>
-                        </tr>
+                                {{ 'S ' . $eresep['signaX'] . 'dd' . $eresep['signaHari'] }}
+                                @if ($eresep['catatanKhusus'])
+                                    {{ ' (' . $eresep['catatanKhusus'] . ')' }}
+                                @endif
+
+                    @endif
+                    </td>
+                    </tr>
                     @endforeach
                 @endisset
             </tbody>
@@ -199,11 +204,19 @@
                             </td>
 
                             <td class="w-1/5 text-center uppercase">
-                                {{ 'No. ' . $eresepRacikan['qty'] }}
+                                @if ($eresepRacikan['qty'])
+                                    {{ 'Jml Racikan ' . $eresepRacikan['qty'] }}
+                                @else
+                                    {{ '' }}
+                                @endif
                             </td>
 
                             <td class="w-1/5 text-center uppercase">
-                                {{ 'S ' . $eresepRacikan['catatan'] . '  ' . $eresepRacikan['catatanKhusus'] }}
+                                @if ($eresepRacikan['qty'])
+                                    {{ '(' . $eresepRacikan['catatan'] . ') ' . 'S ' . $eresepRacikan['catatanKhusus'] }}
+                                @else
+                                    {{ '' }}
+                                @endif
                             </td>
                         </tr>
                     @endforeach

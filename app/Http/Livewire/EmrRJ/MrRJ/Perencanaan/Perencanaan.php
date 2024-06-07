@@ -404,8 +404,8 @@ class Perencanaan extends Component
 
             foreach ($this->dataDaftarPoliRJ['eresep'] as $key => $value) {
                 // NonRacikan
-
-                $eresep .= 'R/' . ' ' . $value['productName'] . ' | No. ' . $value['qty'] . ' | S ' . $value['signaX'] . 'dd' . $value['signaHari'] . ' (' . $value['catatanKhusus'] . ')' . PHP_EOL;
+                $catatanKhusus = ($value['catatanKhusus']) ? ' (' . $value['catatanKhusus'] . ')' : '';
+                $eresep .=  'R/' . ' ' . $value['productName'] . ' | No. ' . $value['qty'] . ' | S ' .  $value['signaX'] . 'dd' . $value['signaHari'] . $catatanKhusus . PHP_EOL;
             }
             $this->dataDaftarPoliRJ['perencanaan']['terapi']['terapi'] = $this->dataDaftarPoliRJ['perencanaan']['terapi']['terapi'] . $eresep;
         }
@@ -414,7 +414,8 @@ class Perencanaan extends Component
             $eresepRacikan = '' . PHP_EOL;
             // Racikan
             foreach ($this->dataDaftarPoliRJ['eresepRacikan'] as $key => $value) {
-                $eresepRacikan .= $value['noRacikan'] . '/ ' . $value['productName'] . ' ' . $value['sedia'] . ' | ' . $value['catatan'] . ' | No. ' . $value['qty'] . ' | S ' . $value['catatanKhusus'] . PHP_EOL;
+                $jmlRacikan = ($value['qty']) ? 'Jml Racikan ' . $value['qty'] . ' | ' . $value['catatan'] . ' | S ' . $value['catatanKhusus'] . PHP_EOL : '';
+                $eresepRacikan .= $value['noRacikan'] . '/ ' . $value['productName'] . ' ' . $value['sedia'] .  PHP_EOL . $jmlRacikan;
             }
 
             $this->dataDaftarPoliRJ['perencanaan']['terapi']['terapi'] = $this->dataDaftarPoliRJ['perencanaan']['terapi']['terapi'] . $eresepRacikan;

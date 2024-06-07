@@ -312,7 +312,10 @@
 
                                                         <td
                                                             class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                            {{ $eresep['signaX'] . 'dd' . $eresep['signaHari'] . ' (' . $eresep['catatanKhusus'] . ')' }}
+                                                            {{ $eresep['signaX'] . 'dd' . $eresep['signaHari'] }}
+                                                            @if ($eresep['catatanKhusus'])
+                                                                {{ ' (' . $eresep['catatanKhusus'] . ')' }}
+                                                            @endif
                                                         </td>
 
 
