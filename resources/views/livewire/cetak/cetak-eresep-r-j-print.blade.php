@@ -229,7 +229,7 @@
             <tbody>
                 <td class="w-3/4">
 
-                    x
+                    .
 
                 </td>
                 @inject('carbon', 'Carbon\Carbon')
