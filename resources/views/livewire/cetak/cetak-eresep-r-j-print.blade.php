@@ -183,10 +183,8 @@
                                 @if ($eresep['catatanKhusus'])
                                     {{ ' (' . $eresep['catatanKhusus'] . ')' }}
                                 @endif
-
-                    @endif
-                    </td>
-                    </tr>
+                            </td>
+                        </tr>
                     @endforeach
                 @endisset
             </tbody>
