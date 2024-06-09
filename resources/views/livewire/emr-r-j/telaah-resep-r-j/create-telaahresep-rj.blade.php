@@ -1,5 +1,10 @@
 <div class="fixed inset-0 z-40">
+    @php
+        $disabledPropertyRjStatus = false;
+        $disabledPropertyRjStatusResep = isset($dataDaftarPoliRJ['telaahResep']['penanggungJawab']) ? true : false;
+        $disabledPropertyRjStatusObat = isset($dataDaftarPoliRJ['telaahObat']['penanggungJawab']) ? true : false;
 
+    @endphp
     <div class="">
 
         <!-- This element is to trick the browser into transition-opacity. -->
@@ -57,7 +62,7 @@
                 </div>
 
                 {{-- Grid Eresep --}}
-                <div class="grid grid-cols-3 gap-2">
+                <div class="grid grid-cols-3 gap-4">
 
                     <div class="col-span-2">
                         {{-- Transasi EMR --}}
@@ -122,20 +127,25 @@
                             </div>
 
 
-
-
-
                         </div>
+
+                        {{-- Telaah Resep / Telaah Obat --}}
+                        @role(['Apoteker', 'Admin'])
+                            <div class="grid w-full grid-cols-2 gap-8 px-8 mx-2 my-2 mr-2 rounded-lg bg-gray-50">
+                                @include('livewire.emr-r-j.telaah-resep-r-j.radio-telaahresep-rj')
+                                @include('livewire.emr-r-j.telaah-resep-r-j.radio-telaahobat-rj')
+                            </div>
+                        @endrole
+
                     </div>
 
                     {{-- Resume --}}
-                    <div>
+                    <div class="col-span-1">
                         <livewire:emr.rekam-medis.rekam-medis-display :wire:key="'content-rekamMedisDisplay'"
                             :rjNoRefCopyTo="$rjNoRef" :regNoRef="$regNoRef">
                     </div>
 
                 </div>
-
 
 
 

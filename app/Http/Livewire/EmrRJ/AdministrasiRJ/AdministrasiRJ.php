@@ -83,9 +83,9 @@ class AdministrasiRJ extends Component
     {
         $sumAdmin = $this->findData($this->rjNoRef);
 
-        $this->sumRsAdmin = $sumAdmin['rsAdmin'];
-        $this->sumRjAdmin = $sumAdmin['rjAdmin'];
-        $this->sumPoliPrice = $sumAdmin['poliPrice'];
+        $this->sumRsAdmin = $sumAdmin['rsAdmin'] ? $sumAdmin['rsAdmin'] : 0;
+        $this->sumRjAdmin = $sumAdmin['rjAdmin'] ? $sumAdmin['rjAdmin'] : 0;
+        $this->sumPoliPrice = $sumAdmin['poliPrice'] ? $sumAdmin['poliPrice'] : 0;
 
         $this->sumJasaKaryawan = isset($sumAdmin['JasaKaryawan']) ? collect($sumAdmin['JasaKaryawan'])->sum('JasaKaryawanPrice') : 0;
         $this->sumJasaMedis = isset($sumAdmin['JasaMedis']) ? collect($sumAdmin['JasaMedis'])->sum('JasaMedisPrice') : 0;
@@ -116,6 +116,7 @@ class AdministrasiRJ extends Component
     {
 
         $dataDaftarPoliRJ = $this->findData($rjNo);
+
         if (isset($dataDaftarPoliRJ['AdministrasiRj']) == false) {
             $dataDaftarPoliRJ['AdministrasiRj'] = [
                 'userLog' => auth()->user()->myuser_name,
@@ -289,9 +290,15 @@ class AdministrasiRJ extends Component
                 ->where('par_id', '1')
                 ->first();
             if (isset($dataRawatJalan['rjAdmin'])) {
-                $dataRawatJalan['rjAdmin'] = $dataRawatJalan['rjAdmin'];
+                $dataRawatJalan['rjAdmin'] = $rsAdmin->rj_admin;
             } else {
                 $dataRawatJalan['rjAdmin'] = $rsAdminParameter->par_value;
+                // update table trnsaksi
+                DB::table('rstxn_rjhdrs')
+                    ->where('rj_no', $rjNo)
+                    ->update([
+                        'rj_admin' => $dataRawatJalan['rjAdmin'],
+                    ]);
             }
         } else {
             $dataRawatJalan['rjAdmin'] = 0;
@@ -305,16 +312,28 @@ class AdministrasiRJ extends Component
 
 
         if (isset($dataRawatJalan['rsAdmin'])) {
-            $dataRawatJalan['rsAdmin'] = $dataRawatJalan['rsAdmin'] ? $dataRawatJalan['rsAdmin'] : 0;
+            $dataRawatJalan['rsAdmin'] = $rsAdmin->rs_admin ? $rsAdmin->rs_admin : 0;
         } else {
             $dataRawatJalan['rsAdmin'] = $rsAdminDokter->rs_admin ? $rsAdminDokter->rs_admin : 0;
+            // update table trnsaksi
+            DB::table('rstxn_rjhdrs')
+                ->where('rj_no', $rjNo)
+                ->update([
+                    'rs_admin' => $dataRawatJalan['rsAdmin'],
+                ]);
         }
 
         // PoliPrice
         if (isset($dataRawatJalan['poliPrice'])) {
-            $dataRawatJalan['poliPrice'] = $dataRawatJalan['poliPrice'] ? $dataRawatJalan['poliPrice'] : 0;
+            $dataRawatJalan['poliPrice'] = $rsAdmin->poli_price ? $rsAdmin->poli_price : 0;
         } else {
             $dataRawatJalan['poliPrice'] = $rsAdminDokter->poli_price ? $rsAdminDokter->poli_price : 0;
+            // update table trnsaksi
+            DB::table('rstxn_rjhdrs')
+                ->where('rj_no', $rjNo)
+                ->update([
+                    'poli_price' => $dataRawatJalan['poliPrice'],
+                ]);
         }
 
         // Ketika Kronis
@@ -322,6 +341,14 @@ class AdministrasiRJ extends Component
             $dataRawatJalan['rjAdmin'] = 0;
             $dataRawatJalan['rsAdmin'] = 0;
             $dataRawatJalan['poliPrice'] = 0;
+            // update table trnsaksi
+            DB::table('rstxn_rjhdrs')
+                ->where('rj_no', $rjNo)
+                ->update([
+                    'rj_admin' => $dataRawatJalan['rjAdmin'],
+                    'rs_admin' => $dataRawatJalan['rsAdmin'],
+                    'poli_price' => $dataRawatJalan['poliPrice'],
+                ]);
         }
 
         $dataRawatJalan['rjObat'] = json_decode(json_encode($rsObat, true), true);

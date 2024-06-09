@@ -12,6 +12,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 use Carbon\Carbon;
+use Spatie\ArrayToXml\ArrayToXml;
 
 
 class TelaahResepRJ extends Component
@@ -32,6 +33,121 @@ class TelaahResepRJ extends Component
     // limit record per page -resetExcept////////////////
     public int $limitPerPage = 10;
 
+    public array $dataDaftarPoliRJ = [];
+
+    public array $telaahResep = [
+        "kejelasanTulisanResep" => [
+            "kejelasanTulisanResep" => "Ya",
+            "kejelasanTulisanResepOptions" => [
+                ["kejelasanTulisanResep" => "Ya"],
+                ["kejelasanTulisanResep" => "Tidak"],
+            ],
+            "desc" => "",
+        ],
+        "tepatObat" => [
+            "tepatObat" => "Ya",
+            "tepatObatOptions" => [
+                ["tepatObat" => "Ya"],
+                ["tepatObat" => "Tidak"],
+            ],
+            "desc" => "",
+        ], "tepatDosis" => [
+            "tepatDosis" => "Ya",
+            "tepatDosisOptions" => [
+                ["tepatDosis" => "Ya"],
+                ["tepatDosis" => "Tidak"],
+            ],
+            "desc" => "",
+        ], "tepatRute" => [
+            "tepatRute" => "Ya",
+            "tepatRuteOptions" => [
+                ["tepatRute" => "Ya"],
+                ["tepatRute" => "Tidak"],
+            ],
+            "desc" => "",
+        ],
+        "tepatWaktu" => [
+            "tepatWaktu" => "Ya",
+            "tepatWaktuOptions" => [
+                ["tepatWaktu" => "Ya"],
+                ["tepatWaktu" => "Tidak"],
+            ],
+            "desc" => "",
+        ],
+        "duplikasi" => [
+            "duplikasi" => "Tidak",
+            "duplikasiOptions" => [
+                ["duplikasi" => "Ya"],
+                ["duplikasi" => "Tidak"],
+            ],
+            "desc" => "",
+        ],
+        "alergi" => [
+            "alergi" => "Tidak",
+            "alergiOptions" => [
+                ["alergi" => "Ya"],
+                ["alergi" => "Tidak"],
+            ],
+            "desc" => "",
+        ],
+        "interaksiObat" => [
+            "interaksiObat" => "Tidak",
+            "interaksiObatOptions" => [
+                ["interaksiObat" => "Ya"],
+                ["interaksiObat" => "Tidak"],
+            ],
+            "desc" => "",
+        ],
+        "bbPasienAnak" => [
+            "bbPasienAnak" => "Ya",
+            "bbPasienAnakOptions" => [
+                ["bbPasienAnak" => "Ya"],
+                ["bbPasienAnak" => "Tidak"],
+            ],
+            "desc" => "",
+        ],
+        "kontraIndikasiLain" => [
+            "kontraIndikasiLain" => "Tidak",
+            "kontraIndikasiLainOptions" => [
+                ["kontraIndikasiLain" => "Ya"],
+                ["kontraIndikasiLain" => "Tidak"],
+            ],
+            "desc" => "",
+        ],
+    ];
+
+    public array $telaahObat = [
+        "obatdgnResep" => [
+            "obatdgnResep" => "Ya",
+            "obatdgnResepOptions" => [
+                ["obatdgnResep" => "Ya"],
+                ["obatdgnResep" => "Tidak"],
+            ],
+            "desc" => "",
+        ],
+        "jmlDosisdgnResep" => [
+            "jmlDosisdgnResep" => "Ya",
+            "jmlDosisdgnResepOptions" => [
+                ["jmlDosisdgnResep" => "Ya"],
+                ["jmlDosisdgnResep" => "Tidak"],
+            ],
+            "desc" => "",
+        ], "rutedgnResep" => [
+            "rutedgnResep" => "Ya",
+            "rutedgnResepOptions" => [
+                ["rutedgnResep" => "Ya"],
+                ["rutedgnResep" => "Tidak"],
+            ],
+            "desc" => "",
+        ], "waktuFrekPemberiandgnResep" => [
+            "waktuFrekPemberiandgnResep" => "Ya",
+            "waktuFrekPemberiandgnResepOptions" => [
+                ["waktuFrekPemberiandgnResep" => "Ya"],
+                ["waktuFrekPemberiandgnResep" => "Tidak"],
+            ],
+            "desc" => "",
+        ],
+    ];
 
     // my Top Bar
     public array $myTopBar = [
@@ -296,7 +412,7 @@ class TelaahResepRJ extends Component
         $this->sumAdmin();
     }
 
-    private function sumAdmin()
+    private function sumAdmin(): void
     {
         $sumAdmin = $this->findData($this->rjNoRef);
 
@@ -333,8 +449,45 @@ class TelaahResepRJ extends Component
         $this->sumTotalRJ = $this->sumPoliPrice + $this->sumRjAdmin + $this->sumRsAdmin  + $this->sumJasaKaryawan + $this->sumJasaDokter + $this->sumJasaMedis + $this->sumLainLain + $this->sumObat + $this->sumLaboratorium + $this->sumRadiologi;
     }
 
+    public function setttdTelaahResep($rjNo)
+    {
+        if (isset($this->dataDaftarPoliRJ['telaahResep']['penanggungJawab']) == false) {
+            $this->dataDaftarPoliRJ['telaahResep']['penanggungJawab'] = [
+                'userLog' => auth()->user()->myuser_name,
+                'userLogDate' => Carbon::now()->format('d/m/Y H:i:s')
+            ];
 
+            DB::table('rstxn_rjhdrs')
+                ->where('rj_no', $rjNo)
+                ->update([
+                    'datadaftarpolirj_json' => json_encode($this->dataDaftarPoliRJ, true),
+                    'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
+                ]);
 
+            $this->emit('syncronizeAssessmentDokterRJFindData');
+            $this->emit('syncronizeAssessmentPerawatRJFindData');
+        }
+    }
+
+    public function setttdTelaahObat($rjNo)
+    {
+        if (isset($this->dataDaftarPoliRJ['telaahObat']['penanggungJawab']) == false) {
+            $this->dataDaftarPoliRJ['telaahObat']['penanggungJawab'] = [
+                'userLog' => auth()->user()->myuser_name,
+                'userLogDate' => Carbon::now()->format('d/m/Y H:i:s')
+            ];
+
+            DB::table('rstxn_rjhdrs')
+                ->where('rj_no', $rjNo)
+                ->update([
+                    'datadaftarpolirj_json' => json_encode($this->dataDaftarPoliRJ, true),
+                    'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
+                ]);
+
+            $this->emit('syncronizeAssessmentDokterRJFindData');
+            $this->emit('syncronizeAssessmentPerawatRJFindData');
+        }
+    }
 
     private function findData($rjNo): array
     {
@@ -349,6 +502,109 @@ class TelaahResepRJ extends Component
 
         if ($dataDaftarPoliRJ_json) {
             $dataRawatJalan = json_decode($findData->datadaftarpolirj_json, true);
+        } else {
+
+            $this->emit('toastr-error', "Data tidak dapat di proses json.");
+            $dataDaftarPoliRJ = DB::table('rsview_rjkasir')
+                ->select(
+                    DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
+                    DB::raw("to_char(rj_date,'yyyymmddhh24miss') AS rj_date1"),
+                    'rj_no',
+                    'reg_no',
+                    'reg_name',
+                    'sex',
+                    'address',
+                    'thn',
+                    DB::raw("to_char(birth_date,'dd/mm/yyyy') AS birth_date"),
+                    'poli_id',
+                    'poli_desc',
+                    'dr_id',
+                    'dr_name',
+                    'klaim_id',
+                    // 'entry_id',
+                    'shift',
+                    'vno_sep',
+                    'no_antrian',
+
+                    'nobooking',
+                    'push_antrian_bpjs_status',
+                    'push_antrian_bpjs_json',
+                    'kd_dr_bpjs',
+                    'kd_poli_bpjs',
+                    'rj_status',
+                    'txn_status',
+                    'erm_status',
+                )
+                ->where('rj_no', '=', $rjNo)
+                ->first();
+
+            $dataRawatJalan = [
+                "regNo" =>  $dataDaftarPoliRJ->reg_no,
+
+                "drId" =>  $dataDaftarPoliRJ->dr_id,
+                "drDesc" =>  $dataDaftarPoliRJ->dr_name,
+
+                "poliId" =>  $dataDaftarPoliRJ->poli_id,
+                "klaimId" => $dataDaftarPoliRJ->klaim_id,
+                // "poliDesc" =>  $dataDaftarPoliRJ->poli_desc ,
+
+                // "kddrbpjs" =>  $dataDaftarPoliRJ->kd_dr_bpjs ,
+                // "kdpolibpjs" =>  $dataDaftarPoliRJ->kd_poli_bpjs ,
+
+                "rjDate" =>  $dataDaftarPoliRJ->rj_date,
+                "rjNo" =>  $dataDaftarPoliRJ->rj_no,
+                "shift" =>  $dataDaftarPoliRJ->shift,
+                "noAntrian" =>  $dataDaftarPoliRJ->no_antrian,
+                "noBooking" =>  $dataDaftarPoliRJ->nobooking,
+                "slCodeFrom" => "02",
+                "passStatus" => "",
+                "rjStatus" =>  $dataDaftarPoliRJ->rj_status,
+                "txnStatus" =>  $dataDaftarPoliRJ->txn_status,
+                "ermStatus" =>  $dataDaftarPoliRJ->erm_status,
+                "cekLab" => "0",
+                "kunjunganInternalStatus" => "0",
+                "noReferensi" =>  $dataDaftarPoliRJ->reg_no,
+                "postInap" => [],
+                "internal12" => "1",
+                "internal12Desc" => "Faskes Tingkat 1",
+                "internal12Options" => [
+                    [
+                        "internal12" => "1",
+                        "internal12Desc" => "Faskes Tingkat 1"
+                    ],
+                    [
+                        "internal12" => "2",
+                        "internal12Desc" => "Faskes Tingkat 2 RS"
+                    ]
+                ],
+                "kontrol12" => "1",
+                "kontrol12Desc" => "Faskes Tingkat 1",
+                "kontrol12Options" => [
+                    [
+                        "kontrol12" => "1",
+                        "kontrol12Desc" => "Faskes Tingkat 1"
+                    ],
+                    [
+                        "kontrol12" => "2",
+                        "kontrol12Desc" => "Faskes Tingkat 2 RS"
+                    ],
+                ],
+                "taskIdPelayanan" => [
+                    "taskId1" => "",
+                    "taskId2" => "",
+                    "taskId3" =>  $dataDaftarPoliRJ->rj_date,
+                    "taskId4" => "",
+                    "taskId5" => "",
+                    "taskId6" => "",
+                    "taskId7" => "",
+                    "taskId99" => "",
+                ],
+                'sep' => [
+                    "noSep" =>  $dataDaftarPoliRJ->vno_sep,
+                    "reqSep" => [],
+                    "resSep" => [],
+                ]
+            ];
         }
 
         $rsAdmin = DB::table('rstxn_rjhdrs')
@@ -374,7 +630,6 @@ class TelaahResepRJ extends Component
             ->get();
 
 
-
         // RJ Admin
         if ($rsAdmin->pass_status == 'N') {
             $rsAdminParameter = DB::table('rsmst_parameters')
@@ -385,6 +640,12 @@ class TelaahResepRJ extends Component
                 $dataRawatJalan['rjAdmin'] = $rsAdmin->rj_admin;
             } else {
                 $dataRawatJalan['rjAdmin'] = $rsAdminParameter->par_value;
+                // update table trnsaksi
+                DB::table('rstxn_rjhdrs')
+                    ->where('rj_no', $rjNo)
+                    ->update([
+                        'rj_admin' => $dataRawatJalan['rjAdmin'],
+                    ]);
             }
         } else {
             $dataRawatJalan['rjAdmin'] = 0;
@@ -401,6 +662,12 @@ class TelaahResepRJ extends Component
             $dataRawatJalan['rsAdmin'] = $rsAdmin->rs_admin ? $rsAdmin->rs_admin : 0;
         } else {
             $dataRawatJalan['rsAdmin'] = $rsAdminDokter->rs_admin ? $rsAdminDokter->rs_admin : 0;
+            // update table trnsaksi
+            DB::table('rstxn_rjhdrs')
+                ->where('rj_no', $rjNo)
+                ->update([
+                    'rs_admin' => $dataRawatJalan['rsAdmin'],
+                ]);
         }
 
         // PoliPrice
@@ -408,6 +675,12 @@ class TelaahResepRJ extends Component
             $dataRawatJalan['poliPrice'] = $rsAdmin->poli_price ? $rsAdmin->poli_price : 0;
         } else {
             $dataRawatJalan['poliPrice'] = $rsAdminDokter->poli_price ? $rsAdminDokter->poli_price : 0;
+            // update table trnsaksi
+            DB::table('rstxn_rjhdrs')
+                ->where('rj_no', $rjNo)
+                ->update([
+                    'poli_price' => $dataRawatJalan['poliPrice'],
+                ]);
         }
 
         // Ketika Kronis
@@ -415,13 +688,32 @@ class TelaahResepRJ extends Component
             $dataRawatJalan['rjAdmin'] = 0;
             $dataRawatJalan['rsAdmin'] = 0;
             $dataRawatJalan['poliPrice'] = 0;
+            // update table trnsaksi
+            DB::table('rstxn_rjhdrs')
+                ->where('rj_no', $rjNo)
+                ->update([
+                    'rj_admin' => $dataRawatJalan['rjAdmin'],
+                    'rs_admin' => $dataRawatJalan['rsAdmin'],
+                    'poli_price' => $dataRawatJalan['poliPrice'],
+                ]);
         }
+
+
 
         $dataRawatJalan['rjObat'] = json_decode(json_encode($rsObat, true), true);
         $dataRawatJalan['rjLab'] = json_decode(json_encode($rsLab, true), true);
         $dataRawatJalan['rjRad'] = json_decode(json_encode($rsRad, true), true);
 
 
+        if (!isset($dataRawatJalan['telaahResep'])) {
+            $dataRawatJalan['telaahResep'] = $this->telaahResep;
+        }
+
+        if (!isset($dataRawatJalan['telaahObat'])) {
+            $dataRawatJalan['telaahObat'] = $this->telaahObat;
+        }
+
+        $this->dataDaftarPoliRJ = $dataRawatJalan;
         return ($dataRawatJalan);
     }
 
