@@ -454,7 +454,8 @@ class TelaahResepRJ extends Component
         if (isset($this->dataDaftarPoliRJ['telaahResep']['penanggungJawab']) == false) {
             $this->dataDaftarPoliRJ['telaahResep']['penanggungJawab'] = [
                 'userLog' => auth()->user()->myuser_name,
-                'userLogDate' => Carbon::now()->format('d/m/Y H:i:s')
+                'userLogDate' => Carbon::now()->format('d/m/Y H:i:s'),
+                'userLogCode' => auth()->user()->myuser_code
             ];
 
             DB::table('rstxn_rjhdrs')
@@ -474,7 +475,8 @@ class TelaahResepRJ extends Component
         if (isset($this->dataDaftarPoliRJ['telaahObat']['penanggungJawab']) == false) {
             $this->dataDaftarPoliRJ['telaahObat']['penanggungJawab'] = [
                 'userLog' => auth()->user()->myuser_name,
-                'userLogDate' => Carbon::now()->format('d/m/Y H:i:s')
+                'userLogDate' => Carbon::now()->format('d/m/Y H:i:s'),
+                'userLogCode' => auth()->user()->myuser_code
             ];
 
             DB::table('rstxn_rjhdrs')
