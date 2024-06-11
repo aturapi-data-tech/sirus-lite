@@ -20,75 +20,94 @@
                     @role(['Dokter', 'Admin'])
                         {{-- collectingMyProduct / obat --}}
                         @if (!$collectingMyProduct)
-                            <div>
-                                <x-input-label for="dataProductLovSearch" :value="__('Nama Obat')" :required="__(true)" />
+                            <div class="grid grid-cols-8 gap-4" x-data="{ selecteddataProductLovIndex: @entangle('selecteddataProductLovIndex') }"
+                                @click.outside="$wire.dataProductLovSearch = ''">
+                                <div class="col-span-1">
+                                    <x-input-label for="collectingMyProduct.noRacikan" :value="__('Racikan')"
+                                        :required="__(true)" />
 
-                                {{-- Lov dataProductLov --}}
-                                <div x-data="{ selecteddataProductLovIndex: @entangle('selecteddataProductLovIndex') }" @click.outside="$wire.dataProductLovSearch = ''">
-                                    <x-text-input id="dataProductLovSearchMain" placeholder="Nama Obat" class="mt-1 ml-2"
-                                        :errorshas="__($errors->has('dataProductLovSearchMain'))" :disabled=$disabledPropertyRjStatus
-                                        wire:model.debounce.200ms="dataProductLovSearch"
-                                        x-on:click.outside="$wire.resetdataProductLov()"
-                                        x-on:keyup.escape="$wire.resetdataProductLov()"
-                                        x-on:keyup.down="$wire.selectNextdataProductLov()"
-                                        x-on:keyup.up="$wire.selectPreviousdataProductLov()"
-                                        x-on:keyup.enter="$wire.enterMydataProductLov(selecteddataProductLovIndex)"
-                                        x-ref="dataProductLovSearchMain" x-init="$watch('selecteddataProductLovIndex', (value, oldValue) => $refs.dataProductLovSearch.children[selecteddataProductLovIndex + 1].scrollIntoView({
-                                            block: 'nearest'
-                                        }))
-                                        $refs.dataProductLovSearchMain.focus()" />
+                                    <div>
+                                        <x-text-input id="collectingMyProduct.noRacikan" placeholder="Racikan"
+                                            class="mt-1 ml-2" :errorshas="__($errors->has('collectingMyProduct.noRacikan'))" :disabled=$disabledPropertyRjStatus
+                                            wire:model.debounce.200ms="noRacikan" x-ref="collectingMyProductnoRacikan"
+                                            x-on:keyup.enter="$refs.dataProductLovSearchMain.focus()" />
 
-                                    {{-- Lov --}}
-                                    <div class="py-2 mt-1 overflow-y-auto bg-white border rounded-md shadow-lg max-h-64"
-                                        x-show="$wire.dataProductLovSearch.length>3 && $wire.dataProductLov.length>0"
-                                        x-transition x-ref="dataProductLovSearch">
-                                        {{-- alphine --}}
-                                        {{-- <template x-for="(dataProductLovx, index) in $wire.dataProductLov">
-                                    <button x-text="dataProductLovx.product_name"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100"
-                                        :class="{
-                                            'bg-gray-100 outline-none': index === $wire
-                                                .selecteddataProductLovIndex
-                                        }"
-                                        x-on:click.prevent="$wire.setMydataProductLov(index)"></button>
-                                </template> --}}
-
-                                        {{-- livewire --}}
-                                        @foreach ($dataProductLov as $key => $lov)
-                                            <li wire:key='dataProductLov{{ $lov['product_name'] }}'>
-                                                <x-dropdown-link wire:click="setMydataProductLov('{{ $key }}')"
-                                                    class="text-base font-normal {{ $key === $selecteddataProductLovIndex ? 'bg-gray-100 outline-none' : '' }}">
-                                                    <div>
-                                                        {{ $lov['product_name'] . ' / ' . number_format($lov['sales_price']) }}
-                                                    </div>
-                                                    <div class="text-xs">
-                                                        {{ '(' . $lov['product_content'] . ')' }}
-                                                    </div>
-                                                </x-dropdown-link>
-                                            </li>
-                                        @endforeach
-
+                                        @error('collectingMyProduct.noRacikan')
+                                            <x-input-error :messages=$message />
+                                        @enderror
                                     </div>
-
-
-                                    {{-- Start Lov exceptions --}}
-
-                                    @if (strlen($dataProductLovSearch) > 0 && strlen($dataProductLovSearch) < 3 && count($dataProductLov) == 0)
-                                        <div class="w-full p-2 text-sm text-center text-gray-500 dark:text-gray-400">
-                                            {{ 'Masukkan minimal 3 karakter' }}
-                                        </div>
-                                    @elseif(strlen($dataProductLovSearch) >= 3 && count($dataProductLov) == 0)
-                                        <div class="w-full p-2 text-sm text-center text-gray-500 dark:text-gray-400">
-                                            {{ 'Data Tidak ditemukan' }}
-                                        </div>
-                                    @endif
-                                    {{-- End Lov exceptions --}}
-
-                                    @error('dataProductLovSearch')
-                                        <x-input-error :messages=$message />
-                                    @enderror
                                 </div>
-                                {{-- Lov dataProductLov --}}
+
+                                <div class="col-span-7">
+                                    <x-input-label for="dataProductLovSearch" :value="__('Nama Obat')" :required="__(true)" />
+
+                                    {{-- Lov dataProductLov --}}
+                                    <div>
+                                        <x-text-input id="dataProductLovSearchMain" placeholder="Nama Obat"
+                                            class="mt-1 ml-2" :errorshas="__($errors->has('dataProductLovSearchMain'))" :disabled=$disabledPropertyRjStatus
+                                            wire:model.debounce.200ms="dataProductLovSearch"
+                                            x-on:click.outside="$wire.resetdataProductLov()"
+                                            x-on:keyup.escape="$wire.resetdataProductLov()"
+                                            x-on:keyup.down="$wire.selectNextdataProductLov()"
+                                            x-on:keyup.up="$wire.selectPreviousdataProductLov()"
+                                            x-on:keyup.enter="$wire.enterMydataProductLov(selecteddataProductLovIndex)"
+                                            x-ref="dataProductLovSearchMain" x-init="$watch('selecteddataProductLovIndex', (value, oldValue) => $refs.dataProductLovSearch.children[selecteddataProductLovIndex + 1].scrollIntoView({
+                                                block: 'nearest'
+                                            }))
+                                            $refs.dataProductLovSearchMain.focus()" />
+
+                                        {{-- Lov --}}
+                                        <div class="py-2 mt-1 overflow-y-auto bg-white border rounded-md shadow-lg max-h-64"
+                                            x-show="$wire.dataProductLovSearch.length>3 && $wire.dataProductLov.length>0"
+                                            x-transition x-ref="dataProductLovSearch">
+                                            {{-- alphine --}}
+                                            {{-- <template x-for="(dataProductLovx, index) in $wire.dataProductLov">
+                                            <button x-text="dataProductLovx.product_name"
+                                                class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100"
+                                                :class="{
+                                                    'bg-gray-100 outline-none': index === $wire
+                                                        .selecteddataProductLovIndex
+                                                }"
+                                                x-on:click.prevent="$wire.setMydataProductLov(index)"></button>
+                                        </template> --}}
+
+                                            {{-- livewire --}}
+                                            @foreach ($dataProductLov as $key => $lov)
+                                                <li wire:key='dataProductLov{{ $lov['product_name'] }}'>
+                                                    <x-dropdown-link wire:click="setMydataProductLov('{{ $key }}')"
+                                                        class="text-base font-normal {{ $key === $selecteddataProductLovIndex ? 'bg-gray-100 outline-none' : '' }}">
+                                                        <div>
+                                                            {{ $lov['product_name'] . ' / ' . number_format($lov['sales_price']) }}
+                                                        </div>
+                                                        <div class="text-xs">
+                                                            {{ '(' . $lov['product_content'] . ')' }}
+                                                        </div>
+                                                    </x-dropdown-link>
+                                                </li>
+                                            @endforeach
+
+                                        </div>
+
+
+                                        {{-- Start Lov exceptions --}}
+
+                                        @if (strlen($dataProductLovSearch) > 0 && strlen($dataProductLovSearch) < 3 && count($dataProductLov) == 0)
+                                            <div class="w-full p-2 text-sm text-center text-gray-500 dark:text-gray-400">
+                                                {{ 'Masukkan minimal 3 karakter' }}
+                                            </div>
+                                        @elseif(strlen($dataProductLovSearch) >= 3 && count($dataProductLov) == 0)
+                                            <div class="w-full p-2 text-sm text-center text-gray-500 dark:text-gray-400">
+                                                {{ 'Data Tidak ditemukan' }}
+                                            </div>
+                                        @endif
+                                        {{-- End Lov exceptions --}}
+
+                                        @error('dataProductLovSearch')
+                                            <x-input-error :messages=$message />
+                                        @enderror
+                                    </div>
+                                    {{-- Lov dataProductLov --}}
+                                </div>
                             </div>
                         @endif
 
@@ -239,7 +258,8 @@
                         <div class="overflow-x-auto rounded-lg">
                             <div class="inline-block min-w-full align-middle">
                                 <div class="overflow-hidden shadow sm:rounded-lg">
-                                    <table class="w-full text-sm text-left text-gray-500 table-auto dark:text-gray-400">
+                                    <table
+                                        class="w-full text-sm text-left text-gray-500 table-auto dark:text-gray-400">
                                         <thead
                                             class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
                                             <tr>
@@ -295,8 +315,18 @@
                                         <tbody class="bg-white dark:bg-gray-800">
 
                                             @isset($dataDaftarPoliRJ['eresepRacikan'])
+                                                @php
+                                                    $myPreviousRow = '';
+                                                @endphp
                                                 @foreach ($dataDaftarPoliRJ['eresepRacikan'] as $key => $eresep)
-                                                    <tr class="border-b group dark:border-gray-700">
+                                                    @php
+                                                        $myRacikanBorder =
+                                                            $myPreviousRow !== $eresep['noRacikan']
+                                                                ? 'border-t-2 '
+                                                                : '';
+                                                    @endphp
+
+                                                    <tr class="{{ $myRacikanBorder }} group">
 
                                                         <td
                                                             class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
@@ -341,15 +371,15 @@
                                                                         <path
                                                                             d="M17 4h-4V2a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v2H1a1 1 0 0 0 0 2h1v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1a1 1 0 1 0 0-2ZM7 2h4v2H7V2Zm1 14a1 1 0 1 1-2 0V8a1 1 0 0 1 2 0v8Zm4 0a1 1 0 0 1-2 0V8a1 1 0 0 1 2 0v8Z" />
                                                                     </svg>
-                                                                    {{ 'Hapus ' }}
                                                                 </x-alternative-button>
                                                             @endrole
                                                         </td>
 
-
-
-
                                                     </tr>
+
+                                                    @php
+                                                        $myPreviousRow = $eresep['noRacikan'];
+                                                    @endphp
                                                 @endforeach
                                             @endisset
 
