@@ -646,37 +646,14 @@
                         </div>
                     </td>
 
-                    <td class="w-1/3 align-text-bottom">
-                        <div class ="text-center">
-                            <div>
-                                @isset($dataDaftarPoliRJ['telaahObat']['penanggungJawab']['userLog'])
-                                    @if ($dataDaftarPoliRJ['telaahObat']['penanggungJawab']['userLog'])
-                                        @isset(App\Models\User::where('myuser_code', $dataDaftarPoliRJ['telaahObat']['penanggungJawab']['userLogCode'])->first()->myuser_ttd_image)
-                                            <img class="h-24 mx-auto"
-                                                src="{{ 'storage/' . App\Models\User::where('myuser_code', $dataDaftarPoliRJ['telaahObat']['penanggungJawab']['userLogCode'])->first()->myuser_ttd_image }}"
-                                                alt="">
-                                        @endisset
-                                    @endif
-                                @endisset
-                            </div>
 
-                            <span>
-                                {{ isset($dataDaftarPoliRJ['telaahObat']['penanggungJawab']['userLog'])
-                                    ? ($dataDaftarPoliRJ['telaahObat']['penanggungJawab']['userLog']
-                                        ? $dataDaftarPoliRJ['telaahObat']['penanggungJawab']['userLog']
-                                        : 'Telaah Obat')
-                                    : 'Telaah Obat' }}
-                            </span>
-
-                            <span>
-                                {{ 'Penanggung Jawab' }}
-                            </span>
-
-                        </div>
-                    </td>
 
                     <td class="w-1/3 align-text-bottom">
                         <div class ="text-center">
+                            <span>
+                                {{ 'Telaah Resep' }}
+                            </span>
+                            <br>
                             <div>
                                 @isset($dataDaftarPoliRJ['telaahResep']['penanggungJawab']['userLog'])
                                     @if ($dataDaftarPoliRJ['telaahResep']['penanggungJawab']['userLog'])
@@ -688,7 +665,7 @@
                                     @endif
                                 @endisset
                             </div>
-
+                            <br>
                             <span>
                                 {{ isset($dataDaftarPoliRJ['telaahResep']['penanggungJawab']['userLog'])
                                     ? ($dataDaftarPoliRJ['telaahResep']['penanggungJawab']['userLog']
@@ -697,9 +674,38 @@
                                     : 'Telaah Resep' }}
                             </span>
 
+
+
+                        </div>
+                    </td>
+
+                    <td class="w-1/3 align-text-bottom">
+                        <div class ="text-center">
                             <span>
-                                {{ 'Penanggung Jawab' }}
+                                {{ 'Telaah Obat' }}
                             </span>
+                            <br>
+                            <div>
+                                @isset($dataDaftarPoliRJ['telaahObat']['penanggungJawab']['userLog'])
+                                    @if ($dataDaftarPoliRJ['telaahObat']['penanggungJawab']['userLog'])
+                                        @isset(App\Models\User::where('myuser_code', $dataDaftarPoliRJ['telaahObat']['penanggungJawab']['userLogCode'])->first()->myuser_ttd_image)
+                                            <img class="h-24 mx-auto"
+                                                src="{{ 'storage/' . App\Models\User::where('myuser_code', $dataDaftarPoliRJ['telaahObat']['penanggungJawab']['userLogCode'])->first()->myuser_ttd_image }}"
+                                                alt="">
+                                        @endisset
+                                    @endif
+                                @endisset
+                            </div>
+                            <br>
+                            <span>
+                                {{ isset($dataDaftarPoliRJ['telaahObat']['penanggungJawab']['userLog'])
+                                    ? ($dataDaftarPoliRJ['telaahObat']['penanggungJawab']['userLog']
+                                        ? $dataDaftarPoliRJ['telaahObat']['penanggungJawab']['userLog']
+                                        : 'Telaah Obat')
+                                    : 'Telaah Obat' }}
+                            </span>
+
+
 
                         </div>
                     </td>
