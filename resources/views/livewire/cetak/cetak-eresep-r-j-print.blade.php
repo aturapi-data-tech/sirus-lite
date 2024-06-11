@@ -211,7 +211,11 @@
                                     </td>
 
                                     <td class="w-2/5 uppercase text-start">
-                                        {{ $eresepRacikan['productName'] . ' - ' . isset($eresepRacikan['dosis']) ? ($eresepRacikan['dosis'] ? $eresepRacikan['dosis'] : '-') : '-' }}
+                                        {{ $eresepRacikan['productName'] }}
+
+                                        @isset($eresepRacikan['dosis'])
+                                            {{ ' - ' . $eresepRacikan['dosis'] }}
+                                        @endisset
                                     </td>
 
                                     <td class="w-1/5 text-center uppercase">
