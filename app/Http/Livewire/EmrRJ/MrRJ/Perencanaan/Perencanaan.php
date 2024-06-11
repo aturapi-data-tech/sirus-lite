@@ -415,7 +415,8 @@ class Perencanaan extends Component
             // Racikan
             foreach ($this->dataDaftarPoliRJ['eresepRacikan'] as $key => $value) {
                 $jmlRacikan = ($value['qty']) ? 'Jml Racikan ' . $value['qty'] . ' | ' . $value['catatan'] . ' | S ' . $value['catatanKhusus'] . PHP_EOL : '';
-                $eresepRacikan .= $value['noRacikan'] . '/ ' . $value['productName'] . ' ' . $value['sedia'] .  PHP_EOL . $jmlRacikan;
+                $dosis = isset($value['dosis']) ? ($value['dosis'] ? $value['dosis'] : '') : '';
+                $eresepRacikan .= $value['noRacikan'] . '/ ' . $value['productName'] . ' - ' . $dosis .  PHP_EOL . $jmlRacikan;
             }
 
             $this->dataDaftarPoliRJ['perencanaan']['terapi']['terapi'] = $this->dataDaftarPoliRJ['perencanaan']['terapi']['terapi'] . $eresepRacikan;
