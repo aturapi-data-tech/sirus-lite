@@ -165,20 +165,20 @@ class MasterPasien extends Component
                 "negara" => "ID" //harus diisi (ISO 3166) ID 	IDN 	360 	ISO 3166-2:ID 	.id
             ],
             "kontak" => [
-                "kodenegara" => "62", //+(62) Indonesia 
+                "kodenegara" => "62", //+(62) Indonesia
                 "nomerTelponSelulerPasien" => "", //+(kode negara) no telp
                 "nomerTelponLain" => "" //+(kode negara) no telp
             ],
             "hubungan" => [
                 "namaAyah" => "", //
-                "kodenegaraAyah" => "62", //+(62) Indonesia 
+                "kodenegaraAyah" => "62", //+(62) Indonesia
                 "nomerTelponSelulerAyah" => "", //+(kode negara) no telp
                 "namaIbu" => "", //
-                "kodenegaraIbu" => "62", //+(62) Indonesia 
+                "kodenegaraIbu" => "62", //+(62) Indonesia
                 "nomerTelponSelulerIbu" => "", //+(kode negara) no telp
 
                 "namaPenanggungJawab" => "", // di isi untuk pasien (Tidak dikenal / Hal Lain)
-                "kodenegaraPenanggungJawab" => "62", //+(62) Indonesia 
+                "kodenegaraPenanggungJawab" => "62", //+(62) Indonesia
                 "nomerTelponSelulerPenanggungJawab" => "", //+(kode negara) no telp
                 "hubunganDgnPasien" => [
                     "hubunganDgnPasienId" => 5, //Default 5 Kerabat / Saudara
@@ -477,7 +477,7 @@ class MasterPasien extends Component
         // Variable Search
         $search = $this->jenisKelaminLovSearch;
 
-        // check LOV by id 
+        // check LOV by id
         $Jeniskelamin = collect($this->dataPasien['pasien']['jenisKelamin']['jenisKelaminOptions'])
             ->where('jenisKelaminId', '=', $search)
             ->first();
@@ -526,7 +526,7 @@ class MasterPasien extends Component
         // Variable Search
         $search = $this->agamaLovSearch;
 
-        // check LOV by id 
+        // check LOV by id
         $agama = collect($this->dataPasien['pasien']['agama']['agamaOptions'])
             ->where('agamaId', '=', $search)
             ->first();
@@ -574,7 +574,7 @@ class MasterPasien extends Component
         // Variable Search
         $search = $this->statusPerkawinanLovSearch;
 
-        // check LOV by id 
+        // check LOV by id
         $statusPerkawinan = collect($this->dataPasien['pasien']['statusPerkawinan']['statusPerkawinanOptions'])
             ->where('statusPerkawinanId', '=', $search)
             ->first();
@@ -622,7 +622,7 @@ class MasterPasien extends Component
         // Variable Search
         $search = $this->pendidikanLovSearch;
 
-        // check LOV by id 
+        // check LOV by id
         $pendidikan = collect($this->dataPasien['pasien']['pendidikan']['pendidikanOptions'])
             ->where('pendidikanId', '=', $search)
             ->first();
@@ -670,7 +670,7 @@ class MasterPasien extends Component
         // Variable Search
         $search = $this->pekerjaanLovSearch;
 
-        // check LOV by id 
+        // check LOV by id
         $pekerjaan = collect($this->dataPasien['pasien']['pekerjaan']['pekerjaanOptions'])
             ->where('pekerjaanId', '=', $search)
             ->first();
@@ -718,7 +718,7 @@ class MasterPasien extends Component
         // Variable Search
         $search = $this->golonganDarahLovSearch;
 
-        // check LOV by id 
+        // check LOV by id
         $golonganDarah = collect($this->dataPasien['pasien']['golonganDarah']['golonganDarahOptions'])
             ->where('golonganDarahId', '=', $search)
             ->first();
@@ -766,7 +766,7 @@ class MasterPasien extends Component
         // Variable Search
         $search = $this->statusLovSearch;
 
-        // check LOV by id 
+        // check LOV by id
         $status = collect($this->dataPasien['pasien']['status']['statusOptions'])
             ->where('statusId', '=', $search)
             ->first();
@@ -814,7 +814,7 @@ class MasterPasien extends Component
         // Variable Search
         $search = $this->hubunganDgnPasienLovSearch;
 
-        // check LOV by id 
+        // check LOV by id
         $hubunganDgnPasien = collect($this->dataPasien['pasien']['hubungan']['hubunganDgnPasien']['hubunganDgnPasienOptions'])
             ->where('hubunganDgnPasienId', '=', $search)
             ->first();
@@ -862,7 +862,7 @@ class MasterPasien extends Component
         // Variable Search
         $search = $this->desaIdentitasLovSearch;
 
-        // check LOV by id 
+        // check LOV by id
         $desaIdentitas = DB::table('rsmst_desas')
             ->select(
                 'rsmst_desas.des_id  as des_id',
@@ -965,7 +965,7 @@ class MasterPasien extends Component
         // Variable Search
         $search = $this->kotaIdentitasLovSearch;
 
-        // check LOV by id 
+        // check LOV by id
         $kotaIdentitas = DB::table('rsmst_kabupatens')
             ->select(
 
@@ -1063,7 +1063,7 @@ class MasterPasien extends Component
         // Variable Search
         $search = $this->desaDomisilLovSearch;
 
-        // check LOV by id 
+        // check LOV by id
         $desaDomisil = DB::table('rsmst_desas')
             ->select(
                 'rsmst_desas.des_id  as des_id',
@@ -1166,7 +1166,7 @@ class MasterPasien extends Component
         // Variable Search
         $search = $this->kotaDomisilLovSearch;
 
-        // check LOV by id 
+        // check LOV by id
         $kotaDomisil = DB::table('rsmst_kabupatens')
             ->select(
 
@@ -1348,9 +1348,9 @@ class MasterPasien extends Component
             'dataPasien.pasien.namaPanggilan' => '',
             'dataPasien.pasien.tempatLahir' => 'bail|required',
             'dataPasien.pasien.tglLahir' => 'bail|required|date_format:d/m/Y',
-            'dataPasien.pasien.thn' => '',
-            'dataPasien.pasien.bln' => '',
-            'dataPasien.pasien.hari' => '',
+            'dataPasien.pasien.thn' => 'bail|numeric',
+            'dataPasien.pasien.bln' => 'bail|numeric',
+            'dataPasien.pasien.hari' => 'bail|numeric',
             'dataPasien.pasien.jenisKelamin.jenisKelaminId' => 'bail|required',
             'dataPasien.pasien.jenisKelamin.jenisKelaminDesc' => 'bail|required',
 
@@ -1536,7 +1536,7 @@ class MasterPasien extends Component
         // 2.Cari berdasarkan reg_no ->if null DB
         // 2.Cari berdasarkan nokaBPJS ->if null DB
 
-        // 4. Goto Pasien Baru berdasarkan nik apiBPJS ->if null 
+        // 4. Goto Pasien Baru berdasarkan nik apiBPJS ->if null
         // 5. Entry Manual Pasien Baru
 
         // by reg_no
