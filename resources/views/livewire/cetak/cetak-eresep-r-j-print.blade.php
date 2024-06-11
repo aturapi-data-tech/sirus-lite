@@ -170,7 +170,7 @@
                     <tbody class="text-gray-900 ">
                         @isset($dataDaftarPoliRJ['eresep'])
                             @foreach ($dataDaftarPoliRJ['eresep'] as $key => $eresep)
-                                <tr>
+                                <tr class="border-b-2 border-black">
                                     <td class="w-1/5 text-center uppercase">
                                         {{ 'R/' }}
                                     </td>
@@ -196,8 +196,16 @@
 
                     <tbody class="text-gray-900 ">
                         @isset($dataDaftarPoliRJ['eresepRacikan'])
+                            @php
+                                $myPreviousRow = '';
+                            @endphp
                             @foreach ($dataDaftarPoliRJ['eresepRacikan'] as $key => $eresepRacikan)
-                                <tr>
+                                @php
+                                    $myRacikanBorder =
+                                        $myPreviousRow !== $eresepRacikan['noRacikan'] ? 'border-t-2 border-black' : '';
+                                @endphp
+
+                                <tr class="{{ $myRacikanBorder }}">
                                     <td class="w-1/5 text-center uppercase">
                                         {{ $eresepRacikan['noRacikan'] . '/' }}
                                     </td>
@@ -222,6 +230,9 @@
                                         @endif
                                     </td>
                                 </tr>
+                                @php
+                                    $myPreviousRow = $eresepRacikan['noRacikan'];
+                                @endphp
                             @endforeach
                         @endisset
                     </tbody>
