@@ -267,7 +267,7 @@
 
                                                     <x-sort-link :active=false wire:click.prevent="" role="button"
                                                         href="#">
-                                                        Racikan/NonRacikan
+                                                        Racikan
                                                     </x-sort-link>
 
                                                 </th>
