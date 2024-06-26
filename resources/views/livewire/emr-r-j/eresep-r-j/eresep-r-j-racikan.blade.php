@@ -2,7 +2,8 @@
 
     @php
         $disabledProperty = true;
-        $disabledPropertyRjStatus = false;
+        $disabledPropertyRjStatus = $rjStatusRef == 'A' ? false : true;
+
     @endphp
 
     {{-- jika anamnesa kosong ngak usah di render --}}
@@ -29,7 +30,7 @@
                                     <div>
                                         <x-text-input id="collectingMyProduct.noRacikan" placeholder="Racikan"
                                             class="mt-1 ml-2" :errorshas="__($errors->has('collectingMyProduct.noRacikan'))" :disabled=$disabledPropertyRjStatus
-                                            wire:model.debounce.200ms="noRacikan" x-ref="collectingMyProductnoRacikan"
+                                            wire:model="noRacikan" x-ref="collectingMyProductnoRacikan"
                                             x-on:keyup.enter="$refs.dataProductLovSearchMain.focus()" />
 
                                         @error('collectingMyProduct.noRacikan')
@@ -45,7 +46,7 @@
                                     <div>
                                         <x-text-input id="dataProductLovSearchMain" placeholder="Nama Obat"
                                             class="mt-1 ml-2" :errorshas="__($errors->has('dataProductLovSearchMain'))" :disabled=$disabledPropertyRjStatus
-                                            wire:model.debounce.200ms="dataProductLovSearch"
+                                            wire:model="dataProductLovSearch"
                                             x-on:click.outside="$wire.resetdataProductLov()"
                                             x-on:keyup.escape="$wire.resetdataProductLov()"
                                             x-on:keyup.down="$wire.selectNextdataProductLov()"
@@ -121,7 +122,7 @@
                                     <div>
                                         <x-text-input id="collectingMyProduct.noRacikan" placeholder="Racikan"
                                             class="mt-1 ml-2" :errorshas="__($errors->has('collectingMyProduct.noRacikan'))" :disabled=$disabledPropertyRjStatus
-                                            wire:model.debounce.200ms="noRacikan" x-ref="collectingMyProductnoRacikan"
+                                            wire:model="noRacikan" x-ref="collectingMyProductnoRacikan"
                                             x-on:keyup.enter="$refs.collectingMyProductproductName.focus()" />
 
                                         @error('collectingMyProduct.noRacikan')
@@ -137,7 +138,7 @@
                                     <div>
                                         <x-text-input id="collectingMyProduct.productId" placeholder="Kode Obat"
                                             class="mt-1 ml-2" :errorshas="__($errors->has('collectingMyProduct.productId'))" :disabled=true
-                                            wire:model.debounce.200ms="collectingMyProduct.productId" />
+                                            wire:model="collectingMyProduct.productId" />
 
                                         @error('collectingMyProduct.productId')
                                             <x-input-error :messages=$message />
@@ -152,7 +153,7 @@
                                     <div>
                                         <x-text-input id="collectingMyProduct.productName" placeholder="Nama Obat"
                                             class="mt-1 ml-2" :errorshas="__($errors->has('collectingMyProduct.productName'))" :disabled=true
-                                            wire:model.debounce.200ms="collectingMyProduct.productName" />
+                                            wire:model="collectingMyProduct.productName" />
 
                                         @error('collectingMyProduct.productName')
                                             <x-input-error :messages=$message />
@@ -170,7 +171,7 @@
                                             :errorshas="__($errors->has('collectingMyProduct.dosis'))" :disabled=$disabledPropertyRjStatus
                                             x-ref="collectingMyProductdosis" x-init="$refs.collectingMyProductdosis.focus()"
                                             x-on:keyup.enter="$refs.collectingMyProductqty.focus()"
-                                            wire:model.debounce.200ms="collectingMyProduct.dosis" />
+                                            wire:model="collectingMyProduct.dosis" />
 
                                         @error('collectingMyProduct.dosis')
                                             <x-input-error :messages=$message />
@@ -186,8 +187,7 @@
                                     <div>
                                         <x-text-input id="collectingMyProduct.qty" placeholder="Jml Racikan"
                                             class="mt-1 ml-2" :errorshas="__($errors->has('collectingMyProduct.qty'))" :disabled=$disabledPropertyRjStatus
-                                            wire:model.debounce.200ms="collectingMyProduct.qty"
-                                            x-ref="collectingMyProductqty"
+                                            wire:model="collectingMyProduct.qty" x-ref="collectingMyProductqty"
                                             x-on:keyup.enter="$refs.collectingMyProductcatatan.focus()" />
 
                                         @error('collectingMyProduct.qty')
@@ -205,7 +205,7 @@
                                             class="mt-1 ml-2" :errorshas="__($errors->has('collectingMyProduct.catatan'))" :disabled=$disabledPropertyRjStatus
                                             x-ref="collectingMyProductcatatan"
                                             x-on:keyup.enter="$refs.collectingMyProductcatatanKhusus.focus()"
-                                            wire:model.debounce.200ms="collectingMyProduct.catatan" />
+                                            wire:model="collectingMyProduct.catatan" />
 
                                         @error('collectingMyProduct.catatan')
                                             <x-input-error :messages=$message />
@@ -303,7 +303,7 @@
                                                 <th scope="col" class="px-4 py-3 ">
                                                     <x-sort-link :active=false wire:click.prevent="" role="button"
                                                         href="#">
-                                                        Signa
+                                                        Signa____
                                                     </x-sort-link>
                                                 </th>
 
@@ -341,22 +341,61 @@
 
                                                         <td
                                                             class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                            {{ isset($eresep['dosis']) ? ($eresep['dosis'] ? $eresep['dosis'] : '-') : '-' }}
+                                                            {{-- {{ isset($eresep['dosis']) ? ($eresep['dosis'] ? $eresep['dosis'] : '-') : '-' }} --}}
+
+                                                            <div>
+                                                                <x-text-input placeholder="dosis" class=""
+                                                                    :disabled=$disabledPropertyRjStatus
+                                                                    x-ref="dataDaftarPoliRJeresepRacikan{{ $key }}dosis"
+                                                                    x-on:keyup.enter="$refs.dataDaftarPoliRJeresepRacikan{{ $key }}qty.focus()"
+                                                                    wire:model="dataDaftarPoliRJ.eresepRacikan.{{ $key }}.dosis" />
+
+                                                            </div>
+
+
+
+
                                                         </td>
 
                                                         <td
                                                             class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                            {{ $eresep['qty'] }}
+                                                            {{-- {{ $eresep['qty'] }} --}}
+
+                                                            <div>
+                                                                <x-text-input placeholder="Jml Racikan" class=""
+                                                                    :disabled=$disabledPropertyRjStatus
+                                                                    wire:model="dataDaftarPoliRJ.eresepRacikan.{{ $key }}.qty"
+                                                                    x-ref="dataDaftarPoliRJeresepRacikan{{ $key }}qty"
+                                                                    x-on:keyup.enter="$refs.dataDaftarPoliRJeresepRacikan{{ $key }}catatan.focus()" />
+                                                            </div>
                                                         </td>
 
                                                         <td
                                                             class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                            {{ $eresep['catatan'] }}
+                                                            {{-- {{ $eresep['catatan'] }} --}}
+
+                                                            <div>
+                                                                <x-text-input placeholder="Catatan" class=""
+                                                                    :disabled=$disabledPropertyRjStatus
+                                                                    x-ref="dataDaftarPoliRJeresepRacikan{{ $key }}catatan"
+                                                                    x-on:keyup.enter="$refs.dataDaftarPoliRJeresepRacikan{{ $key }}catatanKhusus.focus()"
+                                                                    wire:model="dataDaftarPoliRJ.eresepRacikan.{{ $key }}.catatan" />
+
+
+                                                            </div>
                                                         </td>
 
                                                         <td
                                                             class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                            {{ $eresep['catatanKhusus'] }}
+                                                            {{-- {{ $eresep['catatanKhusus'] }} --}}
+                                                            <div>
+                                                                <x-text-input placeholder="Signa" class=""
+                                                                    :disabled=$disabledPropertyRjStatus
+                                                                    wire:model="dataDaftarPoliRJ.eresepRacikan.{{ $key }}.catatanKhusus"
+                                                                    x-on:keyup.enter="$wire.updateProduct('{{ $dataDaftarPoliRJ['eresepRacikan'][$key]['rjObatDtl'] ? $dataDaftarPoliRJ['eresepRacikan'][$key]['rjObatDtl'] : null }}','{{ $dataDaftarPoliRJ['eresepRacikan'][$key]['dosis'] ? $dataDaftarPoliRJ['eresepRacikan'][$key]['dosis'] : null }}','{{ $dataDaftarPoliRJ['eresepRacikan'][$key]['qty'] ? $dataDaftarPoliRJ['eresepRacikan'][$key]['qty'] : null }}','{{ $dataDaftarPoliRJ['eresepRacikan'][$key]['catatan'] ? $dataDaftarPoliRJ['eresepRacikan'][$key]['catatan'] : null }}','{{ $dataDaftarPoliRJ['eresepRacikan'][$key]['catatanKhusus'] ? $dataDaftarPoliRJ['eresepRacikan'][$key]['catatanKhusus'] : null }}')"
+                                                                    x-ref="dataDaftarPoliRJeresepRacikan{{ $key }}catatanKhusus" />
+
+                                                            </div>
                                                         </td>
 
 
@@ -364,6 +403,7 @@
                                                             class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
                                                             @role(['Dokter', 'Admin'])
                                                                 <x-alternative-button class="inline-flex"
+                                                                    :disabled=$disabledPropertyRjStatus
                                                                     wire:click.prevent="removeProduct('{{ $eresep['rjObatDtl'] }}')">
                                                                     <svg class="w-5 h-5 text-gray-800 dark:text-white"
                                                                         aria-hidden="true" xmlns="http://www.w3.org/2000/svg"

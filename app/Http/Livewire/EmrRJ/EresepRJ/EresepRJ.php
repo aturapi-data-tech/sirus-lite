@@ -13,6 +13,7 @@ use App\Http\Traits\customErrorMessagesTrait;
 // use Illuminate\Support\Str;
 use Spatie\ArrayToXml\ArrayToXml;
 use Exception;
+use Illuminate\Support\Facades\Validator;
 
 class EresepRJ extends Component
 {
@@ -28,6 +29,7 @@ class EresepRJ extends Component
     // Ref on top bar
     //////////////////////////////
     public $rjNoRef = 472309;
+    public string $rjStatusRef;
 
     // dataDaftarPoliRJ RJ
     public array $dataDaftarPoliRJ = [];
@@ -232,6 +234,7 @@ class EresepRJ extends Component
     private function findData($rjno): void
     {
         $findData = DB::table('rsview_rjkasir')->select('datadaftarpolirj_json', 'vno_sep')->where('rj_no', $rjno)->first();
+        $this->rjStatusRef = DB::table('rstxn_rjhdrs')->select('rj_status')->where('rj_no', $rjno)->first()->rj_status;
 
         $dataDaftarPoliRJ_json = isset($findData->datadaftarpolirj_json) ? $findData->datadaftarpolirj_json : null;
         // if meta_data_pasien_json = null
@@ -431,6 +434,57 @@ class EresepRJ extends Component
 
             $this->store();
             $this->reset(['collectingMyProduct']);
+
+            //
+        } catch (Exception $e) {
+            // display an error to user
+            dd($e->getMessage());
+        }
+        // goto start;
+    }
+
+    public function updateProduct($rjobat_dtl, $signaX = null, $signaHari = null, $catatanKhusus = null): void
+    {
+        // validate
+        $this->checkRjStatus();
+
+        $r = [
+            'signaX' => $signaX,
+            'signaHari' => $signaHari,
+            'catatanKhusus' => $catatanKhusus,
+        ];
+
+        // customErrorMessages
+        $messages = customErrorMessagesTrait::messages();
+        // require nik ketika pasien tidak dikenal
+        $rules = [
+            'signaX' => 'bail|required|',
+            'signaHari' => 'bail|required|',
+            'catatanKhusus' => 'bail|',
+        ];
+        // Proses Validasi///////////////////////////////////////////
+        $validator = Validator::make($r, $rules, $messages);
+
+        if ($validator->fails()) {
+            dd($validator->errors()->first());
+        }
+        // validate
+
+        // pengganti race condition
+        // start:
+        try {
+            // insert into table transaksi
+            DB::table('rstxn_rjobats')
+                ->where('rjobat_dtl', $rjobat_dtl)
+                ->update([
+                    'rj_carapakai' => $r['signaX'],
+                    'rj_kapsul' => $r['signaHari'],
+                    'catatan_khusus' => $r['catatanKhusus'],
+                    'rj_ket' => $r['catatanKhusus'],
+                ]);
+
+
+            $this->store();
 
             //
         } catch (Exception $e) {

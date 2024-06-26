@@ -13,6 +13,8 @@ use App\Http\Traits\customErrorMessagesTrait;
 // use Illuminate\Support\Str;
 use Spatie\ArrayToXml\ArrayToXml;
 use Exception;
+use Illuminate\Support\Facades\Validator;
+
 
 
 class EresepRJRacikan extends Component
@@ -31,6 +33,7 @@ class EresepRJRacikan extends Component
     // Ref on top bar
     //////////////////////////////
     public $rjNoRef = 472309;
+    public string $rjStatusRef;
 
 
 
@@ -247,6 +250,9 @@ class EresepRJRacikan extends Component
             ->select('datadaftarpolirj_json', 'vno_sep')
             ->where('rj_no', $rjno)
             ->first();
+
+        $this->rjStatusRef = DB::table('rstxn_rjhdrs')->select('rj_status')->where('rj_no', $rjno)->first()->rj_status;
+
 
         $dataDaftarPoliRJ_json = isset($findData->datadaftarpolirj_json) ? $findData->datadaftarpolirj_json   : null;
         // if meta_data_pasien_json = null
@@ -485,6 +491,62 @@ class EresepRJRacikan extends Component
         // goto start;
     }
 
+    public function updateProduct($rjobat_dtl, $dosis = null, $qty = null, $catatan = null, $catatanKhusus = null): void
+    {
+
+        // validate
+        // $this->checkRjStatus();
+
+        $r = [
+            'qty' => $qty,
+            'catatanKhusus' => $catatanKhusus,
+            "catatan" => $catatan,
+            "dosis" => $dosis,
+        ];
+        // customErrorMessages
+        $messages = customErrorMessagesTrait::messages();
+        // require nik ketika pasien tidak dikenal
+        $rules = [
+            "qty" => 'bail|digits_between:1,3|',
+            "catatanKhusus" => 'bail|max:150',
+            "catatan" => 'bail|max:150',
+            "dosis" => 'bail|required|max:150',
+        ];
+
+        // Proses Validasi///////////////////////////////////////////
+        $validator = Validator::make($r, $rules, $messages);
+
+        if ($validator->fails()) {
+            dd($validator->errors()->first());
+        }
+
+        // validate
+
+
+        // pengganti race condition
+        // start:
+        try {
+
+            // insert into table transaksi
+            DB::table('rstxn_rjobatracikans')
+                ->where('rjobat_dtl', $rjobat_dtl)
+                ->update([
+                    'dosis' => $r['dosis'],
+                    'qty' => $r['qty'],
+                    'catatan' => $r['catatan'],
+                    'catatan_khusus' => $r['catatanKhusus'],
+                ]);
+
+            $this->store();
+
+            //
+        } catch (Exception $e) {
+            // display an error to user
+            dd($e->getMessage());
+        }
+        // goto start;
+    }
+
     public function removeProduct($rjObatDtl)
     {
 
@@ -533,8 +595,8 @@ class EresepRJRacikan extends Component
         if ($lastInserted->rj_status !== 'A') {
             // throw new Exception('Pasien Sudah Pulang, Trasaksi Terkunci.');
             $this->emit('toastr-error', "Pasien Sudah Pulang, Trasaksi Terkunci.xx");
-            exit();
-            // return (dd('Pasien Sudah Pulang, Trasaksi Terkunci.'));
+            // exit();
+            return (dd('Pasien Sudah Pulang, Trasaksi Terkunci.'));
         }
     }
 
