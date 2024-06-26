@@ -152,7 +152,7 @@ class EmrRJ extends Component
     public int $rjNoRef;
     public string $regNoRef;
 
-    // 
+    //
     private function openModal(): void
     {
         $this->isOpen = true;
@@ -216,7 +216,7 @@ class EmrRJ extends Component
 
         // resert validation
         $this->resetValidation();
-        // resert input 
+        // resert input
 
     }
     // resert input private////////////////
@@ -438,9 +438,10 @@ class EmrRJ extends Component
                 ->orWhere(DB::raw('upper(reg_no)'), 'like', '%' . strtoupper($mySearch) . '%')
                 ->orWhere(DB::raw('upper(dr_name)'), 'like', '%' . strtoupper($mySearch) . '%');
         })
-            ->orderBy('rj_date1',  'desc')
-            ->orderBy('dr_name',  'desc')
-            ->orderBy('no_antrian',  'asc');
+            ->orderBy('dr_name',  'asc')
+            ->orderBy('shift',  'asc')
+            ->orderBy('no_antrian',  'desc')
+            ->orderBy('rj_date1',  'desc');
 
         ////////////////////////////////////////////////
         // end Query

@@ -21,6 +21,7 @@ class AssessmentDokterPerencanaan extends Component
     // listener from blade////////////////
     protected $listeners = [
         'storeAssessmentDokterRJ' => 'store',
+        'storeAssessmentDokterRJPerencanaan' => 'store',
         'syncronizeAssessmentDokterRJFindData' => 'mount',
     ];
 

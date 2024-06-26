@@ -230,7 +230,8 @@
 
                             <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap ">
                                 <div class="">
-                                    <div class="font-semibold text-primary">{{ $myQData->poli_desc }}
+                                    <div class="font-semibold text-primary">
+                                        {{ $myQData->poli_desc }}
                                     </div>
                                     <div class="font-semibold text-gray-900">
                                         {{ $myQData->dr_name . ' / ' }}

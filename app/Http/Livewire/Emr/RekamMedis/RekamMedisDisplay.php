@@ -61,7 +61,7 @@ class RekamMedisDisplay extends Component
             // cek status transaksi
             $this->checkRjStatus($this->rjNoRefCopyTo);
 
-            // 1 cari data to 
+            // 1 cari data to
             // 2 cari data from
             $to = $this->cariResepRJ($this->rjNoRefCopyTo);
             $from = $this->cariResepRJ($NoRefCopyFrom);
@@ -89,9 +89,11 @@ class RekamMedisDisplay extends Component
                     // ?\
                     // select nvl(max(rjobat_dtl)+1,1) into :rstxn_rjobats.rjobat_dtl from rstxn_rjobats;
                     foreach ($to['eresep']  as $toEresep) {
+
                         $lastInserted = DB::table('rstxn_rjobats')
                             ->select(DB::raw("nvl(max(rjobat_dtl)+1,1) as rjobat_dtl_max"))
                             ->first();
+
                         // insert into table transaksi
                         DB::table('rstxn_rjobats')
                             ->insert([
@@ -104,6 +106,7 @@ class RekamMedisDisplay extends Component
                                 'rj_kapsul' => $toEresep['signaHari'],
                                 'rj_takar' => 'Tablet',
                                 'catatan_khusus' => $toEresep['catatanKhusus'],
+                                'rj_ket' => $toEresep['catatanKhusus'],
                                 'exp_date' => DB::raw("to_date('" . $to['rjDate'] . "','dd/mm/yyyy hh24:mi:ss')+30"),
                                 'etiket_status' => 1,
                             ]);
@@ -162,13 +165,13 @@ class RekamMedisDisplay extends Component
                                 'rj_no' => $this->rjNoRefCopyTo,
                                 // 'product_id' => $toEresepRacikan['productId'],
                                 'product_name' => $toEresepRacikan['productName'],
+                                'sedia' => $toEresepRacikan['sedia'],
+                                'dosis' => isset($toEresepRacikan['dosis']) ? ($toEresepRacikan['dosis'] ? $toEresepRacikan['dosis'] : '') : '',
                                 'qty' => $toEresepRacikan['qty'],
                                 // 'price' => $toEresepRacikan['productPrice'],
                                 // 'rj_carapakai' => $toEresepRacikan['signaX'],
                                 // 'rj_kapsul' => $toEresepRacikan['signaHari'],
-                                'sedia' => $toEresepRacikan['sedia'],
                                 'catatan' => $toEresepRacikan['catatan'],
-                                'qty' => $toEresepRacikan['qty'],
                                 'catatan_khusus' => $toEresepRacikan['catatanKhusus'],
                                 'no_racikan' => $toEresepRacikan['noRacikan'],
 
@@ -192,27 +195,31 @@ class RekamMedisDisplay extends Component
 
 
 
+            // Jika array perencanaan belum terbentuk
+            if (!isset($to['perencanaan'])) {
+                $this->emit('storeAssessmentDokterRJPerencanaan');
+                $this->emit('syncronizeAssessmentDokterRJFindData');
+                $to = $this->cariResepRJ($this->rjNoRefCopyTo);
+            }
 
             // terapi
-
             if (isset($to['eresep'])) {
                 $eresep = '';
                 foreach ($to['eresep'] as  $value) {
-                    $racikanNonRacikan = $value['jenisKeterangan'] == 'NonRacikan' ? 'N' : '';
-                    $eresep .=  '(' . $racikanNonRacikan . ')' . ' ' . $value['productName'] . ' /' . $value['qty'] . ' /' . $value['catatanKhusus'] . PHP_EOL;
+                    $catatanKhusus = ($value['catatanKhusus']) ? ' (' . $value['catatanKhusus'] . ')' : '';
+                    $eresep .=  'R/' . ' ' . $value['productName'] . ' | No. ' . $value['qty'] . ' | S ' .  $value['signaX'] . 'dd' . $value['signaHari'] . $catatanKhusus . PHP_EOL;
                 }
-                $to['perencanaan']['terapi']['terapi'] = $to['perencanaan']['terapi']['terapi']
-                    . $eresep;
+                $to['perencanaan']['terapi']['terapi'] = $eresep;
             }
 
             if (isset($to['eresepRacikan'])) {
                 $eresepRacikan = '' . PHP_EOL;
                 foreach ($to['eresepRacikan'] as  $value) {
-                    $racikanNonRacikan = $value['jenisKeterangan'] == 'NonRacikan' ? 'N' : '';
-                    $eresepRacikan .= $racikanNonRacikan . '(' . $value['noRacikan'] . ') ' . $value['productName'] . ' ' . $value['sedia'] . ' /' . $value['catatan'] . ' /' . $value['qty'] . ' /' . $value['catatanKhusus'] . PHP_EOL;
+                    $jmlRacikan = ($value['qty']) ? 'Jml Racikan ' . $value['qty'] . ' | ' . $value['catatan'] . ' | S ' . $value['catatanKhusus'] . PHP_EOL : '';
+                    $dosis = isset($value['dosis']) ? ($value['dosis'] ? $value['dosis'] : '') : '';
+                    $eresepRacikan .= $value['noRacikan'] . '/ ' . $value['productName'] . ' - ' . $dosis .  PHP_EOL . $jmlRacikan;
                 }
-                $to['perencanaan']['terapi']['terapi'] = $to['perencanaan']['terapi']['terapi']
-                    . $eresepRacikan;
+                $to['perencanaan']['terapi']['terapi'] = $eresepRacikan;
             }
 
 
