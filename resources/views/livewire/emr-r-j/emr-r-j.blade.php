@@ -193,7 +193,7 @@
                                 $datadaftar_json['perencanaan']['pengkajianMedis']['drPemeriksa'],
                             )
                                 ? ($datadaftar_json['perencanaan']['pengkajianMedis']['drPemeriksa']
-                                    ? ''
+                                    ? 'bg-green-100'
                                     : '')
                                 : '';
 
