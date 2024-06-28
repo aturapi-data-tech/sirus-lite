@@ -73,6 +73,12 @@
                                 @endrole
 
                                 @role(['Perawat', 'Mr', 'Admin'])
+                                    <x-nav-link class="pl-4" :href="route('BookingRJ')" :active="request()->routeIs('BookingRJ')">
+                                        {{ __('Booking Rawat Jalan') }}
+                                    </x-nav-link>
+                                @endrole
+
+                                @role(['Perawat', 'Mr', 'Admin'])
                                     <x-nav-link class="pl-4" :href="route('daftarRJ')" :active="request()->routeIs('daftarRJ')">
                                         {{ __('Pendaftaran Rawat Jalan') }}
                                     </x-nav-link>
