@@ -35,6 +35,8 @@ use App\Http\Livewire\PelayananRJ\PelayananRJ;
 use App\Http\Livewire\DisplayPelayananRJ\DisplayPelayananRJ;
 use App\Http\Livewire\EmrRJ\AdministrasiRJ\AdministrasiRJ;
 use App\Http\Livewire\EmrRJ\EmrRJ;
+use App\Http\Livewire\BookingRJ\BookingRJ;
+
 use App\Http\Livewire\EmrRJ\TelaahResepRJ\TelaahResepRJ;
 
 
@@ -137,6 +139,8 @@ Route::get('displayPelayananRJ', displayPelayananRJ::class)->middleware('auth')-
 Route::get('SetupHfisBpjs', SetupHfisBpjs::class)->middleware('auth')->name('SetupHfisBpjs');
 
 Route::get('EmrRJ', EmrRJ::class)->middleware('auth')->name('EmrRJ');
+Route::get('BookingRJ', BookingRJ::class)->middleware('auth')->name('BookingRJ');
+
 Route::get('TelaahResepRJ', TelaahResepRJ::class)->middleware('auth')->name('TelaahResepRJ');
 
 Route::get('EmrUGD', EmrUGD::class)->middleware('auth')->name('EmrUGD');
