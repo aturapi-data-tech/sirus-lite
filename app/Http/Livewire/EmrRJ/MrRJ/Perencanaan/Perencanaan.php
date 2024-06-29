@@ -399,28 +399,26 @@ class Perencanaan extends Component
 
     public function simpanTerapi(): void
     {
+        $eresep = '' . PHP_EOL;
         if (isset($this->dataDaftarPoliRJ['eresep'])) {
-            $eresep = '' . PHP_EOL;
 
             foreach ($this->dataDaftarPoliRJ['eresep'] as $key => $value) {
                 // NonRacikan
                 $catatanKhusus = ($value['catatanKhusus']) ? ' (' . $value['catatanKhusus'] . ')' : '';
                 $eresep .=  'R/' . ' ' . $value['productName'] . ' | No. ' . $value['qty'] . ' | S ' .  $value['signaX'] . 'dd' . $value['signaHari'] . $catatanKhusus . PHP_EOL;
             }
-            $this->dataDaftarPoliRJ['perencanaan']['terapi']['terapi'] = $this->dataDaftarPoliRJ['perencanaan']['terapi']['terapi'] . $eresep;
         }
 
+        $eresepRacikan = '' . PHP_EOL;
         if (isset($this->dataDaftarPoliRJ['eresepRacikan'])) {
-            $eresepRacikan = '' . PHP_EOL;
             // Racikan
             foreach ($this->dataDaftarPoliRJ['eresepRacikan'] as $key => $value) {
                 $jmlRacikan = ($value['qty']) ? 'Jml Racikan ' . $value['qty'] . ' | ' . $value['catatan'] . ' | S ' . $value['catatanKhusus'] . PHP_EOL : '';
                 $dosis = isset($value['dosis']) ? ($value['dosis'] ? $value['dosis'] : '') : '';
                 $eresepRacikan .= $value['noRacikan'] . '/ ' . $value['productName'] . ' - ' . $dosis .  PHP_EOL . $jmlRacikan;
-            }
-
-            $this->dataDaftarPoliRJ['perencanaan']['terapi']['terapi'] = $this->dataDaftarPoliRJ['perencanaan']['terapi']['terapi'] . $eresepRacikan;
+            };
         }
+        $this->dataDaftarPoliRJ['perencanaan']['terapi']['terapi'] = $eresep . $eresepRacikan;
 
         $this->store();
         $this->closeModalEresepRJ();
