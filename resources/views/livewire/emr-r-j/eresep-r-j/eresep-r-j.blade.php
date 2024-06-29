@@ -307,7 +307,14 @@
 
                                                         <td
                                                             class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                            {{ $eresep['qty'] }}
+                                                            {{-- {{ $eresep['qty'] }} --}}
+                                                            <div>
+                                                                <x-text-input placeholder="Jml Racikan" class=""
+                                                                    :disabled=$disabledPropertyRjStatus
+                                                                    wire:model="dataDaftarPoliRJ.eresep.{{ $key }}.qty"
+                                                                    x-ref="dataDaftarPoliRJeresep{{ $key }}qty"
+                                                                    x-on:keyup.enter="$refs.dataDaftarPoliRJeresep{{ $key }}signaX.focus()" />
+                                                            </div>
                                                         </td>
 
                                                         <td
@@ -361,7 +368,7 @@
                                                                             class="mt-1 ml-2"
                                                                             :disabled=$disabledPropertyRjStatus
                                                                             wire:model="dataDaftarPoliRJ.eresep.{{ $key }}.catatanKhusus"
-                                                                            x-on:keyup.enter="$wire.updateProduct('{{ $dataDaftarPoliRJ['eresep'][$key]['rjObatDtl'] ? $dataDaftarPoliRJ['eresep'][$key]['rjObatDtl'] : null }}', '{{ $dataDaftarPoliRJ['eresep'][$key]['signaX'] ? $dataDaftarPoliRJ['eresep'][$key]['signaX'] : null }}', '{{ $dataDaftarPoliRJ['eresep'][$key]['signaHari'] ? $dataDaftarPoliRJ['eresep'][$key]['signaHari'] : null }}', '{{ $dataDaftarPoliRJ['eresep'][$key]['catatanKhusus'] ? $dataDaftarPoliRJ['eresep'][$key]['catatanKhusus'] : null }}')
+                                                                            x-on:keyup.enter="$wire.updateProduct('{{ $dataDaftarPoliRJ['eresep'][$key]['rjObatDtl'] ? $dataDaftarPoliRJ['eresep'][$key]['rjObatDtl'] : null }}', '{{ $dataDaftarPoliRJ['eresep'][$key]['qty'] ? $dataDaftarPoliRJ['eresep'][$key]['qty'] : null }}','{{ $dataDaftarPoliRJ['eresep'][$key]['signaX'] ? $dataDaftarPoliRJ['eresep'][$key]['signaX'] : null }}', '{{ $dataDaftarPoliRJ['eresep'][$key]['signaHari'] ? $dataDaftarPoliRJ['eresep'][$key]['signaHari'] : null }}', '{{ $dataDaftarPoliRJ['eresep'][$key]['catatanKhusus'] ? $dataDaftarPoliRJ['eresep'][$key]['catatanKhusus'] : null }}')
                                                                         $refs.dataDaftarPoliRJeresep{{ $key }}qty.focus()"
                                                                             x-ref="dataDaftarPoliRJeresep{{ $key }}catatanKhusus" />
 

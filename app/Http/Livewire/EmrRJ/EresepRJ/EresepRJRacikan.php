@@ -508,9 +508,9 @@ class EresepRJRacikan extends Component
         // require nik ketika pasien tidak dikenal
         $rules = [
             "qty" => 'bail|digits_between:1,3|',
-            "catatanKhusus" => 'bail|max:150',
-            "catatan" => 'bail|max:150',
             "dosis" => 'bail|required|max:150',
+            "catatan" => 'bail|max:150',
+            "catatanKhusus" => 'bail|max:150',
         ];
 
         // Proses Validasi///////////////////////////////////////////
@@ -531,8 +531,8 @@ class EresepRJRacikan extends Component
             DB::table('rstxn_rjobatracikans')
                 ->where('rjobat_dtl', $rjobat_dtl)
                 ->update([
-                    'dosis' => $r['dosis'],
                     'qty' => $r['qty'],
+                    'dosis' => $r['dosis'],
                     'catatan' => $r['catatan'],
                     'catatan_khusus' => $r['catatanKhusus'],
                 ]);

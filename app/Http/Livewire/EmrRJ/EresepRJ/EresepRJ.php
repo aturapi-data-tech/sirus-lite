@@ -443,12 +443,13 @@ class EresepRJ extends Component
         // goto start;
     }
 
-    public function updateProduct($rjobat_dtl, $signaX = null, $signaHari = null, $catatanKhusus = null): void
+    public function updateProduct($rjobat_dtl, $qty = null, $signaX = null, $signaHari = null, $catatanKhusus = null): void
     {
         // validate
         $this->checkRjStatus();
 
         $r = [
+            'qty' => $qty,
             'signaX' => $signaX,
             'signaHari' => $signaHari,
             'catatanKhusus' => $catatanKhusus,
@@ -458,6 +459,7 @@ class EresepRJ extends Component
         $messages = customErrorMessagesTrait::messages();
         // require nik ketika pasien tidak dikenal
         $rules = [
+            'qty' => 'bail|required|digits_between:1,3|',
             'signaX' => 'bail|required|',
             'signaHari' => 'bail|required|',
             'catatanKhusus' => 'bail|',
@@ -477,6 +479,7 @@ class EresepRJ extends Component
             DB::table('rstxn_rjobats')
                 ->where('rjobat_dtl', $rjobat_dtl)
                 ->update([
+                    'qty' => $r['qty'],
                     'rj_carapakai' => $r['signaX'],
                     'rj_kapsul' => $r['signaHari'],
                     'catatan_khusus' => $r['catatanKhusus'],
