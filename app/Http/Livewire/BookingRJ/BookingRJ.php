@@ -432,7 +432,7 @@ class BookingRJ extends Component
 
             )
             ->join('rsmst_pasiens', 'referensi_mobilejkn_bpjs.norm', 'rsmst_pasiens.reg_no')
-            // ->where(DB::raw("to_char(to_date(tanggalperiksa,'yyyy-mm-dd'),'dd/mm/yyyy')"), '=', $myRefdate)
+            ->where(DB::raw("to_char(to_date(tanggalperiksa,'yyyy-mm-dd'),'dd/mm/yyyy')"), '=', $myRefdate)
             ->orderBy('tanggalperiksa',  'asc')
             ->orderBy('kodedokter',  'asc');
 
