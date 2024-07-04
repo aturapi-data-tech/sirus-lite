@@ -300,29 +300,29 @@ class SetupHfisBpjs extends Component
         $kdPoliBpjsSyncRs = DB::table('rsmst_polis')->where('kd_poli_bpjs',  $poliIdBPJS ? $poliIdBPJS : '')->first();
 
         if (!$kdPoliBpjsSyncRs) {
-            return "Poli tidak ditemukan / Data Dokter belum di syncronuze";
+            dd("Poli tidak ditemukan / Data Dokter belum di syncronuze");
         }
 
         // cek dokter
         $kdDrBpjsSyncRs = DB::table('rsmst_doctors')->where('kd_dr_bpjs',  $drIdBPJS ? $drIdBPJS : '')->first();
 
         if (!$kdDrBpjsSyncRs) {
-            return "Dokter tidak ditemukan / Data Dokter belum di syncronuze";
+            dd("Dokter tidak ditemukan / Data Dokter belum di syncronuze");
         }
 
         // cek dayId
         $kd_hari_bpjs = DB::table('scmst_scdays')->where('day_id',  $dayId ? $dayId : '')->first();
 
         if (!$kd_hari_bpjs) {
-            return "Kode Hari Tidak ditemukan";
+            dd("Kode Hari Tidak ditemukan");
         }
 
         if (!$kuota) {
-            return "Kuota Tidak Tersedia";
+            dd("Kuota Tidak Tersedia");
         }
 
         if (!$jamPraktek) {
-            return "Jam Praktek Tidak Tersedia";
+            dd("Jam Praktek Tidak Tersedia");
         }
 
         $jammulai   = substr($jamPraktek, 0, 5);
@@ -335,11 +335,16 @@ class SetupHfisBpjs extends Component
             shift_start and shift_end")
             ->first();
 
+        if (!$findShift) {
+            dd("Shift Invalid");
+        }
+
         // cek jadwal RS
         $jadwalRS = DB::table('scmst_scpolis')
             ->where('day_id',  $dayId ? $dayId : '')
             ->where('poli_id',  $kdPoliBpjsSyncRs->poli_id ? $kdPoliBpjsSyncRs->poli_id : '')
             ->where('dr_id',  $kdDrBpjsSyncRs->dr_id ? $kdDrBpjsSyncRs->dr_id : '')
+            ->where('sc_poli_ket', $jamPraktek)
             ->first();
 
         if (!$jadwalRS) {
@@ -349,7 +354,7 @@ class SetupHfisBpjs extends Component
                 'sc_poli_ket' => $jamPraktek,
                 'day_id' => $dayId,
                 'poli_id' => $kdPoliBpjsSyncRs->poli_id,
-                'dr_id' => $kdPoliBpjsSyncRs->dr_id,
+                'dr_id' => $kdDrBpjsSyncRs->dr_id,
                 'shift' => $findShift->shift,
                 'mulai_praktek' => $jammulai . ':00',
                 'pelayanan_perp_asien' => '',
@@ -364,13 +369,14 @@ class SetupHfisBpjs extends Component
                 ->where('day_id',  $dayId ? $dayId : '')
                 ->where('poli_id',  $kdPoliBpjsSyncRs->poli_id ? $kdPoliBpjsSyncRs->poli_id : '')
                 ->where('dr_id',  $kdDrBpjsSyncRs->dr_id ? $kdDrBpjsSyncRs->dr_id : '')
+                ->where('sc_poli_ket', $jamPraktek)
 
                 ->update([
                     'sc_poli_status_' => '1',
                     'sc_poli_ket' => $jamPraktek,
                     'day_id' => $dayId,
                     'poli_id' => $kdPoliBpjsSyncRs->poli_id,
-                    'dr_id' => $kdPoliBpjsSyncRs->dr_id,
+                    'dr_id' => $kdDrBpjsSyncRs->dr_id,
                     'shift' => $findShift->shift,
                     'mulai_praktek' => $jammulai . ':00',
                     'pelayanan_perp_asien' => '',
