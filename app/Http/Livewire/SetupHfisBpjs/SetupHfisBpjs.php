@@ -10,6 +10,8 @@ use Carbon\Carbon;
 
 use App\Http\Traits\BPJS\AntrianTrait;
 use App\Http\Traits\BPJS\VclaimTrait;
+use Illuminate\Support\Facades\DB;
+
 
 
 
@@ -289,6 +291,96 @@ class SetupHfisBpjs extends Component
     }
     // LOV selected end
     // /////////////////////
+
+
+
+    public function updateJadwalRS($poliIdBPJS, $drIdBPJS, $dayId, $jamPraktek, $kuota)
+    {
+        // cek poli
+        $kdPoliBpjsSyncRs = DB::table('rsmst_polis')->where('kd_poli_bpjs',  $poliIdBPJS ? $poliIdBPJS : '')->first();
+
+        if (!$kdPoliBpjsSyncRs) {
+            return "Poli tidak ditemukan / Data Dokter belum di syncronuze";
+        }
+
+        // cek dokter
+        $kdDrBpjsSyncRs = DB::table('rsmst_doctors')->where('kd_dr_bpjs',  $drIdBPJS ? $drIdBPJS : '')->first();
+
+        if (!$kdDrBpjsSyncRs) {
+            return "Dokter tidak ditemukan / Data Dokter belum di syncronuze";
+        }
+
+        // cek dayId
+        $kd_hari_bpjs = DB::table('scmst_scdays')->where('day_id',  $dayId ? $dayId : '')->first();
+
+        if (!$kd_hari_bpjs) {
+            return "Kode Hari Tidak ditemukan";
+        }
+
+        if (!$kuota) {
+            return "Kuota Tidak Tersedia";
+        }
+
+        if (!$jamPraktek) {
+            return "Jam Praktek Tidak Tersedia";
+        }
+
+        $jammulai   = substr($jamPraktek, 0, 5);
+        $jamselesai = substr($jamPraktek, 6, 5);
+
+        // shift
+        $findShift = DB::table('rstxn_shiftctls')
+            ->select('shift')
+            ->whereRaw("'" . Carbon::createFromFormat('H:i', $jammulai)->format('H:i:s') . "' between
+            shift_start and shift_end")
+            ->first();
+
+        // cek jadwal RS
+        $jadwalRS = DB::table('scmst_scpolis')
+            ->where('day_id',  $dayId ? $dayId : '')
+            ->where('poli_id',  $kdPoliBpjsSyncRs->poli_id ? $kdPoliBpjsSyncRs->poli_id : '')
+            ->where('dr_id',  $kdDrBpjsSyncRs->dr_id ? $kdDrBpjsSyncRs->dr_id : '')
+            ->first();
+
+        if (!$jadwalRS) {
+            // insert
+            DB::table('scmst_scpolis')->insert([
+                'sc_poli_status_' => '1',
+                'sc_poli_ket' => $jamPraktek,
+                'day_id' => $dayId,
+                'poli_id' => $kdPoliBpjsSyncRs->poli_id,
+                'dr_id' => $kdPoliBpjsSyncRs->dr_id,
+                'shift' => $findShift->shift,
+                'mulai_praktek' => $jammulai . ':00',
+                'pelayanan_perp_asien' => '',
+                'no_urut' => '1',
+                'kuota' => $kuota,
+                'selesai_praktek' => $jamselesai . ':00',
+            ]);
+            $this->emit('toastr-success', 'Insert OK');
+        } else {
+            // update
+            DB::table('scmst_scpolis')
+                ->where('day_id',  $dayId ? $dayId : '')
+                ->where('poli_id',  $kdPoliBpjsSyncRs->poli_id ? $kdPoliBpjsSyncRs->poli_id : '')
+                ->where('dr_id',  $kdDrBpjsSyncRs->dr_id ? $kdDrBpjsSyncRs->dr_id : '')
+
+                ->update([
+                    'sc_poli_status_' => '1',
+                    'sc_poli_ket' => $jamPraktek,
+                    'day_id' => $dayId,
+                    'poli_id' => $kdPoliBpjsSyncRs->poli_id,
+                    'dr_id' => $kdPoliBpjsSyncRs->dr_id,
+                    'shift' => $findShift->shift,
+                    'mulai_praktek' => $jammulai . ':00',
+                    'pelayanan_perp_asien' => '',
+                    'no_urut' => '1',
+                    'kuota' => $kuota,
+                    'selesai_praktek' => $jamselesai . ':00',
+                ]);
+            $this->emit('toastr-success', 'Update OK');
+        }
+    }
 
 
     // when new form instance

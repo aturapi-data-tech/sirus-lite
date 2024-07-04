@@ -181,51 +181,16 @@
                                                 <td
                                                     class="flex items-center justify-center px-4 py-3 group-hover:bg-gray-50 group-hover:text-blue-700">
 
-
-
-                                                    <!-- Dropdown Action menu Flowbite-->
                                                     <div>
-                                                        <x-light-button id="dropdownButton{{ $jd['kodedokter'] }}"
-                                                            class="inline-flex"
-                                                            wire:click="$emit('pressDropdownButton','{{ $jd['kodedokter'] }}')">
-                                                            <svg class="w-5 h-5" aria-hidden="true" fill="currentColor"
-                                                                viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                                                <path
-                                                                    d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
-                                                            </svg>
-                                                        </x-light-button>
-
-                                                        <!-- Dropdown Action Open menu -->
-                                                        <div id="dropdownMenu{{ $jd['kodedokter'] }}"
-                                                            class="z-10 hidden w-auto bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700">
-                                                            <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
-                                                                aria-labelledby="dropdownButton{{ $jd['kodedokter'] }}">
-                                                                <li>
-                                                                    <x-dropdown-link
-                                                                        wire:click="tampil('{{ $jd['kodedokter'] }}')">
-                                                                        {{ __('Tampil | ' . $jd['namadokter']) }}
-                                                                    </x-dropdown-link>
-                                                                </li>
-                                                                <li>
-                                                                    <x-dropdown-link
-                                                                        wire:click="edit('{{ $jd['kodedokter'] }}')">
-                                                                        {{ __('Ubah') }}
-                                                                    </x-dropdown-link>
-                                                                </li>
-                                                                <li>
-                                                                    <x-dropdown-link
-                                                                        wire:click="$emit('confirm_remove_record', '{{ $jd['kodedokter'] }}', '{{ $jd['namadokter'] }}')">
-                                                                        {{ __('Hapus') }}
-                                                                    </x-dropdown-link>
-                                                                </li>
-
-                                                            </ul>
+                                                        <x-primary-button
+                                                            wire:click.prevent="updateJadwalRS('{{ $jd['kodesubspesialis'] }}', '{{ $jd['kodedokter'] }}', '{{ $jd['hari'] }}', '{{ $jd['jadwal'] }}', '{{ $jd['kapasitaspasien'] }}')"
+                                                            type="button" wire:loading.remove>
+                                                            Update Jadwal RS dari Hfis
+                                                        </x-primary-button>
+                                                        <div wire:loading wire:target="copyResep">
+                                                            <x-loading />
                                                         </div>
                                                     </div>
-                                                    <!-- End Dropdown Action Open menu -->
-
-
-
 
 
                                                 </td>
