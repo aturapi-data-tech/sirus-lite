@@ -127,6 +127,8 @@ trait iCareTrait
 
     public static function icare($nomorKartu, $kodeDokter)
     {
+
+
         // customErrorMessages
         $messages = customErrorMessagesTrait::messages();
 
@@ -161,7 +163,7 @@ trait iCareTrait
                 ->send('POST', $url, [
                     'body' => '{
                     "param": "' . $nomorKartu . '",
-                    "kodedokter": ' . $kodeDokter . '
+                    "kodedokter": 1111111111
                 }'
                 ]);
 

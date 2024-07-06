@@ -288,6 +288,7 @@ class RekamMedisDisplay extends Component
 
     public function myiCare($nomorKartu, $kodeDokter)
     {
+
         // trait
         $HttpGetBpjs  = $this->icare($nomorKartu, $kodeDokter)->getOriginalContent();
         // $HttpGetBpjs =  iCareTrait::icare($nomorKartu, $kodeDokter)->getOriginalContent();
@@ -295,7 +296,7 @@ class RekamMedisDisplay extends Component
         $HttpGetBpjsStatus = $HttpGetBpjs['metadata']['code']; //status 200 201 400 ..
         $HttpGetBpjsJson = $HttpGetBpjs; //Return Response
         if ($HttpGetBpjsStatus == 200) {
-            dd($HttpGetBpjsJson);
+            return redirect()->to($HttpGetBpjsJson['response']['response']['url']);
         }
         dd($HttpGetBpjsJson);
     }
