@@ -57,10 +57,10 @@
                                                                         : '-')) }}
                                                         </div>
                                                         <div class="font-semibold text-gray-900">
-                                                            {{ $myQData->txn_date . ' / (' . $myQData->reg_no . ')' }}
+                                                            {{ $myQData->txn_date . ' / (' . $myQData->reg_no . ') / ' . $myQData->nokartu_bpjs }}
                                                         </div>
                                                         <div class="font-normal text-gray-900">
-                                                            {{ $myQData->poli }}
+                                                            {{ $myQData->poli . ' ' . $myQData->kd_dr_bpjs }}
                                                         </div>
                                                     </div>
                                                     <div class="ml-8">
@@ -107,14 +107,28 @@
                                                     </div>
 
                                                     @role(['Dokter', 'Admin'])
-                                                        <div>
-                                                            <x-yellow-button
-                                                                wire:click.prevent="copyResep({{ $myQData->txn_no }},'{{ $myQData->layanan_status }}')"
-                                                                type="button" wire:loading.remove>
-                                                                Copy Resep
-                                                            </x-yellow-button>
-                                                            <div wire:loading wire:target="copyResep">
-                                                                <x-loading />
+                                                        <div class="flex justify-between">
+                                                            <div>
+                                                                <x-yellow-button
+                                                                    wire:click.prevent="copyResep({{ $myQData->txn_no }},'{{ $myQData->layanan_status }}')"
+                                                                    type="button" wire:loading.remove>
+                                                                    Copy Resep
+                                                                </x-yellow-button>
+                                                                <div wire:loading wire:target="copyResep">
+                                                                    <x-loading />
+                                                                </div>
+                                                            </div>
+
+
+                                                            <div>
+                                                                <x-light-button
+                                                                    wire:click.prevent="myiCare('{{ $myQData->nokartu_bpjs }}','{{ $myQData->kd_dr_bpjs }}')"
+                                                                    type="button" wire:loading.remove>
+                                                                    i-Care
+                                                                </x-light-button>
+                                                                <div wire:loading wire:target="myiCare">
+                                                                    <x-loading />
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     @endrole

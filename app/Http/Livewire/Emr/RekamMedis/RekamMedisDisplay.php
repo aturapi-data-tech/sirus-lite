@@ -6,8 +6,8 @@ use Illuminate\Support\Facades\DB;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-use Carbon\Carbon;
-use Barryvdh\DomPDF\Facade\Pdf;
+
+use App\Http\Traits\BPJS\iCareTrait;
 
 
 use Spatie\ArrayToXml\ArrayToXml;
@@ -16,7 +16,7 @@ use Exception;
 
 class RekamMedisDisplay extends Component
 {
-    use WithPagination;
+    use WithPagination, iCareTrait;
 
 
     // listener from blade////////////////
@@ -286,6 +286,21 @@ class RekamMedisDisplay extends Component
     }
 
 
+    public function myiCare($nomorKartu, $kodeDokter)
+    {
+        // trait
+        $HttpGetBpjs  = $this->icare($nomorKartu, $kodeDokter)->getOriginalContent();
+        // $HttpGetBpjs =  iCareTrait::icare($nomorKartu, $kodeDokter)->getOriginalContent();
+        // set http response to public
+        $HttpGetBpjsStatus = $HttpGetBpjs['metadata']['code']; //status 200 201 400 ..
+        $HttpGetBpjsJson = $HttpGetBpjs; //Return Response
+        if ($HttpGetBpjsStatus == 200) {
+            dd($HttpGetBpjsJson);
+        }
+        dd($HttpGetBpjsJson);
+    }
+
+
     // when new form instance
     public function mount()
     {
@@ -310,6 +325,8 @@ class RekamMedisDisplay extends Component
                 'erm_status',
                 'layanan_status',
                 'poli',
+                'kd_dr_bpjs',
+                'nokartu_bpjs',
                 DB::raw("(CASE WHEN layanan_status='RJ' THEN (select datadaftarpolirj_json from rsview_rjkasir where rj_no=txn_no)
                                         WHEN layanan_status='UGD' THEN (select datadaftarugd_json from rsview_ugdkasir where rj_no=txn_no)
                                             ELSE null END) as datadaftar_json")

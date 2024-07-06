@@ -219,6 +219,7 @@ trait VclaimTrait
         $secretKey = env('VCLAIM_SECRET_KEY');
         $userkey = env('VCLAIM_USER_KEY');
 
+
         date_default_timezone_set('UTC');
         $tStamp = strval(time() - strtotime('1970-01-01 00:00:00'));
         $signature = hash_hmac('sha256', $cons_id . "&" . $tStamp, $secretKey, true);
