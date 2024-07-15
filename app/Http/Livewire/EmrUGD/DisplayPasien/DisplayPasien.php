@@ -100,15 +100,17 @@ class DisplayPasien extends Component
     private function findData($rjno): void
     {
 
+
         $findData = DB::table('rsview_ugdkasir')
-            ->select('datadaftarugd_json', 'vno_sep')
+            ->select('datadaftarugd_json', 'vno_sep', 'reg_no')
             ->where('rj_no', $rjno)
             ->first();
+
 
         $datadaftarugd_json = isset($findData->datadaftarugd_json) ? $findData->datadaftarugd_json : null;
         // if meta_data_pasien_json = null
         // then cari Data Pasien By Key Collection (exception when no data found)
-        // 
+        //
         // else json_decode
         if ($datadaftarugd_json) {
             $this->dataDaftarUgd = json_decode($findData->datadaftarugd_json, true);
@@ -127,6 +129,8 @@ class DisplayPasien extends Component
 
             // $this->emit('listenerRegNo', $this->dataDaftarUgd['regNo']);(nggak dipake)
             $this->setDataPasien($this->dataDaftarUgd['regNo']);
+
+
 
 
             if (!isset($this->dataDaftarUgd['klaimId'])) {
@@ -245,7 +249,7 @@ class DisplayPasien extends Component
         }
 
 
-        // 
+        //
 
         // return $findData;
     }
@@ -339,20 +343,20 @@ class DisplayPasien extends Component
                 "negara" => "ID" //harus diisi (ISO 3166) ID 	IDN 	360 	ISO 3166-2:ID 	.id
             ],
             "kontak" => [
-                "kodenegara" => "62", //+(62) Indonesia 
+                "kodenegara" => "62", //+(62) Indonesia
                 "nomerTelponSelulerPasien" => '', //+(kode negara) no telp
                 "nomerTelponLain" => '' //+(kode negara) no telp
             ],
             "hubungan" => [
                 "namaAyah" => '', //
-                "kodenegaraAyah" => "62", //+(62) Indonesia 
+                "kodenegaraAyah" => "62", //+(62) Indonesia
                 "nomerTelponSelulerAyah" => '', //+(kode negara) no telp
                 "namaIbu" => '', //
-                "kodenegaraIbu" => "62", //+(62) Indonesia 
+                "kodenegaraIbu" => "62", //+(62) Indonesia
                 "nomerTelponSelulerIbu" => '', //+(kode negara) no telp
 
                 "namaPenanggungJawab" => '', // di isi untuk pasien (Tidak dikenal / Hal Lain)
-                "kodenegaraPenanggungJawab" => "62", //+(62) Indonesia 
+                "kodenegaraPenanggungJawab" => "62", //+(62) Indonesia
                 "nomerTelponSelulerPenanggungJawab" => '', //+(kode negara) no telp
                 "hubunganDgnPasien" => [
                     "hubunganDgnPasienId" => 5, //Default 5 Kerabat / Saudara
@@ -488,7 +492,7 @@ class DisplayPasien extends Component
         $meta_data_pasien_json = isset($findData->meta_data_pasien_json) ? $findData->meta_data_pasien_json : null;
         // if meta_data_pasien_json = null
         // then cari Data Pasien By Key Collection (exception when no data found)
-        // 
+        //
         // else json_decode
         if ($meta_data_pasien_json == null) {
 
@@ -667,6 +671,7 @@ class DisplayPasien extends Component
 
     public function mount()
     {
+
         $this->findData($this->rjNoRef);
     }
 

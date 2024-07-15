@@ -44,6 +44,7 @@
 
                 </div>
 
+
                 {{-- Display Pasien Componen --}}
                 <div class="">
                     {{-- Display Pasien --}}
@@ -54,6 +55,23 @@
 
                         {{-- <livewire:emr-r-j.form-entry-r-j.form-entry-r-j :rjNo="$regNo"
                             :wire:key="$regNo.'form-entry-r-j'"> --}}
+
+                        {{-- Status PRB --}}
+                        @isset($dataDaftarPoliRJ['statusPRB']['penanggungJawab']['statusPRB'])
+                            @if ($dataDaftarPoliRJ['statusPRB']['penanggungJawab']['statusPRB'])
+                                <x-badge :badgecolor="__('green')">
+                                    PRB
+                                </x-badge>
+                            @else
+                                <x-badge :badgecolor="__('dark')">
+                                    NonPRB
+                                </x-badge>
+                            @endif
+                        @else
+                            <x-badge :badgecolor="__('dark')">
+                                NonPRB
+                            </x-badge>
+                        @endisset
                 </div>
 
                 {{-- Grid Eresep --}}
@@ -123,6 +141,17 @@
                 <div class="sticky bottom-0 flex justify-between px-4 py-3 bg-opacity-75 bg-gray-50 sm:px-6">
 
                     <div class="">
+
+                        <div>
+                            <div wire:loading wire:target="setstatusPRB">
+                                <x-loading />
+                            </div>
+
+                            <x-yellow-button :disabled=false wire:click.prevent="setstatusPRB()" type="button"
+                                wire:loading.remove>
+                                Status PRB
+                            </x-yellow-button>
+                        </div>
 
                     </div>
                     <div>

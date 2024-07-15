@@ -323,6 +323,7 @@ class RekamMedisDisplay extends Component
                 DB::raw("to_char(txn_date,'yyyymmddhh24miss') AS txn_date1"),
                 'txn_no',
                 'reg_no',
+                'reg_name',
                 'erm_status',
                 'layanan_status',
                 'poli',

@@ -150,7 +150,7 @@ class EmrUGD extends Component
     public int $rjNoRef;
     public string $regNoRef;
 
-    // 
+    //
     private function openModal(): void
     {
         $this->isOpen = true;
@@ -215,7 +215,7 @@ class EmrUGD extends Component
 
         // resert validation
         $this->resetValidation();
-        // resert input 
+        // resert input
 
     }
     // resert input private////////////////

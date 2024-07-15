@@ -423,6 +423,32 @@ class Perencanaan extends Component
         $this->store();
         $this->closeModalEresepRJ();
     }
+
+    public function setstatusPRB()
+    {
+
+        // status PRB
+        if (isset($this->dataDaftarPoliRJ['statusPRB']['penanggungJawab']['statusPRB'])) {
+            if ($this->dataDaftarPoliRJ['statusPRB']['penanggungJawab']['statusPRB']) {
+                $statusPRB = 0;
+            } else {
+                $statusPRB = 1;
+            }
+        } else {
+            $statusPRB = 1;
+        }
+
+        // setStatusPRB
+        $this->dataDaftarPoliRJ['statusPRB']['penanggungJawab'] = [
+            'statusPRB' => $statusPRB,
+            'userLog' => auth()->user()->myuser_name,
+            'userLogDate' => Carbon::now()->format('d/m/Y H:i:s'),
+            'userLogCode' => auth()->user()->myuser_code
+        ];
+
+        // simpan
+        $this->store();
+    }
     // /////////////////////////////////////////
 
     // when new form instance

@@ -125,7 +125,7 @@ trait iCareTrait
 
     // icare
 
-    public static function icare($nomorKartu, $kodeDokter)
+    public function icare($nomorKartu, $kodeDokter)
     {
 
 

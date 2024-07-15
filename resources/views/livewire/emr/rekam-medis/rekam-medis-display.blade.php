@@ -55,6 +55,24 @@
                                                                     : ($myQData->layanan_status === 'RJ'
                                                                         ? 'Rawat Jalan'
                                                                         : '-')) }}
+                                                            {{ ' / ' . $myQData->reg_name }}
+
+                                                            {{-- Status PRB --}}
+                                                            @isset($datadaftar_json['statusPRB']['penanggungJawab']['statusPRB'])
+                                                                @if ($datadaftar_json['statusPRB']['penanggungJawab']['statusPRB'])
+                                                                    <x-badge :badgecolor="__('green')">
+                                                                        PRB
+                                                                    </x-badge>
+                                                                @else
+                                                                    {{-- <x-badge :badgecolor="__('dark')">
+                                                                        NonPRB
+                                                                    </x-badge> --}}
+                                                                @endif
+                                                            @else
+                                                                {{-- <x-badge :badgecolor="__('dark')">
+                                                                    NonPRB
+                                                                </x-badge> --}}
+                                                            @endisset
                                                         </div>
                                                         <div class="font-semibold text-gray-900">
                                                             {{ $myQData->txn_date . ' / (' . $myQData->reg_no . ') / ' . $myQData->nokartu_bpjs }}
