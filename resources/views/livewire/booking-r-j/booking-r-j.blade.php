@@ -174,27 +174,27 @@
 
                             <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap ">
                                 <div class="">
-                                    <div class="font-semibold text-primary">
+                                    <div class="grid grid-cols-3 my-1 font-semibold text-primary">
                                         <x-badge :badgecolor="__('default')">
                                             NoBooking
                                         </x-badge>
                                         {{ $myQData->nobooking }}
                                     </div>
-                                    <div class="font-semibold text-gray-900">
+                                    <div class="grid grid-cols-1 text-lg font-semibold text-gray-900">
                                         {{ $myQData->reg_name }}
                                     </div>
-                                    <div class="font-normal text-gray-900 ">
+                                    <div class="grid grid-cols-3 my-1 font-normal text-gray-900">
                                         <x-badge :badgecolor="__('default')">
                                             IdBPJS
                                         </x-badge>
                                         {{ $myQData->nomorkartu }}
                                     </div>
-                                    <div class="font-normal text-gray-900 ">
+                                    <div class="grid grid-cols-3 my-1 font-normal text-gray-900">
                                         <x-badge :badgecolor="__('default')">
                                             NIK
                                         </x-badge> {{ $myQData->nik }}
                                     </div>
-                                    <div class="font-normal text-gray-900">
+                                    <div class="grid grid-cols-1 font-normal text-gray-900">
                                         {{ $myQData->address }}
                                     </div>
                                 </div>
@@ -204,13 +204,34 @@
                             <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap ">
                                 <div class="">
                                     <div class="font-semibold text-primary">
-                                        {{ $myQData->kodepoli }}
+                                        {{ $myQData->kodepoli }} /
+                                        {{ $myQData->poli_desc }}
+
                                     </div>
                                     <div class="font-semibold text-gray-900">
-                                        {{ $myQData->kodedokter }}
+                                        {{ $myQData->kodedokter }} /
+                                        {{ $myQData->dr_name }}
                                     </div>
                                     <div class="font-normal text-gray-900">
                                         {{ 'Nomer Pelayanan ' . $myQData->nomorantrean }}
+                                    </div>
+                                    <div class="font-normal text-gray-900">
+                                        {{-- 1 (Rujukan FKTP), 2 (Rujukan Internal), 3 (Kontrol), 4 (Rujukan Antar RS) --}}
+                                        {{ ((('Jenis Kunjungan ' . $myQData->jeniskunjungan == '1'
+                                                        ? '1 (Rujukan FKTP)'
+                                                        : $myQData->jeniskunjungan == '2')
+                                                    ? '2 (Rujukan Internal)'
+                                                    : $myQData->jeniskunjungan == '3')
+                                                ? '3 (Kontrol)'
+                                                : $myQData->jeniskunjungan == '4')
+                                            ? '4 (Rujukan Antar RS)'
+                                            : 'Tidak ditemukan' }}
+                                    </div>
+                                    <div>
+                                        <x-badge :badgecolor="__('default')">
+                                            NoReferensi
+                                        </x-badge>
+                                        {{ $myQData->nomorreferensi }}
                                     </div>
                                 </div>
                             </td>
