@@ -55,23 +55,26 @@
 
                         {{-- <livewire:emr-r-j.form-entry-r-j.form-entry-r-j :rjNo="$regNo"
                             :wire:key="$regNo.'form-entry-r-j'"> --}}
+                        <div class="mx-8">
 
-                        {{-- Status PRB --}}
-                        @isset($dataDaftarPoliRJ['statusPRB']['penanggungJawab']['statusPRB'])
-                            @if ($dataDaftarPoliRJ['statusPRB']['penanggungJawab']['statusPRB'])
-                                <x-badge :badgecolor="__('green')">
-                                    PRB
-                                </x-badge>
+                            {{-- Status PRB --}}
+                            @isset($dataDaftarPoliRJ['statusPRB']['penanggungJawab']['statusPRB'])
+                                @if ($dataDaftarPoliRJ['statusPRB']['penanggungJawab']['statusPRB'])
+                                    <x-badge :badgecolor="__('dark')">
+                                        PRB
+                                    </x-badge>
+                                @else
+                                    {{-- <x-badge :badgecolor="__('dark')">
+                                        NonPRB
+                                    </x-badge> --}}
+                                @endif
                             @else
-                                <x-badge :badgecolor="__('dark')">
+                                {{-- <x-badge :badgecolor="__('dark')">
                                     NonPRB
-                                </x-badge>
-                            @endif
-                        @else
-                            <x-badge :badgecolor="__('dark')">
-                                NonPRB
-                            </x-badge>
-                        @endisset
+                                </x-badge> --}}
+                            @endisset
+                        </div>
+
                 </div>
 
                 {{-- Grid Eresep --}}
@@ -147,10 +150,25 @@
                                 <x-loading />
                             </div>
 
-                            <x-yellow-button :disabled=false wire:click.prevent="setstatusPRB()" type="button"
-                                wire:loading.remove>
-                                Status PRB
-                            </x-yellow-button>
+
+                            @isset($dataDaftarPoliRJ['statusPRB']['penanggungJawab']['statusPRB'])
+                                @if ($dataDaftarPoliRJ['statusPRB']['penanggungJawab']['statusPRB'])
+                                    <x-red-button :disabled=false wire:click.prevent="setstatusPRB()" type="button"
+                                        wire:loading.remove>
+                                        Set Status NonPRB
+                                    </x-red-button>
+                                @else
+                                    <x-light-button :disabled=false wire:click.prevent="setstatusPRB()" type="button"
+                                        wire:loading.remove>
+                                        Set Status PRB
+                                    </x-light-button>
+                                @endif
+                            @else
+                                <x-light-button :disabled=false wire:click.prevent="setstatusPRB()" type="button"
+                                    wire:loading.remove>
+                                    Set Status PRB
+                                </x-light-button>
+                            @endisset
                         </div>
 
                     </div>

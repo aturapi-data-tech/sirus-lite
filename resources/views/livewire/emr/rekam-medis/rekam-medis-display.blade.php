@@ -60,7 +60,7 @@
                                                             {{-- Status PRB --}}
                                                             @isset($datadaftar_json['statusPRB']['penanggungJawab']['statusPRB'])
                                                                 @if ($datadaftar_json['statusPRB']['penanggungJawab']['statusPRB'])
-                                                                    <x-badge :badgecolor="__('green')">
+                                                                    <x-badge :badgecolor="__('dark')">
                                                                         PRB
                                                                     </x-badge>
                                                                 @else
