@@ -11,6 +11,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
 
 use Spatie\ArrayToXml\ArrayToXml;
+use Exception;
 
 
 class Radiologi extends Component
@@ -36,6 +37,7 @@ class Radiologi extends Component
     public array $dataDaftarTxnLuar;
     public array $dataDaftarTxnHeader;
     public array $dataPasien;
+    public string $rad_pdf_file = '';
 
 
 
@@ -50,93 +52,18 @@ class Radiologi extends Component
     // Layanan RJ/RI/UGD
     public function openModalLayanan($rad_pdf_file)
     {
-
         if ($rad_pdf_file) {
-            return response()->download(storage_path('/penunjang/rad/' . $rad_pdf_file));
+            try {
+
+                return response()->download(storage_path('/penunjang/rad/' . $rad_pdf_file));
+                $this->isOpenRekamMedisRadiologi = true;
+                $this->rad_pdf_file = $rad_pdf_file;
+            } catch (Exception $e) {
+                $this->emit('toastr-error', 'File tidak ditemukan');
+            }
         } else {
             $this->emit('toastr-error', 'Hasil Bacaan Radiologi masih dalam Proses');
         }
-        // $this->isOpenRekamMedisRadiologi = true;
-
-        // $dataDaftarTxnHeader  = collect(DB::select("select distinct a.emp_id,a.checkup_no,checkup_date,a.reg_no,reg_name,a.dr_id,dr_name,'dr. KRISTINA DYAH LESTARI, Sp. PK' as dr_penanggungjawab,sex,birth_date,c.address,emp_name,waktu_selesai_pelayanan,checkup_kesimpulan
-        // from lbtxn_checkuphdrs a,
-        // rsmst_pasiens c,
-        // rsmst_doctors f,
-        // immst_employers g
-
-        // where a.dr_id=f.dr_id
-        // and a.emp_id=g.emp_id
-        // and a.reg_no=c.reg_no
-        // and a.checkup_no =:cno", ['cno' => $txnNo]))->first();
-        // $this->dataDaftarTxnHeader = collect($dataDaftarTxnHeader)->toArray();
-
-
-        // $dataDaftarTxn  = DB::select("select a.emp_id,a.checkup_no,checkup_date,a.reg_no,reg_name,a.dr_id,dr_name,sex,birth_date,c.address,emp_name,app_seq,clab_desc,
-        // b.clabitem_id,('  '||clabitem_desc)clabitem_desc,checkup_kesimpulan,
-        // normal_f,normal_m,lab_result,item_seq,
-        // unit_desc,unit_convert,
-        // item_code,high_limit_m,high_limit_f,low_limit_m,low_limit_f,normal_m,normal_f,
-        // lowhigh_status,lab_result_status,
-        // to_char(checkup_date,'dd/mm/yyyy')checkup_date1x,WAKTU_SELESAI_PELAYANAN,
-
-
-        // (SELECT count(*)
-        // FROM lbtxn_checkupdtls z,LBMST_CLABITEMS x 
-        // where a.checkup_no=z.checkup_no 
-        // and z.clabitem_id=x.clabitem_id  
-
-        // and x.LOW_LIMIT_K is not null
-        // and x.HIGH_LIMIT_K is not null
-        // and to_number(lab_result)<=to_number(LOW_LIMIT_K))+
-        // (SELECT count(*)
-        // FROM lbtxn_checkupdtls z,LBMST_CLABITEMS x 
-        // where a.checkup_no=z.checkup_no 
-        // and z.clabitem_id=x.clabitem_id  
-
-        // and x.LOW_LIMIT_K is not null
-        // and x.HIGH_LIMIT_K is not null
-        // and to_number(lab_result)>=to_number(HIGH_LIMIT_K))
-        // K_1
-
-
-
-        // from lbtxn_checkuphdrs a,lbtxn_checkupdtls b,
-        // rsmst_pasiens c,lbmst_clabitems d,
-        // lbmst_clabs e,rsmst_doctors f,
-        // immst_employers g
-
-        // where a.checkup_no=b.checkup_no
-        // and d.clab_id=e.clab_id
-        // and a.dr_id=f.dr_id
-        // and a.emp_id=g.emp_id
-        // and a.reg_no=c.reg_no
-        // and b.clabitem_id=d.clabitem_id
-        // and a.checkup_no =:cno
-        // and nvl(hidden_status,'N')='N'
-        // order by app_seq,item_seq,clabitem_desc", ['cno' => $txnNo]);
-        // $this->dataDaftarTxn = $dataDaftarTxn;
-
-
-        // $dataDaftarTxnLuar  = DB::select("select a.emp_id,a.checkup_no,checkup_date,a.reg_no,reg_name,a.dr_id,dr_name,sex,birth_date,emp_name,
-        // ('  '||labout_desc)labout_desc,labout_result,labout_normal
-        // from lbtxn_checkuphdrs a,lbtxn_checkupoutdtls b,
-        // rsmst_pasiens c,rsmst_doctors d,
-        // immst_employers e
-
-        // where a.checkup_no=b.checkup_no
-        // and a.dr_id=d.dr_id
-        // and a.emp_id=e.emp_id
-        // and a.reg_no=c.reg_no
-        // and a.checkup_no =:cno
-        // order by checkup_no,labout_dtl,labout_desc", ['cno' => $txnNo]);
-        // $this->dataDaftarTxnLuar = $dataDaftarTxnLuar;
-
-
-
-        // dd($this->dataDaftarTxn);
-        // if (isset($regNo)) {
-        //     $this->setDataPasien($regNo);
-        // }
     }
 
     private function setDataPasien($value): void
@@ -150,7 +77,7 @@ class Radiologi extends Component
         $meta_data_pasien_json = isset($findData->meta_data_pasien_json) ? $findData->meta_data_pasien_json : null;
         // if meta_data_pasien_json = null
         // then cari Data Pasien By Key Collection (exception when no data found)
-        // 
+        //
         // else json_decode
         if ($meta_data_pasien_json == null) {
 
