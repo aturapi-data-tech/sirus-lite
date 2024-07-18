@@ -41,9 +41,9 @@
 
                     <div class="p-4 bg-white shadow-xl ">
 
-                        <iframe src="{{ asset('penunjang/rad/' . $rad_pdf_file) }}" class="w-full h-[calc(100vh-150px)]"
-                            allowfullscreen="" style="border: 1px solid #e4e4e4;border-radius: 4px;"
-                            frameborder="0"></iframe>
+                        <iframe src="{{ asset('storage/penunjang/rad/' . $rad_pdf_file) }}"
+                            class="w-full h-[calc(100vh-150px)]" allowfullscreen=""
+                            style="border: 1px solid #e4e4e4;border-radius: 4px;" frameborder="0"></iframe>
                     </div>
 
 
