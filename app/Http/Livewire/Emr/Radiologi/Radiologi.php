@@ -61,7 +61,7 @@ class Radiologi extends Component
         if ($rad_pdf_file) {
             try {
 
-                // return response()->download(storage_path('/penunjang/rad/' . $rad_pdf_file));
+                return response()->download(storage_path('/penunjang/rad/' . $rad_pdf_file));
                 $this->isOpenRekamMedisRadiologi = true;
                 $this->rad_pdf_file = $rad_pdf_file;
             } catch (Exception $e) {
