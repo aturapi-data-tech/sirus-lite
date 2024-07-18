@@ -524,9 +524,9 @@ class Pemeriksaan extends Component
     public function updated($propertyName)
     {
         // dd($propertyName);
-        // $this->validateOnly($propertyName);
-        // $this->scoringIMT();
-        // $this->store();
+        $this->validateOnly($propertyName);
+        $this->scoringIMT();
+        $this->store();
     }
 
     // lab
