@@ -52,15 +52,9 @@ class Radiologi extends Component
     // Layanan RJ/RI/UGD
     public function openModalLayanan($rad_pdf_file)
     {
-        if ($rad_pdf_file) {
-            try {
-
-                return response()->download(storage_path('/penunjang/rad/' . $rad_pdf_file));
-                $this->isOpenRekamMedisRadiologi = true;
-                $this->rad_pdf_file = $rad_pdf_file;
-            } catch (Exception $e) {
-                $this->emit('toastr-error', 'File tidak ditemukan');
-            }
+        if (Storage::exists('/penunjang/rad/' . $rad_pdf_file)) {
+            $this->isOpenRekamMedisRadiologi = true;
+            $this->rad_pdf_file = $rad_pdf_file;
         } else {
             $this->emit('toastr-error', 'Hasil Bacaan Radiologi masih dalam Proses');
         }

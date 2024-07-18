@@ -83,7 +83,7 @@ class PelayananRJ extends Component
 
 
 
-    // 
+    //
 
 
 
@@ -327,6 +327,31 @@ class PelayananRJ extends Component
                 "cekLab" => "0",
                 "kunjunganInternalStatus" => "0",
                 "noReferensi" => "" . $dataDaftarPoliRJ->reg_no . "",
+                "postInap" => [],
+                "internal12" => "1",
+                "internal12Desc" => "Faskes Tingkat 1",
+                "internal12Options" => [
+                    [
+                        "internal12" => "1",
+                        "internal12Desc" => "Faskes Tingkat 1"
+                    ],
+                    [
+                        "internal12" => "2",
+                        "internal12Desc" => "Faskes Tingkat 2 RS"
+                    ],
+                ],
+                "kontrol12" => "1",
+                "kontrol12Desc" => "Faskes Tingkat 1",
+                "kontrol12Options" => [
+                    [
+                        "kontrol12" => "1",
+                        "kontrol12Desc" => "Faskes Tingkat 1"
+                    ],
+                    [
+                        "kontrol12" => "2",
+                        "kontrol12Desc" => "Faskes Tingkat 2 RS"
+                    ],
+                ],
                 "taskIdPelayanan" => [
                     "taskId1" => "",
                     "taskId2" => "",
@@ -770,7 +795,7 @@ class PelayananRJ extends Component
 
 
 
-        // Lakukan 2 x cek http dan BPJS untuk memastikan proses kirim data berhasil 
+        // Lakukan 2 x cek http dan BPJS untuk memastikan proses kirim data berhasil
         // dan menentukan nilai status / jika code =200 skip proses tersebut
         // jika antrean berhasil-> buat SEP
         //jika gagal ulangi-> antrean

@@ -9,11 +9,13 @@ use Livewire\WithPagination;
 use Carbon\Carbon;
 
 use Spatie\ArrayToXml\ArrayToXml;
+use Illuminate\Support\Facades\Storage;
+use Livewire\WithFileUploads;
 
 
 class Pemeriksaan extends Component
 {
-    use WithPagination;
+    use WithPagination, WithFileUploads;
 
     // listener from blade////////////////
     protected $listeners = [
@@ -29,7 +31,7 @@ class Pemeriksaan extends Component
     // dataDaftarPoliRJ RJ
     public array $dataDaftarPoliRJ = [];
 
-    // data pemeriksaan=>[] 
+    // data pemeriksaan=>[]
     public array $pemeriksaan = [
         "umumTab" => "Umum",
         "tandaVital" => [
@@ -458,6 +460,11 @@ class Pemeriksaan extends Component
         // ]
 
     ];
+
+    public $filePDF, $descPDF;
+    public bool $isOpenRekamMedisuploadpenunjangHasil;
+
+
     //////////////////////////////////////////////////////////////////////
 
     // open and close modal start////////////////
@@ -517,9 +524,9 @@ class Pemeriksaan extends Component
     public function updated($propertyName)
     {
         // dd($propertyName);
-        $this->validateOnly($propertyName);
-        $this->scoringIMT();
-        $this->store();
+        // $this->validateOnly($propertyName);
+        // $this->scoringIMT();
+        // $this->store();
     }
 
     // lab
@@ -817,7 +824,7 @@ class Pemeriksaan extends Component
         // Variable Search
         $search = $this->tingkatKesadaranLovSearch;
 
-        // check LOV by id 
+        // check LOV by id
         $tingkatKesadaran = collect($this->dataDaftarPoliRJ['pemeriksaan']['tandaVital']['tingkatKesadaranOptions'])
             ->where('tingkatKesadaran', '=', $search)
             ->first();
@@ -914,7 +921,7 @@ class Pemeriksaan extends Component
         DB::table('rstxn_rjhdrs')
             ->where('rj_no', $rjNo)
             ->update([
-                'dataDaftarPoliRJ_json' => json_encode($this->dataDaftarPoliRJ, true),
+                'datadaftarpolirj_json' => json_encode($this->dataDaftarPoliRJ, true),
                 'dataDaftarPoliRJ_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
             ]);
 
@@ -935,7 +942,7 @@ class Pemeriksaan extends Component
         $dataDaftarPoliRJ_json = isset($findData->datadaftarpolirj_json) ? $findData->datadaftarpolirj_json   : null;
         // if meta_data_pasien_json = null
         // then cari Data Pasien By Key Collection (exception when no data found)
-        // 
+        //
         // else json_decode
         if ($dataDaftarPoliRJ_json) {
             $this->dataDaftarPoliRJ = json_decode($findData->datadaftarpolirj_json, true);
@@ -1078,6 +1085,66 @@ class Pemeriksaan extends Component
 
         $this->dataDaftarPoliRJ['pemeriksaan']['nutrisi']['imt'] = round($bb / (($tb / 100) * ($tb / 100)), 2);
     }
+
+    public function uploadHasilPenunjang(): void
+    {
+        // validate
+        // $this->checkRjStatus();
+        // customErrorMessages
+        $messages = [];
+        // require nik ketika pasien tidak dikenal
+        $rules = [
+            "filePDF" => "bail|required|mimes:pdf|max:10240",
+            "descPDF" => "bail|required|max:255"
+        ];
+
+        // Proses Validasi///////////////////////////////////////////
+        $this->validate($rules, $messages);
+        // upload photo
+        $uploadHasilPenunjangfile = $this->filePDF->store('uploadHasilPenunjang');
+
+        $this->dataDaftarPoliRJ['pemeriksaan']['uploadHasilPenunjang'][] = [
+            'file' => $uploadHasilPenunjangfile,
+            'desc' => $this->descPDF,
+            'tglUpload' => Carbon::now()->format('d/m/Y H:i:s'),
+            'penanggungJawab' => [
+                'userLog' => auth()->user()->myuser_name,
+                'userLogDate' => Carbon::now()->format('d/m/Y H:i:s'),
+                'userLogCode' => auth()->user()->myuser_code
+            ]
+        ];
+        $this->reset(['filePDF', 'descPDF'],);
+        $this->store();
+    }
+
+    public function deleteHasilPenunjang($file): void
+    {
+        // Foto/////////////////////////////////////////////////////////////////////////
+        Storage::delete($file);
+        $deleteHasilpenunjang = collect($this->dataDaftarPoliRJ['pemeriksaan']['uploadHasilPenunjang'])->where("file", '!=', $file)->toArray();
+        $this->dataDaftarPoliRJ['pemeriksaan']['uploadHasilPenunjang'] = $deleteHasilpenunjang;
+        $this->store();
+        //
+    }
+
+    public function openModalHasilPenunjang($file)
+    {
+
+        if (Storage::exists($file)) {
+            $this->isOpenRekamMedisuploadpenunjangHasil = true;
+            $this->filePDF = $file;
+        } else {
+            $this->emit('toastr-error', 'File tidak ditemukan');
+        }
+    }
+
+    public function closeModalHasilPenunjang()
+    {
+        $this->isOpenRekamMedisuploadpenunjangHasil = false;
+        $this->reset(['filePDF']);
+    }
+
+
 
     // when new form instance
     public function mount()
