@@ -135,7 +135,7 @@ trait iCareTrait
         // Masukkan Nilai dari parameter
         $r = [
             'param' => $nomorKartu,
-            "kodedokter" => $kodeDokter,
+            'kodedokter' => $kodeDokter,
 
         ];
         // lakukan validasis
@@ -162,8 +162,8 @@ trait iCareTrait
                 // ]);
                 ->send('POST', $url, [
                     'body' => '{
-                    "param": "' . $nomorKartu . '",
-                    "kodedokter": 1111111111
+                    "param": "' . $data['param'] . '",
+                    "kodedokter": ' . $data['kodedokter'] . '
                 }'
                 ]);
 

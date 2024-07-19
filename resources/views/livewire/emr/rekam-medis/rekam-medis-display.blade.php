@@ -140,7 +140,7 @@
 
                                                             <div>
                                                                 <x-light-button
-                                                                    wire:click.prevent="myiCare('{{ $myQData->nokartu_bpjs }}','{{ $myQData->kd_dr_bpjs }}')"
+                                                                    wire:click.prevent="myiCare('{{ $myQData->nokartu_bpjs }}','{{ isset($datadaftar_json['sep']['noSep']) ? $datadaftar_json['sep']['noSep'] : '' }}')"
                                                                     type="button" wire:loading.remove>
                                                                     i-Care
                                                                 </x-light-button>

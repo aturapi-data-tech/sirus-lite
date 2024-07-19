@@ -286,11 +286,23 @@ class RekamMedisDisplay extends Component
     }
 
 
-    public function myiCare($nomorKartu, $kodeDokter)
+    public function myiCare($nomorKartu, $sep)
     {
+        if (!$sep) {
+            dd('SEP belum terbit');
+        }
+
+        $kodeDokter = DB::table('rsmst_doctors')
+            ->select('kd_dr_bpjs')
+            ->where('rsmst_doctors.dr_id', auth()->user()->myuser_code)
+            ->first();
+
+        if (!$kodeDokter) {
+            dd('Dokter tidak ditemukan xx.');
+        }
 
         // trait
-        $HttpGetBpjs  = $this->icare($nomorKartu, $kodeDokter)->getOriginalContent();
+        $HttpGetBpjs  = $this->icare($nomorKartu, $kodeDokter->kd_dr_bpjs)->getOriginalContent();
         // $HttpGetBpjs =  iCareTrait::icare($nomorKartu, $kodeDokter)->getOriginalContent();
         // set http response to public
         $HttpGetBpjsStatus = $HttpGetBpjs['metadata']['code']; //status 200 201 400 ..
