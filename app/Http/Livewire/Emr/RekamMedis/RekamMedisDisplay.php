@@ -57,7 +57,6 @@ class RekamMedisDisplay extends Component
 
         if ($txnStatus == 'RJ') {
 
-
             // cek status transaksi
             $this->checkRjStatus($this->rjNoRefCopyTo);
 
@@ -88,7 +87,7 @@ class RekamMedisDisplay extends Component
                 try {
                     // ?\
                     // select nvl(max(rjobat_dtl)+1,1) into :rstxn_rjobats.rjobat_dtl from rstxn_rjobats;
-                    foreach ($to['eresep']  as $toEresep) {
+                    foreach ($to['eresep']  as $key => $toEresep) {
 
                         $lastInserted = DB::table('rstxn_rjobats')
                             ->select(DB::raw("nvl(max(rjobat_dtl)+1,1) as rjobat_dtl_max"))
@@ -110,6 +109,10 @@ class RekamMedisDisplay extends Component
                                 'exp_date' => DB::raw("to_date('" . $to['rjDate'] . "','dd/mm/yyyy hh24:mi:ss')+30"),
                                 'etiket_status' => 1,
                             ]);
+
+                        // replace rjobatdtl dan rjno ke obat yang baru
+                        $to['eresep'][$key]['rjObatDtl'] = $lastInserted->rjobat_dtl_max;
+                        $to['eresep'][$key]['rjNo'] = $this->rjNoRefCopyTo;
                     }
                     //
                 } catch (Exception $e) {
@@ -179,6 +182,10 @@ class RekamMedisDisplay extends Component
                                 'exp_date' => DB::raw("to_date('" . $to['rjDate'] . "','dd/mm/yyyy hh24:mi:ss')+30"),
                                 'etiket_status' => 1,
                             ]);
+
+                        // replace rjobatdtl dan rjno ke obat yang baru
+                        $to['eresepRacikan'][$key]['rjObatDtl'] = $lastInserted->rjobat_dtl_max;
+                        $to['eresepRacikan'][$key]['rjNo'] = $this->rjNoRefCopyTo;
                     }
                     //
                 } catch (Exception $e) {
