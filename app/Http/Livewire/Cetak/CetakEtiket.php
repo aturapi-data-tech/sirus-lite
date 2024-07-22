@@ -101,20 +101,20 @@ class CetakEtiket extends Component
                 "negara" => "ID" //harus diisi (ISO 3166) ID 	IDN 	360 	ISO 3166-2:ID 	.id
             ],
             "kontak" => [
-                "kodenegara" => "62", //+(62) Indonesia 
+                "kodenegara" => "62", //+(62) Indonesia
                 "nomerTelponSelulerPasien" => '', //+(kode negara) no telp
                 "nomerTelponLain" => '' //+(kode negara) no telp
             ],
             "hubungan" => [
                 "namaAyah" => '', //
-                "kodenegaraAyah" => "62", //+(62) Indonesia 
+                "kodenegaraAyah" => "62", //+(62) Indonesia
                 "nomerTelponSelulerAyah" => '', //+(kode negara) no telp
                 "namaIbu" => '', //
-                "kodenegaraIbu" => "62", //+(62) Indonesia 
+                "kodenegaraIbu" => "62", //+(62) Indonesia
                 "nomerTelponSelulerIbu" => '', //+(kode negara) no telp
 
                 "namaPenanggungJawab" => '', // di isi untuk pasien (Tidak dikenal / Hal Lain)
-                "kodenegaraPenanggungJawab" => "62", //+(62) Indonesia 
+                "kodenegaraPenanggungJawab" => "62", //+(62) Indonesia
                 "nomerTelponSelulerPenanggungJawab" => '', //+(kode negara) no telp
                 "hubunganDgnPasien" => [
                     "hubunganDgnPasienId" => 5, //Default 5 Kerabat / Saudara
@@ -149,7 +149,8 @@ class CetakEtiket extends Component
             $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] = ($findData->sex == 'L') ? 'Laki-laki' : 'Perempuan';
             $this->dataPasien['pasien']['tglLahir'] = $findData->birth_date;
             // $this->dataPasien['pasien']['thn'] = $findData->thn;
-            $this->dataPasien['pasien']['thn'] = Carbon::createFromFormat('d/m/Y', $findData->birth_date)->diff(Carbon::now())->format('%y Thn, %m Bln %d Hr'); //$findData->thn;
+            $birth_date = $findData->birth_date ? $findData->birth_date : Carbon::now()->format('d/m/Y');
+            $this->dataPasien['pasien']['thn'] = Carbon::createFromFormat('d/m/Y', $birth_date)->diff(Carbon::now())->format('%y Thn, %m Bln %d Hr'); //$findData->thn;
 
             $this->dataPasien['pasien']['bln'] = $findData->bln;
             $this->dataPasien['pasien']['hari'] = $findData->hari;
