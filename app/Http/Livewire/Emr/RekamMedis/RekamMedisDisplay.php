@@ -44,13 +44,25 @@ class RekamMedisDisplay extends Component
 
 
 
-    public bool $isOpenRekamMedisUGD;
-    public bool $isOpenRekamMedisRJ;
+    public bool $isOpenRekamMedisicare;
+    public string $icareUrlResponse;
 
 
     ////////////////////////////////////////////////
     ///////////begin////////////////////////////////
     ////////////////////////////////////////////////
+
+    public function openModalicare(): void
+    {
+
+        $this->isOpenRekamMedisicare = true;
+    }
+
+    public function closeModalicare(): void
+    {
+        $this->isOpenRekamMedisicare = false;
+    }
+
 
     public function copyResep($NoRefCopyFrom, $txnStatus)
     {
@@ -303,7 +315,6 @@ class RekamMedisDisplay extends Component
             ->select('kd_dr_bpjs')
             ->where('rsmst_doctors.dr_id', auth()->user()->myuser_code)
             ->first();
-
         if (!$kodeDokter) {
             dd('Dokter tidak ditemukan xx.');
         }
@@ -315,9 +326,12 @@ class RekamMedisDisplay extends Component
         $HttpGetBpjsStatus = $HttpGetBpjs['metadata']['code']; //status 200 201 400 ..
         $HttpGetBpjsJson = $HttpGetBpjs; //Return Response
         if ($HttpGetBpjsStatus == 200) {
-            return redirect()->to($HttpGetBpjsJson['response']['response']['url']);
+            $this->icareUrlResponse = $HttpGetBpjsJson['response']['url'];
+            $this->openModalicare();
+            // return redirect()->to($HttpGetBpjsJson['response']['url']);
+        } else {
+            dd($HttpGetBpjsJson);
         }
-        dd($HttpGetBpjsJson);
     }
 
 

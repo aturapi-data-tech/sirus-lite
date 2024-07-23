@@ -176,6 +176,10 @@
                         </div>
                     </div>
 
+                    @if ($isOpenRekamMedisicare)
+                        @include('livewire.emr.rekam-medis.create-icare')
+                    @endif
+
 
                 </div>
             </div>
