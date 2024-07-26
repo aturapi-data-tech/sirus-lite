@@ -70,7 +70,11 @@ class RekamMedisDisplay extends Component
         if ($txnStatus == 'RJ') {
 
             // cek status transaksi
-            $this->checkRjStatus($this->rjNoRefCopyTo);
+            $checkRjStatus = $this->checkRjStatus($this->rjNoRefCopyTo);
+            if ($checkRjStatus) {
+                $this->emit('toastr-error', "Pasien Sudah Pulang, Trasaksi Terkunci.");
+                return;
+            }
 
             // 1 cari data to
             // 2 cari data from
@@ -90,7 +94,9 @@ class RekamMedisDisplay extends Component
                         ->delete();
                 } catch (Exception $e) {
                     // display an error to user
-                    dd($e->getMessage());
+                    // dd($e->getMessage());
+                    $this->emit('toastr-error', $e->getMessage());
+                    return;
                 }
 
                 $to['eresep'] = $myResepFrom;
@@ -129,20 +135,13 @@ class RekamMedisDisplay extends Component
                     //
                 } catch (Exception $e) {
                     // display an error to user
-                    dd($e->getMessage());
+                    // dd($e->getMessage());
+                    $this->emit('toastr-error', $e->getMessage());
+                    return;
                 }
 
                 // 4update database to
             }
-
-
-
-
-
-
-
-
-
 
 
             // racikan
@@ -160,7 +159,9 @@ class RekamMedisDisplay extends Component
                         ->delete();
                 } catch (Exception $e) {
                     // display an error to user
-                    dd($e->getMessage());
+                    // dd($e->getMessage());
+                    $this->emit('toastr-error', $e->getMessage());
+                    return;
                 }
 
                 $to['eresepRacikan'] = $myResepRacikanFrom;
@@ -202,7 +203,9 @@ class RekamMedisDisplay extends Component
                     //
                 } catch (Exception $e) {
                     // display an error to user
-                    dd($e->getMessage());
+                    // dd($e->getMessage());
+                    $this->emit('toastr-error', $e->getMessage());
+                    return;
                 }
 
                 // 4update database to
@@ -246,11 +249,12 @@ class RekamMedisDisplay extends Component
 
             $this->updateDataRj($this->rjNoRefCopyTo, $to);
         } else {
-            dd('Fitur Copy Terapi pasien masih dalam proses pengembangan');
+            $this->emit('toastr-error', "Fitur Copy Terapi pasien masih dalam proses pengembangan.");
+            return;
         }
     }
 
-    private function cariResepRJ($rjNo)
+    private function cariResepRJ($rjNo): array
     {
         // update table trnsaksi
         $cari = DB::table('rstxn_rjhdrs')
@@ -286,12 +290,13 @@ class RekamMedisDisplay extends Component
 
         if (!$myArr) {
             $this->emit('toastr-error', "Data " . $arrName . " tidak ditemukan.");
+            return;
         }
 
         return $myArr;
     }
 
-    private function checkRjStatus($rjNo)
+    private function checkRjStatus($rjNo): bool
     {
         $lastInserted = DB::table('rstxn_rjhdrs')
             ->select('rj_status')
@@ -299,9 +304,9 @@ class RekamMedisDisplay extends Component
             ->first();
 
         if ($lastInserted->rj_status !== 'A') {
-            $this->emit('toastr-error', "Pasien Sudah Pulang, Trasaksi Terkunci.");
-            return (dd('Pasien Sudah Pulang, Trasaksi Terkuncixx.'));
+            return true;
         }
+        return false;
     }
 
 
