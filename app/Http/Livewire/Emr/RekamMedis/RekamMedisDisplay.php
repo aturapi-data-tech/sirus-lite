@@ -308,15 +308,20 @@ class RekamMedisDisplay extends Component
     public function myiCare($nomorKartu, $sep)
     {
         if (!$sep) {
-            dd('SEP belum terbit');
+            $this->emit('toastr-error', "Belum Terbit SEP.");
+            return;
         }
 
         $kodeDokter = DB::table('rsmst_doctors')
             ->select('kd_dr_bpjs')
             ->where('rsmst_doctors.dr_id', auth()->user()->myuser_code)
             ->first();
-        if (!$kodeDokter) {
-            dd('Dokter tidak ditemukan xx.');
+
+
+        // dd($kodeDokter);
+        if ($kodeDokter->kd_dr_bpjs == null) {
+            $this->emit('toastr-error', "Dokter tidak memiliki hak akses untuk I-Care.");
+            return;
         }
 
         // trait
@@ -330,7 +335,8 @@ class RekamMedisDisplay extends Component
             $this->openModalicare();
             // return redirect()->to($HttpGetBpjsJson['response']['url']);
         } else {
-            dd($HttpGetBpjsJson);
+            $this->emit('toastr-error', json_encode($HttpGetBpjsJson['metadata']['message'], true));
+            return;
         }
     }
 
