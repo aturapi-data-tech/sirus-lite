@@ -23,6 +23,8 @@ class EresepRJ extends Component
     protected $listeners = [
         'storeAssessmentDokterRJ' => 'store',
         'syncronizeAssessmentDokterRJFindData' => 'mount',
+        'syncronizeAssessmentPerawatRJFindData' => 'mount'
+
     ];
 
     //////////////////////////////
@@ -215,6 +217,7 @@ class EresepRJ extends Component
         // Logic update mode start //////////
         $this->updateDataRJ($this->dataDaftarPoliRJ['rjNo']);
         $this->emit('syncronizeAssessmentDokterRJFindData');
+        $this->emit('syncronizeAssessmentPerawatRJFindData');
     }
 
     private function updateDataRJ($rjNo): void
