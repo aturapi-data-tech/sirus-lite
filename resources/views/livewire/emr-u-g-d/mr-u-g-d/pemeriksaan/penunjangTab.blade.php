@@ -12,7 +12,7 @@
 
                 <x-text-input-area id="dataDaftarUgd.pemeriksaan.penunjang" placeholder="Penunjang" class="mt-1 ml-2"
                     :errorshas="__($errors->has('dataDaftarUgd.pemeriksaan.penunjang'))" :disabled=$disabledPropertyRjStatus
-                    wire:model.debounce.500ms="dataDaftarUgd.pemeriksaan.penunjang" :rows="__('10')" />
+                    wire:model.debounce.500ms="dataDaftarUgd.pemeriksaan.penunjang" :rows="__('3')" />
             </div>
 
             {{-- tab Penunjang --}}

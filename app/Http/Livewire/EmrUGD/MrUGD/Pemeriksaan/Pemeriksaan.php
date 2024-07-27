@@ -651,7 +651,7 @@ class Pemeriksaan extends Component
 
 
 
-            $this->updateDataUGD($this->dataDaftarUgd['rjNo']);
+            $this->updateDataUgd($this->dataDaftarUgd['rjNo']);
             $this->closeModalLaboratorium();
         } else {
             $this->emit('toastr-error', "Pasien Sudah Pulang, Anda tidak bisa meneruskan pemeriksaan ini.");
@@ -779,7 +779,7 @@ class Pemeriksaan extends Component
 
 
 
-            $this->updateDataUGD($this->dataDaftarUgd['rjNo']);
+            $this->updateDataUgd($this->dataDaftarUgd['rjNo']);
             $this->closeModalRadiologi();
         } else {
             $this->emit('toastr-error', "Pasien Sudah Pulang, Anda tidak bisa meneruskan pemeriksaan ini.");
@@ -845,7 +845,7 @@ class Pemeriksaan extends Component
 
 
     // validate Data RJ//////////////////////////////////////////////////
-    private function validateDataUGD(): void
+    private function validateDataUgd(): void
     {
         // customErrorMessages
         // $messages = customErrorMessagesTrait::messages();
@@ -885,15 +885,15 @@ class Pemeriksaan extends Component
         $this->setDataPrimer();
 
         // Validate RJ
-        $this->validateDataUGD();
+        $this->validateDataUgd();
 
         // Logic update mode start //////////
-        $this->updateDataUGD($this->dataDaftarUgd['rjNo']);
+        $this->updateDataUgd($this->dataDaftarUgd['rjNo']);
 
         $this->emit('syncronizeAssessmentPerawatUGDFindData');
     }
 
-    private function updateDataUGD($rjNo): void
+    private function updateDataUgd($rjNo): void
     {
 
         // update table trnsaksi
@@ -956,7 +956,7 @@ class Pemeriksaan extends Component
         }
 
         // cek status transaksi
-        $this->validateDataUGD($this->rjNoRef);
+        $this->validateDataUgd($this->rjNoRef);
 
 
         // customErrorMessages
