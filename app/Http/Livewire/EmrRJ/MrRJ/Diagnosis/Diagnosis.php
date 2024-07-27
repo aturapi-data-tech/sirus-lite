@@ -6,11 +6,9 @@ use Illuminate\Support\Facades\DB;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-use Carbon\Carbon;
 
 use App\Http\Traits\customErrorMessagesTrait;
 
-use Illuminate\Support\Str;
 use Spatie\ArrayToXml\ArrayToXml;
 use Exception;
 
@@ -36,7 +34,7 @@ class Diagnosis extends Component
     // dataDaftarPoliRJ RJ
     public array $dataDaftarPoliRJ = [];
 
-    // data SKDP / kontrol=>[] 
+    // data SKDP / kontrol=>[]
     public array $diagnosis = [];
     public array $procedure = [];
     //////////////////////////////////////////////////////////////////////
@@ -88,7 +86,7 @@ class Diagnosis extends Component
         // Variable Search
         $search = $this->dataDiagnosaICD10LovSearch;
 
-        // check LOV by dr_id rs id 
+        // check LOV by dr_id rs id
         $dataDiagnosaICD10Lovs = DB::table('rsmst_mstdiags ')->select(
             'diag_id',
             'diag_desc',
@@ -329,7 +327,7 @@ class Diagnosis extends Component
         // Variable Search
         $search = $this->dataProcedureICD9CmLovSearch;
 
-        // check LOV by dr_id rs id 
+        // check LOV by dr_id rs id
         $dataProcedureICD9CmLovs = DB::table('rsmst_mstprocedures ')->select(
             'proc_id',
             'proc_desc',
@@ -532,7 +530,7 @@ class Diagnosis extends Component
         $dataDaftarPoliRJ_json = isset($findData->datadaftarpolirj_json) ? $findData->datadaftarpolirj_json   : null;
         // if meta_data_pasien_json = null
         // then cari Data Pasien By Key Collection (exception when no data found)
-        // 
+        //
         // else json_decode
         if ($dataDaftarPoliRJ_json) {
             $this->dataDaftarPoliRJ = json_decode($findData->datadaftarpolirj_json, true);

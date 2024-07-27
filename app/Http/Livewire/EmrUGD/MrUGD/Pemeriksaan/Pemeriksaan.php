@@ -914,7 +914,6 @@ class Pemeriksaan extends Component
 
         $this->dataDaftarUgd = $this->findDataUGD($rjno);
         // dd($this->dataDaftarUgd);
-        // jika anamnesa tidak ditemukan tambah variable anamnesa pda array
         // jika pemeriksaan tidak ditemukan tambah variable pemeriksaan pda array
         if (isset($this->dataDaftarUgd['pemeriksaan']) == false) {
             $this->dataDaftarUgd['pemeriksaan'] = $this->pemeriksaan;
