@@ -1,30 +1,8 @@
 <div>
     <div class="w-full mb-1">
 
-        <div>
-            <x-input-label for="dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima" :value="__('Perawat Penerima')"
-                :required="__(true)" class="pt-2 sm:text-xl" />
 
-            <div class="mb-2 ">
-                <div class="grid gap-2 mb-2">
-                    <x-text-input id="dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima"
-                        name="dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima" placeholder="Perawat Penerima"
-                        class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima'))" :disabled=$disabledPropertyRjStatus
-                        wire:model.debounce.500ms="dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima"
-                        autocomplete="dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima" />
-
-                    <x-yellow-button :disabled=false wire:click.prevent="setPerawatPenerima()" type="button"
-                        wire:loading.remove>
-                        ttd Perawat
-                    </x-yellow-button>
-
-                </div>
-
-            </div>
-            @error('dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima')
-                <x-input-error :messages=$message />
-            @enderror
-        </div>
+        @include('livewire.emr-u-g-d.mr-u-g-d.anamnesa.keluhanUtamaTab')
 
         <div>
             <x-input-label for="dataDaftarUgd.anamnesa.pengkajianPerawatan.jamDatang" :value="__('Waktu Datang')"
@@ -76,6 +54,7 @@
                     @endforeach
 
 
+
                     <x-text-input id="dataDaftarUgd.anamnesa.pengkajianPerawatan.caraMasukIgdDesc"
                         placeholder="Keterangan Cara Masuk IGD" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.anamnesa.pengkajianPerawatan.caraMasukIgdDesc'))"
                         :disabled=$disabledPropertyRjStatus
@@ -83,6 +62,9 @@
 
 
                 </div>
+                @error('dataDaftarUgd.anamnesa.pengkajianPerawatan.caraMasukIgd')
+                    <x-input-error :messages=$message />
+                @enderror
             </div>
 
         </div>
@@ -102,9 +84,36 @@
                 </div>
             </div>
 
+            @error('dataDaftarUgd.anamnesa.pengkajianPerawatan.tingkatKegawatan')
+                <x-input-error :messages=$message />
+            @enderror
+
         </div>
 
+        <div>
+            <x-input-label for="dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima" :value="__('Perawat Penerima')"
+                :required="__(true)" class="pt-2 sm:text-xl" />
 
+            <div class="mb-2 ">
+                <div class="grid gap-2 mb-2">
+                    <x-text-input id="dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima"
+                        name="dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima" placeholder="Perawat Penerima"
+                        class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima'))" :disabled=true
+                        wire:model.debounce.500ms="dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima"
+                        autocomplete="dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima" />
+
+                    <x-yellow-button :disabled=false wire:click.prevent="setPerawatPenerima()" type="button"
+                        wire:loading.remove>
+                        ttd Perawat
+                    </x-yellow-button>
+
+                </div>
+
+            </div>
+            @error('dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima')
+                <x-input-error :messages=$message />
+            @enderror
+        </div>
 
 
     </div>

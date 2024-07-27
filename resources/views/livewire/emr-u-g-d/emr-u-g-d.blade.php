@@ -2,8 +2,8 @@
 
     {{-- Start Coding  --}}
 
-    {{-- Canvas 
-    Main BgColor / 
+    {{-- Canvas
+    Main BgColor /
     Size H/W --}}
     <div class="w-full h-[calc(100vh-68px)] bg-white border border-gray-200 px-4 pt-6">
 
@@ -256,7 +256,15 @@
                                             $procedure = isset($datadaftar_json['procedure']) ? 1 : 0;
                                             $diagnosis = isset($datadaftar_json['diagnosis']) ? 1 : 0;
                                             $perencanaan = isset($datadaftar_json['perencanaan']) ? 1 : 0;
-                                            $prosentaseEMR = (($anamnesa + $pemeriksaan + $penilaian + $procedure + $diagnosis + $perencanaan) / 6) * 100;
+                                            $prosentaseEMR =
+                                                (($anamnesa +
+                                                    $pemeriksaan +
+                                                    $penilaian +
+                                                    $procedure +
+                                                    $diagnosis +
+                                                    $perencanaan) /
+                                                    6) *
+                                                100;
                                         @endphp
                                         Emr: {{ $prosentaseEMR . '%' }}
 
@@ -293,12 +301,12 @@
                                                             {{ __('Tampil | ' . $myQData->reg_name) }}
                                                         </x-dropdown-link>
                                                     </li> --}}
-                                                    <li>
+                                                    {{-- <li>
                                                         <x-dropdown-link
                                                             wire:click="editScreening('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
                                                             {{ __('Screening') }}
                                                         </x-dropdown-link>
-                                                    </li>
+                                                    </li> --}}
 
                                                     <li>
                                                         <x-dropdown-link
@@ -356,8 +364,8 @@
 
 
 
-    {{-- Canvas 
-    Main BgColor / 
+    {{-- Canvas
+    Main BgColor /
     Size H/W --}}
 
     {{-- End Coding --}}
@@ -407,6 +415,24 @@
 
         {{-- Global Livewire JavaScript Object start --}}
         <script type="text/javascript">
+            toastr.options = {
+                "closeButton": false,
+                "debug": false,
+                "newestOnTop": false,
+                "progressBar": false,
+                "positionClass": "toast-top-left",
+                "preventDuplicates": false,
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            }
+
             window.livewire.on('toastr-success', message => toastr.success(message));
             window.Livewire.on('toastr-info', (message) => {
                 toastr.info(message)

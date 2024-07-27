@@ -132,20 +132,29 @@
                 </div>
 
                 <div class="mb-2 ">
-                    <x-input-label for="dataDaftarUgd.screening.waktuPelayanan" :value="__('Petugas Pelayanan')" :required="__(false)" />
+                    <x-input-label for="dataDaftarUgd.screening.petugasPelayanan" :value="__('Petugas Pelayanan')"
+                        :required="__(false)" />
                     <div class="grid grid-cols-1 gap-0">
-                        <x-text-input id="dataDaftarUgd.screening.waktuPelayanan" placeholder="Petugas Pelayanan"
-                            class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.screening.waktuPelayanan'))" :disabled=$disabledPropertyRjStatus
-                            wire:model.debounce.500ms="dataDaftarUgd.screening.waktuPelayanan" />
+                        <x-text-input id="dataDaftarUgd.screening.petugasPelayanan" placeholder="Petugas Pelayanan"
+                            class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.screening.petugasPelayanan'))" :disabled=$disabledPropertyRjStatus
+                            wire:model.debounce.500ms="dataDaftarUgd.screening.petugasPelayanan" />
                     </div>
                 </div>
 
 
                 <div class="sticky bottom-0 flex justify-between px-4 py-3 bg-gray-50 sm:px-6">
 
-                    <div class="">
-                        {{-- null --}}
+                    <div class=>
+                        <div wire:loading wire:target="resetScreening">
+                            <x-loading />
+                        </div>
+
+                        <x-light-button :disabled=false wire:click.prevent="resetScreening()" type="button"
+                            wire:loading.remove>
+                            Reset Screening
+                        </x-light-button>
                     </div>
+
                     <div>
                         <div wire:loading wire:target="store">
                             <x-loading />

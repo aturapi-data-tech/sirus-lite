@@ -9,6 +9,7 @@ use Livewire\WithPagination;
 use Carbon\Carbon;
 
 
+
 class EmrUGD extends Component
 {
     use WithPagination;
