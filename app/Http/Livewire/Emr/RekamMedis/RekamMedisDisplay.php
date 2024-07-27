@@ -21,7 +21,8 @@ class RekamMedisDisplay extends Component
 
     // listener from blade////////////////
     protected $listeners = [
-        'syncronizeAssessmentDokterRJFindData' => 'mount'
+        'syncronizeAssessmentDokterRJFindData' => 'mount',
+        'syncronizeAssessmentDokterUGDFindData' => 'mount'
     ];
 
     // primitive Variable

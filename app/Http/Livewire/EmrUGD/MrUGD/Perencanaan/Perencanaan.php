@@ -12,14 +12,18 @@ use Carbon\Carbon;
 
 use Illuminate\Support\Str;
 use Spatie\ArrayToXml\ArrayToXml;
+use App\Http\Traits\EmrUGD\EmrUGDTrait;
 
 
 class Perencanaan extends Component
 {
-    use WithPagination;
+    use WithPagination, EmrUGDTrait;
 
     // listener from blade////////////////
-    protected $listeners = [];
+    protected $listeners = [
+        'syncronizeAssessmentPerawatUGDFindData' => 'mount'
+    ];
+
 
     //////////////////////////////
     // Ref on top bar
@@ -29,7 +33,7 @@ class Perencanaan extends Component
     // dataDaftarUgd RJ
     public array $dataDaftarUgd = [];
 
-    // data SKDP / perencanaan=>[] 
+    // data SKDP / perencanaan=>[]
     public array $perencanaan =
     [
         "terapiTab" => "Terapi",
@@ -121,6 +125,9 @@ class Perencanaan extends Component
     {
         // dd($propertyName);
         $this->validateOnly($propertyName);
+        if ($propertyName != 'activeTabRacikanNonRacikan') {
+            $this->store();
+        }
     }
 
 
@@ -148,16 +155,11 @@ class Perencanaan extends Component
 
 
     // validate Data RJ//////////////////////////////////////////////////
-    private function validateDataRJ(): void
+    private function validateDataUgd(): void
     {
         // customErrorMessages
         // $messages = customErrorMessagesTrait::messages();
         $messages = [];
-
-
-        // $rules = [];
-
-
 
         // Proses Validasi///////////////////////////////////////////
         try {
@@ -177,13 +179,15 @@ class Perencanaan extends Component
         $this->setDataPrimer();
 
         // Validate RJ
-        $this->validateDataRJ();
+        $this->validateDataUgd();
 
         // Logic update mode start //////////
-        $this->updateDataRJ($this->dataDaftarUgd['rjNo']);
+        $this->updateDataUgd($this->dataDaftarUgd['rjNo']);
+
+        $this->emit('syncronizeAssessmentPerawatUGDFindData');
     }
 
-    private function updateDataRJ($rjNo): void
+    private function updateDataUgd($rjNo): void
     {
         $p_status = (isset($this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['tingkatKegawatan']) ?
             ($this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['tingkatKegawatan'] ?
@@ -207,8 +211,8 @@ class Perencanaan extends Component
         DB::table('rstxn_ugdhdrs')
             ->where('rj_no', $rjNo)
             ->update([
-                'dataDaftarUgd_json' => json_encode($this->dataDaftarUgd, true),
-                'dataDaftarUgd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
+                'datadaftarugd_json' => json_encode($this->dataDaftarUgd, true),
+                'datadaftarugd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
                 'p_status' => $p_status,
                 'waktu_pasien_datang' => DB::raw("to_date('" . $waktu_pasien_datang . "','dd/mm/yyyy hh24:mi:ss')"),
                 'waktu_pasien_dilayani' => DB::raw("to_date('" . $waktu_pasien_dilayani . "','dd/mm/yyyy hh24:mi:ss')"),
@@ -222,133 +226,11 @@ class Perencanaan extends Component
     private function findData($rjno): void
     {
 
-
-        $findData = DB::table('rsview_ugdkasir')
-            ->select('datadaftarugd_json', 'vno_sep')
-            ->where('rj_no', $rjno)
-            ->first();
-
-        $datadaftarugd_json = isset($findData->datadaftarugd_json) ? $findData->datadaftarugd_json : null;
-        // if meta_data_pasien_json = null
-        // then cari Data Pasien By Key Collection (exception when no data found)
-        // 
-        // else json_decode
-        if ($datadaftarugd_json) {
-            $this->dataDaftarUgd = json_decode($findData->datadaftarugd_json, true);
-
-            // jika perencanaan tidak ditemukan tambah variable perencanaan pda array
-            if (isset($this->dataDaftarUgd['perencanaan']) == false) {
-                $this->dataDaftarUgd['perencanaan'] = $this->perencanaan;
-            }
-        } else {
-
-            $this->emit('toastr-error', "Data tidak dapat di proses json.");
-            $dataDaftarUgd = DB::table('rsview_ugdkasir')
-                ->select(
-                    DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
-                    DB::raw("to_char(rj_date,'yyyymmddhh24miss') AS rj_date1"),
-                    'rj_no',
-                    'reg_no',
-                    'reg_name',
-                    'sex',
-                    'address',
-                    'thn',
-                    DB::raw("to_char(birth_date,'dd/mm/yyyy') AS birth_date"),
-                    'poli_id',
-                    // 'poli_desc',
-                    'dr_id',
-                    'dr_name',
-                    'klaim_id',
-                    'entry_id',
-                    'shift',
-                    'vno_sep',
-                    'no_antrian',
-
-                    'nobooking',
-                    'push_antrian_bpjs_status',
-                    'push_antrian_bpjs_json',
-                    // 'kd_dr_bpjs',
-                    // 'kd_poli_bpjs',
-                    'rj_status',
-                    'txn_status',
-                    'erm_status',
-                )
-                ->where('rj_no', '=', $rjno)
-                ->first();
-
-            $this->dataDaftarUgd = [
-                "regNo" =>  $dataDaftarUgd->reg_no,
-
-                "drId" =>  $dataDaftarUgd->dr_id,
-                "drDesc" =>  $dataDaftarUgd->dr_name,
-
-                "poliId" =>  $dataDaftarUgd->poli_id,
-                "klaimId" => $dataDaftarUgd->klaim_id,
-                // "poliDesc" =>  $dataDaftarUgd->poli_desc ,
-
-                // "kddrbpjs" =>  $dataDaftarUgd->kd_dr_bpjs ,
-                // "kdpolibpjs" =>  $dataDaftarUgd->kd_poli_bpjs ,
-
-                "rjDate" =>  $dataDaftarUgd->rj_date,
-                "rjNo" =>  $dataDaftarUgd->rj_no,
-                "shift" =>  $dataDaftarUgd->shift,
-                "noAntrian" =>  $dataDaftarUgd->no_antrian,
-                "noBooking" =>  $dataDaftarUgd->nobooking,
-                "slCodeFrom" => "02",
-                "passStatus" => "",
-                "rjStatus" =>  $dataDaftarUgd->rj_status,
-                "txnStatus" =>  $dataDaftarUgd->txn_status,
-                "ermStatus" =>  $dataDaftarUgd->erm_status,
-                "cekLab" => "0",
-                "kunjunganInternalStatus" => "0",
-                "noReferensi" =>  $dataDaftarUgd->reg_no,
-                "postInap" => [],
-                "internal12" => "1",
-                "internal12Desc" => "Faskes Tingkat 1",
-                "internal12Options" => [
-                    [
-                        "internal12" => "1",
-                        "internal12Desc" => "Faskes Tingkat 1"
-                    ],
-                    [
-                        "internal12" => "2",
-                        "internal12Desc" => "Faskes Tingkat 2 RS"
-                    ]
-                ],
-                "kontrol12" => "1",
-                "kontrol12Desc" => "Faskes Tingkat 1",
-                "kontrol12Options" => [
-                    [
-                        "kontrol12" => "1",
-                        "kontrol12Desc" => "Faskes Tingkat 1"
-                    ],
-                    [
-                        "kontrol12" => "2",
-                        "kontrol12Desc" => "Faskes Tingkat 2 RS"
-                    ],
-                ],
-                "taskIdPelayanan" => [
-                    "taskId1" => "",
-                    "taskId2" => "",
-                    "taskId3" =>  $dataDaftarUgd->rj_date,
-                    "taskId4" => "",
-                    "taskId5" => "",
-                    "taskId6" => "",
-                    "taskId7" => "",
-                    "taskId99" => "",
-                ],
-                'sep' => [
-                    "noSep" =>  $dataDaftarUgd->vno_sep,
-                    "reqSep" => [],
-                    "resSep" => [],
-                ]
-            ];
-
-
-            // jika perencanaan tidak ditemukan tambah variable perencanaan pda array
-            if (isset($this->dataDaftarUgd['perencanaan']) == false) {
-                $this->dataDaftarUgd['perencanaan'] = $this->perencanaan;
-            }
+        $this->dataDaftarUgd = $this->findDataUGD($rjno);
+        // dd($this->dataDaftarUgd);
+        // jika perencanaan tidak ditemukan tambah variable perencanaan pda array
+        if (isset($this->dataDaftarUgd['perencanaan']) == false) {
+            $this->dataDaftarUgd['perencanaan'] = $this->perencanaan;
         }
     }
 
@@ -367,32 +249,128 @@ class Perencanaan extends Component
         $this->dataDaftarUgd['perencanaan']['pengkajianMedis']['selesaiPemeriksaan'] = $myTime;
     }
 
+    private function validateDrPemeriksa()
+    {
+        // Validasi dulu
+        $messages = [];
+        $myRules = [
+            // 'dataDaftarUgd.pemeriksaan.tandaVital.sistolik' => 'required|numeric',
+            // 'dataDaftarUgd.pemeriksaan.tandaVital.distolik' => 'required|numeric',
+            'dataDaftarUgd.pemeriksaan.tandaVital.frekuensiNadi' => 'required|numeric',
+            'dataDaftarUgd.pemeriksaan.tandaVital.frekuensiNafas' => 'required|numeric',
+            'dataDaftarUgd.pemeriksaan.tandaVital.suhu' => 'required|numeric',
+            'dataDaftarUgd.pemeriksaan.tandaVital.spo2' => 'numeric',
+            'dataDaftarUgd.pemeriksaan.tandaVital.gda' => 'numeric',
+
+            'dataDaftarUgd.pemeriksaan.nutrisi.bb' => 'required|numeric',
+            'dataDaftarUgd.pemeriksaan.nutrisi.tb' => 'required|numeric',
+            'dataDaftarUgd.pemeriksaan.nutrisi.imt' => 'required|numeric',
+            'dataDaftarUgd.pemeriksaan.nutrisi.lk' => 'numeric',
+            'dataDaftarUgd.pemeriksaan.nutrisi.lila' => 'numeric',
+
+            'dataDaftarUgd.anamnesa.pengkajianPerawatan.jamDatang' => 'required|date_format:d/m/Y H:i:s',
+        ];
+        // Proses Validasi///////////////////////////////////////////
+        try {
+            $this->validate($myRules, $messages);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->emit('toastr-error', 'Anda tidak dapat melakukan TTD-E karena data pemeriksaan belum lengkap.');
+            $this->validate($myRules, $messages);
+        }
+        // Validasi dulu
+    }
     public function setDrPemeriksa()
     {
-        if (isset($this->dataDaftarUgd['perencanaan']['pengkajianMedis']['drPemeriksa'])) {
-            if (!$this->dataDaftarUgd['perencanaan']['pengkajianMedis']['drPemeriksa']) {
-                $this->dataDaftarUgd['perencanaan']['pengkajianMedis']['drPemeriksa'] = (isset($this->dataDaftarUgd['drDesc']) ?
-                    ($this->dataDaftarUgd['drDesc'] ? $this->dataDaftarUgd['drDesc']
-                        : 'Dokter pemeriksa')
-                    : 'Dokter pemeriksa-');
+        // $myRoles = json_decode(auth()->user()->roles, true);
+        $myUserCodeActive = auth()->user()->myuser_code;
+        $myUserNameActive = auth()->user()->myuser_name;
+        // $myUserTtdActive = auth()->user()->myuser_ttd_image;
+
+        // Validasi dulu
+        // cek apakah data pemeriksaan sudah dimasukkan atau blm
+        $this->validateDrPemeriksa();
+
+        if (auth()->user()->hasRole('Dokter')) {
+            if ($this->dataDaftarUgd['drId'] == $myUserCodeActive) {
+                if (isset($this->dataDaftarUgd['perencanaan']['pengkajianMedis']['drPemeriksa'])) {
+                    if (!$this->dataDaftarUgd['perencanaan']['pengkajianMedis']['drPemeriksa']) {
+                        $this->dataDaftarUgd['perencanaan']['pengkajianMedis']['drPemeriksa'] = isset($this->dataDaftarUgd['drDesc']) ? ($this->dataDaftarUgd['drDesc'] ? $this->dataDaftarUgd['drDesc'] : 'Dokter pemeriksa') : 'Dokter pemeriksa-';
+                    }
+                } else {
+                    $this->dataDaftarUgd['perencanaan']['pengkajianMedisTab'] = 'Pengkajian Medis';
+                    $this->dataDaftarUgd['perencanaan']['pengkajianMedis']['drPemeriksa'] = isset($this->dataDaftarUgd['drDesc']) ? ($this->dataDaftarUgd['drDesc'] ? $this->dataDaftarUgd['drDesc'] : 'Dokter pemeriksa') : 'Dokter pemeriksa-';
+                }
+                $this->store();
+            } else {
+                $this->emit('toastr-error', 'Anda tidak dapat melakukan TTD-E karena Bukan Pasien ' . $myUserNameActive);
             }
         } else {
-
-            $this->dataDaftarUgd['perencanaan']['pengkajianMedisTab'] = 'Pengkajian Medis';
-            $this->dataDaftarUgd['perencanaan']['pengkajianMedis']['drPemeriksa'] = (isset($this->dataDaftarUgd['drDesc']) ?
-                ($this->dataDaftarUgd['drDesc'] ? $this->dataDaftarUgd['drDesc']
-                    : 'Dokter pemeriksa')
-                : 'Dokter pemeriksa-');
+            $this->emit('toastr-error', 'Anda tidak dapat melakukan TTD-E karena User Role ' . $myUserNameActive . ' Bukan Dokter');
         }
     }
+
+    // /////////////////eresep open////////////////////////
+    public bool $isOpenEresepUGD = false;
+    public string $isOpenModeEresepUGD = 'insert';
+
+    public function openModalEresepUGD(): void
+    {
+        $this->isOpenEresepUGD = true;
+        $this->isOpenModeEresepUGD = 'insert';
+    }
+
+    public function closeModalEresepUGD(): void
+    {
+        $this->isOpenEresepUGD = false;
+        $this->isOpenModeEresepUGD = 'insert';
+    }
+
+    public string $activeTabRacikanNonRacikan = 'NonRacikan';
+    public array $EmrMenuRacikanNonRacikan = [
+        [
+            'ermMenuId' => 'NonRacikan',
+            'ermMenuName' => 'NonRacikan',
+        ],
+        [
+            'ermMenuId' => 'Racikan',
+            'ermMenuName' => 'Racikan',
+        ],
+    ];
+
+    public function simpanTerapi(): void
+    {
+        $eresep = '' . PHP_EOL;
+        if (isset($this->dataDaftarUgd['eresep'])) {
+
+            foreach ($this->dataDaftarUgd['eresep'] as $key => $value) {
+                // NonRacikan
+                $catatanKhusus = ($value['catatanKhusus']) ? ' (' . $value['catatanKhusus'] . ')' : '';
+                $eresep .=  'R/' . ' ' . $value['productName'] . ' | No. ' . $value['qty'] . ' | S ' .  $value['signaX'] . 'dd' . $value['signaHari'] . $catatanKhusus . PHP_EOL;
+            }
+        }
+
+        $eresepRacikan = '' . PHP_EOL;
+        if (isset($this->dataDaftarUgd['eresepRacikan'])) {
+            // Racikan
+            foreach ($this->dataDaftarUgd['eresepRacikan'] as $key => $value) {
+                $jmlRacikan = ($value['qty']) ? 'Jml Racikan ' . $value['qty'] . ' | ' . $value['catatan'] . ' | S ' . $value['catatanKhusus'] . PHP_EOL : '';
+                $dosis = isset($value['dosis']) ? ($value['dosis'] ? $value['dosis'] : '') : '';
+                $eresepRacikan .= $value['noRacikan'] . '/ ' . $value['productName'] . ' - ' . $dosis .  PHP_EOL . $jmlRacikan;
+            };
+        }
+        $this->dataDaftarUgd['perencanaan']['terapi']['terapi'] = $eresep . $eresepRacikan;
+
+        $this->store();
+        $this->closeModalEresepUGD();
+    }
+
+    // /////////////////////////////////////////
+
 
     // when new form instance
     public function mount()
     {
         $this->findData($this->rjNoRef);
-
-        // set dokter pemeriksa
-        $this->setDrPemeriksa();
     }
 
 
