@@ -40,91 +40,114 @@
                 @include('livewire.mr-r-j.pemeriksaan.list-of-value-tingkatKesadaran')
             </div>
 
+            <div class="grid grid-cols-2 gap-2 mt-2">
+                {{-- Jalan Nafas A --}}
+                <div class="p-4 bg-gray-200 rounded-lg">
+                    <x-input-label for="dataDaftarUgd.pemeriksaan.tandaVital.e" :value="__('Jalan Nafas (A)')" :required="__(false)"
+                        class="pt-2 sm:text-xl" />
 
-            {{-- Jalan Nafas A --}}
-            <x-input-label for="dataDaftarUgd.pemeriksaan.tandaVital.e" :value="__('Jalan Nafas (A)')" :required="__(false)"
-                class="pt-2 sm:text-xl" />
+                    <div class="grid grid-cols-4 gap-2 my-2">
+                        @foreach ($dataDaftarUgd['pemeriksaan']['tandaVital']['jalanNafas']['jalanNafasOptions'] as $jalanNafasOptions)
+                            {{-- @dd($sRj) --}}
+                            <x-radio-button :label="__($jalanNafasOptions['jalanNafas'])" value="{{ $jalanNafasOptions['jalanNafas'] }}"
+                                wire:model="dataDaftarUgd.pemeriksaan.tandaVital.jalanNafas.jalanNafas" />
+                        @endforeach
 
-            <div class="grid grid-cols-4 gap-2 my-2">
-                @foreach ($dataDaftarUgd['pemeriksaan']['tandaVital']['jalanNafas']['jalanNafasOptions'] as $jalanNafasOptions)
-                    {{-- @dd($sRj) --}}
-                    <x-radio-button :label="__($jalanNafasOptions['jalanNafas'])" value="{{ $jalanNafasOptions['jalanNafas'] }}"
-                        wire:model="dataDaftarUgd.pemeriksaan.tandaVital.jalanNafas.jalanNafas" />
-                @endforeach
-
-            </div>
-
-            {{-- Pernafasan B --}}
-            <x-input-label for="dataDaftarUgd.pemeriksaan.tandaVital.e" :value="__('Pernafasan (B)')" :required="__(false)"
-                class="pt-2 sm:text-xl" />
-
-            <div class="grid grid-cols-5 gap-2 my-2">
-                @foreach ($dataDaftarUgd['pemeriksaan']['tandaVital']['pernafasan']['pernafasanOptions'] as $pernafasanOptions)
-                    {{-- @dd($sRj) --}}
-                    <x-radio-button :label="__($pernafasanOptions['pernafasan'])" value="{{ $pernafasanOptions['pernafasan'] }}"
-                        wire:model="dataDaftarUgd.pemeriksaan.tandaVital.pernafasan.pernafasan" />
-                @endforeach
-
-            </div>
-
-            <x-input-label for="dataDaftarUgd.pemeriksaan.tandaVital.e" :value="__('Gerak Dada')" :required="__(false)" />
-
-            <div class="grid grid-cols-2 gap-2 my-2">
-                @foreach ($dataDaftarUgd['pemeriksaan']['tandaVital']['gerakDada']['gerakDadaOptions'] as $gerakDadaOptions)
-                    {{-- @dd($sRj) --}}
-                    <x-radio-button :label="__($gerakDadaOptions['gerakDada'])" value="{{ $gerakDadaOptions['gerakDada'] }}"
-                        wire:model="dataDaftarUgd.pemeriksaan.tandaVital.gerakDada.gerakDada" />
-                @endforeach
-
-            </div>
-
-            {{-- Sirkulasi C --}}
-            <x-input-label for="dataDaftarUgd.pemeriksaan.tandaVital.e" :value="__('Sirkulasi (C)')" :required="__(false)"
-                class="pt-2 sm:text-xl" />
-
-            <div class="grid grid-cols-5 gap-2 my-2">
-                @foreach ($dataDaftarUgd['pemeriksaan']['tandaVital']['sirkulasi']['sirkulasiOptions'] as $sirkulasiOptions)
-                    {{-- @dd($sRj) --}}
-                    <x-radio-button :label="__($sirkulasiOptions['sirkulasi'])" value="{{ $sirkulasiOptions['sirkulasi'] }}"
-                        wire:model="dataDaftarUgd.pemeriksaan.tandaVital.sirkulasi.sirkulasi" />
-                @endforeach
-
-            </div>
-
-            {{-- Neurologis D --}}
-            <x-input-label for="dataDaftarUgd.pemeriksaan.tandaVital.e" :value="__('Neurologis (D)')" :required="__(false)"
-                class="pt-2 sm:text-xl" />
-
-            <div class="grid grid-cols-4 gap-2 my-2">
-                <div class="mb-2 ">
-                    <x-input-label for="dataDaftarUgd.pemeriksaan.tandaVital.e" :value="__('E [Eye]')" :required="__(false)" />
-                    <x-text-input id="dataDaftarUgd.pemeriksaan.tandaVital.e" placeholder="E [Eye]" class="mt-1 ml-2"
-                        :errorshas="__($errors->has('dataDaftarUgd.pemeriksaan.tandaVital.e'))" :disabled=$disabledPropertyRjStatus
-                        wire:model.debounce.500ms="dataDaftarUgd.pemeriksaan.tandaVital.e" />
+                    </div>
                 </div>
 
-                <div class="mb-2 ">
-                    <x-input-label for="dataDaftarUgd.pemeriksaan.tandaVital.v" :value="__('V [Verbal]')" :required="__(false)" />
-                    <x-text-input id="dataDaftarUgd.pemeriksaan.tandaVital.v" placeholder="V [Verbal]" class="mt-1 ml-2"
-                        :errorshas="__($errors->has('dataDaftarUgd.pemeriksaan.tandaVital.v'))" :disabled=$disabledPropertyRjStatus
-                        wire:model.debounce.500ms="dataDaftarUgd.pemeriksaan.tandaVital.v" />
+                {{-- Pernafasan B --}}
+                <div class="p-4 bg-gray-200 rounded-lg">
+                    <x-input-label for="dataDaftarUgd.pemeriksaan.tandaVital.e" :value="__('Pernafasan (B)')" :required="__(false)"
+                        class="pt-2 sm:text-xl" />
+
+                    <div class="grid grid-cols-5 gap-2 my-2">
+                        @foreach ($dataDaftarUgd['pemeriksaan']['tandaVital']['pernafasan']['pernafasanOptions'] as $pernafasanOptions)
+                            {{-- @dd($sRj) --}}
+                            <x-radio-button :label="__($pernafasanOptions['pernafasan'])" value="{{ $pernafasanOptions['pernafasan'] }}"
+                                wire:model="dataDaftarUgd.pemeriksaan.tandaVital.pernafasan.pernafasan" />
+                        @endforeach
+
+                    </div>
+
+                    <x-input-label for="dataDaftarUgd.pemeriksaan.tandaVital.e" :value="__('Gerak Dada')" :required="__(false)" />
+
+                    <div class="grid grid-cols-2 gap-2 my-2">
+                        @foreach ($dataDaftarUgd['pemeriksaan']['tandaVital']['gerakDada']['gerakDadaOptions'] as $gerakDadaOptions)
+                            {{-- @dd($sRj) --}}
+                            <x-radio-button :label="__($gerakDadaOptions['gerakDada'])" value="{{ $gerakDadaOptions['gerakDada'] }}"
+                                wire:model="dataDaftarUgd.pemeriksaan.tandaVital.gerakDada.gerakDada" />
+                        @endforeach
+
+                    </div>
                 </div>
 
-                <div class="mb-2 ">
-                    <x-input-label for="dataDaftarUgd.pemeriksaan.tandaVital.m" :value="__('M [Motorik]')" :required="__(false)" />
-                    <x-text-input id="dataDaftarUgd.pemeriksaan.tandaVital.m" placeholder="M [Motorik]"
-                        class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.pemeriksaan.tandaVital.m'))" :disabled=$disabledPropertyRjStatus
-                        wire:model.debounce.500ms="dataDaftarUgd.pemeriksaan.tandaVital.m" />
+                {{-- Sirkulasi C --}}
+                <div class="p-4 bg-gray-200 rounded-lg">
+                    <x-input-label for="dataDaftarUgd.pemeriksaan.tandaVital.e" :value="__('Sirkulasi (C)')" :required="__(false)"
+                        class="pt-2 sm:text-xl" />
+
+                    <div class="grid grid-cols-5 gap-2 my-2">
+                        @foreach ($dataDaftarUgd['pemeriksaan']['tandaVital']['sirkulasi']['sirkulasiOptions'] as $sirkulasiOptions)
+                            {{-- @dd($sRj) --}}
+                            <x-radio-button :label="__($sirkulasiOptions['sirkulasi'])" value="{{ $sirkulasiOptions['sirkulasi'] }}"
+                                wire:model="dataDaftarUgd.pemeriksaan.tandaVital.sirkulasi.sirkulasi" />
+                        @endforeach
+
+                    </div>
                 </div>
 
-                <div class="mb-2 ">
-                    <x-input-label for="dataDaftarUgd.pemeriksaan.tandaVital.gcs" :value="__('GCS')"
-                        :required="__(false)" />
-                    <x-text-input id="dataDaftarUgd.pemeriksaan.tandaVital.gcs" placeholder="GCS" class="mt-1 ml-2"
-                        :errorshas="__($errors->has('dataDaftarUgd.pemeriksaan.tandaVital.gcs'))" :disabled=$disabledPropertyRjStatus
-                        wire:model.debounce.500ms="dataDaftarUgd.pemeriksaan.tandaVital.gcs" />
+                {{-- Neurologis D --}}
+                <div class="p-4 bg-gray-200">
+                    <x-input-label for="dataDaftarUgd.pemeriksaan.tandaVital.e" :value="__('Neurologis (D)')" :required="__(false)"
+                        class="pt-2 sm:text-xl" />
+
+                    <div class="grid grid-cols-4 gap-2 my-2">
+                        <div class="mb-2 ">
+                            <x-input-label for="dataDaftarUgd.pemeriksaan.tandaVital.e" :value="__('E [Eye]')"
+                                :required="__(false)" />
+                            <x-text-input id="dataDaftarUgd.pemeriksaan.tandaVital.e" placeholder="E [Eye]"
+                                class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.pemeriksaan.tandaVital.e'))" :disabled=$disabledPropertyRjStatus
+                                wire:model.debounce.500ms="dataDaftarUgd.pemeriksaan.tandaVital.e" />
+                        </div>
+
+                        <div class="mb-2 ">
+                            <x-input-label for="dataDaftarUgd.pemeriksaan.tandaVital.v" :value="__('V [Verbal]')"
+                                :required="__(false)" />
+                            <x-text-input id="dataDaftarUgd.pemeriksaan.tandaVital.v" placeholder="V [Verbal]"
+                                class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.pemeriksaan.tandaVital.v'))" :disabled=$disabledPropertyRjStatus
+                                wire:model.debounce.500ms="dataDaftarUgd.pemeriksaan.tandaVital.v" />
+                        </div>
+
+                        <div class="mb-2 ">
+                            <x-input-label for="dataDaftarUgd.pemeriksaan.tandaVital.m" :value="__('M [Motorik]')"
+                                :required="__(false)" />
+                            <x-text-input id="dataDaftarUgd.pemeriksaan.tandaVital.m" placeholder="M [Motorik]"
+                                class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.pemeriksaan.tandaVital.m'))" :disabled=$disabledPropertyRjStatus
+                                wire:model.debounce.500ms="dataDaftarUgd.pemeriksaan.tandaVital.m" />
+                        </div>
+
+                        <div class="mb-2 ">
+                            <x-input-label for="dataDaftarUgd.pemeriksaan.tandaVital.gcs" :value="__('GCS')"
+                                :required="__(false)" />
+                            <x-text-input id="dataDaftarUgd.pemeriksaan.tandaVital.gcs" placeholder="GCS"
+                                class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.pemeriksaan.tandaVital.gcs'))" :disabled=$disabledPropertyRjStatus
+                                wire:model.debounce.500ms="dataDaftarUgd.pemeriksaan.tandaVital.gcs" />
+                        </div>
+                    </div>
                 </div>
             </div>
+
+
+
+
+
+
+
+
+
+
+
 
 
             <x-input-label for="dataDaftarUgd.pemeriksaan.tandaVital.sistolik" :value="__('Tanda Vital')" :required="__(false)"

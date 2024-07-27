@@ -133,4 +133,17 @@ trait EmrUGDTrait
             return [];
         }
     }
+
+    protected function checkUGDStatus($rjNo): bool
+    {
+        $lastInserted = DB::table('rstxn_ugdhdrs')
+            ->select('rj_status')
+            ->where('rj_no', $rjNo)
+            ->first();
+
+        if ($lastInserted->rj_status !== 'A') {
+            return true;
+        }
+        return false;
+    }
 }

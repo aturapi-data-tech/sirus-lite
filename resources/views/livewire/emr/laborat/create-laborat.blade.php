@@ -172,25 +172,46 @@
                                         </td>
                                         <td class="p-1 m-1">
                                             @php
-                                                $jenisKelamin = isset($dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc']) ? $dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] : '-';
+                                                $jenisKelamin = isset(
+                                                    $dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc'],
+                                                )
+                                                    ? $dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc']
+                                                    : '-';
 
                                                 // if decimal true
                                                 if ($dataDaftarTxn->lowhigh_status == 'Y') {
-                                                    $unit_convert = $dataDaftarTxn->unit_convert ? $dataDaftarTxn->unit_convert : 1;
+                                                    $unit_convert = $dataDaftarTxn->unit_convert
+                                                        ? $dataDaftarTxn->unit_convert
+                                                        : 1;
                                                     $lab_result = $dataDaftarTxn->lab_result * $unit_convert;
-                                                    $lab_result = fmod($lab_result, 1) !== 0.0 ? $lab_result : number_format($lab_result);
+                                                    $lab_result =
+                                                        fmod($lab_result, 1) !== 0.0
+                                                            ? $lab_result
+                                                            : number_format($lab_result);
 
                                                     $low_limit_m = $dataDaftarTxn->low_limit_m * $unit_convert;
-                                                    $low_limit_m = fmod($low_limit_m, 1) !== 0.0 ? $low_limit_m : number_format($low_limit_m);
+                                                    $low_limit_m =
+                                                        fmod($low_limit_m, 1) !== 0.0
+                                                            ? $low_limit_m
+                                                            : number_format($low_limit_m);
 
                                                     $low_limit_f = $dataDaftarTxn->low_limit_f * $unit_convert;
-                                                    $low_limit_f = fmod($low_limit_f, 1) !== 0.0 ? $low_limit_f : number_format($low_limit_f);
+                                                    $low_limit_f =
+                                                        fmod($low_limit_f, 1) !== 0.0
+                                                            ? $low_limit_f
+                                                            : number_format($low_limit_f);
 
                                                     $high_limit_m = $dataDaftarTxn->high_limit_m * $unit_convert;
-                                                    $high_limit_m = fmod($high_limit_m, 1) !== 0.0 ? $high_limit_m : number_format($high_limit_m);
+                                                    $high_limit_m =
+                                                        fmod($high_limit_m, 1) !== 0.0
+                                                            ? $high_limit_m
+                                                            : number_format($high_limit_m);
 
                                                     $high_limit_f = $dataDaftarTxn->high_limit_f * $unit_convert;
-                                                    $high_limit_f = fmod($high_limit_f, 1) !== 0.0 ? $high_limit_f : number_format($high_limit_f);
+                                                    $high_limit_f =
+                                                        fmod($high_limit_f, 1) !== 0.0
+                                                            ? $high_limit_f
+                                                            : number_format($high_limit_f);
                                                 } else {
                                                     $lab_result = $dataDaftarTxn->lab_result;
                                                     $low_limit_m = $dataDaftarTxn->low_limit_m;
@@ -303,25 +324,6 @@
 
                     {{-- End Content --}}
 
-
-                    <div class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-kd4y6l">
-                        <div
-                            class="MuiInputBase-root MuiFilledInput-root MuiFilledInput-underline MuiInputBase-colorInfo MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall MuiInputBase-adornedEnd MuiAutocomplete-inputRoot css-14nlr0z">
-                            <input aria-invalid="false" autocomplete="off" id=":rg3:" placeholder="Desa/Kelurahan"
-                                type="text"
-                                class="MuiInputBase-input MuiFilledInput-input MuiInputBase-inputSizeSmall MuiInputBase-inputAdornedEnd MuiAutocomplete-input MuiAutocomplete-inputFocused css-1qd5mws"
-                                aria-autocomplete="list" aria-expanded="false" autocapitalize="none"
-                                spellcheck="false" role="combobox" value="">
-                            <div class="MuiAutocomplete-endAdornment css-2iz2x6"><button
-                                    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium MuiAutocomplete-popupIndicator css-193xu89"
-                                    tabindex="-1" type="button" aria-label="Open" title="Open"><svg
-                                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-18k2iyp"
-                                        focusable="false" aria-hidden="true" viewBox="0 0 24 24"
-                                        data-testid="ArrowDropDownIcon">
-                                        <path d="M7 10l5 5 5-5z"></path>
-                                    </svg><span class="MuiTouchRipple-root css-w0pj6f"></span></button></div>
-                        </div>
-                    </div>
 
 
                 </div>

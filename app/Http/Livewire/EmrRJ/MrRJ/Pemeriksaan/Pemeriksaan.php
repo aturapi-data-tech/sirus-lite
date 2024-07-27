@@ -645,28 +645,26 @@ class Pemeriksaan extends Component
                 foreach ($this->isPemeriksaanLaboratoriumSelected as $isPemeriksaanLaboratoriumSelected) {
 
                     // insert No Prise checkup dtl
-                    DB::table('lbmst_clabitems')->select('clabitem_desc', 'clabitem_id', 'price', 'clabitem_group', 'item_code')
+                    $items = DB::table('lbmst_clabitems')->select('clabitem_desc', 'clabitem_id', 'price', 'clabitem_group', 'item_code')
                         ->where('clabitem_group', $labDtl['clabitem_id'])
                         ->orderBy('item_seq', 'asc')
                         ->orderBy('clabitem_desc', 'asc')
-                        ->get()
-                        ->each(
-                            function ($item) use ($checkupNo) {
-                                $sql = "select nvl(to_number(max(checkup_dtl))+1,1) from LBTXN_CHECKUPDTLS";
-                                $checkupDtl = DB::scalar($sql);
+                        ->get();
 
-                                DB::table('lbtxn_checkupdtls')->insert([
-                                    'clabitem_id' => $item->clabitem_id,
-                                    'checkup_no' => $checkupNo,
-                                    'checkup_dtl' => $checkupDtl,
-                                    'lab_item_code' => $item->item_code,
-                                    'price' => $item->price
-                                ]);
+                    foreach ($items as $item) {
+                        $sql = "select nvl(to_number(max(checkup_dtl))+1,1) from LBTXN_CHECKUPDTLS";
+                        $checkupDtl = DB::scalar($sql);
 
+                        DB::table('lbtxn_checkupdtls')->insert([
+                            'clabitem_id' => $item->clabitem_id,
+                            'checkup_no' => $checkupNo,
+                            'checkup_dtl' => $checkupDtl,
+                            'lab_item_code' => $item->item_code,
+                            'price' => $item->price
+                        ]);
 
-                                $this->isPemeriksaanLaboratoriumSelectedKeyDtl = $this->isPemeriksaanLaboratoriumSelectedKeyDtl + 1;
-                            }
-                        );
+                        $this->isPemeriksaanLaboratoriumSelectedKeyDtl = $this->isPemeriksaanLaboratoriumSelectedKeyDtl + 1;
+                    }
                 }
 
 
@@ -679,6 +677,7 @@ class Pemeriksaan extends Component
             $this->closeModalLaboratorium();
         } else {
             $this->emit('toastr-error', "Pasien Sudah Pulang, Anda tidak bisa meneruskan pemeriksaan ini.");
+            return;
         }
     }
     // Lab
@@ -806,6 +805,7 @@ class Pemeriksaan extends Component
             $this->closeModalRadiologi();
         } else {
             $this->emit('toastr-error', "Pasien Sudah Pulang, Anda tidak bisa meneruskan pemeriksaan ini.");
+            return;
         }
     }
     // Rad
@@ -1135,6 +1135,7 @@ class Pemeriksaan extends Component
             $this->filePDF = $file;
         } else {
             $this->emit('toastr-error', 'File tidak ditemukan');
+            return;
         }
     }
 
