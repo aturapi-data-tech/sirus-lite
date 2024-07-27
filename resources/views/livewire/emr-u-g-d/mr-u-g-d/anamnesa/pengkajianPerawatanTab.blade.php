@@ -69,6 +69,8 @@
 
         </div>
 
+        @include('livewire.emr-u-g-d.mr-u-g-d.anamnesa.statusPsikologisTab')
+
         <div class="mb-2">
             <x-input-label for="dataDaftarUgd.anamnesa.pengkajianPerawatan.tingkatKegawatan" :value="__('Tingkat Kegawatan')"
                 :required="__(true)" class="pt-2 sm:text-xl" />

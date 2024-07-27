@@ -485,19 +485,14 @@ class Anamnesa extends Component
     {
         // Validasi dulu
         $messages = [];
-        $myRules = [
-            'dataDaftarUgd.anamnesa.pengkajianPerawatan.jamDatang' => 'required|date_format:d/m/Y H:i:s',
-            'dataDaftarUgd.anamnesa.pengkajianPerawatan.caraMasukIgd' => 'required',
-            'dataDaftarUgd.anamnesa.pengkajianPerawatan.tingkatKegawatan' => 'required',
 
-        ];
         // Proses Validasi///////////////////////////////////////////
         try {
-            $this->validate($myRules, $messages);
+            $this->validate($this->rules, $messages);
         } catch (\Illuminate\Validation\ValidationException $e) {
 
             $this->emit('toastr-error', "Anda tidak dapat melakukan TTD-E karena data pemeriksaan belum lengkap." . $e->getMessage());
-            $this->validate($myRules, $messages);
+            $this->validate($this->rules, $messages);
         }
         // Validasi dulu
     }
