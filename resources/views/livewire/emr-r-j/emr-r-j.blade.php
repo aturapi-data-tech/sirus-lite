@@ -201,13 +201,13 @@
 
                             $badgecolorStatus = isset($myQData->rj_status)
                                 ? ($myQData->rj_status === 'A'
-                                    ? 'green'
+                                    ? 'red'
                                     : ($myQData->rj_status === 'L'
-                                        ? 'yellow'
+                                        ? 'green'
                                         : ($myQData->rj_status === 'I'
-                                            ? 'default'
+                                            ? 'green'
                                             : ($myQData->rj_status === 'F'
-                                                ? 'red'
+                                                ? 'yellow'
                                                 : 'default'))))
                                 : '';
 
