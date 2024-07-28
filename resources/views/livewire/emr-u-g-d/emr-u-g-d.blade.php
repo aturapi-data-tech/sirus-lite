@@ -315,12 +315,12 @@
                                                         </x-dropdown-link>
                                                     </li>
 
-                                                    <li>
+                                                    {{-- <li>
                                                         <x-dropdown-link
                                                             wire:click="editInap('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
                                                             {{ __('UGD Rawat Inap') }}
                                                         </x-dropdown-link>
-                                                    </li>
+                                                    </li> --}}
                                                     {{-- <li>
                                                         <x-dropdown-link
                                                             wire:click="$emit('confirm_remove_record', '{{ $myQData->rj_no }}', '{{ $myQData->reg_name }}')">
