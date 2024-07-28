@@ -137,13 +137,13 @@
                 @include('livewire.emr-u-g-d.create-emr-u-g-d')
             @endif
 
-            @if ($isOpenInap)
+            {{-- @if ($isOpenInap)
                 @include('livewire.emr-u-g-d.create-emr-u-g-d-inap')
-            @endif
+            @endif --}}
 
-            @if ($isOpenScreening)
+            {{-- @if ($isOpenScreening)
                 @include('livewire.emr-u-g-d.create-screening-u-g-d')
-            @endif
+            @endif --}}
 
         </div>
         {{-- Top Bar --}}
@@ -162,9 +162,6 @@
                             Pasien
                         </th>
                         <th scope="col" class="w-1/4 px-4 py-3 ">
-                            SEP
-                        </th>
-                        <th scope="col" class="w-1/4 px-4 py-3 ">
                             Poli
                         </th>
                         <th scope="col" class="w-1/4 px-4 py-3 ">
@@ -179,10 +176,57 @@
                 <tbody class="bg-white ">
 
                     @foreach ($myQueryData as $myQData)
-                        <tr class="border-b group dark:border-gray-700">
+                        @php
+                            $datadaftar_json = json_decode($myQData->datadaftarugd_json, true);
+                            $anamnesa = isset($datadaftar_json['anamnesa']) ? 1 : 0;
+                            $pemeriksaan = isset($datadaftar_json['pemeriksaan']) ? 1 : 0;
+                            $penilaian = isset($datadaftar_json['penilaian']) ? 1 : 0;
+                            $procedure = isset($datadaftar_json['procedure']) ? 1 : 0;
+                            $diagnosis = isset($datadaftar_json['diagnosis']) ? 1 : 0;
+                            $perencanaan = isset($datadaftar_json['perencanaan']) ? 1 : 0;
+                            $prosentaseEMR =
+                                (($anamnesa + $pemeriksaan + $penilaian + $procedure + $diagnosis + $perencanaan) / 6) *
+                                100;
+
+                            $bgSelesaiPemeriksaan = isset(
+                                $datadaftar_json['perencanaan']['pengkajianMedis']['drPemeriksa'],
+                            )
+                                ? ($datadaftar_json['perencanaan']['pengkajianMedis']['drPemeriksa']
+                                    ? 'bg-green-100'
+                                    : '')
+                                : '';
+
+                            $badgecolorEmr = $prosentaseEMR >= 80 ? 'green' : 'red';
+
+                            $badgecolorStatus = isset($myQData->rj_status)
+                                ? ($myQData->rj_status === 'A'
+                                    ? 'red'
+                                    : ($myQData->rj_status === 'L'
+                                        ? 'green'
+                                        : ($myQData->rj_status === 'I'
+                                            ? 'green'
+                                            : ($myQData->rj_status === 'F'
+                                                ? 'yellow'
+                                                : 'default'))))
+                                : '';
+
+                            $badgecolorKlaim =
+                                $myQData->klaim_id == 'UM'
+                                    ? 'green'
+                                    : ($myQData->klaim_id == 'JM'
+                                        ? 'default'
+                                        : ($myQData->klaim_id == 'KR'
+                                            ? 'yellow'
+                                            : 'red'));
+
+                            $badgecolorAdministrasiRj = isset($datadaftar_json['AdministrasiRj']) ? 'green' : 'red';
+                        @endphp
 
 
-                            <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
+                        <tr class="border-b group {{ $bgSelesaiPemeriksaan }}">
+
+
+                            <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap ">
                                 <div class="">
                                     <div class="font-semibold text-primary">
                                         {{ $myQData->reg_no }}
@@ -197,78 +241,72 @@
                             </td>
 
 
-                            <td
-                                class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-primary whitespace-nowrap dark:text-white">
-                                {{ $myQData->vno_sep }}
-                            </td>
-
-
-                            <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
+                            <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap ">
                                 <div class="">
                                     <div class="font-semibold text-primary">{{ $myQData->poli_desc }}
                                     </div>
                                     <div class="font-semibold text-gray-900">
                                         {{ $myQData->dr_name . ' / ' }}
-                                        {{ $myQData->klaim_id == 'UM'
-                                            ? 'UMUM'
-                                            : ($myQData->klaim_id == 'JM'
-                                                ? 'BPJS'
-                                                : ($myQData->klaim_id == 'KR'
-                                                    ? 'Kronis'
-                                                    : 'Asuransi Lain')) }}
+                                        <x-badge :badgecolor="__($badgecolorKlaim)">
+                                            {{ $myQData->klaim_id == 'UM'
+                                                ? 'UMUM'
+                                                : ($myQData->klaim_id == 'JM'
+                                                    ? 'BPJS'
+                                                    : ($myQData->klaim_id == 'KR'
+                                                        ? 'Kronis'
+                                                        : 'Asuransi Lain')) }}
+                                        </x-badge>
+
                                     </div>
                                     <div class="font-normal text-gray-900">
                                         {{ 'Nomer Pelayanan ' . $myQData->no_antrian }}
                                     </div>
+                                    <div class="font-normal">
+                                        {{ $myQData->vno_sep }}
+                                    </div>
                                 </div>
                             </td>
 
-                            <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
-                                <div class="overflow-auto w-52">
+                            <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap ">
+                                <div class="">
                                     <div class="font-semibold text-primary">
                                         {{ $myQData->rj_date }}
                                     </div>
-                                    <div class="italic font-semibold text-gray-900">
-                                        {{ isset($myQData->rj_status)
-                                            ? ($myQData->rj_status === 'A'
-                                                ? 'Pelayanan'
-                                                : ($myQData->rj_status === 'L'
-                                                    ? 'Selesai Pelayanan'
-                                                    : ($myQData->rj_status === 'I'
-                                                        ? 'Transfer Inap'
-                                                        : ($myQData->rj_status === 'F'
-                                                            ? 'Batal Transaksi'
-                                                            : ''))))
-                                            : '' }}
+                                    <div class="flex italic font-semibold text-gray-900">
+                                        <x-badge :badgecolor="__($badgecolorStatus)">
+                                            {{ isset($myQData->rj_status)
+                                                ? ($myQData->rj_status === 'A'
+                                                    ? 'Pelayanan'
+                                                    : ($myQData->rj_status === 'L'
+                                                        ? 'Selesai Pelayanan'
+                                                        : ($myQData->rj_status === 'I'
+                                                            ? 'Transfer Inap'
+                                                            : ($myQData->rj_status === 'F'
+                                                                ? 'Batal Transaksi'
+                                                                : ''))))
+                                                : '' }}
+                                        </x-badge>
+                                        <x-badge :badgecolor="__($badgecolorEmr)">
+                                            Emr: {{ $prosentaseEMR . '%' }}
+                                        </x-badge>
                                     </div>
                                     <div class="font-normal text-gray-900">
                                         {{ '' . $myQData->nobooking }}
                                     </div>
-                                    <div class="font-normal text-gray-900 ">
+                                    {{-- <div class="font-normal text-gray-900 ">
                                         {{ '' . $myQData->push_antrian_bpjs_status . $myQData->push_antrian_bpjs_json }}
+                                    </div> --}}
+                                    <div class="font-normal text-gray-700">
+                                        <x-badge :badgecolor="__($badgecolorAdministrasiRj)">
+                                            Administrasi :
+                                            @isset($datadaftar_json['AdministrasiRj'])
+                                                {{ $datadaftar_json['AdministrasiRj']['userLog'] }}
+                                            @else
+                                                {{ '---' }}
+                                            @endisset
+                                        </x-badge>
                                     </div>
-                                    <div>
-                                        @php
-                                            $datadaftar_json = json_decode($myQData->datadaftarugd_json, true);
-                                            $anamnesa = isset($datadaftar_json['anamnesa']) ? 1 : 0;
-                                            $pemeriksaan = isset($datadaftar_json['pemeriksaan']) ? 1 : 0;
-                                            $penilaian = isset($datadaftar_json['penilaian']) ? 1 : 0;
-                                            $procedure = isset($datadaftar_json['procedure']) ? 1 : 0;
-                                            $diagnosis = isset($datadaftar_json['diagnosis']) ? 1 : 0;
-                                            $perencanaan = isset($datadaftar_json['perencanaan']) ? 1 : 0;
-                                            $prosentaseEMR =
-                                                (($anamnesa +
-                                                    $pemeriksaan +
-                                                    $penilaian +
-                                                    $procedure +
-                                                    $diagnosis +
-                                                    $perencanaan) /
-                                                    6) *
-                                                100;
-                                        @endphp
-                                        Emr: {{ $prosentaseEMR . '%' }}
 
-                                    </div>
                                 </div>
                             </td>
 
@@ -301,26 +339,81 @@
                                                             {{ __('Tampil | ' . $myQData->reg_name) }}
                                                         </x-dropdown-link>
                                                     </li> --}}
-                                                    {{-- <li>
-                                                        <x-dropdown-link
-                                                            wire:click="editScreening('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
-                                                            {{ __('Screening') }}
-                                                        </x-dropdown-link>
-                                                    </li> --}}
 
-                                                    <li>
-                                                        <x-dropdown-link
-                                                            wire:click="edit('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
-                                                            {{ __('Assessment Perawat') }}
-                                                        </x-dropdown-link>
-                                                    </li>
 
-                                                    {{-- <li>
-                                                        <x-dropdown-link
-                                                            wire:click="editInap('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
-                                                            {{ __('UGD Rawat Inap') }}
-                                                        </x-dropdown-link>
-                                                    </li> --}}
+                                                    @role('Admin')
+                                                        {{-- <li>
+                                                            <x-dropdown-link
+                                                                wire:click="editScreening('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
+                                                                {{ __('Screening') }}
+                                                            </x-dropdown-link>
+                                                        </li> --}}
+
+                                                        <li>
+                                                            <x-dropdown-link
+                                                                wire:click="editDokter('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
+                                                                {{ __('Assessment Dokter') }}
+                                                            </x-dropdown-link>
+                                                        </li>
+
+                                                        <li>
+                                                            <x-dropdown-link
+                                                                wire:click="edit('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
+                                                                {{ __('Assessment Perawat') }}
+                                                            </x-dropdown-link>
+                                                        </li>
+                                                    @endrole
+                                                    @role('Mr')
+                                                        {{-- <li>
+                                                            <x-dropdown-link
+                                                                wire:click="editScreening('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
+                                                                {{ __('Screening') }}
+                                                            </x-dropdown-link>
+                                                        </li> --}}
+
+                                                        {{-- <li>
+                                                            <x-dropdown-link
+                                                                wire:click="editDokter('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
+                                                                {{ __('Assessment Dokter') }}
+                                                            </x-dropdown-link>
+                                                        </li> --}}
+
+                                                        <li>
+                                                            <x-dropdown-link
+                                                                wire:click="edit('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
+                                                                {{ __('Assessment Perawat') }}
+                                                            </x-dropdown-link>
+                                                        </li>
+                                                    @endrole
+                                                    @role('Perawat')
+                                                        {{-- <li>
+                                                            <x-dropdown-link
+                                                                wire:click="editScreening('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
+                                                                {{ __('Screening') }}
+                                                            </x-dropdown-link>
+                                                        </li> --}}
+                                                        <li>
+                                                            <x-dropdown-link
+                                                                wire:click="edit('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
+                                                                {{ __('Assessment Perawat') }}
+                                                            </x-dropdown-link>
+                                                        </li>
+                                                    @endrole
+                                                    @role('Dokter')
+                                                        {{-- <li>
+                                                            <x-dropdown-link
+                                                                wire:click="editDokter('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
+                                                                {{ __('Assessment Dokter') }}
+                                                            </x-dropdown-link>
+                                                        </li> --}}
+                                                        <li>
+                                                            <x-dropdown-link
+                                                                wire:click="edit('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
+                                                                {{ __('Assessment Dokter') }}
+                                                            </x-dropdown-link>
+                                                        </li>
+                                                    @endrole
+
                                                     {{-- <li>
                                                         <x-dropdown-link
                                                             wire:click="$emit('confirm_remove_record', '{{ $myQData->rj_no }}', '{{ $myQData->reg_name }}')">
