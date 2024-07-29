@@ -13,11 +13,12 @@ use Illuminate\Support\Collection;
 
 use Carbon\Carbon;
 use Spatie\ArrayToXml\ArrayToXml;
+use App\Http\Traits\EmrUGD\EmrUGDTrait;
 
 
 class TelaahResepUGD extends Component
 {
-    use WithPagination;
+    use WithPagination, EmrUGDTrait;
 
     protected $listeners = [
         'syncronizeAssessmentDokterUGDFindData' => 'sumAll',
@@ -312,6 +313,8 @@ class TelaahResepUGD extends Component
 
     public function editAdministrasi($rjNo, $regNoRef)
     {
+        $this->emit('toastr-error', 'Program dalam masa proses pengembangan');
+        return;
         $this->openModalEditAdministrasi($rjNo, $regNoRef);
         // $this->findData($id);
     }
@@ -461,7 +464,7 @@ class TelaahResepUGD extends Component
             DB::table('rstxn_ugdhdrs')
                 ->where('rj_no', $rjNo)
                 ->update([
-                    'datadaftarUgd_json' => json_encode($this->dataDaftarUgd, true),
+                    'datadaftarugd_json' => json_encode($this->dataDaftarUgd, true),
                     'datadaftarUgd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
                 ]);
 
@@ -482,7 +485,7 @@ class TelaahResepUGD extends Component
             DB::table('rstxn_ugdhdrs')
                 ->where('rj_no', $rjNo)
                 ->update([
-                    'datadaftarUgd_json' => json_encode($this->dataDaftarUgd, true),
+                    'datadaftarugd_json' => json_encode($this->dataDaftarUgd, true),
                     'datadaftarUgd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
                 ]);
 
@@ -496,14 +499,14 @@ class TelaahResepUGD extends Component
         $dataUGD = [];
 
         $findData = DB::table('rsview_ugdkasir')
-            ->select('datadaftarUgd_json', 'vno_sep')
+            ->select('datadaftarugd_json', 'vno_sep')
             ->where('rj_no', $rjNo)
             ->first();
 
-        $dataDaftarUgd_json = isset($findData->datadaftarUgd_json) ? $findData->datadaftarUgd_json   : null;
+        $datadaftarugd_json = isset($findData->datadaftarugd_json) ? $findData->datadaftarugd_json   : null;
 
-        if ($dataDaftarUgd_json) {
-            $dataUGD = json_decode($findData->datadaftarUgd_json, true);
+        if ($datadaftarugd_json) {
+            $dataUGD = json_decode($findData->datadaftarugd_json, true);
         } else {
 
             $this->emit('toastr-error', "Data tidak dapat di proses json.");
@@ -776,7 +779,7 @@ class TelaahResepUGD extends Component
                 'thn',
                 DB::raw("to_char(birth_date,'dd/mm/yyyy') AS birth_date"),
                 'poli_id',
-                'poli_desc',
+                // 'poli_desc',
                 'dr_id',
                 'dr_name',
                 'klaim_id',
@@ -787,7 +790,7 @@ class TelaahResepUGD extends Component
                 'nobooking',
                 'push_antrian_bpjs_status',
                 'push_antrian_bpjs_json',
-                'datadaftarUgd_json'
+                'datadaftarugd_json'
             )
             ->where(DB::raw("nvl(rj_status,'A')"), '=', $myRefstatusId)
             // ->where('rj_status', '!=', 'F')
@@ -816,8 +819,8 @@ class TelaahResepUGD extends Component
         $myQueryPagination = $query->get()
             ->sortByDesc(
                 function ($mySortByJson) {
-                    $myQueryPagination = isset(json_decode($mySortByJson->datadaftarUgd_json, true)['eresep']) ? 1 : 0;
-                    $myQueryPagination1 = isset(json_decode($mySortByJson->datadaftarUgd_json, true)['AdministrasiRj']) ? 1 : 0;
+                    $myQueryPagination = isset(json_decode($mySortByJson->datadaftarugd_json, true)['eresep']) ? 1 : 0;
+                    $myQueryPagination1 = isset(json_decode($mySortByJson->datadaftarugd_json, true)['AdministrasiRj']) ? 1 : 0;
                     return ($myQueryPagination . $myQueryPagination1 . $mySortByJson->rj_date1);
                 }
             );

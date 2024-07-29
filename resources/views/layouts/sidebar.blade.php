@@ -108,6 +108,15 @@
                                     </x-nav-link>
                                 @endrole
 
+                                @role(['Apoteker', 'Admin'])
+                                    <x-nav-link class="pl-4" :href="route('TelaahResepUGD')" :active="request()->routeIs('TelaahResepUGD')">
+                                        <!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
+
+
+                                        {{ __('Resep UGD') }}
+                                    </x-nav-link>
+                                @endrole
+
                                 @role(['Perawat', 'Mr', 'Admin'])
                                     <x-nav-link class="pl-4" :href="route('SetupHfisBpjs')" :active="request()->routeIs('SetupHfisBpjs')">
                                         {{ __('SetupHfisBpjs') }}

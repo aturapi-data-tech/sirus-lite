@@ -135,11 +135,11 @@
 
 
             @if ($isOpenAdministrasi)
-                @include('livewire.emr-r-j.telaah-resep-r-j.create-administrasi-rj')
+                @include('livewire.emr-u-g-d.telaah-resep-u-g-d.create-administrasi-u-g-d')
             @endif
 
             @if ($isOpenTelaahResep)
-                @include('livewire.emr-r-j.telaah-resep-r-j.create-telaahresep-rj')
+                @include('livewire.emr-u-g-d.telaah-resep-u-g-d.create-telaahresep-u-g-d')
             @endif
 
 
@@ -177,7 +177,7 @@
 
                     @foreach ($myQueryData as $myQData)
                         @php
-                            $datadaftar_json = json_decode($myQData->datadaftarpolirj_json, true);
+                            $datadaftar_json = json_decode($myQData->datadaftarugd_json, true);
 
                             $eresep = isset($datadaftar_json['eresep']) ? 1 : 0;
 
@@ -185,13 +185,13 @@
 
                             $badgecolorStatus = isset($myQData->rj_status)
                                 ? ($myQData->rj_status === 'A'
-                                    ? 'green'
+                                    ? 'red'
                                     : ($myQData->rj_status === 'L'
-                                        ? 'yellow'
+                                        ? 'green'
                                         : ($myQData->rj_status === 'I'
-                                            ? 'default'
+                                            ? 'green'
                                             : ($myQData->rj_status === 'F'
-                                                ? 'red'
+                                                ? 'yellow'
                                                 : 'default'))))
                                 : '';
 
@@ -231,7 +231,7 @@
                             <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap ">
                                 <div class="">
                                     <div class="font-semibold text-primary">
-                                        {{ $myQData->poli_desc }}
+                                        {{ 'UGD' }}
                                     </div>
                                     <div class="font-semibold text-gray-900">
                                         {{ $myQData->dr_name . ' / ' }}
@@ -317,12 +317,12 @@
                                         Resep</x-light-button>
                                     <x-green-button
                                         wire:click="editAdministrasi('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">Admin
-                                        RJ</x-green-button>
+                                        UGD</x-green-button>
 
                                 </div>
                                 <div>
-                                    <livewire:cetak.cetak-eresep-r-j :rjNoRef="$myQData->rj_no"
-                                        wire:key="cetak.cetak-eresep-r-j-{{ $myQData->rj_no }}">
+                                    <livewire:cetak.cetak-eresep-u-g-d :rjNoRef="$myQData->rj_no"
+                                        wire:key="cetak.cetak-eresep-u-g-d-{{ $myQData->rj_no }}">
 
                                 </div>
 

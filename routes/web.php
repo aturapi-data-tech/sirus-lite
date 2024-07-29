@@ -38,6 +38,8 @@ use App\Http\Livewire\EmrRJ\EmrRJ;
 use App\Http\Livewire\BookingRJ\BookingRJ;
 
 use App\Http\Livewire\EmrRJ\TelaahResepRJ\TelaahResepRJ;
+use App\Http\Livewire\EmrUGD\TelaahResepUGD\TelaahResepUGD;
+
 
 
 use App\Http\Livewire\EmrUGD\EmrUGD;
@@ -144,7 +146,8 @@ Route::get('BookingRJ', BookingRJ::class)->middleware('auth')->name('BookingRJ')
 Route::get('TelaahResepRJ', TelaahResepRJ::class)->middleware('auth')->name('TelaahResepRJ');
 
 Route::get('EmrUGD', EmrUGD::class)->middleware('auth')->name('EmrUGD');
-// Route::get('Laborat', Laborat::class)->middleware('auth')->name('Laborat');
+Route::get('TelaahResepUGD', TelaahResepUGD::class)->middleware('auth')->name('TelaahResepUGD');
+
 
 
 
