@@ -118,15 +118,21 @@
                             <td class="p-1 m-1">Klaim</td>
                             <td class="p-1 m-1">:</td>
                             <td class="p-1 m-1 font-semibold">
-                                {{ $dataDaftarUgd['klaimId'] == 'UM'
-                                    ? 'UMUM'
-                                    : ($dataDaftarUgd['klaimId'] == 'JM'
-                                        ? 'BPJS'
-                                        : ($dataDaftarUgd['klaimId'] == 'KR'
-                                            ? 'Kronis'
-                                            : 'Asuransi Lain')) }}
-                                /
-                                {{ isset($dataDaftarUgd['poliDesc']) ? $dataDaftarUgd['poliDesc'] : '-' }}
+                                @isset($dataDaftarUgd['klaimId'])
+                                    {{ $dataDaftarUgd['klaimId'] == 'UM'
+                                        ? 'UMUM'
+                                        : ($dataDaftarUgd['klaimId'] == 'JM'
+                                            ? 'BPJS'
+                                            : ($dataDaftarUgd['klaimId'] == 'KR'
+                                                ? 'Kronis'
+                                                : 'Asuransi Lain')) }}
+                                    /
+                                    {{ UGD }}
+                                @else
+                                    '-' /
+                                    {{ UGD }}
+                                @endisset
+
                             </td>
                         </tr>
 

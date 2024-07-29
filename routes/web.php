@@ -76,9 +76,6 @@ Route::group(['middleware' => ['role:Admin|Mr|Perawat|Dokter|Apoteker']], functi
     Route::get('displayPelayananRJ', displayPelayananRJ::class)->middleware('auth')->name('displayPelayananRJ');
     Route::get('SetupHfisBpjs', SetupHfisBpjs::class)->middleware('auth')->name('SetupHfisBpjs');
 
-    // Route::view('/cetak-sep', 'livewire.daftar-r-j.cetak-sep');
-    // Route::view('/cetak-etiket', 'livewire.daftar-r-j.cetak-etiket');
-
     Route::get('RJskdp', RJskdp::class)->middleware('auth')->name('RJskdp');
     Route::get('RIskdp', RIskdp::class)->middleware('auth')->name('RIskdp');
 
