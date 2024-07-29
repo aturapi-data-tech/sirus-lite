@@ -66,19 +66,19 @@
 
                         <ul id="dropdown-layoutsRJ" class="hidden py-2 space-y-2">
                             <li>
-                                @role(['Perawat', 'Mr', 'Admin'])
+                                @role(['Mr', 'Admin'])
                                     <x-nav-link class="pl-4" :href="route('MasterPasien')" :active="request()->routeIs('MasterPasien')">
                                         {{ __('Pendaftaran Pasien Baru') }}
                                     </x-nav-link>
                                 @endrole
 
-                                @role(['Perawat', 'Mr', 'Admin'])
+                                @role(['Mr', 'Admin'])
                                     <x-nav-link class="pl-4" :href="route('BookingRJ')" :active="request()->routeIs('BookingRJ')">
                                         {{ __('Booking Rawat Jalan') }}
                                     </x-nav-link>
                                 @endrole
 
-                                @role(['Perawat', 'Mr', 'Admin'])
+                                @role(['Mr', 'Admin'])
                                     <x-nav-link class="pl-4" :href="route('daftarRJ')" :active="request()->routeIs('daftarRJ')">
                                         {{ __('Pendaftaran Rawat Jalan') }}
                                     </x-nav-link>
@@ -117,7 +117,7 @@
                                     </x-nav-link>
                                 @endrole
 
-                                @role(['Perawat', 'Mr', 'Admin'])
+                                @role(['Mr', 'Admin'])
                                     <x-nav-link class="pl-4" :href="route('SetupHfisBpjs')" :active="request()->routeIs('SetupHfisBpjs')">
                                         {{ __('SetupHfisBpjs') }}
                                     </x-nav-link>
@@ -174,7 +174,7 @@
 
                         <ul id="dropdown-layoutsUGD" class="hidden py-2 space-y-2">
                             <li>
-                                @role(['Perawat', 'Mr', 'Admin'])
+                                @role(['Mr', 'Admin'])
                                     <x-nav-link class="pl-4" :href="route('daftarUGD')" :active="request()->routeIs('daftarUGD')">
                                         {{ __('Pendaftaran UGD') }}
                                     </x-nav-link>
