@@ -319,12 +319,12 @@
                                                     $myPreviousRow = '';
                                                 @endphp
                                                 @foreach ($dataDaftarUgd['eresepRacikan'] as $key => $eresep)
-                                                    @php`
-                                                                                                                $myRacikanBorder =
-                                                                                                                    $myPreviousRow !== $eresep['noRacikan']
-                                                                                                                        ? 'border-t-2 '
-                                                                                                                        : '';
-                                                                                                        @endphp ?>
+                                                    @php
+                                                        $myRacikanBorder =
+                                                            $myPreviousRow !== $eresep['noRacikan']
+                                                                ? 'border-t-2 '
+                                                                : '';
+                                                    @endphp
 
                                                     <tr class="{{ $myRacikanBorder }} group">
 
