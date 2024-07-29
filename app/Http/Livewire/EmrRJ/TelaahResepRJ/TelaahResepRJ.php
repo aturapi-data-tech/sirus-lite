@@ -451,43 +451,55 @@ class TelaahResepRJ extends Component
 
     public function setttdTelaahResep($rjNo)
     {
-        if (isset($this->dataDaftarPoliRJ['telaahResep']['penanggungJawab']) == false) {
-            $this->dataDaftarPoliRJ['telaahResep']['penanggungJawab'] = [
-                'userLog' => auth()->user()->myuser_name,
-                'userLogDate' => Carbon::now()->format('d/m/Y H:i:s'),
-                'userLogCode' => auth()->user()->myuser_code
-            ];
+        $myUserNameActive = auth()->user()->myuser_name;
+        if (auth()->user()->hasRole('Perawat')) {
+            if (isset($this->dataDaftarPoliRJ['telaahResep']['penanggungJawab']) == false) {
+                $this->dataDaftarPoliRJ['telaahResep']['penanggungJawab'] = [
+                    'userLog' => auth()->user()->myuser_name,
+                    'userLogDate' => Carbon::now()->format('d/m/Y H:i:s'),
+                    'userLogCode' => auth()->user()->myuser_code
+                ];
 
-            DB::table('rstxn_rjhdrs')
-                ->where('rj_no', $rjNo)
-                ->update([
-                    'datadaftarpolirj_json' => json_encode($this->dataDaftarPoliRJ, true),
-                    'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
-                ]);
+                DB::table('rstxn_rjhdrs')
+                    ->where('rj_no', $rjNo)
+                    ->update([
+                        'datadaftarpolirj_json' => json_encode($this->dataDaftarPoliRJ, true),
+                        'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
+                    ]);
 
-            $this->emit('syncronizeAssessmentDokterRJFindData');
-            $this->emit('syncronizeAssessmentPerawatRJFindData');
+                $this->emit('syncronizeAssessmentDokterRJFindData');
+                $this->emit('syncronizeAssessmentPerawatRJFindData');
+            }
+        } else {
+            $this->emit('toastr-error', "Anda tidak dapat melakukan TTD-E karena User Role " . $myUserNameActive . ' Bukan Apoteker.');
+            return;
         }
     }
 
     public function setttdTelaahObat($rjNo)
     {
-        if (isset($this->dataDaftarPoliRJ['telaahObat']['penanggungJawab']) == false) {
-            $this->dataDaftarPoliRJ['telaahObat']['penanggungJawab'] = [
-                'userLog' => auth()->user()->myuser_name,
-                'userLogDate' => Carbon::now()->format('d/m/Y H:i:s'),
-                'userLogCode' => auth()->user()->myuser_code
-            ];
+        $myUserNameActive = auth()->user()->myuser_name;
+        if (auth()->user()->hasRole('Perawat')) {
+            if (isset($this->dataDaftarPoliRJ['telaahObat']['penanggungJawab']) == false) {
+                $this->dataDaftarPoliRJ['telaahObat']['penanggungJawab'] = [
+                    'userLog' => auth()->user()->myuser_name,
+                    'userLogDate' => Carbon::now()->format('d/m/Y H:i:s'),
+                    'userLogCode' => auth()->user()->myuser_code
+                ];
 
-            DB::table('rstxn_rjhdrs')
-                ->where('rj_no', $rjNo)
-                ->update([
-                    'datadaftarpolirj_json' => json_encode($this->dataDaftarPoliRJ, true),
-                    'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
-                ]);
+                DB::table('rstxn_rjhdrs')
+                    ->where('rj_no', $rjNo)
+                    ->update([
+                        'datadaftarpolirj_json' => json_encode($this->dataDaftarPoliRJ, true),
+                        'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
+                    ]);
 
-            $this->emit('syncronizeAssessmentDokterRJFindData');
-            $this->emit('syncronizeAssessmentPerawatRJFindData');
+                $this->emit('syncronizeAssessmentDokterRJFindData');
+                $this->emit('syncronizeAssessmentPerawatRJFindData');
+            }
+        } else {
+            $this->emit('toastr-error', "Anda tidak dapat melakukan TTD-E karena User Role " . $myUserNameActive . ' Bukan Apoteker.');
+            return;
         }
     }
 

@@ -454,43 +454,55 @@ class TelaahResepUGD extends Component
 
     public function setttdTelaahResep($rjNo)
     {
-        if (isset($this->dataDaftarUgd['telaahResep']['penanggungJawab']) == false) {
-            $this->dataDaftarUgd['telaahResep']['penanggungJawab'] = [
-                'userLog' => auth()->user()->myuser_name,
-                'userLogDate' => Carbon::now()->format('d/m/Y H:i:s'),
-                'userLogCode' => auth()->user()->myuser_code
-            ];
+        $myUserNameActive = auth()->user()->myuser_name;
+        if (auth()->user()->hasRole('Perawat')) {
+            if (isset($this->dataDaftarUgd['telaahResep']['penanggungJawab']) == false) {
+                $this->dataDaftarUgd['telaahResep']['penanggungJawab'] = [
+                    'userLog' => auth()->user()->myuser_name,
+                    'userLogDate' => Carbon::now()->format('d/m/Y H:i:s'),
+                    'userLogCode' => auth()->user()->myuser_code
+                ];
 
-            DB::table('rstxn_ugdhdrs')
-                ->where('rj_no', $rjNo)
-                ->update([
-                    'datadaftarugd_json' => json_encode($this->dataDaftarUgd, true),
-                    'datadaftarUgd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
-                ]);
+                DB::table('rstxn_ugdhdrs')
+                    ->where('rj_no', $rjNo)
+                    ->update([
+                        'datadaftarugd_json' => json_encode($this->dataDaftarUgd, true),
+                        'datadaftarUgd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
+                    ]);
 
-            $this->emit('syncronizeAssessmentDokterUGDFindData');
-            $this->emit('syncronizeAssessmentPerawatUGDFindData');
+                $this->emit('syncronizeAssessmentDokterUGDFindData');
+                $this->emit('syncronizeAssessmentPerawatUGDFindData');
+            }
+        } else {
+            $this->emit('toastr-error', "Anda tidak dapat melakukan TTD-E karena User Role " . $myUserNameActive . ' Bukan Apoteker.');
+            return;
         }
     }
 
     public function setttdTelaahObat($rjNo)
     {
-        if (isset($this->dataDaftarUgd['telaahObat']['penanggungJawab']) == false) {
-            $this->dataDaftarUgd['telaahObat']['penanggungJawab'] = [
-                'userLog' => auth()->user()->myuser_name,
-                'userLogDate' => Carbon::now()->format('d/m/Y H:i:s'),
-                'userLogCode' => auth()->user()->myuser_code
-            ];
+        $myUserNameActive = auth()->user()->myuser_name;
+        if (auth()->user()->hasRole('Perawat')) {
+            if (isset($this->dataDaftarUgd['telaahObat']['penanggungJawab']) == false) {
+                $this->dataDaftarUgd['telaahObat']['penanggungJawab'] = [
+                    'userLog' => auth()->user()->myuser_name,
+                    'userLogDate' => Carbon::now()->format('d/m/Y H:i:s'),
+                    'userLogCode' => auth()->user()->myuser_code
+                ];
 
-            DB::table('rstxn_ugdhdrs')
-                ->where('rj_no', $rjNo)
-                ->update([
-                    'datadaftarugd_json' => json_encode($this->dataDaftarUgd, true),
-                    'datadaftarUgd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
-                ]);
+                DB::table('rstxn_ugdhdrs')
+                    ->where('rj_no', $rjNo)
+                    ->update([
+                        'datadaftarugd_json' => json_encode($this->dataDaftarUgd, true),
+                        'datadaftarUgd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
+                    ]);
 
-            $this->emit('syncronizeAssessmentDokterUGDFindData');
-            $this->emit('syncronizeAssessmentPerawatUGDFindData');
+                $this->emit('syncronizeAssessmentDokterUGDFindData');
+                $this->emit('syncronizeAssessmentPerawatUGDFindData');
+            }
+        } else {
+            $this->emit('toastr-error', "Anda tidak dapat melakukan TTD-E karena User Role " . $myUserNameActive . ' Bukan Apoteker.');
+            return;
         }
     }
 
