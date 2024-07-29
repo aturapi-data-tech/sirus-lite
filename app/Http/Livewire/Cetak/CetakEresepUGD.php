@@ -14,6 +14,11 @@ class CetakEresepUGD extends Component
 {
     use EmrUGDTrait;
 
+    // listener from blade////////////////
+    protected $listeners = [
+        'syncronizeAssessmentDokterUGDFindData' => 'mount',
+        'syncronizeAssessmentPerawatUGDFindData' => 'mount'
+    ];
 
     // dataDaftarUgd RJ
     public $rjNoRef;

@@ -11,6 +11,13 @@ use Livewire\Component;
 
 class CetakEresepRJ extends Component
 {
+
+    // listener from blade////////////////
+    protected $listeners = [
+        'syncronizeAssessmentDokterRJFindData' => 'mount',
+        'syncronizeAssessmentPerawatRJFindData' => 'mount'
+    ];
+
     // dataDaftarPoliRJ RJ
     public $rjNoRef;
 
