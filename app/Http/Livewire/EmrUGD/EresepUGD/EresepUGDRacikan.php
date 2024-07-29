@@ -26,7 +26,7 @@ class EresepUGDRacikan extends Component
     // listener from blade////////////////
     protected $listeners = [
         'storeAssessmentDokterRJ' => 'store',
-        'syncronizeAssessmentDokterRJFindData' => 'mount',
+        'syncronizeAssessmentDokterUGDFindData' => 'mount',
         'syncronizeAssessmentPerawatUGDFindData' => 'mount'
 
     ];
@@ -228,7 +228,7 @@ class EresepUGDRacikan extends Component
 
         // Logic update mode start //////////
         $this->updateDataRJ($this->dataDaftarUgd['rjNo']);
-        $this->emit('syncronizeAssessmentDokterRJFindData');
+        $this->emit('syncronizeAssessmentDokterUGDFindData');
         $this->emit('syncronizeAssessmentPerawatUGDFindData');
     }
 
