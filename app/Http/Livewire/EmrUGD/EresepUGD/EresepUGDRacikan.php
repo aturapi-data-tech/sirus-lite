@@ -9,6 +9,7 @@ use Livewire\WithPagination;
 // use Carbon\Carbon;
 
 use App\Http\Traits\customErrorMessagesTrait;
+use App\Http\Traits\EmrUGD\EmrUGDTrait;
 
 // use Illuminate\Support\Str;
 use Spatie\ArrayToXml\ArrayToXml;
@@ -19,13 +20,15 @@ use Illuminate\Support\Facades\Validator;
 
 class EresepUGDRacikan extends Component
 {
-    use WithPagination;
+    use WithPagination, EmrUGDTrait;
 
 
     // listener from blade////////////////
     protected $listeners = [
         'storeAssessmentDokterRJ' => 'store',
-        'syncronizeAssessmentDokterRJFindData' => 'mount'
+        'syncronizeAssessmentDokterRJFindData' => 'mount',
+        'syncronizeAssessmentPerawatUGDFindData' => 'mount'
+
     ];
 
 
@@ -37,8 +40,8 @@ class EresepUGDRacikan extends Component
 
 
 
-    // dataDaftarPoliRJ RJ
-    public array $dataDaftarPoliRJ = [];
+    // dataDaftarUgd RJ
+    public array $dataDaftarUgd = [];
 
     //////////////////////////////////////////////////////////////////////
 
@@ -224,19 +227,20 @@ class EresepUGDRacikan extends Component
         $this->setDataPrimer();
 
         // Logic update mode start //////////
-        $this->updateDataRJ($this->dataDaftarPoliRJ['rjNo']);
+        $this->updateDataRJ($this->dataDaftarUgd['rjNo']);
         $this->emit('syncronizeAssessmentDokterRJFindData');
+        $this->emit('syncronizeAssessmentPerawatUGDFindData');
     }
 
     private function updateDataRJ($rjNo): void
     {
 
         // update table trnsaksi
-        DB::table('rstxn_rjhdrs')
+        DB::table('rstxn_ugdhdrs')
             ->where('rj_no', $rjNo)
             ->update([
-                'dataDaftarPoliRJ_json' => json_encode($this->dataDaftarPoliRJ, true),
-                'dataDaftarPoliRJ_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
+                'datadaftarugd_json' => json_encode($this->dataDaftarUgd, true),
+                'datadaftarugd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
             ]);
 
         $this->emit('toastr-success', "Eresep Racikan berhasil disimpan.");
@@ -246,135 +250,13 @@ class EresepUGDRacikan extends Component
 
     private function findData($rjno): void
     {
-        $findData = DB::table('rsview_rjkasir')
-            ->select('datadaftarpolirj_json', 'vno_sep')
-            ->where('rj_no', $rjno)
-            ->first();
+        $this->rjStatusRef = DB::table('rstxn_ugdhdrs')->select('rj_status')->where('rj_no', $rjno)->first()->rj_status;
 
-        $this->rjStatusRef = DB::table('rstxn_rjhdrs')->select('rj_status')->where('rj_no', $rjno)->first()->rj_status;
-
-
-        $dataDaftarPoliRJ_json = isset($findData->datadaftarpolirj_json) ? $findData->datadaftarpolirj_json   : null;
-        // if meta_data_pasien_json = null
-        // then cari Data Pasien By Key Collection (exception when no data found)
-        //
-        // else json_decode
-        if ($dataDaftarPoliRJ_json) {
-            $this->dataDaftarPoliRJ = json_decode($findData->datadaftarpolirj_json, true);
-
-            // jika eresep tidak ditemukan tambah variable eresep pda array
-            if (isset($this->dataDaftarPoliRJ['eresep']) == false) {
-                $this->dataDaftarPoliRJ['eresep'] = [];
-            }
-        } else {
-
-            $this->emit('toastr-error', "Data tidak dapat di proses json.");
-            $dataDaftarPoliRJ = DB::table('rsview_rjkasir')
-                ->select(
-                    DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
-                    DB::raw("to_char(rj_date,'yyyymmddhh24miss') AS rj_date1"),
-                    'rj_no',
-                    'reg_no',
-                    'reg_name',
-                    'sex',
-                    'address',
-                    'thn',
-                    DB::raw("to_char(birth_date,'dd/mm/yyyy') AS birth_date"),
-                    'poli_id',
-                    'poli_desc',
-                    'dr_id',
-                    'dr_name',
-                    'klaim_id',
-                    // 'entry_id',
-                    'shift',
-                    'vno_sep',
-                    'no_antrian',
-
-                    'nobooking',
-                    'push_antrian_bpjs_status',
-                    'push_antrian_bpjs_json',
-                    'kd_dr_bpjs',
-                    'kd_poli_bpjs',
-                    'rj_status',
-                    'txn_status',
-                    'erm_status',
-                )
-                ->where('rj_no', '=', $rjno)
-                ->first();
-
-            $this->dataDaftarPoliRJ = [
-                "regNo" =>  $dataDaftarPoliRJ->reg_no,
-
-                "drId" =>  $dataDaftarPoliRJ->dr_id,
-                "drDesc" =>  $dataDaftarPoliRJ->dr_name,
-
-                "poliId" =>  $dataDaftarPoliRJ->poli_id,
-                "klaimId" => $dataDaftarPoliRJ->klaim_id,
-                // "poliDesc" =>  $dataDaftarPoliRJ->poli_desc ,
-
-                // "kddrbpjs" =>  $dataDaftarPoliRJ->kd_dr_bpjs ,
-                // "kdpolibpjs" =>  $dataDaftarPoliRJ->kd_poli_bpjs ,
-
-                "rjDate" =>  $dataDaftarPoliRJ->rj_date,
-                "rjNo" =>  $dataDaftarPoliRJ->rj_no,
-                "shift" =>  $dataDaftarPoliRJ->shift,
-                "noAntrian" =>  $dataDaftarPoliRJ->no_antrian,
-                "noBooking" =>  $dataDaftarPoliRJ->nobooking,
-                "slCodeFrom" => "02",
-                "passStatus" => "",
-                "rjStatus" =>  $dataDaftarPoliRJ->rj_status,
-                "txnStatus" =>  $dataDaftarPoliRJ->txn_status,
-                "ermStatus" =>  $dataDaftarPoliRJ->erm_status,
-                "cekLab" => "0",
-                "kunjunganInternalStatus" => "0",
-                "noReferensi" =>  $dataDaftarPoliRJ->reg_no,
-                "postInap" => [],
-                "internal12" => "1",
-                "internal12Desc" => "Faskes Tingkat 1",
-                "internal12Options" => [
-                    [
-                        "internal12" => "1",
-                        "internal12Desc" => "Faskes Tingkat 1"
-                    ],
-                    [
-                        "internal12" => "2",
-                        "internal12Desc" => "Faskes Tingkat 2 RS"
-                    ]
-                ],
-                "kontrol12" => "1",
-                "kontrol12Desc" => "Faskes Tingkat 1",
-                "kontrol12Options" => [
-                    [
-                        "kontrol12" => "1",
-                        "kontrol12Desc" => "Faskes Tingkat 1"
-                    ],
-                    [
-                        "kontrol12" => "2",
-                        "kontrol12Desc" => "Faskes Tingkat 2 RS"
-                    ],
-                ],
-                "taskIdPelayanan" => [
-                    "taskId1" => "",
-                    "taskId2" => "",
-                    "taskId3" =>  $dataDaftarPoliRJ->rj_date,
-                    "taskId4" => "",
-                    "taskId5" => "",
-                    "taskId6" => "",
-                    "taskId7" => "",
-                    "taskId99" => "",
-                ],
-                'sep' => [
-                    "noSep" =>  $dataDaftarPoliRJ->vno_sep,
-                    "reqSep" => [],
-                    "resSep" => [],
-                ]
-            ];
-
-
-            // jika eresep tidak ditemukan tambah variable eresep pda array
-            if (isset($this->dataDaftarPoliRJ['eresep']) == false) {
-                $this->dataDaftarPoliRJ['eresep'] = [];
-            }
+        $this->dataDaftarUgd = $this->findDataUGD($rjno);
+        // dd($this->dataDaftarUgd);
+        // jika eresepRacikan tidak ditemukan tambah variable eresepRacikan pda array
+        if (isset($this->dataDaftarUgd['eresepRacikan']) == false) {
+            $this->dataDaftarUgd['eresepRacikan'] = [];
         }
     }
 
@@ -434,13 +316,13 @@ class EresepUGDRacikan extends Component
         // pengganti race condition
         // start:
         try {
-            // select nvl(max(rjobat_dtl)+1,1) into :rstxn_rjobatracikans.rjobat_dtl from rstxn_rjobatracikans;
+            // select nvl(max(rjobat_dtl)+1,1) into :rstxn_ugdobatracikans.rjobat_dtl from rstxn_ugdobatracikans;
 
-            $lastInserted = DB::table('rstxn_rjobatracikans')
+            $lastInserted = DB::table('rstxn_ugdobatracikans')
                 ->select(DB::raw("nvl(max(rjobat_dtl)+1,1) as rjobat_dtl_max"))
                 ->first();
             // insert into table transaksi
-            DB::table('rstxn_rjobatracikans')
+            DB::table('rstxn_ugdobatracikans')
                 ->insert([
                     'rjobat_dtl' => $lastInserted->rjobat_dtl_max,
                     'rj_no' => $this->rjNoRef,
@@ -456,13 +338,13 @@ class EresepUGDRacikan extends Component
                     'catatan_khusus' => isset($this->collectingMyProduct['catatanKhusus']) ? $this->collectingMyProduct['catatanKhusus'] : null,
                     'no_racikan' => $this->noRacikan,
 
-                    'rj_takar' => 'Tablet',
-                    'exp_date' => DB::raw("to_date('" . $this->dataDaftarPoliRJ['rjDate'] . "','dd/mm/yyyy hh24:mi:ss')+30"),
+                    'ugd_takar' => 'Tablet',
+                    'exp_date' => DB::raw("to_date('" . $this->dataDaftarUgd['rjDate'] . "','dd/mm/yyyy hh24:mi:ss')+30"),
                     'etiket_status' => 1,
                 ]);
 
 
-            $this->dataDaftarPoliRJ['eresepRacikan'][] = [
+            $this->dataDaftarUgd['eresepRacikan'][] = [
                 'jenisKeterangan' => 'Racikan', //Racikan non racikan
                 // 'productId' => $this->collectingMyProduct['productId'],
                 'productName' => $this->collectingMyProduct['productName'],
@@ -528,7 +410,7 @@ class EresepUGDRacikan extends Component
         try {
 
             // insert into table transaksi
-            DB::table('rstxn_rjobatracikans')
+            DB::table('rstxn_ugdobatracikans')
                 ->where('rjobat_dtl', $rjobat_dtl)
                 ->update([
                     'qty' => $r['qty'],
@@ -559,13 +441,13 @@ class EresepUGDRacikan extends Component
         // start:
         try {
             // remove into table transaksi
-            DB::table('rstxn_rjobatracikans')
+            DB::table('rstxn_ugdobatracikans')
                 ->where('rjobat_dtl', $rjObatDtl)
                 ->delete();
 
 
-            $Product = collect($this->dataDaftarPoliRJ['eresepRacikan'])->where("rjObatDtl", '!=', $rjObatDtl)->toArray();
-            $this->dataDaftarPoliRJ['eresepRacikan'] = $Product;
+            $Product = collect($this->dataDaftarUgd['eresepRacikan'])->where("rjObatDtl", '!=', $rjObatDtl)->toArray();
+            $this->dataDaftarUgd['eresepRacikan'] = $Product;
             $this->store();
 
 
@@ -587,7 +469,7 @@ class EresepUGDRacikan extends Component
 
     public function checkRjStatus()
     {
-        $lastInserted = DB::table('rstxn_rjhdrs')
+        $lastInserted = DB::table('rstxn_ugdhdrs')
             ->select('rj_status')
             ->where('rj_no', $this->rjNoRef)
             ->first();

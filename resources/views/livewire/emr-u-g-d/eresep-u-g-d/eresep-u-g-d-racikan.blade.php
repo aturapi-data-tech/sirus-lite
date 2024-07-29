@@ -7,7 +7,7 @@
     @endphp
 
     {{-- jika anamnesa kosong ngak usah di render --}}
-    {{-- @if (isset($dataDaftarPoliRJ['diagnosis'])) --}}
+    {{-- @if (isset($dataDaftarUgd['diagnosis'])) --}}
     <div class="w-full mb-1 ">
         <div id="TransaksiRawatJalan" class="p-2">
             <div class="p-2 rounded-lg bg-gray-50">
@@ -314,17 +314,17 @@
                                         </thead>
                                         <tbody class="bg-white dark:bg-gray-800">
 
-                                            @isset($dataDaftarPoliRJ['eresepRacikan'])
+                                            @isset($dataDaftarUgd['eresepRacikan'])
                                                 @php
                                                     $myPreviousRow = '';
                                                 @endphp
-                                                @foreach ($dataDaftarPoliRJ['eresepRacikan'] as $key => $eresep)
-                                                    @php
-                                                        $myRacikanBorder =
-                                                            $myPreviousRow !== $eresep['noRacikan']
-                                                                ? 'border-t-2 '
-                                                                : '';
-                                                    @endphp
+                                                @foreach ($dataDaftarUgd['eresepRacikan'] as $key => $eresep)
+                                                    @php`
+                                                                                                                $myRacikanBorder =
+                                                                                                                    $myPreviousRow !== $eresep['noRacikan']
+                                                                                                                        ? 'border-t-2 '
+                                                                                                                        : '';
+                                                                                                        @endphp ?>
 
                                                     <tr class="{{ $myRacikanBorder }} group">
 
@@ -346,9 +346,9 @@
                                                             <div>
                                                                 <x-text-input placeholder="dosis" class=""
                                                                     :disabled=$disabledPropertyRjStatus
-                                                                    x-ref="dataDaftarPoliRJeresepRacikan{{ $key }}dosis"
-                                                                    x-on:keyup.enter="$refs.dataDaftarPoliRJeresepRacikan{{ $key }}qty.focus()"
-                                                                    wire:model="dataDaftarPoliRJ.eresepRacikan.{{ $key }}.dosis" />
+                                                                    x-ref="dataDaftarUgderesepRacikan{{ $key }}dosis"
+                                                                    x-on:keyup.enter="$refs.dataDaftarUgderesepRacikan{{ $key }}qty.focus()"
+                                                                    wire:model="dataDaftarUgd.eresepRacikan.{{ $key }}.dosis" />
 
                                                             </div>
 
@@ -364,9 +364,9 @@
                                                             <div>
                                                                 <x-text-input placeholder="Jml Racikan" class=""
                                                                     :disabled=$disabledPropertyRjStatus
-                                                                    wire:model="dataDaftarPoliRJ.eresepRacikan.{{ $key }}.qty"
-                                                                    x-ref="dataDaftarPoliRJeresepRacikan{{ $key }}qty"
-                                                                    x-on:keyup.enter="$refs.dataDaftarPoliRJeresepRacikan{{ $key }}catatan.focus()" />
+                                                                    wire:model="dataDaftarUgd.eresepRacikan.{{ $key }}.qty"
+                                                                    x-ref="dataDaftarUgderesepRacikan{{ $key }}qty"
+                                                                    x-on:keyup.enter="$refs.dataDaftarUgderesepRacikan{{ $key }}catatan.focus()" />
                                                             </div>
                                                         </td>
 
@@ -377,9 +377,9 @@
                                                             <div>
                                                                 <x-text-input placeholder="Catatan" class=""
                                                                     :disabled=$disabledPropertyRjStatus
-                                                                    x-ref="dataDaftarPoliRJeresepRacikan{{ $key }}catatan"
-                                                                    x-on:keyup.enter="$refs.dataDaftarPoliRJeresepRacikan{{ $key }}catatanKhusus.focus()"
-                                                                    wire:model="dataDaftarPoliRJ.eresepRacikan.{{ $key }}.catatan" />
+                                                                    x-ref="dataDaftarUgderesepRacikan{{ $key }}catatan"
+                                                                    x-on:keyup.enter="$refs.dataDaftarUgderesepRacikan{{ $key }}catatanKhusus.focus()"
+                                                                    wire:model="dataDaftarUgd.eresepRacikan.{{ $key }}.catatan" />
 
 
                                                             </div>
@@ -391,9 +391,9 @@
                                                             <div>
                                                                 <x-text-input placeholder="Signa" class=""
                                                                     :disabled=$disabledPropertyRjStatus
-                                                                    wire:model="dataDaftarPoliRJ.eresepRacikan.{{ $key }}.catatanKhusus"
-                                                                    x-on:keyup.enter="$wire.updateProduct('{{ $dataDaftarPoliRJ['eresepRacikan'][$key]['rjObatDtl'] ? $dataDaftarPoliRJ['eresepRacikan'][$key]['rjObatDtl'] : null }}','{{ $dataDaftarPoliRJ['eresepRacikan'][$key]['dosis'] ? $dataDaftarPoliRJ['eresepRacikan'][$key]['dosis'] : null }}','{{ $dataDaftarPoliRJ['eresepRacikan'][$key]['qty'] ? $dataDaftarPoliRJ['eresepRacikan'][$key]['qty'] : null }}','{{ $dataDaftarPoliRJ['eresepRacikan'][$key]['catatan'] ? $dataDaftarPoliRJ['eresepRacikan'][$key]['catatan'] : null }}','{{ $dataDaftarPoliRJ['eresepRacikan'][$key]['catatanKhusus'] ? $dataDaftarPoliRJ['eresepRacikan'][$key]['catatanKhusus'] : null }}')"
-                                                                    x-ref="dataDaftarPoliRJeresepRacikan{{ $key }}catatanKhusus" />
+                                                                    wire:model="dataDaftarUgd.eresepRacikan.{{ $key }}.catatanKhusus"
+                                                                    x-on:keyup.enter="$wire.updateProduct('{{ $dataDaftarUgd['eresepRacikan'][$key]['rjObatDtl'] ? $dataDaftarUgd['eresepRacikan'][$key]['rjObatDtl'] : null }}','{{ $dataDaftarUgd['eresepRacikan'][$key]['dosis'] ? $dataDaftarUgd['eresepRacikan'][$key]['dosis'] : null }}','{{ $dataDaftarUgd['eresepRacikan'][$key]['qty'] ? $dataDaftarUgd['eresepRacikan'][$key]['qty'] : null }}','{{ $dataDaftarUgd['eresepRacikan'][$key]['catatan'] ? $dataDaftarUgd['eresepRacikan'][$key]['catatan'] : null }}','{{ $dataDaftarUgd['eresepRacikan'][$key]['catatanKhusus'] ? $dataDaftarUgd['eresepRacikan'][$key]['catatanKhusus'] : null }}')"
+                                                                    x-ref="dataDaftarUgderesepRacikan{{ $key }}catatanKhusus" />
 
                                                             </div>
                                                         </td>
