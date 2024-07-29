@@ -127,10 +127,10 @@
                                                 ? 'Kronis'
                                                 : 'Asuransi Lain')) }}
                                     /
-                                    {{ UGD }}
+                                    {{ 'UGD' }}
                                 @else
                                     '-' /
-                                    {{ UGD }}
+                                    {{ 'UGD' }}
                                 @endisset
 
                             </td>
