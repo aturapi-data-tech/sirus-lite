@@ -558,6 +558,10 @@ class AssessmentDokterDiagnosis extends Component
         if (isset($this->dataDaftarUgd['diagnosis']) == false) {
             $this->dataDaftarUgd['diagnosis'] = $this->diagnosis;
         }
+        // jika procedure tidak ditemukan tambah variable procedure pda array
+        if (isset($this->dataDaftarUgd['procedure']) == false) {
+            $this->dataDaftarUgd['procedure'] = $this->procedure;
+        }
     }
 
 
