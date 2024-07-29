@@ -98,19 +98,8 @@
 
 
 
-
-
-
-                {{--  --}}
-                {{-- buat komponen cetak eresep untuk igd PR --}}
-                {{--  --}}
-                {{--  --}}
-                {{--  --}}
-                {{--  --}}
-                {{--  --}}
-                {{--  --}}
-                {{-- <livewire:cetak.cetak-eresep-u-g-d :rjNoRef="$rjNoRef"
-                    wire:key="cetak.cetak-eresep-u-g-d-{{ $rjNoRef }}"> --}}
+                <livewire:cetak.cetak-eresep-u-g-d :rjNoRef="$rjNoRef"
+                    wire:key="cetak.cetak-eresep-u-g-d-{{ $rjNoRef }}">
 
             </div>
             @error('dataDaftarUgd.perencanaan.pengkajianMedis.drPemeriksa')
