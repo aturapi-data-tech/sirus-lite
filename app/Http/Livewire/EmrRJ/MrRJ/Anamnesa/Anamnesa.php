@@ -665,6 +665,7 @@ class Anamnesa extends Component
                     "rute" => $this->rekonsiliasiObat['rute']
                 ];
 
+                $this->store();
                 // reset rekonsiliasiObat
                 $this->reset(['rekonsiliasiObat']);
             } else {
@@ -680,6 +681,7 @@ class Anamnesa extends Component
 
         $rekonsiliasiObat = collect($this->dataDaftarPoliRJ['anamnesa']['rekonsiliasiObat'])->where("namaObat", '!=', $namaObat)->toArray();
         $this->dataDaftarPoliRJ['anamnesa']['rekonsiliasiObat'] = $rekonsiliasiObat;
+        $this->store();
     }
 
 

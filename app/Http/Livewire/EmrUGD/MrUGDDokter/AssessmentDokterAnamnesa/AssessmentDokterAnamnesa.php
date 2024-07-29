@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\EmrUGD\MrUGD\Anamnesa;
+namespace App\Http\Livewire\EmrUGD\MrUGDDokter\AssessmentDokterAnamnesa;
 
 use Illuminate\Support\Facades\DB;
 
@@ -10,15 +10,17 @@ use Carbon\Carbon;
 
 use Spatie\ArrayToXml\ArrayToXml;
 use App\Http\Traits\EmrUGD\EmrUGDTrait;
-use App\Http\Traits\customErrorMessagesTrait;
 
-class Anamnesa extends Component
+
+
+class AssessmentDokterAnamnesa extends Component
 {
-    use WithPagination, EmrUGDTrait, customErrorMessagesTrait;
+    use WithPagination, EmrUGDTrait;
 
     // listener from blade////////////////
     protected $listeners = [
-        'syncronizeAssessmentPerawatUGDFindData' => 'mount'
+        'storeAssessmentDokterUGD' => 'store',
+        'syncronizeAssessmentDokterUGDFindData' => 'mount'
     ];
 
 
@@ -372,7 +374,7 @@ class Anamnesa extends Component
         // Logic update mode start //////////
         $this->updateDataUgd($this->dataDaftarUgd['rjNo']);
 
-        $this->emit('syncronizeAssessmentPerawatUGDFindData');
+        $this->emit('syncronizeAssessmentDokterUGDFindData');
     }
 
     private function updateDataUgd($rjNo): void
@@ -535,7 +537,7 @@ class Anamnesa extends Component
     {
 
         return view(
-            'livewire.emr-u-g-d.mr-u-g-d.anamnesa.anamnesa',
+            'livewire.emr-u-g-d.mr-u-g-d-dokter.assessment-dokter-anamnesa.assessment-dokter-anamnesa',
             [
                 // 'RJpasiens' => $query->paginate($this->limitPerPage),
                 'myTitle' => 'Anamnesa',

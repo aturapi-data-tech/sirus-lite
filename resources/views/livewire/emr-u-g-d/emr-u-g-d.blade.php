@@ -137,6 +137,10 @@
                 @include('livewire.emr-u-g-d.create-emr-u-g-d')
             @endif
 
+            @if ($isOpenDokter)
+                @include('livewire.emr-u-g-d.create-emr-u-g-d-dokter')
+            @endif
+
             {{-- @if ($isOpenInap)
                 @include('livewire.emr-u-g-d.create-emr-u-g-d-inap')
             @endif --}}
@@ -400,15 +404,9 @@
                                                         </li>
                                                     @endrole
                                                     @role('Dokter')
-                                                        {{-- <li>
-                                                            <x-dropdown-link
-                                                                wire:click="editDokter('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
-                                                                {{ __('Assessment Dokter') }}
-                                                            </x-dropdown-link>
-                                                        </li> --}}
                                                         <li>
                                                             <x-dropdown-link
-                                                                wire:click="edit('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
+                                                                wire:click="editDokter('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
                                                                 {{ __('Assessment Dokter') }}
                                                             </x-dropdown-link>
                                                         </li>

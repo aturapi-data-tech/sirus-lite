@@ -8,7 +8,7 @@
             <div class="mb-2 ">
                 <x-text-input-area id="dataDaftarUgd.anamnesa.riwayatPenyakitDahulu.riwayatPenyakitDahulu"
                     placeholder="Riwayat Perjalanan Penyakit" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.anamnesa.riwayatPenyakitDahulu.riwayatPenyakitDahulu'))"
-                    :disabled=$disabledPropertyRjStatus :rows=7
+                    :disabled=$disabledPropertyRjStatus :rows=3
                     wire:model.debounce.500ms="dataDaftarUgd.anamnesa.riwayatPenyakitDahulu.riwayatPenyakitDahulu" />
 
             </div>
@@ -24,7 +24,7 @@
             <div class="mb-2 ">
                 <x-text-input-area id="dataDaftarUgd.anamnesa.alergi.alergi"
                     placeholder="Jenis Alergi / Alergi [Makanan / Obat / Udara]" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.anamnesa.alergi.alergi'))"
-                    :disabled=$disabledPropertyRjStatus :rows=7
+                    :disabled=$disabledPropertyRjStatus :rows=3
                     wire:model.debounce.500ms="dataDaftarUgd.anamnesa.alergi.alergi" />
 
             </div>
