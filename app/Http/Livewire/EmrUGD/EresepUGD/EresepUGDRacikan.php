@@ -25,7 +25,7 @@ class EresepUGDRacikan extends Component
 
     // listener from blade////////////////
     protected $listeners = [
-        'storeAssessmentDokterRJ' => 'store',
+        'storeAssessmentDokterUGD' => 'store',
         'syncronizeAssessmentDokterUGDFindData' => 'mount',
         'syncronizeAssessmentPerawatUGDFindData' => 'mount'
 
