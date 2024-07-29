@@ -4,7 +4,7 @@
 <head>
     <style>
         @page {
-            size: 21cm 15cm;
+            size: 21cm 18cm;
             margin: 8px;
         }
     </style>
