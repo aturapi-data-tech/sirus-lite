@@ -341,6 +341,10 @@ class EmrUGD extends Component
             'ermMenuId' => 'perencanaan',
             'ermMenuName' => 'Perencanaan'
         ],
+        [
+            'ermMenuId' => 'administrasi',
+            'ermMenuName' => 'Administrasi'
+        ],
         // [
         //     'ermMenuId' => 'cppt',
         //     'ermMenuName' => 'CPPT'

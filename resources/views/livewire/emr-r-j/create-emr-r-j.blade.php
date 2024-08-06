@@ -90,7 +90,7 @@
 
                     <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50"
                         :class="{
-                            'active': activeTab === 'diagnosis'
+                            'active': activeTab === 'penilaian'
                         }"
                         x-show.transition.in.opacity.duration.600="activeTab === 'penilaian'">
                         <livewire:emr-r-j.mr-r-j.penilaian.penilaian :wire:key="'content-penilaianRj'"

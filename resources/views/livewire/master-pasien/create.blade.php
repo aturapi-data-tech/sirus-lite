@@ -423,6 +423,32 @@
                     <div id="AlamatIdentitas" class="flex ">
                         <x-border-form :title="__('Identitas')" :align="__('start')" :bgcolor="__('bg-gray-50')" class="mr-2">
 
+                            <div>
+                                <x-input-label for="UUIDidentitas" :value="__('patientUuid')" :required="__($errors->has('dataPasien.pasien.identitas.patientUuid'))" />
+
+                                <div class="grid grid-cols-4 gap-2">
+                                    <div class="flex items-center col-span-3 mb-2">
+                                        <x-text-input id="UUIDidentitas" placeholder="patientUuid" class="mt-1 ml-2"
+                                            :errorshas="__($errors->has('dataPasien.pasien.identitas.patientUuid'))" :disabled=true
+                                            wire:model.debounce.500ms="dataPasien.pasien.identitas.patientUuid" />
+                                    </div>
+
+                                    <div wire:loading wire:target="UpdatepatientUuid">
+                                        <x-loading />
+                                    </div>
+
+                                    <x-green-button :disabled=$disabledProperty
+                                        wire:click.prevent="UpdatepatientUuid('{{ $dataPasien['pasien']['identitas']['nik'] }}')"
+                                        type="button" wire:loading.remove>
+                                        UUID Pasien
+                                    </x-green-button>
+                                </div>
+
+                                @error('dataPasien.pasien.identitas.patientUuid')
+                                    <x-input-error :messages=$message />
+                                @enderror
+                            </div>
+
                             <div class="grid grid-cols-2">
                                 {{-- grid 1 Identitas --}}
                                 <div>
@@ -657,8 +683,8 @@
                                     <x-text-input placeholder="RW [3digit]" class="mt-1 ml-2 sm:w-1/3"
                                         :errorshas="__($errors->has('dataPasien.pasien.domisil.rw'))" :disabled=$disabledProperty
                                         wire:model.debounce.500ms="dataPasien.pasien.domisil.rw" />
-                                    <x-text-input placeholder="Kode Pos" class="mt-1 ml-2 sm:w-1/3" :errorshas="__($errors->has('dataPasien.pasien.domisil.kodepos'))"
-                                        :disabled=$disabledProperty
+                                    <x-text-input placeholder="Kode Pos" class="mt-1 ml-2 sm:w-1/3"
+                                        :errorshas="__($errors->has('dataPasien.pasien.domisil.kodepos'))" :disabled=$disabledProperty
                                         wire:model.debounce.500ms="dataPasien.pasien.domisil.kodepos" />
                                 </div>
                                 {{-- Error Message Start --}}

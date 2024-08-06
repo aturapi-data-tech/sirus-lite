@@ -10,6 +10,7 @@ use Carbon\Carbon;
 
 use App\Http\Traits\customErrorMessagesTrait;
 use App\Http\Traits\BPJS\VclaimTrait;
+use App\Http\Traits\BPJS\SatuSehatTrait;
 
 
 use Spatie\Permission\Models\Role;
@@ -1469,6 +1470,7 @@ class MasterPasien extends Component
             'kk' => strtoupper($this->dataPasien['pasien']['hubungan']['namaPenanggungJawab']),
             'nyonya' => strtoupper($this->dataPasien['pasien']['hubungan']['namaIbu']),
             // 'no_kk' => $this->dataPasien['pasien']['identitas']['nik'],
+            'patient_uuid' => $this->dataPasien['pasien']['identitas']['patientUuid'],
             'address' => $this->dataPasien['pasien']['identitas']['alamat'],
             'des_id' => $this->dataPasien['pasien']['identitas']['desaId'],
             'rt' => $this->dataPasien['pasien']['identitas']['rt'],
@@ -1510,6 +1512,7 @@ class MasterPasien extends Component
                 'kk' => strtoupper($this->dataPasien['pasien']['hubungan']['namaPenanggungJawab']),
                 'nyonya' => strtoupper($this->dataPasien['pasien']['hubungan']['namaIbu']),
                 // 'no_kk' => $this->dataPasien['pasien']['identitas']['nik'],
+                'patient_uuid' => $this->dataPasien['pasien']['identitas']['patientUuid'],
                 'address' => $this->dataPasien['pasien']['identitas']['alamat'],
                 'des_id' => $this->dataPasien['pasien']['identitas']['desaId'],
                 'rt' => $this->dataPasien['pasien']['identitas']['rt'],
@@ -1933,7 +1936,39 @@ class MasterPasien extends Component
     }
     // delete record end////////////////
 
+    public function UpdatepatientUuid(string $nik = '')
+    {
+        $messages = array(
+            'required' => 'Data NIK tidak boleh kosong.', // mencari referensi pada table tertentu
+        );
 
+        $rules = ['dataPasien.pasien.identitas.nik' => 'bail|required|digits:16'];
+
+        // Proses Validasi///////////////////////////////////////////
+        try {
+            $this->validate($rules, $messages);
+
+            $PatientByNIK = SatuSehatTrait::PatientByNIK($nik);
+
+            // Jika uuid tidak ditemukan
+            if (!isset($PatientByNIK->getOriginalContent()['response']['entry'][0]['resource']['id'])) {
+                $this->emit('toastr-error', 'UUID tidak dapat ditemukan.' . $PatientByNIK->getOriginalContent()['metadata']['message']);
+                return;
+            }
+
+            $this->dataPasien['pasien']['identitas']['patientUuid'] = $PatientByNIK->getOriginalContent()['response']['entry'][0]['resource']['id'];
+            $this->store();
+            $this->emit('toastr-success', $PatientByNIK->getOriginalContent()['response']['entry'][0]['resource']['id'] . ' / ' . $PatientByNIK->getOriginalContent()['response']['entry'][0]['resource']['name'][0]['text']);
+
+            // dd($PatientByNIK->getOriginalContent());
+            // dd($PatientByNIK->getOriginalContent()['response']['entry'][0]['resource']['id']);
+            // dd($PatientByNIK->getOriginalContent()['response']['entry'][0]['resource']['name'][0]['text']);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // dd($validator->fails());
+            $this->emit('toastr-error', 'Errors "' . $e->getMessage());
+            return;
+        }
+    }
 
     public function mount()
     {
