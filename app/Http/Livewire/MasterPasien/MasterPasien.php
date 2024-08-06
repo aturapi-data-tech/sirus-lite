@@ -150,6 +150,7 @@ class MasterPasien extends Component
             "identitas" => [
                 "nik" => "", //harus diisi
                 "idbpjs" => "",
+                "patientUuid" => "", //UUID SATUSEHAT
                 "pasport" => "", //untuk WNA / WNI yang memiliki passport
                 "alamat" => "", //harus diisi
                 "rt" => "", //harus diisi
@@ -1470,7 +1471,7 @@ class MasterPasien extends Component
             'kk' => strtoupper($this->dataPasien['pasien']['hubungan']['namaPenanggungJawab']),
             'nyonya' => strtoupper($this->dataPasien['pasien']['hubungan']['namaIbu']),
             // 'no_kk' => $this->dataPasien['pasien']['identitas']['nik'],
-            'patient_uuid' => $this->dataPasien['pasien']['identitas']['patientUuid'],
+            'patient_uuid' => isset($this->dataPasien['pasien']['identitas']['patientUuid']) ? $this->dataPasien['pasien']['identitas']['patientUuid'] : '',
             'address' => $this->dataPasien['pasien']['identitas']['alamat'],
             'des_id' => $this->dataPasien['pasien']['identitas']['desaId'],
             'rt' => $this->dataPasien['pasien']['identitas']['rt'],
@@ -1512,7 +1513,7 @@ class MasterPasien extends Component
                 'kk' => strtoupper($this->dataPasien['pasien']['hubungan']['namaPenanggungJawab']),
                 'nyonya' => strtoupper($this->dataPasien['pasien']['hubungan']['namaIbu']),
                 // 'no_kk' => $this->dataPasien['pasien']['identitas']['nik'],
-                'patient_uuid' => $this->dataPasien['pasien']['identitas']['patientUuid'],
+                'patient_uuid' => isset($this->dataPasien['pasien']['identitas']['patientUuid']) ? $this->dataPasien['pasien']['identitas']['patientUuid'] : '',
                 'address' => $this->dataPasien['pasien']['identitas']['alamat'],
                 'des_id' => $this->dataPasien['pasien']['identitas']['desaId'],
                 'rt' => $this->dataPasien['pasien']['identitas']['rt'],
