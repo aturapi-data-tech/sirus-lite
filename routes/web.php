@@ -4,6 +4,9 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Livewire\MasterPasien\MasterPasien;
+
+use App\Http\Livewire\MasterPoli\MasterPoli;
+
 use App\Http\Livewire\PendaftaranMandiriPasienPoli\PendaftaranMandiriPasienPoli;
 use App\Http\Livewire\DaftarRJ\DaftarRJ;
 use App\Http\Livewire\DaftarUGD\DaftarUGD;
@@ -68,6 +71,10 @@ Route::group(['middleware' => ['role:Admin|Mr|Perawat|Dokter|Apoteker']], functi
 
     // Master Pasien
     Route::get('MasterPasien', MasterPasien::class)->middleware('auth')->name('MasterPasien');
+
+    // Master Poli
+    Route::get('MasterPoli', MasterPoli::class)->middleware('auth')->name('MasterPoli');
+
 
 
     // RJ

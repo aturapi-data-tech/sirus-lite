@@ -67,6 +67,12 @@
                         <ul id="dropdown-layoutsRJ" class="hidden py-2 space-y-2">
                             <li>
                                 @role(['Mr', 'Admin'])
+                                    <x-nav-link class="pl-4" :href="route('MasterPoli')" :active="request()->routeIs('MasterPoli')">
+                                        {{ __('Master Poli') }}
+                                    </x-nav-link>
+                                @endrole
+
+                                @role(['Mr', 'Admin'])
                                     <x-nav-link class="pl-4" :href="route('MasterPasien')" :active="request()->routeIs('MasterPasien')">
                                         {{ __('Pendaftaran Pasien Baru') }}
                                     </x-nav-link>

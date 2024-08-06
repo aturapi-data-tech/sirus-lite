@@ -5,7 +5,7 @@ namespace App\Http\Traits;
 
 trait customErrorMessagesTrait
 {
-    public static function messages()
+    public static function messages(): array
     {
         $messages = array(
             'required' => 'Data :attribute tidak boleh kosong.', //data tdak boleh kosong
@@ -14,7 +14,10 @@ trait customErrorMessagesTrait
             'min' => 'Data berisi minimal :min digit.', //untuk angka /character min length
             'max' => 'Data berisi maximl :max digit.', //untuk angka /character max length
             'exists' => 'Data :attribute tidak ada didalam data master', // mencari referensi pada table tertentu
-            'date_format' => 'Format :attribute tgl dd/mm/yyyy' //format tgl dd/mm/yyyy
+            'date_format' => 'Format :attribute tgl dd/mm/yyyy', //format tgl dd/mm/yyyy
+            'numeric' => 'Format :attribute harus berupa angka.', //data berupa angka
+            'unique' => 'Data :attribute sudah terdaftar pada di dalam master.' //data berupa angka
+
         );
 
         return $messages;

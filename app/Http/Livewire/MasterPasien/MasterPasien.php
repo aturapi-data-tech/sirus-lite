@@ -1939,33 +1939,7 @@ class MasterPasien extends Component
 
     public function UpdatepatientUuid(string $nik = '')
     {
-        // $accesstoken = SatuSehatTrait::OAuth2();
 
-        // dd($accesstoken->getOriginalContent());
-
-        // $PatientByNIK = SatuSehatTrait::PatientByNIK('3504111211890002');
-        // dd($PatientByNIK->getOriginalContent());
-
-        // $PractitionerByNIK = SatuSehatTrait::PractitionerByNIK('3504111211890002');
-        // dd($PractitionerByNIK->getOriginalContent());
-
-        // $encounter = new Encounter;
-        // // $uuid = Uuid::uuid4()->toString();
-        // $rjNo = 1;
-        // $encounter->addRegistrationId($rjNo); // unique string free text (increments / UUID)
-
-        // $encounter->setArrived(Carbon::now()->subMinutes(15)->toDateTimeString());
-        // $encounter->setInProgress(Carbon::now()->subMinutes(5)->toDateTimeString(), Carbon::now()->toDateTimeString());
-        // $encounter->setFinished(Carbon::now()->toDateTimeString());
-
-        // $encounter->addRegistrationId('123456789'); // unique string free text (increments / UUID)
-        // $encounter->setConsultationMethod('RAJAL'); // RAJAL, IGD, RANAP, HOMECARE, TELEKONSULTASI
-        // $encounter->setSubject('P12312312123', 'TESTER'); // ID SATUSEHAT Pasien dan Nama SATUSEHAT
-        // $encounter->addParticipant('102938712983', 'dr. X'); // ID SATUSEHAT Dokter, Nama Dokter
-        // $encounter->addLocation('A1-001', 'Ruang Poli A1'); // ID SATUSEHAT Location, Nama Poli
-        // $encounter->addDiagnosis($rjNo, 'J06.9'); // ID SATUSEHAT Condition, Kode ICD10
-        // // $encounter = $encounter->json();
-        // dd($encounter);
         $messages = array(
             'required' => 'Data NIK tidak boleh kosong.', // mencari referensi pada table tertentu
         );

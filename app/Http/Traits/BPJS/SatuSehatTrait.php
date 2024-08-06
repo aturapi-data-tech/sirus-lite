@@ -175,4 +175,53 @@ trait SatuSehatTrait
             return self::prosesResponse($e->getMessage(), [], 408, $url, null);
         }
     }
+
+    // nakes Location
+    public static function getLocation($poliDesc)
+    {
+        $access_token = self::access_token();
+
+        try {
+
+            $url = env('SATUSEHAT_BASE_URL') . "Location?name=" . $poliDesc;
+            // $headers = self::signature();
+            $headers['Authorization'] = 'Bearer ' . $access_token;
+
+
+            $response = Http::timeout(10)
+                ->withHeaders($headers)
+                ->send(
+                    'GET',
+                    $url
+                );
+            $myResponse = json_decode($response->getBody()->getContents(), true);
+            $myResponseJson = json_encode($myResponse, true);
+            return self::prosesResponse($myResponseJson, $myResponse, $response->status(), $url, $response->transferStats->getTransferTime());
+        } catch (Exception $e) {
+            return self::prosesResponse($e->getMessage(), [], 408, $url, null);
+        }
+    }
+
+    public static function postLocation($location)
+    {
+        $access_token = self::access_token();
+
+        try {
+
+            $url = env('SATUSEHAT_BASE_URL') . "Location";
+            // $headers = self::signature();
+            $headers['Authorization'] = 'Bearer ' . $access_token;
+
+
+            $response = Http::timeout(10)
+                ->withHeaders($headers)
+                ->post($url, $location);
+
+            $myResponse = json_decode($response->getBody()->getContents(), true);
+            $myResponseJson = json_encode($myResponse, true);
+            return self::prosesResponse($myResponseJson, $myResponse, $response->status(), $url, $response->transferStats->getTransferTime());
+        } catch (Exception $e) {
+            return self::prosesResponse($e->getMessage(), [], 408, $url, null);
+        }
+    }
 }
