@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Livewire\MasterPasien\MasterPasien;
 
 use App\Http\Livewire\MasterPoli\MasterPoli;
+use App\Http\Livewire\MasterDokter\MasterDokter;
+
 
 use App\Http\Livewire\PendaftaranMandiriPasienPoli\PendaftaranMandiriPasienPoli;
 use App\Http\Livewire\DaftarRJ\DaftarRJ;
@@ -74,6 +76,9 @@ Route::group(['middleware' => ['role:Admin|Mr|Perawat|Dokter|Apoteker']], functi
 
     // Master Poli
     Route::get('MasterPoli', MasterPoli::class)->middleware('auth')->name('MasterPoli');
+
+    // Master Dokter
+    Route::get('MasterDokter', MasterDokter::class)->middleware('auth')->name('MasterDokter');
 
 
 

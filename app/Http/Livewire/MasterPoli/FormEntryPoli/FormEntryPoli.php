@@ -187,10 +187,7 @@ class FormEntryPoli extends Component
 
     public function mount()
     {
-        // Jika poliId ditemukan maka cari
-        if ($this->isOpenMode == 'update') {
-            $this->findData($this->poliId);
-        }
+        $this->findData($this->poliId);
     }
 
     public function render()

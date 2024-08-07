@@ -73,6 +73,12 @@
                                 @endrole
 
                                 @role(['Mr', 'Admin'])
+                                    <x-nav-link class="pl-4" :href="route('MasterDokter')" :active="request()->routeIs('MasterDokter')">
+                                        {{ __('Master Dokter') }}
+                                    </x-nav-link>
+                                @endrole
+
+                                @role(['Mr', 'Admin'])
                                     <x-nav-link class="pl-4" :href="route('MasterPasien')" :active="request()->routeIs('MasterPasien')">
                                         {{ __('Pendaftaran Pasien Baru') }}
                                     </x-nav-link>
