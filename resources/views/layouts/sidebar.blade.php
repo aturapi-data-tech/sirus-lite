@@ -90,7 +90,7 @@
                                     </x-nav-link>
                                 @endrole
 
-                                @role(['Mr', 'Admin'])
+                                @role(['Perawat', 'Mr', 'Admin'])
                                     <x-nav-link class="pl-4" :href="route('daftarRJ')" :active="request()->routeIs('daftarRJ')">
                                         {{ __('Pendaftaran Rawat Jalan') }}
                                     </x-nav-link>
