@@ -8,7 +8,6 @@ use Livewire\WithPagination;
 use Illuminate\Support\Facades\Validator;
 
 use App\Http\Traits\customErrorMessagesTrait;
-use App\Http\Traits\BPJS\SatuSehatTrait;
 
 class MasterPoli extends Component
 {

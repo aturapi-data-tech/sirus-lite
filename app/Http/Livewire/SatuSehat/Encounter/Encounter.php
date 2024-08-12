@@ -5,7 +5,6 @@ namespace App\Http\Livewire\SatuSehat\Encounter;
 use Illuminate\Support\Facades\DB;
 
 
-
 class Encounter
 {
     public array $encounter = ['resourceType' => 'Encounter'];
@@ -245,24 +244,6 @@ class Encounter
             $this->setServiceProvider();
         }
 
-        return json_encode($this->encounter, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+        return $this->encounter;
     }
-
-    // public function post()
-    // {
-    //     $payload = $this->json();
-    //     [$statusCode, $res] = $this->ss_post('Encounter', $payload);
-
-    //     return [$statusCode, $res];
-    // }
-
-    // public function put($id)
-    // {
-    //     $this->encounter['id'] = $id;
-
-    //     $payload = $this->json();
-    //     [$statusCode, $res] = $this->ss_put('Encounter', $id, $payload);
-
-    //     return [$statusCode, $res];
-    // }
 }

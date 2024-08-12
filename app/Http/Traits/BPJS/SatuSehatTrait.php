@@ -90,9 +90,9 @@ trait SatuSehatTrait
         $secretId = env('SATUSEHAT_SECRET_ID');
         $headers = self::signature();
 
+        $url = env('SATUSEHAT_AUTH_URL') . "accesstoken?grant_type=client_credentials";
         try {
 
-            $url = env('SATUSEHAT_AUTH_URL') . "accesstoken?grant_type=client_credentials";
             $response = Http::timeout(10)
                 ->withHeaders($headers)
                 ->send('POST', $url, [
@@ -129,9 +129,9 @@ trait SatuSehatTrait
     {
         $access_token = self::access_token();
 
+        $url = env('SATUSEHAT_BASE_URL') . "Patient?identifier=https://fhir.kemkes.go.id/id/nik|" . $nik;
         try {
 
-            $url = env('SATUSEHAT_BASE_URL') . "Patient?identifier=https://fhir.kemkes.go.id/id/nik|" . $nik;
             // $headers = self::signature();
             $headers['Authorization'] = 'Bearer ' . $access_token;
 
@@ -155,9 +155,9 @@ trait SatuSehatTrait
     {
         $access_token = self::access_token();
 
+        $url = env('SATUSEHAT_BASE_URL') . "Practitioner?identifier=https://fhir.kemkes.go.id/id/nik|" . $nik;
         try {
 
-            $url = env('SATUSEHAT_BASE_URL') . "Practitioner?identifier=https://fhir.kemkes.go.id/id/nik|" . $nik;
             // $headers = self::signature();
             $headers['Authorization'] = 'Bearer ' . $access_token;
 
@@ -181,9 +181,9 @@ trait SatuSehatTrait
     {
         $access_token = self::access_token();
 
+        $url = env('SATUSEHAT_BASE_URL') . "Location?name=" . $poliDesc;
         try {
 
-            $url = env('SATUSEHAT_BASE_URL') . "Location?name=" . $poliDesc;
             // $headers = self::signature();
             $headers['Authorization'] = 'Bearer ' . $access_token;
 
@@ -202,20 +202,43 @@ trait SatuSehatTrait
         }
     }
 
-    public static function postLocation($location)
+    public static function postLocation($Location)
     {
         $access_token = self::access_token();
 
+        $url = env('SATUSEHAT_BASE_URL') . "Location";
         try {
 
-            $url = env('SATUSEHAT_BASE_URL') . "Location";
             // $headers = self::signature();
             $headers['Authorization'] = 'Bearer ' . $access_token;
 
 
             $response = Http::timeout(10)
                 ->withHeaders($headers)
-                ->post($url, $location);
+                ->post($url, $Location);
+
+            $myResponse = json_decode($response->getBody()->getContents(), true);
+            $myResponseJson = json_encode($myResponse, true);
+            return self::prosesResponse($myResponseJson, $myResponse, $response->status(), $url, $response->transferStats->getTransferTime());
+        } catch (Exception $e) {
+            return self::prosesResponse($e->getMessage(), [], 408, $url, null);
+        }
+    }
+
+    public static function postBundleEncounterCondition($Bundle)
+    {
+        $access_token = self::access_token();
+
+        $url = env('SATUSEHAT_BASE_URL');
+        try {
+
+            // $headers = self::signature();
+            $headers['Authorization'] = 'Bearer ' . $access_token;
+
+
+            $response = Http::timeout(10)
+                ->withHeaders($headers)
+                ->post($url, $Bundle);
 
             $myResponse = json_decode($response->getBody()->getContents(), true);
             $myResponseJson = json_encode($myResponse, true);

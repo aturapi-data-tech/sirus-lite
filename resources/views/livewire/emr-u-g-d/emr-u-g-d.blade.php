@@ -94,7 +94,7 @@
 
                             @foreach ($myTopBar['drOptions'] as $dr)
                                 <x-dropdown-link
-                                    wire:click="settermyTopBardrOptions('{{ $dr['drId'] }}','{{ $dr['drName'] }}')">
+                                    wire:click="settermyTopBardrOptions('{{ $dr['drId'] }}','{{ addslashes($dr['drName']) }}')">
                                     {{ __($dr['drName']) }}
                                 </x-dropdown-link>
                             @endforeach

@@ -1,34 +1,33 @@
 <?php
 
-namespace App\Http\Traits\EmrUGD;
+namespace App\Http\Traits\EmrRJ;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Exception;
 
-
-trait EmrUGDTrait
+trait EmrRJTrait
 {
 
-    protected function findDataUGD($rjno): array
+    protected function findDataRJ($rjno): array
     {
         try {
-            $findData = DB::table('rsview_ugdkasir')
-                ->select('datadaftarugd_json', 'vno_sep')
+            $findData = DB::table('rsview_rjkasir')
+                ->select('datadaftarpolirj_json', 'vno_sep')
                 ->where('rj_no', $rjno)
                 ->first();
 
-            $datadaftarugd_json = isset($findData->datadaftarugd_json) ? $findData->datadaftarugd_json : null;
+            $datadaftarpolirj_json = isset($findData->datadaftarpolirj_json) ? $findData->datadaftarpolirj_json : null;
             // if meta_data_pasien_json = null
             // then cari Data Pasien By Key Collection (exception when no data found)
             //
             // else json_decode
-            if ($datadaftarugd_json) {
-                $dataDaftarUgd = json_decode($findData->datadaftarugd_json, true);
+            if ($datadaftarpolirj_json) {
+                $dataDaftarRJ = json_decode($findData->datadaftarpolirj_json, true);
             } else {
 
                 $this->emit('toastr-error', "Data tidak dapat di proses json.");
-                $dataDaftarUgd = DB::table('rsview_ugdkasir')
+                $dataDaftarRJ = DB::table('rsview_rjkasir')
                     ->select(
                         DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
                         DB::raw("to_char(rj_date,'yyyymmddhh24miss') AS rj_date1"),
@@ -40,7 +39,7 @@ trait EmrUGDTrait
                         'thn',
                         DB::raw("to_char(birth_date,'dd/mm/yyyy') AS birth_date"),
                         'poli_id',
-                        // 'poli_desc',
+                        'poli_desc',
                         'dr_id',
                         'dr_name',
                         'klaim_id',
@@ -52,8 +51,8 @@ trait EmrUGDTrait
                         'nobooking',
                         'push_antrian_bpjs_status',
                         'push_antrian_bpjs_json',
-                        // 'kd_dr_bpjs',
-                        // 'kd_poli_bpjs',
+                        'kd_dr_bpjs',
+                        'kd_poli_bpjs',
                         'rj_status',
                         'txn_status',
                         'erm_status',
@@ -61,31 +60,31 @@ trait EmrUGDTrait
                     ->where('rj_no', '=', $rjno)
                     ->first();
 
-                $dataDaftarUgd = [
-                    "regNo" => "" . $dataDaftarUgd->reg_no . "",
+                $dataDaftarRJ = [
+                    "regNo" => "" . $dataDaftarRJ->reg_no . "",
 
-                    "drId" => "" . $dataDaftarUgd->dr_id . "",
-                    "drDesc" => "" . $dataDaftarUgd->dr_name . "",
+                    "drId" => "" . $dataDaftarRJ->dr_id . "",
+                    "drDesc" => "" . $dataDaftarRJ->dr_name . "",
 
-                    "poliId" => "" . $dataDaftarUgd->poli_id . "",
-                    // "poliDesc" => "" . $dataDaftarUgd->poli_desc . "",
+                    "poliId" => "" . $dataDaftarRJ->poli_id . "",
+                    "poliDesc" => "" . $dataDaftarRJ->poli_desc . "",
 
-                    // "kddrbpjs" => "" . $dataDaftarUgd->kd_dr_bpjs . "",
-                    // "kdpolibpjs" => "" . $dataDaftarUgd->kd_poli_bpjs . "",
+                    "kddrbpjs" => "" . $dataDaftarRJ->kd_dr_bpjs . "",
+                    "kdpolibpjs" => "" . $dataDaftarRJ->kd_poli_bpjs . "",
 
-                    "rjDate" => "" . $dataDaftarUgd->rj_date . "",
-                    "rjNo" => "" . $dataDaftarUgd->rj_no . "",
-                    "shift" => "" . $dataDaftarUgd->shift . "",
-                    "noAntrian" => "" . $dataDaftarUgd->no_antrian . "",
-                    "noBooking" => "" . $dataDaftarUgd->nobooking . "",
+                    "rjDate" => "" . $dataDaftarRJ->rj_date . "",
+                    "rjNo" => "" . $dataDaftarRJ->rj_no . "",
+                    "shift" => "" . $dataDaftarRJ->shift . "",
+                    "noAntrian" => "" . $dataDaftarRJ->no_antrian . "",
+                    "noBooking" => "" . $dataDaftarRJ->nobooking . "",
                     "slCodeFrom" => "02",
                     "passStatus" => "",
-                    "rjStatus" => "" . $dataDaftarUgd->rj_status . "",
-                    "txnStatus" => "" . $dataDaftarUgd->txn_status . "",
-                    "ermStatus" => "" . $dataDaftarUgd->erm_status . "",
+                    "rjStatus" => "" . $dataDaftarRJ->rj_status . "",
+                    "txnStatus" => "" . $dataDaftarRJ->txn_status . "",
+                    "ermStatus" => "" . $dataDaftarRJ->erm_status . "",
                     "cekLab" => "0",
                     "kunjunganInternalStatus" => "0",
-                    "noReferensi" => "" . $dataDaftarUgd->reg_no . "",
+                    "noReferensi" => "" . $dataDaftarRJ->reg_no . "",
                     "postInap" => [],
                     "internal12" => "1",
                     "internal12Desc" => "Faskes Tingkat 1",
@@ -114,7 +113,7 @@ trait EmrUGDTrait
                     "taskIdPelayanan" => [
                         "taskId1" => "",
                         "taskId2" => "",
-                        "taskId3" => "" . $dataDaftarUgd->rj_date . "",
+                        "taskId3" => "" . $dataDaftarRJ->rj_date . "",
                         "taskId4" => "",
                         "taskId5" => "",
                         "taskId6" => "",
@@ -122,22 +121,63 @@ trait EmrUGDTrait
                         "taskId99" => "",
                     ],
                     'sep' => [
-                        "noSep" => "" . $dataDaftarUgd->vno_sep . "",
+                        "noSep" => "" . $dataDaftarRJ->vno_sep . "",
                         "reqSep" => [],
                         "resSep" => [],
                     ]
                 ];
             }
 
-            return $dataDaftarUgd;
+
+
+            // dataPasienRJ
+            $dataPasienRJ = DB::table('rsview_rjkasir')
+                ->select(
+
+                    'rj_no',
+                    'reg_no',
+                    'patient_uuid',
+                    'poli_uuid',
+                    'dr_uuid',
+                    'reg_name',
+                    'sex',
+                    'address',
+
+                    'poli_id',
+                    'poli_desc',
+                    'dr_id',
+                    'dr_name',
+                    'nobooking',
+                    'kd_dr_bpjs',
+                    'kd_poli_bpjs',
+                )
+                ->where('rj_no', '=', $rjno)
+                ->first();
+
+            $dataPasienRJ = [
+                "regNo" => $dataPasienRJ->reg_no,
+                "regName" => $dataPasienRJ->reg_name,
+                "patientUuid" => $dataPasienRJ->patient_uuid,
+                "drUuid" => $dataPasienRJ->dr_uuid,
+                "drName" => $dataPasienRJ->dr_name,
+                "poliUuid" => $dataPasienRJ->poli_uuid,
+                "poliDesc" => $dataPasienRJ->poli_desc,
+
+            ];
+
+
+            return ([
+                "dataDaftarRJ" => $dataDaftarRJ,
+                "dataPasienRJ" => $dataPasienRJ
+            ]);
         } catch (Exception $e) {
             return [];
         }
     }
 
-    protected function checkUGDStatus($rjNo): bool
+    protected function checkRJStatus($rjNo): bool
     {
-        $lastInserted = DB::table('rstxn_ugdhdrs')
+        $lastInserted = DB::table('rstxn_rjhdrs')
             ->select('rj_status')
             ->where('rj_no', $rjNo)
             ->first();

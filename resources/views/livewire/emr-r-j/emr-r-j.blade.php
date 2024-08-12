@@ -94,7 +94,7 @@
 
                             @foreach ($myTopBar['drOptions'] as $dr)
                                 <x-dropdown-link
-                                    wire:click="settermyTopBardrOptions('{{ $dr['drId'] }}','{{ $dr['drName'] }}')">
+                                    wire:click="settermyTopBardrOptions('{{ $dr['drId'] }}','{{ addslashes($dr['drName']) }}')">
                                     {{ __($dr['drName']) }}
                                 </x-dropdown-link>
                             @endforeach
@@ -316,7 +316,8 @@
 
                                 <div class="inline-flex">
 
-                                    <livewire:cetak.cetak-etiket :regNo="$myQData->reg_no" :wire:key="$myQData->rj_no">
+                                    <livewire:cetak.cetak-etiket :regNo="$myQData->reg_no"
+                                        :wire:key="'cetak-etiket-'.$myQData->rj_no">
 
                                         <!-- Dropdown Action menu Flowbite-->
                                         <div>
@@ -426,6 +427,11 @@
                                             </div>
                                         </div>
                                         <!-- End Dropdown Action Open menu -->
+                                        @role(['Admin', 'Mr', 'Perawat'])
+                                            <livewire:emr-r-j.post-encounter-r-j.post-encounter-r-j :rjNoRef="$myQData->rj_no"
+                                                :wire:key="'post-encounter-r-j-'.$myQData->rj_no">
+                                            @endrole
+
                                 </div>
 
                             </td>
