@@ -2,6 +2,7 @@
 
 namespace App\Http\Traits\EmrRJ;
 
+
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Exception;
