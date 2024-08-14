@@ -293,10 +293,10 @@ class LainLainRJ extends Component
 
                 "poliId" =>  $dataDaftarPoliRJ->poli_id,
                 "klaimId" => $dataDaftarPoliRJ->klaim_id,
-                // "poliDesc" =>  $dataDaftarPoliRJ->poli_desc ,
+                "poliDesc" =>  $dataDaftarPoliRJ->poli_desc,
 
-                // "kddrbpjs" =>  $dataDaftarPoliRJ->kd_dr_bpjs ,
-                // "kdpolibpjs" =>  $dataDaftarPoliRJ->kd_poli_bpjs ,
+                "kddrbpjs" =>  $dataDaftarPoliRJ->kd_dr_bpjs,
+                "kdpolibpjs" =>  $dataDaftarPoliRJ->kd_poli_bpjs,
 
                 "rjDate" =>  $dataDaftarPoliRJ->rj_date,
                 "rjNo" =>  $dataDaftarPoliRJ->rj_no,
@@ -362,9 +362,7 @@ class LainLainRJ extends Component
     }
 
 
-    private function setDataPrimer(): void
-    {
-    }
+    private function setDataPrimer(): void {}
 
 
 
