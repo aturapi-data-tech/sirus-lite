@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Validator;
 
 
 use App\Http\Traits\customErrorMessagesTrait;
+use App\Http\Traits\EmrRJ\EmrRJTrait;
+
 
 // use Illuminate\Support\Str;
 use Spatie\ArrayToXml\ArrayToXml;
@@ -19,7 +21,7 @@ use Exception;
 
 class JasaKaryawanRJ extends Component
 {
-    use WithPagination;
+    use WithPagination, EmrRJTrait;
 
 
     // listener from blade////////////////

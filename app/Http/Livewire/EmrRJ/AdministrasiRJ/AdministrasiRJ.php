@@ -9,11 +9,12 @@ use Livewire\WithPagination;
 use Carbon\Carbon;
 
 use Spatie\ArrayToXml\ArrayToXml;
+use App\Http\Traits\EmrRJ\EmrRJTrait;
 
 
 class AdministrasiRJ extends Component
 {
-    use WithPagination;
+    use WithPagination, EmrRJTrait;
 
     protected $listeners = [
         'syncronizeAssessmentDokterRJFindData' => 'sumAll',

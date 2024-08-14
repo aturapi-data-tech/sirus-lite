@@ -9,6 +9,7 @@ use Livewire\WithPagination;
 use Carbon\Carbon;
 
 use App\Http\Traits\customErrorMessagesTrait;
+use App\Http\Traits\EmrRJ\EmrRJTrait;
 
 // use Illuminate\Support\Str;
 use Spatie\ArrayToXml\ArrayToXml;
@@ -17,7 +18,7 @@ use Exception;
 
 class LainLainRJ extends Component
 {
-    use WithPagination;
+    use WithPagination, EmrRJTrait;
 
 
     // listener from blade////////////////
