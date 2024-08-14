@@ -6,33 +6,29 @@ use Illuminate\Support\Facades\DB;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-use Carbon\Carbon;
 
-use App\Http\Traits\customErrorMessagesTrait;
-use App\Http\Traits\BPJS\AntrianTrait;
-use App\Http\Traits\BPJS\VclaimTrait;
+use App\Http\Traits\EmrRJ\EmrRJTrait;
 
 
-use Illuminate\Support\Str;
 use Spatie\ArrayToXml\ArrayToXml;
 
 
 class Penilaian extends Component
 {
-    use WithPagination;
+    use WithPagination, EmrRJTrait;
 
 
     //////////////////////////////
     // Ref on top bar
     //////////////////////////////
-    public $rjNoRef = '430269';
+    public $rjNoRef;
 
 
 
     // dataDaftarPoliRJ RJ
     public $dataDaftarPoliRJ = [];
 
-    // data SKDP / penilaian=>[] 
+    // data SKDP / penilaian=>[]
     public $penilaian =
     [
         "fisikTab" => "Fisik",
@@ -388,116 +384,17 @@ class Penilaian extends Component
 
     private function findData($rjno): void
     {
+        $findDataRJ = $this->findDataRJ($rjno);
+        $this->dataDaftarPoliRJ  = $findDataRJ['dataDaftarRJ'];
 
-
-        $findData = DB::table('rsview_rjkasir')
-            ->select('datadaftarpolirj_json', 'vno_sep')
-            ->where('rj_no', $rjno)
-            ->first();
-
-
-        if ($findData->datadaftarpolirj_json) {
-            $this->dataDaftarPoliRJ = json_decode($findData->datadaftarpolirj_json, true);
-
-            // jika kontrol tidak ditemukan tambah variable kontrol pda array
-            if (isset($this->dataDaftarPoliRJ['penilaian']) == false) {
-                $this->dataDaftarPoliRJ['penilaian'] = $this->penilaian;
-            }
-        } else {
-
-            $this->emit('toastr-error', "Json Tidak ditemukan, Data sedang diproses ulang.");
-            $dataDaftarPoliRJ = DB::table('rsview_rjkasir')
-                ->select(
-                    DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
-                    DB::raw("to_char(rj_date,'yyyymmddhh24miss') AS rj_date1"),
-                    'rj_no',
-                    'reg_no',
-                    'reg_name',
-                    'sex',
-                    'address',
-                    'thn',
-                    DB::raw("to_char(birth_date,'dd/mm/yyyy') AS birth_date"),
-                    'poli_id',
-                    'poli_desc',
-                    'dr_id',
-                    'dr_name',
-                    'klaim_id',
-                    'shift',
-                    'vno_sep',
-                    'no_antrian',
-
-                    'nobooking',
-                    'push_antrian_bpjs_status',
-                    'push_antrian_bpjs_json',
-                    'kd_dr_bpjs',
-                    'kd_poli_bpjs',
-                    'rj_status',
-                    'txn_status',
-                    'erm_status',
-                )
-                ->where('rj_no', '=', $rjno)
-                ->first();
-
-            $this->dataDaftarPoliRJ = [
-                "regNo" => "" . $dataDaftarPoliRJ->reg_no . "",
-
-                "drId" => "" . $dataDaftarPoliRJ->dr_id . "",
-                "drDesc" => "" . $dataDaftarPoliRJ->dr_name . "",
-
-                "poliId" => "" . $dataDaftarPoliRJ->poli_id . "",
-                "poliDesc" => "" . $dataDaftarPoliRJ->poli_desc . "",
-
-                "kddrbpjs" => "" . $dataDaftarPoliRJ->kd_dr_bpjs . "",
-                "kdpolibpjs" => "" . $dataDaftarPoliRJ->kd_poli_bpjs . "",
-
-                "rjDate" => "" . $dataDaftarPoliRJ->rj_date . "",
-                "rjNo" => "" . $dataDaftarPoliRJ->rj_no . "",
-                "shift" => "" . $dataDaftarPoliRJ->shift . "",
-                "noAntrian" => "" . $dataDaftarPoliRJ->no_antrian . "",
-                "noBooking" => "" . $dataDaftarPoliRJ->nobooking . "",
-                "slCodeFrom" => "02",
-                "passStatus" => "",
-                "rjStatus" => "" . $dataDaftarPoliRJ->rj_status . "",
-                "txnStatus" => "" . $dataDaftarPoliRJ->txn_status . "",
-                "ermStatus" => "" . $dataDaftarPoliRJ->erm_status . "",
-                "cekLab" => "0",
-                "kunjunganInternalStatus" => "0",
-                "noReferensi" => "" . $dataDaftarPoliRJ->reg_no . "",
-                "taskIdPelayanan" => [
-                    "taskId1" => "",
-                    "taskId2" => "",
-                    "taskId3" => "" . $dataDaftarPoliRJ->rj_date . "",
-                    "taskId4" => "",
-                    "taskId5" => "",
-                    "taskId6" => "",
-                    "taskId7" => "",
-                    "taskId99" => "",
-                ],
-                'sep' => [
-                    "noSep" => "" . $dataDaftarPoliRJ->vno_sep . "",
-                    "reqSep" => [],
-                    "resSep" => [],
-                ]
-            ];
-
-            $this->dataDaftarPoliRJ['klaimId'] = $dataDaftarPoliRJ->klaim_id == 'JM' ? 'JM' : 'UM';
-            $this->dataDaftarPoliRJ['JenisKlaimDesc'] = $dataDaftarPoliRJ->klaim_id == 'JM' ? 'BPJS' : 'UMUM';
-
-            $this->dataDaftarPoliRJ['kunjunganId'] = '1';
-            $this->dataDaftarPoliRJ['JenisKunjunganDesc'] = 'Rujukan FKTP';
-
-
-            // jika kontrol tidak ditemukan tambah variable kontrol pda array
-            if (isset($this->dataDaftarPoliRJ['penilaian']) == false) {
-                $this->dataDaftarPoliRJ['penilaian'] = $this->penilaian;
-            }
+        // jika kontrol tidak ditemukan tambah variable kontrol pda array
+        if (isset($this->dataDaftarPoliRJ['penilaian']) == false) {
+            $this->dataDaftarPoliRJ['penilaian'] = $this->penilaian;
         }
     }
 
     // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
-    private function setDataPrimer(): void
-    {
-    }
+    private function setDataPrimer(): void {}
 
 
     // when new form instance
