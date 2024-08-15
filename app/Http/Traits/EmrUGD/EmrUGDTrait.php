@@ -131,7 +131,8 @@ trait EmrUGDTrait
 
             return $dataDaftarUgd;
         } catch (Exception $e) {
-            return [];
+            dd($e->getMessage());
+            return ["errorMessages" => $e->getMessage()];
         }
     }
 

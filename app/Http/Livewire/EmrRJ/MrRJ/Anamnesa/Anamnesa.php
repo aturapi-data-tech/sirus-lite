@@ -517,6 +517,7 @@ class Anamnesa extends Component
 
 
         $findDataRJ = $this->findDataRJ($rjno);
+
         $this->dataDaftarPoliRJ  = $findDataRJ['dataDaftarRJ'];
 
         // jika anamnesa tidak ditemukan tambah variable anamnesa pda array

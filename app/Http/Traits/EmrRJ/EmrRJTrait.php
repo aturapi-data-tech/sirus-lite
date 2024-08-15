@@ -44,7 +44,7 @@ trait EmrRJTrait
                         'dr_id',
                         'dr_name',
                         'klaim_id',
-                        'entry_id',
+                        // 'entry_id',
                         'shift',
                         'vno_sep',
                         'no_antrian',
@@ -171,11 +171,12 @@ trait EmrRJTrait
                 "dataPasienRJ" => $dataPasienRJ
             ]);
         } catch (Exception $e) {
-            $this->emit('toastr-error', $e->getMessage());
 
+            dd($e->getMessage());
             return [
                 "dataDaftarRJ" => [],
-                "dataPasienRJ" => []
+                "dataPasienRJ" => [],
+                "errorMessages" => $e->getMessage()
             ];
         }
     }
