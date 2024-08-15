@@ -15,7 +15,7 @@ trait EmrUGDTrait
         try {
             $findData = DB::table('rsview_ugdkasir')
                 ->select('datadaftarugd_json', 'vno_sep')
-                ->where('rj_no', $rjno)
+                ->where('rj_no', '=', $rjno)
                 ->first();
 
             $datadaftarugd_json = isset($findData->datadaftarugd_json) ? $findData->datadaftarugd_json : null;
@@ -139,7 +139,7 @@ trait EmrUGDTrait
     {
         $lastInserted = DB::table('rstxn_ugdhdrs')
             ->select('rj_status')
-            ->where('rj_no', $rjNo)
+            ->where('rj_no', '=', $rjNo)
             ->first();
 
         if ($lastInserted->rj_status !== 'A') {

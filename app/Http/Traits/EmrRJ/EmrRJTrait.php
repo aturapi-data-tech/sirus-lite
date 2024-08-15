@@ -15,7 +15,7 @@ trait EmrRJTrait
         try {
             $findData = DB::table('rsview_rjkasir')
                 ->select('datadaftarpolirj_json', 'vno_sep')
-                ->where('rj_no', $rjno)
+                ->where('rj_no', '=', $rjno)
                 ->first();
 
             $datadaftarpolirj_json = isset($findData->datadaftarpolirj_json) ? $findData->datadaftarpolirj_json : null;
@@ -130,7 +130,6 @@ trait EmrRJTrait
             }
 
 
-
             // dataPasienRJ
             $dataPasienRJ = DB::table('rsview_rjkasir')
                 ->select(
@@ -185,7 +184,7 @@ trait EmrRJTrait
     {
         $lastInserted = DB::table('rstxn_rjhdrs')
             ->select('rj_status')
-            ->where('rj_no', $rjNo)
+            ->where('rj_no', '=', $rjNo)
             ->first();
 
         if ($lastInserted->rj_status !== 'A') {
