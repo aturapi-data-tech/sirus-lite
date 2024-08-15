@@ -37,6 +37,7 @@ class AdministrasiUGD extends Component
     public int $sumRadiologi;
 
     public int $sumLainLain;
+    public int $sumtrfRJ;
 
     public int $sumTotalRJ;
 
@@ -97,19 +98,25 @@ class AdministrasiUGD extends Component
             return $obat['qty'] * $obat['price'];
         }));
 
-        $this->sumLaboratorium = collect($sumAdmin['rjLab'])->sum((function ($obat) {
-            return $obat['lab_price'];
+        $this->sumLaboratorium = collect($sumAdmin['rjLab'])->sum((function ($rjLab) {
+            return $rjLab['lab_price'];
         }));
 
-        $this->sumRadiologi = collect($sumAdmin['rjRad'])->sum((function ($obat) {
-            return $obat['rad_price'];
+        $this->sumRadiologi = collect($sumAdmin['rjRad'])->sum((function ($rjRad) {
+            return $rjRad['rad_price'];
         }));
 
 
         $this->sumLainLain = isset($sumAdmin['LainLain']) ? collect($sumAdmin['LainLain'])->sum('LainLainPrice') : 0;
 
+        $this->sumtrfRJ = collect($sumAdmin['rjtrfRj'])->sum((function ($trfRj) {
+            return $trfRj['rj_admin'] + $trfRj['poli_price'] + $trfRj['acte_price'] + $trfRj['actp_price'] + $trfRj['actd_price'] + $trfRj['obat'] + $trfRj['lab'] + $trfRj['rad'] + $trfRj['other'] + $trfRj['rs_admin'];
+        }));
 
-        $this->sumTotalRJ = $this->sumPoliPrice + $this->sumRjAdmin + $this->sumRsAdmin  + $this->sumJasaKaryawan + $this->sumJasaDokter + $this->sumJasaMedis + $this->sumLainLain + $this->sumObat + $this->sumLaboratorium + $this->sumRadiologi;
+
+
+
+        $this->sumTotalRJ = $this->sumPoliPrice + $this->sumRjAdmin + $this->sumRsAdmin  + $this->sumJasaKaryawan + $this->sumJasaDokter + $this->sumJasaMedis + $this->sumLainLain + $this->sumObat + $this->sumLaboratorium + $this->sumRadiologi + $this->sumtrfRJ;
     }
 
 
@@ -167,6 +174,11 @@ class AdministrasiUGD extends Component
         $rsRad = DB::table('rstxn_ugdrads')
             ->join('rsmst_radiologis', 'rsmst_radiologis.rad_id', 'rstxn_ugdrads.rad_id')
             ->select('rad_desc', 'rstxn_ugdrads.rad_price as rad_price', 'rad_dtl')
+            ->where('rj_no', $rjNo)
+            ->get();
+
+        $rstrfRj = DB::table('rstxn_ugdtempadmins')
+            ->select('rj_no', 'tempadm_date', 'rj_admin', 'poli_price', 'acte_price', 'actp_price', 'actd_price', 'obat', 'lab', 'rad', 'other', 'rs_admin')
             ->where('rj_no', $rjNo)
             ->get();
 
@@ -243,6 +255,7 @@ class AdministrasiUGD extends Component
         $dataRawatJalan['rjObat'] = json_decode(json_encode($rsObat, true), true);
         $dataRawatJalan['rjLab'] = json_decode(json_encode($rsLab, true), true);
         $dataRawatJalan['rjRad'] = json_decode(json_encode($rsRad, true), true);
+        $dataRawatJalan['rjtrfRj'] = json_decode(json_encode($rstrfRj, true), true);
 
         return ($dataRawatJalan);
     }
