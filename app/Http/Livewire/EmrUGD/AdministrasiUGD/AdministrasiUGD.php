@@ -21,7 +21,7 @@ class AdministrasiUGD extends Component
         'syncronizeAssessmentPerawatUGDFindData' => 'sumAll'
     ];
 
-    // dataDaftarPoliRJ RJ
+    // dataDaftarUgd RJ
     public $rjNoRef;
 
     public int $sumRsAdmin;
@@ -116,10 +116,10 @@ class AdministrasiUGD extends Component
     public function setSelesaiAdministrasiStatus($rjNo)
     {
 
-        $dataDaftarPoliRJ = $this->findData($rjNo);
+        $dataDaftarUgd = $this->findData($rjNo);
 
-        if (isset($dataDaftarPoliRJ['AdministrasiRj']) == false) {
-            $dataDaftarPoliRJ['AdministrasiRj'] = [
+        if (isset($dataDaftarUgd['AdministrasiRj']) == false) {
+            $dataDaftarUgd['AdministrasiRj'] = [
                 'userLog' => auth()->user()->myuser_name,
                 'userLogDate' => Carbon::now()->format('d/m/Y H:i:s')
             ];
@@ -127,15 +127,15 @@ class AdministrasiUGD extends Component
             DB::table('rstxn_ugdhdrs')
                 ->where('rj_no', $rjNo)
                 ->update([
-                    'dataDaftarPoliRJ_json' => json_encode($dataDaftarPoliRJ, true),
-                    'dataDaftarPoliRJ_xml' => ArrayToXml::convert($dataDaftarPoliRJ),
+                    'datadaftarugd_json' => json_encode($dataDaftarUgd, true),
+                    'datadaftarugd_xml' => ArrayToXml::convert($dataDaftarUgd),
                 ]);
 
             $this->emit('toastr-success', "Administrasi berhasil disimpan.");
             $this->emit('syncronizeAssessmentDokterUGDFindData');
             $this->emit('syncronizeAssessmentPerawatUGDFindData');
         } else {
-            $this->emit('toastr-error', "Administrasi sudah tersimpan oleh." . $dataDaftarPoliRJ['AdministrasiRj']['userLog']);
+            $this->emit('toastr-error', "Administrasi sudah tersimpan oleh." . $dataDaftarUgd['AdministrasiRj']['userLog']);
         }
     }
 
