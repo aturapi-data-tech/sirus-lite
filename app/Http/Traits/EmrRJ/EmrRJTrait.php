@@ -172,7 +172,12 @@ trait EmrRJTrait
                 "dataPasienRJ" => $dataPasienRJ
             ]);
         } catch (Exception $e) {
-            return [];
+            $this->emit('toastr-error', $e->getMessage());
+
+            return [
+                "dataDaftarRJ" => [],
+                "dataPasienRJ" => []
+            ];
         }
     }
 
