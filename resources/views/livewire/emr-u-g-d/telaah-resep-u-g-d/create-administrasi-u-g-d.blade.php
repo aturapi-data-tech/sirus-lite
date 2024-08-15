@@ -49,11 +49,11 @@
                     {{-- Display Pasien --}}
                     {{-- :rjNo="" disi dari emit ListeneropenModalEditUgd --}}
 
-                    <livewire:emr-r-j.display-pasien.display-pasien :wire:key="$regNoRef.'display-pasien'"
+                    <livewire:emr-u-g-d.display-pasien.display-pasien :wire:key="$regNoRef.'display-pasien'"
                         :rjNoRef="$rjNoRef">
 
-                        {{-- <livewire:emr-r-j.form-entry-r-j.form-entry-r-j :rjNo="$regNo"
-                            :wire:key="$regNo.'form-entry-r-j'"> --}}
+                        {{-- <livewire:emr-u-g-d.form-entry-u-g-d.form-entry-u-g-d :rjNo="$regNo"
+                            :wire:key="$regNo.'form-entry-u-g-d'"> --}}
                 </div>
 
 
@@ -209,8 +209,8 @@
                                         'active': activeTabAdministrasi === 'JasaKaryawan'
                                     }"
                                     x-show.transition.in.opacity.duration.600="activeTabAdministrasi === 'JasaKaryawan'">
-                                    <livewire:emr-r-j.administrasi-r-j.jasa-karyawan-r-j
-                                        :wire:key="'content-jasa-karyawan-r-j'" :rjNoRef="$rjNoRef">
+                                    <livewire:emr-u-g-d.administrasi-u-g-d.jasa-karyawan-u-g-d
+                                        :wire:key="'content-jasa-karyawan-u-g-d'" :rjNoRef="$rjNoRef">
 
                                 </div>
 
@@ -219,8 +219,8 @@
                                         'active': activeTabAdministrasi === 'JasaDokter'
                                     }"
                                     x-show.transition.in.opacity.duration.600="activeTabAdministrasi === 'JasaDokter'">
-                                    <livewire:emr-r-j.administrasi-r-j.jasa-dokter-r-j
-                                        :wire:key="'content-jasa-dokter-r-j2'" :rjNoRef="$rjNoRef">
+                                    <livewire:emr-u-g-d.administrasi-u-g-d.jasa-dokter-u-g-d
+                                        :wire:key="'content-jasa-dokter-u-g-d2'" :rjNoRef="$rjNoRef">
 
                                 </div>
 
@@ -229,8 +229,8 @@
                                         'active': activeTabAdministrasi === 'JasaMedis'
                                     }"
                                     x-show.transition.in.opacity.duration.600="activeTabAdministrasi === 'JasaMedis'">
-                                    <livewire:emr-r-j.administrasi-r-j.jasa-medis-r-j
-                                        :wire:key="'content-jasa-medis-r-j'" :rjNoRef="$rjNoRef">
+                                    <livewire:emr-u-g-d.administrasi-u-g-d.jasa-medis-u-g-d
+                                        :wire:key="'content-jasa-medis-u-g-d'" :rjNoRef="$rjNoRef">
 
                                 </div>
 
@@ -239,7 +239,7 @@
                                         'active': activeTabAdministrasi === 'Obat'
                                     }"
                                     x-show.transition.in.opacity.duration.600="activeTabAdministrasi === 'Obat'">
-                                    <livewire:emr-r-j.administrasi-r-j.obat-r-j :wire:key="'content-obat-r-j'"
+                                    <livewire:emr-u-g-d.administrasi-u-g-d.obat-u-g-d :wire:key="'content-obat-u-g-d'"
                                         :rjNoRef="$rjNoRef">
 
                                 </div>
@@ -249,8 +249,8 @@
                                         'active': activeTabAdministrasi === 'Laboratorium'
                                     }"
                                     x-show.transition.in.opacity.duration.600="activeTabAdministrasi === 'Laboratorium'">
-                                    <livewire:emr-r-j.administrasi-r-j.laboratorium-r-j
-                                        :wire:key="'content-laboratorium-r-j'" :rjNoRef="$rjNoRef">
+                                    <livewire:emr-u-g-d.administrasi-u-g-d.laboratorium-u-g-d
+                                        :wire:key="'content-laboratorium-u-g-d'" :rjNoRef="$rjNoRef">
 
                                 </div>
 
@@ -259,8 +259,8 @@
                                         'active': activeTabAdministrasi === 'Radiologi'
                                     }"
                                     x-show.transition.in.opacity.duration.600="activeTabAdministrasi === 'Radiologi'">
-                                    <livewire:emr-r-j.administrasi-r-j.radiologi-r-j :wire:key="'content-radiologi-r-j'"
-                                        :rjNoRef="$rjNoRef">
+                                    <livewire:emr-u-g-d.administrasi-u-g-d.radiologi-u-g-d
+                                        :wire:key="'content-radiologi-u-g-d'" :rjNoRef="$rjNoRef">
 
                                 </div>
 
@@ -269,8 +269,8 @@
                                         'active': activeTabAdministrasi === 'LainLain'
                                     }"
                                     x-show.transition.in.opacity.duration.600="activeTabAdministrasi === 'LainLain'">
-                                    <livewire:emr-r-j.administrasi-r-j.lain-lain-r-j
-                                        :wire:key="'content-lain-lain-r-j2'" :rjNoRef="$rjNoRef">
+                                    <livewire:emr-u-g-d.administrasi-u-g-d.lain-lain-u-g-d
+                                        :wire:key="'content-lain-lain-u-g-d2'" :rjNoRef="$rjNoRef">
 
                                 </div>
 

@@ -154,8 +154,8 @@
                         }"
                         x-show.transition.in.opacity.duration.600="activeTab === 'administrasi'">
 
-                        {{-- <livewire:emr-u-g-d.administrasi-u-g-d.administrasi-u-g-d :wire:key="'content-administrasiUgd'"
-                            :rjNoRef="$rjNoRef"> --}}
+                        <livewire:emr-u-g-d.administrasi-u-g-d.administrasi-u-g-d :wire:key="'content-administrasiUgd'"
+                            :rjNoRef="$rjNoRef">
 
                     </div>
 
