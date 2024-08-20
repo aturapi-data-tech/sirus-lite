@@ -69,6 +69,7 @@ trait EmrRJTrait
 
                     "poliId" => "" . $dataDaftarRJ->poli_id . "",
                     "poliDesc" => "" . $dataDaftarRJ->poli_desc . "",
+                    "klaimId" => "" . $dataDaftarRJ->klaim_id == 'JM' ? 'JM' : 'UM' . "",
 
                     "kddrbpjs" => "" . $dataDaftarRJ->kd_dr_bpjs . "",
                     "kdpolibpjs" => "" . $dataDaftarRJ->kd_poli_bpjs . "",
