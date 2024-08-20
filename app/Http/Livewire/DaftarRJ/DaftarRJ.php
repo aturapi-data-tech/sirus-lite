@@ -1324,6 +1324,8 @@ class DaftarRJ extends Component
         // dd(isset($this->dataDaftarPoliRJ['klaimId']));
         if (!isset($this->dataDaftarPoliRJ['klaimId'])) {
             $this->emit('toastr-error', "Data Klaim tidak ditemukan, Reset Data Ke UMUM");
+            $this->dataDaftarPoliRJ['klaimId'] = 'UM';
+            $this->dataDaftarPoliRJ['klaimDesc'] = 'UMUM';
         }
 
         if (!isset($this->dataDaftarPoliRJ['kunjunganId'])) {
