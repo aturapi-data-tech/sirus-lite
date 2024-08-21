@@ -26,12 +26,23 @@ class PostEncounterRJ extends Component
 
     public array $dataDaftarPoliRJ = [];
     public array $dataPasienRJ = [];
-
+    public string $EncounterID;
 
 
     private function findData($rjno): void
     {
         $this->dataDaftarPoliRJ = $this->findDataRJ($rjno);
+
+        if (isset($this->dataDaftarPoliRJ['satuSehatUuidRJ'])) {
+            $EncounterID = collect($this->dataDaftarPoliRJ['satuSehatUuidRJ'])
+                ->filter(function ($item) {
+                    return $item['response']['resourceType'] === 'Encounter';
+                })->first();
+
+            $this->EncounterID = $EncounterID['response']['resourceID'];
+        } else {
+            $this->EncounterID = '';
+        }
     }
 
     public function PostEncounterSatuSehat()
