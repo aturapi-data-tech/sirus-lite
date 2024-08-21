@@ -41,7 +41,7 @@ class PostEncounterRJ extends Component
 
             $this->EncounterID = $EncounterID['response']['resourceID'];
         } else {
-            $this->EncounterID = 'xxx';
+            $this->EncounterID = '';
         }
     }
 
@@ -144,7 +144,6 @@ class PostEncounterRJ extends Component
             $postEncounter = SatuSehatTrait::postBundleEncounterCondition($bundle->json());
 
 
-            dd($postEncounter->getOriginalContent());
 
             if (isset($postEncounter->getOriginalContent()['response']['entry'])) {
                 $dataDaftarPoliRJ['satuSehatUuidRJ'] = $postEncounter->getOriginalContent()['response']['entry'];
