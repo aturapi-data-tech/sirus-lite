@@ -46,10 +46,9 @@ class PostEncounterRJ extends Component
             $EncounterID = collect($dataDaftarPoliRJ['satuSehatUuidRJ'])
                 ->filter(function ($item) {
                     return $item['response']['resourceType'] === 'Encounter';
-                })->first()
-                ->resourceID;
+                })->first();
 
-            $this->emit('toastr-error', 'Data Pasien ' . $dataPasienRJ['regName'] . ' sudah dikirim ke satu sehat dengan EncounterID ' . $EncounterID);
+            $this->emit('toastr-error', 'Data Pasien ' . $dataPasienRJ['regName'] . ' sudah dikirim ke satu sehat dengan EncounterID ' . $EncounterID['resourceID']);
             return;
         }
 
