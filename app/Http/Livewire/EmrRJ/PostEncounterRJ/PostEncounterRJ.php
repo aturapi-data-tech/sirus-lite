@@ -29,7 +29,7 @@ class PostEncounterRJ extends Component
     public string $EncounterID;
 
     protected $listeners = [
-        'PostEncounterRJ' => 'mountxx',
+        'syncronizePostEncounterRJ' => 'mount',
     ];
 
     private function findData($rjno): void
@@ -104,7 +104,6 @@ class PostEncounterRJ extends Component
 
         if ($validator->fails()) {
             $this->emit('toastr-error', $validator->messages()->all());
-            $this->emit('PostEncounterRJ');
             return;
         }
 
@@ -155,8 +154,7 @@ class PostEncounterRJ extends Component
                 $dataDaftarPoliRJ['satuSehatUuidRJ'] = $postEncounter->getOriginalContent()['response']['entry'];
                 // update Json ke database
                 $this->updateJsonRJ($this->rjNoRef, $dataDaftarPoliRJ);
-                $this->emit('PostEncounterRJ');
-                return;
+                $this->emit('syncronizePostEncounterRJ');
             } else {
 
                 // dd($postEncounter->getOriginalContent());
@@ -169,11 +167,7 @@ class PostEncounterRJ extends Component
             return;
         }
     }
-    public function mountxxx()
-    {
-        $this->findData($this->rjNoRef);
-        dd($this->dataDaftarPoliRJ);
-    }
+
 
     public function mount()
     {
