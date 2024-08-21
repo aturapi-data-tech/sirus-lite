@@ -40,6 +40,7 @@ class PostEncounterRJ extends Component
                 })->first();
 
             $this->EncounterID = $EncounterID['response']['resourceID'];
+            dd($EncounterID);
         } else {
             $this->EncounterID = 'xxx';
         }
