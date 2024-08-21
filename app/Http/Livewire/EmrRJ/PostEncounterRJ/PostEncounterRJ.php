@@ -123,7 +123,7 @@ class PostEncounterRJ extends Component
             $postEncounter = SatuSehatTrait::postBundleEncounterCondition($bundle->json());
 
 
-            // dd($postEncounter->getOriginalContent());
+            dd($postEncounter->getOriginalContent());
 
             if (isset($postEncounter->getOriginalContent()['response']['entry'])) {
                 $dataDaftarPoliRJ['satuSehatUuidRJ'] = $postEncounter->getOriginalContent()['response']['entry'];
