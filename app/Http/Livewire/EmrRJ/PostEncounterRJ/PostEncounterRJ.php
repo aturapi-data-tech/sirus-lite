@@ -29,7 +29,7 @@ class PostEncounterRJ extends Component
     public string $EncounterID;
 
     protected $listeners = [
-        'PostEncounterRJ' => 'mount',
+        'PostEncounterRJ' => 'mountxxx',
     ];
 
     private function findData($rjno): void
@@ -168,7 +168,11 @@ class PostEncounterRJ extends Component
             return;
         }
     }
-
+    public function mountxxx()
+    {
+        $this->findData($this->rjNoRef);
+        dd($this->dataDaftarPoliRJ);
+    }
 
     public function mount()
     {
