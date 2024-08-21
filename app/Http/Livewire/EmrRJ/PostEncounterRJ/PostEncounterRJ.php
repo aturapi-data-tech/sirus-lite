@@ -104,6 +104,7 @@ class PostEncounterRJ extends Component
 
         if ($validator->fails()) {
             $this->emit('toastr-error', $validator->messages()->all());
+            $this->emit('PostEncounterRJ');
             return;
         }
 
