@@ -28,6 +28,9 @@ class PostEncounterRJ extends Component
     public array $dataPasienRJ = [];
     public string $EncounterID;
 
+    protected $listeners = [
+        'PostEncounterRJ' => 'mount',
+    ];
 
     private function findData($rjno): void
     {
@@ -108,6 +111,7 @@ class PostEncounterRJ extends Component
         // Proses Validasi///////////////////////////////////////////
         try {
 
+            // Pembuatan Struktur Array Encounter
             $encounter = new Encounter;
             $encounter->addRegistrationId($this->rjNoRef); // unique string free text (increments / UUID)
 
@@ -127,7 +131,8 @@ class PostEncounterRJ extends Component
             $bundle->addEncounter($encounter);
 
             foreach ($dataDaftarPoliRJ['diagnosis'] as $key => $diag) {
-                // Buat Condition
+
+                // Pembuatan Struktur Array Condition
                 $condition = new Condition;
                 $condition->addClinicalStatus(); // active, inactive, resolved. Default bila tidak dideklarasi = active
                 $condition->addCategory('Diagnosis'); // Diagnosis, Keluhan. Default : Diagnosis
@@ -140,39 +145,23 @@ class PostEncounterRJ extends Component
             }
 
             // dd($bundle->json());
-
+            // Post Ke satu sehat
             $postEncounter = SatuSehatTrait::postBundleEncounterCondition($bundle->json());
 
 
-
             if (isset($postEncounter->getOriginalContent()['response']['entry'])) {
+                // Jika 200
                 $dataDaftarPoliRJ['satuSehatUuidRJ'] = $postEncounter->getOriginalContent()['response']['entry'];
+                // update Json ke database
                 $this->updateJsonRJ($this->rjNoRef, $dataDaftarPoliRJ);
+                $this->emit('PostEncounterRJ');
+                return;
             } else {
-                dd($postEncounter->getOriginalContent());
+
+                // dd($postEncounter->getOriginalContent());
                 $this->emit('toastr-error', json_encode($postEncounter->getOriginalContent(), true));
+                return;
             }
-            // Jika uuid tidak ditemukan
-            // if (!isset($postEncounter->getOriginalContent()['response']['entry'][0]['resource']['id'])) {
-            //     $this->emit('toastr-error', 'UUID tidak dapat ditemukan.' . $postEncounter->getOriginalContent()['metadata']['message']);
-            //     return;
-            // }
-
-            // $postEncounter = SatuSehatTrait::postEncounter($nik);
-
-            // Jika uuid tidak ditemukan
-            // if (!isset($postEncounter->getOriginalContent()['response']['entry'][0]['resource']['id'])) {
-            //     $this->emit('toastr-error', 'UUID tidak dapat ditemukan.' . $postEncounter->getOriginalContent()['metadata']['message']);
-            //     return;
-            // }
-
-            // $this->dataPasien['pasien']['identitas']['patientUuid'] = $postEncounter->getOriginalContent()['response']['entry'][0]['resource']['id'];
-            // $this->store();
-            // $this->emit('toastr-success', $postEncounter->getOriginalContent()['response']['entry'][0]['resource']['id'] . ' / ' . $postEncounter->getOriginalContent()['response']['entry'][0]['resource']['name'][0]['text']);
-
-            // dd($postEncounter->getOriginalContent());
-            // dd($postEncounter->getOriginalContent()['response']['entry'][0]['resource']['id']);
-            // dd($postEncounter->getOriginalContent()['response']['entry'][0]['resource']['name'][0]['text']);
         } catch (\Illuminate\Validation\ValidationException $e) {
             // dd($validator->fails());
             $this->emit('toastr-error', 'Errors "' . $e->getMessage());
