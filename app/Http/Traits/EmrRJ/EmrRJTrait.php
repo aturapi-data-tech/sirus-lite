@@ -6,6 +6,7 @@ namespace App\Http\Traits\EmrRJ;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Exception;
+use Spatie\ArrayToXml\ArrayToXml;
 
 trait EmrRJTrait
 {
@@ -27,7 +28,6 @@ trait EmrRJTrait
                 $dataDaftarRJ = json_decode($findData->datadaftarpolirj_json, true);
             } else {
 
-                $this->emit('toastr-error', "Data tidak dapat di proses json.");
                 $dataDaftarRJ = DB::table('rsview_rjkasir')
                     ->select(
                         DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
@@ -182,7 +182,7 @@ trait EmrRJTrait
         }
     }
 
-    protected function checkRJStatus($rjNo): bool
+    protected  function checkRJStatus($rjNo): bool
     {
         $lastInserted = DB::table('rstxn_rjhdrs')
             ->select('rj_status')
@@ -193,5 +193,15 @@ trait EmrRJTrait
             return true;
         }
         return false;
+    }
+
+    public static function updateJsonRJ($rjNo, array $rjArr): void
+    {
+        DB::table('rstxn_rjhdrs')
+            ->where('rj_no', $rjNo)
+            ->update([
+                'datadaftarpolirj_json' => json_encode($rjArr, true),
+                'datadaftarpolirj_xml' => ArrayToXml::convert($rjArr),
+            ]);
     }
 }

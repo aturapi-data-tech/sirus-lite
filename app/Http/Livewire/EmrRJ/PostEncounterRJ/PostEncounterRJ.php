@@ -110,7 +110,7 @@ class PostEncounterRJ extends Component
                 $condition = new Condition;
                 $condition->addClinicalStatus(); // active, inactive, resolved. Default bila tidak dideklarasi = active
                 $condition->addCategory('Diagnosis'); // Diagnosis, Keluhan. Default : Diagnosis
-                $condition->addCode($diag['diagId']); // Kode ICD10
+                $condition->addCode($diag['icdX'], $diag['diagDesc']); // Kode ICD10
                 $condition->setSubject($dataPasienRJ['patientUuid'], $dataPasienRJ['regName']); // ID SATUSEHAT Pasien dan Nama SATUSEHAT
                 $condition->setOnsetDateTime(Carbon::now()->toDateTimeString()); // timestamp onset. Timestamp sekarang
                 $condition->setRecordedDate(Carbon::now()->toDateTimeString()); // timestamp recorded. Timestamp sekarang
@@ -118,13 +118,20 @@ class PostEncounterRJ extends Component
                 $bundle->addCondition($condition);
             }
 
-
+            // dd($bundle->json());
 
             $postEncounter = SatuSehatTrait::postBundleEncounterCondition($bundle->json());
 
-            dd($postEncounter->getOriginalContent());
 
+            // dd($postEncounter->getOriginalContent());
 
+            if (isset($postEncounter->getOriginalContent()['response']['entry'])) {
+                $dataDaftarPoliRJ['satuSehatUuidRJ'] = $postEncounter->getOriginalContent()['response']['entry'];
+                $this->updateJsonRJ($this->rjNoRef, $dataDaftarPoliRJ);
+            } else {
+                dd($postEncounter->getOriginalContent());
+                $this->emit('toastr-error', json_encode($postEncounter->getOriginalContent(), true));
+            }
             // Jika uuid tidak ditemukan
             // if (!isset($postEncounter->getOriginalContent()['response']['entry'][0]['resource']['id'])) {
             //     $this->emit('toastr-error', 'UUID tidak dapat ditemukan.' . $postEncounter->getOriginalContent()['metadata']['message']);
