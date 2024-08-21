@@ -47,8 +47,9 @@ class PostEncounterRJ extends Component
                 ->filter(function ($item) {
                     return $item['response']['resourceType'] === 'Encounter';
                 })->first();
+            dd($EncounterID);
 
-            $this->emit('toastr-error', 'Data Pasien ' . $dataPasienRJ['regName'] . ' sudah dikirim ke satu sehat dengan EncounterID ' . $EncounterID['resourceID']);
+            $this->emit('toastr-error', 'Data Pasien ' . $dataPasienRJ['regName'] . ' sudah dikirim ke satu sehat dengan EncounterID ' . $EncounterID);
             return;
         }
 
