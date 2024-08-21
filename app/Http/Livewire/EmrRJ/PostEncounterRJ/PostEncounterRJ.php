@@ -31,7 +31,7 @@ class PostEncounterRJ extends Component
 
     private function findData($rjno): void
     {
-        $this->dataDaftarPoliRJ = $this->findDataRJ($rjno);
+        $this->dataDaftarPoliRJ = $this->findDataRJ($rjno)['dataDaftarRJ'];
 
         if (isset($this->dataDaftarPoliRJ['satuSehatUuidRJ'])) {
             $EncounterID = collect($this->dataDaftarPoliRJ['satuSehatUuidRJ'])
@@ -40,7 +40,6 @@ class PostEncounterRJ extends Component
                 })->first();
 
             $this->EncounterID = $EncounterID['response']['resourceID'];
-            dd($EncounterID);
         } else {
             $this->EncounterID = 'xxx';
         }
