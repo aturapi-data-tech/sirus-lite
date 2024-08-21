@@ -43,8 +43,17 @@ class PostEncounterRJ extends Component
 
         // cek data satu sehat dikirim atau belum
         if (isset($dataDaftarPoliRJ['satuSehatUuidRJ'])) {
-            $EncounterID = collect($dataDaftarPoliRJ['satuSehatUuidRJ'])->where('resourceType', '=', 'Encounter')->first();
-            dd($dataDaftarPoliRJ['satuSehatUuidRJ']);
+            $EncounterID = collect($dataDaftarPoliRJ['satuSehatUuidRJ'])
+                ->filter(function ($item) {
+                    return $item['response']['resourceType'] === 'Encounter';
+                });
+
+
+
+
+
+
+            dd($EncounterID);
             $this->emit('toastr-error', 'Data Pasien ' . $dataPasienRJ['regName'] . ' sudah dikirim ke satu sehat dengan EncounterID ' . $EncounterID);
             return;
         }
