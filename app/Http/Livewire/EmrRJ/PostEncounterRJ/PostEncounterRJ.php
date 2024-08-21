@@ -41,6 +41,12 @@ class PostEncounterRJ extends Component
         $dataDaftarPoliRJ = $findDataRJ['dataDaftarRJ'];
         $dataPasienRJ = $findDataRJ['dataPasienRJ'];
 
+        // cek data satu sehat dikirim atau belum
+        if (isset($dataDaftarPoliRJ['satuSehatUuidRJ'])) {
+            $EncounterID = collect($dataDaftarPoliRJ['satuSehatUuidRJ'])->where('resourceType', '=', 'Encounter')->first()->resourceID;
+            $this->emit('toastr-error', 'Data Pasien ' . $dataPasienRJ['regName'] . ' sudah dikirim ke satu sehat dengan EncounterID ' . $EncounterID);
+            return;
+        }
 
         // cek
         // if task id null batal proses 3 4 5
