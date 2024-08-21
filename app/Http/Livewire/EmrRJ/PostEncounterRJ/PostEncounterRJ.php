@@ -41,7 +41,7 @@ class PostEncounterRJ extends Component
 
             $this->EncounterID = $EncounterID['response']['resourceID'];
         } else {
-            $this->EncounterID = '';
+            $this->EncounterID = 'xxx';
         }
     }
 
