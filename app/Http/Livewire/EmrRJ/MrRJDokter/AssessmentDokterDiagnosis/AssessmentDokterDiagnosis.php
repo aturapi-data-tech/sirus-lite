@@ -73,6 +73,16 @@ class AssessmentDokterDiagnosis extends Component
     }
 
 
+    public function updateddataDaftarPoliRJdiagnosisFreeText()
+    {
+        $this->store();
+    }
+
+    public function updateddataDaftarPoliRJprocedureFreeText()
+    {
+        $this->store();
+    }
+
     /////////////////////////////////////////////////
     // Lov dataDiagnosaICD10Lov //////////////////////
     ////////////////////////////////////////////////
@@ -539,6 +549,16 @@ class AssessmentDokterDiagnosis extends Component
         // jika procedure tidak ditemukan tambah variable procedure pda array
         if (isset($this->dataDaftarPoliRJ['procedure']) == false) {
             $this->dataDaftarPoliRJ['procedure'] = $this->procedure;
+        }
+
+        // free text
+        if (isset($this->dataDaftarPoliRJ['diagnosisFreeText']) == false) {
+            $this->dataDaftarPoliRJ['diagnosisFreeText'] = '';
+        }
+
+        // jika procedure tidak ditemukan tambah variable procedure pda array
+        if (isset($this->dataDaftarPoliRJ['procedureFreeText']) == false) {
+            $this->dataDaftarPoliRJ['procedureFreeText'] = '';
         }
     }
 
