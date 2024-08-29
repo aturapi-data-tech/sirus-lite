@@ -40,7 +40,7 @@
                 @include('livewire.mr-r-j.pemeriksaan.list-of-value-tingkatKesadaran')
             </div>
 
-            <div class="grid grid-cols-2 gap-2 mt-2">
+            <div class="grid grid-cols-1 gap-2 mt-2">
                 {{-- Jalan Nafas A --}}
                 <div class="p-4 bg-gray-200 rounded-lg">
                     <x-input-label for="dataDaftarUgd.pemeriksaan.tandaVital.e" :value="__('Jalan Nafas (A)')" :required="__(false)"
@@ -72,7 +72,7 @@
 
                     <x-input-label for="dataDaftarUgd.pemeriksaan.tandaVital.e" :value="__('Gerak Dada')" :required="__(false)" />
 
-                    <div class="grid grid-cols-2 gap-2 my-2">
+                    <div class="grid grid-cols-1 gap-2 my-2">
                         @foreach ($dataDaftarUgd['pemeriksaan']['tandaVital']['gerakDada']['gerakDadaOptions'] as $gerakDadaOptions)
                             {{-- @dd($sRj) --}}
                             <x-radio-button :label="__($gerakDadaOptions['gerakDada'])" value="{{ $gerakDadaOptions['gerakDada'] }}"

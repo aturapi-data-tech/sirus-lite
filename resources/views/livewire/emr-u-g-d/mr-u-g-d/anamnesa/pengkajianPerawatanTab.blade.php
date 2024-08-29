@@ -4,6 +4,27 @@
 
         @include('livewire.emr-u-g-d.mr-u-g-d.anamnesa.keluhanUtamaTab')
 
+        <div class="mb-2">
+            <x-input-label for="dataDaftarUgd.anamnesa.pengkajianPerawatan.tingkatKegawatan" :value="__('Tingkat Kegawatan')"
+                :required="__(true)" class="pt-2 sm:text-xl" />
+
+            <div class="mb-2 ">
+
+                <div class="grid grid-cols-4 gap-2 mt-2 ml-2">
+                    @foreach ($dataDaftarUgd['anamnesa']['pengkajianPerawatan']['tingkatKegawatanOption'] as $tingkatKegawatanOption)
+                        {{-- @dd($sRj) --}}
+                        <x-radio-button :label="__($tingkatKegawatanOption['tingkatKegawatan'])" value="{{ $tingkatKegawatanOption['tingkatKegawatan'] }}"
+                            wire:model="dataDaftarUgd.anamnesa.pengkajianPerawatan.tingkatKegawatan" />
+                    @endforeach
+                </div>
+            </div>
+
+            @error('dataDaftarUgd.anamnesa.pengkajianPerawatan.tingkatKegawatan')
+                <x-input-error :messages=$message />
+            @enderror
+
+        </div>
+
         <div>
             <x-input-label for="dataDaftarUgd.anamnesa.pengkajianPerawatan.jamDatang" :value="__('Waktu Datang')"
                 :required="__(true)" />
@@ -71,26 +92,7 @@
 
         @include('livewire.emr-u-g-d.mr-u-g-d.anamnesa.statusPsikologisTab')
 
-        <div class="mb-2">
-            <x-input-label for="dataDaftarUgd.anamnesa.pengkajianPerawatan.tingkatKegawatan" :value="__('Tingkat Kegawatan')"
-                :required="__(true)" class="pt-2 sm:text-xl" />
 
-            <div class="mb-2 ">
-
-                <div class="grid grid-cols-4 gap-2 mt-2 ml-2">
-                    @foreach ($dataDaftarUgd['anamnesa']['pengkajianPerawatan']['tingkatKegawatanOption'] as $tingkatKegawatanOption)
-                        {{-- @dd($sRj) --}}
-                        <x-radio-button :label="__($tingkatKegawatanOption['tingkatKegawatan'])" value="{{ $tingkatKegawatanOption['tingkatKegawatan'] }}"
-                            wire:model="dataDaftarUgd.anamnesa.pengkajianPerawatan.tingkatKegawatan" />
-                    @endforeach
-                </div>
-            </div>
-
-            @error('dataDaftarUgd.anamnesa.pengkajianPerawatan.tingkatKegawatan')
-                <x-input-error :messages=$message />
-            @enderror
-
-        </div>
 
         <div>
             <x-input-label for="dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima" :value="__('Perawat Penerima')"
