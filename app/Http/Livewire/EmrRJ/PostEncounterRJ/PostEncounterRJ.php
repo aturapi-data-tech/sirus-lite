@@ -42,7 +42,7 @@ class PostEncounterRJ extends Component
                     return $item['response']['resourceType'] === 'Encounter';
                 })->first();
 
-            $this->EncounterID = $EncounterID['response']['resourceID'] ? $EncounterID['response']['resourceID'] : $EncounterID['response'];
+            $this->EncounterID = isset($EncounterID['response']['resourceID']) ? $EncounterID['response']['resourceID'] : 'xxx-xxx';
         } else {
             $this->EncounterID = '';
         }
