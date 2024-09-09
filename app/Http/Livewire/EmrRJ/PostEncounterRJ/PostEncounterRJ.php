@@ -37,12 +37,16 @@ class PostEncounterRJ extends Component
         $this->dataDaftarPoliRJ = $this->findDataRJ($rjno)['dataDaftarRJ'];
 
         if (isset($this->dataDaftarPoliRJ['satuSehatUuidRJ'])) {
-            $EncounterID = collect($this->dataDaftarPoliRJ['satuSehatUuidRJ'])
-                ->filter(function ($item) {
-                    return $item['response']['resourceType'] === 'Encounter';
-                })->first();
+            if ($this->dataDaftarPoliRJ['satuSehatUuidRJ']) {
+                $EncounterID = collect($this->dataDaftarPoliRJ['satuSehatUuidRJ'])
+                    ->filter(function ($item) {
+                        return $item['response']['resourceType'] === 'Encounter';
+                    })->first();
 
-            $this->EncounterID = isset($EncounterID['response']['resourceID']) ? $EncounterID['response']['resourceID'] : 'xxx-xxx';
+                $this->EncounterID = isset($EncounterID['response']['resourceID']) ? $EncounterID['response']['resourceID'] : '-';
+            } else {
+                $this->EncounterID = '';
+            }
         } else {
             $this->EncounterID = '';
         }
@@ -57,13 +61,15 @@ class PostEncounterRJ extends Component
 
         // cek data satu sehat dikirim atau belum
         if (isset($dataDaftarPoliRJ['satuSehatUuidRJ'])) {
-            $EncounterID = collect($dataDaftarPoliRJ['satuSehatUuidRJ'])
-                ->filter(function ($item) {
-                    return $item['response']['resourceType'] === 'Encounter';
-                })->first();
+            if ($dataDaftarPoliRJ['satuSehatUuidRJ']) {
+                $EncounterID = collect($dataDaftarPoliRJ['satuSehatUuidRJ'])
+                    ->filter(function ($item) {
+                        return $item['response']['resourceType'] === 'Encounter';
+                    })->first();
 
-            $this->emit('toastr-error', 'Data Pasien ' . $dataPasienRJ['regName'] . ' sudah dikirim ke satu sehat dengan EncounterID ' . $EncounterID['response']['resourceID']);
-            return;
+                $this->emit('toastr-error', 'Data Pasien ' . $dataPasienRJ['regName'] . ' sudah dikirim ke satu sehat dengan EncounterID ' . $EncounterID['response']['resourceID']);
+                return;
+            }
         }
 
         // cek
