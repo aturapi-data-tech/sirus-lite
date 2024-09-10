@@ -200,6 +200,7 @@ class PostEncounterRJAll extends Component
         }
     }
 
+    public function mount() {}
 
     public function render()
     {
