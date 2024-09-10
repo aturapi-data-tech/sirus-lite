@@ -57,6 +57,7 @@ class PostEncounterRJAll extends Component
             ->where(DB::raw("nvl(erm_status,'A')"), '=', 'A')
             ->where('rj_status', '!=', 'F')
             ->where('klaim_id', '!=', 'KR')
+            ->orderBy('rj_no',  'asc')
             ->get();
 
         ///////////////////////
