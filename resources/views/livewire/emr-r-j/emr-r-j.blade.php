@@ -435,13 +435,15 @@
                                         </div>
                                         <!-- End Dropdown Action Open menu -->
                                         @role(['Admin', 'Mr', 'Perawat'])
-                                            <livewire:emr-r-j.post-encounter-r-j.post-encounter-r-j :rjNoRef="$myQData->rj_no"
-                                                :wire:key="'post-encounter-r-j-'.$myQData->rj_no">
+                                            <div class="grid grid-cols-1 gap-2">
+                                                <livewire:emr-r-j.post-encounter-r-j.post-encounter-r-j :rjNoRef="$myQData->rj_no"
+                                                    :wire:key="'post-encounter-r-j-'.$myQData->rj_no">
 
-                                                <livewire:emr-r-j.post-satu-data-kesehatan-r-j.post-satu-data-kesehatan-r-j
-                                                    :rjNoRef="$myQData->rj_no"
-                                                    :wire:key="'post-satu-data-kesehatan-r-j-'.$myQData->rj_no">
-                                                @endrole
+                                                    <livewire:emr-r-j.post-satu-data-kesehatan-r-j.post-satu-data-kesehatan-r-j
+                                                        :rjNoRef="$myQData->rj_no"
+                                                        :wire:key="'post-satu-data-kesehatan-r-j-'.$myQData->rj_no">
+                                            </div>
+                                        @endrole
 
                                 </div>
 
