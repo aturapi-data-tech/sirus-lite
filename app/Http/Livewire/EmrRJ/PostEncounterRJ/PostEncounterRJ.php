@@ -136,18 +136,20 @@ class PostEncounterRJ extends Component
             $bundle = new Bundle;
             $bundle->addEncounter($encounter);
 
-            foreach ($dataDaftarPoliRJ['diagnosis'] as $key => $diag) {
+            if (isset($dataDaftarPoliRJ['diagnosis'])) {
+                foreach ($dataDaftarPoliRJ['diagnosis'] as $key => $diag) {
 
-                // Pembuatan Struktur Array Condition
-                $condition = new Condition;
-                $condition->addClinicalStatus(); // active, inactive, resolved. Default bila tidak dideklarasi = active
-                $condition->addCategory('Diagnosis'); // Diagnosis, Keluhan. Default : Diagnosis
-                $condition->addCode($diag['icdX'], $diag['diagDesc']); // Kode ICD10
-                $condition->setSubject($dataPasienRJ['patientUuid'], $dataPasienRJ['regName']); // ID SATUSEHAT Pasien dan Nama SATUSEHAT
-                $condition->setOnsetDateTime(Carbon::now()->toDateTimeString()); // timestamp onset. Timestamp sekarang
-                $condition->setRecordedDate(Carbon::now()->toDateTimeString()); // timestamp recorded. Timestamp sekarang
-                $condition->json();
-                $bundle->addCondition($condition);
+                    // Pembuatan Struktur Array Condition
+                    $condition = new Condition;
+                    $condition->addClinicalStatus(); // active, inactive, resolved. Default bila tidak dideklarasi = active
+                    $condition->addCategory('Diagnosis'); // Diagnosis, Keluhan. Default : Diagnosis
+                    $condition->addCode($diag['icdX'], $diag['diagDesc']); // Kode ICD10
+                    $condition->setSubject($dataPasienRJ['patientUuid'], $dataPasienRJ['regName']); // ID SATUSEHAT Pasien dan Nama SATUSEHAT
+                    $condition->setOnsetDateTime(Carbon::now()->toDateTimeString()); // timestamp onset. Timestamp sekarang
+                    $condition->setRecordedDate(Carbon::now()->toDateTimeString()); // timestamp recorded. Timestamp sekarang
+                    $condition->json();
+                    $bundle->addCondition($condition);
+                }
             }
 
             // dd($bundle->json());
