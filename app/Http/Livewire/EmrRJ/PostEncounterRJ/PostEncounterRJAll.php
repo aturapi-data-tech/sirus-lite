@@ -7,6 +7,7 @@ use App\Http\Traits\EmrRJ\EmrRJTrait;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 
+use Illuminate\Support\Facades\DB;
 use App\Http\Livewire\SatuSehat\Encounter\Encounter;
 use App\Http\Livewire\SatuSehat\Condition\Condition;
 use App\Http\Livewire\SatuSehat\Bundle\Bundle;
@@ -17,45 +18,67 @@ use Illuminate\Support\Facades\Validator;
 
 use Livewire\Component;
 
-class PostEncounterRJ extends Component
+class PostEncounterRJAll extends Component
 {
     use EmrRJTrait;
 
 
-    public $rjNoRef;
-
-    public array $dataDaftarPoliRJ = [];
-    public array $dataPasienRJ = [];
-    public string $EncounterID;
+    public $rjDateRef;
 
     protected $listeners = [
         'syncronizePostEncounterRJ' => 'mount',
     ];
 
-    private function findData($rjno): void
+
+
+    public function PostEncounterSatuSehatAll()
     {
-        $this->dataDaftarPoliRJ = $this->findDataRJ($rjno)['dataDaftarRJ'];
 
-        if (isset($this->dataDaftarPoliRJ['satuSehatUuidRJ'])) {
-            if ($this->dataDaftarPoliRJ['satuSehatUuidRJ']) {
-                $EncounterID = collect($this->dataDaftarPoliRJ['satuSehatUuidRJ'])
-                    ->filter(function ($item) {
-                        return $item['response']['resourceType'] === 'Encounter';
-                    })->first();
+        ///////////////////////
+        // validate date format
+        ///////////////////////
+        $r = ['rjDate' => $this->rjDateRef];
+        $rules = ['rjDate' => 'bail|required|date_format:d/m/Y'];
+        $customErrorMessagesTrait = customErrorMessagesTrait::messages();
+        $attribute = ['rjDate' => 'Tanggal'];
+        $validator = Validator::make($r, $rules, $customErrorMessagesTrait, $attribute);
 
-                $this->EncounterID = isset($EncounterID['response']['resourceID']) ? $EncounterID['response']['resourceID'] : '-';
-            } else {
-                $this->EncounterID = '';
-            }
-        } else {
-            $this->EncounterID = '';
+        if ($validator->fails()) {
+            $this->emit('toastr-error', $validator->messages()->all());
+            return;
+        }
+        ///////////////////////
+        // validate date format
+        ///////////////////////
+
+        $dataDaftarPoliRJDate = DB::table('rsview_rjkasir')
+            ->select('rj_no')
+            ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $this->rjDateRef)
+            ->where(DB::raw("nvl(erm_status,'A')"), '=', 'A')
+            ->where('rj_status', '!=', 'F')
+            ->where('klaim_id', '!=', 'KR')
+            ->get();
+
+        ///////////////////////
+        // validate data tidak ditemukan
+        ///////////////////////
+
+        if ($dataDaftarPoliRJDate->isEmpty()) {
+            $this->emit('toastr-error', 'Tidak ada data yang diproses');
+            return;
+        }
+        ///////////////////////
+        // validate data tidak ditemukan
+        ///////////////////////
+
+        foreach ($dataDaftarPoliRJDate as $ddRJ) {
+            $this->PostEncounterSatuSehat($ddRJ->rj_no);
         }
     }
 
-    public function PostEncounterSatuSehat()
+    private function PostEncounterSatuSehat($rjNo): void
     {
-
-        $findDataRJ = $this->findDataRJ($this->rjNoRef);
+        $findDataRJ = $this->findDataRJ($rjNo);
         $dataDaftarPoliRJ = $findDataRJ['dataDaftarRJ'];
         $dataPasienRJ = $findDataRJ['dataPasienRJ'];
 
@@ -119,7 +142,7 @@ class PostEncounterRJ extends Component
 
             // Pembuatan Struktur Array Encounter
             $encounter = new Encounter;
-            $encounter->addRegistrationId($this->rjNoRef); // unique string free text (increments / UUID)
+            $encounter->addRegistrationId($rjNo); // unique string free text (increments / UUID)
 
             $encounter->setArrived(Carbon::createFromFormat('d/m/Y H:i:s', $dataDaftarPoliRJ['taskIdPelayanan']['taskId3'])->toDateTimeString());
             $encounter->setInProgress(
@@ -159,7 +182,7 @@ class PostEncounterRJ extends Component
                 // Jika 200
                 $dataDaftarPoliRJ['satuSehatUuidRJ'] = $postEncounter->getOriginalContent()['response']['entry'];
                 // update Json ke database
-                $this->updateJsonRJ($this->rjNoRef, $dataDaftarPoliRJ);
+                $this->updateJsonRJ($rjNo, $dataDaftarPoliRJ);
                 $this->emit('syncronizePostEncounterRJ');
             } else {
 
@@ -175,12 +198,8 @@ class PostEncounterRJ extends Component
     }
 
 
-    public function mount()
-    {
-        $this->findData($this->rjNoRef);
-    }
     public function render()
     {
-        return view('livewire.emr-r-j.post-encounter-r-j.post-encounter-r-j');
+        return view('livewire.emr-r-j.post-encounter-r-j.post-encounter-r-j-all');
     }
 }
