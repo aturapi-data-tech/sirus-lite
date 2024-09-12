@@ -1668,7 +1668,7 @@ class MasterPasien extends Component
             } else {
 
                 // cari meta data berdasarkan regno (primary key)
-                $findData = $findData = DB::table('rsmst_pasiens')
+                $findData = DB::table('rsmst_pasiens')
                     ->select(
                         DB::raw("to_char(reg_date,'dd/mm/yyyy hh24:mi:ss') as reg_date"),
                         DB::raw("to_char(reg_date,'yyyymmddhh24miss') as reg_date1"),
@@ -1972,9 +1972,7 @@ class MasterPasien extends Component
         }
     }
 
-    public function mount()
-    {
-    }
+    public function mount() {}
 
     // select data start////////////////
     public function render()
