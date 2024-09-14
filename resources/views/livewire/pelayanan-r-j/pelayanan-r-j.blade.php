@@ -178,7 +178,16 @@
 
                                         @foreach ($RJpasiens as $RJp)
                                             @php
-                                                $statusLayananBgcolor = $RJp->waktu_masuk_poli == null && $RJp->waktu_masuk_apt == null ? 'bg-yellow-100' : ($RJp->waktu_masuk_poli != null && $RJp->waktu_masuk_apt == null ? 'bg-red-100' : ($RJp->waktu_masuk_poli != null && $RJp->waktu_masuk_apt != null ? 'bg-green-100' : ''));
+                                                $statusLayananBgcolor =
+                                                    $RJp->waktu_masuk_poli == null && $RJp->waktu_masuk_apt == null
+                                                        ? 'bg-yellow-100'
+                                                        : ($RJp->waktu_masuk_poli != null &&
+                                                        $RJp->waktu_masuk_apt == null
+                                                            ? 'bg-red-100'
+                                                            : ($RJp->waktu_masuk_poli != null &&
+                                                            $RJp->waktu_masuk_apt != null
+                                                                ? 'bg-green-100'
+                                                                : ''));
                                             @endphp
                                             <tr
                                                 class="border-b group dark:border-gray-700 {{ $statusLayananBgcolor }}">
@@ -287,14 +296,10 @@
                                                             <x-loading />
                                                         </div>
 
-                                                        <x-red-button
-                                                            wire:click="$emit('confirm_batal_poli', '{{ addslashes($RJp->rj_no) }}', '{{ addslashes($RJp->reg_name) }}')"
-                                                            wire:loading.remove class="ml-12">
-                                                            Batal Poli
-                                                        </x-red-button>
-                                                        <div wire:loading wire:target="batalPoli">
-                                                            <x-loading />
-                                                        </div>
+                                                        {{-- delete Modal --}}
+                                                        @include('livewire.pelayanan-r-j.delete-confirmation')
+
+
 
                                                     </div>
                                                     <div>

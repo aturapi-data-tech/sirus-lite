@@ -1222,8 +1222,23 @@
                                                         </tr>
                                                     @endforeach
                                                 @endisset
-
-
+                                                <tr>
+                                                    <td>
+                                                    </td>
+                                                    <td>
+                                                        {!! nl2br(
+                                                            e(
+                                                                isset($dataDaftarTxn['diagnosisFreeText'])
+                                                                    ? ($dataDaftarTxn['diagnosisFreeText']
+                                                                        ? $dataDaftarTxn['diagnosisFreeText']
+                                                                        : '-')
+                                                                    : '-',
+                                                            ),
+                                                        ) !!}
+                                                    </td>
+                                                    <td>
+                                                    </td>
+                                                </tr>
                                             </tbody>
                                         </table>
 
@@ -1268,7 +1283,21 @@
                                                         </tr>
                                                     @endforeach
                                                 @endisset
-
+                                                <tr>
+                                                    <td>
+                                                    </td>
+                                                    <td>
+                                                        {!! nl2br(
+                                                            e(
+                                                                isset($dataDaftarTxn['diagnosisFreeText'])
+                                                                    ? ($dataDaftarTxn['diagnosisFreeText']
+                                                                        ? $dataDaftarTxn['diagnosisFreeText']
+                                                                        : '-')
+                                                                    : '-',
+                                                            ),
+                                                        ) !!}
+                                                    </td>
+                                                </tr>
 
                                             </tbody>
                                         </table>
