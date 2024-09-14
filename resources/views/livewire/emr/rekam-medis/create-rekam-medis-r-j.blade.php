@@ -1200,7 +1200,7 @@
                                             </thead>
                                             <tbody>
 
-                                                @isset($dataDaftarTxn['diagnosis'])
+                                                {{-- @isset($dataDaftarTxn['diagnosis'])
                                                     @foreach ($dataDaftarTxn['diagnosis'] as $key => $diag)
                                                         <tr>
 
@@ -1221,10 +1221,10 @@
 
                                                         </tr>
                                                     @endforeach
-                                                @endisset
+                                                @endisset --}}
                                                 <tr>
                                                     <td>
-                                                        Freetext Dokter
+                                                        {{-- Freetext Dokter --}}
                                                     </td>
                                                     <td>
                                                         {!! nl2br(
@@ -1269,7 +1269,7 @@
                                             </thead>
                                             <tbody>
 
-                                                @isset($dataDaftarTxn['procedure'])
+                                                {{-- @isset($dataDaftarTxn['procedure'])
                                                     @foreach ($dataDaftarTxn['procedure'] as $key => $procedure)
                                                         <tr>
 
@@ -1283,10 +1283,10 @@
 
                                                         </tr>
                                                     @endforeach
-                                                @endisset
+                                                @endisset --}}
                                                 <tr>
                                                     <td>
-                                                        Freetext Dokter
+                                                        {{-- Freetext Dokter --}}
                                                     </td>
                                                     <td>
                                                         {!! nl2br(
