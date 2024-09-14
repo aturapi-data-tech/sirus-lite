@@ -1224,6 +1224,7 @@
                                                 @endisset
                                                 <tr>
                                                     <td>
+                                                        Freetext Dokter
                                                     </td>
                                                     <td>
                                                         {!! nl2br(
@@ -1285,13 +1286,14 @@
                                                 @endisset
                                                 <tr>
                                                     <td>
+                                                        Freetext Dokter
                                                     </td>
                                                     <td>
                                                         {!! nl2br(
                                                             e(
-                                                                isset($dataDaftarTxn['diagnosisFreeText'])
-                                                                    ? ($dataDaftarTxn['diagnosisFreeText']
-                                                                        ? $dataDaftarTxn['diagnosisFreeText']
+                                                                isset($dataDaftarTxn['procedureFreeText'])
+                                                                    ? ($dataDaftarTxn['procedureFreeText']
+                                                                        ? $dataDaftarTxn['procedureFreeText']
                                                                         : '-')
                                                                     : '-',
                                                             ),

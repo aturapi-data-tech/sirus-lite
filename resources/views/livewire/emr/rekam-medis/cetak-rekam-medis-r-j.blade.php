@@ -1208,6 +1208,7 @@
                                     <tr>
 
                                         <td>
+                                            Freetext Dokter
                                         </td>
                                         <td>
                                             {!! nl2br(
@@ -1273,6 +1274,7 @@
 
                                     <tr>
                                         <td>
+                                            Freetext Dokter
                                         </td>
                                         <td>
                                             {!! nl2br(
