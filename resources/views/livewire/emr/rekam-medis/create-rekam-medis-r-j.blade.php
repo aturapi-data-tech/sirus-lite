@@ -1185,17 +1185,17 @@
                                         <table class="w-full text-sm table-auto">
                                             <thead>
                                                 <tr>
-                                                    <th>
+                                                    {{-- <th>
                                                         Kode (ICD 10)
-                                                    </th>
+                                                    </th> --}}
 
                                                     <th>
                                                         Diagnosa
                                                     </th>
 
-                                                    <th>
+                                                    {{-- <th>
                                                         Kategori
-                                                    </th>
+                                                    </th> --}}
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -1223,9 +1223,9 @@
                                                     @endforeach
                                                 @endisset --}}
                                                 <tr>
-                                                    <td>
-                                                        {{-- Freetext Dokter --}}
-                                                    </td>
+                                                    {{-- <td>
+                                                        Freetext Dokter
+                                                    </td> --}}
                                                     <td>
                                                         {!! nl2br(
                                                             e(
@@ -1237,8 +1237,8 @@
                                                             ),
                                                         ) !!}
                                                     </td>
-                                                    <td>
-                                                    </td>
+                                                    {{-- <td>
+                                                    </td> --}}
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -1258,9 +1258,9 @@
                                         <table class="w-full text-sm table-auto">
                                             <thead>
                                                 <tr>
-                                                    <th>
+                                                    {{-- <th>
                                                         Kode (ICD 9 CM)
-                                                    </th>
+                                                    </th> --}}
 
                                                     <th>
                                                         Prosedur
@@ -1285,9 +1285,9 @@
                                                     @endforeach
                                                 @endisset --}}
                                                 <tr>
-                                                    <td>
-                                                        {{-- Freetext Dokter --}}
-                                                    </td>
+                                                    {{-- <td>
+                                                        Freetext Dokter
+                                                    </td> --}}
                                                     <td>
                                                         {!! nl2br(
                                                             e(

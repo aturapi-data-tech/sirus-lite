@@ -1167,17 +1167,17 @@
                             <table class="w-full text-xs table-auto">
                                 <thead>
                                     <tr>
-                                        <th>
+                                        {{-- <th>
                                             Kode (ICD 10)
-                                        </th>
+                                        </th> --}}
 
                                         <th>
                                             Diagnosa
                                         </th>
 
-                                        <th>
+                                        {{-- <th>
                                             Kategori
-                                        </th>
+                                        </th> --}}
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -1207,9 +1207,9 @@
 
                                     <tr>
 
-                                        <td>
-                                            {{-- Freetext Dokter --}}
-                                        </td>
+                                        {{-- <td>
+                                            Freetext Dokter
+                                        </td> --}}
                                         <td>
                                             {!! nl2br(
                                                 e(
@@ -1221,8 +1221,8 @@
                                                 ),
                                             ) !!}
                                         </td>
-                                        <td>
-                                        </td>
+                                        {{-- <td>
+                                        </td> --}}
 
 
                                     </tr>
@@ -1245,9 +1245,9 @@
                             <table class="w-full text-xs table-auto">
                                 <thead>
                                     <tr>
-                                        <th>
+                                        {{-- <th>
                                             Kode (ICD 9 CM)
-                                        </th>
+                                        </th> --}}
 
                                         <th>
                                             Prosedur
@@ -1273,9 +1273,9 @@
                                     @endisset --}}
 
                                     <tr>
-                                        <td>
-                                            {{-- Freetext Dokter --}}
-                                        </td>
+                                        {{-- <td>
+                                            Freetext Dokter
+                                        </td> --}}
                                         <td>
                                             {!! nl2br(
                                                 e(
