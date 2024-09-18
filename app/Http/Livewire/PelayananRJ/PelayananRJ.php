@@ -100,12 +100,9 @@ class PelayananRJ extends Component
     public $sortAsc = true;
 
 
-    // listener from blade////////////////
-    protected $listeners = [
-        'confirm_batal_poli_taskId' => 'batalPoli',
-    ];
 
 
+    public bool $deleteConfirmation = false;
 
     ////////////////////////////////////////////////
     ///////////begin////////////////////////////////

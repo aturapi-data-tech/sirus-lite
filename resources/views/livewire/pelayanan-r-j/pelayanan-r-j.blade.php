@@ -387,19 +387,6 @@
 
 
 
-
-
-        {{-- Disabling enter key for form --}}
-        <script type="text/javascript">
-            $(document).on("keydown", "form", function(event) {
-                return event.key != "Enter";
-            });
-        </script>
-
-
-
-
-
         {{-- Global Livewire JavaScript Object start --}}
         <script type="text/javascript">
             window.livewire.on('toastr-success', message => toastr.success(message));
@@ -407,77 +394,6 @@
                 toastr.info(message)
             });
             window.livewire.on('toastr-error', message => toastr.error(message));
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            // confirmation message remove record
-            window.livewire.on('confirm_batal_poli', (key, name) => {
-
-                let cfn = confirm('Apakah anda ingin membatalkan data ini ' + name + '?');
-                if (cfn) {
-                    console.log(cfn)
-                    window.livewire.emit('confirm_batal_poli_taskId', key, name);
-                }
-            });
-
-
-
-
-
-
-
-
-
-
-
-
-            // confirmation cari_Data_Pasien_Tidak_Ditemukan_Confirmation
-            window.livewire.on('cari_Data_Pasien_Tidak_Ditemukan_Confirmation', (msg) => {
-                let cfn = confirm('Data ' + msg +
-                    ' tidak ditemuka, apakah anda ingin menambahkan menjadi pasien baru ?');
-
-                if (cfn) {
-                    @this.set('callMasterPasien', true);
-                }
-            });
-
-
-
-
-            // confirmation rePush_Data_Antrian_Confirmation
-            window.livewire.on('rePush_Data_Antrian_Confirmation', () => {
-                let cfn = confirm('Apakah anda ingin mengulaingi Proses Kirim data Antrian ?');
-
-                if (cfn) {
-                    // emit ke controller
-                    window.livewire.emit('rePush_Data_Antrian');
-                }
-            });
-
-
-
-
-
-
-
-
-
-
-
 
 
             // press_dropdownButton flowbite
@@ -520,12 +436,7 @@
 
             );
         </script>
-        <script>
-            // $("#dateRjRef").change(function() {
-            //     const datepickerEl = document.getElementById('dateRjRef');
-            //     console.log(datepickerEl);
-            // });
-        </script>
+
         {{-- Global Livewire JavaScript Object end --}}
     @endpush
 
