@@ -209,43 +209,47 @@
                                 $myPreviousRow = '';
                             @endphp
                             @foreach ($dataDaftarPoliRJ['eresepRacikan'] as $key => $eresepRacikan)
-                                @php
-                                    $myRacikanBorder =
-                                        $myPreviousRow !== $eresepRacikan['noRacikan'] ? 'border-t-2 border-black' : '';
-                                @endphp
+                                @isset($eresepRacikan['jenisKeterangan'])
+                                    @php
+                                        $myRacikanBorder =
+                                            $myPreviousRow !== $eresepRacikan['noRacikan']
+                                                ? 'border-t-2 border-black'
+                                                : '';
+                                    @endphp
 
-                                <tr class="{{ $myRacikanBorder }}">
-                                    <td class="w-1/5 text-center uppercase">
-                                        {{ $eresepRacikan['noRacikan'] . '/' }}
-                                    </td>
+                                    <tr class="{{ $myRacikanBorder }}">
+                                        <td class="w-1/5 text-center uppercase">
+                                            {{ $eresepRacikan['noRacikan'] . '/' }}
+                                        </td>
 
-                                    <td class="w-2/5 uppercase text-start">
-                                        {{ $eresepRacikan['productName'] }}
+                                        <td class="w-2/5 uppercase text-start">
+                                            {{ $eresepRacikan['productName'] }}
 
-                                        @isset($eresepRacikan['dosis'])
-                                            {{ ' - ' . $eresepRacikan['dosis'] }}
-                                        @endisset
-                                    </td>
+                                            @isset($eresepRacikan['dosis'])
+                                                {{ ' - ' . $eresepRacikan['dosis'] }}
+                                            @endisset
+                                        </td>
 
-                                    <td class="w-1/5 text-center uppercase">
-                                        @if ($eresepRacikan['qty'])
-                                            {{ 'Jml Racikan ' . $eresepRacikan['qty'] }}
-                                        @else
-                                            {{ '' }}
-                                        @endif
-                                    </td>
+                                        <td class="w-1/5 text-center uppercase">
+                                            @if ($eresepRacikan['qty'])
+                                                {{ 'Jml Racikan ' . $eresepRacikan['qty'] }}
+                                            @else
+                                                {{ '' }}
+                                            @endif
+                                        </td>
 
-                                    <td class="w-1/5 text-center uppercase">
-                                        @if ($eresepRacikan['qty'])
-                                            {{ '(' . $eresepRacikan['catatan'] . ') ' . 'S ' . $eresepRacikan['catatanKhusus'] }}
-                                        @else
-                                            {{ '' }}
-                                        @endif
-                                    </td>
-                                </tr>
-                                @php
-                                    $myPreviousRow = $eresepRacikan['noRacikan'];
-                                @endphp
+                                        <td class="w-1/5 text-center uppercase">
+                                            @if ($eresepRacikan['qty'])
+                                                {{ '(' . $eresepRacikan['catatan'] . ') ' . 'S ' . $eresepRacikan['catatanKhusus'] }}
+                                            @else
+                                                {{ '' }}
+                                            @endif
+                                        </td>
+                                    </tr>
+                                    @php
+                                        $myPreviousRow = $eresepRacikan['noRacikan'];
+                                    @endphp
+                                @endisset
                             @endforeach
                         @endisset
                     </tbody>
