@@ -62,8 +62,8 @@
                                 </li>
                             @endif --}}
                         @endauth
+                    @endif
             </div>
-            @endif
 
 
             </ul>
