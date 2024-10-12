@@ -64,6 +64,15 @@ class Diagnosis extends Component
     ///////////begin////////////////////////////////
     ////////////////////////////////////////////////
 
+    public function updateddataDaftarUgddiagnosisFreeText()
+    {
+        $this->store();
+    }
+
+    public function updateddataDaftarUgdprocedureFreeText()
+    {
+        $this->store();
+    }
 
 
     /////////////////////////////////////////////////
@@ -557,12 +566,20 @@ class Diagnosis extends Component
         if (isset($this->dataDaftarUgd['procedure']) == false) {
             $this->dataDaftarUgd['procedure'] = $this->procedure;
         }
+
+        // free text
+        if (isset($this->dataDaftarUgd['diagnosisFreeText']) == false) {
+            $this->dataDaftarUgd['diagnosisFreeText'] = '';
+        }
+
+        // jika procedure tidak ditemukan tambah variable procedure pda array
+        if (isset($this->dataDaftarUgd['procedureFreeText']) == false) {
+            $this->dataDaftarUgd['procedureFreeText'] = '';
+        }
     }
 
 
-    private function setDataPrimer(): void
-    {
-    }
+    private function setDataPrimer(): void {}
 
 
     // when new form instance
