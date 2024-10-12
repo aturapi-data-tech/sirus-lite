@@ -658,7 +658,19 @@
                                                             <br>
                                                             <div class="pl-[0px]">
                                                                 @php
-                                                                    $drPemeriksa = isset($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima']) ? ($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima'] ? $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima'] : 'Perawat Penerima') : 'Perawat Penerima';
+                                                                    $drPemeriksa = isset(
+                                                                        $dataDaftarTxn['anamnesa'][
+                                                                            'pengkajianPerawatan'
+                                                                        ]['perawatPenerima'],
+                                                                    )
+                                                                        ? ($dataDaftarTxn['anamnesa'][
+                                                                            'pengkajianPerawatan'
+                                                                        ]['perawatPenerima']
+                                                                            ? $dataDaftarTxn['anamnesa'][
+                                                                                'pengkajianPerawatan'
+                                                                            ]['perawatPenerima']
+                                                                            : 'Perawat Penerima')
+                                                                        : 'Perawat Penerima';
                                                                 @endphp
                                                                 {!! DNS2D::getBarcodeHTML($drPemeriksa, 'QRCODE', 3, 3) !!}
                                                             </div>
@@ -1064,7 +1076,19 @@
                                                         @isset($dataDaftarTxn['pemeriksaan']['anatomi'])
                                                             @foreach ($dataDaftarTxn['pemeriksaan']['anatomi'] as $key => $pAnatomi)
                                                                 @php
-                                                                    $kelainan = isset($dataDaftarTxn['pemeriksaan']['anatomi'][$key]['kelainan']) ? ($dataDaftarTxn['pemeriksaan']['anatomi'][$key]['kelainan'] ? $dataDaftarTxn['pemeriksaan']['anatomi'][$key]['kelainan'] : false) : false;
+                                                                    $kelainan = isset(
+                                                                        $dataDaftarTxn['pemeriksaan']['anatomi'][$key][
+                                                                            'kelainan'
+                                                                        ],
+                                                                    )
+                                                                        ? ($dataDaftarTxn['pemeriksaan']['anatomi'][
+                                                                            $key
+                                                                        ]['kelainan']
+                                                                            ? $dataDaftarTxn['pemeriksaan']['anatomi'][
+                                                                                $key
+                                                                            ]['kelainan']
+                                                                            : false)
+                                                                        : false;
                                                                 @endphp
                                                                 @if ($kelainan && $kelainan !== 'Tidak Diperiksa')
                                                                     <span class="font-normal">
@@ -1129,22 +1153,22 @@
                                         <table class="w-full text-sm table-auto">
                                             <thead>
                                                 <tr>
-                                                    <th>
+                                                    {{-- <th>
                                                         Kode (ICD 10)
-                                                    </th>
+                                                    </th> --}}
 
                                                     <th>
                                                         Diagnosa
                                                     </th>
 
-                                                    <th>
+                                                    {{-- <th>
                                                         Kategori
-                                                    </th>
+                                                    </th> --}}
                                                 </tr>
                                             </thead>
                                             <tbody>
 
-                                                @isset($dataDaftarTxn['diagnosis'])
+                                                {{-- @isset($dataDaftarTxn['diagnosis'])
                                                     @foreach ($dataDaftarTxn['diagnosis'] as $key => $diag)
                                                         <tr>
 
@@ -1165,8 +1189,26 @@
 
                                                         </tr>
                                                     @endforeach
-                                                @endisset
+                                                @endisset --}}
 
+                                                <tr>
+                                                    {{-- <td>
+                                                        Freetext Dokter
+                                                    </td> --}}
+                                                    <td>
+                                                        {!! nl2br(
+                                                            e(
+                                                                isset($dataDaftarTxn['diagnosisFreeText'])
+                                                                    ? ($dataDaftarTxn['diagnosisFreeText']
+                                                                        ? $dataDaftarTxn['diagnosisFreeText']
+                                                                        : '-')
+                                                                    : '-',
+                                                            ),
+                                                        ) !!}
+                                                    </td>
+                                                    {{-- <td>
+                                                    </td> --}}
+                                                </tr>
 
                                             </tbody>
                                         </table>
@@ -1186,9 +1228,9 @@
                                         <table class="w-full text-sm table-auto">
                                             <thead>
                                                 <tr>
-                                                    <th>
+                                                    {{-- <th>
                                                         Kode (ICD 9 CM)
-                                                    </th>
+                                                    </th> --}}
 
                                                     <th>
                                                         Prosedur
@@ -1197,7 +1239,7 @@
                                             </thead>
                                             <tbody>
 
-                                                @isset($dataDaftarTxn['procedure'])
+                                                {{-- @isset($dataDaftarTxn['procedure'])
                                                     @foreach ($dataDaftarTxn['procedure'] as $key => $procedure)
                                                         <tr>
 
@@ -1211,7 +1253,24 @@
 
                                                         </tr>
                                                     @endforeach
-                                                @endisset
+                                                @endisset --}}
+
+                                                <tr>
+                                                    {{-- <td>
+                                                        Freetext Dokter
+                                                    </td> --}}
+                                                    <td>
+                                                        {!! nl2br(
+                                                            e(
+                                                                isset($dataDaftarTxn['procedureFreeText'])
+                                                                    ? ($dataDaftarTxn['procedureFreeText']
+                                                                        ? $dataDaftarTxn['procedureFreeText']
+                                                                        : '-')
+                                                                    : '-',
+                                                            ),
+                                                        ) !!}
+                                                    </td>
+                                                </tr>
 
 
                                             </tbody>
@@ -1337,7 +1396,19 @@
                                                     <br>
                                                     <div class="pl-[85px]">
                                                         @php
-                                                            $drPemeriksa = isset($dataDaftarTxn['perencanaan']['pengkajianMedis']['drPemeriksa']) ? ($dataDaftarTxn['perencanaan']['pengkajianMedis']['drPemeriksa'] ? $dataDaftarTxn['perencanaan']['pengkajianMedis']['drPemeriksa'] : 'Dokter Pemeriksa') : 'Dokter Pemeriksa';
+                                                            $drPemeriksa = isset(
+                                                                $dataDaftarTxn['perencanaan']['pengkajianMedis'][
+                                                                    'drPemeriksa'
+                                                                ],
+                                                            )
+                                                                ? ($dataDaftarTxn['perencanaan']['pengkajianMedis'][
+                                                                    'drPemeriksa'
+                                                                ]
+                                                                    ? $dataDaftarTxn['perencanaan']['pengkajianMedis'][
+                                                                        'drPemeriksa'
+                                                                    ]
+                                                                    : 'Dokter Pemeriksa')
+                                                                : 'Dokter Pemeriksa';
                                                         @endphp
                                                         {!! DNS2D::getBarcodeHTML($drPemeriksa, 'QRCODE', 3, 3) !!}
                                                     </div>
