@@ -156,7 +156,21 @@
 
                     {{-- Pengkajian peerawatan --}}
                     <div>
-                        <table class="w-full table-auto">
+                        @php
+                            $tingkatKegawatan = $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['tingkatKegawatan']
+                                ? $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['tingkatKegawatan']
+                                : 'P0';
+
+                            $tingkatKegawatanBgColor = match ($tingkatKegawatan) {
+                                'P1' => 'bg-red-500',
+                                'P2' => 'bg-yellow-500',
+                                'P3' => 'bg-green-500',
+                                'P0' => 'bg-gray-400',
+                                default => 'bg-white',
+                            };
+                        @endphp
+
+                        <table class="w-full table-auto {{ $tingkatKegawatanBgColor }}">
                             <tbody>
                                 <tr>
                                     <td

@@ -146,7 +146,22 @@
 
         {{-- Pengkajian peerawatan --}}
         <div>
-            <table class="w-full table-auto">
+
+            @php
+                $tingkatKegawatan = $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['tingkatKegawatan']
+                    ? $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['tingkatKegawatan']
+                    : 'P0';
+
+                $tingkatKegawatanBgColor = match ($tingkatKegawatan) {
+                    'P1' => 'red',
+                    'P2' => 'yellow',
+                    'P3' => 'green',
+                    'P0' => 'gray',
+                    default => 'white',
+                };
+            @endphp
+
+            <table class="w-full table-auto" style="background-color:{{ $tingkatKegawatanBgColor }};">>
                 <tbody>
                     <tr>
                         <td
@@ -1142,22 +1157,22 @@
                             <table class="w-full text-xs table-auto">
                                 <thead>
                                     <tr>
-                                        <th>
+                                        {{-- <th>
                                             Kode (ICD 10)
-                                        </th>
+                                        </th> --}}
 
                                         <th>
                                             Diagnosa
                                         </th>
 
-                                        <th>
+                                        {{-- <th>
                                             Kategori
-                                        </th>
+                                        </th> --}}
                                     </tr>
                                 </thead>
                                 <tbody>
 
-                                    @isset($dataDaftarTxn['diagnosis'])
+                                    {{-- @isset($dataDaftarTxn['diagnosis'])
                                         @foreach ($dataDaftarTxn['diagnosis'] as $key => $diag)
                                             <tr>
 
@@ -1178,8 +1193,30 @@
 
                                             </tr>
                                         @endforeach
-                                    @endisset
+                                    @endisset --}}
 
+
+                                    <tr>
+
+                                        {{-- <td>
+                                            Freetext Dokter
+                                        </td> --}}
+                                        <td>
+                                            {!! nl2br(
+                                                e(
+                                                    isset($dataDaftarTxn['diagnosisFreeText'])
+                                                        ? ($dataDaftarTxn['diagnosisFreeText']
+                                                            ? $dataDaftarTxn['diagnosisFreeText']
+                                                            : '-')
+                                                        : '-',
+                                                ),
+                                            ) !!}
+                                        </td>
+                                        {{-- <td>
+                                        </td> --}}
+
+
+                                    </tr>
 
                                 </tbody>
                             </table>
@@ -1198,9 +1235,9 @@
                             <table class="w-full text-xs table-auto">
                                 <thead>
                                     <tr>
-                                        <th>
+                                        {{-- <th>
                                             Kode (ICD 9 CM)
-                                        </th>
+                                        </th> --}}
 
                                         <th>
                                             Prosedur
@@ -1209,7 +1246,7 @@
                                 </thead>
                                 <tbody>
 
-                                    @isset($dataDaftarTxn['procedure'])
+                                    {{-- @isset($dataDaftarTxn['procedure'])
                                         @foreach ($dataDaftarTxn['procedure'] as $key => $procedure)
                                             <tr>
 
@@ -1223,8 +1260,24 @@
 
                                             </tr>
                                         @endforeach
-                                    @endisset
+                                    @endisset --}}
 
+                                    <tr>
+                                        {{-- <td>
+                                            Freetext Dokter
+                                        </td> --}}
+                                        <td>
+                                            {!! nl2br(
+                                                e(
+                                                    isset($dataDaftarTxn['procedureFreeText'])
+                                                        ? ($dataDaftarTxn['procedureFreeText']
+                                                            ? $dataDaftarTxn['procedureFreeText']
+                                                            : '-')
+                                                        : '-',
+                                                ),
+                                            ) !!}
+                                        </td>
+                                    </tr>
 
                                 </tbody>
                             </table>
