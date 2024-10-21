@@ -418,6 +418,10 @@ class MasterPasien extends Component
         $this->resetInputFields();
         $this->isOpen = true;
         $this->isOpenMode = 'insert';
+
+        if (!isset($this->dataPasien['pasien']['regDate'])) {
+            $this->dataPasien['pasien']['regDate'] = Carbon::now()->format('d/m/Y H:i:s');
+        }
     }
 
     private function openModalEdit(): void
@@ -1451,8 +1455,9 @@ class MasterPasien extends Component
     // ///////////////////////////////////////////////////////////////
     private function insertDataPasien(): void
     {
+
         DB::table('rsmst_pasiens')->insert([
-            'reg_date' => Carbon::now(),
+            'reg_date' => DB::raw("to_date('" . $this->dataPasien['pasien']['regDate'] . "','dd/mm/yyyy hh24:mi:ss')"),
             'reg_no' => $this->dataPasien['pasien']['regNo'], //primarykey insert when select max
             'reg_name' => strtoupper($this->dataPasien['pasien']['regName']),
             'nokartu_bpjs' => $this->dataPasien['pasien']['identitas']['idbpjs'],
@@ -1494,7 +1499,7 @@ class MasterPasien extends Component
     {
         DB::table('rsmst_pasiens')->where('reg_no', $regNo)
             ->update([
-                'reg_date' => Carbon::now(),
+                'reg_date' => DB::raw("to_date('" . $this->dataPasien['pasien']['regDate'] . "','dd/mm/yyyy hh24:mi:ss')"),
                 // 'reg_no' => $this->dataPasien['pasien']['regNo'], //primarykey insert when select max
                 'reg_name' => strtoupper($this->dataPasien['pasien']['regName']),
                 'nokartu_bpjs' => $this->dataPasien['pasien']['identitas']['idbpjs'],
@@ -1861,6 +1866,10 @@ class MasterPasien extends Component
 
         $this->validateDataPasien();
 
+        // Set data regDateStore if not exsist then create
+        if (!isset($this->dataPasien['pasien']['regDateStore'])) {
+            $this->dataPasien['pasien']['regDateStore'] = Carbon::now()->format('d/m/Y H:i:s');
+        }
 
         // Logic insert and update mode start //////////
         if ($this->isOpenMode == 'insert') {
