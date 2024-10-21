@@ -1575,7 +1575,7 @@ class MasterPasien extends Component
                         $CaridataVclaim = $CaridataVclaim['response']['peserta'];
 
                         // set dataPasien
-                        $this->dataPasien['pasien']['regDate'] = Carbon::now();
+                        $this->dataPasien['pasien']['regDate'] = Carbon::now()->format('d/m/Y H:i:s');
                         $this->dataPasien['pasien']['regName'] = $CaridataVclaim['nama'];
                         $this->dataPasien['pasien']['identitas']['idbpjs'] = $CaridataVclaim['noKartu'];
                         $this->dataPasien['pasien']['identitas']['nik'] = $CaridataVclaim['nik'];
