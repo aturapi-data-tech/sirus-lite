@@ -255,6 +255,12 @@
                                                                 {{ '' . $RJp->nobooking }}
                                                             </div>
                                                             <div class="italic font-normal text-gray-900">
+                                                                {{ 'TaskId1 ' . json_decode($RJp->datadaftarpolirj_json)->taskIdPelayanan->taskId1 }}
+                                                            </div>
+                                                            <div class="italic font-normal text-gray-900">
+                                                                {{ 'TaskId2 ' . json_decode($RJp->datadaftarpolirj_json)->taskIdPelayanan->taskId2 }}
+                                                            </div>
+                                                            <div class="italic font-normal text-gray-900">
                                                                 {{ 'TaskId3 ' . json_decode($RJp->datadaftarpolirj_json)->taskIdPelayanan->taskId3 }}
                                                             </div>
                                                             <div class="italic font-normal text-gray-900">
@@ -262,6 +268,12 @@
                                                             </div>
                                                             <div class="italic font-normal text-gray-900">
                                                                 {{ 'TaskId5 ' . json_decode($RJp->datadaftarpolirj_json)->taskIdPelayanan->taskId5 }}
+                                                            </div>
+                                                            <div class="italic font-normal text-gray-900">
+                                                                {{ 'TaskId6 ' . json_decode($RJp->datadaftarpolirj_json)->taskIdPelayanan->taskId6 }}
+                                                            </div>
+                                                            <div class="italic font-normal text-gray-900">
+                                                                {{ 'TaskId7 ' . json_decode($RJp->datadaftarpolirj_json)->taskIdPelayanan->taskId7 }}
                                                             </div>
                                                             <div class="italic font-normal text-gray-900">
                                                                 {{ 'TaskId99 ' . json_decode($RJp->datadaftarpolirj_json)->taskIdPelayanan->taskId99 }}
