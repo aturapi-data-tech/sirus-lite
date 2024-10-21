@@ -1779,14 +1779,35 @@ class DaftarRJ extends Component
 
 
 
+        $noBooking = $this->dataDaftarPoliRJ['noBooking'];
+
+
+        /////////////////////////
+        // Update TaskId 1&2 jika tgl registrasi = tgl rj
+        /////////////////////////
+        if (
+            Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'])->format('Ymd')
+            ===
+            Carbon::createFromFormat('d/m/Y H:i:s', $this->dataPasien['pasien']['regDate'])->format('Ymd')
+        ) {
+            // taskId 1
+            $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId1'] = $this->dataPasien['pasien']['regDate'];
+            $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId1'])->timestamp * 1000; //waktu dalam timestamp milisecond
+            $this->pushDataTaskId($noBooking, 1, $waktu);
+
+            //taskId2
+            $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId2'] = $this->dataPasien['pasien']['regDateStore'];
+            $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId2'])->timestamp * 1000; //waktu dalam timestamp milisecond
+            $this->pushDataTaskId($noBooking, 2, $waktu);
+        }
+
+
         /////////////////////////
         // Update TaskId 3
         /////////////////////////
 
-        $noBooking = $this->dataDaftarPoliRJ['noBooking'];
         $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId3'] = $this->dataDaftarPoliRJ['rjDate'];
         $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId3'])->timestamp * 1000; //waktu dalam timestamp milisecond
-        // $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId3'])->valueOf(); //waktu dalam timestamp milisecond
         $waktu = Carbon::now()->timestamp * 1000;
 
         $this->pushDataTaskId($noBooking, 3, $waktu);
