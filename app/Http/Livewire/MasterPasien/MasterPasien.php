@@ -1497,9 +1497,10 @@ class MasterPasien extends Component
     // ///////////////////////////////////////////////////////////////
     private function updateDataPasien($regNo): void
     {
+
         DB::table('rsmst_pasiens')->where('reg_no', $regNo)
             ->update([
-                'reg_date' => DB::raw("to_date('" . $this->dataPasien['pasien']['regDate'] . "','dd/mm/yyyy hh24:mi:ss')"),
+                // 'reg_date' => DB::raw("to_date('" . $this->dataPasien['pasien']['regDate'] . "','dd/mm/yyyy hh24:mi:ss')"),
                 // 'reg_no' => $this->dataPasien['pasien']['regNo'], //primarykey insert when select max
                 'reg_name' => strtoupper($this->dataPasien['pasien']['regName']),
                 'nokartu_bpjs' => $this->dataPasien['pasien']['identitas']['idbpjs'],
