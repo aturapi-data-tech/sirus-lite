@@ -1,4 +1,4 @@
-    <div x-data="{ deleteConfirmation{{ addslashes($RJp->rj_no) }}: false }">
+    <div x-data="{ deleteConfirmation{{ addslashes($RJp->rj_no) }}: false }" class =''>
 
         <div x-show="deleteConfirmation{{ addslashes($RJp->rj_no) }}">
             <x-confirmation-modal>
@@ -45,7 +45,7 @@
             </x-confirmation-modal>
         </div>
 
-        <x-red-button @click="deleteConfirmation{{ addslashes($RJp->rj_no) }} = true" class="ml-12">
+        <x-red-button @click="deleteConfirmation{{ addslashes($RJp->rj_no) }} = true" class='w-full'>
             Batal Poli
         </x-red-button>
 

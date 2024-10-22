@@ -1594,6 +1594,10 @@ class MasterPasien extends Component
                         // dd($CaridataVclaim);
                         $this->emit('toastr-error', $CaridataVclaim['metadata']['code'] . ' ' . $CaridataVclaim['metadata']['message']);
                     }
+
+                    if (!isset($this->dataPasien['pasien']['regDate'])) {
+                        $this->dataPasien['pasien']['regDate'] = Carbon::now()->format('d/m/Y H:i:s');
+                    }
                 }
             }
         }

@@ -431,6 +431,30 @@
                                                     </li> --}}
 
                                                 </ul>
+
+                                                @role(['Admin', 'Perawat'])
+                                                    <div class="grid grid-cols-2 y-2">
+
+                                                        <x-light-button
+                                                            wire:click="masukPoli('{{ addslashes($myQData->rj_no) }}')"
+                                                            wire:loading.remove>
+                                                            4.Masuk Poli
+                                                        </x-light-button>
+                                                        <div wire:loading wire:target="masukPoli">
+                                                            <x-loading />
+                                                        </div>
+
+                                                        <x-light-button
+                                                            wire:click="keluarPoli('{{ addslashes($myQData->rj_no) }}')"
+                                                            wire:loading.remove>
+                                                            5.Keluar Poli
+                                                        </x-light-button>
+                                                        <div wire:loading wire:target="keluarPoli">
+                                                            <x-loading />
+                                                        </div>
+
+                                                    </div>
+                                                @endrole
                                             </div>
                                         </div>
                                         <!-- End Dropdown Action Open menu -->

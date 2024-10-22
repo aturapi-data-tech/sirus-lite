@@ -178,25 +178,20 @@
 
                                         @foreach ($RJpasiens as $RJp)
                                             @php
-                                                $statusLayananBgcolor =
-                                                    $RJp->waktu_masuk_poli == null && $RJp->waktu_masuk_apt == null
-                                                        ? 'bg-yellow-100'
-                                                        : ($RJp->waktu_masuk_poli != null &&
-                                                        $RJp->waktu_masuk_apt == null
-                                                            ? 'bg-red-100'
-                                                            : ($RJp->waktu_masuk_poli != null &&
-                                                            $RJp->waktu_masuk_apt != null
-                                                                ? 'bg-green-100'
-                                                                : ''));
+                                                $statusLayananBgcolor = '';
                                             @endphp
+
                                             <tr
                                                 class="border-b group dark:border-gray-700 {{ $statusLayananBgcolor }}">
 
+
                                                 <td
-                                                    class="flex items-center px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
-                                                    <span
-                                                        class="text-5xl font-semibold text-gray-700">{{ $RJp->no_antrian }}</span>
+                                                    class="px-4 py-3 break-all whitespace-nowrap group-hover:bg-gray-100 dark:text-white ">
+
                                                     <div class="pl-3">
+                                                        <span
+                                                            class="text-5xl font-semibold text-gray-700">{{ $RJp->no_antrian }}
+                                                        </span>
                                                         <div class="text-base font-semibold text-gray-700">
                                                             {{ $RJp->reg_no }}</div>
                                                         <div class="font-semibold text-primary">
@@ -223,10 +218,11 @@
                                                             {{ 'Nomer Pelayanan ' . $RJp->no_antrian }}
                                                         </div>
                                                     </div>
+
                                                 </td>
 
                                                 <td
-                                                    class="px-4 py-3 break-all group-hover:bg-gray-100 dark:text-white w-52">
+                                                    class="px-4 py-3 overflow-auto break-all group-hover:bg-gray-100 dark:text-white w-52">
 
                                                     <div class="mb-2 font-semibold text-primary">
                                                         {{ $RJp->vno_sep }}
@@ -239,7 +235,7 @@
 
                                                 <td
                                                     class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
-                                                    <div class="overflow-auto w-52">
+                                                    <div class="overflow-auto ">
                                                         <div class="font-semibold text-primary">
                                                             {{ $RJp->waktu_masuk_poli == null && $RJp->waktu_masuk_apt == null
                                                                 ? 'Pendaftaran'
@@ -285,47 +281,104 @@
 
                                                 <td class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-primary">
 
+                                                    <div class="grid grid-cols-1">
 
+                                                        <!-- Dropdown Action menu Flowbite-->
+                                                        <div class="grid grid-cols-3">
 
-                                                    <!-- Dropdown Action menu Flowbite-->
-                                                    <div class="inline-flex">
+                                                            <x-light-button
+                                                                wire:click="masukAdmisi('{{ addslashes($RJp->rj_no) }}')"
+                                                                wire:loading.remove>
+                                                                1.Masuk Admisi
+                                                            </x-light-button>
+                                                            <div wire:loading wire:target="masukAdmisi">
+                                                                <x-loading />
+                                                            </div>
 
-                                                        <x-yellow-button
-                                                            wire:click="masukPoli('{{ addslashes($RJp->rj_no) }}')"
-                                                            wire:loading.remove>
-                                                            Masuk Poli
-                                                        </x-yellow-button>
-                                                        <div wire:loading wire:target="masukPoli">
-                                                            <x-loading />
+                                                            <x-light-button
+                                                                wire:click="keluarAdmisi('{{ addslashes($RJp->rj_no) }}')"
+                                                                wire:loading.remove>
+                                                                2.Keluar Admisi
+                                                            </x-light-button>
+                                                            <div wire:loading wire:target="keluarAdmisi">
+                                                                <x-loading />
+                                                            </div>
+
+                                                            <x-light-button
+                                                                wire:click="daftarPoli('{{ addslashes($RJp->rj_no) }}')"
+                                                                wire:loading.remove>
+                                                                3.Daftar Poli
+                                                            </x-light-button>
+                                                            <div wire:loading wire:target="daftarPoli">
+                                                                <x-loading />
+                                                            </div>
+
                                                         </div>
 
-                                                        <x-green-button
-                                                            wire:click="keluarPoli('{{ addslashes($RJp->rj_no) }}')"
-                                                            wire:loading.remove>
-                                                            Keluar Poli
-                                                        </x-green-button>
-                                                        <div wire:loading wire:target="keluarPoli">
-                                                            <x-loading />
+
+
+
+
+                                                        <div class="grid grid-cols-2">
+
+                                                            <x-light-button
+                                                                wire:click="masukPoli('{{ addslashes($RJp->rj_no) }}')"
+                                                                wire:loading.remove>
+                                                                4.Masuk Poli
+                                                            </x-light-button>
+                                                            <div wire:loading wire:target="masukPoli">
+                                                                <x-loading />
+                                                            </div>
+
+                                                            <x-light-button
+                                                                wire:click="keluarPoli('{{ addslashes($RJp->rj_no) }}')"
+                                                                wire:loading.remove>
+                                                                5.Keluar Poli
+                                                            </x-light-button>
+                                                            <div wire:loading wire:target="keluarPoli">
+                                                                <x-loading />
+                                                            </div>
+
+                                                            {{-- delete Modal --}}
+                                                            @include('livewire.pelayanan-r-j.delete-confirmation')
+
+
+
                                                         </div>
 
-                                                        {{-- delete Modal --}}
-                                                        @include('livewire.pelayanan-r-j.delete-confirmation')
+                                                        <div class="grid grid-cols-2">
 
+                                                            <x-light-button
+                                                                wire:click="masukApotek('{{ addslashes($RJp->rj_no) }}')"
+                                                                wire:loading.remove>
+                                                                6.Masuk Apotek
+                                                            </x-light-button>
+                                                            <div wire:loading wire:target="masukApotek">
+                                                                <x-loading />
+                                                            </div>
 
+                                                            <x-light-button
+                                                                wire:click="keluarApotek('{{ addslashes($RJp->rj_no) }}')"
+                                                                wire:loading.remove>
+                                                                7.Keluar Apotek
+                                                            </x-light-button>
+                                                            <div wire:loading wire:target="keluarApotek">
+                                                                <x-loading />
+                                                            </div>
 
+                                                            <x-primary-button
+                                                                wire:click="getListTaskId('{{ addslashes($RJp->nobooking) }}')"
+                                                                wire:loading.remove>
+                                                                Get List Task Id BPJS
+                                                            </x-primary-button>
+                                                            <div wire:loading wire:target="getListTaskId">
+                                                                <x-loading />
+                                                            </div>
+
+                                                        </div>
+
+                                                        <!-- End Dropdown Action Open menu -->
                                                     </div>
-                                                    <div>
-                                                        <x-primary-button
-                                                            wire:click="getListTaskId('{{ addslashes($RJp->nobooking) }}')"
-                                                            wire:loading.remove>
-                                                            Get List Task Id BPJS
-                                                        </x-primary-button>
-                                                        <div wire:loading wire:target="getListTaskId">
-                                                            <x-loading />
-                                                        </div>
-                                                    </div>
-                                                    <!-- End Dropdown Action Open menu -->
-
 
                                                 </td>
                                             </tr>

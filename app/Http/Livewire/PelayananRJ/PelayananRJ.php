@@ -513,6 +513,68 @@ class PelayananRJ extends Component
         return $findData;
     }
 
+    public function masukAdmisi($rjNo)
+    {
+
+        $this->findData($rjNo);
+
+
+        // if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId1']) {
+        //     $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId1'] = Carbon::now()->format('d/m/Y H:i:s');
+        //     // update DB
+        //     $this->updateDataRJ($rjNo);
+
+        //     $this->emit('toastr-success', "masuk Admisi " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId1']);
+        // } else {
+        //     $this->emit('toastr-error', "masuk Admisi " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId1']);
+        // }
+
+        // cari no Booking
+        $noBooking =  $this->dataDaftarPoliRJ['noBooking'];
+
+        if ($this->dataDaftarPoliRJ['taskIdPelayanan']['taskId1']) {
+            $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId1'], 'Asia/Jakarta')->timestamp * 1000; //waktu dalam timestamp milisecond
+            // $waktu = Carbon::now()->timestamp * 1000;
+            $this->pushDataTaskId($noBooking, 1, $waktu);
+        } else {
+            $this->emit('toastr-error', "waktu masuk Admisi kosong tidak dapat dikirim");
+        }
+    }
+
+    public function keluarAdmisi($rjNo)
+    {
+
+        $this->findData($rjNo);
+
+
+        // if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId2']) {
+        //     $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId2'] = Carbon::now()->format('d/m/Y H:i:s');
+        //     // update DB
+        //     $this->updateDataRJ($rjNo);
+
+        //     $this->emit('toastr-success', "masuk Admisi " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId2']);
+        // } else {
+        //     $this->emit('toastr-error', "masuk Admisi " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId2']);
+        // }
+
+        // cari no Booking
+        $noBooking =  $this->dataDaftarPoliRJ['noBooking'];
+
+        if ($this->dataDaftarPoliRJ['taskIdPelayanan']['taskId2']) {
+            $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId2'], 'Asia/Jakarta')->timestamp * 1000; //waktu dalam timestamp milisecond
+            // $waktu = Carbon::now()->timestamp * 1000;
+            $this->pushDataTaskId($noBooking, 2, $waktu);
+        } else {
+            $this->emit('toastr-error', "waktu keluar Admisi kosong tidak dapat dikirim");
+        }
+    }
+
+    public function daftarPoli($rjNo)
+    {
+        $this->emit('toastr-error', "untuk update taskID3 Daftar Poli memakai Pendaftaran Rawat Jalan");
+    }
+
+
     public function masukPoli($rjNo)
     {
 
@@ -658,6 +720,79 @@ class PelayananRJ extends Component
             $this->emit('toastr-success', "Pembatalan " . $regName . " pelayanan Poli berhasil dilakukan.");
         } else {
             $this->emit('toastr-error', "Pembatalan tidak dapat dilakukan, " . $regName . " sudak melakukan pelayanan Poli.");
+        }
+    }
+
+    public function masukApotek($rjNo)
+    {
+        $this->findData($rjNo);
+
+        // add antrian Apotek
+
+        // update no antrian Apotek
+
+        // cek
+        if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']) {
+            $this->emit('toastr-error', "Anda tidak dapat melakukan taskId6 ketika taskId5 Kosong");
+            return;
+        }
+        // update taskId6
+        if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6']) {
+            $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6'] = Carbon::now()->format('d/m/Y H:i:s');
+            // update DB
+            $this->updateDataRJ($rjNo);
+
+            $this->emit('toastr-success', "masuk Admisi " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6']);
+        } else {
+            $this->emit('toastr-error', "masuk Admisi " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6']);
+        }
+
+        // cari no Booking
+        $noBooking =  $this->dataDaftarPoliRJ['noBooking'];
+
+        if ($this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6']) {
+            $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6'], 'Asia/Jakarta')->timestamp * 1000; //waktu dalam timestamp milisecond
+            // $waktu = Carbon::now()->timestamp * 1000;
+            $this->pushDataTaskId($noBooking, 6, $waktu);
+        } else {
+            $this->emit('toastr-error', "waktu Masuk Apotek kosong tidak dapat dikirim");
+        }
+    }
+
+    public function keluarApotek($rjNo)
+    {
+        $this->findData($rjNo);
+
+        // add antrian Apotek
+
+        // update no antrian Apotek
+
+        // cek
+        if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6']) {
+            $this->emit('toastr-error', "Anda tidak dapat melakukan taskId7 ketika taskId6 Kosong");
+            return;
+        }
+
+        // update taskId7
+        if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId7']) {
+            $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId7'] = Carbon::now()->format('d/m/Y H:i:s');
+            // update DB
+            $this->updateDataRJ($rjNo);
+
+            $this->emit('toastr-success', "masuk Admisi " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId7']);
+        } else {
+            $this->emit('toastr-error', "masuk Admisi " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId7']);
+        }
+
+        // cari no Booking
+        $noBooking =  $this->dataDaftarPoliRJ['noBooking'];
+
+        if ($this->dataDaftarPoliRJ['taskIdPelayanan']['taskId7']) {
+            $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId7'], 'Asia/Jakarta')->timestamp * 1000; //waktu dalam timestamp milisecond
+            // $waktu = Carbon::now()->timestamp * 1000;
+            $this->pushDataTaskId($noBooking, 7, $waktu);
+        } else {
+            $this->emit('toastr-error', "waktu Keluar Apotek kosong tidak dapat dikirim");
         }
     }
 
