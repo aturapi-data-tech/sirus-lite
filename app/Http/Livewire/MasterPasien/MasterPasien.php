@@ -429,6 +429,10 @@ class MasterPasien extends Component
         $this->resetInputFields();
         $this->isOpen = true;
         $this->isOpenMode = 'update';
+
+        if (!isset($this->dataPasien['pasien']['regDate'])) {
+            $this->dataPasien['pasien']['regDate'] = Carbon::now()->format('d/m/Y H:i:s');
+        }
     }
 
     private function openModalTampil(): void
