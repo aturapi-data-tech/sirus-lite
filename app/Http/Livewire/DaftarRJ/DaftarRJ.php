@@ -17,6 +17,7 @@ use App\Http\Traits\EmrRJ\EmrRJTrait;
 use Illuminate\Support\Str;
 use Spatie\ArrayToXml\ArrayToXml;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Exception;
 
 
 class DaftarRJ extends Component
@@ -1786,20 +1787,26 @@ class DaftarRJ extends Component
         // Update TaskId 1&2 jika tgl registrasi = tgl rj
         /////////////////////////
         if (isset($this->dataPasien['pasien']['regDate'])) {
-            if (
-                Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'])->format('Ymd')
-                ===
-                Carbon::createFromFormat('d/m/Y H:i:s', $this->dataPasien['pasien']['regDate'])->format('Ymd')
-            ) {
-                // taskId 1
-                $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId1'] = $this->dataPasien['pasien']['regDate'];
-                $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId1'])->timestamp * 1000; //waktu dalam timestamp milisecond
-                $this->pushDataTaskId($noBooking, 1, $waktu);
+            // dd($this->dataPasien['pasien']['regDate']);
+            try {
+                if (
+                    Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'])->format('Ymd')
+                    ===
+                    Carbon::createFromFormat('d/m/Y H:i:s', $this->dataPasien['pasien']['regDate'])->format('Ymd')
+                ) {
+                    // taskId 1
+                    $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId1'] = $this->dataPasien['pasien']['regDate'];
+                    $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId1'])->timestamp * 1000; //waktu dalam timestamp milisecond
+                    $this->pushDataTaskId($noBooking, 1, $waktu);
 
-                //taskId2
-                $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId2'] = $this->dataPasien['pasien']['regDateStore'];
-                $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId2'])->timestamp * 1000; //waktu dalam timestamp milisecond
-                $this->pushDataTaskId($noBooking, 2, $waktu);
+                    //taskId2
+                    $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId2'] = $this->dataPasien['pasien']['regDateStore'];
+                    $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId2'])->timestamp * 1000; //waktu dalam timestamp milisecond
+                    $this->pushDataTaskId($noBooking, 2, $waktu);
+                }
+            } catch (Exception $e) {
+                // dd($e->getMessage());
+                $this->emit('toastr-error', $e->getMessage());
             }
         }
 

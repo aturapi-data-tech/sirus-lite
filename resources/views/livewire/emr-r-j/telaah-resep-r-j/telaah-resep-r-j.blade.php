@@ -309,6 +309,18 @@
 
                             <td class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-primary">
 
+                                <div class="grid grid-cols-2 gap-2">
+
+                                    <x-red-button
+                                        wire:click="mulaiPelayananApotek('{{ $eresep }}','{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
+                                        Mulai Pelayanan Apotek
+                                    </x-red-button>
+                                    <x-red-button
+                                        wire:click="selesaiPelayananApotek('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
+                                        Selesai Pelayanan Apotek
+                                    </x-red-button>
+
+                                </div>
 
                                 <div class="grid grid-cols-2 gap-2">
 

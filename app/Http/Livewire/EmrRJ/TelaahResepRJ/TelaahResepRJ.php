@@ -51,14 +51,16 @@ class TelaahResepRJ extends Component
                 ["tepatObat" => "Tidak"],
             ],
             "desc" => "",
-        ], "tepatDosis" => [
+        ],
+        "tepatDosis" => [
             "tepatDosis" => "Ya",
             "tepatDosisOptions" => [
                 ["tepatDosis" => "Ya"],
                 ["tepatDosis" => "Tidak"],
             ],
             "desc" => "",
-        ], "tepatRute" => [
+        ],
+        "tepatRute" => [
             "tepatRute" => "Ya",
             "tepatRuteOptions" => [
                 ["tepatRute" => "Ya"],
@@ -132,14 +134,16 @@ class TelaahResepRJ extends Component
                 ["jmlDosisdgnResep" => "Tidak"],
             ],
             "desc" => "",
-        ], "rutedgnResep" => [
+        ],
+        "rutedgnResep" => [
             "rutedgnResep" => "Ya",
             "rutedgnResepOptions" => [
                 ["rutedgnResep" => "Ya"],
                 ["rutedgnResep" => "Tidak"],
             ],
             "desc" => "",
-        ], "waktuFrekPemberiandgnResep" => [
+        ],
+        "waktuFrekPemberiandgnResep" => [
             "waktuFrekPemberiandgnResep" => "Ya",
             "waktuFrekPemberiandgnResepOptions" => [
                 ["waktuFrekPemberiandgnResep" => "Ya"],
@@ -452,7 +456,7 @@ class TelaahResepRJ extends Component
     public function setttdTelaahResep($rjNo)
     {
         $myUserNameActive = auth()->user()->myuser_name;
-        if (auth()->user()->hasRole('Perawat')) {
+        if (auth()->user()->hasRole('Apoteker')) {
             if (isset($this->dataDaftarPoliRJ['telaahResep']['penanggungJawab']) == false) {
                 $this->dataDaftarPoliRJ['telaahResep']['penanggungJawab'] = [
                     'userLog' => auth()->user()->myuser_name,
@@ -479,7 +483,7 @@ class TelaahResepRJ extends Component
     public function setttdTelaahObat($rjNo)
     {
         $myUserNameActive = auth()->user()->myuser_name;
-        if (auth()->user()->hasRole('Perawat')) {
+        if (auth()->user()->hasRole('Apoteker')) {
             if (isset($this->dataDaftarPoliRJ['telaahObat']['penanggungJawab']) == false) {
                 $this->dataDaftarPoliRJ['telaahObat']['penanggungJawab'] = [
                     'userLog' => auth()->user()->myuser_name,
