@@ -753,6 +753,12 @@ class TelaahResepRJ extends Component
         $this->settermyTopBarShiftandmyTopBarrefDate();
     }
 
+    public function mulaiPelayananApotek() {}
+
+    public function selesaiPelayananApotek() {}
+
+
+
 
     private function paginate($items, $perPage = 5, $page = null, $options = [])
 

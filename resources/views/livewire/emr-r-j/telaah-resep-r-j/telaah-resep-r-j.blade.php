@@ -311,12 +311,10 @@
 
                                 <div class="grid grid-cols-2 gap-2">
 
-                                    <x-red-button
-                                        wire:click="mulaiPelayananApotek('{{ $eresep }}','{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
+                                    <x-red-button wire:click="mulaiPelayananApotek()">
                                         Mulai Pelayanan Apotek
                                     </x-red-button>
-                                    <x-red-button
-                                        wire:click="selesaiPelayananApotek('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
+                                    <x-red-button wire:click="selesaiPelayananApotek()">
                                         Selesai Pelayanan Apotek
                                     </x-red-button>
 
