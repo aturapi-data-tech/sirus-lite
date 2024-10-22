@@ -1796,12 +1796,12 @@ class DaftarRJ extends Component
                 ) {
                     // taskId 1
                     $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId1'] = $this->dataPasien['pasien']['regDate'];
-                    $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId1'])->timestamp * 1000; //waktu dalam timestamp milisecond
+                    $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId1'], 'Asia/Jakarta')->timestamp * 1000; //waktu dalam timestamp milisecond
                     $this->pushDataTaskId($noBooking, 1, $waktu);
 
                     //taskId2
                     $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId2'] = $this->dataPasien['pasien']['regDateStore'];
-                    $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId2'])->timestamp * 1000; //waktu dalam timestamp milisecond
+                    $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId2'], 'Asia/Jakarta')->timestamp * 1000; //waktu dalam timestamp milisecond
                     $this->pushDataTaskId($noBooking, 2, $waktu);
                 }
             } catch (Exception $e) {
@@ -1822,6 +1822,15 @@ class DaftarRJ extends Component
         $this->pushDataTaskId($noBooking, 3, $waktu);
     }
 
+    public function xxx()
+    {
+        $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId1'])->timestamp * 1000; //waktu dalam timestamp milisecond
+        $waktu1 = Carbon::now()->timestamp * 1000;
+        $date = Carbon::createFromTimestampMs($waktu)->format('Y-m-d H:i:s');
+        $date1 = Carbon::createFromTimestampMs($waktu1)->format('Y-m-d H:i:s');
+
+        dd($waktu . ' xxxx ' . $waktu1 . 'xxxxxxxxxxxxxxx' . $date . 'xxxxx' . $date1);
+    }
     private function pushDataTaskId($noBooking, $taskId, $time): void
     {
         //////////////////////////////////////////////////////////

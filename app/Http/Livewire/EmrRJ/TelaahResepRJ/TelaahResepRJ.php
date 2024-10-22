@@ -753,9 +753,17 @@ class TelaahResepRJ extends Component
         $this->settermyTopBarShiftandmyTopBarrefDate();
     }
 
-    public function mulaiPelayananApotek() {}
+    public function mulaiPelayananApotek()
+    {
+        // cek nomer pelayanan
+        // tambah antrian Apotek
+        // taskid 6
+    }
 
-    public function selesaiPelayananApotek() {}
+    public function selesaiPelayananApotek()
+    {
+        // taskid 7
+    }
 
 
 

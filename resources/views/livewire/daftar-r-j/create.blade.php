@@ -1349,6 +1349,12 @@
                             </x-green-button>
                         @endif
                         <x-light-button wire:click="closeModal()" type="button">Keluar</x-light-button>
+
+
+                        <x-green-button :disabled=$disabledPropertyRjStatus wire:click.prevent="xxx()" type="button"
+                            wire:loading.remove>
+                            xxxx
+                        </x-green-button>
                     </div>
                 </div>
 
