@@ -366,11 +366,11 @@
                                                             <x-loading />
                                                         </div>
 
-                                                        <x-yellow-button
+                                                        <x-primary-button
                                                             wire:click="keluarPoli('{{ addslashes($myQData->rj_no) }}')"
                                                             wire:loading.remove>
                                                             5.Keluar Poli
-                                                        </x-yellow-button>
+                                                        </x-primary-button>
                                                         <div wire:loading wire:target="keluarPoli">
                                                             <x-loading />
                                                         </div>
