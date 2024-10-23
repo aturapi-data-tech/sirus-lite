@@ -455,6 +455,8 @@ class PelayananRJ extends Component
     public function masukApotek($rjNo)
     {
         $this->findData($rjNo);
+        $masukApotek = Carbon::now()->format('d/m/Y H:i:s');
+
 
         // add antrian Apotek
 
@@ -520,7 +522,7 @@ class PelayananRJ extends Component
 
         // update taskId6
         if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6']) {
-            $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6'] = Carbon::now()->format('d/m/Y H:i:s');
+            $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6'] = $masukApotek;
             // update DB
             $this->updateDataRJ($rjNo);
 
@@ -542,6 +544,8 @@ class PelayananRJ extends Component
     public function keluarApotek($rjNo)
     {
         $this->findData($rjNo);
+        $keluarApotek = Carbon::now()->format('d/m/Y H:i:s');
+
 
         // add antrian Apotek
 
@@ -555,7 +559,7 @@ class PelayananRJ extends Component
 
         // update taskId7
         if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId7']) {
-            $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId7'] = Carbon::now()->format('d/m/Y H:i:s');
+            $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId7'] = $keluarApotek;
             // update DB
             $this->updateDataRJ($rjNo);
 

@@ -646,8 +646,10 @@ class TelaahResepRJ extends Component
 
     public function masukApotek($rjNo)
     {
-        dd(Carbon::now()->format('d/m/Y H:i:s'));
         $this->findData($rjNo);
+        $masukApotek = Carbon::now()->format('d/m/Y H:i:s');
+
+
         // add antrian Apotek
 
         // update no antrian Apotek
@@ -675,7 +677,7 @@ class TelaahResepRJ extends Component
                 )
                 ->where('rj_status', '!=', ['F'])
                 ->where('klaim_id', '!=', 'KR')
-                ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $this->myTopBar['refDate'])
+                ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $this->dateRjRef)
                 ->get();
 
             $nomerAntrian = $query->filter(function ($item) {
@@ -712,7 +714,7 @@ class TelaahResepRJ extends Component
 
         // update taskId6
         if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6']) {
-            $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6'] = Carbon::now()->format('d/m/Y H:i:s');
+            $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6'] = $masukApotek;
             // update DB
             $this->updateDataRJ($rjNo);
 
@@ -734,6 +736,8 @@ class TelaahResepRJ extends Component
     public function keluarApotek($rjNo)
     {
         $this->findData($rjNo);
+        $keluarApotek = Carbon::now()->format('d/m/Y H:i:s');
+
 
         // add antrian Apotek
 
@@ -747,7 +751,7 @@ class TelaahResepRJ extends Component
 
         // update taskId7
         if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId7']) {
-            $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId7'] = Carbon::now()->format('d/m/Y H:i:s');
+            $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId7'] = $keluarApotek;
             // update DB
             $this->updateDataRJ($rjNo);
 
