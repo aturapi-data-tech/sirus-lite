@@ -313,133 +313,7 @@ trait AntrianTrait
     //     );
     //     return self::response_decrypt($response, $signature);
     // }
-    // public static function tambah_antrean($antreanadd)
-    // {
-
-    //     // customErrorMessages
-    //     // $messages = customErrorMessagesTrait::messages();
-    //     $messages = [];
-
-
-    //     $r = [
-    //         "kodebooking" => $antreanadd['kodebooking'],
-    //         "nomorkartu" =>  $antreanadd['nomorkartu'],
-    //         "nomorreferensi" =>  $antreanadd['nomorreferensi'],
-    //         "nik" =>  $antreanadd['nik'],
-    //         "nohp" => $antreanadd['nohp'],
-    //         "kodepoli" =>  $antreanadd['kodepoli'],
-    //         "norm" =>  $antreanadd['norm'],
-    //         "pasienbaru" =>  $antreanadd['pasienbaru'],
-    //         "tanggalperiksa" =>   $antreanadd['tanggalperiksa'],
-    //         "kodedokter" =>  $antreanadd['kodedokter'],
-    //         "jampraktek" =>  $antreanadd['jampraktek'],
-    //         "jeniskunjungan" => $antreanadd['jeniskunjungan'],
-    //         "jenispasien" =>  $antreanadd['jenispasien'],
-    //         "namapoli" =>  $antreanadd['namapoli'],
-    //         "namadokter" =>  $antreanadd['namadokter'],
-    //         "nomorantrean" =>  $antreanadd['nomorantrean'],
-    //         "angkaantrean" =>  $antreanadd['angkaantrean'],
-    //         "estimasidilayani" =>  $antreanadd['estimasidilayani'],
-    //         "sisakuotajkn" =>  $antreanadd['sisakuotajkn'],
-    //         "kuotajkn" => $antreanadd['kuotajkn'],
-    //         "sisakuotanonjkn" => $antreanadd['sisakuotanonjkn'],
-    //         "kuotanonjkn" => $antreanadd['kuotanonjkn'],
-    //         "keterangan" =>  $antreanadd['keterangan'],
-    //         // "nama" =>  $antreanadd['nama'],
-    //     ];
-
-
-    //     $rules = [
-    //         "kodebooking" => "required",
-    //         "nomorkartu" =>  "digits:13|numeric",
-    //         // "nomorreferensi" =>  "required",
-    //         "nik" =>  "required|digits:16|numeric",
-    //         "nohp" => "required|numeric",
-    //         "kodepoli" =>  "required",
-    //         "norm" =>  "required",
-    //         "pasienbaru" =>  "required",
-    //         "tanggalperiksa" =>  "required|date|date_format:Y-m-d",
-    //         "kodedokter" =>  "required",
-    //         "jampraktek" =>  "required",
-    //         "jeniskunjungan" => "required",
-    //         "jenispasien" =>  "required",
-    //         // "namapoli" =>  "required",
-    //         // "namadokter" =>  "required",
-    //         "nomorantrean" =>  "required",
-    //         "angkaantrean" =>  "required",
-    //         "estimasidilayani" =>  "required",
-    //         "sisakuotajkn" =>  "required",
-    //         "kuotajkn" => "required",
-    //         "sisakuotanonjkn" => "required",
-    //         "kuotanonjkn" => "required",
-    //         "keterangan" =>  "required",
-    //         // "nama" =>  "required",
-    //     ];
-
-    //     // ketika pasien umum nik dan noka boleh kosong
-    //     $rules['nomorkartu'] = ($antreanadd['jenispasien'] == 'JKN') ? 'digits:13|numeric' : '';
-    //     $rules['nik'] = ($antreanadd['jenispasien'] == 'JKN') ? 'required|digits:16|numeric' : '';
-
-    //     $validator = Validator::make($r, $rules, $messages);
-    //     // dd($validator->errors());
-
-    //     if ($validator->fails()) {
-    //         // error, msgError,Code,url,ReqtrfTime
-    //         return self::sendError($validator->errors()->first(), $validator->errors(), 201, null, null);
-    //     }
-
-
-    //     // handler when time out and off line mode
-    //     try {
-
-    //         $antreanadd = $r;
-
-    //         $url = env('ANTRIAN_URL') . "antrean/add";
-    //         $signature = self::signature();
-
-    //         $response = Http::timeout(10)
-    //             ->withHeaders($signature)
-    //             ->post(
-    //                 $url,
-    //                 [
-    //                     "kodebooking" => $antreanadd['kodebooking'],
-    //                     "jenispasien" => $antreanadd['jenispasien'],
-    //                     "nomorkartu" => $antreanadd['nomorkartu'],
-    //                     "nik" => $antreanadd['nik'],
-    //                     "nohp" => $antreanadd['nohp'],
-    //                     "kodepoli" => $antreanadd['kodepoli'],
-    //                     "namapoli" => $antreanadd['namapoli'],
-    //                     "pasienbaru" => $antreanadd['pasienbaru'],
-    //                     "norm" => $antreanadd['norm'],
-    //                     "tanggalperiksa" => $antreanadd['tanggalperiksa'],
-    //                     "kodedokter" => $antreanadd['kodedokter'],
-    //                     "namadokter" => $antreanadd['namadokter'],
-    //                     "jampraktek" => $antreanadd['jampraktek'],
-    //                     "jeniskunjungan" => $antreanadd['jeniskunjungan'],
-    //                     "nomorreferensi" => $antreanadd['nomorreferensi'],
-    //                     "nomorantrean" => $antreanadd['nomorantrean'],
-    //                     "angkaantrean" => $antreanadd['angkaantrean'],
-    //                     "estimasidilayani" => $antreanadd['estimasidilayani'],
-    //                     "sisakuotajkn" => $antreanadd['sisakuotajkn'],
-    //                     "kuotajkn" => $antreanadd['kuotajkn'],
-    //                     "sisakuotanonjkn" => $antreanadd['sisakuotanonjkn'],
-    //                     "kuotanonjkn" => $antreanadd['kuotanonjkn'],
-    //                     "keterangan" => $antreanadd['keterangan'],
-    //                 ]
-    //             );
-
-    //         // dd($response->getBody()->getContents());
-
-    //         // dd($response->transferStats->getTransferTime()); //Get Transfertime request
-    //         // semua response error atau sukses dari BPJS di handle pada logic response_decrypt
-    //         return self::response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
-    //         /////////////////////////////////////////////////////////////////////////////
-    //     } catch (Exception $e) {
-    //         // error, msgError,Code,url,ReqtrfTime
-
-    //         return self::sendError($e->getMessage(), $validator->errors(), 408, $url, null);
-    //     }
-    // }
+    //
 
 
     // public static function tambah_antrean_farmasi(Request $request)
@@ -2454,7 +2328,7 @@ trait AntrianTrait
             "kodebooking" => $noBooking,
             "jenisresep" =>  $jenisResep, //  "Tidak ada/Racikan/Non racikan" ---> khusus yang sudah implementasi antrean farmasi
             "nomorantrean" =>  $nomerAntrean,
-            "keterangan" => ""
+            "keterangan" => "xxxxxxx",
         ];
 
 
@@ -2488,6 +2362,135 @@ trait AntrianTrait
                         "jenisresep" =>  $jenisResep, //  "Tidak ada/Racikan/Non racikan" ---> khusus yang sudah implementasi antrean farmasi
                         "nomorantrean" =>  $nomerAntrean,
                         "keterangan" => ""
+                    ]
+                );
+
+            // dd($response->getBody()->getContents());
+
+            // dd($response->transferStats->getTransferTime()); //Get Transfertime request
+            // semua response error atau sukses dari BPJS di handle pada logic response_decrypt
+            return self::response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
+            /////////////////////////////////////////////////////////////////////////////
+        } catch (Exception $e) {
+            // error, msgError,Code,url,ReqtrfTime
+
+            return self::sendError($e->getMessage(), $validator->errors(), 408, $url, null);
+        }
+    }
+
+
+    public static function tambah_antrean($antreanadd)
+    {
+
+        // customErrorMessages
+        // $messages = customErrorMessagesTrait::messages();
+        $messages = [];
+
+
+        $r = [
+            "kodebooking" => $antreanadd['kodebooking'],
+            "nomorkartu" =>  $antreanadd['nomorkartu'],
+            "nomorreferensi" =>  $antreanadd['nomorreferensi'],
+            "nik" =>  $antreanadd['nik'],
+            "nohp" => $antreanadd['nohp'],
+            "kodepoli" =>  $antreanadd['kodepoli'],
+            "norm" =>  $antreanadd['norm'],
+            "pasienbaru" =>  $antreanadd['pasienbaru'],
+            "tanggalperiksa" =>   $antreanadd['tanggalperiksa'],
+            "kodedokter" =>  $antreanadd['kodedokter'],
+            "jampraktek" =>  $antreanadd['jampraktek'],
+            "jeniskunjungan" => $antreanadd['jeniskunjungan'],
+            "jenispasien" =>  $antreanadd['jenispasien'],
+            "namapoli" =>  $antreanadd['namapoli'],
+            "namadokter" =>  $antreanadd['namadokter'],
+            "nomorantrean" =>  $antreanadd['nomorantrean'],
+            "angkaantrean" =>  $antreanadd['angkaantrean'],
+            "estimasidilayani" =>  $antreanadd['estimasidilayani'],
+            "sisakuotajkn" =>  $antreanadd['sisakuotajkn'],
+            "kuotajkn" => $antreanadd['kuotajkn'],
+            "sisakuotanonjkn" => $antreanadd['sisakuotanonjkn'],
+            "kuotanonjkn" => $antreanadd['kuotanonjkn'],
+            "keterangan" =>  $antreanadd['keterangan'],
+            // "nama" =>  $antreanadd['nama'],
+        ];
+
+
+        $rules = [
+            "kodebooking" => "required",
+            "nomorkartu" =>  "digits:13|numeric",
+            // "nomorreferensi" =>  "required",
+            "nik" =>  "required|digits:16|numeric",
+            "nohp" => "required|numeric",
+            "kodepoli" =>  "required",
+            "norm" =>  "required",
+            "pasienbaru" =>  "required",
+            "tanggalperiksa" =>  "required|date|date_format:Y-m-d",
+            "kodedokter" =>  "required",
+            "jampraktek" =>  "required",
+            "jeniskunjungan" => "required",
+            "jenispasien" =>  "required",
+            // "namapoli" =>  "required",
+            // "namadokter" =>  "required",
+            "nomorantrean" =>  "required",
+            "angkaantrean" =>  "required",
+            "estimasidilayani" =>  "required",
+            "sisakuotajkn" =>  "required",
+            "kuotajkn" => "required",
+            "sisakuotanonjkn" => "required",
+            "kuotanonjkn" => "required",
+            "keterangan" =>  "required",
+            // "nama" =>  "required",
+        ];
+
+        // ketika pasien umum nik dan noka boleh kosong
+        $rules['nomorkartu'] = ($antreanadd['jenispasien'] == 'JKN') ? 'digits:13|numeric' : '';
+        $rules['nik'] = ($antreanadd['jenispasien'] == 'JKN') ? 'required|digits:16|numeric' : '';
+
+        $validator = Validator::make($r, $rules, $messages);
+        // dd($validator->errors());
+
+        if ($validator->fails()) {
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError($validator->errors()->first(), $validator->errors(), 201, null, null);
+        }
+
+
+        // handler when time out and off line mode
+        try {
+
+            $antreanadd = $r;
+
+            $url = env('ANTRIAN_URL') . "antrean/add";
+            $signature = self::signature();
+
+            $response = Http::timeout(10)
+                ->withHeaders($signature)
+                ->post(
+                    $url,
+                    [
+                        "kodebooking" => $antreanadd['kodebooking'],
+                        "jenispasien" => $antreanadd['jenispasien'],
+                        "nomorkartu" => $antreanadd['nomorkartu'],
+                        "nik" => $antreanadd['nik'],
+                        "nohp" => $antreanadd['nohp'],
+                        "kodepoli" => $antreanadd['kodepoli'],
+                        "namapoli" => $antreanadd['namapoli'],
+                        "pasienbaru" => $antreanadd['pasienbaru'],
+                        "norm" => $antreanadd['norm'],
+                        "tanggalperiksa" => $antreanadd['tanggalperiksa'],
+                        "kodedokter" => $antreanadd['kodedokter'],
+                        "namadokter" => $antreanadd['namadokter'],
+                        "jampraktek" => $antreanadd['jampraktek'],
+                        "jeniskunjungan" => $antreanadd['jeniskunjungan'],
+                        "nomorreferensi" => $antreanadd['nomorreferensi'],
+                        "nomorantrean" => $antreanadd['nomorantrean'],
+                        "angkaantrean" => $antreanadd['angkaantrean'],
+                        "estimasidilayani" => $antreanadd['estimasidilayani'],
+                        "sisakuotajkn" => $antreanadd['sisakuotajkn'],
+                        "kuotajkn" => $antreanadd['kuotajkn'],
+                        "sisakuotanonjkn" => $antreanadd['sisakuotanonjkn'],
+                        "kuotanonjkn" => $antreanadd['kuotanonjkn'],
+                        "keterangan" => $antreanadd['keterangan'],
                     ]
                 );
 
