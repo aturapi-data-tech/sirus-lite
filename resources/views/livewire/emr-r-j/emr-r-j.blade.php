@@ -314,7 +314,7 @@
                                             @endisset
                                         </x-badge>
 
-                                        @role(['Mr', 'Perawat', 'Admin'])
+                                        @role(['Mr', 'Admin', 'Perawat'])
                                             <div class="italic font-normal text-gray-900">
                                                 {{ 'TaskId3 ' . json_decode($myQData->datadaftarpolirj_json)->taskIdPelayanan->taskId3 }}
                                             </div>
