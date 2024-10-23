@@ -313,6 +313,18 @@
                                                 {{ '---' }}
                                             @endisset
                                         </x-badge>
+
+                                        @role(['Mr', 'Asisten', 'Admin'])
+                                            <div class="italic font-normal text-gray-900">
+                                                {{ 'TaskId3 ' . json_decode($myQData->datadaftarpolirj_json)->taskIdPelayanan->taskId3 }}
+                                            </div>
+                                            <div class="italic font-normal text-gray-900">
+                                                {{ 'TaskId4 ' . json_decode($myQData->datadaftarpolirj_json)->taskIdPelayanan->taskId4 }}
+                                            </div>
+                                            <div class="italic font-normal text-gray-900">
+                                                {{ 'TaskId5 ' . json_decode($myQData->datadaftarpolirj_json)->taskIdPelayanan->taskId5 }}
+                                            </div>
+                                        @endrole
                                     </div>
 
                                 </div>
