@@ -1816,21 +1816,11 @@ class DaftarRJ extends Component
         /////////////////////////
 
         $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId3'] = $this->dataDaftarPoliRJ['rjDate'];
-        $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId3'])->timestamp * 1000; //waktu dalam timestamp milisecond
-        $waktu = Carbon::now()->timestamp * 1000;
-
+        $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId3'], 'Asia/Jakarta')->timestamp * 1000; //waktu dalam timestamp milisecond
         $this->pushDataTaskId($noBooking, 3, $waktu);
     }
 
-    public function xxx()
-    {
-        $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId1'])->timestamp * 1000; //waktu dalam timestamp milisecond
-        $waktu1 = Carbon::now()->timestamp * 1000;
-        $date = Carbon::createFromTimestampMs($waktu)->format('Y-m-d H:i:s');
-        $date1 = Carbon::createFromTimestampMs($waktu1)->format('Y-m-d H:i:s');
 
-        dd($waktu . ' xxxx ' . $waktu1 . 'xxxxxxxxxxxxxxx' . $date . 'xxxxx' . $date1);
-    }
     private function pushDataTaskId($noBooking, $taskId, $time): void
     {
         //////////////////////////////////////////////////////////

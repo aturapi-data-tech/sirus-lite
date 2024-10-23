@@ -350,8 +350,7 @@ class PelayananRJ extends Component
         $noBooking =  $this->dataDaftarPoliRJ['noBooking'];
 
 
-        $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4'])->timestamp * 1000; //waktu dalam timestamp milisecond
-        $waktu = Carbon::now()->timestamp * 1000;
+        $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4'], 'Asia/Jakarta')->timestamp * 1000; //waktu dalam timestamp milisecond
         $this->pushDataTaskId($noBooking, 4, $waktu);
     }
 
@@ -418,8 +417,7 @@ class PelayananRJ extends Component
             // //////////////////////////
 
 
-            $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5'])->timestamp * 1000; //waktu dalam timestamp milisecond
-            $waktu = Carbon::now()->timestamp * 1000;
+            $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5'], 'Asia/Jakarta')->timestamp * 1000; //waktu dalam timestamp milisecond
             $this->pushDataTaskId($noBooking, 5, $waktu);
 
             $this->emit('toastr-success', "Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
@@ -487,7 +485,6 @@ class PelayananRJ extends Component
 
         if ($this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6']) {
             $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6'], 'Asia/Jakarta')->timestamp * 1000; //waktu dalam timestamp milisecond
-            // $waktu = Carbon::now()->timestamp * 1000;
             $this->pushDataTaskId($noBooking, 6, $waktu);
         } else {
             $this->emit('toastr-error', "waktu Masuk Apotek kosong tidak dapat dikirim");
@@ -524,7 +521,6 @@ class PelayananRJ extends Component
 
         if ($this->dataDaftarPoliRJ['taskIdPelayanan']['taskId7']) {
             $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId7'], 'Asia/Jakarta')->timestamp * 1000; //waktu dalam timestamp milisecond
-            // $waktu = Carbon::now()->timestamp * 1000;
             $this->pushDataTaskId($noBooking, 7, $waktu);
         } else {
             $this->emit('toastr-error', "waktu Keluar Apotek kosong tidak dapat dikirim");
