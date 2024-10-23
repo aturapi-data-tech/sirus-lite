@@ -341,6 +341,31 @@
                                             <!-- Dropdown Action Open menu -->
                                             <div id="dropdownMenu{{ $myQData->rj_no }}"
                                                 class="z-10 hidden w-auto bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700">
+
+                                                @role(['Admin', 'Perawat'])
+                                                    <div class="grid grid-cols-2 p-2">
+
+                                                        <x-light-button
+                                                            wire:click="masukPoli('{{ addslashes($myQData->rj_no) }}')"
+                                                            wire:loading.remove>
+                                                            4.Masuk Poli
+                                                        </x-light-button>
+                                                        <div wire:loading wire:target="masukPoli">
+                                                            <x-loading />
+                                                        </div>
+
+                                                        <x-light-button
+                                                            wire:click="keluarPoli('{{ addslashes($myQData->rj_no) }}')"
+                                                            wire:loading.remove>
+                                                            5.Keluar Poli
+                                                        </x-light-button>
+                                                        <div wire:loading wire:target="keluarPoli">
+                                                            <x-loading />
+                                                        </div>
+
+                                                    </div>
+                                                @endrole
+
                                                 <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
                                                     aria-labelledby="dropdownButton{{ $myQData->rj_no }}">
                                                     {{-- <li>
@@ -432,29 +457,7 @@
 
                                                 </ul>
 
-                                                @role(['Admin', 'Perawat'])
-                                                    <div class="grid grid-cols-2 y-2">
 
-                                                        <x-light-button
-                                                            wire:click="masukPoli('{{ addslashes($myQData->rj_no) }}')"
-                                                            wire:loading.remove>
-                                                            4.Masuk Poli
-                                                        </x-light-button>
-                                                        <div wire:loading wire:target="masukPoli">
-                                                            <x-loading />
-                                                        </div>
-
-                                                        <x-light-button
-                                                            wire:click="keluarPoli('{{ addslashes($myQData->rj_no) }}')"
-                                                            wire:loading.remove>
-                                                            5.Keluar Poli
-                                                        </x-light-button>
-                                                        <div wire:loading wire:target="keluarPoli">
-                                                            <x-loading />
-                                                        </div>
-
-                                                    </div>
-                                                @endrole
                                             </div>
                                         </div>
                                         <!-- End Dropdown Action Open menu -->

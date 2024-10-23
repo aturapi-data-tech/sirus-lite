@@ -7,11 +7,14 @@ use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
+use Spatie\ArrayToXml\ArrayToXml;
+use App\Http\Traits\BPJS\AntrianTrait;
+use App\Http\Traits\EmrRJ\EmrRJTrait;
 
 
 class EmrRJ extends Component
 {
-    use WithPagination;
+    use WithPagination, EmrRJTrait;
 
     // primitive Variable
     public string $myTitle = 'Rekam Medis Rawat Jalan';
@@ -68,6 +71,8 @@ class EmrRJ extends Component
         'refFilter' => ['except' => '', 'as' => 'cariData'],
         'page' => ['except' => 1, 'as' => 'p'],
     ];
+
+    public $dataDaftarPoliRJ = [];
 
     // reset page when myTopBar Change
     public function updatedReffilter()
@@ -367,7 +372,167 @@ class EmrRJ extends Component
 
 
 
+    public function masukPoli($rjNo)
+    {
 
+        $this->findData($rjNo);
+
+        $sql = "select waktu_masuk_poli from rstxn_rjhdrs where rj_no=:rjNo";
+        $cek_waktu_masuk_poli = DB::scalar($sql, ['rjNo' => $rjNo]);
+
+
+        // ketika cek_waktu_masuk_poli kosong lalu update
+        if (!$cek_waktu_masuk_poli) {
+            $waktuMasukPoli = Carbon::now()->format('d/m/Y H:i:s');
+
+            DB::table('rstxn_rjhdrs')
+                ->where('rj_no', $rjNo)
+                ->update([
+                    'waktu_masuk_poli' => DB::raw("to_date('" . $waktuMasukPoli . "','dd/mm/yyyy hh24:mi:ss')"), //waktu masuk = rjdate
+                ]);
+        }
+
+        /////////////////////////
+        // Update TaskId 4
+        /////////////////////////
+        $sqlWaktuMasukPoli = "select to_char(waktu_masuk_poli,'dd/mm/yyyy hh24:mi:ss') as waktu_masuk_poli from rstxn_rjhdrs where rj_no=:rjNo";
+        $waktuMasukPoli = DB::scalar($sqlWaktuMasukPoli, ['rjNo' => $rjNo]);
+
+        if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']) {
+            $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4'] = $waktuMasukPoli;
+            // update DB
+            $this->updateDataRJ($rjNo);
+
+            $this->emit('toastr-success', "Masuk Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']);
+        } else {
+            $this->emit('toastr-error', "Masuk Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']);
+        }
+
+        // cari no Booking
+        $noBooking =  $this->dataDaftarPoliRJ['noBooking'];
+
+
+        $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4'])->timestamp * 1000; //waktu dalam timestamp milisecond
+        $waktu = Carbon::now()->timestamp * 1000;
+        $this->pushDataTaskId($noBooking, 4, $waktu);
+    }
+
+
+    public function keluarPoli($rjNo)
+    {
+        // SEMENTARA {WAKTU MASUK APT = WAKTU KELUAR POLI}
+        $this->findData($rjNo);
+
+
+        $sql = "select waktu_masuk_apt from rstxn_rjhdrs where rj_no=:rjNo";
+        $cek_waktu_masuk_apt = DB::scalar($sql, ['rjNo' => $rjNo]);
+
+        // ketika cek_waktu_masuk_apt kosong lalu update
+        if (!$cek_waktu_masuk_apt) {
+            $waktuMasukApotek = Carbon::now()->format('d/m/Y H:i:s');
+
+            DB::table('rstxn_rjhdrs')
+                ->where('rj_no', $rjNo)
+                ->update([
+                    'waktu_masuk_apt' => DB::raw("to_date('" . $waktuMasukApotek . "','dd/mm/yyyy hh24:mi:ss')"), //waktu masuk = rjdate
+                ]);
+        }
+
+        /////////////////////////
+        // Update TaskId 5         // SEMENTARA {WAKTU MASUK APT = WAKTU KELUAR POLI}
+        /////////////////////////
+        $sqlwaktuMasukApotek = "select to_char(waktu_masuk_apt,'dd/mm/yyyy hh24:mi:ss') as waktu_masuk_apt  from rstxn_rjhdrs where rj_no=:rjNo";
+        $waktuMasukApotek = DB::scalar($sqlwaktuMasukApotek, ['rjNo' => $rjNo]);
+
+        // check task Id 4 sudah dilakukan atau belum
+        if ($this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']) {
+
+            if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']) {
+                $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5'] = $waktuMasukApotek;
+                // update DB
+                $this->updateDataRJ($rjNo);
+
+                $this->emit('toastr-success', "Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
+            } else {
+                $this->emit('toastr-error', "Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
+            }
+
+            // cari no Booking
+            $noBooking =  $this->dataDaftarPoliRJ['noBooking'];
+
+            // //////////////////////////
+            // //////////////////////////
+            // //////////////////////////
+
+            // off kan jika memberatkan program
+            // ulangi proses taskId start pushDataAntrian booking + task id 3
+            // $this->pushDataAntrian($rjNo);
+
+            // $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId3'])->timestamp * 1000; //waktu dalam timestamp milisecond
+            // $this->pushDataTaskId($noBooking, 3, $waktu);
+
+            // $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4'])->timestamp * 1000; //waktu dalam timestamp milisecond
+            // $this->pushDataTaskId($noBooking, 4, $waktu);
+            // ulangi proses taskId end
+
+            // //////////////////////////
+            // //////////////////////////
+            // //////////////////////////
+
+
+            $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5'])->timestamp * 1000; //waktu dalam timestamp milisecond
+            $waktu = Carbon::now()->timestamp * 1000;
+            $this->pushDataTaskId($noBooking, 5, $waktu);
+
+            $this->emit('toastr-success', "Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
+        } else {
+            $this->emit('toastr-error', "Satus Pasien Belum melalui pelayanan Poli");
+        }
+    }
+
+    private function findData($rjNo): void
+    {
+        $findDataRJ = $this->findDataRJ($rjNo);
+        $this->dataDaftarPoliRJ  = $findDataRJ['dataDaftarRJ'];
+    }
+
+    private function updateDataRJ($rjNo): void
+    {
+
+        // update table trnsaksi
+        DB::table('rstxn_rjhdrs')
+            ->where('rj_no', $rjNo)
+            ->update([
+                'datadaftarpolirj_json' => json_encode($this->dataDaftarPoliRJ, true),
+                'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
+            ]);
+
+        $this->emit('toastr-success', "Json Berhasil di update.");
+    }
+
+    private function pushDataTaskId($noBooking, $taskId, $time): void
+    {
+        //////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////
+        // Update Task Id $kodebooking, $taskid, $waktu, $jenisresep
+
+        $waktu = $time;
+        $HttpGetBpjs =  AntrianTrait::update_antrean($noBooking, $taskId, $waktu, "")->getOriginalContent();
+
+        // set http response to public
+        // $this->HttpGetBpjsStatus = $HttpGetBpjs['metadata']['code']; //status 200 201 400 ..
+        // $this->HttpGetBpjsJson = json_encode($HttpGetBpjs, true); //Return Response Tambah Antrean
+
+        // metadata d kecil
+        if ($HttpGetBpjs['metadata']['code'] == 200) {
+            $this->emit('toastr-success', 'Task Id' . $taskId . ' ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+        } else {
+            $this->emit('toastr-error', 'Task Id' . $taskId . ' ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+
+            // Ulangi Proses pushTaskId;
+            // $this->emit('rePush_Data_TaskId_Confirmation');
+        }
+    }
 
 
     // when new form instance
