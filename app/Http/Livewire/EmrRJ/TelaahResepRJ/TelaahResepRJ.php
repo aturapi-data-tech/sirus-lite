@@ -12,6 +12,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 use Carbon\Carbon;
+
 use Spatie\ArrayToXml\ArrayToXml;
 
 use App\Http\Traits\EmrRJ\EmrRJTrait;
@@ -645,6 +646,7 @@ class TelaahResepRJ extends Component
 
     public function masukApotek($rjNo)
     {
+        dd(Carbon::now()->format('d/m/Y H:i:s'));
         $this->findData($rjNo);
         // add antrian Apotek
 
