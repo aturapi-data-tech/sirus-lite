@@ -354,23 +354,23 @@
                                             <div id="dropdownMenu{{ $myQData->rj_no }}"
                                                 class="z-10 hidden w-auto bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700">
 
-                                                @role(['Admin', 'Perawat'])
+                                                @role(['Admin', 'Mr', 'Perawat'])
                                                     <div class="grid grid-cols-2 p-2">
 
-                                                        <x-light-button
+                                                        <x-yellow-button
                                                             wire:click="masukPoli('{{ addslashes($myQData->rj_no) }}')"
                                                             wire:loading.remove>
                                                             4.Masuk Poli
-                                                        </x-light-button>
+                                                        </x-yellow-button>
                                                         <div wire:loading wire:target="masukPoli">
                                                             <x-loading />
                                                         </div>
 
-                                                        <x-light-button
+                                                        <x-yellow-button
                                                             wire:click="keluarPoli('{{ addslashes($myQData->rj_no) }}')"
                                                             wire:loading.remove>
                                                             5.Keluar Poli
-                                                        </x-light-button>
+                                                        </x-yellow-button>
                                                         <div wire:loading wire:target="keluarPoli">
                                                             <x-loading />
                                                         </div>
@@ -471,18 +471,22 @@
 
 
                                             </div>
+
+                                            @role(['Admin', 'Mr', 'Perawat'])
+                                                <div class="grid grid-cols-1 gap-2">
+                                                    <livewire:emr-r-j.post-encounter-r-j.post-encounter-r-j
+                                                        :rjNoRef="$myQData->rj_no"
+                                                        :wire:key="'post-encounter-r-j-'.$myQData->rj_no">
+
+                                                        <livewire:emr-r-j.post-satu-data-kesehatan-r-j.post-satu-data-kesehatan-r-j
+                                                            :rjNoRef="$myQData->rj_no"
+                                                            :wire:key="'post-satu-data-kesehatan-r-j-'.$myQData->rj_no">
+                                                </div>
+                                            @endrole
+
                                         </div>
                                         <!-- End Dropdown Action Open menu -->
-                                        @role(['Admin', 'Mr', 'Perawat'])
-                                            <div class="grid grid-cols-1 gap-2">
-                                                <livewire:emr-r-j.post-encounter-r-j.post-encounter-r-j :rjNoRef="$myQData->rj_no"
-                                                    :wire:key="'post-encounter-r-j-'.$myQData->rj_no">
 
-                                                    <livewire:emr-r-j.post-satu-data-kesehatan-r-j.post-satu-data-kesehatan-r-j
-                                                        :rjNoRef="$myQData->rj_no"
-                                                        :wire:key="'post-satu-data-kesehatan-r-j-'.$myQData->rj_no">
-                                            </div>
-                                        @endrole
 
                                 </div>
 
