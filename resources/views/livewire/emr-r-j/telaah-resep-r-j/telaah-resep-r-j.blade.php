@@ -180,6 +180,9 @@
                             $datadaftar_json = json_decode($myQData->datadaftarpolirj_json, true);
 
                             $eresep = isset($datadaftar_json['eresep']) ? 1 : 0;
+                            $noAntrianFarmasi = isset($datadaftar_json['noAntrianApotek']['noAntrian'])
+                                ? $datadaftar_json['noAntrianApotek']['noAntrian']
+                                : 0;
 
                             $prosentaseEMR = ($eresep / 1) * 100;
 
@@ -208,6 +211,10 @@
 
                             $badgecolorAdministrasiRj = isset($datadaftar_json['AdministrasiRj']) ? 'green' : 'red';
 
+                            $taskId5 = $datadaftar_json['taskIdPelayanan']['taskId5'] ?? 'xxxx-xx-xx xx:xx:xx';
+                            $taskId6 = $datadaftar_json['taskIdPelayanan']['taskId6'] ?? 'xxxx-xx-xx xx:xx:xx';
+                            $taskId7 = $datadaftar_json['taskIdPelayanan']['taskId7'] ?? 'xxxx-xx-xx xx:xx:xx';
+
                         @endphp
 
 
@@ -216,6 +223,13 @@
 
                             <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap ">
                                 <div class="">
+                                    <div>
+                                        <p>Antrian Farmasi
+                                            <span class="text-5xl font-semibold text-gray-700">
+                                                {{ $noAntrianFarmasi }}
+                                            </span>
+                                        </p>
+                                    </div>
                                     <div class="font-semibold text-primary">
                                         {{ $myQData->reg_no }}
                                     </div>
@@ -278,6 +292,8 @@
                                         </x-badge>
                                     </div>
 
+
+
                                     <div>
 
 
@@ -303,6 +319,16 @@
                                         </x-badge>
                                     </div>
 
+                                    <div class="italic font-normal text-gray-900">
+                                        {{ 'TaskId5 ' . $taskId5 }}
+                                    </div>
+                                    <div class="italic font-normal text-gray-900">
+                                        {{ 'TaskId6 ' . $taskId6 }}
+                                    </div>
+                                    <div class="italic font-normal text-gray-900">
+                                        {{ 'TaskId7 ' . $taskId7 }}
+                                    </div>
+
 
                                 </div>
                             </td>
@@ -311,10 +337,10 @@
 
                                 <div class="grid grid-cols-2 gap-2">
 
-                                    <x-red-button wire:click="mulaiPelayananApotek()">
+                                    <x-red-button wire:click="masukApotek('{{ $myQData->rj_no }}')">
                                         Mulai Pelayanan Apotek
                                     </x-red-button>
-                                    <x-red-button wire:click="selesaiPelayananApotek()">
+                                    <x-red-button wire:click="keluarApotek('{{ $myQData->rj_no }}')">
                                         Selesai Pelayanan Apotek
                                     </x-red-button>
 

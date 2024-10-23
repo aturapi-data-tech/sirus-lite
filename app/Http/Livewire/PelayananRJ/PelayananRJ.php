@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
-use Illuminate\Support\Str;
 use App\Http\Traits\EmrRJ\EmrRJTrait;
 use App\Http\Traits\BPJS\AntrianTrait;
 
@@ -227,7 +226,6 @@ class PelayananRJ extends Component
     /////////////////////////////////////////////////////////////////////
     private function updateDataRJ($rjNo): void
     {
-
         // update table trnsaksi
         DB::table('rstxn_rjhdrs')
             ->where('rj_no', $rjNo)
@@ -235,8 +233,6 @@ class PelayananRJ extends Component
                 'datadaftarpolirj_json' => json_encode($this->dataDaftarPoliRJ, true),
                 'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
             ]);
-
-        $this->emit('toastr-success', "Json Berhasil di update.");
     }
 
     private function findData($rjNo): void
@@ -469,6 +465,59 @@ class PelayananRJ extends Component
             $this->emit('toastr-error', "Anda tidak dapat melakukan taskId6 ketika taskId5 Kosong");
             return;
         }
+
+        $noBooking =  $this->dataDaftarPoliRJ['noBooking'];
+        //////PushDataAntrianApotek////////////////////
+
+        // cekNoantrian Apotek sudah ada atau belum
+        if (!isset($this->dataDaftarPoliRJ['noAntrianApotek'])) {
+            $cekAntrianEresep = $this->findData($rjNo);
+            $eresepRacikan = collect(isset($cekAntrianEresep['eresepRacikan']) ? $cekAntrianEresep['eresepRacikan'] : [])->count();
+            $jenisResep = $eresepRacikan ? 'racikan' : 'non racikan';
+
+            $query = DB::table('rstxn_rjhdrs')
+                ->select(
+                    DB::raw("to_char(rj_date,'dd/mm/yyyy') AS rj_date"),
+                    DB::raw("to_char(rj_date,'yyyymmdd') AS rj_date1"),
+                    'datadaftarpolirj_json'
+                )
+                ->where('rj_status', '!=', ['F'])
+                ->where('klaim_id', '!=', 'KR')
+                ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $this->dateRjRef)
+                ->get();
+
+            $nomerAntrian = $query->filter(function ($item) {
+                $datadaftarpolirj_json = json_decode($item->datadaftarpolirj_json, true);
+                $noAntrianApotek = isset($datadaftarpolirj_json['noAntrianApotek']) ? 1 : 0;
+                if ($noAntrianApotek > 0) {
+                    return 'x';
+                }
+            })->count();
+
+
+            // Antrian ketika data antrian kosong
+            // proses antrian
+            if ($this->dataDaftarPoliRJ['klaimId'] != 'KR') {
+                $noAntrian = $nomerAntrian + 1;
+            } else {
+                // Kronis
+                $noAntrian = 999;
+            }
+            $this->dataDaftarPoliRJ['noAntrianApotek'] = [
+                'noAntrian' => $noAntrian,
+                'jenisResep' => $jenisResep
+            ];
+
+            $this->updateDataRJ($rjNo);
+        }
+        // cekNoantrian Apotek sudah ada atau belum
+
+
+        // tambah antrian Apotek
+        $this->pushAntreanApotek($noBooking, $this->dataDaftarPoliRJ['noAntrianApotek']['jenisResep'], $this->dataDaftarPoliRJ['noAntrianApotek']['noAntrian']);
+        //////////////////////////
+
+
         // update taskId6
         if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6']) {
             $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6'] = Carbon::now()->format('d/m/Y H:i:s');
@@ -481,7 +530,6 @@ class PelayananRJ extends Component
         }
 
         // cari no Booking
-        $noBooking =  $this->dataDaftarPoliRJ['noBooking'];
 
         if ($this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6']) {
             $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6'], 'Asia/Jakarta')->timestamp * 1000; //waktu dalam timestamp milisecond
@@ -558,6 +606,17 @@ class PelayananRJ extends Component
 
             // Ulangi Proses pushTaskId;
             // $this->emit('rePush_Data_TaskId_Confirmation');
+        }
+    }
+
+    private function pushAntreanApotek($noBooking, $jenisResep, $nomerAntrean): void
+    {
+        $HttpGetBpjs =  AntrianTrait::tambah_antrean_farmasi($noBooking, $jenisResep, $nomerAntrean, "")->getOriginalContent();
+
+        if ($HttpGetBpjs['metadata']['code'] == 200) {
+            $this->emit('toastr-success', 'NoBooking' . $noBooking . ' ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+        } else {
+            $this->emit('toastr-error', 'NoBooking' . $noBooking . ' ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
         }
     }
 
