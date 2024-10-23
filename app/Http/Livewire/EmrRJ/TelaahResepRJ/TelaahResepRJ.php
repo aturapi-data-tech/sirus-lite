@@ -677,7 +677,7 @@ class TelaahResepRJ extends Component
                 )
                 ->where('rj_status', '!=', ['F'])
                 ->where('klaim_id', '!=', 'KR')
-                ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $this->dateRjRef)
+                ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $this->myTopBar['refDate'])
                 ->get();
 
             $nomerAntrian = $query->filter(function ($item) {
