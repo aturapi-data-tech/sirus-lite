@@ -2361,7 +2361,7 @@ trait AntrianTrait
                         "kodebooking" => $noBooking,
                         "jenisresep" =>  $jenisResep, //  "Tidak ada/Racikan/Non racikan" ---> khusus yang sudah implementasi antrean farmasi
                         "nomorantrean" =>  $nomerAntrean,
-                        "keterangan" => ""
+                        "keterangan" => "xxxxxxx",
                     ]
                 );
 
