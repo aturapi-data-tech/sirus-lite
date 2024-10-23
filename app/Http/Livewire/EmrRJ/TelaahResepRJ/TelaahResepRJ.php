@@ -17,6 +17,7 @@ use Spatie\ArrayToXml\ArrayToXml;
 
 use App\Http\Traits\EmrRJ\EmrRJTrait;
 use App\Http\Traits\BPJS\AntrianTrait;
+use Exception;
 
 class TelaahResepRJ extends Component
 {
@@ -681,7 +682,12 @@ class TelaahResepRJ extends Component
                 ->get();
 
             $nomerAntrian = $query->filter(function ($item) {
-                $datadaftarpolirj_json = json_decode($item->datadaftarpolirj_json, true);
+                try {
+                    $datadaftarpolirj_json = json_decode($item->datadaftarpolirj_json, true);
+                } catch (Exception $e) {
+                    $datadaftarpolirj_json = [];
+                }
+
                 $noAntrianApotek = isset($datadaftarpolirj_json['noAntrianApotek']) ? 1 : 0;
                 if ($noAntrianApotek > 0) {
                     return 'x';
