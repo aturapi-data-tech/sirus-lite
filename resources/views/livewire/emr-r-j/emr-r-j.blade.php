@@ -228,6 +228,10 @@
                                             : 'red'));
 
                             $badgecolorAdministrasiRj = isset($datadaftar_json['AdministrasiRj']) ? 'green' : 'red';
+
+                            $taskId3 = $datadaftar_json['taskIdPelayanan']['taskId3'] ?? 'xxxx-xx-xx xx:xx:xx';
+                            $taskId4 = $datadaftar_json['taskIdPelayanan']['taskId4'] ?? 'xxxx-xx-xx xx:xx:xx';
+                            $taskId5 = $datadaftar_json['taskIdPelayanan']['taskId5'] ?? 'xxxx-xx-xx xx:xx:xx';
                         @endphp
 
 
@@ -317,17 +321,17 @@
                                         @role(['Mr', 'Admin', 'Perawat'])
                                             <div class="italic font-normal text-gray-900">
                                                 <x-badge :badgecolor="__('green')">
-                                                    {{ 'TaskId3 ' . json_decode($myQData->datadaftarpolirj_json)->taskIdPelayanan->taskId3 }}
+                                                    {{ 'TaskId3 ' . $taskId3 }}
                                                 </x-badge>
                                             </div>
                                             <div class="italic font-normal text-gray-900">
                                                 <x-badge :badgecolor="__('green')">
-                                                    {{ 'TaskId4 ' . json_decode($myQData->datadaftarpolirj_json)->taskIdPelayanan->taskId4 }}
+                                                    {{ 'TaskId4 ' . $taskId4 }}
                                                 </x-badge>
                                             </div>
                                             <div class="italic font-normal text-gray-900">
                                                 <x-badge :badgecolor="__('green')">
-                                                    {{ 'TaskId5 ' . json_decode($myQData->datadaftarpolirj_json)->taskIdPelayanan->taskId5 }}
+                                                    {{ 'TaskId5 ' . $taskId5 }}
                                                 </x-badge>
                                             </div>
                                         @endrole
