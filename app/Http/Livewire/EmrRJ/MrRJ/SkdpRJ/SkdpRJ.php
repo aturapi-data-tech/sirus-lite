@@ -40,7 +40,7 @@ class SkdpRJ extends Component
     public array $dataDaftarPoliRJ = [];
     public array $dataPasien = [];
 
-    // data SKDP / kontrol=>[] 
+    // data SKDP / kontrol=>[]
     public $kontrol = [
         // 'noKontrolRS' => "",
         // 'noSKDPBPJS' => "",
@@ -110,7 +110,7 @@ class SkdpRJ extends Component
         // Variable Search
         $search = $this->dataDokterLovSearch;
 
-        // check LOV by dr_id rs id 
+        // check LOV by dr_id rs id
         $dataDokter = DB::table('rsmst_doctors')->select(
             'rsmst_doctors.dr_id as dr_id',
             'rsmst_doctors.dr_name as dr_name',
@@ -299,7 +299,7 @@ class SkdpRJ extends Component
         $dataDaftarPoliRJ_json = isset($findData->datadaftarpolirj_json) ? $findData->datadaftarpolirj_json : null;
         // if meta_data_pasien_json = null
         // then cari Data Pasien By Key Collection (exception when no data found)
-        // 
+        //
         // else json_decode
 
         if ($dataDaftarPoliRJ_json) {
@@ -489,14 +489,15 @@ class SkdpRJ extends Component
     private function pushSuratKontrolBPJS(): void
     {
 
-
         //push data SuratKontrolBPJS
         if ($this->dataDaftarPoliRJ['klaimId'] == 'JM') {
 
             // jika SKDP kosong lakukan push data
             // insert
-            if (!isset($this->dataDaftarPoliRJ['kontrol']['noSKDPBPJS'])) {
-
+            if (
+                !isset($this->dataDaftarPoliRJ['kontrol']['noSKDPBPJS']) ||
+                empty($this->dataDaftarPoliRJ['kontrol']['noSKDPBPJS'])
+            ) {
                 $this->dataDaftarPoliRJ['kontrol']['noSKDPBPJS'] = '';
 
                 if (!$this->dataDaftarPoliRJ['kontrol']['noSKDPBPJS']) {
@@ -540,7 +541,7 @@ class SkdpRJ extends Component
         $meta_data_pasien_json = isset($findData->meta_data_pasien_json) ? $findData->meta_data_pasien_json : null;
         // if meta_data_pasien_json = null
         // then cari Data Pasien By Key Collection (exception when no data found)
-        // 
+        //
         // else json_decode
         if ($meta_data_pasien_json == null) {
 
@@ -750,7 +751,7 @@ class SkdpRJ extends Component
                 $this->emit('toastr-success', 'CetakSKDP');
 
                 return response()->streamDownload(
-                    fn () => print($pdfContent),
+                    fn() => print($pdfContent),
                     "filename.pdf"
                 );
             }
