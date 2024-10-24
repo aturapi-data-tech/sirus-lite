@@ -419,35 +419,15 @@ class EmrRJ extends Component
 
     public function keluarPoli($rjNo)
     {
-        // SEMENTARA {WAKTU MASUK APT = WAKTU KELUAR POLI}
         $this->findData($rjNo);
 
-
-        $sql = "select waktu_masuk_apt from rstxn_rjhdrs where rj_no=:rjNo";
-        $cek_waktu_masuk_apt = DB::scalar($sql, ['rjNo' => $rjNo]);
-
-        // ketika cek_waktu_masuk_apt kosong lalu update
-        if (!$cek_waktu_masuk_apt) {
-            $waktuMasukApotek = Carbon::now()->format('d/m/Y H:i:s');
-
-            DB::table('rstxn_rjhdrs')
-                ->where('rj_no', $rjNo)
-                ->update([
-                    'waktu_masuk_apt' => DB::raw("to_date('" . $waktuMasukApotek . "','dd/mm/yyyy hh24:mi:ss')"), //waktu masuk = rjdate
-                ]);
-        }
-
-        /////////////////////////
-        // Update TaskId 5         // SEMENTARA {WAKTU MASUK APT = WAKTU KELUAR POLI}
-        /////////////////////////
-        $sqlwaktuMasukApotek = "select to_char(waktu_masuk_apt,'dd/mm/yyyy hh24:mi:ss') as waktu_masuk_apt  from rstxn_rjhdrs where rj_no=:rjNo";
-        $waktuMasukApotek = DB::scalar($sqlwaktuMasukApotek, ['rjNo' => $rjNo]);
+        $keluarPoli = Carbon::now()->format('d/m/Y H:i:s');
 
         // check task Id 4 sudah dilakukan atau belum
         if ($this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']) {
 
             if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']) {
-                $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5'] = $waktuMasukApotek;
+                $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5'] = $keluarPoli;
                 // update DB
                 $this->updateDataRJ($rjNo);
 
@@ -458,25 +438,6 @@ class EmrRJ extends Component
 
             // cari no Booking
             $noBooking =  $this->dataDaftarPoliRJ['noBooking'];
-
-            // //////////////////////////
-            // //////////////////////////
-            // //////////////////////////
-
-            // off kan jika memberatkan program
-            // ulangi proses taskId start pushDataAntrian booking + task id 3
-            // $this->pushDataAntrian($rjNo);
-
-            // $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId3'])->timestamp * 1000; //waktu dalam timestamp milisecond
-            // $this->pushDataTaskId($noBooking, 3, $waktu);
-
-            // $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4'])->timestamp * 1000; //waktu dalam timestamp milisecond
-            // $this->pushDataTaskId($noBooking, 4, $waktu);
-            // ulangi proses taskId end
-
-            // //////////////////////////
-            // //////////////////////////
-            // //////////////////////////
 
 
             $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5'], 'Asia/Jakarta')->timestamp * 1000; //waktu dalam timestamp milisecond
