@@ -316,13 +316,19 @@
 
                                         @role(['Mr', 'Admin', 'Perawat'])
                                             <div class="italic font-normal text-gray-900">
-                                                {{ 'TaskId3 ' . json_decode($myQData->datadaftarpolirj_json)->taskIdPelayanan->taskId3 }}
+                                                <x-badge :badgecolor="__('green')">
+                                                    {{ 'TaskId3 ' . json_decode($myQData->datadaftarpolirj_json)->taskIdPelayanan->taskId3 }}
+                                                </x-badge>
                                             </div>
                                             <div class="italic font-normal text-gray-900">
-                                                {{ 'TaskId4 ' . json_decode($myQData->datadaftarpolirj_json)->taskIdPelayanan->taskId4 }}
+                                                <x-badge :badgecolor="__('green')">
+                                                    {{ 'TaskId4 ' . json_decode($myQData->datadaftarpolirj_json)->taskIdPelayanan->taskId4 }}
+                                                </x-badge>
                                             </div>
                                             <div class="italic font-normal text-gray-900">
-                                                {{ 'TaskId5 ' . json_decode($myQData->datadaftarpolirj_json)->taskIdPelayanan->taskId5 }}
+                                                <x-badge :badgecolor="__('green')">
+                                                    {{ 'TaskId5 ' . json_decode($myQData->datadaftarpolirj_json)->taskIdPelayanan->taskId5 }}
+                                                </x-badge>
                                             </div>
                                         @endrole
                                     </div>
