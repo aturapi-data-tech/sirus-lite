@@ -650,6 +650,20 @@ class TelaahResepRJ extends Component
         $this->findData($rjNo);
         $masukApotek = Carbon::now()->format('d/m/Y H:i:s');
 
+        //////updateDB/////////////////////
+        $sql = "select waktu_masuk_apt from rstxn_rjhdrs where rj_no=:rjNo";
+        $cek_waktu_masuk_apt = DB::scalar($sql, ['rjNo' => $rjNo]);
+
+
+        // ketika cek_waktu_masuk_apt kosong lalu update
+        if (!$cek_waktu_masuk_apt) {
+            DB::table('rstxn_rjhdrs')
+                ->where('rj_no', $rjNo)
+                ->update([
+                    'waktu_masuk_apt' => DB::raw("to_date('" . $masukApotek . "','dd/mm/yyyy hh24:mi:ss')"), //waktu masuk = rjdate
+                ]);
+        }
+        //////////////////////////////////
 
         // add antrian Apotek
 
@@ -744,6 +758,20 @@ class TelaahResepRJ extends Component
         $this->findData($rjNo);
         $keluarApotek = Carbon::now()->format('d/m/Y H:i:s');
 
+        //////updateDB/////////////////////
+        $sql = "select waktu_selesai_pelayanan from rstxn_rjhdrs where rj_no=:rjNo";
+        $cek_waktu_selesai_pelayanan = DB::scalar($sql, ['rjNo' => $rjNo]);
+
+
+        // ketika cek_waktu_selesai_pelayanan kosong lalu update
+        if (!$cek_waktu_selesai_pelayanan) {
+            DB::table('rstxn_rjhdrs')
+                ->where('rj_no', $rjNo)
+                ->update([
+                    'waktu_selesai_pelayanan' => DB::raw("to_date('" . $keluarApotek . "','dd/mm/yyyy hh24:mi:ss')"), //waktu masuk = rjdate
+                ]);
+        }
+        //////////////////////////////////
 
         // add antrian Apotek
 
