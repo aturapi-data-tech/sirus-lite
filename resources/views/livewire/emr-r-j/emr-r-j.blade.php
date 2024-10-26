@@ -322,7 +322,7 @@
                                             @isset($datadaftar_json['AdministrasiRj'])
                                                 {{ $datadaftar_json['AdministrasiRj']['userLog'] }}
                                             @else
-                                                {{ '---' }}
+                                                {{ '' }}
                                             @endisset
                                         </div>
                                     </div>
