@@ -355,7 +355,7 @@
                                                 ? $datadaftar_json['kontrol']['tglKontrol']
                                                 : '-')
                                             : '-' }}
-                                        -
+                                        </br>
                                         {{ isset($datadaftar_json['kontrol']['noSKDPBPJS'])
                                             ? ($datadaftar_json['kontrol']['noSKDPBPJS']
                                                 ? $datadaftar_json['kontrol']['noSKDPBPJS']
