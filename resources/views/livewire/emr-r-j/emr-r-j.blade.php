@@ -166,16 +166,21 @@
             <table class="w-full text-sm text-left text-gray-700 table-auto ">
                 <thead class="sticky top-0 text-xs text-gray-900 uppercase bg-gray-100 ">
                     <tr>
-                        <th scope="col" class="w-1/4 px-4 py-3 ">
+                        <th scope="col" class="w-1/5 px-4 py-3 ">
                             Pasien
                         </th>
-                        <th scope="col" class="w-1/4 px-4 py-3 ">
+                        <th scope="col" class="w-1/5 px-4 py-3 ">
                             Poli
                         </th>
-                        <th scope="col" class="w-1/4 px-4 py-3 ">
+                        <th scope="col" class="w-1/5 px-4 py-3 ">
                             Status Layanan
                         </th>
-                        <th scope="col" class="w-1/4 px-4 py-3 ">
+                        @role(['Mr', 'Admin', 'Perawat'])
+                            <th scope="col" class="w-1/5 px-4 py-3 ">
+                                Tindak Lanjut
+                            </th>
+                        @endrole
+                        <th scope="col" class="w-1/5 px-4 py-3 ">
                             Action
                         </th>
                     </tr>
@@ -238,7 +243,7 @@
                         <tr class="border-b group {{ $bgSelesaiPemeriksaan }}">
 
 
-                            <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap ">
+                            <td class="px-4 py-3 group-hover:bg-gray-100">
                                 <div class="">
                                     <div class="font-semibold text-primary">
                                         {{ $myQData->reg_no }}
@@ -253,7 +258,7 @@
                             </td>
 
 
-                            <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap ">
+                            <td class="px-4 py-3 group-hover:bg-gray-100">
                                 <div class="">
                                     <div class="font-semibold text-primary">{{ $myQData->poli_desc }}
                                     </div>
@@ -279,7 +284,7 @@
                                 </div>
                             </td>
 
-                            <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap ">
+                            <td class="px-4 py-3 group-hover:bg-gray-100">
                                 <div class="">
                                     <div class="font-semibold text-primary">
                                         {{ $myQData->rj_date }}
@@ -305,62 +310,59 @@
                                     <div class="font-normal text-gray-900">
                                         {{ '' . $myQData->nobooking }}
                                     </div>
-                                    {{-- <div class="font-normal text-gray-900 ">
-                                        {{ '' . $myQData->push_antrian_bpjs_status . $myQData->push_antrian_bpjs_json }}
-                                    </div> --}}
+
+
+                                </div>
+                            </td>
+                            @role(['Mr', 'Admin', 'Perawat'])
+                                <td class="px-4 py-3 group-hover:bg-gray-100">
                                     <div class="font-normal text-gray-700">
-                                        <x-badge :badgecolor="__($badgecolorAdministrasiRj)">
-                                            Administrasi :
+                                        <p class="font-semibold text-primary">Administrasi :</p>
+                                        <div class="font-semibold text-gray-900">
                                             @isset($datadaftar_json['AdministrasiRj'])
                                                 {{ $datadaftar_json['AdministrasiRj']['userLog'] }}
                                             @else
                                                 {{ '---' }}
                                             @endisset
-                                        </x-badge>
-
-                                        @role(['Mr', 'Admin', 'Perawat'])
-                                            <div class="italic font-normal text-gray-900">
-                                                <x-badge :badgecolor="__('green')">
-                                                    {{ 'TaskId3 ' . $taskId3 }}
-                                                </x-badge>
-                                            </div>
-                                            <div class="italic font-normal text-gray-900">
-                                                <x-badge :badgecolor="__('green')">
-                                                    {{ 'TaskId4 ' . $taskId4 }}
-                                                </x-badge>
-                                            </div>
-                                            <div class="italic font-normal text-gray-900">
-                                                <x-badge :badgecolor="__('green')">
-                                                    {{ 'TaskId5 ' . $taskId5 }}
-                                                </x-badge>
-                                            </div>
-                                            <div>
-                                                Tindak Lanjut :
-                                                {{ isset($datadaftar_json['perencanaan']['tindakLanjut']['tindakLanjut'])
-                                                    ? ($datadaftar_json['perencanaan']['tindakLanjut']['tindakLanjut']
-                                                        ? $datadaftar_json['perencanaan']['tindakLanjut']['tindakLanjut']
-                                                        : '-')
-                                                    : '-' }}
-                                                /
-                                                {{ isset($datadaftar_json['perencanaan']['tindakLanjut']['keteranganTindakLanjut'])
-                                                    ? ($datadaftar_json['perencanaan']['tindakLanjut']['keteranganTindakLanjut']
-                                                        ? $datadaftar_json['perencanaan']['tindakLanjut']['keteranganTindakLanjut']
-                                                        : '-')
-                                                    : '-' }}
-                                                /
-                                                {{ isset($datadaftar_json['kontrol']['noSKDPBPJS'])
-                                                    ? ($datadaftar_json['kontrol']['noSKDPBPJS']
-                                                        ? $datadaftar_json['kontrol']['noSKDPBPJS']
-                                                        : '-')
-                                                    : '-' }}
-                                            </div>
-                                        @endrole
-
-
+                                        </div>
                                     </div>
-
-                                </div>
-                            </td>
+                                    <div class="italic font-normal text-gray-900">
+                                        <x-badge :badgecolor="__('green')">
+                                            {{ 'TaskId3 ' . $taskId3 }}
+                                        </x-badge>
+                                    </div>
+                                    <div class="italic font-normal text-gray-900">
+                                        <x-badge :badgecolor="__('green')">
+                                            {{ 'TaskId4 ' . $taskId4 }}
+                                        </x-badge>
+                                    </div>
+                                    <div class="italic font-normal text-gray-900">
+                                        <x-badge :badgecolor="__('green')">
+                                            {{ 'TaskId5 ' . $taskId5 }}
+                                        </x-badge>
+                                    </div>
+                                    <div class="mt-2 font-normal">
+                                        Tindak Lanjut :
+                                        {{ isset($datadaftar_json['perencanaan']['tindakLanjut']['tindakLanjut'])
+                                            ? ($datadaftar_json['perencanaan']['tindakLanjut']['tindakLanjut']
+                                                ? $datadaftar_json['perencanaan']['tindakLanjut']['tindakLanjut']
+                                                : '-')
+                                            : '-' }}
+                                        /</br>
+                                        {{ isset($datadaftar_json['perencanaan']['tindakLanjut']['keteranganTindakLanjut'])
+                                            ? ($datadaftar_json['perencanaan']['tindakLanjut']['keteranganTindakLanjut']
+                                                ? $datadaftar_json['perencanaan']['tindakLanjut']['keteranganTindakLanjut']
+                                                : '-')
+                                            : '-' }}
+                                        /</br>
+                                        {{ isset($datadaftar_json['kontrol']['noSKDPBPJS'])
+                                            ? ($datadaftar_json['kontrol']['noSKDPBPJS']
+                                                ? $datadaftar_json['kontrol']['noSKDPBPJS']
+                                                : '-')
+                                            : '-' }}
+                                    </div>
+                                </td>
+                            @endrole
 
                             <td class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-primary">
 
