@@ -349,12 +349,12 @@
                                                 : '-')
                                             : '-' }}
                                         </br>
-                                        {{ isset($datadaftar_json['perencanaan']['tindakLanjut']['keteranganTindakLanjut'])
-                                            ? ($datadaftar_json['perencanaan']['tindakLanjut']['keteranganTindakLanjut']
-                                                ? $datadaftar_json['perencanaan']['tindakLanjut']['keteranganTindakLanjut']
+                                        {{ isset($datadaftar_json['kontrol']['tglKontrol'])
+                                            ? ($datadaftar_json['kontrol']['tglKontrol']
+                                                ? $datadaftar_json['kontrol']['tglKontrol']
                                                 : '-')
                                             : '-' }}
-                                        </br>
+                                        -
                                         {{ isset($datadaftar_json['kontrol']['noSKDPBPJS'])
                                             ? ($datadaftar_json['kontrol']['noSKDPBPJS']
                                                 ? $datadaftar_json['kontrol']['noSKDPBPJS']
