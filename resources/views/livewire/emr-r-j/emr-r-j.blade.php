@@ -349,6 +349,7 @@
                                                 : '-')
                                             : '-' }}
                                         </br>
+                                        Tanggal :
                                         {{ isset($datadaftar_json['kontrol']['tglKontrol'])
                                             ? ($datadaftar_json['kontrol']['tglKontrol']
                                                 ? $datadaftar_json['kontrol']['tglKontrol']
