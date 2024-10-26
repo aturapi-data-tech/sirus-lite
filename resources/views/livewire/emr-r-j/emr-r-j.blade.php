@@ -341,20 +341,20 @@
                                             {{ 'TaskId5 ' . $taskId5 }}
                                         </x-badge>
                                     </div>
-                                    <div class="mt-2 font-normal">
+                                    <div class="mt-1 font-normal">
                                         Tindak Lanjut :
                                         {{ isset($datadaftar_json['perencanaan']['tindakLanjut']['tindakLanjut'])
                                             ? ($datadaftar_json['perencanaan']['tindakLanjut']['tindakLanjut']
                                                 ? $datadaftar_json['perencanaan']['tindakLanjut']['tindakLanjut']
                                                 : '-')
                                             : '-' }}
-                                        /</br>
+                                        </br>
                                         {{ isset($datadaftar_json['perencanaan']['tindakLanjut']['keteranganTindakLanjut'])
                                             ? ($datadaftar_json['perencanaan']['tindakLanjut']['keteranganTindakLanjut']
                                                 ? $datadaftar_json['perencanaan']['tindakLanjut']['keteranganTindakLanjut']
                                                 : '-')
                                             : '-' }}
-                                        /</br>
+                                        </br>
                                         {{ isset($datadaftar_json['kontrol']['noSKDPBPJS'])
                                             ? ($datadaftar_json['kontrol']['noSKDPBPJS']
                                                 ? $datadaftar_json['kontrol']['noSKDPBPJS']
