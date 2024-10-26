@@ -334,7 +334,29 @@
                                                     {{ 'TaskId5 ' . $taskId5 }}
                                                 </x-badge>
                                             </div>
+                                            <div>
+                                                Tindak Lanjut :
+                                                {{ isset($datadaftar_json['perencanaan']['tindakLanjut']['tindakLanjut'])
+                                                    ? ($datadaftar_json['perencanaan']['tindakLanjut']['tindakLanjut']
+                                                        ? $datadaftar_json['perencanaan']['tindakLanjut']['tindakLanjut']
+                                                        : '-')
+                                                    : '-' }}
+                                                /
+                                                {{ isset($datadaftar_json['perencanaan']['tindakLanjut']['keteranganTindakLanjut'])
+                                                    ? ($datadaftar_json['perencanaan']['tindakLanjut']['keteranganTindakLanjut']
+                                                        ? $datadaftar_json['perencanaan']['tindakLanjut']['keteranganTindakLanjut']
+                                                        : '-')
+                                                    : '-' }}
+                                                /
+                                                {{ isset($datadaftar_json['kontrol']['noSKDPBPJS'])
+                                                    ? ($datadaftar_json['kontrol']['noSKDPBPJS']
+                                                        ? $datadaftar_json['kontrol']['noSKDPBPJS']
+                                                        : '-')
+                                                    : '-' }}
+                                            </div>
                                         @endrole
+
+
                                     </div>
 
                                 </div>
