@@ -69,9 +69,6 @@
                     {{-- End Tools --}}
 
 
-                    @if ($isOpen)
-                        @include('livewire.master-level-satu.create')
-                    @endif
 
 
 
@@ -123,12 +120,12 @@
                                             </th>
                                         </tr>
                                     </thead>
-                                    <tbody class="bg-white dark:bg-gray-800">
+                                    <tbody class="bg-white ">
 
 
                                         @foreach ($jadwal_dokter as $jd)
                                             {{-- @dd($jd) --}}
-                                            <tr class="border-b group dark:border-gray-700">
+                                            <tr class="border-b group">
                                                 <td
                                                     class="w-1/4 px-4 py-3 font-medium group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
                                                     {{-- <img class="w-10 h-10 rounded-full " src="profile-picture-1.jpg"
@@ -220,14 +217,58 @@
                 </div>
 
 
+                {{-- Jadwal Aktif RS --}}
+                <div class="grid grid-cols-2 gap-4 ">
+                    @for ($i = 1; $i <= 7; $i++)
+                        <table class="w-full text-sm text-left text-gray-500 table-auto dark:text-gray-400">
+                            <thead
+                                class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
+                                <tr>
 
-                <!-- Pagination start -->
-                {{-- <div class="flex items-center justify-end pt-3 sm:pt-6"> --}}
-                {{-- {{ $jadwal_dokter->links() }} --}}
-                {{-- {{ $jadwal_dokter->links('vendor.livewire.tailwind') }} --}}
-                {{-- </div> --}}
-                <!-- Pagination end -->
+                                    <th scope="col" class="w-1/4 px-4 py-3">
 
+                                        <x-sort-link :active=false wire:click.prevent="" role="button" href="#">
+                                            Jadwal Dokter Hari {{ $i }}
+                                        </x-sort-link>
+
+                                    </th>
+
+                                    <th scope="col" class="w-1/3 px-4 py-3">
+
+                                        <x-sort-link :active=false wire:click.prevent="" role="button" href="#">
+                                            Jadwal Hfiz
+                                        </x-sort-link>
+
+                                    </th>
+
+                                    <th scope="col" class="w-1/3 px-4 py-3">
+
+                                        <x-sort-link :active=false wire:click.prevent="" role="button"
+                                            href="#">
+                                            Status Kirim Antrian
+                                        </x-sort-link>
+
+                                    </th>
+
+
+
+
+                                    <th scope="col" class="w-8 px-4 py-3 text-center">Action
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white ">
+
+
+
+
+
+
+                            </tbody>
+                        </table>
+                        {{-- <div>{{ $i }}</div> --}}
+                    @endfor
+                </div>
 
 
             </div>
