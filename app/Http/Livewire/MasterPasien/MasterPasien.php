@@ -1556,17 +1556,20 @@ class MasterPasien extends Component
         // by reg_no
         $cariDataPasienRegNo = $this->findDataByKey('reg_no', $this->dataPasienBPJSSearch);
         if ($cariDataPasienRegNo) {
+
             $this->emit('toastr-success', "Data " . $this->dataPasien['pasien']['regName'] . " berhasil ditampilkan.");
         } else {
 
             // by nik
             $cariDataPasienNik = $this->findDataByKey('nik_bpjs', $this->dataPasienBPJSSearch);
             if ($cariDataPasienNik) {
+
                 $this->emit('toastr-success', "Data " . $this->dataPasien['pasien']['regName'] . " berhasil ditampilkan.");
             } else {
                 // by nokaBPJS
                 $cariDataPasienNokaBpjs = $this->findDataByKey('nokartu_bpjs', $this->dataPasienBPJSSearch);
                 if ($cariDataPasienNokaBpjs) {
+
                     $this->emit('toastr-success', "Data " . $this->dataPasien['pasien']['regName'] . " berhasil ditampilkan.");
                 } else {
                     // resert variable dataPasien otomatis (insert mode) cek data dari bpjs server
@@ -1580,7 +1583,9 @@ class MasterPasien extends Component
                         $CaridataVclaim = $CaridataVclaim['response']['peserta'];
 
                         // set dataPasien
-                        $this->dataPasien['pasien']['regDate'] = Carbon::now()->format('d/m/Y H:i:s');
+                        if (!isset($this->dataPasien['pasien']['regDate'])) {
+                            $this->dataPasien['pasien']['regDate'] = Carbon::now()->format('d/m/Y H:i:s');
+                        }
                         $this->dataPasien['pasien']['regName'] = $CaridataVclaim['nama'];
                         $this->dataPasien['pasien']['identitas']['idbpjs'] = $CaridataVclaim['noKartu'];
                         $this->dataPasien['pasien']['identitas']['nik'] = $CaridataVclaim['nik'];
@@ -1593,10 +1598,17 @@ class MasterPasien extends Component
                     } else {
                         // dd($CaridataVclaim);
                         $this->emit('toastr-error', $CaridataVclaim['metadata']['code'] . ' ' . $CaridataVclaim['metadata']['message']);
-                    }
 
-                    if (!isset($this->dataPasien['pasien']['regDate'])) {
-                        $this->dataPasien['pasien']['regDate'] = Carbon::now()->format('d/m/Y H:i:s');
+                        if (!isset($this->dataPasien['pasien']['regDate'])) {
+                            $this->dataPasien['pasien']['regDate'] = Carbon::now()->format('d/m/Y H:i:s');
+                        }
+                        $this->dataPasien['pasien']['regName'] = 'INPUT NAMA';
+                        $this->dataPasien['pasien']['identitas']['idbpjs'] = '';
+                        $this->dataPasien['pasien']['identitas']['nik'] = $this->dataPasienBPJSSearch;
+                        $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminId'] = ('L' == 'L') ? 1 : 2;
+                        $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] = ('Laki-laki' == 'Laki-laki') ? 'Laki-laki' : 'Perempuan';
+
+                        $this->dataPasien['pasien']['tglLahir'] = Carbon::now()->format('d/m/Y');
                     }
                 }
             }
@@ -1730,7 +1742,12 @@ class MasterPasien extends Component
                     ->first();
 
 
-                $this->dataPasien['pasien']['regDate'] = $findData->reg_date;
+                if (!isset($findData->reg_date) && !empty($findData->reg_date)) {
+                    $this->dataPasien['pasien']['regDate'] = $findData->reg_date;
+                } else {
+                    $this->dataPasien['pasien']['regDate'] = Carbon::now()->format('d/m/Y H:i:s');
+                }
+
                 $this->dataPasien['pasien']['regNo'] = $findData->reg_no;
                 $this->dataPasien['pasien']['regName'] = $findData->reg_name;
                 $this->dataPasien['pasien']['identitas']['idbpjs'] = $findData->nokartu_bpjs;
@@ -1790,9 +1807,10 @@ class MasterPasien extends Component
 
             }
 
-            return true;
+            return;
         } else {
-            return false;
+            $this->dataPasien['pasien']['regDate'] = Carbon::now()->format('d/m/Y H:i:s');
+            return;
         }
     }
 
