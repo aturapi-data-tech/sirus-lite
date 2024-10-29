@@ -216,54 +216,7 @@ trait AntrianTrait
     // }
 
 
-    // public static function ref_jadwal_dokter($kodePoli, $tgl)
-    // {
-
-
-
-    //     // customErrorMessages
-    //     $messages = customErrorMessagesTrait::messages();
-
-    //     $r = [
-    //         "kodePoli" => $kodePoli,
-    //         "tanggal" =>  $tgl,
-    //     ];
-
-    //     $rules = [
-    //         "kodePoli" => "required",
-    //         "tanggal" =>  "required|date",
-    //     ];
-
-    //     $validator = Validator::make($r, $rules, $messages);
-
-    //     if ($validator->fails()) {
-    //         // error, msgError,Code,url,ReqtrfTime
-    //         return self::sendError($validator->errors()->first(), $validator->errors(), 201, null, null);
-    //     }
-
-
-    //     // handler when time out and off line mode
-    //     try {
-
-    //         $url = env('ANTRIAN_URL') . "jadwaldokter/kodepoli/" . $kodePoli . "/tanggal/" . $tgl;
-    //         $signature = self::signature();
-
-    //         $response = Http::timeout(10)
-    //             ->withHeaders($signature)
-    //             ->get($url);
-
-    //         // dd($response->getBody()->getContents());
-
-    //         // dd($response->transferStats->getTransferTime()); //Get Transfertime request
-    //         // semua response error atau sukses dari BPJS di handle pada logic response_decrypt
-    //         return self::response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
-    //         /////////////////////////////////////////////////////////////////////////////
-    //     } catch (Exception $e) {
-
-    //         // error, msgError,Code,url,ReqtrfTime
-    //         return self::sendError($e->getMessage(), $validator->errors(), 408, $url, null);
-    //     }
-    // }
+    //
 
 
     // public static function ref_poli_fingerprint()
@@ -2556,6 +2509,8 @@ trait AntrianTrait
             return self::sendError($e->getMessage(), $validator->errors(), 408, $url, null);
         }
     }
+
+
 
     ///////////////////////////////////////////////////
 }
