@@ -437,9 +437,15 @@ class MasterPasien extends Component
 
     private function openModalTampil(): void
     {
+
+
         $this->resetInputFields();
         $this->isOpen = true;
         $this->isOpenMode = 'tampil';
+
+        if (!isset($this->dataPasien['pasien']['regDate'])) {
+            $this->dataPasien['pasien']['regDate'] = Carbon::now()->format('d/m/Y H:i:s');
+        }
     }
 
     public function closeModal()
