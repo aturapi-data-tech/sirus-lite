@@ -2463,9 +2463,6 @@ trait AntrianTrait
 
     public static function ref_jadwal_dokter($kodePoli, $tgl)
     {
-
-
-
         // customErrorMessages
         $messages = customErrorMessagesTrait::messages();
 
