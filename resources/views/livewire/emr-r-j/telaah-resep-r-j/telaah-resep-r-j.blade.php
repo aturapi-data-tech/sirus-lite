@@ -152,233 +152,231 @@
 
 
 
-        <div wire:poll.10s="render" class="h-[calc(100vh-250px)] mt-2 overflow-auto">
-            <!-- Table -->
-            <table class="w-full text-sm text-left text-gray-700 table-auto ">
-                <thead class="sticky top-0 text-xs text-gray-900 uppercase bg-gray-100 ">
-                    <tr>
-                        <th scope="col" class="w-1/4 px-4 py-3 ">
-                            Pasien
-                        </th>
+        <!-- Table -->
+        <table class="w-full text-sm text-left text-gray-700 table-auto ">
+            <thead class="sticky top-0 text-xs text-gray-900 uppercase bg-gray-100 ">
+                <tr>
+                    <th scope="col" class="w-1/4 px-4 py-3 ">
+                        Pasien
+                    </th>
 
-                        <th scope="col" class="w-1/4 px-4 py-3 ">
-                            Poli
-                        </th>
-                        <th scope="col" class="w-1/4 px-2 py-3 ">
-                            Status Layanan
-                        </th>
-                        <th scope="col" class="w-1/4 px-4 py-3 ">
-                            Action
-                        </th>
-                    </tr>
-                </thead>
+                    <th scope="col" class="w-1/4 px-4 py-3 ">
+                        Poli
+                    </th>
+                    <th scope="col" class="w-1/4 px-2 py-3 ">
+                        Status Layanan
+                    </th>
+                    <th scope="col" class="w-1/4 px-4 py-3 ">
+                        Action
+                    </th>
+                </tr>
+            </thead>
 
-                <tbody class="bg-white ">
+            <tbody class="bg-white ">
 
-                    @foreach ($myQueryData as $myQData)
-                        @php
-                            $datadaftar_json = json_decode($myQData->datadaftarpolirj_json, true);
+                @foreach ($myQueryData as $myQData)
+                    @php
+                        $datadaftar_json = json_decode($myQData->datadaftarpolirj_json, true);
 
-                            $eresep = isset($datadaftar_json['eresep']) ? 1 : 0;
-                            $noAntrianFarmasi = isset($datadaftar_json['noAntrianApotek']['noAntrian'])
-                                ? $datadaftar_json['noAntrianApotek']['noAntrian']
-                                : 0;
+                        $eresep = isset($datadaftar_json['eresep']) ? 1 : 0;
+                        $noAntrianFarmasi = isset($datadaftar_json['noAntrianApotek']['noAntrian'])
+                            ? $datadaftar_json['noAntrianApotek']['noAntrian']
+                            : 0;
 
-                            $prosentaseEMR = ($eresep / 1) * 100;
+                        $prosentaseEMR = ($eresep / 1) * 100;
 
-                            $badgecolorStatus = isset($myQData->rj_status)
-                                ? ($myQData->rj_status === 'A'
-                                    ? 'red'
-                                    : ($myQData->rj_status === 'L'
-                                        ? 'green'
-                                        : ($myQData->rj_status === 'I'
-                                            ? 'green'
-                                            : ($myQData->rj_status === 'F'
-                                                ? 'yellow'
-                                                : 'default'))))
-                                : '';
-
-                            $badgecolorEresep = $eresep ? 'green' : 'red';
-
-                            $badgecolorKlaim =
-                                $myQData->klaim_id == 'UM'
+                        $badgecolorStatus = isset($myQData->rj_status)
+                            ? ($myQData->rj_status === 'A'
+                                ? 'red'
+                                : ($myQData->rj_status === 'L'
                                     ? 'green'
-                                    : ($myQData->klaim_id == 'JM'
-                                        ? 'default'
-                                        : ($myQData->klaim_id == 'KR'
+                                    : ($myQData->rj_status === 'I'
+                                        ? 'green'
+                                        : ($myQData->rj_status === 'F'
                                             ? 'yellow'
-                                            : 'red'));
+                                            : 'default'))))
+                            : '';
 
-                            $badgecolorAdministrasiRj = isset($datadaftar_json['AdministrasiRj']) ? 'green' : 'red';
+                        $badgecolorEresep = $eresep ? 'green' : 'red';
 
-                            $taskId5 = $datadaftar_json['taskIdPelayanan']['taskId5'] ?? 'xxxx-xx-xx xx:xx:xx';
-                            $taskId6 = $datadaftar_json['taskIdPelayanan']['taskId6'] ?? 'xxxx-xx-xx xx:xx:xx';
-                            $taskId7 = $datadaftar_json['taskIdPelayanan']['taskId7'] ?? 'xxxx-xx-xx xx:xx:xx';
+                        $badgecolorKlaim =
+                            $myQData->klaim_id == 'UM'
+                                ? 'green'
+                                : ($myQData->klaim_id == 'JM'
+                                    ? 'default'
+                                    : ($myQData->klaim_id == 'KR'
+                                        ? 'yellow'
+                                        : 'red'));
 
-                        @endphp
+                        $badgecolorAdministrasiRj = isset($datadaftar_json['AdministrasiRj']) ? 'green' : 'red';
 
+                        $taskId5 = $datadaftar_json['taskIdPelayanan']['taskId5'] ?? 'xxxx-xx-xx xx:xx:xx';
+                        $taskId6 = $datadaftar_json['taskIdPelayanan']['taskId6'] ?? 'xxxx-xx-xx xx:xx:xx';
+                        $taskId7 = $datadaftar_json['taskIdPelayanan']['taskId7'] ?? 'xxxx-xx-xx xx:xx:xx';
 
-                        <tr class="border-b group ">
-
-
-                            <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap ">
-                                <div class="">
-                                    <div>
-                                        <p>Antrian Farmasi
-                                            <span class="text-5xl font-semibold text-gray-700">
-                                                {{ $noAntrianFarmasi }}
-                                            </span>
-                                        </p>
-                                    </div>
-                                    <div class="font-semibold text-primary">
-                                        {{ $myQData->reg_no }}
-                                    </div>
-                                    <div class="font-semibold text-gray-900">
-                                        {{ $myQData->reg_name . ' / (' . $myQData->sex . ')' . ' / ' . $myQData->thn }}
-                                    </div>
-                                    <div class="font-normal text-gray-700">
-                                        {{ $myQData->address }}
-                                    </div>
-                                </div>
-                            </td>
-
-                            <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap ">
-                                <div class="">
-                                    <div class="font-semibold text-primary">
-                                        {{ $myQData->poli_desc }}
-                                    </div>
-                                    <div class="font-semibold text-gray-900">
-                                        {{ $myQData->dr_name . ' / ' }}
-                                        <x-badge :badgecolor="__($badgecolorKlaim)">
-                                            {{ $myQData->klaim_id == 'UM'
-                                                ? 'UMUM'
-                                                : ($myQData->klaim_id == 'JM'
-                                                    ? 'BPJS'
-                                                    : ($myQData->klaim_id == 'KR'
-                                                        ? 'Kronis'
-                                                        : 'Asuransi Lain')) }}
-                                        </x-badge>
-                                    </div>
-                                    <div class="font-normal">
-                                        {{ $myQData->vno_sep }}
-                                    </div>
+                    @endphp
 
 
-                                </div>
-                            </td>
-
-                            <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap ">
-                                <div class="w-full overflow-auto">
-
-                                    <div class="font-semibold text-gray-900">
-                                        {{ 'Nomer Pelayanan : ' . $myQData->rj_no }}
-                                    </div>
-                                    <div class = "flex space-x-1">
-                                        <x-badge :badgecolor="__($badgecolorStatus)">
-                                            {{ isset($myQData->rj_status)
-                                                ? ($myQData->rj_status === 'A'
-                                                    ? 'Pelayanan'
-                                                    : ($myQData->rj_status === 'L'
-                                                        ? 'Selesai Pelayanan'
-                                                        : ($myQData->rj_status === 'I'
-                                                            ? 'Transfer Inap'
-                                                            : ($myQData->rj_status === 'F'
-                                                                ? 'Batal Transaksi'
-                                                                : ''))))
-                                                : '' }}
-                                        </x-badge>
-                                        <x-badge :badgecolor="__($badgecolorEresep)">
-                                            E-Resep: {{ $prosentaseEMR . '%' }}
-                                        </x-badge>
-                                    </div>
+                    <tr class="border-b group ">
 
 
-
-                                    <div>
-
-
-                                    </div>
-
-                                    <div class="font-normal text-gray-700">
-                                        {{ $myQData->rj_date }}
-                                        {{ '| Shift : ' . $myQData->shift }}
-                                    </div>
-
-                                    <div class="font-normal text-gray-700">
-                                        {{ '' . $myQData->nobooking }}
-                                    </div>
-
-                                    <div class="font-normal text-gray-700">
-                                        <x-badge :badgecolor="__($badgecolorAdministrasiRj)">
-                                            Administrasi :
-                                            @isset($datadaftar_json['AdministrasiRj'])
-                                                {{ $datadaftar_json['AdministrasiRj']['userLog'] }}
-                                            @else
-                                                {{ '---' }}
-                                            @endisset
-                                        </x-badge>
-                                    </div>
-
-                                    <div class="italic font-normal text-gray-900">
-                                        {{ 'TaskId5 ' . $taskId5 }}
-                                    </div>
-                                    <div class="italic font-normal text-gray-900">
-                                        {{ 'TaskId6 ' . $taskId6 }}
-                                    </div>
-                                    <div class="italic font-normal text-gray-900">
-                                        {{ 'TaskId7 ' . $taskId7 }}
-                                    </div>
-
-
-                                </div>
-                            </td>
-
-                            <td class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-primary">
-
-                                <div class="grid grid-cols-2 gap-2">
-
-                                    <x-red-button wire:click="masukApotek('{{ $myQData->rj_no }}')">
-                                        Mulai Pelayanan Apotek
-                                    </x-red-button>
-                                    <x-red-button wire:click="keluarApotek('{{ $myQData->rj_no }}')">
-                                        Selesai Pelayanan Apotek
-                                    </x-red-button>
-
-                                </div>
-
-                                <div class="grid grid-cols-2 gap-2">
-
-                                    <x-light-button
-                                        wire:click="editTelaahResep('{{ $eresep }}','{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">Telaah
-                                        Resep</x-light-button>
-                                    <x-green-button
-                                        wire:click="editAdministrasi('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">Admin
-                                        RJ</x-green-button>
-
-                                </div>
+                        <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap ">
+                            <div class="">
                                 <div>
-                                    <livewire:cetak.cetak-eresep-r-j :rjNoRef="$myQData->rj_no"
-                                        wire:key="cetak.cetak-eresep-r-j-{{ $myQData->rj_no }}">
+                                    <p>Antrian Farmasi
+                                        <span class="text-5xl font-semibold text-gray-700">
+                                            {{ $noAntrianFarmasi }}
+                                        </span>
+                                    </p>
+                                </div>
+                                <div class="font-semibold text-primary">
+                                    {{ $myQData->reg_no }}
+                                </div>
+                                <div class="font-semibold text-gray-900">
+                                    {{ $myQData->reg_name . ' / (' . $myQData->sex . ')' . ' / ' . $myQData->thn }}
+                                </div>
+                                <div class="font-normal text-gray-700">
+                                    {{ $myQData->address }}
+                                </div>
+                            </div>
+                        </td>
 
+                        <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap ">
+                            <div class="">
+                                <div class="font-semibold text-primary">
+                                    {{ $myQData->poli_desc }}
+                                </div>
+                                <div class="font-semibold text-gray-900">
+                                    {{ $myQData->dr_name . ' / ' }}
+                                    <x-badge :badgecolor="__($badgecolorKlaim)">
+                                        {{ $myQData->klaim_id == 'UM'
+                                            ? 'UMUM'
+                                            : ($myQData->klaim_id == 'JM'
+                                                ? 'BPJS'
+                                                : ($myQData->klaim_id == 'KR'
+                                                    ? 'Kronis'
+                                                    : 'Asuransi Lain')) }}
+                                    </x-badge>
+                                </div>
+                                <div class="font-normal">
+                                    {{ $myQData->vno_sep }}
                                 </div>
 
 
-                            </td>
-                        </tr>
-                    @endforeach
+                            </div>
+                        </td>
 
-                </tbody>
-            </table>
+                        <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap ">
+                            <div class="w-full overflow-auto">
 
-            {{-- no data found start --}}
-            @if ($myQueryData->count() == 0)
-                <div class="w-full p-4 text-sm text-center text-gray-900 dark:text-gray-400">
-                    {{ 'Data ' . $myProgram . ' Tidak ditemukan' }}
-                </div>
-            @endif
-            {{-- no data found end --}}
+                                <div class="font-semibold text-gray-900">
+                                    {{ 'Nomer Pelayanan : ' . $myQData->rj_no }}
+                                </div>
+                                <div class = "flex space-x-1">
+                                    <x-badge :badgecolor="__($badgecolorStatus)">
+                                        {{ isset($myQData->rj_status)
+                                            ? ($myQData->rj_status === 'A'
+                                                ? 'Pelayanan'
+                                                : ($myQData->rj_status === 'L'
+                                                    ? 'Selesai Pelayanan'
+                                                    : ($myQData->rj_status === 'I'
+                                                        ? 'Transfer Inap'
+                                                        : ($myQData->rj_status === 'F'
+                                                            ? 'Batal Transaksi'
+                                                            : ''))))
+                                            : '' }}
+                                    </x-badge>
+                                    <x-badge :badgecolor="__($badgecolorEresep)">
+                                        E-Resep: {{ $prosentaseEMR . '%' }}
+                                    </x-badge>
+                                </div>
 
-        </div>
+
+
+                                <div>
+
+
+                                </div>
+
+                                <div class="font-normal text-gray-700">
+                                    {{ $myQData->rj_date }}
+                                    {{ '| Shift : ' . $myQData->shift }}
+                                </div>
+
+                                <div class="font-normal text-gray-700">
+                                    {{ '' . $myQData->nobooking }}
+                                </div>
+
+                                <div class="font-normal text-gray-700">
+                                    <x-badge :badgecolor="__($badgecolorAdministrasiRj)">
+                                        Administrasi :
+                                        @isset($datadaftar_json['AdministrasiRj'])
+                                            {{ $datadaftar_json['AdministrasiRj']['userLog'] }}
+                                        @else
+                                            {{ '---' }}
+                                        @endisset
+                                    </x-badge>
+                                </div>
+
+                                <div class="italic font-normal text-gray-900">
+                                    {{ 'TaskId5 ' . $taskId5 }}
+                                </div>
+                                <div class="italic font-normal text-gray-900">
+                                    {{ 'TaskId6 ' . $taskId6 }}
+                                </div>
+                                <div class="italic font-normal text-gray-900">
+                                    {{ 'TaskId7 ' . $taskId7 }}
+                                </div>
+
+
+                            </div>
+                        </td>
+
+                        <td class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-primary">
+
+                            <div class="grid grid-cols-2 gap-2">
+
+                                <x-red-button wire:click="masukApotek('{{ $myQData->rj_no }}')">
+                                    Mulai Pelayanan Apotek
+                                </x-red-button>
+                                <x-red-button wire:click="keluarApotek('{{ $myQData->rj_no }}')">
+                                    Selesai Pelayanan Apotek
+                                </x-red-button>
+
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2">
+
+                                <x-light-button
+                                    wire:click="editTelaahResep('{{ $eresep }}','{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">Telaah
+                                    Resep</x-light-button>
+                                <x-green-button
+                                    wire:click="editAdministrasi('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">Admin
+                                    RJ</x-green-button>
+
+                            </div>
+                            <div>
+                                <livewire:cetak.cetak-eresep-r-j :rjNoRef="$myQData->rj_no"
+                                    wire:key="cetak.cetak-eresep-r-j-{{ $myQData->rj_no }}">
+
+                            </div>
+
+
+                        </td>
+                    </tr>
+                @endforeach
+
+            </tbody>
+        </table>
+
+        {{-- no data found start --}}
+        @if ($myQueryData->count() == 0)
+            <div class="w-full p-4 text-sm text-center text-gray-900 dark:text-gray-400">
+                {{ 'Data ' . $myProgram . ' Tidak ditemukan' }}
+            </div>
+        @endif
+        {{-- no data found end --}}
+
 
         {{ $myQueryData->links() }}
 
