@@ -214,6 +214,9 @@
                         $taskId6 = $datadaftar_json['taskIdPelayanan']['taskId6'] ?? 'xxxx-xx-xx xx:xx:xx';
                         $taskId7 = $datadaftar_json['taskIdPelayanan']['taskId7'] ?? 'xxxx-xx-xx xx:xx:xx';
 
+                        $telaahResepStatus = $datadaftar_json['telaahResep']['penanggungJawab'] ? true : false;
+                        $telaahObatStatus = $datadaftar_json['telaahObat']['penanggungJawab'] ? true : false;
+
                     @endphp
 
 
@@ -347,9 +350,16 @@
 
                             <div class="grid grid-cols-2 gap-2">
 
-                                <x-light-button
-                                    wire:click="editTelaahResep('{{ $eresep }}','{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">Telaah
-                                    Resep</x-light-button>
+                                @if ($telaahResepStatus && telaahObatStatus)
+                                    <x-green-button
+                                        wire:click="editTelaahResep('{{ $eresep }}','{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">Telaah
+                                        Resep</x-green-button>
+                                @else
+                                    <x-light-button
+                                        wire:click="editTelaahResep('{{ $eresep }}','{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">Telaah
+                                        Resep</x-light-button>
+                                @endif
+
                                 <x-green-button
                                     wire:click="editAdministrasi('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">Admin
                                     RJ</x-green-button>
