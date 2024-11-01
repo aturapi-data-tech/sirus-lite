@@ -1,9 +1,8 @@
 @php
     $disabledProperty = true;
 
-    // $disabledPropertyRjStatus = $statusRjRef['statusId'] !== 'A' ? true : false;
-    $disabledPropertyRjStatus = false;
-
+    $disabledPropertyRjStatus = $rjStatus;
+    // $disabledPropertyRjStatus = false;
 @endphp
 
 

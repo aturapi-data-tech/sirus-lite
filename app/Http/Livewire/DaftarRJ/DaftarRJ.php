@@ -383,6 +383,8 @@ class DaftarRJ extends Component
         ]
     ];
 
+    public bool $rjStatus = false;
+
     // http status Push antrian BPJS
     public $HttpGetBpjsStatus; //status push antrian 200 /201/ 400
     public $HttpGetBpjsJson; // response json
@@ -617,6 +619,7 @@ class DaftarRJ extends Component
         $this->isOpen = true;
         $this->isOpenMode = 'insert';
         $this->setShiftnCurrentDate();
+        $this->rjStatus = $this->checkRJStatus();
     }
     private function openModalEdit(): void
     {
@@ -1321,6 +1324,8 @@ class DaftarRJ extends Component
     {
         $findDataRJ = $this->findDataRJ($rjno);
         $this->dataDaftarPoliRJ  = $findDataRJ['dataDaftarRJ'];
+
+        $this->rjStatus = $this->checkRJStatus($rjno);
 
         // dd(isset($this->dataDaftarPoliRJ['klaimId']));
         if (!isset($this->dataDaftarPoliRJ['klaimId'])) {

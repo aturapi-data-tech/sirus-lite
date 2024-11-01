@@ -233,16 +233,21 @@ trait EmrRJTrait
         }
     }
 
-    protected  function checkRJStatus($rjNo): bool
+    protected  function checkRJStatus(int $rjNo = 0): bool
     {
-        $lastInserted = DB::table('rstxn_rjhdrs')
+        $rjStatus = DB::table('rstxn_rjhdrs')
             ->select('rj_status')
             ->where('rj_no', '=', $rjNo)
             ->first();
 
-        if ($lastInserted->rj_status !== 'A') {
+        if (!isset($rjStatus->rj_status) || empty($rjStatus->rj_status)) {
+            return false;
+        }
+
+        if ($rjStatus->rj_status !== 'A') {
             return true;
         }
+
         return false;
     }
 
