@@ -927,19 +927,20 @@ class TelaahResepRJ extends Component
 
         // 1 urutkan berdasarkan json table
         $myQueryPagination = $query->get()
-            ->sortBy(
-                function ($mySortByJson) {
-                    $datadaftar_json = json_decode($mySortByJson->datadaftarpolirj_json, true);
-                    $myQueryAntrianFarmasi = isset($datadaftar_json['noAntrianApotek']['noAntrian']) ? $datadaftar_json['noAntrianApotek']['noAntrian'] : 999;
-                    return ($myQueryAntrianFarmasi);
-                }
-            )
+
             ->sortByDesc(
                 function ($mySortByJson) {
                     $datadaftar_json = json_decode($mySortByJson->datadaftarpolirj_json, true);
+                    $myQueryAntrianFarmasi = isset($datadaftar_json['noAntrianApotek']['noAntrian']) ? $datadaftar_json['noAntrianApotek']['noAntrian'] : 0;
                     $myQueryPagination = isset($datadaftar_json['eresep']) ? 1 : 0;
                     $myQueryPagination1 = isset($datadaftar_json['AdministrasiRj']) ? 1 : 0;
-                    return ($myQueryPagination . $myQueryPagination1 . $mySortByJson->rj_date1);
+                    return ($myQueryAntrianFarmasi . $myQueryPagination . $myQueryPagination1 . $mySortByJson->rj_date1);
+                }
+            )->sortBy(
+                function ($mySortByJson) {
+                    $datadaftar_json = json_decode($mySortByJson->datadaftarpolirj_json, true);
+                    $myQueryAntrianFarmasi = isset($datadaftar_json['noAntrianApotek']['noAntrian']) ? $datadaftar_json['noAntrianApotek']['noAntrian'] : 0;
+                    return ($myQueryAntrianFarmasi);
                 }
             );
 
