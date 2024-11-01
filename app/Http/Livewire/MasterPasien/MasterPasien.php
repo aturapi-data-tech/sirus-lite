@@ -1900,6 +1900,10 @@ class MasterPasien extends Component
         $this->validateDataPasien();
 
         // Set data regDateStore if not exsist then create
+        if (!isset($this->dataPasien['pasien']['regDate'])) {
+            $this->dataPasien['pasien']['regDate'] = Carbon::now()->format('d/m/Y H:i:s');
+        }
+
         if (!isset($this->dataPasien['pasien']['regDateStore'])) {
             $this->dataPasien['pasien']['regDateStore'] = Carbon::now()->format('d/m/Y H:i:s');
         }
