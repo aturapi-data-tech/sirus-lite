@@ -214,8 +214,16 @@
                         $taskId6 = $datadaftar_json['taskIdPelayanan']['taskId6'] ?? 'xxxx-xx-xx xx:xx:xx';
                         $taskId7 = $datadaftar_json['taskIdPelayanan']['taskId7'] ?? 'xxxx-xx-xx xx:xx:xx';
 
-                        $telaahResepStatus = $datadaftar_json['telaahResep']['penanggungJawab'] ? true : false;
-                        $telaahObatStatus = $datadaftar_json['telaahObat']['penanggungJawab'] ? true : false;
+                        $telaahResepStatus = isset($datadaftar_json['telaahResep']['penanggungJawab'])
+                            ? ($datadaftar_json['telaahResep']['penanggungJawab']
+                                ? true
+                                : false)
+                            : false;
+                        $telaahObatStatus = isset($datadaftar_json['telaahObat']['penanggungJawab'])
+                            ? ($datadaftar_json['telaahObat']['penanggungJawab']
+                                ? true
+                                : false)
+                            : false;
 
                     @endphp
 
