@@ -350,7 +350,7 @@
 
                             <div class="grid grid-cols-2 gap-2">
 
-                                @if ($telaahResepStatus && telaahObatStatus)
+                                @if ($telaahResepStatus && $telaahObatStatus)
                                     <x-green-button
                                         wire:click="editTelaahResep('{{ $eresep }}','{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">Telaah
                                         Resep</x-green-button>
