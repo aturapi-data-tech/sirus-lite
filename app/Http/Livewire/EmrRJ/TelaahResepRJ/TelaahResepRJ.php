@@ -904,7 +904,7 @@ class TelaahResepRJ extends Component
             )
             ->where(DB::raw("nvl(rj_status,'A')"), '=', $myRefstatusId)
             // ->where('rj_status', '!=', 'F')
-            // ->where('klaim_id', '!=', 'KR')
+            ->where('klaim_id', '!=', 'KR')
 
             // ->where('shift', '=', $myRefshift)
             ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $myRefdate);
@@ -939,7 +939,7 @@ class TelaahResepRJ extends Component
             )->sortBy(
                 function ($mySortByJson) {
                     $datadaftar_json = json_decode($mySortByJson->datadaftarpolirj_json, true);
-                    $myQueryAntrianFarmasi = isset($datadaftar_json['noAntrianApotek']['noAntrian']) ? $datadaftar_json['noAntrianApotek']['noAntrian'] : 0;
+                    $myQueryAntrianFarmasi = isset($datadaftar_json['noAntrianApotek']['noAntrian']) ? $datadaftar_json['noAntrianApotek']['noAntrian'] : 9999;
                     return ($myQueryAntrianFarmasi);
                 }
             );
