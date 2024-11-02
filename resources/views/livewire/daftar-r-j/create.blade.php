@@ -1,8 +1,6 @@
 @php
     $disabledProperty = true;
-
     $disabledPropertyRjStatus = $rjStatus;
-    // $disabledPropertyRjStatus = false;
 @endphp
 
 
