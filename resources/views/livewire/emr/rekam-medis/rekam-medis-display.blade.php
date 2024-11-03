@@ -106,12 +106,17 @@
                                                             : '' }}
                                                         (mg/dL)
                                                         <br> --}}
-                                                        <span class="font-semibold"> Diagnosis :</span>
+                                                        <span class="font-semibold"> Diagnosis ICD10:</span>
                                                         <br>
                                                         @isset($datadaftar_json['diagnosis'])
                                                             @foreach ($datadaftar_json['diagnosis'] as $diagnosis)
                                                                 {!! nl2br(e($diagnosis['diagId'] . ' - ' . $diagnosis['diagDesc'])) . '</br>' !!}
                                                             @endforeach
+                                                        @endisset
+                                                        <span class="font-semibold"> Diagnosis Dokter :</span>
+                                                        <br>
+                                                        @isset($datadaftar_json['diagnosisFreeText'])
+                                                            {!! nl2br(e($datadaftar_json['diagnosisFreeText'])) . '</br>' !!}
                                                         @endisset
                                                         <span class="font-semibold"> Terapi :</span>
                                                         <br>
