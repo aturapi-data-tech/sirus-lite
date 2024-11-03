@@ -4,23 +4,46 @@
 
     <div class="px-1 pt-7 ">
         <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
-            <!-- Card header -->
             <div class="w-full h-screen mb-1 overflow-y-auto">
 
-                <div id="TopBarMenuMaster" class="">
+                <div class="md:flex md:justify-between">
 
-                    {{-- text Title --}}
+                    {{-- search --}}
+
+                    {{-- end search --}}
+
+                    {{-- two button --}}
+                    <div class="flex justify-between mt-2 md:mt-0">
+                        <div wire:loading wire:target="updateDataHfisBpjsToRsAll">
+                            <x-loading />
+                        </div>
+                        <x-primary-button wire:click="updateDataHfisBpjsToRsAll()" class="flex justify-center flex-auto"
+                            wire:loading.remove>
+                            <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd"
+                                    d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                                    clip-rule="evenodd"></path>
+                            </svg>
+                            Update {{ $myProgram }}
+                        </x-primary-button>
+
+                    </div>
+                    {{-- end two button --}}
+
+                </div>
+
+
+                {{-- <div id="TopBarMenuMaster" class="">
+
                     <div class="mb-2">
                         <h3 class="text-2xl font-bold text-midnight dark:text-white">{{ $myTitle }}</h3>
                         <span class="text-base font-normal text-gray-500 dark:text-gray-400">{{ $mySnipt }}</span>
                     </div>
-                    {{-- end text Title --}}
 
 
-                    {{-- Tools --}}
                     <div class="flex justify-between">
 
-                        {{-- search --}}
                         <div class="w-full">
                             <label for="mobile-search" class="sr-only">Search</label>
                             <div class="relative">
@@ -33,17 +56,15 @@
                                     </svg>
                                 </div>
                                 <x-text-input type="text" class="pl-10 p-2.5" placeholder="Cari Data"
-                                    wire:model.lazy="search" autofocus />
+                                    wire:model="search" autofocus />
 
                                 <div wire:loading wire:target="search">
                                     <x-loading />
                                 </div>
 
-                                {{-- LOV jadwal_dokter --}}
                                 @include('livewire.setup-hfis-bpjs.list-of-value-hfis-bpjs')
                             </div>
 
-                            {{-- date --}}
                             <div class="relative mt-2 ">
                                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                     <svg aria-hidden="true" class="w-5 h-5 text-gray-900 dark:text-gray-400"
@@ -61,23 +82,13 @@
                             </div>
 
                         </div>
-                        {{-- end search --}}
-
-
-
                     </div>
-                    {{-- End Tools --}}
-
-
-
-
-
-                </div>
+                </div> --}}
 
 
 
                 <!-- Table -->
-                <div class="flex flex-col mt-6">
+                {{-- <div class="flex flex-col mt-6">
                     <div class="overflow-x-auto rounded-lg">
                         <div class="inline-block min-w-full align-middle">
                             <div class="overflow-hidden shadow sm:rounded-lg">
@@ -124,12 +135,9 @@
 
 
                                         @foreach ($jadwal_dokter as $jd)
-                                            {{-- @dd($jd) --}}
                                             <tr class="border-b group">
                                                 <td
                                                     class="w-1/4 px-4 py-3 font-medium group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                    {{-- <img class="w-10 h-10 rounded-full " src="profile-picture-1.jpg"
-                                                    alt="Jese image"> --}}
                                                     <div class="pl-0">
                                                         <div class="font-semibold text-gray-700 ">
                                                             {{ $jd['namadokter'] }}</div>
@@ -144,8 +152,6 @@
 
                                                 <td
                                                     class="w-1/3 px-4 py-3 font-medium group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                    {{-- <img class="w-10 h-10 rounded-full " src="profile-picture-1.jpg"
-                                                    alt="Jese image"> --}}
                                                     <div class="pl-0">
                                                         <div class="font-semibold text-gray-700 ">
                                                             {{ 'Kapasitas : ' . $jd['kapasitaspasien'] }}</div>
@@ -160,8 +166,6 @@
 
                                                 <td
                                                     class="w-1/3 px-4 py-3 font-medium group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                    {{-- <img class="w-10 h-10 rounded-full " src="profile-picture-1.jpg"
-                                                    alt="Jese image"> --}}
                                                     <div class="pl-0">
                                                         <div class="font-semibold text-gray-700 ">
                                                             {{ 'Jml Pasien RS : ' . $jd['kapasitaspasien'] }}</div>
@@ -201,25 +205,100 @@
 
 
 
-                                {{-- no data found start --}}
                                 @if (count($jadwal_dokter) == 0)
                                     <div class="w-full p-4 text-sm text-center text-gray-500 dark:text-gray-400">
                                         {{ 'Data ' . $myProgram . ' Tidak ditemukan' }}
                                     </div>
                                 @endif
-                                {{-- no data found end --}}
-
-
-
                             </div>
                         </div>
+                    </div>
+                </div> --}}
+
+                <div class="pb-2 mb-2 bg-gray-400 bg-opacity-25 rounded-lg">
+                    {{-- Jadwal Aktif RS --}}
+                    <div class="my-4 text-3xl font-bold text-center">
+                        Jadwal Dokter {{ env('SATUSEHAT_ORGANIZATION_NAME') }}
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 ">
+                        @foreach ($myHari as $hari)
+                            <table class="w-full text-sm text-left text-gray-500 table-auto dark:text-gray-400">
+                                <thead
+                                    class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
+                                    <tr>
+
+                                        <th scope="col" class="w-1/4 px-4 py-3">
+
+                                            <x-sort-link :active=false wire:click.prevent="" role="button"
+                                                href="#">
+                                                {{ $hari['day_desc'] }}
+                                            </x-sort-link>
+
+                                        </th>
+
+                                        <th scope="col" class="w-1/3 px-4 py-3">
+
+                                            <x-sort-link :active=false wire:click.prevent="" role="button"
+                                                href="#">
+                                                Jadwal Hfiz
+                                            </x-sort-link>
+
+                                        </th>
+
+                                        <th scope="col" class="w-1/3 px-4 py-3">
+
+                                            <x-sort-link :active=false wire:click.prevent="" role="button"
+                                                href="#">
+                                                Kuota
+                                            </x-sort-link>
+
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white ">
+
+                                    @foreach ($hari['jadwalDokter'] as $key => $jadwalDokter)
+                                        <tr class="border-b group dark:border-gray-700">
+                                            <td
+                                                class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
+                                                <span class="font-semibold text-primary">
+                                                    {{ $key + 1 . ' ' . $jadwalDokter['dr_name'] }}
+                                                </span>
+                                                </br>
+                                                {{ $jadwalDokter['poli_desc'] }}
+
+                                            </td>
+                                            <td
+                                                class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
+                                                <span
+                                                    class="font-semibold text-gray-700">{{ $jadwalDokter['mulai_praktek'] . '-' . $jadwalDokter['selesai_praktek'] }}</span>
+                                                </br>
+                                                {{ 'Shift ' . $jadwalDokter['shift'] }}
+                                            </td>
+                                            <td
+                                                class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
+                                                {{ 'Kuota ' . $jadwalDokter['kuota'] }}
+
+                                            </td>
+                                        </tr>
+                                    @endforeach
+
+                                </tbody>
+                            </table>
+                            {{-- <div>{{ $i }}</div> --}}
+                        @endforeach
+
                     </div>
                 </div>
 
 
-                {{-- Jadwal Aktif RS --}}
-                <div class="grid grid-cols-2 gap-4 ">
-                    @for ($i = 1; $i <= 7; $i++)
+
+                <div class="p-4 my-4 bg-red-100 rounded-lg">
+
+                    <div class="my-4 text-3xl font-bold text-center text-red-500">
+                        Dokter Blm Masuk Jadwal {{ env('SATUSEHAT_ORGANIZATION_NAME') }}
+                    </div>
+                    <div class="grid grid-cols-1 gap-4 ">
                         <table class="w-full text-sm text-left text-gray-500 table-auto dark:text-gray-400">
                             <thead
                                 class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
@@ -228,7 +307,7 @@
                                     <th scope="col" class="w-1/4 px-4 py-3">
 
                                         <x-sort-link :active=false wire:click.prevent="" role="button" href="#">
-                                            Jadwal Dokter Hari {{ $i }}
+                                            Dokter
                                         </x-sort-link>
 
                                     </th>
@@ -236,38 +315,50 @@
                                     <th scope="col" class="w-1/3 px-4 py-3">
 
                                         <x-sort-link :active=false wire:click.prevent="" role="button" href="#">
-                                            Jadwal Hfiz
+                                            Jadwal
                                         </x-sort-link>
 
                                     </th>
 
                                     <th scope="col" class="w-1/3 px-4 py-3">
 
-                                        <x-sort-link :active=false wire:click.prevent="" role="button"
-                                            href="#">
-                                            Status Kirim Antrian
+                                        <x-sort-link :active=false wire:click.prevent="" role="button" href="#">
+                                            Kuota
                                         </x-sort-link>
 
-                                    </th>
-
-
-
-
-                                    <th scope="col" class="w-8 px-4 py-3 text-center">Action
                                     </th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white ">
 
+                                @foreach ($myDokterBlmTerJadwalHari as $key => $dokterBlmTerJadwalHari)
+                                    <tr class="border-b group dark:border-gray-700">
+                                        <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
+                                            <span class="font-semibold text-red-500">
+                                                {{ $key + 1 . ' ' . $dokterBlmTerJadwalHari['dr_name'] }}
+                                            </span>
+                                            </br>
+                                            {{ $dokterBlmTerJadwalHari['poli_desc'] }}
 
+                                        </td>
+                                        <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
+                                            <span
+                                                class="font-semibold text-gray-700">{{ '00:00:00' . '-' . '00:00:00' }}</span>
+                                            </br>
+                                            {{ 'Shift ' . 'xxx' }}
+                                        </td>
+                                        <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
+                                            {{ 'Kuota ' . '0' }}
 
-
-
+                                        </td>
+                                    </tr>
+                                @endforeach
 
                             </tbody>
                         </table>
-                        {{-- <div>{{ $i }}</div> --}}
-                    @endfor
+
+
+                    </div>
                 </div>
 
 
