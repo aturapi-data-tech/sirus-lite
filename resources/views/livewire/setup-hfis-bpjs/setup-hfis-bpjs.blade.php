@@ -265,7 +265,11 @@
                                                     {{ $key + 1 . ' ' . $jadwalDokter['dr_name'] }}
                                                 </span>
                                                 </br>
-                                                {{ $jadwalDokter['poli_desc'] }}
+                                                @if (in_array($jadwalDokter['poli_desc'], ['POLI UMUM', 'OK']))
+                                                    {{ $jadwalDokter['poli_desc'] }}
+                                                @else
+                                                    <x-badge> {{ $jadwalDokter['poli_desc'] }}</x-badge>
+                                                @endif
 
                                             </td>
                                             <td
@@ -338,7 +342,11 @@
                                                 {{ $key + 1 . ' ' . $dokterBlmTerJadwalHari['dr_name'] }}
                                             </span>
                                             </br>
-                                            {{ $dokterBlmTerJadwalHari['poli_desc'] }}
+                                            @if (in_array($dokterBlmTerJadwalHari['poli_desc'], ['POLI UMUM', 'OK']))
+                                                {{ $dokterBlmTerJadwalHari['poli_desc'] }}
+                                            @else
+                                                <x-badge> {{ $dokterBlmTerJadwalHari['poli_desc'] }}</x-badge>
+                                            @endif
 
                                         </td>
                                         <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
