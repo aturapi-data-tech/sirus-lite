@@ -329,7 +329,8 @@
                                         <p class="font-semibold text-primary">Administrasi :</p>
                                         <div class="font-semibold text-gray-900">
                                             @isset($datadaftar_json['AdministrasiRj'])
-                                                {{ $datadaftar_json['AdministrasiRj']['userLog'] }}
+                                                <x-badge :badgecolor="__('green')">
+                                                    {{ $datadaftar_json['AdministrasiRj']['userLog'] }}</x-badge>
                                             @else
                                                 <x-badge :badgecolor="__('red')"> {{ '-' }}</x-badge>
                                             @endisset
