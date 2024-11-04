@@ -237,6 +237,10 @@
                             $taskId3 = $datadaftar_json['taskIdPelayanan']['taskId3'] ?? 'xxxx-xx-xx xx:xx:xx';
                             $taskId4 = $datadaftar_json['taskIdPelayanan']['taskId4'] ?? 'xxxx-xx-xx xx:xx:xx';
                             $taskId5 = $datadaftar_json['taskIdPelayanan']['taskId5'] ?? 'xxxx-xx-xx xx:xx:xx';
+
+                            $eresep = isset($datadaftar_json['eresep']) ? 1 : 0;
+                            $prosentaseEMREresep = ($eresep / 1) * 100;
+                            $badgecolorEresep = $eresep ? 'green' : 'red';
                         @endphp
 
 
@@ -310,6 +314,11 @@
                                     <div class="font-normal text-gray-900">
                                         {{ '' . $myQData->nobooking }}
                                     </div>
+                                    <div>
+                                        <x-badge :badgecolor="__($badgecolorEresep)">
+                                            E-Resep: {{ $prosentaseEMREresep . '%' }}
+                                        </x-badge>
+                                    </div>
 
 
                                 </div>
@@ -322,7 +331,7 @@
                                             @isset($datadaftar_json['AdministrasiRj'])
                                                 {{ $datadaftar_json['AdministrasiRj']['userLog'] }}
                                             @else
-                                                {{ '' }}
+                                                <x-badge :badgecolor="__('red')"> {{ '-' }}</x-badge>
                                             @endisset
                                         </div>
                                     </div>
