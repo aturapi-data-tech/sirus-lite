@@ -184,6 +184,11 @@ class TelaahResepRJ extends Component
                 'drId' => 'All',
                 'drName' => 'All'
             ]
+        ],
+        'autoRefresh' => 'Ya',
+        'autoRefreshOptions' => [
+            ['autoRefresh' => 'Ya'],
+            ['autoRefresh' => 'Tidak']
         ]
     ];
 
