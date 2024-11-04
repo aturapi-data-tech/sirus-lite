@@ -165,7 +165,7 @@
                 <div class="h-[calc(100vh-250px)] mt-2 overflow-auto">
         @endif
 
-        <p class="text-xs">Data Terakhir: {{ now()->format('d-m-y H:i:s') . $myTopBar['autoRefresh'] }}</p>
+        <p class="text-xs">Data Terakhir: {{ now()->format('d-m-y H:i:s') }}</p>
         <!-- Table -->
         <table class="w-full text-sm text-left text-gray-700 table-auto ">
             <thead class="sticky top-0 text-xs text-gray-900 uppercase bg-gray-100 ">
