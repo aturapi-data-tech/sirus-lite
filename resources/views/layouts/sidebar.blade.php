@@ -111,6 +111,15 @@
                                     </x-nav-link>
                                 @endrole
 
+                                @role(['Perawat', 'Mr', 'Admin'])
+                                    <x-nav-link class="pl-4" :href="route('EmrRJBulan')" :active="request()->routeIs('EmrRJBulan')">
+                                        <!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
+
+
+                                        {{ __('Upload Rawat Jalan Bulanan') }}
+                                    </x-nav-link>
+                                @endrole
+
                                 @role(['Apoteker', 'Admin'])
                                     <x-nav-link class="pl-4" :href="route('TelaahResepRJ')" :active="request()->routeIs('TelaahResepRJ')">
                                         <!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
