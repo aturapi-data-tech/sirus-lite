@@ -197,6 +197,11 @@
                             ? $datadaftar_json['noAntrianApotek']['noAntrian']
                             : 0;
 
+                        $eresepRacikan = collect(
+                            isset($datadaftar_json['eresepRacikan']) ? $datadaftar_json['eresepRacikan'] : [],
+                        )->count();
+                        $jenisResep = $eresepRacikan ? 'racikan' : 'non racikan';
+
                         $prosentaseEMR = ($eresep / 1) * 100;
 
                         $badgecolorStatus = isset($myQData->rj_status)
@@ -326,6 +331,16 @@
                                 <div class="font-normal text-gray-700">
                                     {{ $myQData->rj_date }}
                                     {{ '| Shift : ' . $myQData->shift }}
+                                </div>
+
+                                <div>
+                                    @if ($jenisResep == 'racikan' && $eresep > 0)
+                                        <x-badge :badgecolor="__('default')"> {{ $jenisResep }}</x-badge>
+                                    @elseif($jenisResep == 'non racikan' && $eresep > 0)
+                                        <x-badge :badgecolor="__('green')"> {{ $jenisResep }}</x-badge>
+                                    @else
+                                        <x-badge :badgecolor="__('red')"> {{ '---' }}</x-badge>
+                                    @endif
                                 </div>
 
                                 <div class="font-normal text-gray-700">
