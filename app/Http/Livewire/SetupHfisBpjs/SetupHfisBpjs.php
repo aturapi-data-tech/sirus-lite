@@ -133,9 +133,9 @@ class SetupHfisBpjs extends Component
         // cek dayId
         $kd_hari_bpjs = DB::table('scmst_scdays')->where('day_id',  $dayId ?? '')->first();
 
-        if (!$kd_hari_bpjs) {
-            dd("Kode Hari Tidak ditemukan " . $dayId);
-        }
+        // if (!$kd_hari_bpjs) {
+        //     dd("Kode Hari Tidak ditemukan " . $dayId);
+        // }
 
         if (!$kuota) {
             dd("Kuota Tidak Tersedia " . $kuota);
