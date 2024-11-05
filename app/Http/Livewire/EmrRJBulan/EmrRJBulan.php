@@ -8,12 +8,16 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
 use App\Http\Traits\EmrRJ\EmrRJTrait;
+use App\Http\Traits\MasterPasien\MasterPasienTrait;
 
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class EmrRJBulan extends Component
 {
-    use WithPagination, EmrRJTrait;
-
+    use WithPagination, EmrRJTrait, MasterPasienTrait;
+    public $file;
     // primitive Variable
     public string $myTitle = 'Upload FIle Rekam Medis Bulanan';
     public string $mySnipt = 'Rekam Medis Pasien';
@@ -108,6 +112,62 @@ class EmrRJBulan extends Component
     private function settermyTopBarmyTopBarrefDate(): void
     {
         $this->myTopBar['refDate'] = Carbon::now()->format('m/Y');
+    }
+
+
+    public function uploadRekamMedisRJGrid($txnNo = null)
+    {
+        $queryIdentitas = DB::table('rsmst_identitases')
+            ->select(
+                'int_name',
+                'int_phone1',
+                'int_phone2',
+                'int_fax',
+                'int_address',
+                'int_city',
+            )
+            ->first();
+        $dataDaftarTxn = $this->findDataRJ($txnNo)['dataDaftarRJ'];
+        $dataPasien = $this->findDataMasterPasien($dataDaftarTxn['regNo']);
+        $data = [
+            'myQueryIdentitas' => $queryIdentitas,
+            'dataPasien' => $dataPasien,
+            'dataDaftarTxn' => $dataDaftarTxn,
+        ];
+
+        $pdfContent = PDF::loadView('livewire.emr.rekam-medis.cetak-rekam-medis-r-j', $data)->output();
+        $filename = Carbon::now()->format('dmYhis');
+        $filePath = 'bpjs/' . $filename . '.pdf'; // Adjust the path as needed
+
+
+        $cekFile = DB::table('rstxn_rjuploadbpjses')
+            ->where('rj_no', $txnNo)
+            ->where('seq_file', 3)
+            ->first();
+
+        if ($cekFile) {
+            Storage::disk('local')->delete('bpjs/' . $cekFile->uploadbpjs);
+            Storage::disk('local')->put($filePath, $pdfContent);
+            DB::table('rstxn_rjuploadbpjses')
+                ->where('rj_no', $txnNo)
+                ->where('seq_file', 3)
+                ->update([
+                    'uploadbpjs' => $filename . '.pdf',
+                    'rj_no' => $txnNo,
+                    'jenis_file' => 'pdf'
+                ]);
+            $this->emit('toastr-success', "Data berhasil diupdate.");
+        } else {
+            Storage::disk('local')->put($filePath, $pdfContent);
+            DB::table('rstxn_rjuploadbpjses')
+                ->insert([
+                    'seq_file' => 3,
+                    'uploadbpjs' => $filename . '.pdf',
+                    'rj_no' => $txnNo,
+                    'jenis_file' => 'pdf'
+                ]);
+            $this->emit('toastr-success', "Data berhasil diupload.");
+        }
     }
 
     // when new form instance

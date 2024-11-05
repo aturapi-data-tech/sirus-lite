@@ -266,22 +266,21 @@
 
                                 <div class="inline-flex">
                                     @if ($myQData->rjuploadbpjs_sep_count)
-                                        <x-light-button> Upload SEP</x-light-button>
+                                        <x-light-button
+                                            wire:click.prevent="uploadRekamMedisRJGrid('{{ $myQData->rj_no }}')"
+                                            type="button" wire:loading.remove>
+                                            Upload Resume Medis
+                                        </x-light-button>
                                     @else
-                                        <x-primary-button> Update SEP</x-primary-button>
+                                        <x-primary-button
+                                            wire:click.prevent="uploadRekamMedisRJGrid('{{ $myQData->rj_no }}')"
+                                            type="button" wire:loading.remove>
+                                            Update Resume Medis
+                                        </x-primary-button>
                                     @endif
-
-                                    @if ($myQData->rjuploadbpjs_rm_count)
-                                        <x-light-button> Upload Resume Medis</x-light-button>
-                                    @else
-                                        <x-primary-button> Update Resume Medis</x-primary-button>
-                                    @endif
-
-                                    @if ($myQData->rjuploadbpjs_skdp_count)
-                                        <x-light-button> Upload SKDP</x-light-button>
-                                    @else
-                                        <x-primary-button> Update SKDP</x-primary-button>
-                                    @endif
+                                    <div wire:loading wire:target="uploadRekamMedisRJGrid">
+                                        <x-loading />
+                                    </div>
 
                                 </div>
 
