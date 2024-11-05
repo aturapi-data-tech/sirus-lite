@@ -150,6 +150,7 @@ class EmrRJBulan extends Component
             Storage::disk('local')->put($filePath, $pdfContent);
             DB::table('rstxn_rjuploadbpjses')
                 ->where('rj_no', $txnNo)
+                ->where('uploadbpjs', $cekFile->uploadbpjs)
                 ->where('seq_file', 3)
                 ->update([
                     'uploadbpjs' => $filename . '.pdf',

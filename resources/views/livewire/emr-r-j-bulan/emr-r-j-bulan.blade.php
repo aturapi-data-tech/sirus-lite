@@ -265,7 +265,7 @@
 
 
                                 <div class="inline-flex">
-                                    @if ($myQData->rjuploadbpjs_sep_count)
+                                    @if ($myQData->rjuploadbpjs_rm_count)
                                         <x-light-button
                                             wire:click.prevent="uploadRekamMedisRJGrid('{{ $myQData->rj_no }}')"
                                             type="button" wire:loading.remove>
