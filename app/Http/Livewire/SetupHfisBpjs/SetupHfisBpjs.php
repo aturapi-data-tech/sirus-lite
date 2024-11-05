@@ -185,7 +185,7 @@ class SetupHfisBpjs extends Component
                 ]);
                 $this->emit('toastr-success', 'Insert OK');
             } catch (\Exception $e) {
-                // dd($e->getMessage());
+                dd($e->getMessage());
                 $this->emit('toastr-error', 'Insert ' . $e->getMessage());
             }
         } else {
@@ -212,7 +212,7 @@ class SetupHfisBpjs extends Component
                     ]);
                 $this->emit('toastr-success', 'Update OK');
             } catch (\Exception $e) {
-                // dd($e->getMessage());
+                dd($e->getMessage());
                 $this->emit('toastr-error', 'Update ' . $e->getMessage());
             }
         }
