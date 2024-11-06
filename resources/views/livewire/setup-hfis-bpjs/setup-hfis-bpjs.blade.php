@@ -34,7 +34,7 @@
                 </div>
 
 
-                {{-- <div id="TopBarMenuMaster" class="">
+                <div id="TopBarMenuMaster" class="">
 
                     <div class="mb-2">
                         <h3 class="text-2xl font-bold text-midnight dark:text-white">{{ $myTitle }}</h3>
@@ -83,12 +83,12 @@
 
                         </div>
                     </div>
-                </div> --}}
+                </div>
 
 
 
                 <!-- Table -->
-                {{-- <div class="flex flex-col mt-6">
+                <div class="flex flex-col mt-6">
                     <div class="overflow-x-auto rounded-lg">
                         <div class="inline-block min-w-full align-middle">
                             <div class="overflow-hidden shadow sm:rounded-lg">
@@ -184,7 +184,7 @@
 
                                                     <div>
                                                         <x-primary-button
-                                                            wire:click.prevent="updateJadwalRS('{{ $jd['kodesubspesialis'] }}', '{{ $jd['kodedokter'] }}', '{{ $jd['hari'] }}', '{{ $jd['jadwal'] }}', '{{ $jd['kapasitaspasien'] }}')"
+                                                            wire:click.prevent="updateJadwalRS('{{ $jd['kodesubspesialis'] }}', '{{ $jd['kodedokter'] }}','{{ $jd['kodedokter'] }}', '{{ $jd['hari'] }}', '{{ $jd['jadwal'] }}', '{{ $jd['kapasitaspasien'] }}')"
                                                             type="button" wire:loading.remove>
                                                             Update Jadwal RS dari Hfis
                                                         </x-primary-button>
@@ -213,7 +213,7 @@
                             </div>
                         </div>
                     </div>
-                </div> --}}
+                </div>
 
                 <div class="pb-2 mb-2 bg-gray-400 bg-opacity-25 rounded-lg">
                     {{-- Jadwal Aktif RS --}}
@@ -310,7 +310,8 @@
 
                                     <th scope="col" class="w-1/4 px-4 py-3">
 
-                                        <x-sort-link :active=false wire:click.prevent="" role="button" href="#">
+                                        <x-sort-link :active=false wire:click.prevent="" role="button"
+                                            href="#">
                                             Dokter
                                         </x-sort-link>
 
@@ -318,7 +319,8 @@
 
                                     <th scope="col" class="w-1/3 px-4 py-3">
 
-                                        <x-sort-link :active=false wire:click.prevent="" role="button" href="#">
+                                        <x-sort-link :active=false wire:click.prevent="" role="button"
+                                            href="#">
                                             Jadwal
                                         </x-sort-link>
 
@@ -326,7 +328,8 @@
 
                                     <th scope="col" class="w-1/3 px-4 py-3">
 
-                                        <x-sort-link :active=false wire:click.prevent="" role="button" href="#">
+                                        <x-sort-link :active=false wire:click.prevent="" role="button"
+                                            href="#">
                                             Kuota
                                         </x-sort-link>
 
@@ -337,7 +340,8 @@
 
                                 @foreach ($myDokterBlmTerJadwalHari as $key => $dokterBlmTerJadwalHari)
                                     <tr class="border-b group dark:border-gray-700">
-                                        <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
+                                        <td
+                                            class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
                                             <span class="font-semibold text-red-500">
                                                 {{ $key + 1 . ' ' . $dokterBlmTerJadwalHari['dr_name'] }}
                                             </span>
@@ -349,13 +353,15 @@
                                             @endif
 
                                         </td>
-                                        <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
+                                        <td
+                                            class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
                                             <span
                                                 class="font-semibold text-gray-700">{{ '00:00:00' . '-' . '00:00:00' }}</span>
                                             </br>
                                             {{ 'Shift ' . 'xxx' }}
                                         </td>
-                                        <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
+                                        <td
+                                            class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
                                             {{ 'Kuota ' . '0' }}
 
                                         </td>
