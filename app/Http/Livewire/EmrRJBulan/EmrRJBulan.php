@@ -148,27 +148,34 @@ class EmrRJBulan extends Component
         if ($cekFile) {
             Storage::disk('local')->delete('bpjs/' . $cekFile->uploadbpjs);
             Storage::disk('local')->put($filePath, $pdfContent);
-            DB::table('rstxn_rjuploadbpjses')
-                ->where('rj_no', $txnNo)
-                ->where('uploadbpjs', $cekFile->uploadbpjs)
-                ->where('seq_file', 3)
-                ->update([
-                    'uploadbpjs' => $filename . '.pdf',
-                    'rj_no' => $txnNo,
-                    'jenis_file' => 'pdf'
-                ]);
-
-            $this->emit('toastr-success', "Data berhasil diupdate " . $cekFile->uploadbpjs);
+            if (Storage::disk('local')->exists($filePath)) {
+                DB::table('rstxn_rjuploadbpjses')
+                    ->where('rj_no', $txnNo)
+                    ->where('uploadbpjs', $cekFile->uploadbpjs)
+                    ->where('seq_file', 3)
+                    ->update([
+                        'uploadbpjs' => $filename . '.pdf',
+                        'rj_no' => $txnNo,
+                        'jenis_file' => 'pdf'
+                    ]);
+                $this->emit('toastr-success', "Data berhasil diupdate " . $cekFile->uploadbpjs);
+            } else {
+                $this->emit('toastr-error', "Data tidak berhasil diupdate " . $cekFile->uploadbpjs);
+            }
         } else {
             Storage::disk('local')->put($filePath, $pdfContent);
-            DB::table('rstxn_rjuploadbpjses')
-                ->insert([
-                    'seq_file' => 3,
-                    'uploadbpjs' => $filename . '.pdf',
-                    'rj_no' => $txnNo,
-                    'jenis_file' => 'pdf'
-                ]);
-            $this->emit('toastr-success', "Data berhasil diupload " . $filename . '.pdf');
+            if (Storage::disk('local')->exists($filePath)) {
+                DB::table('rstxn_rjuploadbpjses')
+                    ->insert([
+                        'seq_file' => 3,
+                        'uploadbpjs' => $filename . '.pdf',
+                        'rj_no' => $txnNo,
+                        'jenis_file' => 'pdf'
+                    ]);
+                $this->emit('toastr-success', "Data berhasil diupload " . $filename . '.pdf');
+            } else {
+                $this->emit('toastr-error', "Data tidak berhasil diupdate " . $filename . '.pdf');
+            }
         }
     }
 
