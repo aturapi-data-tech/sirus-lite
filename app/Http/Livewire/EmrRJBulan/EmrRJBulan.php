@@ -157,6 +157,7 @@ class EmrRJBulan extends Component
                     'rj_no' => $txnNo,
                     'jenis_file' => 'pdf'
                 ]);
+
             $this->emit('toastr-success', "Data berhasil diupdate " . $cekFile->uploadbpjs);
         } else {
             Storage::disk('local')->put($filePath, $pdfContent);
