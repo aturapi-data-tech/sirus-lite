@@ -157,7 +157,7 @@ class EmrRJBulan extends Component
                     'rj_no' => $txnNo,
                     'jenis_file' => 'pdf'
                 ]);
-            $this->emit('toastr-success', "Data berhasil diupdate.");
+            $this->emit('toastr-success', "Data berhasil diupdate " . $cekFile->uploadbpjs);
         } else {
             Storage::disk('local')->put($filePath, $pdfContent);
             DB::table('rstxn_rjuploadbpjses')
@@ -167,7 +167,7 @@ class EmrRJBulan extends Component
                     'rj_no' => $txnNo,
                     'jenis_file' => 'pdf'
                 ]);
-            $this->emit('toastr-success', "Data berhasil diupload.");
+            $this->emit('toastr-success', "Data berhasil diupload " . $filename . '.pdf');
         }
     }
 
