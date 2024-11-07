@@ -185,7 +185,9 @@ class BookingRJ extends Component
                 ->orWhere(DB::raw('upper(nomorkartu)'), 'like', '%' . strtoupper($this->refFilter) . '%');
         })
             ->orderBy('tanggalperiksa',  'asc')
-            ->orderBy('kodedokter',  'asc');
+            ->orderBy('kodedokter',  'asc')
+
+            ->orderBy('tanggalbooking',  'asc');
 
 
         ////////////////////////////////////////////////
