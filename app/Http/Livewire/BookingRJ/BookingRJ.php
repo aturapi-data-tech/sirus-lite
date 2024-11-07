@@ -22,27 +22,9 @@ class BookingRJ extends Component
     // limit record per page -resetExcept////////////////
     public int $limitPerPage = 10;
 
-    // my Reg No
-
-    public string $regNo = '';
-
-    public bool $callMasterPasien = false;
-
-
-
-
-
     // my Top Bar
     public array $myTopBar = [
         'refDate' => '',
-
-        'refShiftId' => '1',
-        'refShiftDesc' => '1',
-        'refShiftOptions' => [
-            ['refShiftId' => '1', 'refShiftDesc' => '1'],
-            ['refShiftId' => '2', 'refShiftDesc' => '2'],
-            ['refShiftId' => '3', 'refShiftDesc' => '3'],
-        ],
 
         'refStatusId' => 'Belum',
         'refStatusDesc' => 'Belum',
@@ -50,15 +32,6 @@ class BookingRJ extends Component
             ['refStatusId' => 'Belum', 'refStatusDesc' => 'Belum'],
             ['refStatusId' => 'Checkin', 'refStatusDesc' => 'Checkin'],
             ['refStatusId' => 'Batal', 'refStatusDesc' => 'Batal'],
-        ],
-
-        'drId' => 'All',
-        'drName' => 'All',
-        'drOptions' => [
-            [
-                'drId' => 'All',
-                'drName' => 'All'
-            ]
         ]
     ];
 
@@ -88,18 +61,9 @@ class BookingRJ extends Component
 
 
     // setter myTopBar Shift and myTopBar refDate
-    private function settermyTopBarShiftandmyTopBarrefDate(): void
+    private function settermyTopBarmyTopBarrefDate(): void
     {
-        // dd/mm/yyyy hh24:mi:ss
         $this->myTopBar['refDate'] = Carbon::now()->format('d/m/Y');
-        // dd(Carbon::now()->format('H:i:s'));
-
-        // shift
-        $findShift = DB::table('rstxn_shiftctls')->select('shift')
-            ->whereRaw("'" . Carbon::now()->format('H:i:s') . "' between
-             shift_start and shift_end")
-            ->first();
-        $this->myTopBar['refShiftId'] = isset($findShift->shift) && $findShift->shift ? $findShift->shift : 3;
     }
 
 
@@ -136,244 +100,28 @@ class BookingRJ extends Component
 
 
 
-    // open and close modal start////////////////
-    //  modal status////////////////
-    public bool $isOpen = false;
-    public string $isOpenMode = 'insert';
-
-    public bool $isOpenDokter = false;
-    public string $isOpenModeDokter = 'insert';
-
-    public bool $isOpenScreening = false;
-    public string $isOpenModeScreening = 'insert';
-
-    public bool $forceInsertRecord = false;
-
-    public int $rjNoRef;
-    public string $regNoRef;
-
-    //
-    private function openModal(): void
-    {
-        $this->isOpen = true;
-        $this->isOpenMode = 'insert';
-    }
-    private function openModalEdit($rjNo, $regNoRef): void
-    {
-        $this->isOpen = true;
-        $this->isOpenMode = 'update';
-        $this->rjNoRef = $rjNo;
-        $this->regNoRef = $regNoRef;
-    }
-    private function openModalEditDokter($rjNo, $regNoRef): void
-    {
-        $this->isOpenDokter = true;
-        $this->isOpenModeDokter = 'update';
-        $this->rjNoRef = $rjNo;
-        $this->regNoRef = $regNoRef;
-    }
-
-    private function openModalEditScreening($rjNo, $regNoRef): void
-    {
-        $this->isOpenScreening = true;
-        $this->isOpenModeScreening = 'update';
-        $this->rjNoRef = $rjNo;
-        $this->regNoRef = $regNoRef;
-    }
-
-    private function openModalTampil(): void
-    {
-        $this->isOpen = true;
-        $this->isOpenMode = 'tampil';
-    }
-
-    public function closeModal(): void
-    {
-        $this->isOpen = false;
-        $this->isOpenMode = 'insert';
-        $this->resetInputFields();
-    }
-
-    public function closeModalDokter(): void
-    {
-        $this->isOpenDokter = false;
-        $this->isOpenModeDokter = 'insert';
-        $this->resetInputFields();
-    }
-
-    public function closeModalScreening(): void
-    {
-        $this->isOpenScreening = false;
-        $this->isOpenModeScreening = 'insert';
-        $this->resetInputFields();
-    }
-    // open and close modal end////////////////
-
 
     // resert input private////////////////
     private function resetInputFields(): void
     {
-
-        // resert validation
         $this->resetValidation();
-        // resert input
-
     }
     // resert input private////////////////
 
-    // is going to edit data/////////////////
-    public function edit($rjNo, $regNoRef)
-    {
-        $this->openModalEdit($rjNo, $regNoRef);
-        // $this->findData($id);
-    }
-
-    public function editDokter($rjNo, $regNoRef)
-    {
-        $this->openModalEditDokter($rjNo, $regNoRef);
-        // $this->findData($id);
-    }
-
-    public function editScreening($rjNo, $regNoRef)
-    {
-        $this->openModalEditScreening($rjNo, $regNoRef);
-        // $this->findData($id);
-    }
-
-
-
-
-
-    // listener from blade////////////////
     protected $listeners = [
         // 'ListenerisOpenRJ' => 'ListenerisOpenRJ',
         'confirm_remove_record_RJp' => 'delete'
     ];
 
-    // public function ListenerisOpenRJ($ListenerisOpenRJ): void
-    // {
-    //     // dd($ListenerisOpenRJ);
-    //     $this->isOpen = $ListenerisOpenRJ['isOpen'];
-    //     $this->isOpenMode = $ListenerisOpenRJ['isOpenMode'];
-    //     $this->render();
-    // }
-
-
     ////////////////////////////////////////////////
     ///////////begin////////////////////////////////
     ////////////////////////////////////////////////
-
-    // is going to insert data////////////////
-    public function create()
-    {
-        $this->openModal();
-    }
-
-    public function tampil()
-    {
-        $this->emit('toastr-error', 'Fitur dalam masa pengembangan');
-    }
-
-    public function delete()
-    {
-        $this->emit('toastr-error', 'Fitur dalam masa pengembangan');
-    }
-
-
-    public function callFormPasien(): void
-    {
-        // set Call MasterPasien True
-        $this->callMasterPasien = true;
-    }
-
-    public string $activeTab = "rekamMedis";
-    public string $activeTabDokter = "assessmentDokter";
-
-
-
-
-    public array $EmrMenu = [
-        // [
-        //     'ermMenuId' => 'keperawatan',
-        //     'ermMenuName' => 'Keperawatan'
-        // ],
-        [
-            'ermMenuId' => 'anamnesa',
-            'ermMenuName' => 'Anamnesa'
-        ],
-        [
-            'ermMenuId' => 'pemeriksaan',
-            'ermMenuName' => 'Pemeriksaan'
-        ],
-        [
-            'ermMenuId' => 'penilaian',
-            'ermMenuName' => 'Penilaian'
-        ],
-        [
-            'ermMenuId' => 'diagnosis',
-            'ermMenuName' => 'Diagnosis (ICD)'
-        ],
-        // [
-        //     'ermMenuId' => 'penandaanGbr',
-        //     'ermMenuName' => 'Penandaan Gambar'
-        // ],
-        [
-            'ermMenuId' => 'perencanaan',
-            'ermMenuName' => 'Perencanaan'
-        ],
-        [
-            'ermMenuId' => 'administrasi',
-            'ermMenuName' => 'Administrasi'
-        ],
-        [
-            'ermMenuId' => 'suket',
-            'ermMenuName' => 'Surat Keterangan (Sehat/Istirahat)'
-        ],
-        // [
-        //     'ermMenuId' => 'cppt',
-        //     'ermMenuName' => 'CPPT'
-        // ],
-        // [
-        //     'ermMenuId' => 'resumeMds',
-        //     'ermMenuName' => 'Resume Medis'
-        // ],
-        // [
-        //     'ermMenuId' => 'penerbitanSrt',
-        //     'ermMenuName' => 'Penerbitan Surat'
-        // ],
-        [
-            'ermMenuId' => 'rekamMedis',
-            'ermMenuName' => 'Resume Medis'
-        ],
-
-    ];
-
-
-    public array $EmrMenuDokter = [
-        [
-            'ermMenuId' => 'assessmentDokter',
-            'ermMenuName' => 'Assessment Dokter'
-        ],
-        [
-            'ermMenuId' => 'pelayananPenunjang',
-            'ermMenuName' => 'Pelayanan Penunjang'
-        ],
-        [
-            'ermMenuId' => 'rekamMedis',
-            'ermMenuName' => 'Resume Medis'
-        ],
-
-    ];
-
-
-
-
 
 
     // when new form instance
     public function mount()
     {
-        $this->settermyTopBarShiftandmyTopBarrefDate();
+        $this->settermyTopBarmyTopBarrefDate();
     }
 
 
@@ -383,15 +131,6 @@ class BookingRJ extends Component
     public function render()
     {
         $this->gettermyTopBardrOptions();
-
-        // set mySearch
-        $mySearch = $this->refFilter;
-        $myRefdate = $this->myTopBar['refDate'];
-        // $myRefshift = $this->myTopBar['refShiftId'];
-        $myRefstatusId = $this->myTopBar['refStatusId'];
-        $myRefdrId = $this->myTopBar['drId'];
-
-
 
         //////////////////////////////////////////
         // Query ///////////////////////////////
@@ -434,7 +173,17 @@ class BookingRJ extends Component
 
             )
             ->join('rsmst_pasiens', DB::raw("upper(referensi_mobilejkn_bpjs.norm)"), '=', 'rsmst_pasiens.reg_no')
-            ->where(DB::raw("to_char(to_date(tanggalperiksa,'yyyy-mm-dd'),'dd/mm/yyyy')"), '=', $myRefdate)
+            ->where(DB::raw("to_char(to_date(tanggalperiksa,'yyyy-mm-dd'),'dd/mm/yyyy')"), '=', $this->myTopBar['refDate'])
+            ->where('status', '=', $this->myTopBar['refStatusId']);
+
+
+        $query->where(function ($q) {
+            $q->Where(DB::raw('upper(nobooking)'), 'like', '%' . strtoupper($this->refFilter) . '%')
+                ->orWhere(DB::raw('upper(norm)'), 'like', '%' . strtoupper($this->refFilter) . '%')
+                ->orWhere(DB::raw('upper(nik)'), 'like', '%' . strtoupper($this->refFilter) . '%')
+                ->orWhere(DB::raw('upper(reg_name)'), 'like', '%' . strtoupper($this->refFilter) . '%')
+                ->orWhere(DB::raw('upper(nomorkartu)'), 'like', '%' . strtoupper($this->refFilter) . '%');
+        })
             ->orderBy('tanggalperiksa',  'asc')
             ->orderBy('kodedokter',  'asc');
 

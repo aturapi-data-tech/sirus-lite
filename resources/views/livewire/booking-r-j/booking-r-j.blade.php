@@ -73,36 +73,6 @@
                             wire:model="myTopBar.refStatusId" />
                     @endforeach
                 </div>
-                {{-- Status Transaksi --}}
-
-                {{-- Dokter --}}
-                <div>
-                    <x-dropdown align="right" :width="__('80')" :contentclasses="__('overflow-auto max-h-[150px] py-1 bg-white dark:bg-gray-700')">
-                        <x-slot name="trigger">
-                            {{-- Button Dokter --}}
-                            <x-alternative-button class="inline-flex whitespace-nowrap">
-                                <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
-                                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                    <path clip-rule="evenodd" fill-rule="evenodd"
-                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-                                </svg>
-                                <span>{{ $myTopBar['drName'] }}</span>
-                            </x-alternative-button>
-                        </x-slot>
-                        {{-- Open shiftcontent --}}
-                        <x-slot name="content">
-
-                            @foreach ($myTopBar['drOptions'] as $dr)
-                                <x-dropdown-link
-                                    wire:click="settermyTopBardrOptions('{{ $dr['drId'] }}','{{ $dr['drName'] }}')">
-                                    {{ __($dr['drName']) }}
-                                </x-dropdown-link>
-                            @endforeach
-                        </x-slot>
-                    </x-dropdown>
-                </div>
-
-
 
             </div>
 
@@ -134,9 +104,7 @@
             </div>
 
 
-            @if ($isOpen)
-                {{-- @include('livewire.emr-r-j.create-emr-r-j') --}}
-            @endif
+
 
         </div>
         {{-- Top Bar --}}
@@ -245,10 +213,18 @@
                                         <x-badge :badgecolor="__('default')">
                                             Tgl Periksa {{ $myQData->tanggalperiksa }}
                                         </x-badge>
-                                        <x-badge :badgecolor="__($myQData->status == 'Batal' ? 'red' : 'default')">
+                                        <x-badge :badgecolor="__(
+                                            $myQData->status == 'Batal' || $myQData->status == 'Belum'
+                                                ? 'red'
+                                                : 'green',
+                                        )">
                                             {{ $myQData->status }}
                                         </x-badge>
-                                        <x-badge :badgecolor="__($myQData->status == 'Batal' ? 'red' : 'default')">
+                                        <x-badge :badgecolor="__(
+                                            $myQData->status == 'Batal' || $myQData->status == 'Belum'
+                                                ? 'red'
+                                                : 'green',
+                                        )">
                                             {{ $myQData->keterangan_batal }}
                                         </x-badge>
                                     </div>
