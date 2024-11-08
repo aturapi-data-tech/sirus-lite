@@ -113,7 +113,6 @@
                 <div class="flex ml-2">
                     <p class="text-sm">AutoRefresh :</p>
                     @foreach ($myTopBar['autoRefreshOptions'] as $autoRefresh)
-                        {{-- @dd($autoRefresh) --}}
                         <x-radio-button :label="__($autoRefresh['autoRefresh'])" value="{{ $autoRefresh['autoRefresh'] }}"
                             wire:model="myTopBar.autoRefresh" />
                     @endforeach
@@ -399,7 +398,8 @@
 
                                 <x-green-button
                                     wire:click="editAdministrasi('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">Admin
-                                    RJ</x-green-button>
+                                    RJ
+                                </x-green-button>
 
                             </div>
                             <div>

@@ -52,14 +52,16 @@ class TelaahResepUGD extends Component
                 ["tepatObat" => "Tidak"],
             ],
             "desc" => "",
-        ], "tepatDosis" => [
+        ],
+        "tepatDosis" => [
             "tepatDosis" => "Ya",
             "tepatDosisOptions" => [
                 ["tepatDosis" => "Ya"],
                 ["tepatDosis" => "Tidak"],
             ],
             "desc" => "",
-        ], "tepatRute" => [
+        ],
+        "tepatRute" => [
             "tepatRute" => "Ya",
             "tepatRuteOptions" => [
                 ["tepatRute" => "Ya"],
@@ -133,14 +135,16 @@ class TelaahResepUGD extends Component
                 ["jmlDosisdgnResep" => "Tidak"],
             ],
             "desc" => "",
-        ], "rutedgnResep" => [
+        ],
+        "rutedgnResep" => [
             "rutedgnResep" => "Ya",
             "rutedgnResepOptions" => [
                 ["rutedgnResep" => "Ya"],
                 ["rutedgnResep" => "Tidak"],
             ],
             "desc" => "",
-        ], "waktuFrekPemberiandgnResep" => [
+        ],
+        "waktuFrekPemberiandgnResep" => [
             "waktuFrekPemberiandgnResep" => "Ya",
             "waktuFrekPemberiandgnResepOptions" => [
                 ["waktuFrekPemberiandgnResep" => "Ya"],
@@ -177,6 +181,11 @@ class TelaahResepUGD extends Component
                 'drId' => 'All',
                 'drName' => 'All'
             ]
+        ],
+        'autoRefresh' => 'Ya',
+        'autoRefreshOptions' => [
+            ['autoRefresh' => 'Ya'],
+            ['autoRefresh' => 'Tidak']
         ]
     ];
 
@@ -352,16 +361,9 @@ class TelaahResepUGD extends Component
     // resert input private////////////////
     private function resetInputFields(): void
     {
-
-        // resert validation
         $this->resetValidation();
-        // resert input
-
     }
     // resert input private////////////////
-
-
-
 
 
     ////////////////////////////////////////////////
@@ -455,7 +457,7 @@ class TelaahResepUGD extends Component
     public function setttdTelaahResep($rjNo)
     {
         $myUserNameActive = auth()->user()->myuser_name;
-        if (auth()->user()->hasRole('Perawat')) {
+        if (auth()->user()->hasRole('Apoteker')) {
             if (isset($this->dataDaftarUgd['telaahResep']['penanggungJawab']) == false) {
                 $this->dataDaftarUgd['telaahResep']['penanggungJawab'] = [
                     'userLog' => auth()->user()->myuser_name,
@@ -482,7 +484,7 @@ class TelaahResepUGD extends Component
     public function setttdTelaahObat($rjNo)
     {
         $myUserNameActive = auth()->user()->myuser_name;
-        if (auth()->user()->hasRole('Perawat')) {
+        if (auth()->user()->hasRole('Apoteker')) {
             if (isset($this->dataDaftarUgd['telaahObat']['penanggungJawab']) == false) {
                 $this->dataDaftarUgd['telaahObat']['penanggungJawab'] = [
                     'userLog' => auth()->user()->myuser_name,
@@ -508,121 +510,10 @@ class TelaahResepUGD extends Component
 
     private function findData($rjNo): array
     {
-        $dataUGD = [];
 
-        $findData = DB::table('rsview_ugdkasir')
-            ->select('datadaftarugd_json', 'vno_sep')
-            ->where('rj_no', $rjNo)
-            ->first();
+        $this->dataDaftarUgd = $this->findDataUGD($rjNo);
+        $dataUGD = $this->dataDaftarUgd;
 
-        $datadaftarugd_json = isset($findData->datadaftarugd_json) ? $findData->datadaftarugd_json   : null;
-
-        if ($datadaftarugd_json) {
-            $dataUGD = json_decode($findData->datadaftarugd_json, true);
-        } else {
-
-            $this->emit('toastr-error', "Data tidak dapat di proses json.");
-            $dataDaftarUgd = DB::table('rsview_ugdkasir')
-                ->select(
-                    DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
-                    DB::raw("to_char(rj_date,'yyyymmddhh24miss') AS rj_date1"),
-                    'rj_no',
-                    'reg_no',
-                    'reg_name',
-                    'sex',
-                    'address',
-                    'thn',
-                    DB::raw("to_char(birth_date,'dd/mm/yyyy') AS birth_date"),
-                    'poli_id',
-                    'poli_desc',
-                    'dr_id',
-                    'dr_name',
-                    'klaim_id',
-                    // 'entry_id',
-                    'shift',
-                    'vno_sep',
-                    'no_antrian',
-
-                    'nobooking',
-                    'push_antrian_bpjs_status',
-                    'push_antrian_bpjs_json',
-                    'kd_dr_bpjs',
-                    'kd_poli_bpjs',
-                    'rj_status',
-                    'txn_status',
-                    'erm_status',
-                )
-                ->where('rj_no', '=', $rjNo)
-                ->first();
-
-            $dataUGD = [
-                "regNo" =>  $dataDaftarUgd->reg_no,
-
-                "drId" =>  $dataDaftarUgd->dr_id,
-                "drDesc" =>  $dataDaftarUgd->dr_name,
-
-                "poliId" =>  $dataDaftarUgd->poli_id,
-                "klaimId" => $dataDaftarUgd->klaim_id,
-                // "poliDesc" =>  $dataDaftarUgd->poli_desc ,
-
-                // "kddrbpjs" =>  $dataDaftarUgd->kd_dr_bpjs ,
-                // "kdpolibpjs" =>  $dataDaftarUgd->kd_poli_bpjs ,
-
-                "rjDate" =>  $dataDaftarUgd->rj_date,
-                "rjNo" =>  $dataDaftarUgd->rj_no,
-                "shift" =>  $dataDaftarUgd->shift,
-                "noAntrian" =>  $dataDaftarUgd->no_antrian,
-                "noBooking" =>  $dataDaftarUgd->nobooking,
-                "slCodeFrom" => "02",
-                "passStatus" => "",
-                "rjStatus" =>  $dataDaftarUgd->rj_status,
-                "txnStatus" =>  $dataDaftarUgd->txn_status,
-                "ermStatus" =>  $dataDaftarUgd->erm_status,
-                "cekLab" => "0",
-                "kunjunganInternalStatus" => "0",
-                "noReferensi" =>  $dataDaftarUgd->reg_no,
-                "postInap" => [],
-                "internal12" => "1",
-                "internal12Desc" => "Faskes Tingkat 1",
-                "internal12Options" => [
-                    [
-                        "internal12" => "1",
-                        "internal12Desc" => "Faskes Tingkat 1"
-                    ],
-                    [
-                        "internal12" => "2",
-                        "internal12Desc" => "Faskes Tingkat 2 RS"
-                    ]
-                ],
-                "kontrol12" => "1",
-                "kontrol12Desc" => "Faskes Tingkat 1",
-                "kontrol12Options" => [
-                    [
-                        "kontrol12" => "1",
-                        "kontrol12Desc" => "Faskes Tingkat 1"
-                    ],
-                    [
-                        "kontrol12" => "2",
-                        "kontrol12Desc" => "Faskes Tingkat 2 RS"
-                    ],
-                ],
-                "taskIdPelayanan" => [
-                    "taskId1" => "",
-                    "taskId2" => "",
-                    "taskId3" =>  $dataDaftarUgd->rj_date,
-                    "taskId4" => "",
-                    "taskId5" => "",
-                    "taskId6" => "",
-                    "taskId7" => "",
-                    "taskId99" => "",
-                ],
-                'sep' => [
-                    "noSep" =>  $dataDaftarUgd->vno_sep,
-                    "reqSep" => [],
-                    "resSep" => [],
-                ]
-            ];
-        }
 
         $rsAdmin = DB::table('rstxn_ugdhdrs')
             ->select('rs_admin', 'rj_admin', 'poli_price', 'klaim_id', 'pass_status')
@@ -754,12 +645,143 @@ class TelaahResepUGD extends Component
 
 
     private function paginate($items, $perPage = 5, $page = null, $options = [])
-
     {
 
         $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
         $items = $items instanceof Collection ? $items : Collection::make($items);
         return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, $options);
+    }
+
+    public function masukApotek($rjNo)
+    {
+        $this->findData($rjNo);
+        $masukApotek = Carbon::now()->format('d/m/Y H:i:s');
+
+        //////updateDB/////////////////////
+        $sql = "select waktu_masuk_apt from rstxn_ugdhdrs where rj_no=:rjNo";
+        $cek_waktu_masuk_apt = DB::scalar($sql, ['rjNo' => $rjNo]);
+
+
+        // ketika cek_waktu_masuk_apt kosong lalu update
+        if (!$cek_waktu_masuk_apt) {
+            DB::table('rstxn_ugdhdrs')
+                ->where('rj_no', $rjNo)
+                ->update([
+                    'waktu_masuk_apt' => DB::raw("to_date('" . $masukApotek . "','dd/mm/yyyy hh24:mi:ss')"), //waktu masuk = rjdate
+                ]);
+        }
+        //////////////////////////////////
+
+        // add antrian Apotek
+
+        // update no antrian Apotek
+
+        // cek
+        // if (!$this->dataDaftarUgd['taskIdPelayanan']['taskId5']) {
+        //     $this->emit('toastr-error', "Anda tidak dapat melakukan taskId6 ketika taskId5 Kosong");
+        //     return;
+        // }
+
+        $noBooking =  $this->dataDaftarUgd['noBooking'];
+        //////PushDataAntrianApotek////////////////////
+
+        // cekNoantrian Apotek sudah ada atau belum
+        if (!isset($this->dataDaftarUgd['noAntrianApotek'])) {
+            $cekAntrianEresep = $this->findData($rjNo);
+            $eresepRacikan = collect(isset($cekAntrianEresep['eresepRacikan']) ? $cekAntrianEresep['eresepRacikan'] : [])->count();
+            $jenisResep = $eresepRacikan ? 'racikan' : 'non racikan';
+
+            $query = DB::table('rstxn_ugdhdrs')
+                ->select(
+                    DB::raw("to_char(rj_date,'dd/mm/yyyy') AS rj_date"),
+                    DB::raw("to_char(rj_date,'yyyymmdd') AS rj_date1"),
+                    'datadaftarugd_json'
+                )
+                ->where('rj_status', '!=', ['F'])
+                ->where('klaim_id', '!=', 'KR')
+                ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $this->myTopBar['refDate'])
+                ->get();
+
+            $nomerAntrian = $query->filter(function ($item) {
+                try {
+                    $datadaftarugd_json = json_decode($item->datadaftarugd_json, true);
+                } catch (\Exception $e) {
+                    $datadaftarugd_json = [];
+                }
+
+                $noAntrianApotek = isset($datadaftarugd_json['noAntrianApotek']) ? 1 : 0;
+                if ($noAntrianApotek > 0) {
+                    return 'x';
+                }
+            })->count();
+
+
+            // Antrian ketika data antrian kosong
+            // proses antrian
+            if ($this->dataDaftarUgd['klaimId'] != 'KR') {
+                $noAntrian = $nomerAntrian + 1;
+            } else {
+                // Kronis
+                $noAntrian = 999;
+            }
+            $this->dataDaftarUgd['noAntrianApotek'] = [
+                'noAntrian' => $noAntrian,
+                'jenisResep' => $jenisResep
+            ];
+
+            $this->updateJsonUGD($rjNo, $this->dataDaftarUgd);
+        }
+        // cekNoantrian Apotek sudah ada atau belum
+
+        // update taskId6
+        if (!$this->dataDaftarUgd['taskIdPelayanan']['taskId6']) {
+            $this->dataDaftarUgd['taskIdPelayanan']['taskId6'] = $masukApotek;
+            // update DB
+            $this->updateJsonUGD($rjNo, $this->dataDaftarUgd);
+
+            $this->emit('toastr-success', "masuk Apotek " . $this->dataDaftarUgd['taskIdPelayanan']['taskId6']);
+        } else {
+            $this->emit('toastr-error', "masuk Apotek " . $this->dataDaftarUgd['taskIdPelayanan']['taskId6']);
+        }
+    }
+
+    public function keluarApotek($rjNo)
+    {
+        $this->findData($rjNo);
+        $keluarApotek = Carbon::now()->format('d/m/Y H:i:s');
+
+        //////updateDB/////////////////////
+        $sql = "select waktu_selesai_pelayanan from rstxn_ugdhdrs where rj_no=:rjNo";
+        $cek_waktu_selesai_pelayanan = DB::scalar($sql, ['rjNo' => $rjNo]);
+
+
+        // ketika cek_waktu_selesai_pelayanan kosong lalu update
+        if (!$cek_waktu_selesai_pelayanan) {
+            DB::table('rstxn_ugdhdrs')
+                ->where('rj_no', $rjNo)
+                ->update([
+                    'waktu_selesai_pelayanan' => DB::raw("to_date('" . $keluarApotek . "','dd/mm/yyyy hh24:mi:ss')"), //waktu masuk = rjdate
+                ]);
+        }
+        //////////////////////////////////
+        // add antrian Apotek
+        // update no antrian Apotek
+        // cek
+        if (!$this->dataDaftarUgd['taskIdPelayanan']['taskId6']) {
+            $this->emit('toastr-error', "Anda tidak dapat melakukan taskId7 ketika taskId6 Kosong");
+            return;
+        }
+
+        // update taskId7
+        if (!$this->dataDaftarUgd['taskIdPelayanan']['taskId7']) {
+            $this->dataDaftarUgd['taskIdPelayanan']['taskId7'] = $keluarApotek;
+            // update DB
+            $this->updateJsonUGD($rjNo, $this->dataDaftarUgd);
+
+            $this->emit('toastr-success', "keluar Apotek " . $this->dataDaftarUgd['taskIdPelayanan']['taskId7']);
+        } else {
+            $this->emit('toastr-error', "keluar Apotek " . $this->dataDaftarUgd['taskIdPelayanan']['taskId7']);
+        }
     }
 
     // select data start////////////////
@@ -831,9 +853,17 @@ class TelaahResepUGD extends Component
         $myQueryPagination = $query->get()
             ->sortByDesc(
                 function ($mySortByJson) {
-                    $myQueryPagination = isset(json_decode($mySortByJson->datadaftarugd_json, true)['eresep']) ? 1 : 0;
-                    $myQueryPagination1 = isset(json_decode($mySortByJson->datadaftarugd_json, true)['AdministrasiRj']) ? 1 : 0;
-                    return ($myQueryPagination . $myQueryPagination1 . $mySortByJson->rj_date1);
+                    $datadaftar_json = json_decode($mySortByJson->datadaftarugd_json, true);
+                    $myQueryAntrianFarmasi = isset($datadaftar_json['noAntrianApotek']['noAntrian']) ? $datadaftar_json['noAntrianApotek']['noAntrian'] : 0;
+                    $myQueryPagination = isset($datadaftar_json['eresep']) ? 1 : 0;
+                    $myQueryPagination1 = isset($datadaftar_json['AdministrasiRj']) ? 1 : 0;
+                    return ($myQueryAntrianFarmasi . $myQueryPagination . $myQueryPagination1 . $mySortByJson->rj_date1);
+                }
+            )->sortBy(
+                function ($mySortByJson) {
+                    $datadaftar_json = json_decode($mySortByJson->datadaftarugd_json, true);
+                    $myQueryAntrianFarmasi = isset($datadaftar_json['noAntrianApotek']['noAntrian']) ? $datadaftar_json['noAntrianApotek']['noAntrian'] : 9999;
+                    return ($myQueryAntrianFarmasi);
                 }
             );
 

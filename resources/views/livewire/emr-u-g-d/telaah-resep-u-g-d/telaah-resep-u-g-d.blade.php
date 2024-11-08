@@ -109,6 +109,16 @@
 
 
             <div class="flex justify-end w-1/2">
+
+                <div class="flex ml-2">
+                    <p class="text-sm">AutoRefresh :</p>
+                    @foreach ($myTopBar['autoRefreshOptions'] as $autoRefresh)
+                        <x-radio-button :label="__($autoRefresh['autoRefresh'])" value="{{ $autoRefresh['autoRefresh'] }}"
+                            wire:model="myTopBar.autoRefresh" />
+                    @endforeach
+                </div>
+
+
                 <x-dropdown align="right" :width="__('20')">
                     <x-slot name="trigger">
                         {{-- Button myLimitPerPage --}}
@@ -152,216 +162,289 @@
 
 
 
-        <div wire:poll.10s="render" class="h-[calc(100vh-250px)] mt-2 overflow-auto">
-            <!-- Table -->
-            <table class="w-full text-sm text-left text-gray-700 table-auto ">
-                <thead class="sticky top-0 text-xs text-gray-900 uppercase bg-gray-100 ">
-                    <tr>
-                        <th scope="col" class="w-1/4 px-4 py-3 ">
-                            Pasien
-                        </th>
+        @if ($myTopBar['autoRefresh'] == 'Ya')
+            <div wire:poll.400s="render" class="h-[calc(100vh-250px)] mt-2 overflow-auto">
+            @else
+                <div class="h-[calc(100vh-250px)] mt-2 overflow-auto">
+        @endif
 
-                        <th scope="col" class="w-1/4 px-4 py-3 ">
-                            Poli
-                        </th>
-                        <th scope="col" class="w-1/4 px-2 py-3 ">
-                            Status Layanan
-                        </th>
-                        <th scope="col" class="w-1/4 px-4 py-3 ">
-                            Action
-                        </th>
-                    </tr>
-                </thead>
+        <p class="text-xs">Data Terakhir: {{ now()->format('d-m-y H:i:s') }}</p>
+        <!-- Table -->
+        <table class="w-full text-sm text-left text-gray-700 table-auto ">
+            <thead class="sticky top-0 text-xs text-gray-900 uppercase bg-gray-100 ">
+                <tr>
+                    <th scope="col" class="w-1/4 px-4 py-3 ">
+                        Pasien
+                    </th>
 
-                <tbody class="bg-white ">
+                    <th scope="col" class="w-1/4 px-4 py-3 ">
+                        Poli
+                    </th>
+                    <th scope="col" class="w-1/4 px-2 py-3 ">
+                        Status Layanan
+                    </th>
+                    <th scope="col" class="w-1/4 px-4 py-3 ">
+                        Action
+                    </th>
+                </tr>
+            </thead>
 
-                    @foreach ($myQueryData as $myQData)
-                        @php
-                            $datadaftar_json = json_decode($myQData->datadaftarugd_json, true);
+            <tbody class="bg-white ">
 
-                            $eresep = isset($datadaftar_json['eresep']) ? 1 : 0;
+                @foreach ($myQueryData as $myQData)
+                    @php
+                        $datadaftar_json = json_decode($myQData->datadaftarugd_json, true);
 
-                            $prosentaseEMR = ($eresep / 1) * 100;
+                        $eresep = isset($datadaftar_json['eresep']) ? 1 : 0;
+                        $noAntrianFarmasi = isset($datadaftar_json['noAntrianApotek']['noAntrian'])
+                            ? $datadaftar_json['noAntrianApotek']['noAntrian']
+                            : 0;
 
-                            $badgecolorStatus = isset($myQData->rj_status)
-                                ? ($myQData->rj_status === 'A'
-                                    ? 'red'
-                                    : ($myQData->rj_status === 'L'
-                                        ? 'green'
-                                        : ($myQData->rj_status === 'I'
-                                            ? 'green'
-                                            : ($myQData->rj_status === 'F'
-                                                ? 'yellow'
-                                                : 'default'))))
-                                : '';
+                        $eresepRacikan = collect(
+                            isset($datadaftar_json['eresepRacikan']) ? $datadaftar_json['eresepRacikan'] : [],
+                        )->count();
+                        $jenisResep = $eresepRacikan ? 'racikan' : 'non racikan';
 
-                            $badgecolorEresep = $eresep ? 'green' : 'red';
+                        $prosentaseEMR = ($eresep / 1) * 100;
 
-                            $badgecolorKlaim =
-                                $myQData->klaim_id == 'UM'
+                        $badgecolorStatus = isset($myQData->rj_status)
+                            ? ($myQData->rj_status === 'A'
+                                ? 'red'
+                                : ($myQData->rj_status === 'L'
                                     ? 'green'
-                                    : ($myQData->klaim_id == 'JM'
-                                        ? 'default'
-                                        : ($myQData->klaim_id == 'KR'
+                                    : ($myQData->rj_status === 'I'
+                                        ? 'green'
+                                        : ($myQData->rj_status === 'F'
                                             ? 'yellow'
-                                            : 'red'));
+                                            : 'default'))))
+                            : '';
 
-                            $badgecolorAdministrasiRj = isset($datadaftar_json['AdministrasiRj']) ? 'green' : 'red';
+                        $badgecolorEresep = $eresep ? 'green' : 'red';
 
-                        @endphp
+                        $badgecolorKlaim =
+                            $myQData->klaim_id == 'UM'
+                                ? 'green'
+                                : ($myQData->klaim_id == 'JM'
+                                    ? 'default'
+                                    : ($myQData->klaim_id == 'KR'
+                                        ? 'yellow'
+                                        : 'red'));
+
+                        $badgecolorAdministrasiRj = isset($datadaftar_json['AdministrasiRj']) ? 'green' : 'red';
+
+                        $taskId5 = $datadaftar_json['taskIdPelayanan']['taskId5'] ?? 'xxxx-xx-xx xx:xx:xx';
+                        $taskId6 = $datadaftar_json['taskIdPelayanan']['taskId6'] ?? 'xxxx-xx-xx xx:xx:xx';
+                        $taskId7 = $datadaftar_json['taskIdPelayanan']['taskId7'] ?? 'xxxx-xx-xx xx:xx:xx';
+
+                        $telaahResepStatus = isset($datadaftar_json['telaahResep']['penanggungJawab'])
+                            ? ($datadaftar_json['telaahResep']['penanggungJawab']
+                                ? true
+                                : false)
+                            : false;
+                        $telaahObatStatus = isset($datadaftar_json['telaahObat']['penanggungJawab'])
+                            ? ($datadaftar_json['telaahObat']['penanggungJawab']
+                                ? true
+                                : false)
+                            : false;
+
+                    @endphp
 
 
-                        <tr class="border-b group ">
-
-
-                            <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap ">
-                                <div class="">
-                                    <div class="font-semibold text-primary">
-                                        {{ $myQData->reg_no }}
-                                    </div>
-                                    <div class="font-semibold text-gray-900">
-                                        {{ $myQData->reg_name . ' / (' . $myQData->sex . ')' . ' / ' . $myQData->thn }}
-                                    </div>
-                                    <div class="font-normal text-gray-700">
-                                        {{ $myQData->address }}
-                                    </div>
+                    <tr class="border-b group ">
+                        <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap ">
+                            <div class="">
+                                <div>
+                                    <p>Antrian Farmasi
+                                        <span class="text-5xl font-semibold text-gray-700">
+                                            {{ $noAntrianFarmasi }}
+                                        </span>
+                                    </p>
                                 </div>
-                            </td>
+                                <div class="font-semibold text-primary">
+                                    {{ $myQData->reg_no }}
+                                </div>
+                                <div class="font-semibold text-gray-900">
+                                    {{ $myQData->reg_name . ' / (' . $myQData->sex . ')' . ' / ' . $myQData->thn }}
+                                </div>
+                                <div class="font-normal text-gray-700">
+                                    {{ $myQData->address }}
+                                </div>
+                            </div>
+                        </td>
 
-                            <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap ">
-                                <div class="">
-                                    <div class="font-semibold text-primary">
-                                        {{ 'UGD' }}
-                                    </div>
-                                    <div class="font-semibold text-gray-900">
-                                        {{ $myQData->dr_name . ' / ' }}
-                                        <x-badge :badgecolor="__($badgecolorKlaim)">
-                                            {{ $myQData->klaim_id == 'UM'
-                                                ? 'UMUM'
-                                                : ($myQData->klaim_id == 'JM'
-                                                    ? 'BPJS'
-                                                    : ($myQData->klaim_id == 'KR'
-                                                        ? 'Kronis'
-                                                        : 'Asuransi Lain')) }}
-                                        </x-badge>
-                                    </div>
-                                    <div class="font-normal">
-                                        {{ $myQData->vno_sep }}
-                                    </div>
+                        <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap ">
+                            <div class="">
+                                <div class="font-semibold text-primary">
+                                    {{ 'UGD' }}
+                                </div>
+                                <div class="font-semibold text-gray-900">
+                                    {{ $myQData->dr_name . ' / ' }}
+                                    <x-badge :badgecolor="__($badgecolorKlaim)">
+                                        {{ $myQData->klaim_id == 'UM'
+                                            ? 'UMUM'
+                                            : ($myQData->klaim_id == 'JM'
+                                                ? 'BPJS'
+                                                : ($myQData->klaim_id == 'KR'
+                                                    ? 'Kronis'
+                                                    : 'Asuransi Lain')) }}
+                                    </x-badge>
+                                </div>
+                                <div class="font-normal">
+                                    {{ $myQData->vno_sep }}
+                                </div>
+
+
+                            </div>
+                        </td>
+
+                        <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap ">
+                            <div class="w-full overflow-auto">
+
+                                <div class="font-semibold text-gray-900">
+                                    {{ 'Nomer Pelayanan : ' . $myQData->rj_no }}
+                                </div>
+                                <div class = "flex space-x-1">
+                                    <x-badge :badgecolor="__($badgecolorStatus)">
+                                        {{ isset($myQData->rj_status)
+                                            ? ($myQData->rj_status === 'A'
+                                                ? 'Pelayanan'
+                                                : ($myQData->rj_status === 'L'
+                                                    ? 'Selesai Pelayanan'
+                                                    : ($myQData->rj_status === 'I'
+                                                        ? 'Transfer Inap'
+                                                        : ($myQData->rj_status === 'F'
+                                                            ? 'Batal Transaksi'
+                                                            : ''))))
+                                            : '' }}
+                                    </x-badge>
+                                    <x-badge :badgecolor="__($badgecolorEresep)">
+                                        E-Resep: {{ $prosentaseEMR . '%' }}
+                                    </x-badge>
+                                </div>
+
+                                <div>
 
 
                                 </div>
-                            </td>
 
-                            <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap ">
-                                <div class="w-full overflow-auto">
-
-                                    <div class="font-semibold text-gray-900">
-                                        {{ 'Nomer Pelayanan : ' . $myQData->rj_no }}
-                                    </div>
-                                    <div class = "flex space-x-1">
-                                        <x-badge :badgecolor="__($badgecolorStatus)">
-                                            {{ isset($myQData->rj_status)
-                                                ? ($myQData->rj_status === 'A'
-                                                    ? 'Pelayanan'
-                                                    : ($myQData->rj_status === 'L'
-                                                        ? 'Selesai Pelayanan'
-                                                        : ($myQData->rj_status === 'I'
-                                                            ? 'Transfer Inap'
-                                                            : ($myQData->rj_status === 'F'
-                                                                ? 'Batal Transaksi'
-                                                                : ''))))
-                                                : '' }}
-                                        </x-badge>
-                                        <x-badge :badgecolor="__($badgecolorEresep)">
-                                            E-Resep: {{ $prosentaseEMR . '%' }}
-                                        </x-badge>
-                                    </div>
-
-                                    <div>
-
-
-                                    </div>
-
-                                    <div class="font-normal text-gray-700">
-                                        {{ $myQData->rj_date }}
-                                        {{ '| Shift : ' . $myQData->shift }}
-                                    </div>
-
-                                    <div class="font-normal text-gray-700">
-                                        {{ '' . $myQData->nobooking }}
-                                    </div>
-
-                                    <div class="font-normal text-gray-700">
-                                        <x-badge :badgecolor="__($badgecolorAdministrasiRj)">
-                                            Administrasi :
-                                            @isset($datadaftar_json['AdministrasiRj'])
-                                                {{ $datadaftar_json['AdministrasiRj']['userLog'] }}
-                                            @else
-                                                {{ '---' }}
-                                            @endisset
-                                        </x-badge>
-                                    </div>
-
-
+                                <div class="font-normal text-gray-700">
+                                    {{ $myQData->rj_date }}
+                                    {{ '| Shift : ' . $myQData->shift }}
                                 </div>
-                            </td>
 
-                            <td class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-primary">
+                                <div>
+                                    @if ($jenisResep == 'racikan' && $eresep > 0)
+                                        <x-badge :badgecolor="__('default')"> {{ $jenisResep }}</x-badge>
+                                    @elseif($jenisResep == 'non racikan' && $eresep > 0)
+                                        <x-badge :badgecolor="__('green')"> {{ $jenisResep }}</x-badge>
+                                    @else
+                                        <x-badge :badgecolor="__('red')"> {{ '---' }}</x-badge>
+                                    @endif
+                                </div>
+
+                                <div class="font-normal text-gray-700">
+                                    {{ '' . $myQData->nobooking }}
+                                </div>
+
+                                <div class="font-normal text-gray-700">
+                                    <x-badge :badgecolor="__($badgecolorAdministrasiRj)">
+                                        Administrasi :
+                                        @isset($datadaftar_json['AdministrasiRj'])
+                                            {{ $datadaftar_json['AdministrasiRj']['userLog'] }}
+                                        @else
+                                            {{ '---' }}
+                                        @endisset
+                                    </x-badge>
+                                </div>
+
+                                {{-- <div class="italic font-normal text-gray-900">
+                                    {{ 'TaskId5 ' . $taskId5 }}
+                                </div> --}}
+                                <div class="italic font-normal text-gray-900">
+                                    {{ 'TaskId6 ' . $taskId6 }}
+                                </div>
+                                <div class="italic font-normal text-gray-900">
+                                    {{ 'TaskId7 ' . $taskId7 }}
+                                </div>
 
 
-                                <div class="grid grid-cols-2 gap-2">
+                            </div>
+                        </td>
 
+                        <td class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-primary">
+                            <div class="grid grid-cols-2 gap-2">
+
+                                <x-red-button wire:click="masukApotek('{{ $myQData->rj_no }}')">
+                                    Mulai Pelayanan Apotek
+                                </x-red-button>
+                                <x-red-button wire:click="keluarApotek('{{ $myQData->rj_no }}')">
+                                    Selesai Pelayanan Apotek
+                                </x-red-button>
+
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2">
+
+                                @if ($telaahResepStatus && $telaahObatStatus)
+                                    <x-green-button
+                                        wire:click="editTelaahResep('{{ $eresep }}','{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">Telaah
+                                        Resep</x-green-button>
+                                @else
                                     <x-light-button
                                         wire:click="editTelaahResep('{{ $eresep }}','{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">Telaah
                                         Resep</x-light-button>
-                                    <x-green-button
-                                        wire:click="editAdministrasi('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">Admin
-                                        UGD</x-green-button>
+                                @endif
 
-                                </div>
-                                <div>
-                                    <livewire:cetak.cetak-eresep-u-g-d :rjNoRef="$myQData->rj_no"
-                                        wire:key="cetak.cetak-eresep-u-g-d-{{ $myQData->rj_no }}">
+                                <x-green-button
+                                    wire:click="editAdministrasi('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">Admin
+                                    UGD
+                                </x-green-button>
 
-                                </div>
+                            </div>
+                            <div>
+                                <livewire:cetak.cetak-eresep-u-g-d :rjNoRef="$myQData->rj_no"
+                                    wire:key="cetak.cetak-eresep-u-g-d-{{ $myQData->rj_no }}">
 
-
-                            </td>
-                        </tr>
-                    @endforeach
-
-                </tbody>
-            </table>
-
-            {{-- no data found start --}}
-            @if ($myQueryData->count() == 0)
-                <div class="w-full p-4 text-sm text-center text-gray-900 dark:text-gray-400">
-                    {{ 'Data ' . $myProgram . ' Tidak ditemukan' }}
-                </div>
-            @endif
-            {{-- no data found end --}}
-
-        </div>
-
-        {{ $myQueryData->links() }}
+                            </div>
 
 
+                        </td>
+                    </tr>
+                @endforeach
 
+            </tbody>
+        </table>
 
-
-
-
+        {{-- no data found start --}}
+        @if ($myQueryData->count() == 0)
+            <div class="w-full p-4 text-sm text-center text-gray-900 dark:text-gray-400">
+                {{ 'Data ' . $myProgram . ' Tidak ditemukan' }}
+            </div>
+        @endif
+        {{-- no data found end --}}
 
     </div>
 
 
 
-    {{-- Canvas
+    {{ $myQueryData->links() }}
+
+
+
+
+
+
+
+
+</div>
+
+
+
+{{-- Canvas
     Main BgColor /
     Size H/W --}}
 
-    {{-- End Coding --}}
+{{-- End Coding --}}
 
 
 
@@ -382,57 +465,196 @@
 
 
 
-    {{-- push start ///////////////////////////////// --}}
-    @push('scripts')
-        {{-- script start --}}
-        <script src="{{ url('assets/js/jquery.min.js') }}"></script>
-        <script src="{{ url('assets/plugins/toastr/toastr.min.js') }}"></script>
-        <script src="{{ url('assets/flowbite/dist/datepicker.js') }}"></script>
+{{-- push start ///////////////////////////////// --}}
+@push('scripts')
+    {{-- script start --}}
+    <script src="{{ url('assets/js/jquery.min.js') }}"></script>
+    <script src="{{ url('assets/plugins/toastr/toastr.min.js') }}"></script>
+    <script src="{{ url('assets/flowbite/dist/datepicker.js') }}"></script>
 
-        {{-- script end --}}
-
-
-
-
-
-        {{-- Disabling enter key for form --}}
-        <script type="text/javascript">
-            $(document).on("keydown", "form", function(event) {
-                return event.key != "Enter";
-            });
-        </script>
+    {{-- script end --}}
 
 
 
 
 
-        {{-- Global Livewire JavaScript Object start --}}
-        <script type="text/javascript">
-            toastr.options = {
-                "closeButton": false,
-                "debug": false,
-                "newestOnTop": false,
-                "progressBar": false,
-                "positionClass": "toast-top-left",
-                "preventDuplicates": false,
-                "onclick": null,
-                "showDuration": "300",
-                "hideDuration": "1000",
-                "timeOut": "5000",
-                "extendedTimeOut": "1000",
-                "showEasing": "swing",
-                "hideEasing": "linear",
-                "showMethod": "fadeIn",
-                "hideMethod": "fadeOut"
+    {{-- Disabling enter key for form --}}
+    <script type="text/javascript">
+        $(document).on("keydown", "form", function(event) {
+            return event.key != "Enter";
+        });
+    </script>
+
+
+
+
+
+    {{-- Global Livewire JavaScript Object start --}}
+    <script type="text/javascript">
+        toastr.options = {
+            "closeButton": false,
+            "debug": false,
+            "newestOnTop": false,
+            "progressBar": false,
+            "positionClass": "toast-top-left",
+            "preventDuplicates": false,
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "5000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        }
+
+        window.livewire.on('toastr-success', message => toastr.success(message));
+        window.Livewire.on('toastr-info', (message) => {
+            toastr.info(message)
+        });
+        window.livewire.on('toastr-error', message => toastr.error(message));
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // confirmation message remove record
+        window.livewire.on('confirm_remove_record', (key, name) => {
+
+            let cfn = confirm('Apakah anda ingin menghapus data ini ' + name + '?');
+
+            if (cfn) {
+                window.livewire.emit('confirm_remove_record_RJp', key, name);
+            }
+        });
+
+
+        // confirmation message doble record
+        window.livewire.on('confirm_doble_record', (key, name) => {
+
+            let cfn = confirm('Pasien Sudah terdaftar, Apakah anda ingin tetap menyimpan data ini ' + name + '?');
+
+            if (cfn) {
+                window.livewire.emit('confirm_doble_record_RJp', key, name);
+            }
+        });
+
+
+
+
+
+
+
+
+
+
+
+
+        // confirmation cari_Data_Pasien_Tidak_Ditemukan_Confirmation
+        window.livewire.on('cari_Data_Pasien_Tidak_Ditemukan_Confirmation', (msg) => {
+            let cfn = confirm('Data ' + msg +
+                ' tidak ditemuka, apakah anda ingin menambahkan menjadi pasien baru ?');
+
+            if (cfn) {
+                @this.set('callMasterPasien', true);
+            }
+        });
+
+
+
+
+        // confirmation rePush_Data_Antrian_Confirmation
+        window.livewire.on('rePush_Data_Antrian_Confirmation', () => {
+            let cfn = confirm('Apakah anda ingin mengulaingi Proses Kirim data Antrian ?');
+
+            if (cfn) {
+                // emit ke controller
+                window.livewire.emit('rePush_Data_Antrian');
+            }
+        });
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // press_dropdownButton flowbite
+        window.Livewire.on('pressDropdownButton', (key) => {
+                // set the dropdown menu element
+                const $targetEl = document.getElementById('dropdownMenu' + key);
+
+                // set the element that trigger the dropdown menu on click
+                const $triggerEl = document.getElementById('dropdownButton' + key);
+
+                // options with default values
+                const options = {
+                    placement: 'left',
+                    triggerType: 'click',
+                    offsetSkidding: 0,
+                    offsetDistance: 10,
+                    delay: 300,
+                    onHide: () => {
+                        console.log('dropdown has been hidden');
+
+                    },
+                    onShow: () => {
+                        console.log('dropdown has been shown');
+                    },
+                    onToggle: () => {
+                        console.log('dropdown has been toggled');
+                    }
+                };
+
+                /*
+                 * $targetEl: required
+                 * $triggerEl: required
+                 * options: optional
+                 */
+                const dropdown = new Dropdown($targetEl, $triggerEl, options);
+
+                dropdown.show();
+
             }
 
-            window.livewire.on('toastr-success', message => toastr.success(message));
-            window.Livewire.on('toastr-info', (message) => {
-                toastr.info(message)
-            });
-            window.livewire.on('toastr-error', message => toastr.error(message));
+        );
+    </script>
+    <script>
+        // $("#dateRjRef").change(function() {
+        //     const datepickerEl = document.getElementById('dateRjRef');
+        //     console.log(datepickerEl);
+        // });
+    </script>
+    {{-- Global Livewire JavaScript Object end --}}
 
+    {{-- Global Livewire JavaScript Object start --}}
+    <script type="text/javascript">
+        // confirmation message doble record
+        window.livewire.on('confirm_doble_recordUGD', (key, name) => {
+            console.log('x')
+            let cfn = confirm('Pasien Sudah terdaftar, Apakah anda ingin tetap menyimpan data ini ' + name + '?');
 
+            if (cfn) {
+                window.livewire.emit('confirm_doble_record_UGDp', key, name);
+            }
+        });
+    </script>
+@endpush
 
 
 
@@ -444,153 +666,14 @@
 
 
 
-            // confirmation message remove record
-            window.livewire.on('confirm_remove_record', (key, name) => {
 
-                let cfn = confirm('Apakah anda ingin menghapus data ini ' + name + '?');
 
-                if (cfn) {
-                    window.livewire.emit('confirm_remove_record_RJp', key, name);
-                }
-            });
+@push('styles')
+    {{-- stylesheet start --}}
+    <link rel="stylesheet" href="{{ url('assets/plugins/toastr/toastr.min.css') }}">
 
-
-            // confirmation message doble record
-            window.livewire.on('confirm_doble_record', (key, name) => {
-
-                let cfn = confirm('Pasien Sudah terdaftar, Apakah anda ingin tetap menyimpan data ini ' + name + '?');
-
-                if (cfn) {
-                    window.livewire.emit('confirm_doble_record_RJp', key, name);
-                }
-            });
-
-
-
-
-
-
-
-
-
-
-
-
-            // confirmation cari_Data_Pasien_Tidak_Ditemukan_Confirmation
-            window.livewire.on('cari_Data_Pasien_Tidak_Ditemukan_Confirmation', (msg) => {
-                let cfn = confirm('Data ' + msg +
-                    ' tidak ditemuka, apakah anda ingin menambahkan menjadi pasien baru ?');
-
-                if (cfn) {
-                    @this.set('callMasterPasien', true);
-                }
-            });
-
-
-
-
-            // confirmation rePush_Data_Antrian_Confirmation
-            window.livewire.on('rePush_Data_Antrian_Confirmation', () => {
-                let cfn = confirm('Apakah anda ingin mengulaingi Proses Kirim data Antrian ?');
-
-                if (cfn) {
-                    // emit ke controller
-                    window.livewire.emit('rePush_Data_Antrian');
-                }
-            });
-
-
-
-
-
-
-
-
-
-
-
-
-
-            // press_dropdownButton flowbite
-            window.Livewire.on('pressDropdownButton', (key) => {
-                    // set the dropdown menu element
-                    const $targetEl = document.getElementById('dropdownMenu' + key);
-
-                    // set the element that trigger the dropdown menu on click
-                    const $triggerEl = document.getElementById('dropdownButton' + key);
-
-                    // options with default values
-                    const options = {
-                        placement: 'left',
-                        triggerType: 'click',
-                        offsetSkidding: 0,
-                        offsetDistance: 10,
-                        delay: 300,
-                        onHide: () => {
-                            console.log('dropdown has been hidden');
-
-                        },
-                        onShow: () => {
-                            console.log('dropdown has been shown');
-                        },
-                        onToggle: () => {
-                            console.log('dropdown has been toggled');
-                        }
-                    };
-
-                    /*
-                     * $targetEl: required
-                     * $triggerEl: required
-                     * options: optional
-                     */
-                    const dropdown = new Dropdown($targetEl, $triggerEl, options);
-
-                    dropdown.show();
-
-                }
-
-            );
-        </script>
-        <script>
-            // $("#dateRjRef").change(function() {
-            //     const datepickerEl = document.getElementById('dateRjRef');
-            //     console.log(datepickerEl);
-            // });
-        </script>
-        {{-- Global Livewire JavaScript Object end --}}
-
-        {{-- Global Livewire JavaScript Object start --}}
-        <script type="text/javascript">
-            // confirmation message doble record
-            window.livewire.on('confirm_doble_recordUGD', (key, name) => {
-                console.log('x')
-                let cfn = confirm('Pasien Sudah terdaftar, Apakah anda ingin tetap menyimpan data ini ' + name + '?');
-
-                if (cfn) {
-                    window.livewire.emit('confirm_doble_record_UGDp', key, name);
-                }
-            });
-        </script>
-    @endpush
-
-
-
-
-
-
-
-
-
-
-
-
-
-    @push('styles')
-        {{-- stylesheet start --}}
-        <link rel="stylesheet" href="{{ url('assets/plugins/toastr/toastr.min.css') }}">
-
-        {{-- stylesheet end --}}
-    @endpush
-    {{-- push end --}}
+    {{-- stylesheet end --}}
+@endpush
+{{-- push end --}}
 
 </div>

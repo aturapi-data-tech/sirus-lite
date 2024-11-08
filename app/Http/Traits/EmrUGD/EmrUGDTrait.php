@@ -4,6 +4,7 @@ namespace App\Http\Traits\EmrUGD;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Spatie\ArrayToXml\ArrayToXml;
 use Exception;
 
 
@@ -148,5 +149,15 @@ trait EmrUGDTrait
             return true;
         }
         return false;
+    }
+
+    public static function updateJsonUGD($rjNo, array $rjArr): void
+    {
+        DB::table('rstxn_ugdhdrs')
+            ->where('rj_no', $rjNo)
+            ->update([
+                'datadaftarugd_json' => json_encode($rjArr, true),
+                'datadaftarugd_xml' => ArrayToXml::convert($rjArr),
+            ]);
     }
 }
