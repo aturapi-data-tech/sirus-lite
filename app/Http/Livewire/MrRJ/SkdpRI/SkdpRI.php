@@ -36,7 +36,7 @@ class SkdpRI extends Component
     // dataDaftarRi RJ
     public $dataDaftarRi = [];
 
-    // data SKDP / kontrol=>[] 
+    // data SKDP / kontrol=>[]
     public $kontrol = [
         'noKontrolRS' => "",
         'noSKDPBPJS' => "",
@@ -117,7 +117,7 @@ class SkdpRI extends Component
         // Variable Search
         $search = $this->dataDokterLovSearch;
 
-        // check LOV by dr_id rs id 
+        // check LOV by dr_id rs id
         $dataDokter = DB::table('rsmst_doctors')->select(
             'rsmst_doctors.dr_id as dr_id',
             'rsmst_doctors.dr_name as dr_name',
@@ -308,7 +308,7 @@ class SkdpRI extends Component
         $datadaftarRI_json = isset($findData->datadaftarri_json) ? $findData->datadaftarri_json : null;
         // if meta_data_pasien_json = null
         // then cari Data Pasien By Key Collection (exception when no data found)
-        // 
+        //
         // else json_decode
 
         if ($datadaftarRI_json) {
@@ -499,10 +499,12 @@ class SkdpRI extends Component
         //push data SuratKontrolBPJS
         if ($this->dataDaftarRi['klaimId'] = 'JM') {
 
-
             // jika SKDP kosong lakukan push data
             // insert
-            if (!isset($this->dataDaftarRi['kontrol']['noSKDPBPJS'])) {
+            if (
+                !isset($this->dataDaftarRi['kontrol']['noSKDPBPJS']) ||
+                empty($this->dataDaftarRi['kontrol']['noSKDPBPJS'])
+            ) {
 
                 $this->dataDaftarRi['kontrol']['noSKDPBPJS'] = '';
 
