@@ -903,7 +903,9 @@ class TelaahResepRJ extends Component
                 'nobooking',
                 'push_antrian_bpjs_status',
                 'push_antrian_bpjs_json',
-                'datadaftarpolirj_json'
+                'datadaftarpolirj_json',
+                DB::raw("(select count(*) from lbtxn_checkuphdrs where status_rjri='RJ' and checkup_status!='B' and ref_no = rsview_rjkasir.rj_no) AS lab_status"),
+                DB::raw("(select count(*) from rstxn_rjrads where rj_no = rsview_rjkasir.rj_no) AS rad_status")
             )
             ->where(DB::raw("nvl(rj_status,'A')"), '=', $myRefstatusId)
             // ->where('rj_status', '!=', 'F')

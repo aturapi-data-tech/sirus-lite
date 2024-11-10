@@ -430,7 +430,9 @@ class EmrUGD extends Component
                 'nobooking',
                 'push_antrian_bpjs_status',
                 'push_antrian_bpjs_json',
-                'datadaftarugd_json'
+                'datadaftarugd_json',
+                DB::raw("(select count(*) from lbtxn_checkuphdrs where status_rjri='UGD' and checkup_status!='B' and ref_no = rsview_ugdkasir.rj_no) AS lab_status"),
+                DB::raw("(select count(*) from rstxn_ugdrads where rj_no = rsview_ugdkasir.rj_no) AS rad_status")
             )
             ->where(DB::raw("nvl(erm_status,'A')"), '=', $myRefstatusId)
             ->where('rj_status', '!=', 'F')

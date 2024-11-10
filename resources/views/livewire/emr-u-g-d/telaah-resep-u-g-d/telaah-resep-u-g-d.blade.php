@@ -293,6 +293,20 @@
                                     {{ $myQData->vno_sep }}
                                 </div>
 
+                                <div class="flex my-2 space-x-2">
+                                    @if ($myQData->lab_status)
+                                        <x-badge :badgecolor="__('default')">
+                                            {{ 'Laborat' }}
+                                        </x-badge>
+                                    @endif
+
+                                    @if ($myQData->rad_status)
+                                        <x-badge :badgecolor="__('default')">
+                                            {{ 'Radiologi' }}
+                                        </x-badge>
+                                    @endif
+                                </div>
+
 
                             </div>
                         </td>
