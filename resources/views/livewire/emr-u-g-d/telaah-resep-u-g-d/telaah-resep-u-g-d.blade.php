@@ -163,7 +163,7 @@
 
 
         @if ($myTopBar['autoRefresh'] == 'Ya')
-            <div wire:poll.400s="render" class="h-[calc(100vh-250px)] mt-2 overflow-auto">
+            <div wire:poll.20s="render" class="h-[calc(100vh-250px)] mt-2 overflow-auto">
             @else
                 <div class="h-[calc(100vh-250px)] mt-2 overflow-auto">
         @endif
