@@ -259,7 +259,6 @@ class DaftarRJ extends Component
     // Ref on top bar
     //////////////////////////////
     public $dateRjRef = '';
-
     public $shiftRjRef = [
         'shiftId' => '1',
         'shiftDesc' => '1',
@@ -662,7 +661,7 @@ class DaftarRJ extends Component
                 'dr_id',
                 'dr_name',
             )
-            ->where('shift', '=', $this->shiftRjRef['shiftId'])
+            // ->where('shift', '=', $this->shiftRjRef['shiftId'])
             ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $this->dateRjRef)
             ->groupBy('dr_id')
             ->groupBy('dr_name')
@@ -727,7 +726,7 @@ class DaftarRJ extends Component
     // dr
     public function setdrRjRef($id, $name): void
     {
-        // $this->emit('toastr-error', "dr.");
+        // $this->emit('toastr-error', $id);
 
         $this->drRjRef['drId'] = $id;
         $this->drRjRef['drName'] = $name;
@@ -2662,7 +2661,82 @@ class DaftarRJ extends Component
         }
     }
 
+    public function masukPoli($rjNo)
+    {
 
+        $this->findData($rjNo);
+
+        $sql = "select waktu_masuk_poli from rstxn_rjhdrs where rj_no=:rjNo";
+        $cek_waktu_masuk_poli = DB::scalar($sql, ['rjNo' => $rjNo]);
+
+
+        // ketika cek_waktu_masuk_poli kosong lalu update
+        if (!$cek_waktu_masuk_poli) {
+            $waktuMasukPoli = Carbon::now()->format('d/m/Y H:i:s');
+
+            DB::table('rstxn_rjhdrs')
+                ->where('rj_no', $rjNo)
+                ->update([
+                    'waktu_masuk_poli' => DB::raw("to_date('" . $waktuMasukPoli . "','dd/mm/yyyy hh24:mi:ss')"), //waktu masuk = rjdate
+                ]);
+        }
+
+        /////////////////////////
+        // Update TaskId 4
+        /////////////////////////
+        $sqlWaktuMasukPoli = "select to_char(waktu_masuk_poli,'dd/mm/yyyy hh24:mi:ss') as waktu_masuk_poli from rstxn_rjhdrs where rj_no=:rjNo";
+        $waktuMasukPoli = DB::scalar($sqlWaktuMasukPoli, ['rjNo' => $rjNo]);
+
+        if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']) {
+            $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4'] = $waktuMasukPoli;
+            // update DB
+            $this->updateDataRJ($rjNo);
+
+            $this->emit('toastr-success', "Masuk Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']);
+        } else {
+            $this->emit('toastr-error', "Masuk Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']);
+        }
+
+        // cari no Booking
+        $noBooking =  $this->dataDaftarPoliRJ['noBooking'];
+
+
+        $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4'], 'Asia/Jakarta')->timestamp * 1000; //waktu dalam timestamp milisecond
+        $this->pushDataTaskId($noBooking, 4, $waktu);
+    }
+
+
+    public function keluarPoli($rjNo)
+    {
+        $this->findData($rjNo);
+
+        $keluarPoli = Carbon::now()->format('d/m/Y H:i:s');
+
+        // check task Id 4 sudah dilakukan atau belum
+        if ($this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']) {
+
+            if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']) {
+                $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5'] = $keluarPoli;
+                // update DB
+                $this->updateDataRJ($rjNo);
+
+                $this->emit('toastr-success', "Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
+            } else {
+                $this->emit('toastr-error', "Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
+            }
+
+            // cari no Booking
+            $noBooking =  $this->dataDaftarPoliRJ['noBooking'];
+
+
+            $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5'], 'Asia/Jakarta')->timestamp * 1000; //waktu dalam timestamp milisecond
+            $this->pushDataTaskId($noBooking, 5, $waktu);
+
+            $this->emit('toastr-success', "Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
+        } else {
+            $this->emit('toastr-error', "Satus Pasien Belum melalui pelayanan Poli");
+        }
+    }
 
     // when new form instance
     public function mount()
@@ -2671,12 +2745,6 @@ class DaftarRJ extends Component
         // set date
         $this->dateRjRef = Carbon::now()->format('d/m/Y');
         // set shift
-        $findShift = DB::table('rstxn_shiftctls')->select('shift')
-            ->whereRaw("'" . Carbon::now()->format('H:i:s') . "' between shift_start and shift_end")
-            ->first();
-        $this->shiftRjRef['shiftId'] = isset($findShift->shift) && $findShift->shift ? $findShift->shift : 3;
-        $this->shiftRjRef['shiftDesc'] = isset($findShift->shift) && $findShift->shift ? $findShift->shift : 3;
-        // set data dokter ref
         $this->optionsdrRjRef();
     }
 
@@ -2715,11 +2783,12 @@ class DaftarRJ extends Component
                 'no_antrian',
                 'rj_status',
                 'nobooking',
-                'push_antrian_bpjs_status',
-                'push_antrian_bpjs_json'
+                'datadaftarpolirj_json',
+                DB::raw("(select count(*) from lbtxn_checkuphdrs where status_rjri='RJ' and checkup_status!='B' and ref_no = rsview_rjkasir.rj_no) AS lab_status"),
+                DB::raw("(select count(*) from rstxn_rjrads where rj_no = rsview_rjkasir.rj_no) AS rad_status")
             )
             ->where('rj_status', '=', $this->statusRjRef['statusId'])
-            ->where('shift', '=', $this->shiftRjRef['shiftId'])
+            // ->where('shift', '=', $this->shiftRjRef['shiftId'])
             ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $this->dateRjRef);
 
         //Jika where dokter tidak kosong
@@ -2733,10 +2802,11 @@ class DaftarRJ extends Component
                 ->orWhere(DB::raw('upper(dr_name)'), 'like', '%' . strtoupper($this->search) . '%')
                 ->orWhere(DB::raw('upper(poli_desc)'), 'like', '%' . strtoupper($this->search) . '%');
         })
+            ->orderBy('rj_date1',  'desc')
+            ->orderBy('no_antrian',  'asc')
             ->orderBy('dr_name',  'desc')
             ->orderBy('poli_desc',  'desc')
-            ->orderBy('no_antrian',  'asc')
-            ->orderBy('rj_date1',  'desc');
+        ;
 
         ////////////////////////////////////////////////
         // end Query

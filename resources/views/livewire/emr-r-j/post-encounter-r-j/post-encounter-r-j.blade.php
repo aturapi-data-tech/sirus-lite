@@ -1,3 +1,11 @@
+{{-- @php
+    $EncounterID =
+        collect($dataDaftarPoliRJ['satuSehatUuidRJ'])
+            ->filter(function ($item) {
+                return $item['response']['resourceType'] === 'Encounter';
+            })
+            ->first()['response']['resourceID'] ?? '';
+@endphp --}}
 <div>
     <x-light-button wire:click.prevent="PostEncounterSatuSehat()" type="button" wire:loading.remove>
         Kirim Satu Sehat

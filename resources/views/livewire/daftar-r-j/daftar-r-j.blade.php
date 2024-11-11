@@ -106,32 +106,7 @@
                             @endforeach
                         </div>
 
-                        {{-- shift --}}
-                        <div class="mt-2 ml-0">
-                            <x-dropdown align="right" :width="__('20')" class="">
-                                <x-slot name="trigger">
-                                    {{-- Button shift --}}
-                                    <x-alternative-button class="inline-flex">
-                                        <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
-                                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                            <path clip-rule="evenodd" fill-rule="evenodd"
-                                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-                                        </svg>
-                                        <span>{{ 'Shift' . $shiftRjRef['shiftDesc'] }}</span>
-                                    </x-alternative-button>
-                                </x-slot>
-                                {{-- Open shiftcontent --}}
-                                <x-slot name="content">
 
-                                    @foreach ($shiftRjRef['shiftOptions'] as $shift)
-                                        <x-dropdown-link
-                                            wire:click="setShift({{ $shift['shiftId'] }},{{ $shift['shiftDesc'] }})">
-                                            {{ __($shift['shiftDesc']) }}
-                                        </x-dropdown-link>
-                                    @endforeach
-                                </x-slot>
-                            </x-dropdown>
-                        </div>
 
                         {{-- Dokter --}}
                         <div class="mt-2 ml-0">
@@ -152,7 +127,7 @@
 
                                     @foreach ($drRjRef['drOptions'] as $dr)
                                         <x-dropdown-link
-                                            wire:click="setdrRjRef('{{ $dr['drId'] }}','{{ $dr['drName'] }}')">
+                                            wire:click="setdrRjRef('{{ sprintf($dr['drId']) }}','{{ sprintf($dr['drName']) }}')">
                                             {{ __($dr['drName']) }}
                                         </x-dropdown-link>
                                     @endforeach
@@ -187,49 +162,107 @@
                                     <thead
                                         class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                         <tr>
-                                            <th scope="col" class="w-1/3 px-4 py-3 ">
-                                                <x-sort-link :active=false wire:click.prevent="sortBy('RJp_id')"
-                                                    role="button" href="#">
-                                                    Pasien
-                                                </x-sort-link>
+                                            <th scope="col" class="w-1/5 px-4 py-3 ">
+                                                Pasien
                                             </th>
-
-                                            <th scope="col" class="w-1/3 px-4 py-3">
-                                                <x-sort-link :active=false wire:click.prevent="" role="button"
-                                                    href="#">
-                                                    SEP
-                                                </x-sort-link>
+                                            <th scope="col" class="w-1/5 px-4 py-3 ">
+                                                Poli
                                             </th>
-                                            <th scope="col" class="w-1/3 px-4 py-3">
-                                                <x-sort-link :active=false wire:click.prevent="" role="button"
-                                                    href="#">
-                                                    Poli
-                                                </x-sort-link>
+                                            <th scope="col" class="w-1/5 px-4 py-3 ">
+                                                Status Layanan
                                             </th>
-                                            <th scope="col" class="w-1/3 px-4 py-3 ">
-                                                <x-sort-link :active=false wire:click.prevent="" role="button"
-                                                    href="#">
-                                                    Status Layanan
-                                                </x-sort-link>
-                                            </th>
-
-
-
-
-                                            <th scope="col" class="w-1/3 px-4 py-3 text-center">Action
+                                            @role(['Mr', 'Admin', 'Perawat'])
+                                                <th scope="col" class="w-1/5 px-4 py-3 ">
+                                                    Tindak Lanjut
+                                                </th>
+                                            @endrole
+                                            <th scope="col" class="w-1/5 px-4 py-3 ">
+                                                Action
                                             </th>
                                         </tr>
+
                                     </thead>
                                     <tbody class="bg-white dark:bg-gray-800">
 
-
                                         @foreach ($RJpasiens as $RJp)
-                                            <tr class="border-b group dark:border-gray-700">
+                                            @php
+                                                $datadaftar_json = json_decode($RJp->datadaftarpolirj_json, true);
+                                                $anamnesa = isset($datadaftar_json['anamnesa']) ? 1 : 0;
+                                                $pemeriksaan = isset($datadaftar_json['pemeriksaan']) ? 1 : 0;
+                                                $penilaian = isset($datadaftar_json['penilaian']) ? 1 : 0;
+                                                $procedure = isset($datadaftar_json['procedure']) ? 1 : 0;
+                                                $diagnosis = isset($datadaftar_json['diagnosis']) ? 1 : 0;
+                                                $perencanaan = isset($datadaftar_json['perencanaan']) ? 1 : 0;
+                                                $prosentaseEMR =
+                                                    (($anamnesa +
+                                                        $pemeriksaan +
+                                                        $penilaian +
+                                                        $procedure +
+                                                        $diagnosis +
+                                                        $perencanaan) /
+                                                        6) *
+                                                    100;
+
+                                                $bgSelesaiPemeriksaan = isset(
+                                                    $datadaftar_json['perencanaan']['pengkajianMedis']['drPemeriksa'],
+                                                )
+                                                    ? ($datadaftar_json['perencanaan']['pengkajianMedis']['drPemeriksa']
+                                                        ? 'bg-green-100'
+                                                        : '')
+                                                    : '';
+
+                                                $badgecolorEmr = $prosentaseEMR >= 80 ? 'green' : 'red';
+
+                                                $badgecolorStatus = isset($RJp->rj_status)
+                                                    ? ($RJp->rj_status === 'A'
+                                                        ? 'red'
+                                                        : ($RJp->rj_status === 'L'
+                                                            ? 'green'
+                                                            : ($RJp->rj_status === 'I'
+                                                                ? 'green'
+                                                                : ($RJp->rj_status === 'F'
+                                                                    ? 'yellow'
+                                                                    : 'default'))))
+                                                    : '';
+
+                                                $badgecolorKlaim =
+                                                    $RJp->klaim_id == 'UM'
+                                                        ? 'green'
+                                                        : ($RJp->klaim_id == 'JM'
+                                                            ? 'default'
+                                                            : ($RJp->klaim_id == 'KR'
+                                                                ? 'yellow'
+                                                                : 'red'));
+
+                                                $badgecolorAdministrasiRj = isset($datadaftar_json['AdministrasiRj'])
+                                                    ? 'green'
+                                                    : 'red';
+
+                                                $taskId3 =
+                                                    $datadaftar_json['taskIdPelayanan']['taskId3'] ??
+                                                    'xxxx-xx-xx xx:xx:xx';
+                                                $taskId4 =
+                                                    $datadaftar_json['taskIdPelayanan']['taskId4'] ??
+                                                    'xxxx-xx-xx xx:xx:xx';
+                                                $taskId5 =
+                                                    $datadaftar_json['taskIdPelayanan']['taskId5'] ??
+                                                    'xxxx-xx-xx xx:xx:xx';
+
+                                                $eresep = isset($datadaftar_json['eresep']) ? 1 : 0;
+                                                $prosentaseEMREresep = ($eresep / 1) * 100;
+                                                $badgecolorEresep = $eresep ? 'green' : 'red';
+                                            @endphp
 
 
-                                                <td
-                                                    class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
+                                            <tr class="border-b group {{ $bgSelesaiPemeriksaan }}">
+
+
+                                                <td class="px-4 py-3 group-hover:bg-gray-100">
                                                     <div class="">
+                                                        <div class="font-normal text-gray-700">
+                                                            {{ 'No. Antrian ' }} <span
+                                                                class="text-5xl font-semibold text-gray-700">{{ $RJp->no_antrian }}</span>
+                                                        </div>
                                                         <div class="font-semibold text-primary">
                                                             {{ $RJp->reg_no }}
                                                         </div>
@@ -243,46 +276,132 @@
                                                 </td>
 
 
-                                                <td
-                                                    class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-primary whitespace-nowrap dark:text-white">
-                                                    {{ $RJp->vno_sep }}
-                                                </td>
-
-
-                                                <td
-                                                    class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
+                                                <td class="px-4 py-3 group-hover:bg-gray-100">
                                                     <div class="">
-                                                        <div class="font-semibold text-primary">{{ $RJp->poli_desc }}
+                                                        <div class="font-semibold text-primary">
+                                                            {{ $RJp->poli_desc }}
                                                         </div>
                                                         <div class="font-semibold text-gray-900">
                                                             {{ $RJp->dr_name . ' / ' }}
-                                                            {{ $RJp->klaim_id == 'UM'
-                                                                ? 'UMUM'
-                                                                : ($RJp->klaim_id == 'JM'
-                                                                    ? 'BPJS'
-                                                                    : ($RJp->klaim_id == 'KR'
-                                                                        ? 'Kronis'
-                                                                        : 'Asuransi Lain')) }}
+                                                            <x-badge :badgecolor="__($badgecolorKlaim)">
+                                                                {{ $RJp->klaim_id == 'UM'
+                                                                    ? 'UMUM'
+                                                                    : ($RJp->klaim_id == 'JM'
+                                                                        ? 'BPJS'
+                                                                        : ($RJp->klaim_id == 'KR'
+                                                                            ? 'Kronis'
+                                                                            : 'Asuransi Lain')) }}
+                                                            </x-badge>
+
                                                         </div>
-                                                        <div class="font-normal text-gray-900">
-                                                            {{ 'Nomer Pelayanan ' . $RJp->no_antrian }}
+
+                                                        <div class="font-normal">
+                                                            {{ $RJp->vno_sep }}
+                                                        </div>
+
+                                                        <div class="flex my-2 space-x-2">
+                                                            @if ($RJp->lab_status)
+                                                                <x-badge :badgecolor="__('default')">
+                                                                    {{ 'Laborat' }}
+                                                                </x-badge>
+                                                            @endif
+
+                                                            @if ($RJp->rad_status)
+                                                                <x-badge :badgecolor="__('default')">
+                                                                    {{ 'Radiologi' }}
+                                                                </x-badge>
+                                                            @endif
                                                         </div>
                                                     </div>
                                                 </td>
 
-                                                <td
-                                                    class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
-                                                    <div class="overflow-auto w-52">
-                                                        <div class="font-semibold text-primary">{{ $RJp->rj_status }}
+                                                <td class="px-4 py-3 group-hover:bg-gray-100">
+                                                    <div class="">
+                                                        <div class="font-semibold text-primary">
+                                                            {{ $RJp->rj_date }}
+                                                            {{ '| Shift : ' . $RJp->shift }}
                                                         </div>
-                                                        <div class="font-semibold text-gray-900">
+                                                        <div class="flex italic font-semibold text-gray-900">
+                                                            <x-badge :badgecolor="__($badgecolorStatus)">
+                                                                {{ isset($RJp->rj_status)
+                                                                    ? ($RJp->rj_status === 'A'
+                                                                        ? 'Pelayanan'
+                                                                        : ($RJp->rj_status === 'L'
+                                                                            ? 'Selesai Pelayanan'
+                                                                            : ($RJp->rj_status === 'I'
+                                                                                ? 'Transfer Inap'
+                                                                                : ($RJp->rj_status === 'F'
+                                                                                    ? 'Batal Transaksi'
+                                                                                    : ''))))
+                                                                    : '' }}
+                                                            </x-badge>
+                                                            <x-badge :badgecolor="__($badgecolorEmr)">
+                                                                Emr: {{ $prosentaseEMR . '%' }}
+                                                            </x-badge>
+                                                        </div>
+                                                        <div class="font-normal text-gray-900">
                                                             {{ '' . $RJp->nobooking }}
                                                         </div>
-                                                        <div class="font-normal text-gray-900 ">
-                                                            {{ '' . $RJp->push_antrian_bpjs_status . $RJp->push_antrian_bpjs_json }}
+                                                        <div>
+                                                            <x-badge :badgecolor="__($badgecolorEresep)">
+                                                                E-Resep: {{ $prosentaseEMREresep . '%' }}
+                                                            </x-badge>
                                                         </div>
+
+
                                                     </div>
                                                 </td>
+                                                @role(['Mr', 'Admin', 'Perawat'])
+                                                    <td class="px-4 py-3 group-hover:bg-gray-100">
+                                                        <div class="font-normal text-gray-700">
+                                                            <p class="font-semibold text-primary">Administrasi :</p>
+                                                            <div class="font-semibold text-gray-900">
+                                                                @isset($datadaftar_json['AdministrasiRj'])
+                                                                    <x-badge :badgecolor="__('green')">
+                                                                        {{ $datadaftar_json['AdministrasiRj']['userLog'] }}</x-badge>
+                                                                @else
+                                                                    <x-badge :badgecolor="__('red')"> {{ '-' }}</x-badge>
+                                                                @endisset
+                                                            </div>
+                                                        </div>
+                                                        <div class="italic font-normal text-gray-900">
+                                                            <x-badge :badgecolor="__('green')">
+                                                                {{ 'TaskId3 ' . $taskId3 }}
+                                                            </x-badge>
+                                                        </div>
+                                                        <div class="italic font-normal text-gray-900">
+                                                            <x-badge :badgecolor="__('green')">
+                                                                {{ 'TaskId4 ' . $taskId4 }}
+                                                            </x-badge>
+                                                        </div>
+                                                        <div class="italic font-normal text-gray-900">
+                                                            <x-badge :badgecolor="__('green')">
+                                                                {{ 'TaskId5 ' . $taskId5 }}
+                                                            </x-badge>
+                                                        </div>
+                                                        <div class="mt-1 font-normal">
+                                                            Tindak Lanjut :
+                                                            {{ isset($datadaftar_json['perencanaan']['tindakLanjut']['tindakLanjut'])
+                                                                ? ($datadaftar_json['perencanaan']['tindakLanjut']['tindakLanjut']
+                                                                    ? $datadaftar_json['perencanaan']['tindakLanjut']['tindakLanjut']
+                                                                    : '-')
+                                                                : '-' }}
+                                                            </br>
+                                                            Tanggal :
+                                                            {{ isset($datadaftar_json['kontrol']['tglKontrol'])
+                                                                ? ($datadaftar_json['kontrol']['tglKontrol']
+                                                                    ? $datadaftar_json['kontrol']['tglKontrol']
+                                                                    : '-')
+                                                                : '-' }}
+                                                            </br>
+                                                            {{ isset($datadaftar_json['kontrol']['noSKDPBPJS'])
+                                                                ? ($datadaftar_json['kontrol']['noSKDPBPJS']
+                                                                    ? $datadaftar_json['kontrol']['noSKDPBPJS']
+                                                                    : '-')
+                                                                : '-' }}
+                                                        </div>
+                                                    </td>
+                                                @endrole
 
                                                 <td class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-primary">
 
@@ -290,7 +409,7 @@
                                                     <div class="inline-flex">
 
                                                         <livewire:cetak.cetak-etiket :regNo="$RJp->reg_no"
-                                                            :wire:key="$RJp->rj_no">
+                                                            :wire:key="'cetak-etiket-'.$RJp->rj_no">
 
                                                             <!-- Dropdown Action menu Flowbite-->
                                                             <div>
@@ -305,34 +424,77 @@
                                                                     </svg>
                                                                 </x-light-button>
 
-                                                                <!-- Dropdown Action Open menu -->
                                                                 <div id="dropdownMenu{{ $RJp->rj_no }}"
                                                                     class="z-10 hidden w-auto bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700">
+
+                                                                    @role(['Admin', 'Mr', 'Perawat'])
+                                                                        @if ($RJp->lab_status || $RJp->rad_status)
+                                                                            <div class="grid grid-cols-2 p-2">
+
+                                                                                <x-yellow-button
+                                                                                    wire:click="masukPoli('{{ addslashes($RJp->rj_no) }}')"
+                                                                                    wire:loading.remove>
+                                                                                    4.Masuk Poli
+                                                                                </x-yellow-button>
+                                                                                <div wire:loading wire:target="masukPoli">
+                                                                                    <x-loading />
+                                                                                </div>
+
+                                                                                <x-primary-button
+                                                                                    wire:click="keluarPoli('{{ addslashes($RJp->rj_no) }}')"
+                                                                                    wire:loading.remove>
+                                                                                    5.Keluar Poli
+                                                                                </x-primary-button>
+                                                                                <div wire:loading wire:target="keluarPoli">
+                                                                                    <x-loading />
+                                                                                </div>
+
+                                                                            </div>
+                                                                        @endif
+                                                                    @endrole
+
                                                                     <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
                                                                         aria-labelledby="dropdownButton{{ $RJp->rj_no }}">
-                                                                        <li>
-                                                                            <x-dropdown-link
-                                                                                wire:click="tampil('{{ $RJp->rj_no }}')">
-                                                                                {{ __('Tampil | ' . $RJp->reg_name) }}
-                                                                            </x-dropdown-link>
-                                                                        </li>
-                                                                        <li>
-                                                                            <x-dropdown-link
-                                                                                wire:click="edit('{{ $RJp->rj_no }}')">
-                                                                                {{ __('Ubah') }}
-                                                                            </x-dropdown-link>
-                                                                        </li>
-                                                                        <li>
-                                                                            <x-dropdown-link
-                                                                                wire:click="$emit('confirm_remove_record', '{{ $RJp->rj_no }}', '{{ $RJp->reg_name }}')">
-                                                                                {{ __('Hapus') }}
-                                                                            </x-dropdown-link>
-                                                                        </li>
-
+                                                                        @role(['Admin', 'Mr', 'Perawat'])
+                                                                            {{-- <li>
+                                                                                <x-dropdown-link
+                                                                                    wire:click="tampil('{{ $RJp->rj_no }}')">
+                                                                                    {{ __('Tampil | ' . $RJp->reg_name) }}
+                                                                                </x-dropdown-link>
+                                                                            </li> --}}
+                                                                            <li>
+                                                                                <x-dropdown-link
+                                                                                    wire:click="edit('{{ $RJp->rj_no }}')">
+                                                                                    {{ __('Ubah | ' . $RJp->reg_name) }}
+                                                                                </x-dropdown-link>
+                                                                            </li>
+                                                                            {{-- <li>
+                                                                                <x-dropdown-link
+                                                                                    wire:click="$emit('confirm_remove_record', '{{ $RJp->rj_no }}', '{{ $RJp->reg_name }}')">
+                                                                                    {{ __('Hapus') }}
+                                                                                </x-dropdown-link>
+                                                                            </li> --}}
+                                                                        @endrole
                                                                     </ul>
+
+                                                                    @role(['Admin', 'Mr', 'Perawat'])
+                                                                        <div class="grid grid-cols-2 gap-1 mt-10 ml-2">
+                                                                            <livewire:emr-r-j.post-encounter-r-j.post-encounter-r-j
+                                                                                :rjNoRef="$RJp->rj_no"
+                                                                                :wire:key="'post-encounter-r-j-'.$RJp->rj_no">
+
+                                                                                <livewire:emr-r-j.post-satu-data-kesehatan-r-j.post-satu-data-kesehatan-r-j
+                                                                                    :rjNoRef="$RJp->rj_no"
+                                                                                    :wire:key="'post-satu-data-kesehatan-r-j-'.$RJp->rj_no">
+                                                                        </div>
+                                                                    @endrole
+
+
                                                                 </div>
+
                                                             </div>
-                                                            <!-- End Dropdown Action Open menu -->
+
+
                                                     </div>
 
                                                 </td>
