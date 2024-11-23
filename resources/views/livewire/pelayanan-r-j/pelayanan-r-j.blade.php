@@ -192,6 +192,9 @@
                                                         <span
                                                             class="text-5xl font-semibold text-gray-700">{{ $RJp->no_antrian }}
                                                         </span>
+                                                        <div class="text-base text-gray-700">
+                                                            {{ $RJp->rj_date }}{{ '/ shift ' }}{{ $RJp->shift }}
+                                                        </div>
                                                         <div class="text-base font-semibold text-gray-700">
                                                             {{ $RJp->reg_no }}</div>
                                                         <div class="font-semibold text-primary">
