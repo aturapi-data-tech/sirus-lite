@@ -19,7 +19,7 @@ class RIskdp extends Component
 
     //  table data////////////////
     // variable data pasien dan rawat jalan
-    //  table data//////////////// 
+    //  table data////////////////
     public  $dataPasien = [
         "pasien" => [
             "pasientidakdikenal" => [],  //status pasien tdak dikenal 0 false 1 true
@@ -107,20 +107,20 @@ class RIskdp extends Component
                 "negara" => "ID" //harus diisi (ISO 3166) ID 	IDN 	360 	ISO 3166-2:ID 	.id
             ],
             "kontak" => [
-                "kodenegara" => "62", //+(62) Indonesia 
+                "kodenegara" => "62", //+(62) Indonesia
                 "nomerTelponSelulerPasien" => '', //+(kode negara) no telp
                 "nomerTelponLain" => '' //+(kode negara) no telp
             ],
             "hubungan" => [
                 "namaAyah" => '', //
-                "kodenegaraAyah" => "62", //+(62) Indonesia 
+                "kodenegaraAyah" => "62", //+(62) Indonesia
                 "nomerTelponSelulerAyah" => '', //+(kode negara) no telp
                 "namaIbu" => '', //
-                "kodenegaraIbu" => "62", //+(62) Indonesia 
+                "kodenegaraIbu" => "62", //+(62) Indonesia
                 "nomerTelponSelulerIbu" => '', //+(kode negara) no telp
 
                 "namaPenanggungJawab" => '', // di isi untuk pasien (Tidak dikenal / Hal Lain)
-                "kodenegaraPenanggungJawab" => "62", //+(62) Indonesia 
+                "kodenegaraPenanggungJawab" => "62", //+(62) Indonesia
                 "nomerTelponSelulerPenanggungJawab" => '', //+(kode negara) no telp
                 "hubunganDgnPasien" => [
                     "hubunganDgnPasienId" => 5, //Default 5 Kerabat / Saudara
@@ -325,7 +325,7 @@ class RIskdp extends Component
     public $dataDokterLovStatus = 0;
     public $dataDokterLovSearch = '';
 
-    // 
+    //
 
     //  modal status////////////////
     public $isOpen = 0;
@@ -513,7 +513,7 @@ class RIskdp extends Component
     //     // Variable Search
     //     $search = $this->dataDokterLovSearch;
 
-    //     // check LOV by dr_id rs id 
+    //     // check LOV by dr_id rs id
     //     $dataDokter = DB::table('rsmst_doctors')->select(
     //         'rsmst_doctors.dr_id as dr_id',
     //         'rsmst_doctors.dr_name as dr_name',
@@ -835,7 +835,7 @@ class RIskdp extends Component
 
             $this->dataDaftarRi['kontrol']['tglKontrol'] = $this->dataDaftarRi['kontrol']['tglKontrol']
                 ? $this->dataDaftarRi['kontrol']['tglKontrol']
-                : Carbon::now()->addDays(8)->format('d/m/Y');
+                : Carbon::now(env('APP_TIMEZONE'))->addDays(8)->format('d/m/Y');
             $this->dataDaftarRi['kontrol']['drKontrol'] = $this->dataDaftarRi['kontrol']['drKontrol']
                 ? $this->dataDaftarRi['kontrol']['drKontrol']
                 : $this->dataDaftarRi['drId'];
@@ -944,7 +944,7 @@ class RIskdp extends Component
             // setDataKontrol
             $this->dataDaftarRi['kontrol']['tglKontrol'] = $this->dataDaftarRi['kontrol']['tglKontrol']
                 ? $this->dataDaftarRi['kontrol']['tglKontrol']
-                : Carbon::now()->addDays(0)->format('d/m/Y');
+                : Carbon::now(env('APP_TIMEZONE'))->addDays(0)->format('d/m/Y');
             $this->dataDaftarRi['kontrol']['drKontrol'] = "";
             $this->dataDaftarRi['kontrol']['drKontrolDesc'] = "";
             $this->dataDaftarRi['kontrol']['drKontrolBPJS'] =  "";
@@ -960,14 +960,14 @@ class RIskdp extends Component
     // set data RiHdrNo / NoBooking / NoAntrian / klaimId / kunjunganId
     private function setDataPrimer(): void
     {
-        $noKontrol = Carbon::now()->addDays(8)->format('dmY') . $this->dataDaftarRi['kontrol']['drKontrol'] . $this->dataDaftarRi['kontrol']['poliKontrol'];
+        $noKontrol = Carbon::now(env('APP_TIMEZONE'))->addDays(8)->format('dmY') . $this->dataDaftarRi['kontrol']['drKontrol'] . $this->dataDaftarRi['kontrol']['poliKontrol'];
         $this->dataDaftarRi['kontrol']['noKontrolRS'] =  $this->dataDaftarRi['kontrol']['noKontrolRS'] ? $this->dataDaftarRi['kontrol']['noKontrolRS'] : $noKontrol;
     }
 
     // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
     // private function setDataPrimer(): void
     // {
-    //     $noKontrol = Carbon::now()->addDays(8)->format('dmY') . $this->dataDaftarRi['kontrol']['drKontrol'] . $this->dataDaftarRi['kontrol']['poliKontrol'];
+    //     $noKontrol = Carbon::now(env('APP_TIMEZONE'))->addDays(8)->format('dmY') . $this->dataDaftarRi['kontrol']['drKontrol'] . $this->dataDaftarRi['kontrol']['poliKontrol'];
     //     $this->dataDaftarRi['kontrol']['noKontrolRS'] =  $this->dataDaftarRi['kontrol']['noKontrolRS'] ? $this->dataDaftarRi['kontrol']['noKontrolRS'] : $noKontrol;
     // }
 

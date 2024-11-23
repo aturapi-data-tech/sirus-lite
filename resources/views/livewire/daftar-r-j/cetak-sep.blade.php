@@ -316,14 +316,18 @@
                 <p><span>{{ isset($data['peserta']['nama']) ? ($data['peserta']['nama'] ? $data['peserta']['nama'] : '-') : '--' }}</span>
                 </p>
                 @inject('carbon', 'Carbon\Carbon')
-                <p><span>Cetakan ke 1 {{ $carbon::now()->format('d/m/Y H:i:s') }}</span></p>
+                <p><span>Cetakan ke 1 {{ $carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s') }}</span></p>
 
                 @php
-                    $tglRujukan = isset($reqData['request']['t_sep']['rujukan']['tglRujukan']) ? ($reqData['request']['t_sep']['rujukan']['tglRujukan'] ? $reqData['request']['t_sep']['rujukan']['tglRujukan'] : $carbon::now()->format('Y-m-d')) : $carbon::now()->format('Y-m-d');
+                    $tglRujukan = isset($reqData['request']['t_sep']['rujukan']['tglRujukan'])
+                        ? ($reqData['request']['t_sep']['rujukan']['tglRujukan']
+                            ? $reqData['request']['t_sep']['rujukan']['tglRujukan']
+                            : $carbon::now(env('APP_TIMEZONE'))->format('Y-m-d'))
+                        : $carbon::now(env('APP_TIMEZONE'))->format('Y-m-d');
                     $tglRujukanAwal = $carbon::createFromFormat('Y-m-d', $tglRujukan);
                     $tglBatasRujukan = $carbon::createFromFormat('Y-m-d', $tglRujukan)->addMonths(3);
-                    
-                    $diffInDays = $tglBatasRujukan->diffInDays($carbon::now());
+
+                    $diffInDays = $tglBatasRujukan->diffInDays($carbon::now(env('APP_TIMEZONE')));
                     $propertyDiffInDays = $diffInDays <= 20 ? 'red' : ($diffInDays <= 30 ? 'yellow' : '');
                 @endphp
 

@@ -149,8 +149,8 @@ class CetakEtiket extends Component
             $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] = ($findData->sex == 'L') ? 'Laki-laki' : 'Perempuan';
             $this->dataPasien['pasien']['tglLahir'] = $findData->birth_date;
             // $this->dataPasien['pasien']['thn'] = $findData->thn;
-            $birth_date = $findData->birth_date ? $findData->birth_date : Carbon::now()->format('d/m/Y');
-            $this->dataPasien['pasien']['thn'] = Carbon::createFromFormat('d/m/Y', $birth_date)->diff(Carbon::now())->format('%y Thn, %m Bln %d Hr'); //$findData->thn;
+            $birth_date = $findData->birth_date ? $findData->birth_date : Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y');
+            $this->dataPasien['pasien']['thn'] = Carbon::createFromFormat('d/m/Y', $birth_date)->diff(Carbon::now(env('APP_TIMEZONE')))->format('%y Thn, %m Bln %d Hr'); //$findData->thn;
 
             $this->dataPasien['pasien']['bln'] = $findData->bln;
             $this->dataPasien['pasien']['hari'] = $findData->hari;
@@ -206,7 +206,7 @@ class CetakEtiket extends Component
         } else {
             // ubah data Pasien
             $this->dataPasien = json_decode($findData->meta_data_pasien_json, true);
-            $this->dataPasien['pasien']['thn'] = Carbon::createFromFormat('d/m/Y', $this->dataPasien['pasien']['tglLahir'])->diff(Carbon::now())->format('%y Thn, %m Bln %d Hr'); //$findData->thn;
+            $this->dataPasien['pasien']['thn'] = Carbon::createFromFormat('d/m/Y', $this->dataPasien['pasien']['tglLahir'])->diff(Carbon::now(env('APP_TIMEZONE')))->format('%y Thn, %m Bln %d Hr'); //$findData->thn;
 
         }
     }
@@ -273,7 +273,7 @@ class CetakEtiket extends Component
         $pdfContent = PDF::loadView('livewire.cetak.cetak-etiket-print', $data)->output();
 
         return response()->streamDownload(
-            fn () => print($pdfContent),
+            fn() => print($pdfContent),
             "etiket.pdf"
         );
     }

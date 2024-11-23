@@ -318,7 +318,7 @@ class SkdpRI extends Component
 
             // jika kontrol tidak ditemukan tambah variable kontrol pda array
             if (isset($this->dataDaftarRi['kontrol']) == false) {
-                $this->dataDaftarRi['kontrol']['tglKontrol'] =  Carbon::now()->addDays(8)->format('d/m/Y');
+                $this->dataDaftarRi['kontrol']['tglKontrol'] =  Carbon::now(env('APP_TIMEZONE'))->addDays(8)->format('d/m/Y');
                 $this->dataDaftarRi['kontrol']['drKontrol'] =  (isset($this->dataDaftarRi['drId'])
                     ? ($this->dataDaftarRi['drId']
                         ? $this->dataDaftarRi['drId']
@@ -433,7 +433,7 @@ class SkdpRI extends Component
 
             // jika kontrol tidak ditemukan tambah variable kontrol pda array
             if (isset($this->dataDaftarRi['kontrol']) == false) {
-                $this->dataDaftarRi['kontrol']['tglKontrol'] =  Carbon::now()->addDays(8)->format('d/m/Y');
+                $this->dataDaftarRi['kontrol']['tglKontrol'] =  Carbon::now(env('APP_TIMEZONE'))->addDays(8)->format('d/m/Y');
                 $this->dataDaftarRi['kontrol']['drKontrol'] =  (isset($this->dataDaftarRi['drId'])
                     ? ($this->dataDaftarRi['drId']
                         ? $this->dataDaftarRi['drId']
@@ -476,7 +476,7 @@ class SkdpRI extends Component
     // set data RiHdrNo / NoBooking / NoAntrian / klaimId / kunjunganId
     private function setDataPrimer(): void
     {
-        $noKontrol = Carbon::now()->addDays(8)->format('dmY') . $this->dataDaftarRi['kontrol']['drKontrol'] . $this->dataDaftarRi['kontrol']['poliKontrol'];
+        $noKontrol = Carbon::now(env('APP_TIMEZONE'))->addDays(8)->format('dmY') . $this->dataDaftarRi['kontrol']['drKontrol'] . $this->dataDaftarRi['kontrol']['poliKontrol'];
         $this->dataDaftarRi['kontrol']['noKontrolRS'] = (isset($this->dataDaftarRi['kontrol']['noKontrolRS'])
             ? ($this->dataDaftarRi['kontrol']['noKontrolRS']
                 ? $this->dataDaftarRi['kontrol']['noKontrolRS']

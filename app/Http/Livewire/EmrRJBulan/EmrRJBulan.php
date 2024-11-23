@@ -111,7 +111,7 @@ class EmrRJBulan extends Component
 
     private function settermyTopBarmyTopBarrefDate(): void
     {
-        $this->myTopBar['refDate'] = Carbon::now()->format('m/Y');
+        $this->myTopBar['refDate'] = Carbon::now(env('APP_TIMEZONE'))->format('m/Y');
     }
 
 
@@ -136,7 +136,7 @@ class EmrRJBulan extends Component
         ];
 
         $pdfContent = PDF::loadView('livewire.emr.rekam-medis.cetak-rekam-medis-r-j', $data)->output();
-        $filename = Carbon::now()->format('dmYhis');
+        $filename = Carbon::now(env('APP_TIMEZONE'))->format('dmYhis');
         $filePath = 'bpjs/' . $filename . '.pdf'; // Adjust the path as needed
 
 

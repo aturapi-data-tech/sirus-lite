@@ -581,14 +581,14 @@ class Pemeriksaan extends Component
 
             // array Hdr
             $this->dataDaftarUgd['pemeriksaan']['pemeriksaanPenunjang']['lab'][$this->isPemeriksaanLaboratoriumSelectedKeyHdr]['labHdr']['labHdrNo'] =  $checkupNo;
-            $this->dataDaftarUgd['pemeriksaan']['pemeriksaanPenunjang']['lab'][$this->isPemeriksaanLaboratoriumSelectedKeyHdr]['labHdr']['labHdrDate'] = Carbon::now()->format('d/m/Y H:i:s');
+            $this->dataDaftarUgd['pemeriksaan']['pemeriksaanPenunjang']['lab'][$this->isPemeriksaanLaboratoriumSelectedKeyHdr]['labHdr']['labHdrDate'] = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
 
 
             // insert Hdr
             DB::table('lbtxn_checkuphdrs')->insert([
                 'reg_no' => $this->dataDaftarUgd['regNo'],
                 'dr_id' => $this->dataDaftarUgd['drId'],
-                'checkup_date' => DB::raw("to_date('" . Carbon::now()->format('d/m/Y H:i:s') . "','dd/mm/yyyy hh24:mi:ss')"),
+                'checkup_date' => DB::raw("to_date('" . Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s') . "','dd/mm/yyyy hh24:mi:ss')"),
                 'status_rjri' => 'UGD',
                 'checkup_status' => 'P',
                 'ref_no' => $this->dataDaftarUgd['rjNo'],
@@ -733,14 +733,14 @@ class Pemeriksaan extends Component
 
             // array Hdr
             $this->dataDaftarUgd['pemeriksaan']['pemeriksaanPenunjang']['rad'][$this->isPemeriksaanRadiologiSelectedKeyHdr]['radHdr']['radHdrNo'] =  $this->dataDaftarUgd['rjNo'];
-            $this->dataDaftarUgd['pemeriksaan']['pemeriksaanPenunjang']['rad'][$this->isPemeriksaanRadiologiSelectedKeyHdr]['radHdr']['radHdrDate'] = Carbon::now()->format('d/m/Y H:i:s');
+            $this->dataDaftarUgd['pemeriksaan']['pemeriksaanPenunjang']['rad'][$this->isPemeriksaanRadiologiSelectedKeyHdr]['radHdr']['radHdrDate'] = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
 
 
             // insert Hdr (Radiologi tidak di insert header / ikut txn rj)
             // DB::table('lbtxn_checkuphdrs')->insert([
             //     'reg_no' => $this->dataDaftarUgd['regNo'],
             //     'dr_id' => $this->dataDaftarUgd['drId'],
-            //     'checkup_date' => DB::raw("to_date('" . Carbon::now()->format('d/m/Y H:i:s') . "','dd/mm/yyyy hh24:mi:ss')"),
+            //     'checkup_date' => DB::raw("to_date('" . Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s') . "','dd/mm/yyyy hh24:mi:ss')"),
             //     'status_rjri' => 'RJ',
             //     'checkup_status' => 'P',
             //     'ref_no' => $this->dataDaftarUgd['rjNo'],
@@ -770,7 +770,7 @@ class Pemeriksaan extends Component
                     'rj_no' => $this->dataDaftarUgd['rjNo'],
                     'rad_price' => $radDtl['rad_price'],
                     'dr_radiologi' => 'dr. M.A. Budi Purwito, Sp.Rad.',
-                    'waktu_entry' => DB::raw("to_date('" . Carbon::now()->format('d/m/Y H:i:s') . "','dd/mm/yyyy hh24:mi:ss')"),
+                    'waktu_entry' => DB::raw("to_date('" . Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s') . "','dd/mm/yyyy hh24:mi:ss')"),
                 ]);
 
 
@@ -856,7 +856,7 @@ class Pemeriksaan extends Component
         $birthDate = DB::scalar($sql, [
             "regNo" => $this->dataDaftarUgd['regNo'],
         ]);
-        $cekUsia = Carbon::createFromFormat('Y-m-d H:i:s', $birthDate)->diff(Carbon::now())->format('%y');
+        $cekUsia = Carbon::createFromFormat('Y-m-d H:i:s', $birthDate)->diff(Carbon::now(env('APP_TIMEZONE')))->format('%y');
 
         if ($cekUsia > 13) {
             $this->rules['dataDaftarUgd.pemeriksaan.tandaVital.sistolik'] = 'required|numeric';
@@ -922,9 +922,7 @@ class Pemeriksaan extends Component
 
 
     // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
-    private function setDataPrimer(): void
-    {
-    }
+    private function setDataPrimer(): void {}
 
     private function scoringIMT(): void
     {
@@ -974,10 +972,10 @@ class Pemeriksaan extends Component
         $this->dataDaftarUgd['pemeriksaan']['uploadHasilPenunjang'][] = [
             'file' => $uploadHasilPenunjangfile,
             'desc' => $this->descPDF,
-            'tglUpload' => Carbon::now()->format('d/m/Y H:i:s'),
+            'tglUpload' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'),
             'penanggungJawab' => [
                 'userLog' => auth()->user()->myuser_name,
-                'userLogDate' => Carbon::now()->format('d/m/Y H:i:s'),
+                'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'),
                 'userLogCode' => auth()->user()->myuser_code
             ]
         ];

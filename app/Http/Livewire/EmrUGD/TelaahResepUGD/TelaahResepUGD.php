@@ -218,12 +218,12 @@ class TelaahResepUGD extends Component
     private function settermyTopBarShiftandmyTopBarrefDate(): void
     {
         // dd/mm/yyyy hh24:mi:ss
-        $this->myTopBar['refDate'] = Carbon::now()->format('d/m/Y');
-        // dd(Carbon::now()->format('H:i:s'));
+        $this->myTopBar['refDate'] = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y');
+        // dd(Carbon::now(env('APP_TIMEZONE'))->format('H:i:s'));
 
         // shift
         $findShift = DB::table('rstxn_shiftctls')->select('shift')
-            ->whereRaw("'" . Carbon::now()->format('H:i:s') . "' between
+            ->whereRaw("'" . Carbon::now(env('APP_TIMEZONE'))->format('H:i:s') . "' between
              shift_start and shift_end")
             ->first();
         $this->myTopBar['refShiftId'] = isset($findShift->shift) && $findShift->shift ? $findShift->shift : 3;
@@ -461,7 +461,7 @@ class TelaahResepUGD extends Component
             if (isset($this->dataDaftarUgd['telaahResep']['penanggungJawab']) == false) {
                 $this->dataDaftarUgd['telaahResep']['penanggungJawab'] = [
                     'userLog' => auth()->user()->myuser_name,
-                    'userLogDate' => Carbon::now()->format('d/m/Y H:i:s'),
+                    'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'),
                     'userLogCode' => auth()->user()->myuser_code
                 ];
 
@@ -488,7 +488,7 @@ class TelaahResepUGD extends Component
             if (isset($this->dataDaftarUgd['telaahObat']['penanggungJawab']) == false) {
                 $this->dataDaftarUgd['telaahObat']['penanggungJawab'] = [
                     'userLog' => auth()->user()->myuser_name,
-                    'userLogDate' => Carbon::now()->format('d/m/Y H:i:s'),
+                    'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'),
                     'userLogCode' => auth()->user()->myuser_code
                 ];
 
@@ -655,7 +655,7 @@ class TelaahResepUGD extends Component
     public function masukApotek($rjNo)
     {
         $this->findData($rjNo);
-        $masukApotek = Carbon::now()->format('d/m/Y H:i:s');
+        $masukApotek = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
 
         //////updateDB/////////////////////
         $sql = "select waktu_masuk_apt from rstxn_ugdhdrs where rj_no=:rjNo";
@@ -748,7 +748,7 @@ class TelaahResepUGD extends Component
     public function keluarApotek($rjNo)
     {
         $this->findData($rjNo);
-        $keluarApotek = Carbon::now()->format('d/m/Y H:i:s');
+        $keluarApotek = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
 
         //////updateDB/////////////////////
         $sql = "select waktu_selesai_pelayanan from rstxn_ugdhdrs where rj_no=:rjNo";

@@ -63,7 +63,7 @@ class BookingRJ extends Component
     // setter myTopBar Shift and myTopBar refDate
     private function settermyTopBarmyTopBarrefDate(): void
     {
-        $this->myTopBar['refDate'] = Carbon::now()->format('d/m/Y');
+        $this->myTopBar['refDate'] = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y');
     }
 
 

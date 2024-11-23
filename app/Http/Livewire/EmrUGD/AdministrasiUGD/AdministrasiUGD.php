@@ -128,7 +128,7 @@ class AdministrasiUGD extends Component
         if (isset($dataDaftarUgd['AdministrasiRj']) == false) {
             $dataDaftarUgd['AdministrasiRj'] = [
                 'userLog' => auth()->user()->myuser_name,
-                'userLogDate' => Carbon::now()->format('d/m/Y H:i:s')
+                'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
             ];
 
             DB::table('rstxn_ugdhdrs')

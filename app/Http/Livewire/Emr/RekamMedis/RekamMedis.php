@@ -84,7 +84,7 @@ class RekamMedis extends Component
         $meta_data_pasien_json = isset($findData->meta_data_pasien_json) ? $findData->meta_data_pasien_json : null;
         // if meta_data_pasien_json = null
         // then cari Data Pasien By Key Collection (exception when no data found)
-        // 
+        //
         // else json_decode
         if ($meta_data_pasien_json == null) {
 
@@ -98,7 +98,7 @@ class RekamMedis extends Component
                 $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminId'] = ($findData->sex == 'L') ? 1 : 2;
                 $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] = ($findData->sex == 'L') ? 'Laki-laki' : 'Perempuan';
                 $this->dataPasien['pasien']['tglLahir'] = $findData->birth_date;
-                $this->dataPasien['pasien']['thn'] = Carbon::createFromFormat('d/m/Y', $findData->birth_date)->diff(Carbon::now())->format('%y Thn, %m Bln %d Hr'); //$findData->thn;
+                $this->dataPasien['pasien']['thn'] = Carbon::createFromFormat('d/m/Y', $findData->birth_date)->diff(Carbon::now(env('APP_TIMEZONE')))->format('%y Thn, %m Bln %d Hr'); //$findData->thn;
                 $this->dataPasien['pasien']['bln'] = $findData->bln;
                 $this->dataPasien['pasien']['hari'] = $findData->hari;
                 $this->dataPasien['pasien']['tempatLahir'] = $findData->birth_place;
@@ -205,7 +205,7 @@ class RekamMedis extends Component
         } else {
             // ubah data Pasien
             $this->dataPasien = json_decode($findData->meta_data_pasien_json, true);
-            $this->dataPasien['pasien']['thn'] = Carbon::createFromFormat('d/m/Y', $this->dataPasien['pasien']['tglLahir'])->diff(Carbon::now())->format('%y Thn, %m Bln %d Hr'); //$findData->thn;
+            $this->dataPasien['pasien']['thn'] = Carbon::createFromFormat('d/m/Y', $this->dataPasien['pasien']['tglLahir'])->diff(Carbon::now(env('APP_TIMEZONE')))->format('%y Thn, %m Bln %d Hr'); //$findData->thn;
 
 
         }
@@ -293,7 +293,7 @@ class RekamMedis extends Component
         $this->emit('toastr-success', 'Cetak RM IGD');
 
         return response()->streamDownload(
-            fn () => print($pdfContent),
+            fn() => print($pdfContent),
             "rmUGD.pdf"
         );
     }
@@ -321,7 +321,7 @@ class RekamMedis extends Component
         $this->emit('toastr-success', 'Cetak RM RJ');
 
         return response()->streamDownload(
-            fn () => print($pdfContent),
+            fn() => print($pdfContent),
             "rmRJ.pdf"
         );
     }
@@ -358,7 +358,7 @@ class RekamMedis extends Component
 
 
                 return response()->streamDownload(
-                    fn () => print($pdfContent),
+                    fn() => print($pdfContent),
                     "rmRJ.pdf"
                 );
             } else if ($layananStatus === 'UGD') {
@@ -379,7 +379,7 @@ class RekamMedis extends Component
                 $this->emit('toastr-success', 'Cetak RM IGD');
 
                 return response()->streamDownload(
-                    fn () => print($pdfContent),
+                    fn() => print($pdfContent),
                     "rmUGD.pdf"
                 );
             } else if ($layananStatus === 'RI') {
@@ -428,7 +428,7 @@ class RekamMedis extends Component
 
 
                 return response()->streamDownload(
-                    fn () => print($pdfContent),
+                    fn() => print($pdfContent),
                     "rmRJ.pdf"
                 );
             } else if ($layananStatus === 'UGD') {
@@ -449,7 +449,7 @@ class RekamMedis extends Component
                 $this->emit('toastr-success', 'Cetak RM IGD');
 
                 return response()->streamDownload(
-                    fn () => print($pdfContent),
+                    fn() => print($pdfContent),
                     "rmUGD.pdf"
                 );
             } else if ($layananStatus === 'RI') {
@@ -498,7 +498,7 @@ class RekamMedis extends Component
 
 
                 return response()->streamDownload(
-                    fn () => print($pdfContent),
+                    fn() => print($pdfContent),
                     "rmRJ.pdf"
                 );
             } else if ($layananStatus === 'UGD') {
@@ -519,7 +519,7 @@ class RekamMedis extends Component
                 $this->emit('toastr-success', 'Cetak RM IGD');
 
                 return response()->streamDownload(
-                    fn () => print($pdfContent),
+                    fn() => print($pdfContent),
                     "rmUGD.pdf"
                 );
             } else if ($layananStatus === 'RI') {
@@ -537,9 +537,7 @@ class RekamMedis extends Component
 
 
     // when new form instance
-    public function mount()
-    {
-    }
+    public function mount() {}
 
 
 

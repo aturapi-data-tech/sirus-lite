@@ -128,20 +128,20 @@ class FormEntryUGD extends Component
                 "negara" => "ID" //harus diisi (ISO 3166) ID 	IDN 	360 	ISO 3166-2:ID 	.id
             ],
             "kontak" => [
-                "kodenegara" => "62", //+(62) Indonesia 
+                "kodenegara" => "62", //+(62) Indonesia
                 "nomerTelponSelulerPasien" => '', //+(kode negara) no telp
                 "nomerTelponLain" => '' //+(kode negara) no telp
             ],
             "hubungan" => [
                 "namaAyah" => '', //
-                "kodenegaraAyah" => "62", //+(62) Indonesia 
+                "kodenegaraAyah" => "62", //+(62) Indonesia
                 "nomerTelponSelulerAyah" => '', //+(kode negara) no telp
                 "namaIbu" => '', //
-                "kodenegaraIbu" => "62", //+(62) Indonesia 
+                "kodenegaraIbu" => "62", //+(62) Indonesia
                 "nomerTelponSelulerIbu" => '', //+(kode negara) no telp
 
                 "namaPenanggungJawab" => '', // di isi untuk pasien (Tidak dikenal / Hal Lain)
-                "kodenegaraPenanggungJawab" => "62", //+(62) Indonesia 
+                "kodenegaraPenanggungJawab" => "62", //+(62) Indonesia
                 "nomerTelponSelulerPenanggungJawab" => '', //+(kode negara) no telp
                 "hubunganDgnPasien" => [
                     "hubunganDgnPasienId" => 5, //Default 5 Kerabat / Saudara
@@ -448,7 +448,7 @@ class FormEntryUGD extends Component
         // Variable Search
         $search = $this->dataPasienLovSearch;
 
-        // check LOV by id 
+        // check LOV by id
 
 
         // Open Lov Pasien Status
@@ -469,7 +469,7 @@ class FormEntryUGD extends Component
             // 3.Cari berdasarkan nokaBPJS ->if null DB
             // 4.Cari berdasarkan reg_name ->if null DB
 
-            // 5. Goto Pasien Baru berdasarkan nik apiBPJS ->if null 
+            // 5. Goto Pasien Baru berdasarkan nik apiBPJS ->if null
             // 6. Entry Manual Pasien Baru
 
             // by reg_noxxx
@@ -656,7 +656,7 @@ class FormEntryUGD extends Component
         // Variable Search
         $search = $this->dataDokterLovSearch;
 
-        // check LOV by dr_id rs id 
+        // check LOV by dr_id rs id
         $dataDokter = DB::table('rsmst_doctors')->select(
             'rsmst_doctors.dr_id as dr_id',
             'rsmst_doctors.dr_name as dr_name',
@@ -812,7 +812,7 @@ class FormEntryUGD extends Component
     private function setDataPrimer(): void
     {
 
-        // Klaim & Kunjungan 
+        // Klaim & Kunjungan
         // dd($this->dataDaftarUgd['klaimId']);
         $this->dataDaftarUgd['klaimId'] = $this->JenisKlaim['JenisKlaimId'];
         $this->dataDaftarUgd['kunjunganId'] = $this->JenisKunjungan['JenisKunjunganId'];
@@ -820,14 +820,14 @@ class FormEntryUGD extends Component
         $this->dataDaftarUgd['entryId'] = $this->entryUgd['entryId'];
         $this->dataDaftarUgd['entryDesc'] = $this->entryUgd['entryDesc'];
 
-        // JenisKunjungan Internal 
+        // JenisKunjungan Internal
         if ($this->JenisKunjungan['JenisKunjunganId'] == 2) {
             $this->dataDaftarUgd['kunjunganInternalStatus'] = "1";
         }
 
         // noBooking
         if (!$this->dataDaftarUgd['noBooking']) {
-            $this->dataDaftarUgd['noBooking'] = Carbon::now()->format('YmdHis') . 'RSIM';
+            $this->dataDaftarUgd['noBooking'] = Carbon::now(env('APP_TIMEZONE'))->format('YmdHis') . 'RSIM';
         }
 
         // rjNoMax
@@ -842,8 +842,8 @@ class FormEntryUGD extends Component
         }
 
         // noUrutAntrian (count all kecuali KRonis) if KR 999
-        $sql = "select count(*) no_antrian 
-      from rstxn_ugdhdrs 
+        $sql = "select count(*) no_antrian
+      from rstxn_ugdhdrs
       where dr_id=:drId
       and to_char(rj_date,'ddmmyyyy')=:tgl
       and klaim_id!='KR'";
@@ -870,11 +870,11 @@ class FormEntryUGD extends Component
     private function setShiftnCurrentDate(): void
     {
         // dd/mm/yyyy hh24:mi:ss
-        $this->dataDaftarUgd['rjDate'] = $this->dataDaftarUgd['rjDate'] ? $this->dataDaftarUgd['rjDate'] : Carbon::now()->format('d/m/Y H:i:s');
+        $this->dataDaftarUgd['rjDate'] = $this->dataDaftarUgd['rjDate'] ? $this->dataDaftarUgd['rjDate'] : Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
 
         // shift
         $findShift = DB::table('rstxn_shiftctls')->select('shift')
-            ->whereRaw("'" . Carbon::now()->format('H:i:s') . "' between
+            ->whereRaw("'" . Carbon::now(env('APP_TIMEZONE'))->format('H:i:s') . "' between
             shift_start and shift_end")
             ->first();
         $this->dataDaftarUgd['shift'] = $this->dataDaftarUgd['shift']
@@ -1062,7 +1062,7 @@ class FormEntryUGD extends Component
 
         // resert validation
         $this->resetValidation();
-        // resert input 
+        // resert input
         $this->reset(
             [
                 'dataPasienLovSearch',
@@ -1099,7 +1099,7 @@ class FormEntryUGD extends Component
         $datadaftarugd_json = isset($findData->datadaftarugd_json) ? $findData->datadaftarugd_json : null;
         // if meta_data_pasien_json = null
         // then cari Data Pasien By Key Collection (exception when no data found)
-        // 
+        //
         // else json_decode
         if ($datadaftarugd_json) {
             $this->dataDaftarUgd = json_decode($findData->datadaftarugd_json, true);
@@ -1248,7 +1248,7 @@ class FormEntryUGD extends Component
         }
 
 
-        // 
+        //
 
         // return $findData;
     }
@@ -1314,7 +1314,7 @@ class FormEntryUGD extends Component
         $meta_data_pasien_json = isset($findData->meta_data_pasien_json) ? $findData->meta_data_pasien_json : null;
         // if meta_data_pasien_json = null
         // then cari Data Pasien By Key Collection (exception when no data found)
-        // 
+        //
         // else json_decode
         if ($meta_data_pasien_json == null) {
 
@@ -1544,7 +1544,7 @@ class FormEntryUGD extends Component
         // Variable Search
         $search = $this->dataDokterBPJSLovSearch;
 
-        // check LOV by dr_id rs id 
+        // check LOV by dr_id rs id
         $dataDokterBPJS = DB::table('rsmst_doctors')->select(
             'rsmst_doctors.dr_id as dr_id',
             'rsmst_doctors.dr_name as dr_name',
@@ -1681,7 +1681,7 @@ class FormEntryUGD extends Component
         // Variable Search
         $search = $this->dataDiagnosaBPJSLovSearch;
 
-        // check LOV by dr_id rs id 
+        // check LOV by dr_id rs id
         $dataDiagnosaBPJS = DB::table('rsmst_mstdiags')->select(
             'diag_id',
             'diag_desc',
@@ -1854,7 +1854,7 @@ class FormEntryUGD extends Component
                 $this->emit('toastr-success', 'CetakSEP');
 
                 return response()->streamDownload(
-                    fn () => print($pdfContent),
+                    fn() => print($pdfContent),
                     "filename.pdf"
                 );
             }

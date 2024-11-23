@@ -96,12 +96,12 @@ class EmrRJ extends Component
     private function settermyTopBarShiftandmyTopBarrefDate(): void
     {
         // dd/mm/yyyy hh24:mi:ss
-        $this->myTopBar['refDate'] = Carbon::now()->format('d/m/Y');
-        // dd(Carbon::now()->format('H:i:s'));
+        $this->myTopBar['refDate'] = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y');
+        // dd(Carbon::now(env('APP_TIMEZONE'))->format('H:i:s'));
 
         // shift
         $findShift = DB::table('rstxn_shiftctls')->select('shift')
-            ->whereRaw("'" . Carbon::now()->format('H:i:s') . "' between
+            ->whereRaw("'" . Carbon::now(env('APP_TIMEZONE'))->format('H:i:s') . "' between
              shift_start and shift_end")
             ->first();
         $this->myTopBar['refShiftId'] = isset($findShift->shift) && $findShift->shift ? $findShift->shift : 3;
@@ -383,7 +383,7 @@ class EmrRJ extends Component
 
         // ketika cek_waktu_masuk_poli kosong lalu update
         if (!$cek_waktu_masuk_poli) {
-            $waktuMasukPoli = Carbon::now()->format('d/m/Y H:i:s');
+            $waktuMasukPoli = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
 
             DB::table('rstxn_rjhdrs')
                 ->where('rj_no', $rjNo)
@@ -412,7 +412,7 @@ class EmrRJ extends Component
         $noBooking =  $this->dataDaftarPoliRJ['noBooking'];
 
 
-        $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4'], 'Asia/Jakarta')->timestamp * 1000; //waktu dalam timestamp milisecond
+        $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4'], env('APP_TIMEZONE'))->timestamp * 1000; //waktu dalam timestamp milisecond
         $this->pushDataTaskId($noBooking, 4, $waktu);
     }
 
@@ -421,7 +421,7 @@ class EmrRJ extends Component
     {
         $this->findData($rjNo);
 
-        $keluarPoli = Carbon::now()->format('d/m/Y H:i:s');
+        $keluarPoli = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
 
         // check task Id 4 sudah dilakukan atau belum
         if ($this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']) {
@@ -440,7 +440,7 @@ class EmrRJ extends Component
             $noBooking =  $this->dataDaftarPoliRJ['noBooking'];
 
 
-            $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5'], 'Asia/Jakarta')->timestamp * 1000; //waktu dalam timestamp milisecond
+            $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5'], env('APP_TIMEZONE'))->timestamp * 1000; //waktu dalam timestamp milisecond
             $this->pushDataTaskId($noBooking, 5, $waktu);
 
             $this->emit('toastr-success', "Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);

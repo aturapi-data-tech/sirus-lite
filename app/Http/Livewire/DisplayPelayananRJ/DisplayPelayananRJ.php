@@ -44,7 +44,7 @@ class DisplayPelayananRJ extends Component
     private function optionsshiftRjRef(): void
     {
         $findShift = DB::table('rstxn_shiftctls')->select('shift')
-            ->whereRaw("'" . Carbon::now()->format('H:i:s') . "' between shift_start and shift_end")
+            ->whereRaw("'" . Carbon::now(env('APP_TIMEZONE'))->format('H:i:s') . "' between shift_start and shift_end")
             ->first();
         $this->shiftRjRef['shiftId'] = isset($findShift->shift) && $findShift->shift ? $findShift->shift : 3;
         $this->shiftRjRef['shiftDesc'] = isset($findShift->shift) && $findShift->shift ? $findShift->shift : 3;
@@ -163,7 +163,7 @@ class DisplayPelayananRJ extends Component
     public function mount()
     {
         // set date
-        $this->dateRjRef = Carbon::now()->format('d/m/Y');
+        $this->dateRjRef = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y');
         // set Status
         $this->statusRjRef['statusId'] = 'A';
         // set shift

@@ -833,7 +833,7 @@ class RJskdp extends Component
 
             $this->dataDaftarPoliRJ['kontrol']['tglKontrol'] = $this->dataDaftarPoliRJ['kontrol']['tglKontrol']
                 ? $this->dataDaftarPoliRJ['kontrol']['tglKontrol']
-                : Carbon::now()->addDays(8)->format('d/m/Y');
+                : Carbon::now(env('APP_TIMEZONE'))->addDays(8)->format('d/m/Y');
             $this->dataDaftarPoliRJ['kontrol']['drKontrol'] = $this->dataDaftarPoliRJ['kontrol']['drKontrol']
                 ? $this->dataDaftarPoliRJ['kontrol']['drKontrol']
                 : $this->dataDaftarPoliRJ['drId'];
@@ -940,7 +940,7 @@ class RJskdp extends Component
             }
 
             // setDataKontrol
-            $this->dataDaftarPoliRJ['kontrol']['tglKontrol'] = $this->dataDaftarPoliRJ['kontrol']['tglKontrol'] ? $this->dataDaftarPoliRJ['kontrol']['tglKontrol'] : Carbon::now()->addDays(8)->format('d/m/Y');
+            $this->dataDaftarPoliRJ['kontrol']['tglKontrol'] = $this->dataDaftarPoliRJ['kontrol']['tglKontrol'] ? $this->dataDaftarPoliRJ['kontrol']['tglKontrol'] : Carbon::now(env('APP_TIMEZONE'))->addDays(8)->format('d/m/Y');
 
             $this->dataDaftarPoliRJ['kontrol']['drKontrol'] = $this->dataDaftarPoliRJ['kontrol']['drKontrol'] ? $this->dataDaftarPoliRJ['kontrol']['drKontrol'] : $dataDaftarPoliRJ->dr_id;
             $this->dataDaftarPoliRJ['kontrol']['drKontrolDesc'] = $this->dataDaftarPoliRJ['kontrol']['drKontrolDesc'] ? $this->dataDaftarPoliRJ['kontrol']['drKontrolDesc'] : $dataDaftarPoliRJ->dr_name;
@@ -955,7 +955,7 @@ class RJskdp extends Component
     // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
     // private function setDataPrimer(): void
     // {
-    //     $noKontrol = Carbon::now()->addDays(8)->format('dmY') . $this->dataDaftarPoliRJ['kontrol']['drKontrol'] . $this->dataDaftarPoliRJ['kontrol']['poliKontrol'];
+    //     $noKontrol = Carbon::now(env('APP_TIMEZONE'))->addDays(8)->format('dmY') . $this->dataDaftarPoliRJ['kontrol']['drKontrol'] . $this->dataDaftarPoliRJ['kontrol']['poliKontrol'];
     //     $this->dataDaftarPoliRJ['kontrol']['noKontrolRS'] =  $this->dataDaftarPoliRJ['kontrol']['noKontrolRS'] ? $this->dataDaftarPoliRJ['kontrol']['noKontrolRS'] : $noKontrol;
     // }
 

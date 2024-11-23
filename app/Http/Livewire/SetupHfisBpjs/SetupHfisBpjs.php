@@ -222,7 +222,7 @@ class SetupHfisBpjs extends Component
     // when new form instance
     public function mount()
     {
-        $this->dateRef = Carbon::now()->format('d/m/Y');
+        $this->dateRef = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y');
         $this->jadwal_dokter = [];
     }
 

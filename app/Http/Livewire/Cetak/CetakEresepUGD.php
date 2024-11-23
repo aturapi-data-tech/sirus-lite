@@ -187,8 +187,8 @@ class CetakEresepUGD extends Component
                 $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] = ($findData->sex == 'L') ? 'Laki-laki' : 'Perempuan';
                 $this->dataPasien['pasien']['tglLahir'] = $findData->birth_date;
 
-                $birthDate = $findData->birth_date ? $findData->birth_date : Carbon::now()->format('d/m/Y');
-                $this->dataPasien['pasien']['thn'] = Carbon::createFromFormat('d/m/Y', $birthDate)->diff(Carbon::now())->format('%y Thn, %m Bln %d Hr'); //$findData->thn;
+                $birthDate = $findData->birth_date ? $findData->birth_date : Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y');
+                $this->dataPasien['pasien']['thn'] = Carbon::createFromFormat('d/m/Y', $birthDate)->diff(Carbon::now(env('APP_TIMEZONE')))->format('%y Thn, %m Bln %d Hr'); //$findData->thn;
                 $this->dataPasien['pasien']['bln'] = $findData->bln;
                 $this->dataPasien['pasien']['hari'] = $findData->hari;
                 $this->dataPasien['pasien']['tempatLahir'] = $findData->birth_place;
@@ -296,8 +296,8 @@ class CetakEresepUGD extends Component
             // ubah data Pasien
             $this->dataPasien = json_decode($findData->meta_data_pasien_json, true);
             // replace thn to age
-            $birthDate = $this->dataPasien['pasien']['tglLahir'] ? $this->dataPasien['pasien']['tglLahir'] : Carbon::now()->format('d/m/Y');
-            $this->dataPasien['pasien']['thn'] = Carbon::createFromFormat('d/m/Y', $this->dataPasien['pasien']['tglLahir'])->diff(Carbon::now())->format('%y Thn, %m Bln %d Hr'); //$findData->thn;
+            $birthDate = $this->dataPasien['pasien']['tglLahir'] ? $this->dataPasien['pasien']['tglLahir'] : Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y');
+            $this->dataPasien['pasien']['thn'] = Carbon::createFromFormat('d/m/Y', $this->dataPasien['pasien']['tglLahir'])->diff(Carbon::now(env('APP_TIMEZONE')))->format('%y Thn, %m Bln %d Hr'); //$findData->thn;
         }
     }
 

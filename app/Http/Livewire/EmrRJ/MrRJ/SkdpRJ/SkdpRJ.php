@@ -308,7 +308,7 @@ class SkdpRJ extends Component
             // jika kontrol tidak ditemukan tambah variable kontrol pda array
             if (isset($this->dataDaftarPoliRJ['kontrol']) == false) {
 
-                $this->dataDaftarPoliRJ['kontrol']['tglKontrol'] =  Carbon::now()->addDays(8)->format('d/m/Y');
+                $this->dataDaftarPoliRJ['kontrol']['tglKontrol'] =  Carbon::now(env('APP_TIMEZONE'))->addDays(8)->format('d/m/Y');
                 $this->dataDaftarPoliRJ['kontrol']['drKontrol'] =  (isset($this->dataDaftarPoliRJ['drId'])
                     ? ($this->dataDaftarPoliRJ['drId']
                         ? $this->dataDaftarPoliRJ['drId']
@@ -427,7 +427,7 @@ class SkdpRJ extends Component
             // jika kontrol tidak ditemukan tambah variable kontrol pda array
             if (isset($this->dataDaftarPoliRJ['kontrol']) == false) {
 
-                $this->dataDaftarPoliRJ['kontrol']['tglKontrol'] =  Carbon::now()->addDays(8)->format('d/m/Y');
+                $this->dataDaftarPoliRJ['kontrol']['tglKontrol'] =  Carbon::now(env('APP_TIMEZONE'))->addDays(8)->format('d/m/Y');
                 $this->dataDaftarPoliRJ['kontrol']['drKontrol'] =  (isset($this->dataDaftarPoliRJ['drId'])
                     ? ($this->dataDaftarPoliRJ['drId']
                         ? $this->dataDaftarPoliRJ['drId']
@@ -470,7 +470,7 @@ class SkdpRJ extends Component
     // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
     private function setDataPrimer(): void
     {
-        $noKontrol = Carbon::now()->addDays(8)->format('dmY') . $this->dataDaftarPoliRJ['kontrol']['drKontrol'] . $this->dataDaftarPoliRJ['kontrol']['poliKontrol'];
+        $noKontrol = Carbon::now(env('APP_TIMEZONE'))->addDays(8)->format('dmY') . $this->dataDaftarPoliRJ['kontrol']['drKontrol'] . $this->dataDaftarPoliRJ['kontrol']['poliKontrol'];
         $this->dataDaftarPoliRJ['kontrol']['noKontrolRS'] = (isset($this->dataDaftarPoliRJ['kontrol']['noKontrolRS'])
             ? ($this->dataDaftarPoliRJ['kontrol']['noKontrolRS']
                 ? $this->dataDaftarPoliRJ['kontrol']['noKontrolRS']
@@ -555,7 +555,7 @@ class SkdpRJ extends Component
                 $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminId'] = ($findData->sex == 'L') ? 1 : 2;
                 $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] = ($findData->sex == 'L') ? 'Laki-laki' : 'Perempuan';
                 $this->dataPasien['pasien']['tglLahir'] = $findData->birth_date;
-                $this->dataPasien['pasien']['thn'] = Carbon::createFromFormat('d/m/Y', $findData->birth_date)->diff(Carbon::now())->format('%y Thn, %m Bln %d Hr'); //$findData->thn;
+                $this->dataPasien['pasien']['thn'] = Carbon::createFromFormat('d/m/Y', $findData->birth_date)->diff(Carbon::now(env('APP_TIMEZONE')))->format('%y Thn, %m Bln %d Hr'); //$findData->thn;
                 $this->dataPasien['pasien']['bln'] = $findData->bln;
                 $this->dataPasien['pasien']['hari'] = $findData->hari;
                 $this->dataPasien['pasien']['tempatLahir'] = $findData->birth_place;
@@ -662,7 +662,7 @@ class SkdpRJ extends Component
         } else {
             // ubah data Pasien
             $this->dataPasien = json_decode($findData->meta_data_pasien_json, true);
-            $this->dataPasien['pasien']['thn'] = Carbon::createFromFormat('d/m/Y', $this->dataPasien['pasien']['tglLahir'])->diff(Carbon::now())->format('%y Thn, %m Bln %d Hr'); //$findData->thn;
+            $this->dataPasien['pasien']['thn'] = Carbon::createFromFormat('d/m/Y', $this->dataPasien['pasien']['tglLahir'])->diff(Carbon::now(env('APP_TIMEZONE')))->format('%y Thn, %m Bln %d Hr'); //$findData->thn;
 
 
         }

@@ -388,14 +388,14 @@ class AssessmentDokterAnamnesa extends Component
         $waktu_pasien_datang = (isset($this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['jamDatang']) ?
             ($this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['jamDatang'] ?
                 $this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['jamDatang']
-                : Carbon::now()->format('d/m/Y H:i:s'))
-            : Carbon::now()->format('d/m/Y H:i:s'));
+                : Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'))
+            : Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'));
 
         $waktu_pasien_dilayani = (isset($this->dataDaftarUgd['perencanaan']['pengkajianMedis']['waktuPemeriksaan']) ?
             ($this->dataDaftarUgd['perencanaan']['pengkajianMedis']['waktuPemeriksaan'] ?
                 $this->dataDaftarUgd['perencanaan']['pengkajianMedis']['waktuPemeriksaan']
-                : Carbon::now()->format('d/m/Y H:i:s'))
-            : Carbon::now()->format('d/m/Y H:i:s'));
+                : Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'))
+            : Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'));
 
         // update table trnsaksi
         DB::table('rstxn_ugdhdrs')

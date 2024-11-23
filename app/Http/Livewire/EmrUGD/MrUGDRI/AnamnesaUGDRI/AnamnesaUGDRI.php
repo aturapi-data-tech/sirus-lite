@@ -384,14 +384,14 @@ class AnamnesaUGDRI extends Component
         $waktu_pasien_datang = (isset($this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['jamDatang']) ?
             ($this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['jamDatang'] ?
                 $this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['jamDatang']
-                : Carbon::now()->format('d/m/Y H:i:s'))
-            : Carbon::now()->format('d/m/Y H:i:s'));
+                : Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'))
+            : Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'));
 
         $waktu_pasien_dilayani = (isset($this->dataDaftarUgd['perencanaan']['pengkajianMedis']['waktuPemeriksaan']) ?
             ($this->dataDaftarUgd['perencanaan']['pengkajianMedis']['waktuPemeriksaan'] ?
                 $this->dataDaftarUgd['perencanaan']['pengkajianMedis']['waktuPemeriksaan']
-                : Carbon::now()->format('d/m/Y H:i:s'))
-            : Carbon::now()->format('d/m/Y H:i:s'));
+                : Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'))
+            : Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'));
 
         // update table trnsaksi
         DB::table('rstxn_ugdhdrs')
@@ -423,7 +423,7 @@ class AnamnesaUGDRI extends Component
         $datadaftarugd_json = isset($findData->datadaftarugd_json) ? $findData->datadaftarugd_json : null;
         // if meta_data_pasien_json = null
         // then cari Data Pasien By Key Collection (exception when no data found)
-        // 
+        //
         // else json_decode
         if ($datadaftarugd_json) {
             $this->dataDaftarUgd = json_decode($findData->datadaftarugd_json, true);

@@ -221,12 +221,12 @@ class TelaahResepRJ extends Component
     private function settermyTopBarShiftandmyTopBarrefDate(): void
     {
         // dd/mm/yyyy hh24:mi:ss
-        $this->myTopBar['refDate'] = Carbon::now()->format('d/m/Y');
-        // dd(Carbon::now()->format('H:i:s'));
+        $this->myTopBar['refDate'] = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y');
+        // dd(Carbon::now(env('APP_TIMEZONE'))->format('H:i:s'));
 
         // shift
         $findShift = DB::table('rstxn_shiftctls')->select('shift')
-            ->whereRaw("'" . Carbon::now()->format('H:i:s') . "' between
+            ->whereRaw("'" . Carbon::now(env('APP_TIMEZONE'))->format('H:i:s') . "' between
              shift_start and shift_end")
             ->first();
         $this->myTopBar['refShiftId'] = isset($findShift->shift) && $findShift->shift ? $findShift->shift : 3;
@@ -469,7 +469,7 @@ class TelaahResepRJ extends Component
             if (isset($this->dataDaftarPoliRJ['telaahResep']['penanggungJawab']) == false) {
                 $this->dataDaftarPoliRJ['telaahResep']['penanggungJawab'] = [
                     'userLog' => auth()->user()->myuser_name,
-                    'userLogDate' => Carbon::now()->format('d/m/Y H:i:s'),
+                    'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'),
                     'userLogCode' => auth()->user()->myuser_code
                 ];
 
@@ -496,7 +496,7 @@ class TelaahResepRJ extends Component
             if (isset($this->dataDaftarPoliRJ['telaahObat']['penanggungJawab']) == false) {
                 $this->dataDaftarPoliRJ['telaahObat']['penanggungJawab'] = [
                     'userLog' => auth()->user()->myuser_name,
-                    'userLogDate' => Carbon::now()->format('d/m/Y H:i:s'),
+                    'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'),
                     'userLogCode' => auth()->user()->myuser_code
                 ];
 
@@ -653,7 +653,7 @@ class TelaahResepRJ extends Component
     public function masukApotek($rjNo)
     {
         $this->findData($rjNo);
-        $masukApotek = Carbon::now()->format('d/m/Y H:i:s');
+        $masukApotek = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
 
         //////updateDB/////////////////////
         $sql = "select waktu_masuk_apt from rstxn_rjhdrs where rj_no=:rjNo";
@@ -751,7 +751,7 @@ class TelaahResepRJ extends Component
         // cari no Booking
 
         if ($this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6']) {
-            $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6'], 'Asia/Jakarta')->timestamp * 1000; //waktu dalam timestamp milisecond
+            $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6'], env('APP_TIMEZONE'))->timestamp * 1000; //waktu dalam timestamp milisecond
             $this->pushDataTaskId($noBooking, 6, $waktu);
         } else {
             $this->emit('toastr-error', "waktu Masuk Apotek kosong tidak dapat dikirim");
@@ -761,7 +761,7 @@ class TelaahResepRJ extends Component
     public function keluarApotek($rjNo)
     {
         $this->findData($rjNo);
-        $keluarApotek = Carbon::now()->format('d/m/Y H:i:s');
+        $keluarApotek = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
 
         //////updateDB/////////////////////
         $sql = "select waktu_selesai_pelayanan from rstxn_rjhdrs where rj_no=:rjNo";
@@ -803,7 +803,7 @@ class TelaahResepRJ extends Component
         $noBooking =  $this->dataDaftarPoliRJ['noBooking'];
 
         if ($this->dataDaftarPoliRJ['taskIdPelayanan']['taskId7']) {
-            $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId7'], 'Asia/Jakarta')->timestamp * 1000; //waktu dalam timestamp milisecond
+            $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId7'], env('APP_TIMEZONE'))->timestamp * 1000; //waktu dalam timestamp milisecond
             $this->pushDataTaskId($noBooking, 7, $waktu);
         } else {
             $this->emit('toastr-error', "waktu Keluar Apotek kosong tidak dapat dikirim");

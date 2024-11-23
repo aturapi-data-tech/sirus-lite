@@ -32,7 +32,7 @@ class Skdp extends Component
     // dataDaftarPoliRJ RJ
     public $dataDaftarPoliRJ = [];
 
-    // data SKDP / kontrol=>[] 
+    // data SKDP / kontrol=>[]
     public $kontrol = [
         'noKontrolRS' => "",
         'noSKDPBPJS' => "",
@@ -116,7 +116,7 @@ class Skdp extends Component
         // Variable Search
         $search = $this->dataDokterLovSearch;
 
-        // check LOV by dr_id rs id 
+        // check LOV by dr_id rs id
         $dataDokter = DB::table('rsmst_doctors')->select(
             'rsmst_doctors.dr_id as dr_id',
             'rsmst_doctors.dr_name as dr_name',
@@ -309,7 +309,7 @@ class Skdp extends Component
 
             $this->dataDaftarPoliRJ['kontrol']['tglKontrol'] = $this->dataDaftarPoliRJ['kontrol']['tglKontrol']
                 ? $this->dataDaftarPoliRJ['kontrol']['tglKontrol']
-                : Carbon::now()->addDays(8)->format('d/m/Y');
+                : Carbon::now(env('APP_TIMEZONE'))->addDays(8)->format('d/m/Y');
             $this->dataDaftarPoliRJ['kontrol']['drKontrol'] = $this->dataDaftarPoliRJ['kontrol']['drKontrol']
                 ? $this->dataDaftarPoliRJ['kontrol']['drKontrol']
                 : $this->dataDaftarPoliRJ['drId'];
@@ -425,7 +425,7 @@ class Skdp extends Component
             // setDataKontrol
             $this->dataDaftarPoliRJ['kontrol']['tglKontrol'] = $this->dataDaftarPoliRJ['kontrol']['tglKontrol']
                 ? $this->dataDaftarPoliRJ['kontrol']['tglKontrol']
-                : Carbon::now()->addDays(8)->format('d/m/Y');
+                : Carbon::now(env('APP_TIMEZONE'))->addDays(8)->format('d/m/Y');
             $this->dataDaftarPoliRJ['kontrol']['drKontrol'] = $this->dataDaftarPoliRJ['kontrol']['drKontrol']
                 ? $this->dataDaftarPoliRJ['kontrol']['drKontrol']
                 : $dataDaftarPoliRJ->dr_id;
@@ -453,7 +453,7 @@ class Skdp extends Component
     // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
     private function setDataPrimer(): void
     {
-        $noKontrol = Carbon::now()->addDays(8)->format('dmY') . $this->dataDaftarPoliRJ['kontrol']['drKontrol'] . $this->dataDaftarPoliRJ['kontrol']['poliKontrol'];
+        $noKontrol = Carbon::now(env('APP_TIMEZONE'))->addDays(8)->format('dmY') . $this->dataDaftarPoliRJ['kontrol']['drKontrol'] . $this->dataDaftarPoliRJ['kontrol']['poliKontrol'];
         $this->dataDaftarPoliRJ['kontrol']['noKontrolRS'] =  $this->dataDaftarPoliRJ['kontrol']['noKontrolRS'] ? $this->dataDaftarPoliRJ['kontrol']['noKontrolRS'] : $noKontrol;
     }
 

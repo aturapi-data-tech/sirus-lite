@@ -115,7 +115,7 @@ class PendaftaranMandiriPasienPoli extends Component
             b.dr_name as dr_name,
             nvl(a.sc_poli_ket,'-') as sc_poli_ket,
             a.poli_id as poli_id,
-            c.poli_desc as poli_desc 
+            c.poli_desc as poli_desc
 
             from scmst_scpolis a, rsmst_doctors b,rsmst_polis c
             where day_id='$value'
@@ -141,8 +141,8 @@ class PendaftaranMandiriPasienPoli extends Component
                 $this->steperStatus++;
 
                 // cariHariIni
-                $hariIniHariApa = strtoupper(Carbon::now()->isoFormat('dddd'));
-                $sql = "select day_id 
+                $hariIniHariApa = strtoupper(Carbon::now(env('APP_TIMEZONE'))->isoFormat('dddd'));
+                $sql = "select day_id
                 from scmst_scdays
                 where day_desc=:dayDesc";
                 $findDataHariIni = DB::scalar($sql, ["dayDesc" => $hariIniHariApa]);
@@ -221,12 +221,12 @@ class PendaftaranMandiriPasienPoli extends Component
     public function rjNoMax()
     {
         // SetTanggal
-        $this->dataDaftarPasienPoli["rjDate"] = Carbon::now();
-        $tglNoantrian = Carbon::now()->format('dmY');
+        $this->dataDaftarPasienPoli["rjDate"] = Carbon::now(env('APP_TIMEZONE'));
+        $tglNoantrian = Carbon::now(env('APP_TIMEZONE'))->format('dmY');
 
 
         //SetNoBooking
-        $this->dataDaftarPasienPoli["noBooking"] = Carbon::now()->format('YmdHis') . 'RS';
+        $this->dataDaftarPasienPoli["noBooking"] = Carbon::now(env('APP_TIMEZONE'))->format('YmdHis') . 'RS';
 
         // rjNoMax
         $sql = "select nvl(max(rj_no)+1,1) rjno_max from rstxn_rjhdrs";
@@ -234,8 +234,8 @@ class PendaftaranMandiriPasienPoli extends Component
         $this->dataDaftarPasienPoli["rjNo"] = $findDataRjNo;
 
         // noUrutAntrian
-        $sql = "select count(*) no_antrian 
-		from rstxn_rjhdrs 
+        $sql = "select count(*) no_antrian
+		from rstxn_rjhdrs
         where dr_id=:drId
         and to_char(rj_date,'ddmmyyyy')=:tgl
         and klaim_id!='KR'";
@@ -286,7 +286,7 @@ class PendaftaranMandiriPasienPoli extends Component
         $this->emit('toastr-success', "Data sudah tersimpan.");
 
         return response()->streamDownload(
-            fn () => print($pdfContent),
+            fn() => print($pdfContent),
             "filename.pdf"
         );
     }
