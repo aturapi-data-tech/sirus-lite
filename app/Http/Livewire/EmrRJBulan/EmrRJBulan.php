@@ -243,10 +243,11 @@ class EmrRJBulan extends Component
                 ->orWhere(DB::raw('upper(reg_no)'), 'like', '%' . strtoupper($mySearch) . '%')
                 ->orWhere(DB::raw('upper(dr_name)'), 'like', '%' . strtoupper($mySearch) . '%');
         })
-            ->orderBy('dr_name',  'asc')
+            ->orderBy('rj_date1',  'desc')
             ->orderBy('shift',  'asc')
             ->orderBy('no_antrian',  'desc')
-            ->orderBy('rj_date1',  'desc');
+            ->orderBy('dr_name',  'asc')
+        ;
 
         ////////////////////////////////////////////////
         // end Query
