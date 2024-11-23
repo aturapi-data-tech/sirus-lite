@@ -630,7 +630,7 @@
                 <tbody>
 
                     @inject('carbon', 'Carbon\Carbon')
-                    <td class="w-1/3 ">
+                    <td class="w-1/4 ">
                         <div class ="text-center">
                             <span>
                                 Tulungagung,{{ isset($dataDaftarPoliRJ['rjDate'])
@@ -676,7 +676,7 @@
 
 
 
-                    <td class="w-1/3 align-text-bottom">
+                    <td class="w-1/4 align-text-bottom">
                         <div class ="text-center">
                             <span>
                                 {{ 'Telaah Resep' }}
@@ -707,7 +707,7 @@
                         </div>
                     </td>
 
-                    <td class="w-1/3 align-text-bottom">
+                    <td class="w-1/4 align-text-bottom">
                         <div class ="text-center">
                             <span>
                                 {{ 'Telaah Obat' }}
@@ -735,6 +735,16 @@
 
 
 
+                        </div>
+                    </td>
+
+                    <td class="w-1/4 align-text-bottom">
+                        <div class ="text-center">
+                            <span>
+                                {{ 'ttd Pasien' }}
+                            </span>
+                            <br>
+                            <br>
                         </div>
                     </td>
 
