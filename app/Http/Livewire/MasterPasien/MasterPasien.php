@@ -1598,7 +1598,7 @@ class MasterPasien extends Component
                         $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminId'] = ($CaridataVclaim['sex'] == 'L') ? 1 : 2;
                         $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] = ($CaridataVclaim['sex'] == 'L') ? 'Laki-laki' : 'Perempuan';
 
-                        $this->dataPasien['pasien']['tglLahir'] = Carbon::createFromFormat('Y-m-d', $CaridataVclaim['tglLahir'])->format('d/m/Y');
+                        $this->dataPasien['pasien']['tglLahir'] = Carbon::createFromFormat('Y-m-d', $CaridataVclaim['tglLahir'], env('APP_TIMEZONE'))->format('d/m/Y');
 
                         $this->emit('toastr-success', $CaridataVclaim['nama'] . ' ' . $CaridataVclaim['nik']);
                     } else {

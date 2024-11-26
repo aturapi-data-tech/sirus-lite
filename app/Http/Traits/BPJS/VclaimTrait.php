@@ -567,7 +567,7 @@ trait VclaimTrait
         $r = [
             "request" => [
                 "noSEP" => $kontrol['noSEP'],
-                "tglRencanaKontrol" => Carbon::createFromFormat('d/m/Y', $kontrol['tglKontrol'])->format('Y-m-d'),
+                "tglRencanaKontrol" => Carbon::createFromFormat('d/m/Y', $kontrol['tglKontrol'], env('APP_TIMEZONE'))->format('Y-m-d'),
                 "poliKontrol" => $kontrol['poliKontrolBPJS'],
                 "kodeDokter" => $kontrol['drKontrolBPJS'],
                 "user" =>  'Sirus',
@@ -621,7 +621,7 @@ trait VclaimTrait
             "request" => [
                 "request.noSuratKontrol" => $kontrol['noSKDPBPJS'],
                 "noSEP" => $kontrol['noSEP'],
-                "tglRencanaKontrol" => Carbon::createFromFormat('d/m/Y', $kontrol['tglKontrol'])->format('Y-m-d'),
+                "tglRencanaKontrol" => Carbon::createFromFormat('d/m/Y', $kontrol['tglKontrol'], env('APP_TIMEZONE'))->format('Y-m-d'),
                 "poliKontrol" => $kontrol['poliKontrolBPJS'],
                 "kodeDokter" => $kontrol['drKontrolBPJS'],
                 "user" =>  'Sirus',

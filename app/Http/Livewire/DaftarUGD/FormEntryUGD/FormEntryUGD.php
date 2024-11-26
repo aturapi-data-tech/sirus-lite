@@ -776,7 +776,7 @@ class FormEntryUGD extends Component
             // fungsi dasar untuk memperbaiki data EMR
             $cekDoblePendaftaran = DB::table('rsview_ugdkasir')
                 ->where('rj_status', '!=', 'F')
-                ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarUgd['rjDate'])->format('d/m/Y'))
+                ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarUgd['rjDate'], env('APP_TIMEZONE'))->format('d/m/Y'))
                 ->where("reg_no", '=', $this->dataDaftarUgd['regNo'])
                 ->count();
 
@@ -853,7 +853,7 @@ class FormEntryUGD extends Component
             // proses antrian
             if ($this->dataDaftarUgd['klaimId'] != 'KR') {
                 $noUrutAntrian = DB::scalar($sql, [
-                    "tgl" => Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarUgd['rjDate'])->format('dmY'),
+                    "tgl" => Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarUgd['rjDate'], env('APP_TIMEZONE'))->format('dmY'),
                     "drId" => $this->dataDaftarUgd['drId']
                 ]);
 
@@ -1279,7 +1279,7 @@ class FormEntryUGD extends Component
                 $this->formRujukanRefBPJSStatus = true;
             } else {
 
-                $tanggal = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarUgd['rjDate'])->format('Y-m-d');
+                $tanggal = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarUgd['rjDate'], env('APP_TIMEZONE'))->format('Y-m-d');
                 $this->pesertaNomorKartu($this->dataPasien['pasien']['identitas']['idbpjs'], $tanggal);
             }
         }
@@ -1448,7 +1448,7 @@ class FormEntryUGD extends Component
             "request" =>  [
                 "t_sep" =>  [
                     "noKartu" => "" . $dataRefPeserta['peserta']['noKartu'] . "",
-                    "tglSep" => "" . Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarUgd['rjDate'])->format('Y-m-d') . "", //Y-m-d =tgl rj
+                    "tglSep" => "" . Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarUgd['rjDate'], env('APP_TIMEZONE'))->format('Y-m-d') . "", //Y-m-d =tgl rj
                     "ppkPelayanan" => "0184R006", //ppk rs
                     "jnsPelayanan" => "2", // {jenis pelayanan = 1. r.inap 2. r.jalan}
                     "klsRawat" =>  [
@@ -1462,7 +1462,7 @@ class FormEntryUGD extends Component
                     "rujukan" =>  [
                         "asalRujukan" => "2", //{asal rujukan ->1.Faskes 1, 2. Faskes 2(RS)} Post inap asal rujukan 2
                         "asalRujukanNama" => "Faskes Tingkat 2 RS ", //{asal rujukan ->1.Faskes 1, 2. Faskes 2(RS)}
-                        "tglRujukan" => "" . Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarUgd['rjDate'])->format('Y-m-d') . "", //Y-m-d
+                        "tglRujukan" => "" . Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarUgd['rjDate'], env('APP_TIMEZONE'))->format('Y-m-d') . "", //Y-m-d
                         "noRujukan" => "" . '' . "",
                         "ppkRujukan" => "" . '0184R006' . "", //{kode faskes rujukam -> baca di referensi faskes}
                         "ppkRujukanNama" => "" . 'MADINAH' . "", //{kode faskes rujukam -> baca di referensi faskes}

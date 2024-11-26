@@ -1058,7 +1058,7 @@ class DaftarRJ extends Component
             // proses antrian
             if ($this->dataDaftarPoliRJ['klaimId'] != 'KR') {
                 $noUrutAntrian = DB::scalar($sql, [
-                    "tgl" => Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'])->format('dmY'),
+                    "tgl" => Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'], env('APP_TIMEZONE'))->format('dmY'),
                     "drId" => $this->dataDaftarPoliRJ['drId']
                 ]);
 
@@ -1196,7 +1196,7 @@ class DaftarRJ extends Component
                 } else if ($this->JenisKlaim['JenisKlaimId'] == 'JM' && $this->JenisKunjungan['JenisKunjunganId'] == 3) {
                     // if jenis klaim BPJS dan Kunjungan = Kontrol (3) / Post Inap
                     if ($this->dataDaftarPoliRJ['postInap']) {
-                        $tanggal = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'])->format('Y-m-d');
+                        $tanggal = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'], env('APP_TIMEZONE'))->format('Y-m-d');
                         $this->pesertaNomorKartu($this->dataPasien['pasien']['identitas']['idbpjs'], $tanggal);
                     } else {
                         // if jenis klaim BPJS dan Kunjungan = Kontrol (3)
@@ -1696,7 +1696,7 @@ class DaftarRJ extends Component
                 "namapoli" => $this->dataDaftarPoliRJ['poliDesc'],
                 "pasienbaru" => 0,
                 "norm" => $this->dataDaftarPoliRJ['regNo'],
-                "tanggalperiksa" => Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'])->format('Y-m-d'),
+                "tanggalperiksa" => Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'], env('APP_TIMEZONE'))->format('Y-m-d'),
                 "kodedokter" => $this->dataDaftarPoliRJ['kddrbpjs'] ? $this->dataDaftarPoliRJ['kddrbpjs'] : $this->dataDaftarPoliRJ['drId'], //if Null dridRS
                 "namadokter" => $this->dataDaftarPoliRJ['drDesc'],
                 "jampraktek" => $jampraktek,
@@ -1794,9 +1794,9 @@ class DaftarRJ extends Component
             // dd($this->dataPasien['pasien']['regDate']);
             try {
                 if (
-                    Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'])->format('Ymd')
+                    Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'], env('APP_TIMEZONE'))->format('Ymd')
                     ===
-                    Carbon::createFromFormat('d/m/Y H:i:s', $this->dataPasien['pasien']['regDate'])->format('Ymd')
+                    Carbon::createFromFormat('d/m/Y H:i:s', $this->dataPasien['pasien']['regDate'], env('APP_TIMEZONE'))->format('Ymd')
                 ) {
                     // taskId 1
                     $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId1'] = $this->dataPasien['pasien']['regDate'];
@@ -2141,7 +2141,7 @@ class DaftarRJ extends Component
             "request" =>  [
                 "t_sep" =>  [
                     "noKartu" => "" . $dataRefBPJSLov['peserta']['noKartu'] . "",
-                    "tglSep" => "" . Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'])->format('Y-m-d') . "", //Y-m-d =tgl rj
+                    "tglSep" => "" . Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'], env('APP_TIMEZONE'))->format('Y-m-d') . "", //Y-m-d =tgl rj
                     "ppkPelayanan" => "0184R006", //ppk rs
                     "jnsPelayanan" => "" . $dataRefBPJSLov['pelayanan']['kode'] . "", // {jenis pelayanan = 1. r.inap 2. r.jalan}
                     "klsRawat" =>  [
@@ -2235,7 +2235,7 @@ class DaftarRJ extends Component
             "request" =>  [
                 "t_sep" =>  [
                     "noKartu" => "" . $dataRefPeserta['peserta']['noKartu'] . "",
-                    "tglSep" => "" . Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'])->format('Y-m-d') . "", //Y-m-d =tgl rj
+                    "tglSep" => "" . Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'], env('APP_TIMEZONE'))->format('Y-m-d') . "", //Y-m-d =tgl rj
                     "ppkPelayanan" => "0184R006", //ppk rs
                     "jnsPelayanan" => "2", // {jenis pelayanan = 1. r.inap 2. r.jalan}
                     "klsRawat" =>  [
@@ -2249,7 +2249,7 @@ class DaftarRJ extends Component
                     "rujukan" =>  [
                         "asalRujukan" => "2", //{asal rujukan ->1.Faskes 1, 2. Faskes 2(RS)} Post inap asal rujukan 2
                         "asalRujukanNama" => "Faskes Tingkat 2 RS ", //{asal rujukan ->1.Faskes 1, 2. Faskes 2(RS)}
-                        "tglRujukan" => "" . Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'])->format('Y-m-d') . "", //Y-m-d
+                        "tglRujukan" => "" . Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'], env('APP_TIMEZONE'))->format('Y-m-d') . "", //Y-m-d
                         "noRujukan" => "" . '' . "",
                         "ppkRujukan" => "" . '0184R006' . "", //{kode faskes rujukam -> baca di referensi faskes}
                         "ppkRujukanNama" => "" . 'MADINAH' . "", //{kode faskes rujukam -> baca di referensi faskes}
