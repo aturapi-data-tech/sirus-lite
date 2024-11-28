@@ -95,7 +95,7 @@ class EmrRJHari extends Component
                 'dr_id',
                 'dr_name',
             )
-            ->where(DB::raw("to_char(rj_date,'mm/yyyy')"), '=', $myRefdate)
+            ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $myRefdate)
             ->groupBy('dr_id')
             ->groupBy('dr_name')
             ->orderBy('dr_name', 'desc')
