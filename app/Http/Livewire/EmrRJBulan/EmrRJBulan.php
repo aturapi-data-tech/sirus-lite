@@ -179,6 +179,66 @@ class EmrRJBulan extends Component
         }
     }
 
+
+    public function uploadSepRJGrid($txnNo = null)
+    {
+        $dataDaftarTxn = $this->findDataRJ($txnNo)['dataDaftarRJ'];
+        if (!empty($dataDaftarTxn['sep']['resSep'])) {
+
+            // cetak PDF
+            $data = [
+                'data' => $dataDaftarTxn['sep']['resSep'],
+                'reqData' => $dataDaftarTxn['sep']['reqSep'],
+
+            ];
+
+            $pdfContent = PDF::loadView('livewire.daftar-r-j.cetak-sep', $data)->output();
+            $filename = Carbon::now(env('APP_TIMEZONE'))->format('dmYhis');
+            $filePath = 'bpjs/' . $filename . '.pdf'; // Adjust the path as needed
+
+
+            $cekFile = DB::table('rstxn_rjuploadbpjses')
+                ->where('rj_no', $txnNo)
+                ->where('seq_file', 1)
+                ->first();
+
+            if ($cekFile) {
+                Storage::disk('local')->delete('bpjs/' . $cekFile->uploadbpjs);
+                Storage::disk('local')->put($filePath, $pdfContent);
+                if (Storage::disk('local')->exists($filePath)) {
+                    DB::table('rstxn_rjuploadbpjses')
+                        ->where('rj_no', $txnNo)
+                        ->where('uploadbpjs', $cekFile->uploadbpjs)
+                        ->where('seq_file', 1)
+                        ->update([
+                            'uploadbpjs' => $filename . '.pdf',
+                            'rj_no' => $txnNo,
+                            'jenis_file' => 'pdf'
+                        ]);
+                    $this->emit('toastr-success', "Data berhasil diupdate " . $cekFile->uploadbpjs);
+                } else {
+                    $this->emit('toastr-error', "Data tidak berhasil diupdate " . $cekFile->uploadbpjs);
+                }
+            } else {
+                Storage::disk('local')->put($filePath, $pdfContent);
+                if (Storage::disk('local')->exists($filePath)) {
+                    DB::table('rstxn_rjuploadbpjses')
+                        ->insert([
+                            'seq_file' => 1,
+                            'uploadbpjs' => $filename . '.pdf',
+                            'rj_no' => $txnNo,
+                            'jenis_file' => 'pdf'
+                        ]);
+                    $this->emit('toastr-success', "Data berhasil diupload " . $filename . '.pdf');
+                } else {
+                    $this->emit('toastr-error', "Data tidak berhasil diupdate " . $filename . '.pdf');
+                }
+            }
+        } else {
+            $this->emit('toastr-error', "Data SEP Tidak ditemukan");
+        }
+    }
+
     // when new form instance
     public function mount()
     {

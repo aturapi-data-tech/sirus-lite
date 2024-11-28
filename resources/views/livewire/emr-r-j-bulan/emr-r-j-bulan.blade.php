@@ -265,23 +265,47 @@
 
 
                                 <div class="inline-flex">
-                                    @if ($myQData->rjuploadbpjs_rm_count)
-                                        <x-light-button
-                                            wire:click.prevent="uploadRekamMedisRJGrid('{{ $myQData->rj_no }}')"
-                                            type="button" wire:loading.remove>
-                                            Upload Resume Medis
-                                        </x-light-button>
-                                    @else
+                                    @if (!$myQData->rjuploadbpjs_rm_count)
                                         <x-primary-button
                                             wire:click.prevent="uploadRekamMedisRJGrid('{{ $myQData->rj_no }}')"
                                             type="button" wire:loading.remove>
-                                            Update Resume Medis
+                                            Upload Resume Medis
                                         </x-primary-button>
+                                    @else
+                                        <x-light-button
+                                            wire:click.prevent="uploadRekamMedisRJGrid('{{ $myQData->rj_no }}')"
+                                            type="button" wire:loading.remove>
+                                            Update Resume Medis
+                                        </x-light-button>
                                     @endif
                                     <div wire:loading wire:target="uploadRekamMedisRJGrid">
                                         <x-loading />
                                     </div>
 
+                                </div>
+
+                                <div class="inline-flex">
+                                    @if (!$myQData->rjuploadbpjs_sep_count)
+                                        <x-primary-button
+                                            wire:click.prevent="uploadSepRJGrid('{{ $myQData->rj_no }}')"
+                                            type="button" wire:loading.remove>
+                                            Upload SEP
+                                        </x-primary-button>
+                                    @else
+                                        <x-light-button wire:click.prevent="uploadSepRJGrid('{{ $myQData->rj_no }}')"
+                                            type="button" wire:loading.remove>
+                                            Update SEP
+                                        </x-light-button>
+                                    @endif
+                                    <div wire:loading wire:target="uploadSepRJGrid">
+                                        <x-loading />
+                                    </div>
+                                    <div>
+                                        {{ $myQData->rjuploadbpjs_sep_count }}
+                                        {{ $myQData->rjuploadbpjs_rm_count }}
+                                        {{ $myQData->rjuploadbpjs_skdp_count }}
+
+                                    </div>
                                 </div>
 
                             </td>
