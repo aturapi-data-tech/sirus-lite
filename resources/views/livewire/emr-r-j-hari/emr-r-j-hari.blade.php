@@ -252,6 +252,19 @@
                                     <div class="font-normal">
                                         {{ $myQData->vno_sep }}
                                     </div>
+                                    <div class="flex my-2 space-x-2">
+                                        @if ($myQData->lab_status)
+                                            <x-badge :badgecolor="__('default')">
+                                                {{ 'Laborat' }}
+                                            </x-badge>
+                                        @endif
+
+                                        @if ($myQData->rad_status)
+                                            <x-badge :badgecolor="__('default')">
+                                                {{ 'Radiologi' }}
+                                            </x-badge>
+                                        @endif
+                                    </div>
                                 </div>
                             </td>
 
@@ -282,6 +295,27 @@
                                         {{ '' . $myQData->nobooking }}
                                     </div>
 
+                                    <div class="mt-1 font-normal">
+                                        Tindak Lanjut :
+                                        {{ isset($datadaftar_json['perencanaan']['tindakLanjut']['tindakLanjut'])
+                                            ? ($datadaftar_json['perencanaan']['tindakLanjut']['tindakLanjut']
+                                                ? $datadaftar_json['perencanaan']['tindakLanjut']['tindakLanjut']
+                                                : '-')
+                                            : '-' }}
+                                        </br>
+                                        Tanggal :
+                                        {{ isset($datadaftar_json['kontrol']['tglKontrol'])
+                                            ? ($datadaftar_json['kontrol']['tglKontrol']
+                                                ? $datadaftar_json['kontrol']['tglKontrol']
+                                                : '-')
+                                            : '-' }}
+                                        </br>
+                                        {{ isset($datadaftar_json['kontrol']['noSKDPBPJS'])
+                                            ? ($datadaftar_json['kontrol']['noSKDPBPJS']
+                                                ? $datadaftar_json['kontrol']['noSKDPBPJS']
+                                                : '-')
+                                            : '-' }}
+                                    </div>
 
                                 </div>
                             </td>
@@ -326,12 +360,25 @@
                                     <div wire:loading wire:target="uploadSepRJGrid">
                                         <x-loading />
                                     </div>
-                                    <div>
-                                        {{ $myQData->rjuploadbpjs_sep_count }}
-                                        {{ $myQData->rjuploadbpjs_rm_count }}
-                                        {{ $myQData->rjuploadbpjs_skdp_count }}
+                                </div>
 
+                                <div class="inline-flex">
+                                    @if (!$myQData->rjuploadbpjs_skdp_count)
+                                        <x-primary-button
+                                            wire:click.prevent="uploadSkdpRJGrid('{{ $myQData->rj_no }}')"
+                                            type="button" wire:loading.remove>
+                                            Upload SKDP
+                                        </x-primary-button>
+                                    @else
+                                        <x-light-button wire:click.prevent="uploadSkdpRJGrid('{{ $myQData->rj_no }}')"
+                                            type="button" wire:loading.remove>
+                                            Update SKDP
+                                        </x-light-button>
+                                    @endif
+                                    <div wire:loading wire:target="uploadSkdpRJGrid">
+                                        <x-loading />
                                     </div>
+
                                 </div>
 
                             </td>

@@ -261,6 +261,82 @@ class EmrRJHari extends Component
         }
     }
 
+    public function uploadSkdpRJGrid($txnNo = null)
+    {
+        $dataDaftarTxn = $this->findDataRJ($txnNo)['dataDaftarRJ'];
+
+        // cek skdp rs->baru skdp bpjs terbit
+        if (!empty($dataDaftarTxn['kontrol']['noKontrolRS'])) {
+
+            $queryIdentitas = DB::table('rsmst_identitases')
+                ->select(
+                    'int_name',
+                    'int_phone1',
+                    'int_phone2',
+                    'int_fax',
+                    'int_address',
+                    'int_city',
+                )
+                ->first();
+            $dataPasien = $this->findDataMasterPasien($dataDaftarTxn['regNo']);
+
+            // cetak PDF
+            $data = [
+                'myQueryIdentitas' => $queryIdentitas,
+                'dataPasien' => $dataPasien,
+                'dataDaftarTxn' => $dataDaftarTxn,
+
+            ];
+
+            $pdfContent = PDF::loadView('livewire.emr-r-j.mr-r-j.skdp-r-j.cetak-skdp-rj', $data)->output();
+
+            $filename = Carbon::now(env('APP_TIMEZONE'))->format('dmYhis');
+            $filePath = 'bpjs/' . $filename . '.pdf'; // Adjust the path as needed
+
+
+            $cekFile = DB::table('rstxn_rjuploadbpjses')
+                ->where('rj_no', $txnNo)
+                ->where('seq_file', 4)
+                ->first();
+
+            if ($cekFile) {
+                Storage::disk('local')->delete('bpjs/' . $cekFile->uploadbpjs);
+                Storage::disk('local')->put($filePath, $pdfContent);
+                if (Storage::disk('local')->exists($filePath)) {
+                    DB::table('rstxn_rjuploadbpjses')
+                        ->where('rj_no', $txnNo)
+                        ->where('uploadbpjs', $cekFile->uploadbpjs)
+                        ->where('seq_file', 4)
+                        ->update([
+                            'uploadbpjs' => $filename . '.pdf',
+                            'rj_no' => $txnNo,
+                            'jenis_file' => 'pdf'
+                        ]);
+                    $this->emit('toastr-success', "Data berhasil diupdate " . $cekFile->uploadbpjs);
+                } else {
+                    $this->emit('toastr-error', "Data tidak berhasil diupdate " . $cekFile->uploadbpjs);
+                }
+            } else {
+                Storage::disk('local')->put($filePath, $pdfContent);
+                if (Storage::disk('local')->exists($filePath)) {
+                    DB::table('rstxn_rjuploadbpjses')
+                        ->insert([
+                            'seq_file' => 4,
+                            'uploadbpjs' => $filename . '.pdf',
+                            'rj_no' => $txnNo,
+                            'jenis_file' => 'pdf'
+                        ]);
+                    $this->emit('toastr-success', "Data berhasil diupload " . $filename . '.pdf');
+                } else {
+                    $this->emit('toastr-error', "Data tidak berhasil diupdate " . $filename . '.pdf');
+                }
+            }
+        } else {
+            $this->emit('toastr-error', "Data SKDP Tidak ditemukan");
+        }
+    }
+
+
     // when new form instance
     public function mount()
     {
@@ -308,6 +384,8 @@ class EmrRJHari extends Component
                 'push_antrian_bpjs_status',
                 'push_antrian_bpjs_json',
                 'datadaftarpolirj_json',
+                DB::raw("(select count(*) from lbtxn_checkuphdrs where status_rjri='RJ' and checkup_status!='B' and ref_no = rsview_rjkasir.rj_no) AS lab_status"),
+                DB::raw("(select count(*) from rstxn_rjrads where rj_no = rsview_rjkasir.rj_no) AS rad_status"),
                 DB::raw("(select count(*) from rstxn_rjuploadbpjses where rj_no = rsview_rjkasir.rj_no and seq_file=1) AS rjuploadbpjs_sep_count"),
                 DB::raw("(select count(*) from rstxn_rjuploadbpjses where rj_no = rsview_rjkasir.rj_no and seq_file=3) AS rjuploadbpjs_rm_count"),
                 DB::raw("(select count(*) from rstxn_rjuploadbpjses where rj_no = rsview_rjkasir.rj_no and seq_file=4) AS rjuploadbpjs_skdp_count"),
