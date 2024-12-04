@@ -2738,6 +2738,11 @@ class DaftarRJ extends Component
         }
     }
 
+    public function cekSep($jsonSep)
+    {
+        dd($jsonSep);
+    }
+
     // when new form instance
     public function mount()
     {

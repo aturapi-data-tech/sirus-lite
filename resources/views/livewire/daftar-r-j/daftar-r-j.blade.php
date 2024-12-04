@@ -251,6 +251,8 @@
                                                 $eresep = isset($datadaftar_json['eresep']) ? 1 : 0;
                                                 $prosentaseEMREresep = ($eresep / 1) * 100;
                                                 $badgecolorEresep = $eresep ? 'green' : 'red';
+
+                                                $noReferensi = $datadaftar_json['noReferensi'] ?? '-';
                                             @endphp
 
 
@@ -346,6 +348,15 @@
                                                             <x-badge :badgecolor="__($badgecolorEresep)">
                                                                 E-Resep: {{ $prosentaseEMREresep . '%' }}
                                                             </x-badge>
+                                                        </div>
+                                                        <div>
+                                                            {{ $noReferensi }}
+                                                        </div>
+                                                        <div>
+                                                            <x-primary-button
+                                                                wire:click="cekSep('{{ json_encode($datadaftar_json['sep'] ?? [], true) }}')">
+                                                                Cek SEP
+                                                            </x-primary-button>
                                                         </div>
 
 
