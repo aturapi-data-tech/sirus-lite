@@ -125,8 +125,21 @@
 
                             </div>
 
-
-
+                            <div class="w-full mx-2 bg-gray-200 rounded-lg">
+                                <div class="text-lg font-bold text-center text-primary">Template Rersep</div>
+                                <div class="flex justify-center">
+                                    @isset($myQueryData)
+                                        @foreach ($myQueryData as $key => $myData)
+                                            <div class="col-span-1">
+                                                <x-light-button
+                                                    wire:click="copyResepFromTemplate('{{ $rjNoRef }}','{{ $myData->temp_json_nonracikan ?? '{}' }}','{{ $myData->temp_json_racikan ?? '{}' }}')">
+                                                    {{ $key + 1 }} {{ $myData->tempr_desc }}
+                                                </x-light-button>
+                                            </div>
+                                        @endforeach
+                                    @endisset
+                                </div>
+                            </div>
 
 
                         </div>

@@ -172,7 +172,7 @@ class RekamMedisDisplay extends Component
                 try {
                     // ?\
                     // select nvl(max(rjobat_dtl)+1,1) into :rstxn_rjobatracikans.rjobat_dtl from rstxn_rjobatracikans;
-                    foreach ($to['eresepRacikan']  as $toEresepRacikan) {
+                    foreach ($to['eresepRacikan']  as $key => $toEresepRacikan) {
 
                         if (isset($toEresepRacikan['jenisKeterangan'])) {
                             $lastInserted = DB::table('rstxn_rjobatracikans')

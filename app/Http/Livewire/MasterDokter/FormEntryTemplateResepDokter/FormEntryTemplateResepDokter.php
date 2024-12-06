@@ -39,7 +39,7 @@ class FormEntryTemplateResepDokter extends Component
     // rules///////////////////
     protected $rules = [
         'FormEntry.dokterId' => 'required|numeric|digits_between:1,3',
-        'FormEntry.temprId' => 'required|unique:rsmst_doctortempreseps,tempr_id',
+        'FormEntry.temprId' => 'required',
         'FormEntry.temprDesc' => 'required',
     ];
 
@@ -165,7 +165,7 @@ class FormEntryTemplateResepDokter extends Component
 
             // tambahkan exists counstrain
             if ($this->isOpenMode == 'insert') {
-                $this->rules['FormEntry.dokterId'] = 'numeric|digits_between:1,3|exists:rsmst_doctors,dr_id';
+                $this->rules['FormEntry.dokterId'] = 'numeric|digits_between:1,3';
                 // $this->rules['FormEntry.dokterId'] = 'required|numeric|digits_between:1,3|exists:rsmst_doctors,dr_id';
 
             }

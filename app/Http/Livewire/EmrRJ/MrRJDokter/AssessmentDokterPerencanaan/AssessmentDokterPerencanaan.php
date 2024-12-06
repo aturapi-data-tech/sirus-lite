@@ -11,6 +11,7 @@ use Carbon\Carbon;
 
 use Spatie\ArrayToXml\ArrayToXml;
 use App\Http\Traits\EmrRJ\EmrRJTrait;
+use Exception;
 
 
 class AssessmentDokterPerencanaan extends Component
@@ -191,24 +192,11 @@ class AssessmentDokterPerencanaan extends Component
         $this->validateDataRJ();
 
         // Logic update mode start //////////
-        $this->updateDataRJ($this->dataDaftarPoliRJ['rjNo']);
+        $this->updateDataRj($this->dataDaftarPoliRJ['rjNo'], $this->dataDaftarPoliRJ);
         $this->emit('syncronizeAssessmentDokterRJFindData');
     }
 
-    private function updateDataRJ($rjNo): void
-    {
 
-        // update table trnsaksi
-        DB::table('rstxn_rjhdrs')
-            ->where('rj_no', $rjNo)
-            ->update([
-                'dataDaftarPoliRJ_json' => json_encode($this->dataDaftarPoliRJ, true),
-                'dataDaftarPoliRJ_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
-
-            ]);
-
-        $this->emit('toastr-success', "Perencanaan berhasil disimpan.");
-    }
     // insert and update record end////////////////
 
 
@@ -406,7 +394,248 @@ class AssessmentDokterPerencanaan extends Component
 
 
 
+    public function copyResepFromTemplate($rjNoRefCopyTo,  $tempJsonNonRacikan, $tempJsonRacikan)
+    {
+        // cek status transaksi
+        $checkRjStatus = $this->checkRjStatus($rjNoRefCopyTo);
+        if ($checkRjStatus) {
+            $this->emit('toastr-error', "Pasien Sudah Pulang, Trasaksi Terkunci.");
+            return;
+        }
 
+        // 1 cari data to
+        // 2 cari data from
+        $to = $this->cariResepRJ($rjNoRefCopyTo);
+        $from['eresep'] = json_decode($tempJsonNonRacikan, true)['eresep'] ?? [];
+        $from['eresepRacikan'] = json_decode($tempJsonRacikan, true)['eresepRacikan'] ?? [];
+
+        $myResepFrom = $this->prosesDataArray(isset($from['eresep']) ? $from['eresep'] : [], 'EResepFrom');
+
+        // 3 if eresep from (true) then update data eresep to
+        if ($myResepFrom) {
+
+            // hapus data obat
+            try {
+                // remove into table transaksi
+                DB::table('rstxn_rjobats')
+                    ->where('rj_no', $rjNoRefCopyTo)
+                    ->delete();
+            } catch (Exception $e) {
+                // display an error to user
+                // dd($e->getMessage());
+                $this->emit('toastr-error', $e->getMessage());
+                return;
+            }
+
+            $to['eresep'] = $myResepFrom;
+            // insert data obat loop
+            try {
+                // ?\
+                // select nvl(max(rjobat_dtl)+1,1) into :rstxn_rjobats.rjobat_dtl from rstxn_rjobats;
+                foreach ($to['eresep']  as $key => $toEresep) {
+
+                    $lastInserted = DB::table('rstxn_rjobats')
+                        ->select(DB::raw("nvl(max(rjobat_dtl)+1,1) as rjobat_dtl_max"))
+                        ->first();
+                    $productPrice = DB::table('immst_products')
+                        ->select('sales_price')
+                        ->where('product_id', $toEresep['productId'])
+                        ->first()->sales_price ?? 0;
+
+                    // insert into table transaksi
+                    DB::table('rstxn_rjobats')
+                        ->insert([
+                            'rjobat_dtl' => $lastInserted->rjobat_dtl_max,
+                            'rj_no' => $rjNoRefCopyTo,
+                            'product_id' => $toEresep['productId'],
+                            'qty' => $toEresep['qty'],
+                            'price' => $productPrice,
+                            'rj_carapakai' => $toEresep['signaX'],
+                            'rj_kapsul' => $toEresep['signaHari'],
+                            'rj_takar' => 'Tablet',
+                            'catatan_khusus' => $toEresep['catatanKhusus'],
+                            'rj_ket' => $toEresep['catatanKhusus'],
+                            'exp_date' => DB::raw("to_date('" . $to['rjDate'] . "','dd/mm/yyyy hh24:mi:ss')+30"),
+                            'etiket_status' => 1,
+                        ]);
+
+                    // replace rjobatdtl dan rjno ke obat yang baru
+                    $to['eresep'][$key]['rjObatDtl'] = $lastInserted->rjobat_dtl_max;
+                    $to['eresep'][$key]['rjNo'] = $rjNoRefCopyTo;
+                    unset($to['eresep'][$key]['temprId']);
+                }
+                //
+            } catch (Exception $e) {
+                // display an error to user
+                // dd($e->getMessage());
+                $this->emit('toastr-error', $e->getMessage());
+                return;
+            }
+
+            // 4update database to
+        }
+
+
+        // racikan
+
+        $myResepRacikanFrom = $this->prosesDataArray(isset($from['eresepRacikan']) ? $from['eresepRacikan'] : [], 'EResepRacikanFrom');
+
+        // 3if eresepRacikan from (true) then update data eresepRacikan to
+        if ($myResepRacikanFrom) {
+
+            // hapus data obat
+            try {
+                // remove into table transaksi
+                DB::table('rstxn_rjobatracikans')
+                    ->where('rj_no', $rjNoRefCopyTo)
+                    ->delete();
+            } catch (Exception $e) {
+                // display an error to user
+                // dd($e->getMessage());
+
+                $this->emit('toastr-error', $e->getMessage());
+                return;
+            }
+
+            $to['eresepRacikan'] = $myResepRacikanFrom;
+            // insert data obat loop
+            try {
+                // ?\
+                // select nvl(max(rjobat_dtl)+1,1) into :rstxn_rjobatracikans.rjobat_dtl from rstxn_rjobatracikans;
+                foreach ($to['eresepRacikan']  as $key => $toEresepRacikan) {
+                    if (isset($toEresepRacikan['jenisKeterangan'])) {
+                        $lastInserted = DB::table('rstxn_rjobatracikans')
+                            ->select(DB::raw("nvl(max(rjobat_dtl)+1,1) as rjobat_dtl_max"))
+                            ->first();
+                        // insert into table transaksi
+                        DB::table('rstxn_rjobatracikans')
+                            ->insert([
+                                'rjobat_dtl' => $lastInserted->rjobat_dtl_max,
+                                'rj_no' => $rjNoRefCopyTo,
+                                // 'product_id' => $toEresepRacikan['productId'],
+                                'product_name' => $toEresepRacikan['productName'],
+                                'sedia' => $toEresepRacikan['sedia'],
+                                'dosis' => isset($toEresepRacikan['dosis']) ? ($toEresepRacikan['dosis'] ? $toEresepRacikan['dosis'] : '') : '',
+                                'qty' => $toEresepRacikan['qty'],
+                                // 'price' => $toEresepRacikan['productPrice'],
+                                // 'rj_carapakai' => $toEresepRacikan['signaX'],
+                                // 'rj_kapsul' => $toEresepRacikan['signaHari'],
+                                'catatan' => $toEresepRacikan['catatan'],
+                                'catatan_khusus' => $toEresepRacikan['catatanKhusus'],
+                                'no_racikan' => $toEresepRacikan['noRacikan'],
+
+                                'rj_takar' => 'Tablet',
+                                'exp_date' => DB::raw("to_date('" . $to['rjDate'] . "','dd/mm/yyyy hh24:mi:ss')+30"),
+                                'etiket_status' => 1,
+                            ]);
+
+                        // replace rjobatdtl dan rjno ke obat yang baru
+                        $to['eresepRacikan'][$key]['rjObatDtl'] = $lastInserted->rjobat_dtl_max;
+                        $to['eresepRacikan'][$key]['rjNo'] = $rjNoRefCopyTo;
+                        unset($to['eresepRacikan'][$key]['temprId']);
+                    }
+                }
+                //
+            } catch (Exception $e) {
+                // display an error to user
+                // dd($e->getMessage());
+
+                $this->emit('toastr-error', $e->getMessage());
+                return;
+            }
+
+            // 4update database to
+        }
+
+
+
+
+
+
+        // Jika array perencanaan belum terbentuk
+        if (!isset($to['perencanaan'])) {
+            $this->emit('storeAssessmentDokterRJPerencanaan');
+            $this->emit('syncronizeAssessmentDokterRJFindData');
+            $this->emit('syncronizeAssessmentPerawatRJFindData');
+            $to = $this->cariResepRJ($rjNoRefCopyTo);
+        }
+
+        // terapi
+        $eresep = '';
+        if (isset($to['eresep'])) {
+            foreach ($to['eresep'] as  $value) {
+                $catatanKhusus = ($value['catatanKhusus']) ? ' (' . $value['catatanKhusus'] . ')' : '';
+                $eresep .=  'R/' . ' ' . $value['productName'] . ' | No. ' . $value['qty'] . ' | S ' .  $value['signaX'] . 'dd' . $value['signaHari'] . $catatanKhusus . PHP_EOL;
+            }
+            // $to['perencanaan']['terapi']['terapi'] = $eresep;
+        }
+
+        // dd($to['eresepRacikan']);
+        $eresepRacikan = '' . PHP_EOL;
+        if (isset($to['eresepRacikan'])) {
+            foreach ($to['eresepRacikan'] as  $value) {
+                if (isset($value['jenisKeterangan'])) {
+                    $catatan = isset($value['catatan']) ? $value['catatan'] : '';
+                    $catatanKhusus = isset($value['catatanKhusus']) ? $value['catatanKhusus'] : '';
+                    $noRacikan = isset($value['noRacikan']) ? $value['noRacikan'] : '';
+                    $productName = isset($value['productName']) ? $value['productName'] : '';
+
+
+                    $jmlRacikan = ($value['qty']) ? 'Jml Racikan ' . $value['qty'] . ' | ' . $catatan . ' | S ' . $catatanKhusus . PHP_EOL : '';
+                    $dosis = isset($value['dosis']) ? ($value['dosis'] ? $value['dosis'] : '') : '';
+                    $eresepRacikan .= $noRacikan . '/ ' . $productName . ' - ' . $dosis .  PHP_EOL . $jmlRacikan;
+                }
+            }
+            // $to['perencanaan']['terapi']['terapi'] = $eresepRacikan;
+        }
+        $to['perencanaan']['terapi']['terapi'] = $eresep . $eresepRacikan;
+
+
+        $this->updateDataRj($rjNoRefCopyTo, $to);
+    }
+
+    private function prosesDataArray(array $arr, string $arrName)
+    {
+        $myArr = $arr ? $arr : [];
+
+        if (!$myArr) {
+            $this->emit('toastr-error', "Data " . $arrName . " tidak ditemukan.");
+            return;
+        }
+
+        return $myArr;
+    }
+
+    private function cariResepRJ($rjNo): array
+    {
+        // update table trnsaksi
+        $cari = DB::table('rstxn_rjhdrs')
+            ->select('datadaftarpolirj_json')
+            ->where('rj_no', $rjNo)
+            ->first();
+
+        if (isset($cari->datadaftarpolirj_json)) {
+            if ($cari->datadaftarpolirj_json) {
+                return json_decode($cari->datadaftarpolirj_json, true);
+            }
+        }
+        return [];
+    }
+
+    private function updateDataRj($rjNo, $dataDaftarPoliRJArr): void
+    {
+        // update table trnsaksi
+        DB::table('rstxn_rjhdrs')
+            ->where('rj_no', $rjNo)
+            ->update([
+                'datadaftarpolirj_json' => json_encode($dataDaftarPoliRJArr, true),
+                'datadaftarpolirj_xml' => ArrayToXml::convert($dataDaftarPoliRJArr),
+            ]);
+
+        $this->emit('syncronizeAssessmentDokterRJFindData');
+        $this->emit('syncronizeAssessmentPerawatRJFindData');
+        $this->emit('toastr-success', "Data Resep berhasil disimpan.");
+    }
 
     // when new form instance
     public function mount()
@@ -423,10 +652,28 @@ class AssessmentDokterPerencanaan extends Component
     public function render()
     {
 
+        $drId = auth()->user()->myuser_code;
+        //////////////////////////////////////////
+        // Query ///////////////////////////////
+        //////////////////////////////////////////
+        $query = DB::table('rsmst_doctortempreseps')
+            ->select(
+                'dr_id',
+                'tempr_id',
+                'tempr_desc',
+                'temp_json_racikan',
+                'temp_json_nonracikan'
+            )
+            ->where('dr_id', $drId)
+            ->orderBy('tempr_desc',  'asc');
+
+        ////////////////////////////////////////////////
+        // end Query
+        ///////////////////////////////////////////////        return view(
         return view(
             'livewire.emr-r-j.mr-r-j-dokter.assessment-dokter-perencanaan.assessment-dokter-perencanaan',
             [
-                // 'RJpasiens' => $query->paginate($this->limitPerPage),
+                'myQueryData' => $query->paginate(100),
                 'myTitle' => 'Perencanaan',
                 'mySnipt' => 'Rekam Medis Pasien',
                 'myProgram' => 'Pasien Rawat Jalan',
