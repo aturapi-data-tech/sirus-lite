@@ -11,6 +11,7 @@ use Carbon\Carbon;
 
 use Spatie\ArrayToXml\ArrayToXml;
 use App\Http\Traits\EmrRJ\EmrRJTrait;
+use Exception;
 
 class Perencanaan extends Component
 {
