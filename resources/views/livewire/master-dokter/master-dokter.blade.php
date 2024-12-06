@@ -81,6 +81,10 @@
                 @include('livewire.master-dokter.create')
             @endif
 
+            @if ($isOpenTemplateResepDokter)
+                @include('livewire.master-dokter.create-template-resep-dokter')
+            @endif
+
         </div>
         {{-- Top Bar --}}
 
@@ -179,6 +183,12 @@
                                                     <x-dropdown-link
                                                         wire:click="edit('{{ $myQData->dr_id }}','{{ $myQData->dr_name }}')">
                                                         {{ __('Ubah') }}
+                                                    </x-dropdown-link>
+                                                </li>
+                                                <li>
+                                                    <x-dropdown-link
+                                                        wire:click="editTemplateResepDokter('{{ $myQData->dr_id }}','{{ $myQData->dr_name }}')">
+                                                        {{ __('Template Resep Dokter') }}
                                                     </x-dropdown-link>
                                                 </li>
                                                 <li>

@@ -48,10 +48,19 @@ class MasterDokter extends Component
     public bool $isOpen = false;
     public string $isOpenMode = 'insert';
 
+    public bool $isOpenTemplateResepDokter = false;
+    public string $isOpenTemplateResepDokterMode = 'insert';
+
     private function openModal(): void
     {
         $this->isOpen = true;
         $this->isOpenMode = 'insert';
+    }
+
+    private function openModalTemplateResepDokter(): void
+    {
+        $this->isOpenTemplateResepDokter = true;
+        $this->isOpenTemplateResepDokterMode = 'insert';
     }
 
     private function openModalEdit(): void
@@ -60,9 +69,15 @@ class MasterDokter extends Component
         $this->isOpenMode = 'update';
     }
 
+    private function openModalTemplateResepDokterEdit(): void
+    {
+        $this->isOpenTemplateResepDokter = true;
+        $this->isOpenTemplateResepDokterMode = 'update';
+    }
+
     public function closeModal(): void
     {
-        $this->reset(['isOpen', 'isOpenMode']);
+        $this->reset(['isOpen', 'isOpenMode', 'isOpenTemplateResepDokter', 'isOpenTemplateResepDokterMode']);
     }
 
     public function create(): void
@@ -74,6 +89,12 @@ class MasterDokter extends Component
     public function edit($id): void
     {
         $this->openModalEdit();
+        $this->dokterId = $id;
+    }
+
+    public function editTemplateResepDokter($id): void
+    {
+        $this->openModalTemplateResepDokterEdit();
         $this->dokterId = $id;
     }
 
