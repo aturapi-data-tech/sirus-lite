@@ -3,8 +3,8 @@
         $disabledProperty = true;
         $disabledPropertyRjStatus = false;
     @endphp
-    {{-- jika anamnesa kosong ngak usah di render --}}
-    @if (isset($dataDaftarUgd['anamnesa']))
+    {{-- jika observasi kosong ngak usah di render --}}
+    @if (isset($dataDaftarUgd['observasi']))
         <div class="w-full mb-1">
 
             <div id="TransaksiRawatJalan" class="px-2">
