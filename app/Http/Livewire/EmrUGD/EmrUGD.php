@@ -330,6 +330,10 @@ class EmrUGD extends Component
             'ermMenuName' => 'Penilaian'
         ],
         [
+            'ermMenuId' => 'observasi',
+            'ermMenuName' => 'Observasi'
+        ],
+        [
             'ermMenuId' => 'diagnosis',
             'ermMenuName' => 'Diagnosis (ICD)'
         ],

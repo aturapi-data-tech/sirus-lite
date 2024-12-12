@@ -116,6 +116,16 @@
 
                     <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50"
                         :class="{
+                            'active': activeTab === 'observasi'
+                        }"
+                        x-show.transition.in.opacity.duration.600="activeTab === 'observasi'">
+
+                        <livewire:emr-u-g-d.mr-u-g-d.observasi.observasi :wire:key="'content-observasiUgd'"
+                            :rjNoRef="$rjNoRef">
+                    </div>
+
+                    <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50"
+                        :class="{
                             'active': activeTab === 'diagnosis'
                         }"
                         x-show.transition.in.opacity.duration.600="activeTab === 'diagnosis'">

@@ -50,6 +50,7 @@ class Perencanaan extends Component
                 ["tindakLanjut" => "KRS"],
                 ["tindakLanjut" => "APS"],
                 ["tindakLanjut" => "Rujuk"],
+                ["tindakLanjut" => "Meninggal"],
                 ["tindakLanjut" => "Lain-lain"],
             ],
 

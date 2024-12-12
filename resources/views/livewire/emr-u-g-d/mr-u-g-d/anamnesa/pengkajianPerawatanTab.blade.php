@@ -67,7 +67,7 @@
 
             <div class="mb-2 ">
 
-                <div class="grid grid-cols-4 gap-2 mt-2 ml-2">
+                <div class="grid grid-cols-5 gap-2 mt-2 ml-2">
                     @foreach ($dataDaftarUgd['anamnesa']['pengkajianPerawatan']['caraMasukIgdOption'] as $caraMasukIgdOption)
                         {{-- @dd($sRj) --}}
                         <x-radio-button :label="__($caraMasukIgdOption['caraMasukIgd'])" value="{{ $caraMasukIgdOption['caraMasukIgd'] }}"
@@ -88,6 +88,27 @@
                 @enderror
             </div>
 
+        </div>
+
+        <div class="mb-2">
+            <x-input-label for="dataDaftarUgd.anamnesa.pengkajianPerawatan.saranaTransportasiId" :value="__('Sarana Transportasi Kedatangan ')"
+                :required="__(true)" />
+            <div class="grid grid-cols-5 gap-2 mt-2 ml-2">
+                @foreach ($dataDaftarUgd['anamnesa']['pengkajianPerawatan']['saranaTransportasiOptions'] ?? [] as $saranaTransportasi)
+                    {{-- @dd($saranaTransportasi) --}}
+                    <x-radio-button :label="__($saranaTransportasi['saranaTransportasiDesc'])" value="{{ $saranaTransportasi['saranaTransportasiId'] }}"
+                        wire:model="dataDaftarUgd.anamnesa.pengkajianPerawatan.saranaTransportasiId"
+                        wire:click="$set('dataDaftarUgd.anamnesa.pengkajianPerawatan.saranaTransportasiDesc','{{ $saranaTransportasi['saranaTransportasiDesc'] }}')" />
+                @endforeach
+
+                <x-text-input id="dataDaftarUgd.anamnesa.pengkajianPerawatan.saranaTransportasiKet"
+                    placeholder="Keterangan Sarana Transportasi" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.anamnesa.pengkajianPerawatan.saranaTransportasiKet'))"
+                    :disabled=$disabledPropertyRjStatus
+                    wire:model.debounce.500ms="dataDaftarUgd.anamnesa.pengkajianPerawatan.saranaTransportasiKet" />
+            </div>
+            @error('saranaTransportasi.saranaTransportasiId')
+                <x-input-error :messages=$message />
+            @enderror
         </div>
 
         @include('livewire.emr-u-g-d.mr-u-g-d.anamnesa.statusPsikologisTab')

@@ -52,17 +52,31 @@
                                 <div>
                                     <x-input-label :value="__('Cara Masuk IGD')" :required="__(false)" class="" />
 
-                                    <p class="w-full ml-2 text-sm">
-                                        {!! nl2br(
-                                            e(
-                                                isset($dataDaftarUgd['anamnesa']['pengkajianPerawatan']['caraMasukIgd'])
-                                                    ? ($dataDaftarUgd['anamnesa']['pengkajianPerawatan']['caraMasukIgd']
-                                                        ? $dataDaftarUgd['anamnesa']['pengkajianPerawatan']['caraMasukIgd']
-                                                        : '-')
-                                                    : '-',
-                                            ),
-                                        ) !!}
-                                    </p>
+                                    <div class="flex">
+                                        <p class="w-full ml-2 text-sm">
+                                            {!! nl2br(
+                                                e(
+                                                    isset($dataDaftarUgd['anamnesa']['pengkajianPerawatan']['caraMasukIgd'])
+                                                        ? ($dataDaftarUgd['anamnesa']['pengkajianPerawatan']['caraMasukIgd']
+                                                            ? $dataDaftarUgd['anamnesa']['pengkajianPerawatan']['caraMasukIgd']
+                                                            : '-')
+                                                        : '-',
+                                                ),
+                                            ) !!}
+                                        </p>
+
+                                        <p class="w-full ml-2 text-sm">
+                                            Transportasi :{!! nl2br(
+                                                e(
+                                                    isset($dataDaftarUgd['anamnesa']['pengkajianPerawatan']['saranaTransportasiDesc'])
+                                                        ? ($dataDaftarUgd['anamnesa']['pengkajianPerawatan']['saranaTransportasiDesc']
+                                                            ? $dataDaftarUgd['anamnesa']['pengkajianPerawatan']['saranaTransportasiDesc']
+                                                            : '-')
+                                                        : '-',
+                                                ),
+                                            ) !!}
+                                        </p>
+                                    </div>
                                 </div>
 
                                 <div>

@@ -59,6 +59,15 @@ class AssessmentDokterAnamnesa extends Component
                 ["tingkatKegawatan" => "P3"],
                 ["tingkatKegawatan" => "P0"],
             ],
+            "saranaTransportasiId" => "4",
+            "saranaTransportasiDesc" => "Lain-lain",
+            "saranaTransportasiKet" => "",
+            "saranaTransportasiOptions" => [
+                ["saranaTransportasiId" => "1", "saranaTransportasiDesc" => "Ambulans"],
+                ["saranaTransportasiId" => "2", "saranaTransportasiDesc" => "Mobil"],
+                ["saranaTransportasiId" => "3", "saranaTransportasiDesc" => "Motor"],
+                ["saranaTransportasiId" => "4", "saranaTransportasiDesc" => "Lain-lain"],
+            ],
         ],
 
         "keluhanUtamaTab" => "Keluhan Utama",
