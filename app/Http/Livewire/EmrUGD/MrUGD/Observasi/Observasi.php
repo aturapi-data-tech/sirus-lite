@@ -67,7 +67,7 @@ class Observasi extends Component
         'observasiLanjutan.suhu' => 'required|numeric',
         'observasiLanjutan.spo2' => 'required|numeric',
         'observasiLanjutan.waktuPemeriksaan' => 'required|date_format:d/m/Y H:i:s',
-        'observasiLanjutan.pemeriksa' => '',
+        'observasiLanjutan.pemeriksa' => 'required',
     ];
 
 
