@@ -44,6 +44,7 @@ class Observasi extends Component
         "suhu" => "", //number
         "spo2" => "", //number
         "gda" => "", //number
+        "gcs" => "", //number
         "waktuPemeriksaan" => "", //date dd/mm/yyyy hh24:mi:ss
         "pemeriksa" => ""
     ];
@@ -66,6 +67,8 @@ class Observasi extends Component
         'observasiLanjutan.frekuensiNadi' => 'required|numeric',
         'observasiLanjutan.suhu' => 'required|numeric',
         'observasiLanjutan.spo2' => 'required|numeric',
+        'observasiLanjutan.gda' => '',
+        'observasiLanjutan.gcs' => '',
         'observasiLanjutan.waktuPemeriksaan' => 'required|date_format:d/m/Y H:i:s',
         'observasiLanjutan.pemeriksa' => 'required',
     ];
@@ -180,6 +183,7 @@ class Observasi extends Component
                 "suhu" => $this->observasiLanjutan['suhu'],
                 "spo2" => $this->observasiLanjutan['spo2'],
                 "gda" => $this->observasiLanjutan['gda'],
+                "gcs" => $this->observasiLanjutan['gcs'],
                 "waktuPemeriksaan" => $this->observasiLanjutan['waktuPemeriksaan'],
                 "pemeriksa" => auth()->user()->myuser_name,
             ];

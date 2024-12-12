@@ -113,18 +113,24 @@
 
                 <div>
                     <div class="mb-2 ">
-                        <div class="grid grid-cols-2 gap-2">
+                        <div class="grid grid-cols-3 gap-2">
                             <x-input-label for="observasiLanjutan.frekuensiNafas" :value="__('SPO2')" :required="__(false)" />
                             <x-input-label for="observasiLanjutan.frekuensiNafas" :value="__('GDA')" :required="__(false)" />
+                            <x-input-label for="observasiLanjutan.gcs" :value="__('GCS')" :required="__(false)" />
+
                         </div>
 
-                        <div class="grid grid-cols-2 gap-2">
+                        <div class="grid grid-cols-3 gap-2">
                             <x-text-input-mou id="observasiLanjutan.spo2" placeholder="SPO2" class="mt-1 ml-2"
                                 :errorshas="__($errors->has('observasiLanjutan.spo2'))" :disabled=$disabledPropertyRjStatus :mou_label="__('%')"
                                 wire:model.debounce.500ms="observasiLanjutan.spo2" />
                             <x-text-input-mou id="observasiLanjutan.gda" placeholder="GDA" class="mt-1 ml-2"
                                 :errorshas="__($errors->has('observasiLanjutan.gda'))" :disabled=$disabledPropertyRjStatus :mou_label="__('g/dl')"
                                 wire:model.debounce.500ms="observasiLanjutan.gda" />
+                            <x-text-input id="observasiLanjutan.gcs" placeholder="gcs" class="mt-1 ml-2" :errorshas="__($errors->has('observasiLanjutan.gcs'))"
+                                :disabled=$disabledPropertyRjStatus wire:model.debounce.500ms="observasiLanjutan.gcs" />
+
+
                         </div>
                     </div>
                 </div>

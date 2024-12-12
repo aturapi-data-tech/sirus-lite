@@ -33,6 +33,9 @@
                         GDA
                     </th>
                     <th scope="col" class="text-center ">
+                        GCS
+                    </th>
+                    <th scope="col" class="text-center ">
                         Action
                     </th>
                 </tr>
@@ -81,6 +84,9 @@
                         </td>
                         <td class="text-center group-hover:bg-gray-100 group-hover:text-primary">
                             {{ $tandaVital['gda'] . ' mg/dL' }}
+                        </td>
+                        <td class="text-center group-hover:bg-gray-100 group-hover:text-primary">
+                            {{ $tandaVital['gcs'] }}
                         </td>
                         <td class="text-center group-hover:bg-gray-100 group-hover:text-primary">
                             <x-alternative-button class="inline-flex"
