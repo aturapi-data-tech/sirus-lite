@@ -127,7 +127,7 @@
                             <x-text-input-mou id="observasiLanjutan.gda" placeholder="GDA" class="mt-1 ml-2"
                                 :errorshas="__($errors->has('observasiLanjutan.gda'))" :disabled=$disabledPropertyRjStatus :mou_label="__('g/dl')"
                                 wire:model.debounce.500ms="observasiLanjutan.gda" />
-                            <x-text-input id="observasiLanjutan.gcs" placeholder="gcs" class="mt-1 ml-2" :errorshas="__($errors->has('observasiLanjutan.gcs'))"
+                            <x-text-input id="observasiLanjutan.gcs" placeholder="GCS" class="mt-1 ml-2" :errorshas="__($errors->has('observasiLanjutan.gcs'))"
                                 :disabled=$disabledPropertyRjStatus wire:model.debounce.500ms="observasiLanjutan.gcs" />
 
 
