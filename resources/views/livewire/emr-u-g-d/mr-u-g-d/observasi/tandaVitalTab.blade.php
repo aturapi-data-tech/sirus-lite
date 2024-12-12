@@ -119,7 +119,7 @@
 
                     <x-green-button :disabled=$disabledPropertyRjStatus wire:click.prevent="addObservasiLanjutan()"
                         type="button" wire:loading.remove>
-                        Simpan
+                        Simpan Observasi Lanjutan
                     </x-green-button>
                 </div>
 
