@@ -374,6 +374,10 @@ class EmrUGD extends Component
             'ermMenuName' => 'Assessment Dokter'
         ],
         [
+            'ermMenuId' => 'observasi',
+            'ermMenuName' => 'Observasi'
+        ],
+        [
             'ermMenuId' => 'pelayananPenunjang',
             'ermMenuName' => 'Pelayanan Penunjang'
         ],
