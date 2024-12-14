@@ -347,7 +347,7 @@ class Penilaian extends Component
         //     $this->validate($rules, $messages);
         // } catch (\Illuminate\Validation\ValidationException $e) {
 
-        //     $this->emit('toastr-error', "Lakukan Pengecekan kembali Input Data.");
+        //      toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError( "Lakukan Pengecekan kembali Input Data.");
         //     $this->validate($rules, $messages);
         // }
     }
@@ -377,7 +377,7 @@ class Penilaian extends Component
                 'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
             ]);
 
-        $this->emit('toastr-success', "Penilaian Fisik berhasil disimpan.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Penilaian Fisik berhasil disimpan.");
     }
     // insert and update record end////////////////
 

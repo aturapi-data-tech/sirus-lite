@@ -201,7 +201,7 @@ class AssessmentDokterDiagnosis extends Component
             $this->addDiagnosaICD10($this->dataDiagnosaICD10Lov[$id]['diag_id'], $this->dataDiagnosaICD10Lov[$id]['diag_desc'], $this->dataDiagnosaICD10Lov[$id]['icdx']);
             $this->resetdataDiagnosaICD10Lov();
         } else {
-            $this->emit('toastr-error', "Kode Diagnosa belum tersedia.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Kode Diagnosa belum tersedia.");
         }
     }
 
@@ -441,7 +441,7 @@ class AssessmentDokterDiagnosis extends Component
             $this->addProcedureICD9Cm($this->dataProcedureICD9CmLov[$id]['proc_id'], $this->dataProcedureICD9CmLov[$id]['proc_desc']);
             $this->resetdataProcedureICD9CmLov();
         } else {
-            $this->emit('toastr-error', "Kode Diagnosa belum tersedia.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Kode Diagnosa belum tersedia.");
         }
     }
 
@@ -528,7 +528,7 @@ class AssessmentDokterDiagnosis extends Component
                 'dataDaftarPoliRJ_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
             ]);
 
-        $this->emit('toastr-success', "Diagnosa berhasil disimpan.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Diagnosa berhasil disimpan.");
     }
     // insert and update record end////////////////
 

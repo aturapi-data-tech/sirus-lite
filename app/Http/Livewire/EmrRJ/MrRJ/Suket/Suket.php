@@ -29,7 +29,7 @@ class Suket extends Component
     // dataDaftarPoliRJ RJ
     public array $dataDaftarPoliRJ = [];
 
-    // data SKDP / suket=>[] 
+    // data SKDP / suket=>[]
     public array $suket =
     [
         "suketSehatTab" => "Suket Sehat",
@@ -108,7 +108,7 @@ class Suket extends Component
             $this->validate($this->rules, $messages);
         } catch (\Illuminate\Validation\ValidationException $e) {
 
-            $this->emit('toastr-error', "Lakukan Pengecekan kembali Input Data.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Lakukan Pengecekan kembali Input Data.");
             $this->validate($this->rules, $messages);
         }
     }
@@ -140,7 +140,7 @@ class Suket extends Component
 
             ]);
 
-        $this->emit('toastr-success', "suket berhasil disimpan.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("suket berhasil disimpan.");
     }
     // insert and update record end////////////////
 
@@ -157,7 +157,7 @@ class Suket extends Component
         $dataDaftarPoliRJ_json = isset($findData->datadaftarpolirj_json) ? $findData->datadaftarpolirj_json   : null;
         // if meta_data_pasien_json = null
         // then cari Data Pasien By Key Collection (exception when no data found)
-        // 
+        //
         // else json_decode
         if ($dataDaftarPoliRJ_json) {
             $this->dataDaftarPoliRJ = json_decode($findData->datadaftarpolirj_json, true);
@@ -168,7 +168,7 @@ class Suket extends Component
             }
         } else {
 
-            $this->emit('toastr-error', "Data tidak dapat di proses json.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data tidak dapat di proses json.");
             $dataDaftarPoliRJ = DB::table('rsview_rjkasir')
                 ->select(
                     DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
@@ -279,9 +279,7 @@ class Suket extends Component
     }
 
     // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
-    private function setDataPrimer(): void
-    {
-    }
+    private function setDataPrimer(): void {}
 
 
 

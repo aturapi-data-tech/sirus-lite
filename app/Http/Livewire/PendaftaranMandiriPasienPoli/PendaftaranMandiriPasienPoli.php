@@ -152,7 +152,7 @@ class PendaftaranMandiriPasienPoli extends Component
                 $this->cariDataJadwalPoli($this->hariIni);
             }
         } else {
-            $this->emit('toastr-error', "Data Pasien tidak ditemukan, tempelkan kartu pasien anda ke mesin pemindai.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data Pasien tidak ditemukan, tempelkan kartu pasien anda ke mesin pemindai.");
         }
     }
 
@@ -174,7 +174,7 @@ class PendaftaranMandiriPasienPoli extends Component
             $this->dataPasien["address"] = $pasien->address;
         } else {
             $this->resetInputFields();
-            $this->emit('toastr-error', "Data Pasien dgn No Reg " . $id . " tidak ditemukan.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data Pasien dgn No Reg " . $id . " tidak ditemukan.");
         }
     }
 
@@ -283,7 +283,7 @@ class PendaftaranMandiriPasienPoli extends Component
         $pdfContent = PDF::loadView('livewire.pendaftaran-mandiri-pasien-poli.cetak-tiket', $data)->output();
 
         $this->resetInputFields();
-        $this->emit('toastr-success', "Data sudah tersimpan.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Data sudah tersimpan.");
 
         return response()->streamDownload(
             fn() => print($pdfContent),

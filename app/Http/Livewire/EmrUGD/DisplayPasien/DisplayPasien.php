@@ -134,14 +134,14 @@ class DisplayPasien extends Component
 
 
             if (!isset($this->dataDaftarUgd['klaimId'])) {
-                $this->emit('toastr-error', "Data Klaim tidak ditemukan, Reset Data Ke UMUM");
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data Klaim tidak ditemukan, Reset Data Ke UMUM");
             }
             if (!isset($this->dataDaftarUgd['kunjunganId'])) {
-                $this->emit('toastr-error', "Data Kunjungan tidak ditemukan, Reset Data Ke FKTP");
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data Kunjungan tidak ditemukan, Reset Data Ke FKTP");
             }
         } else {
 
-            $this->emit('toastr-error', "Data tidak dapat di proses json.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data tidak dapat di proses json.");
             $dataDaftarUgd = DB::table('rsview_ugdkasir')
                 ->select(
                     DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),

@@ -276,12 +276,12 @@ class EmrRJ extends Component
 
     public function tampil()
     {
-        $this->emit('toastr-error', 'Fitur dalam masa pengembangan');
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Fitur dalam masa pengembangan');
     }
 
     public function delete()
     {
-        $this->emit('toastr-error', 'Fitur dalam masa pengembangan');
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Fitur dalam masa pengembangan');
     }
 
 
@@ -403,9 +403,9 @@ class EmrRJ extends Component
             // update DB
             $this->updateDataRJ($rjNo);
 
-            $this->emit('toastr-success', "Masuk Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Masuk Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']);
         } else {
-            $this->emit('toastr-error', "Masuk Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Masuk Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']);
         }
 
         // cari no Booking
@@ -431,9 +431,9 @@ class EmrRJ extends Component
                 // update DB
                 $this->updateDataRJ($rjNo);
 
-                $this->emit('toastr-success', "Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
             } else {
-                $this->emit('toastr-error', "Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
             }
 
             // cari no Booking
@@ -443,9 +443,9 @@ class EmrRJ extends Component
             $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5'], env('APP_TIMEZONE'))->timestamp * 1000; //waktu dalam timestamp milisecond
             $this->pushDataTaskId($noBooking, 5, $waktu);
 
-            $this->emit('toastr-success', "Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
         } else {
-            $this->emit('toastr-error', "Satus Pasien Belum melalui pelayanan Poli");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Satus Pasien Belum melalui pelayanan Poli");
         }
     }
 
@@ -466,7 +466,7 @@ class EmrRJ extends Component
                 'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
             ]);
 
-        $this->emit('toastr-success', "Json Berhasil di update.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Json Berhasil di update.");
     }
 
     private function pushDataTaskId($noBooking, $taskId, $time): void
@@ -484,9 +484,9 @@ class EmrRJ extends Component
 
         // metadata d kecil
         if ($HttpGetBpjs['metadata']['code'] == 200) {
-            $this->emit('toastr-success', 'Task Id' . $taskId . ' ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Task Id' . $taskId . ' ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
         } else {
-            $this->emit('toastr-error', 'Task Id' . $taskId . ' ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Task Id' . $taskId . ' ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
 
             // Ulangi Proses pushTaskId;
             // $this->emit('rePush_Data_TaskId_Confirmation');

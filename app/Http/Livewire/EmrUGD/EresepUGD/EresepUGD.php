@@ -199,7 +199,7 @@ class EresepUGD extends Component
             $this->addProduct($this->dataProductLov[$id]['product_id'], $this->dataProductLov[$id]['product_name'], $this->dataProductLov[$id]['sales_price']);
             $this->resetdataProductLov();
         } else {
-            $this->emit('toastr-error', 'Data Obat belum tersedia.');
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Data Obat belum tersedia.');
         }
     }
 
@@ -230,7 +230,7 @@ class EresepUGD extends Component
                 'datadaftarugd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
             ]);
 
-        $this->emit('toastr-success', 'Eresep berhasil disimpan.');
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Eresep berhasil disimpan.');
     }
     // insert and update record end////////////////
 
@@ -246,9 +246,7 @@ class EresepUGD extends Component
         }
     }
 
-    private function setDataPrimer(): void
-    {
-    }
+    private function setDataPrimer(): void {}
 
     private function addProduct($productId, $productName, $salesPrice): void
     {
@@ -422,7 +420,7 @@ class EresepUGD extends Component
             ->first();
 
         if ($lastInserted->rj_status !== 'A') {
-            $this->emit('toastr-error', 'Pasien Sudah Pulang, Trasaksi Terkunci.');
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Pasien Sudah Pulang, Trasaksi Terkunci.');
             return dd('Pasien Sudah Pulang, Trasaksi Terkuncixx.');
         }
     }

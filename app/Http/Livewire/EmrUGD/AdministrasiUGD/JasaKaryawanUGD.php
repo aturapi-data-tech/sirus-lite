@@ -190,7 +190,7 @@ class JasaKaryawanUGD extends Component
             $this->addJasaKaryawan($this->dataJasaKaryawanLov[$id]['acte_id'], $this->dataJasaKaryawanLov[$id]['acte_desc'], $this->dataJasaKaryawanLov[$id]['acte_price']);
             $this->resetdataJasaKaryawanLov();
         } else {
-            $this->emit('toastr-error', "Jasa Karyawan belum tersedia.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Jasa Karyawan belum tersedia.");
         }
     }
 
@@ -229,7 +229,7 @@ class JasaKaryawanUGD extends Component
                 'datadaftarugd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
             ]);
 
-        $this->emit('toastr-success', "Jasa Karyawan berhasil disimpan.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Jasa Karyawan berhasil disimpan.");
     }
     // insert and update record end////////////////
 
@@ -657,7 +657,7 @@ class JasaKaryawanUGD extends Component
             ->first();
 
         if ($lastInserted->rj_status !== 'A') {
-            $this->emit('toastr-error', "Pasien Sudah Pulang, Trasaksi Terkunci.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Pasien Sudah Pulang, Trasaksi Terkunci.");
             return (dd('Pasien Sudah Pulang, Trasaksi Terkuncixx.' . $this->rjNoRef));
         }
     }

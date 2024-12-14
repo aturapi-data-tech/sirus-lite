@@ -181,7 +181,7 @@ class TemplateResepDokter extends Component
             $this->addProduct($this->dataProductLov[$id]['product_id'], $this->dataProductLov[$id]['product_name'], $this->dataProductLov[$id]['sales_price']);
             $this->resetdataProductLov();
         } else {
-            $this->emit('toastr-error', 'Data Obat belum tersedia.');
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Data Obat belum tersedia.');
         }
     }
 
@@ -262,7 +262,7 @@ class TemplateResepDokter extends Component
             // insert into table transaksi
             $this->store();
             $this->reset(['collectingMyProduct']);
-            $this->emit('toastr-success', 'Data Obat berhasil disimpan.');
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Data Obat berhasil disimpan.');
 
 
             //
@@ -317,7 +317,7 @@ class TemplateResepDokter extends Component
 
             // insert into table transaksi
             $this->store();
-            $this->emit('toastr-success', 'Data Obat berhasil diupdate.');
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Data Obat berhasil diupdate.');
 
             //
         } catch (Exception $e) {

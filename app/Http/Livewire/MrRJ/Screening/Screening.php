@@ -26,7 +26,7 @@ class Screening extends Component
     // dataDaftarPoliRJ RJ
     public $dataDaftarPoliRJ = [];
 
-    // data screening / kesimpulan=>[] 
+    // data screening / kesimpulan=>[]
     public $screeningQuestions = [
         [
             "sc_seq" => "1",
@@ -283,7 +283,7 @@ class Screening extends Component
                 'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
             ]);
 
-        $this->emit('toastr-success', "Screening " . $this->dataDaftarPoliRJ['regNo'] . " berhasil disimpan.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Screening " . $this->dataDaftarPoliRJ['regNo'] . " berhasil disimpan.");
     }
     // insert and update record end////////////////
 
@@ -310,7 +310,7 @@ class Screening extends Component
             }
         } else {
 
-            $this->emit('toastr-error', "Json Tidak ditemukan, Data sedang diproses ulang.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Json Tidak ditemukan, Data sedang diproses ulang.");
             $dataDaftarPoliRJ = DB::table('rsview_rjkasir')
                 ->select(
                     DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
@@ -420,7 +420,7 @@ class Screening extends Component
         // //////////////////////////////////////
 
 
-        $this->emit('toastr-success', "$desc : $label Kesimpulan : $KesimpulanDariScreening");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("$desc : $label Kesimpulan : $KesimpulanDariScreening");
     }
 
     // /prosesDataKesimpulan/////////////

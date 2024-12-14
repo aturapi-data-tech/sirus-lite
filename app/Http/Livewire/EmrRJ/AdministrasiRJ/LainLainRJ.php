@@ -187,7 +187,7 @@ class LainLainRJ extends Component
             $this->addLainLain($this->dataLainLainLov[$id]['other_id'], $this->dataLainLainLov[$id]['other_desc'], $this->dataLainLainLov[$id]['other_price']);
             $this->resetdataLainLainLov();
         } else {
-            $this->emit('toastr-error', "Lain-Lain belum tersedia.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Lain-Lain belum tersedia.");
         }
     }
 
@@ -226,7 +226,7 @@ class LainLainRJ extends Component
                 'dataDaftarPoliRJ_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
             ]);
 
-        $this->emit('toastr-success', "Lain-Lain berhasil disimpan.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Lain-Lain berhasil disimpan.");
     }
     // insert and update record end////////////////
 
@@ -360,7 +360,7 @@ class LainLainRJ extends Component
             ->first();
 
         if ($lastInserted->rj_status !== 'A') {
-            $this->emit('toastr-error', "Pasien Sudah Pulang, Trasaksi Terkunci.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Pasien Sudah Pulang, Trasaksi Terkunci.");
             return (dd('Pasien Sudah Pulang, Trasaksi Terkuncixx.'));
         }
     }

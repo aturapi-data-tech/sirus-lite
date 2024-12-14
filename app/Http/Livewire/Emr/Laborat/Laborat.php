@@ -350,7 +350,7 @@ class Laborat extends Component
 
         ];
         $pdfContent = PDF::loadView('livewire.emr.rekam-medis.cetak-rekam-medis-u-g-d', $data)->output();
-        $this->emit('toastr-success', 'Cetak RM IGD');
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Cetak RM IGD');
 
         return response()->streamDownload(
             fn() => print($pdfContent),
@@ -378,7 +378,7 @@ class Laborat extends Component
 
         ];
         $pdfContent = PDF::loadView('livewire.emr.rekam-medis.cetak-rekam-medis-r-j', $data)->output();
-        $this->emit('toastr-success', 'Cetak RM RJ');
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Cetak RM RJ');
 
         return response()->streamDownload(
             fn() => print($pdfContent),
@@ -414,7 +414,7 @@ class Laborat extends Component
 
                 ];
                 $pdfContent = PDF::loadView('livewire.emr.rekam-medis.cetak-rekam-medis-r-j', $data)->output();
-                $this->emit('toastr-success', 'Cetak RM RJ');
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Cetak RM RJ');
 
 
                 return response()->streamDownload(
@@ -436,14 +436,14 @@ class Laborat extends Component
 
                 ];
                 $pdfContent = PDF::loadView('livewire.emr.rekam-medis.cetak-rekam-medis-u-g-d', $data)->output();
-                $this->emit('toastr-success', 'Cetak RM IGD');
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Cetak RM IGD');
 
                 return response()->streamDownload(
                     fn() => print($pdfContent),
                     "rmUGD.pdf"
                 );
             } else if ($layananStatus === 'RI') {
-                $this->emit('toastr-error', 'Rekam Medis (Rawat Inap) Fitur dalam masa pengembangan');
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Rekam Medis (Rawat Inap) Fitur dalam masa pengembangan');
                 // $this->dataDaftarTxn = $dataDaftarTxn;
 
                 // if (isset($this->dataDaftarTxn['regNo'])) {
@@ -451,7 +451,7 @@ class Laborat extends Component
                 // }
             }
         } else {
-            $this->emit('toastr-error', 'Data Rekam Medis Tidak di Temukan');
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Data Rekam Medis Tidak di Temukan');
         }
     }
 

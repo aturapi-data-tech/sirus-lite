@@ -189,7 +189,7 @@ class JasaDokterRJ extends Component
             $this->addJasaDokter($this->dataJasaDokterLov[$id]['accdoc_id'], $this->dataJasaDokterLov[$id]['accdoc_desc'], $this->dataJasaDokterLov[$id]['accdoc_price']);
             $this->resetdataJasaDokterLov();
         } else {
-            $this->emit('toastr-error', "Jasa Dokter belum tersedia.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Jasa Dokter belum tersedia.");
         }
     }
 
@@ -228,7 +228,7 @@ class JasaDokterRJ extends Component
                 'dataDaftarPoliRJ_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
             ]);
 
-        $this->emit('toastr-success', "Jasa Dokter berhasil disimpan.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Jasa Dokter berhasil disimpan.");
     }
     // insert and update record end////////////////
 
@@ -653,7 +653,7 @@ class JasaDokterRJ extends Component
             ->first();
 
         if ($lastInserted->rj_status !== 'A') {
-            $this->emit('toastr-error', "Pasien Sudah Pulang, Trasaksi Terkunci.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Pasien Sudah Pulang, Trasaksi Terkunci.");
             return (dd('Pasien Sudah Pulang, Trasaksi Terkuncixx.'));
         }
     }

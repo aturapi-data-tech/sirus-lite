@@ -162,7 +162,7 @@ class PelayananRJ extends Component
     // search
     public function updatedSearch(): void
     {
-        // $this->emit('toastr-error', "search.");
+        //  toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError( "search.");
 
         $this->resetPage();
         $this->resetValidation();
@@ -171,7 +171,7 @@ class PelayananRJ extends Component
     // date
     public function updatedDaterjref(): void
     {
-        // $this->emit('toastr-error', "date.");
+        //  toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError( "date.");
 
         $this->resetPage();
         $this->resetValidation();
@@ -180,7 +180,7 @@ class PelayananRJ extends Component
     // status
     public function updatedStatusrjref(): void
     {
-        // $this->emit('toastr-error', "status.");
+        //  toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError( "status.");
 
         $this->resetPage();
         $this->resetValidation();
@@ -189,7 +189,7 @@ class PelayananRJ extends Component
     // dr
     public function setdrRjRef($id, $name): void
     {
-        // $this->emit('toastr-error', "dr.");
+        //  toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError( "dr.");
 
         $this->drRjRef['drId'] = $id;
         $this->drRjRef['drName'] = $name;
@@ -200,7 +200,7 @@ class PelayananRJ extends Component
     // shift
     public function setShift($id, $desc): void
     {
-        // $this->emit('toastr-error', "shift.");
+        //  toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError( "shift.");
 
         $this->shiftRjRef['shiftId'] = $id;
         $this->shiftRjRef['shiftDesc'] = $desc;
@@ -248,7 +248,7 @@ class PelayananRJ extends Component
             $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId1'], env('APP_TIMEZONE'))->timestamp * 1000; //waktu dalam timestamp milisecond
             $this->pushDataTaskId($noBooking, 1, $waktu);
         } else {
-            $this->emit('toastr-error', "waktu masuk Admisi kosong tidak dapat dikirim");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("waktu masuk Admisi kosong tidak dapat dikirim");
         }
     }
 
@@ -266,13 +266,13 @@ class PelayananRJ extends Component
             $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId2'], env('APP_TIMEZONE'))->timestamp * 1000; //waktu dalam timestamp milisecond
             $this->pushDataTaskId($noBooking, 2, $waktu);
         } else {
-            $this->emit('toastr-error', "waktu keluar Admisi kosong tidak dapat dikirim");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("waktu keluar Admisi kosong tidak dapat dikirim");
         }
     }
 
     public function daftarPoli($rjNo)
     {
-        $this->emit('toastr-error', "untuk update taskID3 Daftar Poli memakai Pendaftaran Rawat Jalan");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("untuk update taskID3 Daftar Poli memakai Pendaftaran Rawat Jalan");
     }
 
 
@@ -307,9 +307,9 @@ class PelayananRJ extends Component
             // update DB
             $this->updateDataRJ($rjNo);
 
-            $this->emit('toastr-success', "Masuk Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Masuk Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']);
         } else {
-            $this->emit('toastr-error', "Masuk Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Masuk Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']);
         }
 
         // cari no Booking
@@ -335,9 +335,9 @@ class PelayananRJ extends Component
                 // update DB
                 $this->updateDataRJ($rjNo);
 
-                $this->emit('toastr-success', "Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
             } else {
-                $this->emit('toastr-error', "Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
             }
 
             // cari no Booking
@@ -347,9 +347,9 @@ class PelayananRJ extends Component
             $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5'], env('APP_TIMEZONE'))->timestamp * 1000; //waktu dalam timestamp milisecond
             $this->pushDataTaskId($noBooking, 5, $waktu);
 
-            $this->emit('toastr-success', "Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
         } else {
-            $this->emit('toastr-error', "Satus Pasien Belum melalui pelayanan Poli");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Satus Pasien Belum melalui pelayanan Poli");
         }
     }
 
@@ -370,9 +370,9 @@ class PelayananRJ extends Component
             // update DB
             $this->updateDataRJ($rjNo);
 
-            $this->emit('toastr-success', "Pembatalan " . $regName . " pelayanan Poli berhasil dilakukan.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Pembatalan " . $regName . " pelayanan Poli berhasil dilakukan.");
         } else {
-            $this->emit('toastr-error', "Pembatalan tidak dapat dilakukan, " . $regName . " sudak melakukan pelayanan Poli.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Pembatalan tidak dapat dilakukan, " . $regName . " sudak melakukan pelayanan Poli.");
             return;
         }
 
@@ -411,7 +411,7 @@ class PelayananRJ extends Component
 
         // cek
         if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']) {
-            $this->emit('toastr-error', "Anda tidak dapat melakukan taskId6 ketika taskId5 Kosong");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Anda tidak dapat melakukan taskId6 ketika taskId5 Kosong");
             return;
         }
 
@@ -473,9 +473,9 @@ class PelayananRJ extends Component
             // update DB
             $this->updateDataRJ($rjNo);
 
-            $this->emit('toastr-success', "masuk Apotek " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("masuk Apotek " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6']);
         } else {
-            $this->emit('toastr-error', "masuk Apotek " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("masuk Apotek " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6']);
         }
 
         // cari no Booking
@@ -484,7 +484,7 @@ class PelayananRJ extends Component
             $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6'], env('APP_TIMEZONE'))->timestamp * 1000; //waktu dalam timestamp milisecond
             $this->pushDataTaskId($noBooking, 6, $waktu);
         } else {
-            $this->emit('toastr-error', "waktu Masuk Apotek kosong tidak dapat dikirim");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("waktu Masuk Apotek kosong tidak dapat dikirim");
         }
     }
 
@@ -515,7 +515,7 @@ class PelayananRJ extends Component
 
         // cek
         if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6']) {
-            $this->emit('toastr-error', "Anda tidak dapat melakukan taskId7 ketika taskId6 Kosong");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Anda tidak dapat melakukan taskId7 ketika taskId6 Kosong");
             return;
         }
 
@@ -525,9 +525,9 @@ class PelayananRJ extends Component
             // update DB
             $this->updateDataRJ($rjNo);
 
-            $this->emit('toastr-success', "keluar Apotek " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId7']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("keluar Apotek " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId7']);
         } else {
-            $this->emit('toastr-error', "keluar Apotek " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId7']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("keluar Apotek " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId7']);
         }
 
         // cari no Booking
@@ -537,7 +537,7 @@ class PelayananRJ extends Component
             $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId7'], env('APP_TIMEZONE'))->timestamp * 1000; //waktu dalam timestamp milisecond
             $this->pushDataTaskId($noBooking, 7, $waktu);
         } else {
-            $this->emit('toastr-error', "waktu Keluar Apotek kosong tidak dapat dikirim");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("waktu Keluar Apotek kosong tidak dapat dikirim");
         }
     }
 
@@ -548,7 +548,7 @@ class PelayananRJ extends Component
         $HttpGetBpjs =  AntrianTrait::taskid_antrean($noBooking)->getOriginalContent();
 
         dd($HttpGetBpjs);
-        $this->emit('toastr-success', 'Task Id' . $noBooking . ' ' . $HttpGetBpjs);
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Task Id' . $noBooking . ' ' . $HttpGetBpjs);
     }
 
     private function pushDataTaskId($noBooking, $taskId, $time): void
@@ -566,9 +566,9 @@ class PelayananRJ extends Component
 
         // metadata d kecil
         if ($HttpGetBpjs['metadata']['code'] == 200) {
-            $this->emit('toastr-success', 'Task Id' . $taskId . ' ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Task Id' . $taskId . ' ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
         } else {
-            $this->emit('toastr-error', 'Task Id' . $taskId . ' ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Task Id' . $taskId . ' ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
 
             // Ulangi Proses pushTaskId;
             // $this->emit('rePush_Data_TaskId_Confirmation');
@@ -580,9 +580,9 @@ class PelayananRJ extends Component
         $HttpGetBpjs =  AntrianTrait::tambah_antrean_farmasi($noBooking, $jenisResep, $nomerAntrean, "")->getOriginalContent();
 
         if ($HttpGetBpjs['metadata']['code'] == 200) {
-            $this->emit('toastr-success', 'NoBooking' . $noBooking . ' ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('NoBooking' . $noBooking . ' ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
         } else {
-            $this->emit('toastr-error', 'NoBooking' . $noBooking . ' ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('NoBooking' . $noBooking . ' ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
         }
     }
 

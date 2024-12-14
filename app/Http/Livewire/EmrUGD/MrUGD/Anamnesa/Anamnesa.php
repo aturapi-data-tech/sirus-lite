@@ -366,7 +366,7 @@ class Anamnesa extends Component
             $this->validate($this->rules, $messages);
         } catch (\Illuminate\Validation\ValidationException $e) {
 
-            $this->emit('toastr-error', "Lakukan Pengecekan kembali Input Data.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Lakukan Pengecekan kembali Input Data.");
             $this->validate($this->rules, $messages);
         }
     }
@@ -417,7 +417,7 @@ class Anamnesa extends Component
 
             ]);
 
-        $this->emit('toastr-success', "Anamnesa berhasil disimpan.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Anamnesa berhasil disimpan.");
     }
     // insert and update record end////////////////
 
@@ -458,10 +458,10 @@ class Anamnesa extends Component
                 // reset rekonsiliasiObat
                 $this->reset(['rekonsiliasiObat']);
             } else {
-                $this->emit('toastr-error', "Nama Obat Sudah ada.");
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Nama Obat Sudah ada.");
             }
         } else {
-            $this->emit('toastr-error', "Nama Obat Kosong.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Nama Obat Kosong.");
         }
     }
 
@@ -502,7 +502,7 @@ class Anamnesa extends Component
             $this->validate($this->rules, $messages);
         } catch (\Illuminate\Validation\ValidationException $e) {
 
-            $this->emit('toastr-error', "Anda tidak dapat melakukan TTD-E karena data pemeriksaan belum lengkap." . $e->getMessage());
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Anda tidak dapat melakukan TTD-E karena data pemeriksaan belum lengkap." . $e->getMessage());
             $this->validate($this->rules, $messages);
         }
         // Validasi dulu
@@ -518,14 +518,14 @@ class Anamnesa extends Component
         // Validasi dulu
         // cek apakah data pemeriksaan sudah dimasukkan atau blm
         $this->validatePerawatPenerima();
-        // $this->emit('toastr-error', "Role " . $myUserNameActive);
+        //  toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError( "Role " . $myUserNameActive);
         if (auth()->user()->hasRole('Perawat')) {
             $this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['perawatPenerima'] = $myUserNameActive;
             $this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['perawatPenerimaCode'] = $myUserCodeActive;
             $this->store();
         } else {
 
-            $this->emit('toastr-error', "Anda tidak dapat melakukan TTD-E karena User Role " . $myUserNameActive . ' Bukan Perawat.');
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Anda tidak dapat melakukan TTD-E karena User Role " . $myUserNameActive . ' Bukan Perawat.');
             return;
         }
     }

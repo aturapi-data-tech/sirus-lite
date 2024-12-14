@@ -443,7 +443,7 @@ class RJskdp extends Component
     // search
     public function updatedSearch(): void
     {
-        // $this->emit('toastr-error', "search.");
+        //  toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError( "search.");
 
         $this->resetPage();
         $this->resetValidation();
@@ -453,7 +453,7 @@ class RJskdp extends Component
     // dr
     public function setdrRjRef($id, $name): void
     {
-        // $this->emit('toastr-error', "dr.");
+        //  toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError( "dr.");
 
         $this->drRjRef['drId'] = $id;
         $this->drRjRef['drName'] = $name;
@@ -648,7 +648,7 @@ class RJskdp extends Component
     //         $this->validate($rules, $messages);
     //     } catch (\Illuminate\Validation\ValidationException $e) {
 
-    //         $this->emit('toastr-error', "Lakukan Pengecekan kembali Input Data.");
+    //          toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError( "Lakukan Pengecekan kembali Input Data.");
     //         $this->validate($rules, $messages);
     //     }
     // }
@@ -680,7 +680,7 @@ class RJskdp extends Component
     //             'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
     //         ]);
 
-    //     $this->emit('toastr-success', "Surat Kontrol berhasil disimpan.");
+    //     toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess( "Surat Kontrol berhasil disimpan.");
     // }
     // insert and update record end////////////////
 
@@ -857,7 +857,7 @@ class RJskdp extends Component
                 : $findData->vno_sep;;
         } else {
 
-            $this->emit('toastr-error', "Json Tidak ditemukan, Data sedang diproses ulang.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Json Tidak ditemukan, Data sedang diproses ulang.");
             $dataDaftarPoliRJ = DB::table('rsview_rjkasir')
                 ->select(
                     DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
@@ -985,24 +985,24 @@ class RJskdp extends Component
 
     //             // 2 cek proses pada getHttp
     //             if ($HttpGetBpjs['metadata']['code'] == 200) {
-    //                 $this->emit('toastr-success', 'KONTROL ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+    //                 toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess( 'KONTROL ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
     //                 $this->dataDaftarPoliRJ['kontrol']['noSKDPBPJS'] = $HttpGetBpjs['response']['noSuratKontrol'];
 
-    //                 $this->emit('toastr-success', 'KONTROL ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+    //                 toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess( 'KONTROL ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
     //             } else {
-    //                 $this->emit('toastr-error', 'KONTROL ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+    //                  toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError( 'KONTROL ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
     //             }
     //         } else {
     //             // update
     //             $HttpGetBpjs =  VclaimTrait::suratkontrol_update($this->dataDaftarPoliRJ['kontrol'])->getOriginalContent();
 
     //             if ($HttpGetBpjs['metadata']['code'] == 200) {
-    //                 $this->emit('toastr-success', 'UPDATEKONTROL ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+    //                 toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess( 'UPDATEKONTROL ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
     //                 $this->dataDaftarPoliRJ['kontrol']['noSKDPBPJS'] = $HttpGetBpjs['response']['noSuratKontrol'];
 
-    //                 $this->emit('toastr-success', 'UPDATEKONTROL ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+    //                 toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess( 'UPDATEKONTROL ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
     //             } else {
-    //                 $this->emit('toastr-error', 'UPDATEKONTROL ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+    //                  toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError( 'UPDATEKONTROL ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
     //             }
     //         }
     //     }

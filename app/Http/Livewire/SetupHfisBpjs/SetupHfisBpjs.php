@@ -77,10 +77,10 @@ class SetupHfisBpjs extends Component
 
             if ($HttpGetBpjs['metadata']['code'] == 200) {
                 $this->hfisLov = $HttpGetBpjs['response']['poli'];
-                $this->emit('toastr-success', $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess($HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
             } else {
                 $this->hfisLov = [];
-                $this->emit('toastr-error', $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError($HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
             }
         }
     }
@@ -98,10 +98,10 @@ class SetupHfisBpjs extends Component
             $this->jadwal_dokter = $HttpGetBpjs['response'];
             // dd($this->jadwal_dokter);
 
-            $this->emit('toastr-success', $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess($HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
         } else {
             $this->jadwal_dokter = [];
-            $this->emit('toastr-error', $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError($HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
         }
 
 
@@ -127,7 +127,7 @@ class SetupHfisBpjs extends Component
 
         if (!$kdDrBpjsSyncRs) {
             // dd("Dokter tidak ditemukan / Data Dokter belum di syncronuze " . $drIdBPJS . ' ' . $nmDokterBPJS);
-            $this->emit('toastr-success', "Dokter tidak ditemukan / Data Dokter belum di syncronuze " . $drIdBPJS . ' ' . $nmDokterBPJS);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Dokter tidak ditemukan / Data Dokter belum di syncronuze " . $drIdBPJS . ' ' . $nmDokterBPJS);
         }
 
         // cek dayId
@@ -183,10 +183,10 @@ class SetupHfisBpjs extends Component
                     'kuota' => $kuota,
                     'selesai_praktek' => $jamselesai . ':00',
                 ]);
-                $this->emit('toastr-success', 'Insert OK');
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Insert OK');
             } catch (\Exception $e) {
                 // dd($e->getMessage());
-                $this->emit('toastr-error', 'Insert ' . $e->getMessage());
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Insert ' . $e->getMessage());
             }
         } else {
             // update
@@ -210,10 +210,10 @@ class SetupHfisBpjs extends Component
                         'kuota' => $kuota,
                         'selesai_praktek' => $jamselesai . ':00',
                     ]);
-                $this->emit('toastr-success', 'Update OK');
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Update OK');
             } catch (\Exception $e) {
                 // dd($e->getMessage());
-                $this->emit('toastr-error', 'Update ' . $e->getMessage());
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Update ' . $e->getMessage());
             }
         }
     }
@@ -250,7 +250,7 @@ class SetupHfisBpjs extends Component
             }
             // dd($this->jadwal_dokter);
         }
-        $this->emit('toastr-success', 'Update OK');
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Update OK');
     }
 
     private function setHari(): array

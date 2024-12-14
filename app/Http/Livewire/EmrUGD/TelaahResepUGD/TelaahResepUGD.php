@@ -322,7 +322,7 @@ class TelaahResepUGD extends Component
 
     public function editAdministrasi($rjNo, $regNoRef)
     {
-        $this->emit('toastr-error', 'Program dalam masa proses pengembangan');
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Program dalam masa proses pengembangan');
         return;
         $this->openModalEditAdministrasi($rjNo, $regNoRef);
         // $this->findData($id);
@@ -349,7 +349,7 @@ class TelaahResepUGD extends Component
     public function editTelaahResep($eresep, $rjNo, $regNoRef)
     {
         if (!$eresep) {
-            $this->emit('toastr-error', 'E-Resep Tidak ditemukan');
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('E-Resep Tidak ditemukan');
         } else {
             $this->openModalEditTelaahResep($rjNo, $regNoRef);
         }
@@ -476,7 +476,7 @@ class TelaahResepUGD extends Component
                 $this->emit('syncronizeAssessmentPerawatUGDFindData');
             }
         } else {
-            $this->emit('toastr-error', "Anda tidak dapat melakukan TTD-E karena User Role " . $myUserNameActive . ' Bukan Apoteker.');
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Anda tidak dapat melakukan TTD-E karena User Role " . $myUserNameActive . ' Bukan Apoteker.');
             return;
         }
     }
@@ -503,7 +503,7 @@ class TelaahResepUGD extends Component
                 $this->emit('syncronizeAssessmentPerawatUGDFindData');
             }
         } else {
-            $this->emit('toastr-error', "Anda tidak dapat melakukan TTD-E karena User Role " . $myUserNameActive . ' Bukan Apoteker.');
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Anda tidak dapat melakukan TTD-E karena User Role " . $myUserNameActive . ' Bukan Apoteker.');
             return;
         }
     }
@@ -678,7 +678,7 @@ class TelaahResepUGD extends Component
 
         // cek
         // if (!$this->dataDaftarUgd['taskIdPelayanan']['taskId5']) {
-        //     $this->emit('toastr-error', "Anda tidak dapat melakukan taskId6 ketika taskId5 Kosong");
+        //      toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError( "Anda tidak dapat melakukan taskId6 ketika taskId5 Kosong");
         //     return;
         // }
 
@@ -739,9 +739,9 @@ class TelaahResepUGD extends Component
             // update DB
             $this->updateJsonUGD($rjNo, $this->dataDaftarUgd);
 
-            $this->emit('toastr-success', "masuk Apotek " . $this->dataDaftarUgd['taskIdPelayanan']['taskId6']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("masuk Apotek " . $this->dataDaftarUgd['taskIdPelayanan']['taskId6']);
         } else {
-            $this->emit('toastr-error', "masuk Apotek " . $this->dataDaftarUgd['taskIdPelayanan']['taskId6']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("masuk Apotek " . $this->dataDaftarUgd['taskIdPelayanan']['taskId6']);
         }
     }
 
@@ -768,7 +768,7 @@ class TelaahResepUGD extends Component
         // update no antrian Apotek
         // cek
         if (!$this->dataDaftarUgd['taskIdPelayanan']['taskId6']) {
-            $this->emit('toastr-error', "Anda tidak dapat melakukan taskId7 ketika taskId6 Kosong");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Anda tidak dapat melakukan taskId7 ketika taskId6 Kosong");
             return;
         }
 
@@ -778,9 +778,9 @@ class TelaahResepUGD extends Component
             // update DB
             $this->updateJsonUGD($rjNo, $this->dataDaftarUgd);
 
-            $this->emit('toastr-success', "keluar Apotek " . $this->dataDaftarUgd['taskIdPelayanan']['taskId7']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("keluar Apotek " . $this->dataDaftarUgd['taskIdPelayanan']['taskId7']);
         } else {
-            $this->emit('toastr-error', "keluar Apotek " . $this->dataDaftarUgd['taskIdPelayanan']['taskId7']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("keluar Apotek " . $this->dataDaftarUgd['taskIdPelayanan']['taskId7']);
         }
     }
 

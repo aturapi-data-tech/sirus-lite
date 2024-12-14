@@ -105,9 +105,7 @@
                             <button data-tooltip-target="tooltip-profile" type="button"
                                 class="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600">
                                 <span class="sr-only">Open user menu</span>
-                                <img class="w-8 h-8 rounded-full"
-                                    src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
-                                    alt="user photo">
+                                <img class="w-8 h-8 rounded-full" src="madinahlogopersegi.png" alt="user photo">
                             </button>
                         </x-slot>
 

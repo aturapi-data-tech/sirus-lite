@@ -166,7 +166,7 @@ class Screening extends Component
             $this->validate($rules, $messages);
         } catch (\Illuminate\Validation\ValidationException $e) {
 
-            // $this->emit('toastr-error', "Lakukan Pengecekan kembali Input Data.");
+            //  toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError( "Lakukan Pengecekan kembali Input Data.");
             $this->validate($rules, $messages);
         }
     }
@@ -193,7 +193,7 @@ class Screening extends Component
                 'datadaftarUgd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
             ]);
 
-        $this->emit('toastr-success', "Screening berhasil disimpan.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Screening berhasil disimpan.");
     }
     // insert and update record end////////////////
 

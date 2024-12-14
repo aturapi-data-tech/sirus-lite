@@ -699,7 +699,7 @@ class DaftarRJ extends Component
     // search
     public function updatedSearch(): void
     {
-        // $this->emit('toastr-error', "search.");
+        //  toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError( "search.");
 
         $this->resetPage();
         $this->resetValidation();
@@ -708,7 +708,7 @@ class DaftarRJ extends Component
     // date
     public function updatedDaterjref(): void
     {
-        // $this->emit('toastr-error', "date.");
+        //  toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError( "date.");
 
         $this->resetPage();
         $this->resetValidation();
@@ -717,7 +717,7 @@ class DaftarRJ extends Component
     // status
     public function updatedStatusrjref(): void
     {
-        // $this->emit('toastr-error', "status.");
+        //  toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError( "status.");
 
         $this->resetPage();
         $this->resetValidation();
@@ -726,7 +726,7 @@ class DaftarRJ extends Component
     // dr
     public function setdrRjRef($id, $name): void
     {
-        // $this->emit('toastr-error', $id);
+        //  toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError( $id);
 
         $this->drRjRef['drId'] = $id;
         $this->drRjRef['drName'] = $name;
@@ -737,7 +737,7 @@ class DaftarRJ extends Component
     // shift
     public function setShift($id, $desc): void
     {
-        // $this->emit('toastr-error', "shift.");
+        //  toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError( "shift.");
 
         $this->shiftRjRef['shiftId'] = $id;
         $this->shiftRjRef['shiftDesc'] = $desc;
@@ -760,13 +760,13 @@ class DaftarRJ extends Component
     // is going to delete data////////////////
     public function delete()
     {
-        $this->emit('toastr-error', "delete Data tidak dapat di proses.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("delete Data tidak dapat di proses.");
     }
 
     // is going to tampil data////////////////
     public function tampil()
     {
-        $this->emit('toastr-error', "tampil Data tidak dapat di proses.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("tampil Data tidak dapat di proses.");
     }
 
     // is going to edit data/////////////////
@@ -871,7 +871,7 @@ class DaftarRJ extends Component
             $this->validate($rules, $messages);
         } catch (\Illuminate\Validation\ValidationException $e) {
 
-            $this->emit('toastr-error', "Lakukan Pengecekan kembali Input Data Pasien.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Lakukan Pengecekan kembali Input Data Pasien.");
             $this->validate($rules, $messages);
         }
     }
@@ -976,7 +976,7 @@ class DaftarRJ extends Component
 
         ]);
 
-        $this->emit('toastr-success', "Data sudah tersimpan.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Data sudah tersimpan.");
     }
 
     private function updateDataRJ($rjNo): void
@@ -1016,7 +1016,7 @@ class DaftarRJ extends Component
                 'vno_sep' => isset($this->dataDaftarPoliRJ['sep']['noSep']) ? $this->dataDaftarPoliRJ['sep']['noSep'] : "",
             ]);
 
-        $this->emit('toastr-success', "Data berhasil diupdate.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Data berhasil diupdate.");
     }
     // insert and update record end////////////////
 
@@ -1167,7 +1167,7 @@ class DaftarRJ extends Component
     {
         // Cek jika bukan BPJS
         if ($this->JenisKlaim['JenisKlaimId'] != 'JM') {
-            $this->emit('toastr-error', 'Jenis Klaim ' . $this->JenisKlaim['JenisKlaimDesc']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Jenis Klaim ' . $this->JenisKlaim['JenisKlaimDesc']);
         } else {
             // Cek Apakah reqSep ada datanya apa blm
             // if (isset($this->dataDaftarPoliRJ['sep']['reqSep']['request']) && isset($this->dataDaftarPoliRJ['sep']['noSep'])) {
@@ -1212,7 +1212,7 @@ class DaftarRJ extends Component
                 } else if ($this->JenisKlaim['JenisKlaimId'] == 'JM' && $this->JenisKunjungan['JenisKunjunganId'] == 4) {
                     // if jenis klaim BPJS dan Kunjungan = FKTL antar rs(4)
                     $this->rujukanPesertaFKTL($this->dataPasien['pasien']['identitas']['idbpjs']);
-                    $this->emit('toastr-error', 'Jenis Klaim FKTL antar rs cek');
+                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Jenis Klaim FKTL antar rs cek');
                 }
             }
         }
@@ -1328,13 +1328,13 @@ class DaftarRJ extends Component
 
         // dd(isset($this->dataDaftarPoliRJ['klaimId']));
         if (!isset($this->dataDaftarPoliRJ['klaimId'])) {
-            $this->emit('toastr-error', "Data Klaim tidak ditemukan, Reset Data Ke UMUM");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data Klaim tidak ditemukan, Reset Data Ke UMUM");
             $this->dataDaftarPoliRJ['klaimId'] = 'UM';
             $this->dataDaftarPoliRJ['klaimDesc'] = 'UMUM';
         }
 
         if (!isset($this->dataDaftarPoliRJ['kunjunganId'])) {
-            $this->emit('toastr-error', "Data Kunjungan tidak ditemukan, Reset Data Ke FKTP");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data Kunjungan tidak ditemukan, Reset Data Ke FKTP");
         }
 
         $this->setDataPasien($this->dataDaftarPoliRJ['regNo']);
@@ -1759,7 +1759,7 @@ class DaftarRJ extends Component
 
             // 2 cek proses pada getHttp
             if ($HttpGetBpjs['metadata']['code'] == 200 || $HttpGetBpjs['metadata']['code'] == 208) {
-                $this->emit('toastr-success', 'Tambah Antrian ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Tambah Antrian ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
 
                 $this->HttpGetBpjsStatus = $HttpGetBpjs['metadata']['code']; //status 200 201 400 ..
                 $this->HttpGetBpjsJson = json_encode($HttpGetBpjs, true); //Return Response Tambah Antrean
@@ -1772,7 +1772,7 @@ class DaftarRJ extends Component
                 //ketika Push Tambah Antrean Berhasil buat SEP
                 //////////////////////////////////////////////
             } else {
-                $this->emit('toastr-error', 'Tambah Antrian ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Tambah Antrian ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
 
                 $this->HttpGetBpjsStatus = $HttpGetBpjs['metadata']['code']; //status 200 201 400 ..
                 $this->HttpGetBpjsJson = json_encode($HttpGetBpjs, true); //Return Response Tambah Antrean
@@ -1810,7 +1810,7 @@ class DaftarRJ extends Component
                 }
             } catch (Exception $e) {
                 // dd($e->getMessage());
-                $this->emit('toastr-error', $e->getMessage());
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError($e->getMessage());
             }
         }
 
@@ -1838,9 +1838,9 @@ class DaftarRJ extends Component
 
         // metadata d kecil
         if ($HttpGetBpjs['metadata']['code'] == 200) {
-            $this->emit('toastr-success', 'Task Id' . $taskId . ' ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Task Id' . $taskId . ' ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
         } else {
-            $this->emit('toastr-error', 'Task Id' . $taskId . ' ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Task Id' . $taskId . ' ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
 
             // Ulangi Proses pushTaskId;
             // $this->emit('rePush_Data_TaskId_Confirmation');
@@ -1856,11 +1856,11 @@ class DaftarRJ extends Component
             $this->dataRefBPJSLovStatus = true;
             $this->dataRefBPJSLov = json_decode(json_encode($HttpGetBpjs['response']['rujukan'], true), true);
 
-            $this->emit('toastr-success', $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess($HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
         } else {
             $this->dataRefBPJSLovStatus = false;
             $this->dataRefBPJSLov = [];
-            $this->emit('toastr-error', $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError($HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
         }
     }
 
@@ -1873,11 +1873,11 @@ class DaftarRJ extends Component
             $this->dataRefBPJSLovStatus = true;
             $this->dataRefBPJSLov = json_decode(json_encode($HttpGetBpjs['response']['rujukan'], true), true);
 
-            $this->emit('toastr-success', $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess($HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
         } else {
             $this->dataRefBPJSLovStatus = false;
             $this->dataRefBPJSLov = [];
-            $this->emit('toastr-error', $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError($HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
         }
     }
 
@@ -1890,11 +1890,11 @@ class DaftarRJ extends Component
             $peserta = $HttpGetBpjs['response'];
             $this->setSEPJsonReqPostInap($peserta);
             $this->formRujukanRefBPJSStatus = true;
-            $this->emit('toastr-success', $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess($HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
         } else {
             $this->dataRefBPJSLovStatus = false;
             $this->dataRefBPJSLov = [];
-            $this->emit('toastr-error', $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError($HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
         }
     }
 
@@ -1919,9 +1919,9 @@ class DaftarRJ extends Component
             $this->dataDaftarPoliRJ['sep']['resSep'] = $HttpGetBpjs['response']['sep'];
             $this->dataDaftarPoliRJ['sep']['noSep'] = $HttpGetBpjs['response']['sep']['noSep'];
 
-            $this->emit('toastr-success', 'SEP ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('SEP ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
         } else {
-            $this->emit('toastr-error', 'SEP ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('SEP ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
         }
 
         // response sep value
@@ -2085,10 +2085,10 @@ class DaftarRJ extends Component
                 $this->dataDaftarPoliRJ['kdpolibpjs'] = $cariDataIdBpjs_dr_poli->kd_poli_bpjs;
             } else {
                 // jika salah satu data kosong
-                $this->emit('toastr-error', "Data Dokter atau Poli mapping BPJS belum di set.");
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data Dokter atau Poli mapping BPJS belum di set.");
             }
         } else {
-            $this->emit('toastr-error', "Data Dokter atau Poli mapping BPJS belum tidak di temukan.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data Dokter atau Poli mapping BPJS belum tidak di temukan.");
         }
 
         // Mencari asalRujukan
@@ -2595,7 +2595,7 @@ class DaftarRJ extends Component
     {
         // cek BPJS atau bukan
         if ($this->JenisKlaim['JenisKlaimId'] != 'JM') {
-            $this->emit('toastr-error', 'Jenis Klaim ' . $this->JenisKlaim['JenisKlaimDesc']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Jenis Klaim ' . $this->JenisKlaim['JenisKlaimDesc']);
         } else {
             // cek ada resSep ada atau tidak
             if (!$this->dataDaftarPoliRJ['sep']['resSep']) {
@@ -2618,9 +2618,9 @@ class DaftarRJ extends Component
                         ]);
 
 
-                    $this->emit('toastr-success', 'CetakSEP ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('CetakSEP ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
                 } else {
-                    $this->emit('toastr-error', 'CetakSEP ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('CetakSEP ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
                 }
             } else {
 
@@ -2631,7 +2631,7 @@ class DaftarRJ extends Component
 
                 ];
                 $pdfContent = PDF::loadView('livewire.daftar-r-j.cetak-sep', $data)->output();
-                $this->emit('toastr-success', 'CetakSEP');
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('CetakSEP');
 
                 return response()->streamDownload(
                     fn() => print($pdfContent),
@@ -2657,7 +2657,7 @@ class DaftarRJ extends Component
         if ($this->dataDaftarPoliRJ['regNo']) {
             $this->callRJskdp = true;
         } else {
-            $this->emit('toastr-error', "Data Tidak dapat di proses (Reg No Pasien Kosong)");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data Tidak dapat di proses (Reg No Pasien Kosong)");
         }
     }
 
@@ -2692,9 +2692,9 @@ class DaftarRJ extends Component
             // update DB
             $this->updateDataRJ($rjNo);
 
-            $this->emit('toastr-success', "Masuk Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Masuk Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']);
         } else {
-            $this->emit('toastr-error', "Masuk Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Masuk Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']);
         }
 
         // cari no Booking
@@ -2720,9 +2720,9 @@ class DaftarRJ extends Component
                 // update DB
                 $this->updateDataRJ($rjNo);
 
-                $this->emit('toastr-success', "Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
             } else {
-                $this->emit('toastr-error', "Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
             }
 
             // cari no Booking
@@ -2732,9 +2732,9 @@ class DaftarRJ extends Component
             $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5'], env('APP_TIMEZONE'))->timestamp * 1000; //waktu dalam timestamp milisecond
             $this->pushDataTaskId($noBooking, 5, $waktu);
 
-            $this->emit('toastr-success', "Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
         } else {
-            $this->emit('toastr-error', "Satus Pasien Belum melalui pelayanan Poli");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Satus Pasien Belum melalui pelayanan Poli");
         }
     }
 

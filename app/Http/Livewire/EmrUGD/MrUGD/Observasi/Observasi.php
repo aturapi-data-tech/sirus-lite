@@ -119,7 +119,7 @@ class Observasi extends Component
             $this->validate($this->rules, $messages);
         } catch (\Illuminate\Validation\ValidationException $e) {
 
-            $this->emit('toastr-error', "Lakukan Pengecekan kembali Input Data." . $e->getMessage());
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Lakukan Pengecekan kembali Input Data." . $e->getMessage());
             $this->validate($this->rules, $messages);
         }
     }
@@ -146,7 +146,7 @@ class Observasi extends Component
                 'datadaftarUgd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
             ]);
 
-        $this->emit('toastr-success', "Observasi berhasil disimpan.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Observasi berhasil disimpan.");
     }
     // insert and update record end////////////////
 
@@ -199,7 +199,7 @@ class Observasi extends Component
             // reset observasiLanjutan
             $this->reset(['observasiLanjutan']);
         } else {
-            $this->emit('toastr-error', "Observasi Sudah ada.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Observasi Sudah ada.");
         }
     }
 

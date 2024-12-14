@@ -89,7 +89,7 @@ class MasterPoli extends Component
         $validator = Validator::make($r, $rules, $customErrorMessagesTrait, $attribute);
 
         if ($validator->fails()) {
-            $this->emit('toastr-error', $validator->messages()->all());
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError($validator->messages()->all());
             return;
         }
         // Proses Validasi///////////////////////////////////////////
@@ -99,7 +99,7 @@ class MasterPoli extends Component
             ->where('poli_id', $poliId)
             ->delete();
 
-        $this->emit('toastr-success', "Data " . $poliDesc . " berhasil dihapus.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Data " . $poliDesc . " berhasil dihapus.");
     }
     // open and close modal start////////////////
 

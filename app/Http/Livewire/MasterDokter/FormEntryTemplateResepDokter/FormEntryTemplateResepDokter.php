@@ -86,7 +86,7 @@ class FormEntryTemplateResepDokter extends Component
 
                 $this->isOpenMode = 'update';
             } else {
-                $this->emit('toastr-error', "Data tidak ditemukan.");
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data tidak ditemukan.");
                 $this->FormEntry = [
                     'dokterId' => $dokterId,
                     'temprId' => null,
@@ -98,7 +98,7 @@ class FormEntryTemplateResepDokter extends Component
                 $this->isOpenMode = 'insert';
             }
         } catch (Exception $e) {
-            $this->emit('toastr-error', $e->getMessage());
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError($e->getMessage());
             $this->FormEntry = [
                 'dokterId' => $dokterId,
                 'temprId' => null,
@@ -122,7 +122,7 @@ class FormEntryTemplateResepDokter extends Component
                 'tempr_desc' => isset($this->FormEntry['temprDesc']) ? $this->FormEntry['temprDesc'] : '',
             ]);
 
-        $this->emit('toastr-success', "Data berhasil diupdate.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Data berhasil diupdate.");
     }
 
     private function insert(): void
@@ -135,7 +135,7 @@ class FormEntryTemplateResepDokter extends Component
                 'tempr_desc' => isset($this->FormEntry['temprDesc']) ? $this->FormEntry['temprDesc'] : '',
             ]);
 
-        $this->emit('toastr-success', "Data berhasil dimasukkan.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Data berhasil dimasukkan.");
     }
 
     public function store()
@@ -172,7 +172,7 @@ class FormEntryTemplateResepDokter extends Component
 
             $this->validate($this->rules, customErrorMessagesTrait::messages());
         } catch (\Illuminate\Validation\ValidationException $e) {
-            $this->emit('toastr-error', $e->getMessage());
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError($e->getMessage());
             $this->validate($this->rules, customErrorMessagesTrait::messages());
         }
     }
@@ -198,7 +198,7 @@ class FormEntryTemplateResepDokter extends Component
         $validator = Validator::make($r, $rules, $customErrorMessagesTrait, $attribute);
 
         if ($validator->fails()) {
-            $this->emit('toastr-error', $validator->messages()->all());
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError($validator->messages()->all());
             return;
         }
         // Proses Validasi///////////////////////////////////////////
@@ -209,7 +209,7 @@ class FormEntryTemplateResepDokter extends Component
             ->where('tempr_id', $temprId)
             ->delete();
 
-        $this->emit('toastr-success', "Data " . $temprId . " berhasil dihapus.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Data " . $temprId . " berhasil dihapus.");
     }
 
     public function mount()

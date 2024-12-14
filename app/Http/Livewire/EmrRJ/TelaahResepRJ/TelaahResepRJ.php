@@ -350,7 +350,7 @@ class TelaahResepRJ extends Component
     public function editTelaahResep($eresep, $rjNo, $regNoRef)
     {
         if (!$eresep) {
-            $this->emit('toastr-error', 'E-Resep Tidak ditemukan');
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('E-Resep Tidak ditemukan');
         } else {
             $this->openModalEditTelaahResep($rjNo, $regNoRef);
         }
@@ -484,7 +484,7 @@ class TelaahResepRJ extends Component
                 $this->emit('syncronizeAssessmentPerawatRJFindData');
             }
         } else {
-            $this->emit('toastr-error', "Anda tidak dapat melakukan TTD-E karena User Role " . $myUserNameActive . ' Bukan Apoteker.');
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Anda tidak dapat melakukan TTD-E karena User Role " . $myUserNameActive . ' Bukan Apoteker.');
             return;
         }
     }
@@ -511,7 +511,7 @@ class TelaahResepRJ extends Component
                 $this->emit('syncronizeAssessmentPerawatRJFindData');
             }
         } else {
-            $this->emit('toastr-error', "Anda tidak dapat melakukan TTD-E karena User Role " . $myUserNameActive . ' Bukan Apoteker.');
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Anda tidak dapat melakukan TTD-E karena User Role " . $myUserNameActive . ' Bukan Apoteker.');
             return;
         }
     }
@@ -676,7 +676,7 @@ class TelaahResepRJ extends Component
 
         // cek
         if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']) {
-            $this->emit('toastr-error', "Anda tidak dapat melakukan taskId6 ketika taskId5 Kosong");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Anda tidak dapat melakukan taskId6 ketika taskId5 Kosong");
             return;
         }
 
@@ -743,9 +743,9 @@ class TelaahResepRJ extends Component
             // update DB
             $this->updateDataRJ($rjNo);
 
-            $this->emit('toastr-success', "masuk Apotek " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("masuk Apotek " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6']);
         } else {
-            $this->emit('toastr-error', "masuk Apotek " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("masuk Apotek " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6']);
         }
 
         // cari no Booking
@@ -754,7 +754,7 @@ class TelaahResepRJ extends Component
             $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6'], env('APP_TIMEZONE'))->timestamp * 1000; //waktu dalam timestamp milisecond
             $this->pushDataTaskId($noBooking, 6, $waktu);
         } else {
-            $this->emit('toastr-error', "waktu Masuk Apotek kosong tidak dapat dikirim");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("waktu Masuk Apotek kosong tidak dapat dikirim");
         }
     }
 
@@ -784,7 +784,7 @@ class TelaahResepRJ extends Component
 
         // cek
         if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6']) {
-            $this->emit('toastr-error', "Anda tidak dapat melakukan taskId7 ketika taskId6 Kosong");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Anda tidak dapat melakukan taskId7 ketika taskId6 Kosong");
             return;
         }
 
@@ -794,9 +794,9 @@ class TelaahResepRJ extends Component
             // update DB
             $this->updateDataRJ($rjNo);
 
-            $this->emit('toastr-success', "keluar Apotek " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId7']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("keluar Apotek " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId7']);
         } else {
-            $this->emit('toastr-error', "keluar Apotek " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId7']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("keluar Apotek " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId7']);
         }
 
         // cari no Booking
@@ -806,7 +806,7 @@ class TelaahResepRJ extends Component
             $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId7'], env('APP_TIMEZONE'))->timestamp * 1000; //waktu dalam timestamp milisecond
             $this->pushDataTaskId($noBooking, 7, $waktu);
         } else {
-            $this->emit('toastr-error', "waktu Keluar Apotek kosong tidak dapat dikirim");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("waktu Keluar Apotek kosong tidak dapat dikirim");
         }
     }
 
@@ -815,9 +815,9 @@ class TelaahResepRJ extends Component
         $HttpGetBpjs =  AntrianTrait::tambah_antrean_farmasi($noBooking, $jenisResep, $nomerAntrean, "")->getOriginalContent();
 
         if ($HttpGetBpjs['metadata']['code'] == 200) {
-            $this->emit('toastr-success', 'NoBooking' . $noBooking . ' ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('NoBooking' . $noBooking . ' ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
         } else {
-            $this->emit('toastr-error', 'NoBooking' . $noBooking . ' ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('NoBooking' . $noBooking . ' ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
         }
     }
 
@@ -836,9 +836,9 @@ class TelaahResepRJ extends Component
 
         // metadata d kecil
         if ($HttpGetBpjs['metadata']['code'] == 200) {
-            $this->emit('toastr-success', 'Task Id' . $taskId . ' ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Task Id' . $taskId . ' ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
         } else {
-            $this->emit('toastr-error', 'Task Id' . $taskId . ' ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Task Id' . $taskId . ' ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
 
             // Ulangi Proses pushTaskId;
             // $this->emit('rePush_Data_TaskId_Confirmation');

@@ -167,7 +167,7 @@ class CetakEresepRJ extends Component
             }
         } else {
 
-            $this->emit('toastr-error', "Data tidak dapat di proses json.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data tidak dapat di proses json.");
             $dataDaftarPoliRJ = DB::table('rsview_rjkasir')
                 ->select(
                     DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
@@ -497,7 +497,7 @@ class CetakEresepRJ extends Component
 
                 ];
                 $pdfContent = PDF::loadView('livewire.cetak.cetak-eresep-r-j-print', $data)->output();
-                $this->emit('toastr-success', 'Cetak Eresep RJ');
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Cetak Eresep RJ');
 
 
                 return response()->streamDownload(
@@ -505,10 +505,10 @@ class CetakEresepRJ extends Component
                     "eresep.pdf"
                 );
             } else {
-                $this->emit('toastr-error', 'Data Resep Tidak ditemukan');
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Data Resep Tidak ditemukan');
             }
         } else {
-            $this->emit('toastr-error', 'Belum ada TTD pada Data Resep');
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Belum ada TTD pada Data Resep');
         }
     }
 

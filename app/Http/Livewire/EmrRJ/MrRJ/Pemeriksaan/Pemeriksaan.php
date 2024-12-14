@@ -677,7 +677,7 @@ class Pemeriksaan extends Component
             $this->updateDataRJ($this->dataDaftarPoliRJ['rjNo']);
             $this->closeModalLaboratorium();
         } else {
-            $this->emit('toastr-error', "Pasien Sudah Pulang, Anda tidak bisa meneruskan pemeriksaan ini.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Pasien Sudah Pulang, Anda tidak bisa meneruskan pemeriksaan ini.");
             return;
         }
     }
@@ -805,7 +805,7 @@ class Pemeriksaan extends Component
             $this->updateDataRJ($this->dataDaftarPoliRJ['rjNo']);
             $this->closeModalRadiologi();
         } else {
-            $this->emit('toastr-error', "Pasien Sudah Pulang, Anda tidak bisa meneruskan pemeriksaan ini.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Pasien Sudah Pulang, Anda tidak bisa meneruskan pemeriksaan ini.");
             return;
         }
     }
@@ -895,7 +895,7 @@ class Pemeriksaan extends Component
             $this->validate($this->rules, $messages);
         } catch (\Illuminate\Validation\ValidationException $e) {
 
-            $this->emit('toastr-error', "Lakukan Pengecekan kembali Input Data.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Lakukan Pengecekan kembali Input Data.");
             $this->validate($this->rules, $messages);
         }
     }
@@ -926,7 +926,7 @@ class Pemeriksaan extends Component
                 'dataDaftarPoliRJ_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
             ]);
 
-        $this->emit('toastr-success', "Pemeriksaan berhasil disimpan.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Pemeriksaan berhasil disimpan.");
     }
     // insert and update record end////////////////
 
@@ -1013,7 +1013,7 @@ class Pemeriksaan extends Component
             $this->isOpenRekamMedisuploadpenunjangHasil = true;
             $this->filePDF = $file;
         } else {
-            $this->emit('toastr-error', 'File tidak ditemukan');
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('File tidak ditemukan');
             return;
         }
     }

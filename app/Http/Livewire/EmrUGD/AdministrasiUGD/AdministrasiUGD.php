@@ -138,11 +138,11 @@ class AdministrasiUGD extends Component
                     'datadaftarugd_xml' => ArrayToXml::convert($dataDaftarUgd),
                 ]);
 
-            $this->emit('toastr-success', "Administrasi berhasil disimpan.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Administrasi berhasil disimpan.");
             $this->emit('syncronizeAssessmentDokterUGDFindData');
             $this->emit('syncronizeAssessmentPerawatUGDFindData');
         } else {
-            $this->emit('toastr-error', "Administrasi sudah tersimpan oleh." . $dataDaftarUgd['AdministrasiRj']['userLog']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Administrasi sudah tersimpan oleh." . $dataDaftarUgd['AdministrasiRj']['userLog']);
         }
     }
 

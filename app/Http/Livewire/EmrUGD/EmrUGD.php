@@ -317,12 +317,12 @@ class EmrUGD extends Component
 
     public function tampil()
     {
-        $this->emit('toastr-error', 'Fitur dalam masa pengembangan');
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Fitur dalam masa pengembangan');
     }
 
     public function delete()
     {
-        $this->emit('toastr-error', 'Fitur dalam masa pengembangan');
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Fitur dalam masa pengembangan');
     }
 
 

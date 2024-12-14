@@ -357,7 +357,7 @@ class AnamnesaUGDRI extends Component
             $this->validate($this->rules, $messages);
         } catch (\Illuminate\Validation\ValidationException $e) {
 
-            $this->emit('toastr-error', "Lakukan Pengecekan kembali Input Data.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Lakukan Pengecekan kembali Input Data.");
             $this->validate($this->rules, $messages);
         }
     }
@@ -406,7 +406,7 @@ class AnamnesaUGDRI extends Component
 
             ]);
 
-        $this->emit('toastr-success', "Anamnesa berhasil disimpan.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Anamnesa berhasil disimpan.");
     }
     // insert and update record end////////////////
 
@@ -434,7 +434,7 @@ class AnamnesaUGDRI extends Component
             }
         } else {
 
-            $this->emit('toastr-error', "Data tidak dapat di proses json.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data tidak dapat di proses json.");
             $dataDaftarUgd = DB::table('rsview_ugdkasir')
                 ->select(
                     DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
@@ -567,10 +567,10 @@ class AnamnesaUGDRI extends Component
                 // reset rekonsiliasiObat
                 $this->reset(['rekonsiliasiObat']);
             } else {
-                $this->emit('toastr-error', "Nama Obat Sudah ada.");
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Nama Obat Sudah ada.");
             }
         } else {
-            $this->emit('toastr-error', "Nama Obat Kosong.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Nama Obat Kosong.");
         }
     }
 

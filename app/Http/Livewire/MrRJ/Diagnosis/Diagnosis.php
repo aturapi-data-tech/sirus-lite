@@ -32,7 +32,7 @@ class Diagnosis extends Component
     // dataDaftarPoliRJ RJ
     public $dataDaftarPoliRJ = [];
 
-    // data SKDP / kontrol=>[] 
+    // data SKDP / kontrol=>[]
     public $diagnosis = [];
     public $procedure = [];
     //////////////////////////////////////////////////////////////////////
@@ -109,7 +109,7 @@ class Diagnosis extends Component
         // Variable Search
         $search = $this->dataDiagnosaICD10LovSearch;
 
-        // check LOV by dr_id rs id 
+        // check LOV by dr_id rs id
         $dataDiagnosaICD10 = DB::table('rsmst_mstdiags')->select(
             'diag_id',
             'diag_desc',
@@ -196,7 +196,7 @@ class Diagnosis extends Component
         // Variable Search
         $search = $this->dataProcedureICD9CmLovSearch;
 
-        // check LOV by dr_id rs id 
+        // check LOV by dr_id rs id
         $dataProcedureICD9Cm = DB::table('rsmst_mstprocedures')->select(
             'proc_id',
             'proc_desc',
@@ -282,7 +282,7 @@ class Diagnosis extends Component
             $this->validate($rules, $messages);
         } catch (\Illuminate\Validation\ValidationException $e) {
 
-            $this->emit('toastr-error', "Lakukan Pengecekan kembali Input Data.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Lakukan Pengecekan kembali Input Data.");
             $this->validate($rules, $messages);
         }
     }
@@ -312,7 +312,7 @@ class Diagnosis extends Component
                 'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
             ]);
 
-        $this->emit('toastr-success', "Diagnosa berhasil disimpan.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Diagnosa berhasil disimpan.");
     }
     // insert and update record end////////////////
 
@@ -339,7 +339,7 @@ class Diagnosis extends Component
             }
         } else {
 
-            $this->emit('toastr-error', "Json Tidak ditemukan, Data sedang diproses ulang.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Json Tidak ditemukan, Data sedang diproses ulang.");
             $dataDaftarPoliRJ = DB::table('rsview_rjkasir')
                 ->select(
                     DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
@@ -431,9 +431,7 @@ class Diagnosis extends Component
         }
     }
 
-    private function setDataPrimer(): void
-    {
-    }
+    private function setDataPrimer(): void {}
 
     private function addDiagICD10($diagId, $diagDesc, $icdX): void
     {

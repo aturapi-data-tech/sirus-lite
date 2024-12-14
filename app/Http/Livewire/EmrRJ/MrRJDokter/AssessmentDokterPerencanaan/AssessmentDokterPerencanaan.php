@@ -176,7 +176,7 @@ class AssessmentDokterPerencanaan extends Component
             $this->validate($this->rules, $messages);
         } catch (\Illuminate\Validation\ValidationException $e) {
 
-            $this->emit('toastr-error', "Lakukan Pengecekan kembali Input Data Perencanaan." . json_encode($e->errors(), true));
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Lakukan Pengecekan kembali Input Data Perencanaan." . json_encode($e->errors(), true));
             $this->validate($this->rules, $messages);
         }
     }
@@ -251,7 +251,7 @@ class AssessmentDokterPerencanaan extends Component
             $this->validate($myRules, $messages);
         } catch (\Illuminate\Validation\ValidationException $e) {
 
-            $this->emit('toastr-error', "Anda tidak dapat melakukan TTD-E karena data pemeriksaan belum lengkap.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Anda tidak dapat melakukan TTD-E karena data pemeriksaan belum lengkap.");
             $this->validate($myRules, $messages);
         }
         // Validasi dulu
@@ -295,10 +295,10 @@ class AssessmentDokterPerencanaan extends Component
                     ->update(['erm_status' => $this->dataDaftarPoliRJ['ermStatus']]);
                 $this->store();
             } else {
-                $this->emit('toastr-error', "Anda tidak dapat melakukan TTD-E karena Bukan Pasien " . $myUserNameActive);
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Anda tidak dapat melakukan TTD-E karena Bukan Pasien " . $myUserNameActive);
             }
         } else {
-            $this->emit('toastr-error', "Anda tidak dapat melakukan TTD-E karena User Role " . $myUserNameActive . " Bukan Dokter");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Anda tidak dapat melakukan TTD-E karena User Role " . $myUserNameActive . " Bukan Dokter");
         }
     }
 
@@ -399,7 +399,7 @@ class AssessmentDokterPerencanaan extends Component
         // cek status transaksi
         $checkRjStatus = $this->checkRjStatus($rjNoRefCopyTo);
         if ($checkRjStatus) {
-            $this->emit('toastr-error', "Pasien Sudah Pulang, Trasaksi Terkunci.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Pasien Sudah Pulang, Trasaksi Terkunci.");
             return;
         }
 
@@ -423,7 +423,7 @@ class AssessmentDokterPerencanaan extends Component
             } catch (Exception $e) {
                 // display an error to user
                 // dd($e->getMessage());
-                $this->emit('toastr-error', $e->getMessage());
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError($e->getMessage());
                 return;
             }
 
@@ -468,7 +468,7 @@ class AssessmentDokterPerencanaan extends Component
             } catch (Exception $e) {
                 // display an error to user
                 // dd($e->getMessage());
-                $this->emit('toastr-error', $e->getMessage());
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError($e->getMessage());
                 return;
             }
 
@@ -493,7 +493,7 @@ class AssessmentDokterPerencanaan extends Component
                 // display an error to user
                 // dd($e->getMessage());
 
-                $this->emit('toastr-error', $e->getMessage());
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError($e->getMessage());
                 return;
             }
 
@@ -540,7 +540,7 @@ class AssessmentDokterPerencanaan extends Component
                 // display an error to user
                 // dd($e->getMessage());
 
-                $this->emit('toastr-error', $e->getMessage());
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError($e->getMessage());
                 return;
             }
 
@@ -599,7 +599,7 @@ class AssessmentDokterPerencanaan extends Component
         $myArr = $arr ? $arr : [];
 
         if (!$myArr) {
-            $this->emit('toastr-error', "Data " . $arrName . " tidak ditemukan.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data " . $arrName . " tidak ditemukan.");
             return;
         }
 
@@ -634,7 +634,7 @@ class AssessmentDokterPerencanaan extends Component
 
         $this->emit('syncronizeAssessmentDokterRJFindData');
         $this->emit('syncronizeAssessmentPerawatRJFindData');
-        $this->emit('toastr-success', "Data Resep berhasil disimpan.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Data Resep berhasil disimpan.");
     }
 
     // when new form instance

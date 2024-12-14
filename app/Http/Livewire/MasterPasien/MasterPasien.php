@@ -1455,7 +1455,7 @@ class MasterPasien extends Component
         } catch (\Illuminate\Validation\ValidationException $e) {
 
             // dd($validator->fails());
-            $this->emit('toastr-error', "Lakukan Pengecekan kembali Input Data Pasien.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Lakukan Pengecekan kembali Input Data Pasien.");
             $this->validate($rules, $messages);
         }
     }
@@ -1499,7 +1499,7 @@ class MasterPasien extends Component
             'meta_data_pasien_xml' => ArrayToXml::convert($this->dataPasien)
 
         ]);
-        $this->emit('toastr-success', "Data " .  $this->dataPasien['pasien']['regName'] . " berhasil disimpan.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Data " .  $this->dataPasien['pasien']['regName'] . " berhasil disimpan.");
     }
 
     // update Data Pasien//////////////////////////////////////////////////
@@ -1543,7 +1543,7 @@ class MasterPasien extends Component
 
             ]);
 
-        $this->emit('toastr-success', "Data " . $this->dataPasien['pasien']['regName'] . " berhasil diupdate.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Data " . $this->dataPasien['pasien']['regName'] . " berhasil diupdate.");
     }
 
     // update Data Pasien BPJS Search//////////////////////////////////////////////////
@@ -1563,20 +1563,20 @@ class MasterPasien extends Component
         $cariDataPasienRegNo = $this->findDataByKey('reg_no', $this->dataPasienBPJSSearch);
         if ($cariDataPasienRegNo) {
 
-            $this->emit('toastr-success', "Data " . $this->dataPasien['pasien']['regName'] . " berhasil ditampilkan.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Data " . $this->dataPasien['pasien']['regName'] . " berhasil ditampilkan.");
         } else {
 
             // by nik
             $cariDataPasienNik = $this->findDataByKey('nik_bpjs', $this->dataPasienBPJSSearch);
             if ($cariDataPasienNik) {
 
-                $this->emit('toastr-success', "Data " . $this->dataPasien['pasien']['regName'] . " berhasil ditampilkan.");
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Data " . $this->dataPasien['pasien']['regName'] . " berhasil ditampilkan.");
             } else {
                 // by nokaBPJS
                 $cariDataPasienNokaBpjs = $this->findDataByKey('nokartu_bpjs', $this->dataPasienBPJSSearch);
                 if ($cariDataPasienNokaBpjs) {
 
-                    $this->emit('toastr-success', "Data " . $this->dataPasien['pasien']['regName'] . " berhasil ditampilkan.");
+                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Data " . $this->dataPasien['pasien']['regName'] . " berhasil ditampilkan.");
                 } else {
                     // resert variable dataPasien otomatis (insert mode) cek data dari bpjs server
                     $this->reset('dataPasien');
@@ -1600,10 +1600,10 @@ class MasterPasien extends Component
 
                         $this->dataPasien['pasien']['tglLahir'] = Carbon::createFromFormat('Y-m-d', $CaridataVclaim['tglLahir'], env('APP_TIMEZONE'))->format('d/m/Y');
 
-                        $this->emit('toastr-success', $CaridataVclaim['nama'] . ' ' . $CaridataVclaim['nik']);
+                        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess($CaridataVclaim['nama'] . ' ' . $CaridataVclaim['nik']);
                     } else {
                         // dd($CaridataVclaim);
-                        $this->emit('toastr-error', $CaridataVclaim['metadata']['code'] . ' ' . $CaridataVclaim['metadata']['message']);
+                        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError($CaridataVclaim['metadata']['code'] . ' ' . $CaridataVclaim['metadata']['message']);
 
                         if (!isset($this->dataPasien['pasien']['regDate'])) {
                             $this->dataPasien['pasien']['regDate'] = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
@@ -1971,7 +1971,7 @@ class MasterPasien extends Component
             $this->validate($rules, $messages);
         } catch (\Illuminate\Validation\ValidationException $e) {
             // dd($validator->fails());
-            $this->emit('toastr-error', 'Anda tidak dapat menghapus data ini, Data "' . $id . ' / ' . $name . '" sudah di pakai di dalam transaksi.');
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Anda tidak dapat menghapus data ini, Data "' . $id . ' / ' . $name . '" sudah di pakai di dalam transaksi.');
             $this->validate($rules, $messages);
         }
 
@@ -1979,7 +1979,7 @@ class MasterPasien extends Component
         DB::table('rsmst_pasiens')
             ->where('reg_no', $id)
             ->delete();
-        $this->emit('toastr-success', "Hapus data " . $name . " berhasil.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Hapus data " . $name . " berhasil.");
     }
     // delete record end////////////////
 
@@ -2000,20 +2000,20 @@ class MasterPasien extends Component
 
             // Jika uuid tidak ditemukan
             if (!isset($PatientByNIK->getOriginalContent()['response']['entry'][0]['resource']['id'])) {
-                $this->emit('toastr-error', 'UUID tidak dapat ditemukan.' . $PatientByNIK->getOriginalContent()['metadata']['message']);
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('UUID tidak dapat ditemukan.' . $PatientByNIK->getOriginalContent()['metadata']['message']);
                 return;
             }
 
             $this->dataPasien['pasien']['identitas']['patientUuid'] = $PatientByNIK->getOriginalContent()['response']['entry'][0]['resource']['id'];
             $this->store();
-            $this->emit('toastr-success', $PatientByNIK->getOriginalContent()['response']['entry'][0]['resource']['id'] . ' / ' . $PatientByNIK->getOriginalContent()['response']['entry'][0]['resource']['name'][0]['text']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess($PatientByNIK->getOriginalContent()['response']['entry'][0]['resource']['id'] . ' / ' . $PatientByNIK->getOriginalContent()['response']['entry'][0]['resource']['name'][0]['text']);
 
             // dd($PatientByNIK->getOriginalContent());
             // dd($PatientByNIK->getOriginalContent()['response']['entry'][0]['resource']['id']);
             // dd($PatientByNIK->getOriginalContent()['response']['entry'][0]['resource']['name'][0]['text']);
         } catch (\Illuminate\Validation\ValidationException $e) {
             // dd($validator->fails());
-            $this->emit('toastr-error', 'Errors "' . $e->getMessage());
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Errors "' . $e->getMessage());
             return;
         }
     }

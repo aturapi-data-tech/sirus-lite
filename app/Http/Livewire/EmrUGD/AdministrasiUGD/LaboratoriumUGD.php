@@ -71,7 +71,7 @@ class LaboratoriumUGD extends Component
             ->first();
 
         if ($lastInserted->rj_status !== 'A') {
-            $this->emit('toastr-error', "Pasien Sudah Pulang, Trasaksi Terkunci.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Pasien Sudah Pulang, Trasaksi Terkunci.");
             return (dd('Pasien Sudah Pulang, Trasaksi Terkuncixx.'));
         }
     }

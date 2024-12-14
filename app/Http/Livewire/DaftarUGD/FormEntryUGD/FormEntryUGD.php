@@ -943,7 +943,7 @@ class FormEntryUGD extends Component
             $this->validate($rules, $messages);
         } catch (\Illuminate\Validation\ValidationException $e) {
 
-            $this->emit('toastr-error', "Lakukan Pengecekan kembali Input Data Pasien." . json_encode($e->errors(), true));
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Lakukan Pengecekan kembali Input Data Pasien." . json_encode($e->errors(), true));
             $this->validate($rules, $messages);
         }
     }
@@ -993,7 +993,7 @@ class FormEntryUGD extends Component
 
         ]);
 
-        $this->emit('toastr-success', "Data sudah tersimpan.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Data sudah tersimpan.");
     }
 
     private function updateDataRJ($rjNo): void
@@ -1040,7 +1040,7 @@ class FormEntryUGD extends Component
                 'vno_sep' => isset($this->dataDaftarUgd['sep']['noSep']) ? $this->dataDaftarUgd['sep']['noSep'] : "",
             ]);
 
-        $this->emit('toastr-success', "Data berhasil diupdate.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Data berhasil diupdate.");
     }
 
 
@@ -1120,17 +1120,17 @@ class FormEntryUGD extends Component
 
             // dd(isset($this->dataDaftarUgd['klaimId']));
             if (!isset($this->dataDaftarUgd['klaimId'])) {
-                $this->emit('toastr-error', "Data Klaim tidak ditemukan, Reset Data Ke UMUM");
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data Klaim tidak ditemukan, Reset Data Ke UMUM");
             }
             if (!isset($this->dataDaftarUgd['kunjunganId'])) {
-                $this->emit('toastr-error', "Data Kunjungan tidak ditemukan, Reset Data Ke FKTP");
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data Kunjungan tidak ditemukan, Reset Data Ke FKTP");
             }
 
             $this->dataPasienLovSearch = $this->dataDaftarUgd['regNo'];
             $this->JenisKlaim['JenisKlaimId'] = isset($this->dataDaftarUgd['klaimId']) ? $this->dataDaftarUgd['klaimId'] : "UM";
             $this->JenisKunjungan['JenisKunjunganId'] = isset($this->dataDaftarUgd['kunjunganId']) ? $this->dataDaftarUgd['kunjunganId'] : '1';
         } else {
-            $this->emit('toastr-error', "Data tidak dapat di proses json.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data tidak dapat di proses json.");
             $dataDaftarUgd = DB::table('rsview_ugdkasir')
                 ->select(
                     DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
@@ -1268,7 +1268,7 @@ class FormEntryUGD extends Component
     {
         // Cek jika bukan BPJS
         if ($this->JenisKlaim['JenisKlaimId'] != 'JM') {
-            $this->emit('toastr-error', 'Jenis Klaim ' . $this->JenisKlaim['JenisKlaimDesc']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Jenis Klaim ' . $this->JenisKlaim['JenisKlaimDesc']);
         } else {
             // Cek Apakah reqSep ada datanya apa blm
             // if (isset($this->dataDaftarUgd['sep']['reqSep']['request']) && isset($this->dataDaftarUgd['sep']['noSep'])) {
@@ -1294,11 +1294,11 @@ class FormEntryUGD extends Component
             $peserta = $HttpGetBpjs['response'];
             $this->setSEPJsonReqUgd($peserta);
             $this->formRujukanRefBPJSStatus = true;
-            $this->emit('toastr-success', $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess($HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
         } else {
             $this->dataRefBPJSLovStatus = false;
             $this->dataRefBPJSLov = [];
-            $this->emit('toastr-error', $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError($HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
         }
     }
 
@@ -1800,9 +1800,9 @@ class FormEntryUGD extends Component
                 $this->dataDaftarUgd['sep']['resSep'] = $HttpGetBpjs['response']['sep'];
                 $this->dataDaftarUgd['sep']['noSep'] = $HttpGetBpjs['response']['sep']['noSep'];
 
-                $this->emit('toastr-success', 'SEP ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('SEP ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
             } else {
-                $this->emit('toastr-error', 'SEP ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('SEP ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
             }
         }
         // response sep value
@@ -1815,7 +1815,7 @@ class FormEntryUGD extends Component
     {
         // cek BPJS atau bukan
         if ($this->JenisKlaim['JenisKlaimId'] != 'JM') {
-            $this->emit('toastr-error', 'Jenis Klaim ' . $this->JenisKlaim['JenisKlaimDesc']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Jenis Klaim ' . $this->JenisKlaim['JenisKlaimDesc']);
         } else {
             // cek ada resSep ada atau tidak
             if (!$this->dataDaftarUgd['sep']['resSep']) {
@@ -1838,9 +1838,9 @@ class FormEntryUGD extends Component
                         ]);
 
 
-                    $this->emit('toastr-success', 'CetakSEP ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('CetakSEP ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
                 } else {
-                    $this->emit('toastr-error', 'CetakSEP ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('CetakSEP ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
                 }
             } else {
 
@@ -1851,7 +1851,7 @@ class FormEntryUGD extends Component
 
                 ];
                 $pdfContent = PDF::loadView('livewire.daftar-r-j.cetak-sep', $data)->output();
-                $this->emit('toastr-success', 'CetakSEP');
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('CetakSEP');
 
                 return response()->streamDownload(
                     fn() => print($pdfContent),

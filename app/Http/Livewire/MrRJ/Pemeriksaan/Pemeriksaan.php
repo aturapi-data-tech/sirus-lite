@@ -26,7 +26,7 @@ class Pemeriksaan extends Component
     // dataDaftarPoliRJ RJ
     public $dataDaftarPoliRJ = [];
 
-    // data SKDP / pemeriksaan=>[] 
+    // data SKDP / pemeriksaan=>[]
     public $pemeriksaan = [
         "umumTab" => "Umum",
         "tandaVital" => [
@@ -411,7 +411,7 @@ class Pemeriksaan extends Component
         // Variable Search
         $search = $this->tingkatKesadaranLovSearch;
 
-        // check LOV by id 
+        // check LOV by id
         $tingkatKesadaran = collect($this->dataDaftarPoliRJ['pemeriksaan']['tandaVital']['tingkatKesadaranOptions'])
             ->where('tingkatKesadaran', '=', $search)
             ->first();
@@ -487,7 +487,7 @@ class Pemeriksaan extends Component
         //     $this->validate($rules, $messages);
         // } catch (\Illuminate\Validation\ValidationException $e) {
 
-        //     $this->emit('toastr-error', "Lakukan Pengecekan kembali Input Data.");
+        //      toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError( "Lakukan Pengecekan kembali Input Data.");
         //     $this->validate($rules, $messages);
         // }
     }
@@ -517,7 +517,7 @@ class Pemeriksaan extends Component
                 'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
             ]);
 
-        $this->emit('toastr-success', "Pemeriksaan berhasil disimpan.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Pemeriksaan berhasil disimpan.");
     }
     // insert and update record end////////////////
 
@@ -541,7 +541,7 @@ class Pemeriksaan extends Component
             }
         } else {
 
-            $this->emit('toastr-error', "Json Tidak ditemukan, Data sedang diproses ulang.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Json Tidak ditemukan, Data sedang diproses ulang.");
             $dataDaftarPoliRJ = DB::table('rsview_rjkasir')
                 ->select(
                     DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
@@ -631,9 +631,7 @@ class Pemeriksaan extends Component
     }
 
     // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
-    private function setDataPrimer(): void
-    {
-    }
+    private function setDataPrimer(): void {}
 
 
     // when new form instance

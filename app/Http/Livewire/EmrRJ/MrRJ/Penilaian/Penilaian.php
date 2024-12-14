@@ -28,7 +28,7 @@ class Penilaian extends Component
     // dataDaftarPoliRJ RJ
     public array $dataDaftarPoliRJ = [];
 
-    // data penilaian=>[] 
+    // data penilaian=>[]
     public array $penilaian =
     [
         "fisikTab" => "Fisik",
@@ -391,7 +391,7 @@ class Penilaian extends Component
         //     $this->validate($rules, $messages);
         // } catch (\Illuminate\Validation\ValidationException $e) {
 
-        //     $this->emit('toastr-error', "Lakukan Pengecekan kembali Input Data.");
+        //      toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError( "Lakukan Pengecekan kembali Input Data.");
         //     $this->validate($rules, $messages);
         // }
     }
@@ -422,7 +422,7 @@ class Penilaian extends Component
                 'dataDaftarPoliRJ_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
             ]);
 
-        $this->emit('toastr-success', "Penilaian Fisik berhasil disimpan.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Penilaian Fisik berhasil disimpan.");
     }
     // insert and update record end////////////////
 
@@ -439,7 +439,7 @@ class Penilaian extends Component
         $dataDaftarPoliRJ_json = isset($findData->datadaftarpolirj_json) ? $findData->datadaftarpolirj_json   : null;
         // if meta_data_pasien_json = null
         // then cari Data Pasien By Key Collection (exception when no data found)
-        // 
+        //
         // else json_decode
         if ($dataDaftarPoliRJ_json) {
             $this->dataDaftarPoliRJ = json_decode($findData->datadaftarpolirj_json, true);
@@ -450,7 +450,7 @@ class Penilaian extends Component
             }
         } else {
 
-            $this->emit('toastr-error', "Data tidak dapat di proses json.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data tidak dapat di proses json.");
             $dataDaftarPoliRJ = DB::table('rsview_rjkasir')
                 ->select(
                     DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
@@ -561,9 +561,7 @@ class Penilaian extends Component
     }
 
     // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
-    private function setDataPrimer(): void
-    {
-    }
+    private function setDataPrimer(): void {}
 
     private function scoringSkalaMorse(): void
     {

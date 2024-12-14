@@ -131,11 +131,11 @@ class AdministrasiRJ extends Component
                     'dataDaftarPoliRJ_xml' => ArrayToXml::convert($dataDaftarPoliRJ),
                 ]);
 
-            $this->emit('toastr-success', "Administrasi berhasil disimpan.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Administrasi berhasil disimpan.");
             $this->emit('syncronizeAssessmentDokterRJFindData');
             $this->emit('syncronizeAssessmentPerawatRJFindData');
         } else {
-            $this->emit('toastr-error', "Administrasi sudah tersimpan oleh." . $dataDaftarPoliRJ['AdministrasiRj']['userLog']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Administrasi sudah tersimpan oleh." . $dataDaftarPoliRJ['AdministrasiRj']['userLog']);
         }
     }
 

@@ -29,7 +29,7 @@ trait MasterPasienTrait
                 $dataPasien = json_decode($findData->meta_data_pasien_json, true);
             } else {
 
-                $this->emit('toastr-error', "Data tidak dapat di proses json.");
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data tidak dapat di proses json.");
 
                 $dataPasien = [
                     "pasien" => [

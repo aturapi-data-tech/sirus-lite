@@ -158,9 +158,9 @@ class EmrRJBulan extends Component
                         'rj_no' => $txnNo,
                         'jenis_file' => 'pdf'
                     ]);
-                $this->emit('toastr-success', "Data berhasil diupdate " . $cekFile->uploadbpjs);
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Data berhasil diupdate " . $cekFile->uploadbpjs);
             } else {
-                $this->emit('toastr-error', "Data tidak berhasil diupdate " . $cekFile->uploadbpjs);
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data tidak berhasil diupdate " . $cekFile->uploadbpjs);
             }
         } else {
             Storage::disk('local')->put($filePath, $pdfContent);
@@ -172,9 +172,9 @@ class EmrRJBulan extends Component
                         'rj_no' => $txnNo,
                         'jenis_file' => 'pdf'
                     ]);
-                $this->emit('toastr-success', "Data berhasil diupload " . $filename . '.pdf');
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Data berhasil diupload " . $filename . '.pdf');
             } else {
-                $this->emit('toastr-error', "Data tidak berhasil diupdate " . $filename . '.pdf');
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data tidak berhasil diupdate " . $filename . '.pdf');
             }
         }
     }
@@ -215,9 +215,9 @@ class EmrRJBulan extends Component
                             'rj_no' => $txnNo,
                             'jenis_file' => 'pdf'
                         ]);
-                    $this->emit('toastr-success', "Data berhasil diupdate " . $cekFile->uploadbpjs);
+                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Data berhasil diupdate " . $cekFile->uploadbpjs);
                 } else {
-                    $this->emit('toastr-error', "Data tidak berhasil diupdate " . $cekFile->uploadbpjs);
+                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data tidak berhasil diupdate " . $cekFile->uploadbpjs);
                 }
             } else {
                 Storage::disk('local')->put($filePath, $pdfContent);
@@ -229,13 +229,13 @@ class EmrRJBulan extends Component
                             'rj_no' => $txnNo,
                             'jenis_file' => 'pdf'
                         ]);
-                    $this->emit('toastr-success', "Data berhasil diupload " . $filename . '.pdf');
+                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Data berhasil diupload " . $filename . '.pdf');
                 } else {
-                    $this->emit('toastr-error', "Data tidak berhasil diupdate " . $filename . '.pdf');
+                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data tidak berhasil diupdate " . $filename . '.pdf');
                 }
             }
         } else {
-            $this->emit('toastr-error', "Data SEP Tidak ditemukan");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data SEP Tidak ditemukan");
         }
     }
 
@@ -290,9 +290,9 @@ class EmrRJBulan extends Component
                             'rj_no' => $txnNo,
                             'jenis_file' => 'pdf'
                         ]);
-                    $this->emit('toastr-success', "Data berhasil diupdate " . $cekFile->uploadbpjs);
+                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Data berhasil diupdate " . $cekFile->uploadbpjs);
                 } else {
-                    $this->emit('toastr-error', "Data tidak berhasil diupdate " . $cekFile->uploadbpjs);
+                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data tidak berhasil diupdate " . $cekFile->uploadbpjs);
                 }
             } else {
                 Storage::disk('local')->put($filePath, $pdfContent);
@@ -304,13 +304,13 @@ class EmrRJBulan extends Component
                             'rj_no' => $txnNo,
                             'jenis_file' => 'pdf'
                         ]);
-                    $this->emit('toastr-success', "Data berhasil diupload " . $filename . '.pdf');
+                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Data berhasil diupload " . $filename . '.pdf');
                 } else {
-                    $this->emit('toastr-error', "Data tidak berhasil diupdate " . $filename . '.pdf');
+                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data tidak berhasil diupdate " . $filename . '.pdf');
                 }
             }
         } else {
-            $this->emit('toastr-error', "Data SKDP Tidak ditemukan");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data SKDP Tidak ditemukan");
         }
     }
 

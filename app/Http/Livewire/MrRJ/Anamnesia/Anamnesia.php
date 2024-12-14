@@ -32,7 +32,7 @@ class Anamnesia extends Component
     // dataDaftarPoliRJ RJ
     public $dataDaftarPoliRJ = [];
 
-    // data SKDP / anamnesia=>[] 
+    // data SKDP / anamnesia=>[]
     public $anamnesia =
     [
         "keluhanUtamaTab" => "Keluhan Utama",
@@ -329,7 +329,7 @@ class Anamnesia extends Component
         //     $this->validate($rules, $messages);
         // } catch (\Illuminate\Validation\ValidationException $e) {
 
-        //     $this->emit('toastr-error', "Lakukan Pengecekan kembali Input Data.");
+        //      toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError( "Lakukan Pengecekan kembali Input Data.");
         //     $this->validate($rules, $messages);
         // }
     }
@@ -359,7 +359,7 @@ class Anamnesia extends Component
                 'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
             ]);
 
-        $this->emit('toastr-success', "Anamnesia berhasil disimpan.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Anamnesia berhasil disimpan.");
     }
     // insert and update record end////////////////
 
@@ -383,7 +383,7 @@ class Anamnesia extends Component
             }
         } else {
 
-            $this->emit('toastr-error', "Json Tidak ditemukan, Data sedang diproses ulang.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Json Tidak ditemukan, Data sedang diproses ulang.");
             $dataDaftarPoliRJ = DB::table('rsview_rjkasir')
                 ->select(
                     DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
@@ -473,9 +473,7 @@ class Anamnesia extends Component
     }
 
     // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
-    private function setDataPrimer(): void
-    {
-    }
+    private function setDataPrimer(): void {}
 
 
     // when new form instance

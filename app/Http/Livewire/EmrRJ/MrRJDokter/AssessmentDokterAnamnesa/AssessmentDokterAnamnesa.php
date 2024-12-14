@@ -475,7 +475,7 @@ class AssessmentDokterAnamnesa extends Component
             $this->validate($this->rules, $messages);
         } catch (\Illuminate\Validation\ValidationException $e) {
 
-            $this->emit('toastr-error', "Lakukan Pengecekan kembali Input Data Anamnesa." .  json_encode($e->errors(), true));
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Lakukan Pengecekan kembali Input Data Anamnesa." .  json_encode($e->errors(), true));
             $this->validate($this->rules, $messages);
         }
     }
@@ -508,7 +508,7 @@ class AssessmentDokterAnamnesa extends Component
                 'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
             ]);
 
-        $this->emit('toastr-success', "Anamnesa berhasil disimpan.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Anamnesa berhasil disimpan.");
     }
     // insert and update record end////////////////
 
@@ -549,10 +549,10 @@ class AssessmentDokterAnamnesa extends Component
                 // reset rekonsiliasiObat
                 $this->reset(['rekonsiliasiObat']);
             } else {
-                $this->emit('toastr-error', "Nama Obat Sudah ada.");
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Nama Obat Sudah ada.");
             }
         } else {
-            $this->emit('toastr-error', "Nama Obat Kosong.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Nama Obat Kosong.");
         }
     }
 
@@ -804,7 +804,7 @@ class AssessmentDokterAnamnesa extends Component
                     'meta_data_pasien_xml' => ArrayToXml::convert($this->dataPasien)
                 ]);
 
-            $this->emit('toastr-success', "Data Alergi " . $this->dataPasien['pasien']['regName'] . " berhasil diupdate.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Data Alergi " . $this->dataPasien['pasien']['regName'] . " berhasil diupdate.");
         }
     }
 

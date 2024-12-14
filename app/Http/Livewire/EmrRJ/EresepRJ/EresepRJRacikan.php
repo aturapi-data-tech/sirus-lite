@@ -208,7 +208,7 @@ class EresepRJRacikan extends Component
             $this->addProduct($this->dataProductLov[$id]['product_id'], $this->dataProductLov[$id]['product_name'], $this->dataProductLov[$id]['sales_price']);
             $this->resetdataProductLov();
         } else {
-            $this->emit('toastr-error', 'Data Obat belum tersedia.');
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Data Obat belum tersedia.');
         }
     }
 
@@ -241,7 +241,7 @@ class EresepRJRacikan extends Component
                 'dataDaftarPoliRJ_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
             ]);
 
-        $this->emit('toastr-success', "Eresep Racikan berhasil disimpan.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Eresep Racikan berhasil disimpan.");
     }
     // insert and update record end////////////////
 
@@ -270,7 +270,7 @@ class EresepRJRacikan extends Component
             }
         } else {
 
-            $this->emit('toastr-error', "Data tidak dapat di proses json.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data tidak dapat di proses json.");
             $dataDaftarPoliRJ = DB::table('rsview_rjkasir')
                 ->select(
                     DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
@@ -381,9 +381,7 @@ class EresepRJRacikan extends Component
     }
 
 
-    private function setDataPrimer(): void
-    {
-    }
+    private function setDataPrimer(): void {}
 
     private function addProduct($productId, $productName, $salesPrice): void
     {
@@ -596,7 +594,7 @@ class EresepRJRacikan extends Component
 
         if ($lastInserted->rj_status !== 'A') {
             // throw new Exception('Pasien Sudah Pulang, Trasaksi Terkunci.');
-            $this->emit('toastr-error', "Pasien Sudah Pulang, Trasaksi Terkunci.xx");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Pasien Sudah Pulang, Trasaksi Terkunci.xx");
             // exit();
             return (dd('Pasien Sudah Pulang, Trasaksi Terkunci.'));
         }

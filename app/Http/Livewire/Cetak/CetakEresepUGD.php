@@ -376,7 +376,7 @@ class CetakEresepUGD extends Component
 
                 ];
                 $pdfContent = PDF::loadView('livewire.cetak.cetak-eresep-u-g-d-print', $data)->output();
-                $this->emit('toastr-success', 'Cetak Eresep UGD');
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Cetak Eresep UGD');
 
 
                 return response()->streamDownload(
@@ -384,10 +384,10 @@ class CetakEresepUGD extends Component
                     "eresep.pdf"
                 );
             } else {
-                $this->emit('toastr-error', 'Data Resep Tidak ditemukan');
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Data Resep Tidak ditemukan');
             }
         } else {
-            $this->emit('toastr-error', 'Belum ada TTD pada Data Resep');
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Belum ada TTD pada Data Resep');
         }
     }
 
