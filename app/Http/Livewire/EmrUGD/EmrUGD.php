@@ -146,6 +146,9 @@ class EmrUGD extends Component
     public bool $isOpenInap = false;
     public string $isOpenModeInap = 'insert';
 
+    public bool $isOpenGeneralConsentPasienUGD = false;
+    public string $isOpenModeGeneralConsentPasienUGD = 'insert';
+
     public bool $isOpenScreening = false;
     public string $isOpenModeScreening = 'insert';
 
@@ -172,6 +175,14 @@ class EmrUGD extends Component
     {
         $this->isOpenDokter = true;
         $this->isOpenModeDokter = 'update';
+        $this->rjNoRef = $rjNo;
+        $this->regNoRef = $regNoRef;
+    }
+
+    private function openModalEditGeneralConsentPasienUGD($rjNo, $regNoRef): void
+    {
+        $this->isOpenGeneralConsentPasienUGD = true;
+        $this->isOpenModeGeneralConsentPasienUGD = 'update';
         $this->rjNoRef = $rjNo;
         $this->regNoRef = $regNoRef;
     }
@@ -212,6 +223,13 @@ class EmrUGD extends Component
         $this->resetInputFields();
     }
 
+    public function closeModalGeneralConsentPasienUGD(): void
+    {
+        $this->isOpenGeneralConsentPasienUGD = false;
+        $this->isOpenModeGeneralConsentPasienUGD = 'insert';
+        $this->resetInputFields();
+    }
+
     public function closeModalInap(): void
     {
         $this->isOpenInap = false;
@@ -249,6 +267,12 @@ class EmrUGD extends Component
     public function editDokter($rjNo, $regNoRef)
     {
         $this->openModalEditDokter($rjNo, $regNoRef);
+        // $this->findData($id);
+    }
+
+    public function editGeneralConsentPasienUGD($rjNo, $regNoRef)
+    {
+        $this->openModalEditGeneralConsentPasienUGD($rjNo, $regNoRef);
         // $this->findData($id);
     }
 
@@ -310,6 +334,8 @@ class EmrUGD extends Component
 
     public string $activeTab = "rekamMedis";
     public string $activeTabDokter = "assessmentDokter";
+    public string $activeTabGeneralConsentPasienUGD = "generalConsentPasienUGD";
+
 
 
     public array $EmrMenu = [
@@ -388,15 +414,23 @@ class EmrUGD extends Component
 
     ];
 
+    public array $EmrMenuGeneralConsentPasienUGD = [
+        [
+            'ermMenuId' => 'generalConsentPasienUGD',
+            'ermMenuName' => 'General Consent Pasien UGD'
+        ],
+        [
+            'ermMenuId' => 'informConsentPasienUGD',
+            'ermMenuName' => 'Inform Consent Pasien UGD'
+        ]
+    ];
+
 
     // when new form instance
     public function mount()
     {
         $this->settermyTopBarShiftandmyTopBarrefDate();
     }
-
-
-
 
     // select data start////////////////
     public function render()

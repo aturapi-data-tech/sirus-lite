@@ -1,5 +1,7 @@
 <div>
 
+
+
     {{-- Start Coding  --}}
 
     {{-- Canvas
@@ -14,6 +16,22 @@
         </div>
         {{-- Title --}}
 
+        <div>
+            <div class="relative flex flex-col gap-4 p-6 bg-white rounded-lg shadow-xl">
+                <x-signature-pad wire:model.defer="signature">
+                </x-signature-pad>
+                <x-primary-button wire:click="submit" class="text-white">
+                    Submit
+                </x-primary-button>
+
+                <div class="relative h-20 bg-white w-36 ">
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        {!! $signature !!}
+                    </div>
+                </div>
+            </div>
+
+        </div>
         {{-- Top Bar --}}
         <div class="flex justify-between">
 

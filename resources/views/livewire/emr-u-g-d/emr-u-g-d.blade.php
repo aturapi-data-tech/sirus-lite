@@ -141,6 +141,11 @@
                 @include('livewire.emr-u-g-d.create-emr-u-g-d-dokter')
             @endif
 
+            @if ($isOpenGeneralConsentPasienUGD)
+                @include('livewire.emr-u-g-d.create-general-consent-u-g-d-pasien')
+            @endif
+
+
             {{-- @if ($isOpenInap)
                 @include('livewire.emr-u-g-d.create-emr-u-g-d-inap')
             @endif --}}
@@ -335,19 +340,22 @@
 
                                 <div class="inline-flex">
 
-                                    <livewire:cetak.cetak-etiket :regNo="$myQData->reg_no" :wire:key="$myQData->rj_no">
+                                    <livewire:cetak.cetak-etiket :regNo="$myQData->reg_no"
+                                        :wire:key="'cetak-etiket-grid-'.$myQData->rj_no">
 
                                         <!-- Dropdown Action menu Flowbite-->
                                         <div>
-                                            <x-light-button id="dropdownButton{{ $myQData->rj_no }}"
-                                                class="inline-flex"
-                                                wire:click="$emit('pressDropdownButton','{{ $myQData->rj_no }}')">
-                                                <svg class="w-5 h-5" aria-hidden="true" fill="currentColor"
-                                                    viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                                    <path
-                                                        d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
-                                                </svg>
-                                            </x-light-button>
+                                            <div>
+                                                <x-light-button id="dropdownButton{{ $myQData->rj_no }}"
+                                                    class="inline-flex"
+                                                    wire:click="$emit('pressDropdownButtonUgd','{{ $myQData->rj_no }}')">
+                                                    <svg class="w-5 h-5" aria-hidden="true" fill="currentColor"
+                                                        viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                                        <path
+                                                            d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
+                                                    </svg>
+                                                </x-light-button>
+                                            </div>
 
                                             <!-- Dropdown Action Open menu -->
                                             <div id="dropdownMenu{{ $myQData->rj_no }}"
@@ -380,6 +388,13 @@
                                                             <x-dropdown-link
                                                                 wire:click="edit('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
                                                                 {{ __('Assessment Perawat') }}
+                                                            </x-dropdown-link>
+                                                        </li>
+
+                                                        <li>
+                                                            <x-dropdown-link
+                                                                wire:click="editGeneralConsentPasienUGD('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
+                                                                {{ __('General Consent Pasien') }}
                                                             </x-dropdown-link>
                                                         </li>
                                                     @endrole
@@ -437,6 +452,7 @@
 
                                                 </ul>
                                             </div>
+
                                         </div>
                                         <!-- End Dropdown Action Open menu -->
                                 </div>
@@ -626,7 +642,7 @@
 
 
             // press_dropdownButton flowbite
-            window.Livewire.on('pressDropdownButton', (key) => {
+            window.Livewire.on('pressDropdownButtonUgd', (key) => {
                     // set the dropdown menu element
                     const $targetEl = document.getElementById('dropdownMenu' + key);
 

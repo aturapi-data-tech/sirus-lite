@@ -3,6 +3,8 @@
 namespace App\Http\Livewire\BookingRJ;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -123,9 +125,13 @@ class BookingRJ extends Component
     {
         $this->settermyTopBarmyTopBarrefDate();
     }
+    public $signature;
 
-
-
+    public function submit()
+    {
+        // dd($this->signature);
+        // \Storage::put('signatures/signature.png', base64_decode(Str::of($this->signature)->after(',')));
+    }
 
     // select data start////////////////
     public function render()
