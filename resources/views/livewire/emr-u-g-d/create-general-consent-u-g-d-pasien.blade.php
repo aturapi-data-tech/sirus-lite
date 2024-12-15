@@ -46,12 +46,8 @@
 
                 {{-- Display Pasien Componen --}}
                 <div class="">
-                    {{-- Display Pasien --}}
-                    {{-- :rjNo="" disi dari emit ListeneropenModalEditUgd --}}
-
-                    {{-- <livewire:emr-u-g-d.display-pasien.display-pasien
-                        :wire:key="$regNo.'display-pasien-general-consent-pasien'" :rjNoRef="$rjNoRef"> --}}
-
+                    <livewire:emr-u-g-d.display-pasien.display-pasien
+                        :wire:key="$regNo.'display-pasien-general-consent-pasien'" :rjNoRef="$rjNoRef">
                 </div>
 
 
@@ -87,7 +83,7 @@
                         }"
                         x-show.transition.in.opacity.duration.600="activeTabGeneralConsentPasienUGD === 'generalConsentPasienUGD'">
                         <livewire:emr-u-g-d.general-consent-pasien-u-g-d.general-consent-pasien-u-g-d
-                            :wire:key="'content-generalConsentPasienUGD'" :rjNoRef="$rjNoRef" :regNoRef="$regNoRef">
+                            :wire:key="'content-generalConsentPasienUGD'.$rjNoRef" :rjNoRef="$rjNoRef" :regNoRef="$regNoRef">
                     </div>
 
                     <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50 "

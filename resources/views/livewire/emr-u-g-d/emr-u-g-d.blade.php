@@ -457,6 +457,8 @@
                                         <!-- End Dropdown Action Open menu -->
                                 </div>
 
+
+
                             </td>
                         </tr>
                     @endforeach
@@ -521,21 +523,6 @@
 
         {{-- script end --}}
 
-
-
-
-
-        {{-- Disabling enter key for form --}}
-        <script type="text/javascript">
-            $(document).on("keydown", "form", function(event) {
-                return event.key != "Enter";
-            });
-        </script>
-
-
-
-
-
         {{-- Global Livewire JavaScript Object start --}}
         <script type="text/javascript">
             toastr.options = {
@@ -561,82 +548,6 @@
                 toastr.info(message)
             });
             window.livewire.on('toastr-error', message => toastr.error(message));
-
-
-
-
-
-
-
-
-
-
-
-
-
-            // confirmation message remove record
-            window.livewire.on('confirm_remove_record', (key, name) => {
-
-                let cfn = confirm('Apakah anda ingin menghapus data ini ' + name + '?');
-
-                if (cfn) {
-                    window.livewire.emit('confirm_remove_record_UGDp', key, name);
-                }
-            });
-
-
-            // confirmation message doble record
-            window.livewire.on('confirm_doble_record', (key, name) => {
-
-                let cfn = confirm('Pasien Sudah terdaftar, Apakah anda ingin tetap menyimpan data ini ' + name + '?');
-
-                if (cfn) {
-                    window.livewire.emit('confirm_doble_record_RJp', key, name);
-                }
-            });
-
-
-
-
-
-
-
-
-
-
-
-
-            // confirmation cari_Data_Pasien_Tidak_Ditemukan_Confirmation
-            window.livewire.on('cari_Data_Pasien_Tidak_Ditemukan_Confirmation', (msg) => {
-                let cfn = confirm('Data ' + msg +
-                    ' tidak ditemuka, apakah anda ingin menambahkan menjadi pasien baru ?');
-
-                if (cfn) {
-                    @this.set('callMasterPasien', true);
-                }
-            });
-
-
-
-
-            // confirmation rePush_Data_Antrian_Confirmation
-            window.livewire.on('rePush_Data_Antrian_Confirmation', () => {
-                let cfn = confirm('Apakah anda ingin mengulaingi Proses Kirim data Antrian ?');
-
-                if (cfn) {
-                    // emit ke controller
-                    window.livewire.emit('rePush_Data_Antrian');
-                }
-            });
-
-
-
-
-
-
-
-
-
 
 
 
@@ -681,25 +592,33 @@
 
             );
         </script>
+
+        <script src="assets/js/signature_pad.umd.min.js"></script>
         <script>
-            // $("#dateRjRef").change(function() {
-            //     const datepickerEl = document.getElementById('dateRjRef');
-            //     console.log(datepickerEl);
-            // });
-        </script>
-        {{-- Global Livewire JavaScript Object end --}}
+            document.addEventListener('alpine:init', () => {
+                Alpine.data('signaturePad', (value) => ({
+                    signaturePadInstance: null,
+                    value: value,
+                    init() {
 
-        {{-- Global Livewire JavaScript Object start --}}
-        <script type="text/javascript">
-            // confirmation message doble record
-            window.livewire.on('confirm_doble_recordUGD', (key, name) => {
-                console.log('x')
-                let cfn = confirm('Pasien Sudah terdaftar, Apakah anda ingin tetap menyimpan data ini ' + name + '?');
+                        this.signaturePadInstance = new SignaturePad(this.$refs.signature_canvas, {
+                                minWidth: 2,
+                                maxWidth: 2,
+                                penColor: "rgb(11, 73, 182)"
+                            }
 
-                if (cfn) {
-                    window.livewire.emit('confirm_doble_record_UGDp', key, name);
-                }
-            });
+                        );
+                        this.signaturePadInstance.addEventListener("endStroke", () => {
+                            // this.value = this.signaturePadInstance.toDataURL('image/png');signaturePad.toSVG()
+                            // https://github.com/aturapi-data-tech/signature_pad
+                            // https://gist.github.com/jonneroelofs/a4a372fe4b55c5f9c0679d432f2c0231
+                            this.value = this.signaturePadInstance.toSVG();
+
+                            // console.log(this.signaturePadInstance)
+                        });
+                    },
+                }))
+            })
         </script>
     @endpush
 
