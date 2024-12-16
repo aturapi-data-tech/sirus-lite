@@ -197,7 +197,10 @@
         </div>
 
         <div>
-            @if (!$this->dataDaftarUgd['generalConsentPasienUGD']['signature'])
+            @if (
+                !$this->dataDaftarUgd['generalConsentPasienUGD']['signature'] ||
+                    !$this->dataDaftarUgd['generalConsentPasienUGD']['wali']
+            )
                 <div>
                     <div class="flex ml-2">
                         @foreach ($agreementOptions as $agreement)
@@ -217,7 +220,7 @@
                         <div>
                             <x-text-input id="dataDaftarUgd.generalConsentPasienUGD.wali" placeholder="Nama Wali"
                                 class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.generalConsentPasienUGD.wali'))"
-                                wire:model="dataDaftarUgd.generalConsentPasienUGD.wali" />
+                                wire:model.lazy="dataDaftarUgd.generalConsentPasienUGD.wali" />
                         </div>
 
                         <x-primary-button wire:click="submit" class="text-white">
