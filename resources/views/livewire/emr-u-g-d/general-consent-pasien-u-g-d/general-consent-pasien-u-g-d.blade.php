@@ -8,7 +8,122 @@
             <p class="font-bold">Saya yang bertanda tangan di bawah ini menyatakan dengan sesungguhnya bahwa:
             </p>
 
-            <div class="persetujuan" class="bg-red-100 ">
+            <div id="hakPasien">
+                <p>
+                    <span class="font-bold">
+                        HAK DAN KEWAJIBAN SEBAGAI PASIEN:
+                    </span>
+                </p>
+                </br>
+                <p>
+                    <span class="font-bold">
+                        1.
+                    </span>
+                    Memperoleh informasi mengenai tata tertib dan peraturan yang berlaku di rumah sakit
+                </p>
+                </br>
+                <p>
+                    <span class="font-bold">
+                        2.
+                    </span>
+                    Memperoleh informasi tentang hak dan kewajiban pasien
+                </p>
+                </br>
+                <p>
+                    <span class="font-bold">
+                        3.
+                    </span>
+                    Memperoleh layanan yang menusiawi, adil,
+                    jujur dan tanpa diskriminasi
+                </p>
+                </br>
+                <p>
+                    <span class="font-bold">
+                        4.
+                    </span>
+                    Memperoleh layanan kesehatan yang bermutu sesuai dengan standar profesi dan standar prosedur
+                    operasional
+                </p>
+                </br>
+                <p>
+                    <span class="font-bold">
+                        5.
+                    </span>
+                    Memperoleh layanan yang efektif dan efisien sehingga pasien terhindar dari kerugian fisik dan materi
+                </p>
+                </br>
+                <p>
+                    <span class="font-bold">
+                        6.
+                    </span>
+                    Mengajukan pengaduan atas kualitas pelayanan yang didapatkan
+                </p>
+                </br>
+                <p>
+                    <span class="font-bold">
+                        7.
+                    </span>
+                    Memilih dokter dan kelas perawatan sesuai dengan keinginannya dan peraturan yang berlaku di rumah
+                    sakit
+                </p>
+                </br>
+                <p>
+                    <span class="font-bold">
+                        8.
+                    </span>
+                    Meminta konsultasi tentang penvakit yang dideritanya kepada dokter lain yang mempunyai surat izin
+                    praktik (sip) baik di dalam maupun di luar rumah sakit
+                </p>
+                </br>
+                <p>
+                    <span class="font-bold">
+                        9.
+                    </span>
+                    Mendapatkan privasi dan kerahasiaan penyakit yang diderita termasuk data-data medisnya
+                </p>
+                </br>
+                <p>
+                    <span class="font-bold">
+                        10.
+                    </span>
+                    Mendapat informasi yang meliputi diagnosis dan tata cara tindakan medis, tujuan tindakan medis,
+                    alternatif tindakan, risiko dan komplikasi yang mungkin terjadi, dan prognosis terhadap tindakan
+                    yang dilakukan serta perkiraan biaya pengobatan.
+                </p>
+                </br>
+                <p>
+                    <span class="font-bold">
+                        11.
+                    </span>
+                    Memberikan persetujuan atau menolak atas tindakan
+                    yang akan dilakukan oleh tenaga kesehatan terhadap penyakit yanng dideritanya
+                </p>
+                </br>
+                <p>
+                    <span class="font-bold">
+                        12.
+                    </span>
+                    Didampingi keluarganya dalam keadaan kritis
+                </p>
+                </br>
+                <p>
+                    <span class="font-bold">
+                        13.
+                    </span>
+                    Menjalankan ibadah sesuai agama atau kepercayaan yang dianutnya selama hal itu tidak mengganggu
+                    pasien lainnya
+                </p>
+                </br>
+                <p>
+                    <span class="font-bold">
+                        14.
+                    </span>
+                    Memperoleh keamanan dan keselamatan dirinya selama dalam perawatan di rumah sakit
+                </p>
+                </br>
+            </div>
+
+            <div id="persetujuan">
                 <p>
                     <span class="font-bold">
                         Pemahaman:
@@ -74,7 +189,11 @@
                     sesuai dengan ketentuan yang berlaku.
                 </p>
                 </br>
+
+
             </div>
+
+
         </div>
 
         <div>

@@ -36,7 +36,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-2">
+                {{-- <div class="grid grid-cols-2 gap-2">
                     <div>
                         <x-input-label for="observasiLanjutan.cairan" :value="__('cairan')" :required="__(false)" />
                         <div class="mb-2 ">
@@ -56,7 +56,7 @@
 
                         </div>
                     </div>
-                </div>
+                </div> --}}
 
                 <x-input-label for="observasiLanjutan.sistolik" :value="__('Tanda Vital')" :required="__(false)"
                     class="pt-2 sm:text-xl" />
