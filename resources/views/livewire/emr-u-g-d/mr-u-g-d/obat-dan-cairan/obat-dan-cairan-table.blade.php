@@ -9,31 +9,19 @@
                         Tanggal / Jam
                     </th>
                     <th scope="col" class="text-center ">
-                        Cairan
+                        Nama Obat Atau Jenis Cairan
                     </th>
                     <th scope="col" class="text-center ">
-                        Tetesan
+                        Jumlah
                     </th>
                     <th scope="col" class="text-center ">
-                        TD
+                        Dosis
                     </th>
                     <th scope="col" class="text-center ">
-                        Nadi
+                        Route
                     </th>
                     <th scope="col" class="text-center ">
-                        Pernafasan
-                    </th>
-                    <th scope="col" class="text-center ">
-                        Suhu
-                    </th>
-                    <th scope="col" class="text-center ">
-                        SPO2
-                    </th>
-                    <th scope="col" class="text-center ">
-                        GDA
-                    </th>
-                    <th scope="col" class="text-center ">
-                        GCS
+                        Keterangan
                     </th>
                     <th scope="col" class="text-center ">
                         Action
@@ -45,58 +33,47 @@
                 @php
                     use Carbon\Carbon;
 
-                    $sortedTandaVital = collect(
-                        $this->dataDaftarUgd['observasi']['observasiLanjutan']['tandaVital'] ?? [],
+                    $sortedObatDanCairan = collect(
+                        $this->dataDaftarUgd['observasi']['obatDanCairan']['pemberianObatDanCairan'] ?? [],
                     )->sortByDesc(function ($item) {
-                        return Carbon::parse($item['waktuPemeriksaan']);
+                        return Carbon::createFromFormat('d/m/Y H:i:s', $item['waktuPemberian'], env('APP_TIMEZONE'));
                     });
+
                 @endphp
 
-                @foreach ($sortedTandaVital ?? [] as $tandaVital)
+                @foreach ($sortedObatDanCairan ?? [] as $pemberianObatDanCairan)
                     <tr class="border-b group dark:border-gray-700 ">
 
                         <td class="text-center group-hover:bg-gray-100 group-hover:text-primary">
-                            {{ $tandaVital['waktuPemeriksaan'] }}
+                            {{ $pemberianObatDanCairan['waktuPemberian'] }}
                             <br>
-                            {{ $tandaVital['pemeriksa'] }}
+                            {{ $pemberianObatDanCairan['pemeriksa'] }}
                         </td>
                         <td class="text-center group-hover:bg-gray-100 group-hover:text-primary">
-                            {{ $tandaVital['cairan'] }}
+                            {{ $pemberianObatDanCairan['namaObatAtauJenisCairan'] }}
                         </td>
                         <td class="text-center group-hover:bg-gray-100 group-hover:text-primary">
-                            {{ $tandaVital['tetesan'] }}
+                            {{ $pemberianObatDanCairan['jumlah'] }}
                         </td>
                         <td class="text-center group-hover:bg-gray-100 group-hover:text-primary">
-                            {{ $tandaVital['sistolik'] . '/' . $tandaVital['distolik'] . ' mmhg' }}
+                            {{ $pemberianObatDanCairan['dosis'] }}
+                        </td>
+                        <td class="text-center group-hover:bg-gray-100 group-hover:text-primary">
+                            {{ $pemberianObatDanCairan['rute'] }}
+                        </td>
+                        <td class="text-center group-hover:bg-gray-100 group-hover:text-primary">
+                            {{ $pemberianObatDanCairan['keterangan'] }}
 
                         </td>
                         <td class="text-center group-hover:bg-gray-100 group-hover:text-primary">
-                            {{ $tandaVital['frekuensiNadi'] . ' x/mnt' }}
-                        </td>
-                        <td class="text-center group-hover:bg-gray-100 group-hover:text-primary">
-                            {{ $tandaVital['frekuensiNafas'] . ' x/mnt' }}
-                        </td>
-                        <td class="text-center group-hover:bg-gray-100 group-hover:text-primary">
-                            {{ $tandaVital['suhu'] . ' °C' }}
-                        </td>
-                        <td class="text-center group-hover:bg-gray-100 group-hover:text-primary">
-                            {{ $tandaVital['spo2'] . ' %' }}
-                        </td>
-                        <td class="text-center group-hover:bg-gray-100 group-hover:text-primary">
-                            {{ $tandaVital['gda'] . ' mg/dL' }}
-                        </td>
-                        <td class="text-center group-hover:bg-gray-100 group-hover:text-primary">
-                            {{ $tandaVital['gcs'] }}
-                        </td>
-                        <td class="text-center group-hover:bg-gray-100 group-hover:text-primary">
                             <x-alternative-button class="inline-flex"
-                                wire:click.prevent="removeObservasiLanjutan('{{ $tandaVital['waktuPemeriksaan'] }}')">
+                                wire:click.prevent="removeObatDanCairan('{{ $pemberianObatDanCairan['waktuPemberian'] }}')">
                                 <svg class="w-5 h-5 text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                     fill="currentColor" viewBox="0 0 18 20">
                                     <path
                                         d="M17 4h-4V2a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v2H1a1 1 0 0 0 0 2h1v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1a1 1 0 1 0 0-2ZM7 2h4v2H7V2Zm1 14a1 1 0 1 1-2 0V8a1 1 0 0 1 2 0v8Zm4 0a1 1 0 0 1-2 0V8a1 1 0 0 1 2 0v8Z" />
                                 </svg>
-                                {{ $tandaVital['waktuPemeriksaan'] }}
+                                {{ $pemberianObatDanCairan['waktuPemberian'] }}
                             </x-alternative-button>
                         </td>
                     </tr>

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\EmrUGD\MrUGD\Observasi;
+namespace App\Http\Livewire\EmrUGD\MrUGD\ObatDanCairan;
 
 use Illuminate\Support\Facades\DB;
 
@@ -12,7 +12,7 @@ use Spatie\ArrayToXml\ArrayToXml;
 use App\Http\Traits\EmrUGD\EmrUGDTrait;
 use App\Http\Traits\customErrorMessagesTrait;
 
-class Observasi extends Component
+class ObatDanCairan extends Component
 {
     use WithPagination, EmrUGDTrait, customErrorMessagesTrait;
 
@@ -34,43 +34,33 @@ class Observasi extends Component
 
     public array $dataDaftarUgd = [];
 
-    public array $observasiLanjutan = [
-        "cairan" => "",
-        "tetesan" => "",
-        "sistolik" => "", //number
-        "distolik" => "", //number
-        "frekuensiNafas" => "", //number
-        "frekuensiNadi" => "", //number
-        "suhu" => "", //number
-        "spo2" => "", //number
-        "gda" => "", //number
-        "gcs" => "", //number
-        "waktuPemeriksaan" => "", //date dd/mm/yyyy hh24:mi:ss
+    public array $obatDanCairan = [
+        "namaObatAtauJenisCairan" => "",
+        "jumlah" => "", //number
+        "dosis" => "", //number
+        "rute" => "", //number
+        "keterangan" => "",
+        "waktuPemberian" => "", //date dd/mm/yyyy hh24:mi:ss
         "pemeriksa" => ""
     ];
 
     public array $observasi =
     [
-        "tandaVitalTab" => "Observasi Lanjutan",
-        "tandaVital" => [],
+        "pemberianObatDanCairanTab" => "Pemberian Obat Dan Cairan",
+        "pemberianObatDanCairan" => [],
 
     ];
     //////////////////////////////////////////////////////////////////////
 
 
     protected $rules = [
-        'observasiLanjutan.cairan' => '',
-        'observasiLanjutan.tetesan' => '',
-        'observasiLanjutan.sistolik' => 'required|numeric',
-        'observasiLanjutan.distolik' => 'required|numeric',
-        'observasiLanjutan.frekuensiNafas' => 'required|numeric',
-        'observasiLanjutan.frekuensiNadi' => 'required|numeric',
-        'observasiLanjutan.suhu' => 'required|numeric',
-        'observasiLanjutan.spo2' => 'required|numeric',
-        'observasiLanjutan.gda' => '',
-        'observasiLanjutan.gcs' => '',
-        'observasiLanjutan.waktuPemeriksaan' => 'required|date_format:d/m/Y H:i:s',
-        'observasiLanjutan.pemeriksa' => 'required',
+        'obatDanCairan.namaObatAtauJenisCairan' => 'required',
+        'obatDanCairan.jumlah' => 'required|numeric',
+        'obatDanCairan.dosis' => 'required|numeric',
+        'obatDanCairan.rute' => 'required|numeric',
+        'obatDanCairan.keterangan' => 'required',
+        'obatDanCairan.waktuPemberian' => 'required|date_format:d/m/Y H:i:s',
+        'obatDanCairan.pemeriksa' => 'required',
     ];
 
 
@@ -108,7 +98,7 @@ class Observasi extends Component
 
 
     // validate Data RJ//////////////////////////////////////////////////
-    private function validateDataObservasiUgd(): void
+    private function validateDataObatDanCairanUgd(): void
     {
         // customErrorMessages
         // $messages = customErrorMessagesTrait::messages();
@@ -146,7 +136,7 @@ class Observasi extends Component
                 'datadaftarUgd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
             ]);
 
-        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Observasi berhasil disimpan.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("ObatDanCairan berhasil disimpan.");
     }
     // insert and update record end////////////////
 
@@ -157,73 +147,69 @@ class Observasi extends Component
         $this->dataDaftarUgd = $this->findDataUGD($rjno);
         // dd($this->dataDaftarUgd);
         // jika observasi tidak ditemukan tambah variable observasi pda array
-        if (isset($this->dataDaftarUgd['observasi']['observasiLanjutan']) == false) {
-            $this->dataDaftarUgd['observasi']['observasiLanjutan'] = $this->observasi;
+        if (isset($this->dataDaftarUgd['observasi']['obatDanCairan']) == false) {
+            $this->dataDaftarUgd['observasi']['obatDanCairan'] = $this->observasi;
         }
     }
 
 
 
-    public function addObservasiLanjutan()
+    public function addObatDanCairan()
     {
+
         // entry Pemeriksa
-        $this->observasiLanjutan['pemeriksa'] = auth()->user()->myuser_name;
+        $this->obatDanCairan['pemeriksa'] = auth()->user()->myuser_name;
 
         // validasi
-        $this->validateDataObservasiUgd();
+        $this->validateDataObatDanCairanUgd();
         // check exist
-        $cekObservasiLanjutan = collect($this->dataDaftarUgd['observasi']['observasiLanjutan']['tandaVital'])
-            ->where("waktuPemeriksaan", '=', $this->observasiLanjutan['waktuPemeriksaan'])
+        $cekdObatDanCairan = collect($this->dataDaftarUgd['observasi']['obatDanCairan']['pemberianObatDanCairan'])
+            ->where("waktuPemberian", '=', $this->obatDanCairan['waktuPemberian'])
             ->count();
-        if (!$cekObservasiLanjutan) {
-            $this->dataDaftarUgd['observasi']['observasiLanjutan']['tandaVital'][] = [
-                "cairan" => $this->observasiLanjutan['cairan'],
-                "tetesan" => $this->observasiLanjutan['tetesan'],
-                "sistolik" => $this->observasiLanjutan['sistolik'],
-                "distolik" => $this->observasiLanjutan['distolik'],
-                "frekuensiNafas" => $this->observasiLanjutan['frekuensiNafas'],
-                "frekuensiNadi" => $this->observasiLanjutan['frekuensiNadi'],
-                "suhu" => $this->observasiLanjutan['suhu'],
-                "spo2" => $this->observasiLanjutan['spo2'],
-                "gda" => $this->observasiLanjutan['gda'],
-                "gcs" => $this->observasiLanjutan['gcs'],
-                "waktuPemeriksaan" => $this->observasiLanjutan['waktuPemeriksaan'],
-                "pemeriksa" => $this->observasiLanjutan['pemeriksa'],
+        if (!$cekdObatDanCairan) {
+            $this->dataDaftarUgd['observasi']['obatDanCairan']['pemberianObatDanCairan'][] = [
+                "namaObatAtauJenisCairan" => $this->obatDanCairan['namaObatAtauJenisCairan'],
+                "jumlah" => $this->obatDanCairan['jumlah'],
+                "dosis" => $this->obatDanCairan['dosis'],
+                "rute" => $this->obatDanCairan['rute'],
+                "keterangan" => $this->obatDanCairan['keterangan'],
+                "waktuPemberian" => $this->obatDanCairan['waktuPemberian'],
+                "pemeriksa" => $this->obatDanCairan['pemeriksa'],
             ];
 
-            $this->dataDaftarUgd['observasi']['observasiLanjutan']['tandaVitalLog'] =
+            $this->dataDaftarUgd['observasi']['obatDanCairan']['pemberianObatDanCairanLog'] =
                 [
-                    'userLogDesc' => 'Form Entry observasiLanjutan',
+                    'userLogDesc' => 'Form Entry obatDanCairan',
                     'userLog' => auth()->user()->myuser_name,
                     'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
                 ];
 
             $this->store();
-            // reset observasiLanjutan
-            $this->reset(['observasiLanjutan']);
+            // reset obatDanCairan
+            $this->reset(['obatDanCairan']);
         } else {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Observasi Sudah ada.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("ObatDanCairan Sudah ada.");
         }
     }
 
-    public function removeObservasiLanjutan($waktuPemeriksaan)
+    public function removeObatDanCairan($waktuPemberian)
     {
 
-        $observasiLanjutan = collect($this->dataDaftarUgd['observasi']['observasiLanjutan']['tandaVital'])->where("waktuPemeriksaan", '!=', $waktuPemeriksaan)->toArray();
-        $this->dataDaftarUgd['observasi']['observasiLanjutan']['tandaVital'] = $observasiLanjutan;
+        $obatDanCairan = collect($this->dataDaftarUgd['observasi']['obatDanCairan']['pemberianObatDanCairan'])->where("waktuPemberian", '!=', $waktuPemberian)->toArray();
+        $this->dataDaftarUgd['observasi']['obatDanCairan']['pemberianObatDanCairan'] = $obatDanCairan;
 
-        $this->dataDaftarUgd['observasi']['observasiLanjutan']['tandaVitalLog'] =
+        $this->dataDaftarUgd['observasi']['obatDanCairan']['pemberianObatDanCairanLog'] =
             [
-                'userLogDesc' => 'Hapus observasiLanjutan',
+                'userLogDesc' => 'Hapus obatDanCairan',
                 'userLog' => auth()->user()->myuser_name,
                 'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
             ];
         $this->store();
     }
 
-    public function setWaktuPemeriksaan($myTime)
+    public function setWaktuPemberian($myTime)
     {
-        $this->observasiLanjutan['waktuPemeriksaan'] = $myTime;
+        $this->obatDanCairan['waktuPemberian'] = $myTime;
     }
 
 
@@ -240,10 +226,10 @@ class Observasi extends Component
     {
 
         return view(
-            'livewire.emr-u-g-d.mr-u-g-d.observasi.observasi',
+            'livewire.emr-u-g-d.mr-u-g-d.obat-dan-cairan.obat-dan-cairan',
             [
                 // 'RJpasiens' => $query->paginate($this->limitPerPage),
-                'myTitle' => 'Observasi',
+                'myTitle' => 'Obat Dan Cairan',
                 'mySnipt' => 'Rekam Medis Pasien',
                 'myProgram' => 'Pasien UGD',
             ]

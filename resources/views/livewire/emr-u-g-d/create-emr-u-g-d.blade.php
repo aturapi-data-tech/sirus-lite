@@ -120,8 +120,14 @@
                         }"
                         x-show.transition.in.opacity.duration.600="activeTab === 'observasi'">
 
-                        <livewire:emr-u-g-d.mr-u-g-d.observasi.observasi :wire:key="'content-observasiUgd'"
-                            :rjNoRef="$rjNoRef">
+
+                        <livewire:emr-u-g-d.mr-u-g-d.obat-dan-cairan.obat-dan-cairan
+                            :wire:key="'content-obat-dan-cairan-Ugd'" :rjNoRef="$rjNoRef">
+
+                            <livewire:emr-u-g-d.mr-u-g-d.observasi.observasi :wire:key="'content-observasiUgd'"
+                                :rjNoRef="$rjNoRef">
+
+
                     </div>
 
                     <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50"

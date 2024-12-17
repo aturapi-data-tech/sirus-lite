@@ -153,7 +153,7 @@
         @endrole
 
         <div class="w-full my-2">
-            @include('livewire.emr-u-g-d.mr-u-g-d.observasi.tandaVitalTable')
+            @include('livewire.emr-u-g-d.mr-u-g-d.observasi.tanda-vital-table')
         </div>
     </div>
 

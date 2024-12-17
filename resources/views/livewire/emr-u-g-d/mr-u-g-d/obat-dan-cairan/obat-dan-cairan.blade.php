@@ -4,7 +4,7 @@
         $disabledPropertyRjStatus = false;
     @endphp
     {{-- jika observasi kosong ngak usah di render --}}
-    @if (isset($dataDaftarUgd['observasi']['observasiLanjutan']))
+    @if (isset($dataDaftarUgd['observasi']['obatDanCairan']))
         <div class="w-full mb-1">
 
             <div id="TransaksiRawatJalan" class="px-2">
@@ -17,19 +17,20 @@
                             <li class="mr-2">
                                 <label
                                     class="inline-block p-2 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
-                                    :class="activeTab === '{{ $dataDaftarUgd['observasi']['observasiLanjutan']['tandaVitalTab'] }}'
+                                    :class="activeTab === '{{ $dataDaftarUgd['observasi']['obatDanCairan']['pemberianObatDanCairanTab'] }}'
                                         ?
                                         'text-primary border-primary bg-gray-100' : ''"
-                                    @click="activeTab =!activeTab?'{{ $dataDaftarUgd['observasi']['observasiLanjutan']['tandaVitalTab'] }}':false">{{ $dataDaftarUgd['observasi']['observasiLanjutan']['tandaVitalTab'] }}</label>
+                                    @click="activeTab =!activeTab?'{{ $dataDaftarUgd['observasi']['obatDanCairan']['pemberianObatDanCairanTab'] }}':false">{{ $dataDaftarUgd['observasi']['obatDanCairan']['pemberianObatDanCairanTab'] }}</label>
                             </li>
+                        </ul>
                     </div>
 
                     <div class="p-2 rounded-lg bg-gray-50"
                         :class="{
-                            'active': activeTab === '{{ $dataDaftarUgd['observasi']['observasiLanjutan']['tandaVitalTab'] }}'
+                            'active': activeTab === '{{ $dataDaftarUgd['observasi']['obatDanCairan']['pemberianObatDanCairanTab'] }}'
                         }"
-                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarUgd['observasi']['observasiLanjutan']['tandaVitalTab'] }}'">
-                        @include('livewire.emr-u-g-d.mr-u-g-d.observasi.tanda-vital-tab')
+                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarUgd['observasi']['obatDanCairan']['pemberianObatDanCairanTab'] }}'">
+                        @include('livewire.emr-u-g-d.mr-u-g-d.obat-dan-cairan.obat-dan-cairan-tab')
 
                     </div>
 
