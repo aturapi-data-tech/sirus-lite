@@ -56,8 +56,8 @@ class ObatDanCairan extends Component
     protected $rules = [
         'obatDanCairan.namaObatAtauJenisCairan' => 'required',
         'obatDanCairan.jumlah' => 'required|numeric',
-        'obatDanCairan.dosis' => 'required|numeric',
-        'obatDanCairan.rute' => 'required|numeric',
+        'obatDanCairan.dosis' => 'required',
+        'obatDanCairan.rute' => 'required',
         'obatDanCairan.keterangan' => 'required',
         'obatDanCairan.waktuPemberian' => 'required|date_format:d/m/Y H:i:s',
         'obatDanCairan.pemeriksa' => 'required',
