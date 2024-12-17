@@ -29,7 +29,8 @@
                         :class="{
                             'active': activeTab === '{{ $dataDaftarUgd['observasi']['obatDanCairan']['pemberianObatDanCairanTab'] }}'
                         }"
-                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarUgd['observasi']['obatDanCairan']['pemberianObatDanCairanTab'] }}'">
+                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarUgd['observasi']['obatDanCairan']['pemberianObatDanCairanTab'] }}'"
+                        @click.outside="activeTab=false">
                         @include('livewire.emr-u-g-d.mr-u-g-d.obat-dan-cairan.obat-dan-cairan-tab')
 
                     </div>

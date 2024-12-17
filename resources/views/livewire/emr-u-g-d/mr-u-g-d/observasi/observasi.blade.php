@@ -28,7 +28,8 @@
                         :class="{
                             'active': activeTab === '{{ $dataDaftarUgd['observasi']['observasiLanjutan']['tandaVitalTab'] }}'
                         }"
-                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarUgd['observasi']['observasiLanjutan']['tandaVitalTab'] }}'">
+                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarUgd['observasi']['observasiLanjutan']['tandaVitalTab'] }}'"
+                        @click.outside="activeTab=false">
                         @include('livewire.emr-u-g-d.mr-u-g-d.observasi.tanda-vital-tab')
 
                     </div>
