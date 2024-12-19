@@ -253,10 +253,9 @@
                                                 $badgecolorEresep = $eresep ? 'green' : 'red';
 
                                                 $noReferensi = $datadaftar_json['noReferensi'] ?? '-';
+                                                $rjNoJson = $datadaftar_json['rjNo'] ?? '-';
                                                 $bgChekJsonRjNo =
-                                                    $RJp->rj_no === $datadaftar_json['rjNo']
-                                                        ? 'bg-green-100'
-                                                        : 'bg-red-100';
+                                                    $RJp->rj_no === $rjNoJson ? 'bg-green-100' : 'bg-red-100';
                                             @endphp
 
 
