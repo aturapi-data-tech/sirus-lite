@@ -998,7 +998,9 @@ class FormEntryUGD extends Component
 
     private function updateDataRJ($rjNo): void
     {
-
+        if ($rjNo !== $this->dataDaftarUgd['rjNo']) {
+            dd('Data Json Tidak sesuai' . $rjNo . '  /  ' . $this->dataDaftarUgd['rjNo']);
+        }
         // update table trnsaksi
         DB::table('rstxn_ugdhdrs')
             ->where('rj_no', $rjNo)

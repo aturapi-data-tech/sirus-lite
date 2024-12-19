@@ -982,6 +982,10 @@ class DaftarRJ extends Component
     private function updateDataRJ($rjNo): void
     {
 
+        if ($rjNo !== $this->dataDaftarPoliRJ['rjNo']) {
+            dd('Data Json Tidak sesuai' . $rjNo . '  /  ' . $this->dataDaftarPoliRJ['rjNo']);
+        }
+
         // update table trnsaksi
         DB::table('rstxn_rjhdrs')
             ->where('rj_no', $rjNo)
