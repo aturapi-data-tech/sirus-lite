@@ -253,6 +253,10 @@
                                                 $badgecolorEresep = $eresep ? 'green' : 'red';
 
                                                 $noReferensi = $datadaftar_json['noReferensi'] ?? '-';
+                                                $bgChekJsonRjNo =
+                                                    $RJp->rj_no === $datadaftar_json['rjNo']
+                                                        ? 'bg-green-100'
+                                                        : 'bg-red-100';
                                             @endphp
 
 
@@ -273,6 +277,10 @@
                                                         </div>
                                                         <div class="font-normal text-gray-900">
                                                             {{ $RJp->address }}
+                                                        </div>
+
+                                                        <div class="text-xs text-gray-900 {{ $bgChekJsonRjNo }}">
+                                                            {{ $RJp->rj_no . ' / ' . $datadaftar_json['rjNo'] }}
                                                         </div>
                                                     </div>
                                                 </td>
