@@ -279,7 +279,7 @@
                                                         </div>
 
                                                         <div class="text-xs text-gray-900 {{ $bgChekJsonRjNo }}">
-                                                            {{ $RJp->rj_no . ' / ' . $datadaftar_json['rjNo'] }}
+                                                            {{ $RJp->rj_no . ' / ' . $rjNoJson }}
                                                         </div>
                                                     </div>
                                                 </td>
