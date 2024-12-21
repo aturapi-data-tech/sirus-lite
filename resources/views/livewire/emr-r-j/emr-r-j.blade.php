@@ -241,6 +241,8 @@
                             $eresep = isset($datadaftar_json['eresep']) ? 1 : 0;
                             $prosentaseEMREresep = ($eresep / 1) * 100;
                             $badgecolorEresep = $eresep ? 'green' : 'red';
+                            $rjNoJson = $datadaftar_json['rjNo'] ?? '-';
+                            $bgChekJsonRjNo = $RJp->rj_no === $rjNoJson ? 'bg-green-100' : 'bg-red-100';
                         @endphp
 
 
@@ -261,6 +263,9 @@
                                     </div>
                                     <div class="font-normal text-gray-900">
                                         {{ $myQData->address }}
+                                    </div>
+                                    <div class="text-xs text-gray-900 {{ $bgChekJsonRjNo }}">
+                                        {{ $RJp->rj_no . ' / ' . $rjNoJson }}
                                     </div>
                                 </div>
                             </td>
