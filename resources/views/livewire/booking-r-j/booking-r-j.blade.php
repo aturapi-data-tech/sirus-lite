@@ -237,10 +237,24 @@
                             </td>
 
                             <td class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-primary">
-
-
-                                <x-light-button>x</x-light-button>
-
+                                <x-light-button :disabled=false
+                                    wire:click.prevent="setBelum('{{ $myQData->nobooking }}')" type="button"
+                                    wire:loading.remove>Belum</x-light-button>
+                                <div wire:loading wire:target="setBelum">
+                                    <x-loading />
+                                </div>
+                                {{-- <x-light-button :disabled=false
+                                    wire:click.prevent="setCheckin('{{ $myQData->nobooking }}')" type="button"
+                                    wire:loading.remove>Checkin</x-light-button>
+                                <div wire:loading wire:target="setCheckin">
+                                    <x-loading />
+                                </div> --}}
+                                {{-- <x-light-button :disabled=false
+                                    wire:click.prevent="setBatal('{{ $myQData->nobooking }}')" type="button"
+                                    wire:loading.remove>Batal</x-light-button>
+                                <div wire:loading wire:target="setBatal">
+                                    <x-loading />
+                                </div> --}}
                             </td>
                         </tr>
                     @endforeach
