@@ -242,7 +242,7 @@
                             $prosentaseEMREresep = ($eresep / 1) * 100;
                             $badgecolorEresep = $eresep ? 'green' : 'red';
                             $rjNoJson = $datadaftar_json['rjNo'] ?? '-';
-                            $bgChekJsonRjNo = $RJp->rj_no === $rjNoJson ? 'bg-green-100' : 'bg-red-100';
+                            $bgChekJsonRjNo = $myQData->rj_no === $rjNoJson ? 'bg-green-100' : 'bg-red-100';
                         @endphp
 
 
