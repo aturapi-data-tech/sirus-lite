@@ -216,13 +216,18 @@ class PelayananRJ extends Component
     /////////////////////////////////////////////////////////////////////
     private function updateDataRJ($rjNo): void
     {
-        // update table trnsaksi
-        DB::table('rstxn_rjhdrs')
-            ->where('rj_no', $rjNo)
-            ->update([
-                'datadaftarpolirj_json' => json_encode($this->dataDaftarPoliRJ, true),
-                'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
-            ]);
+        // if ($rjNo !== $this->dataDaftarPoliRJ['rjNo']) {
+        //     dd('Data Json Tidak sesuai' . $rjNo . '  /  ' . $this->dataDaftarPoliRJ['rjNo']);
+        // }
+
+        // // update table trnsaksi
+        // DB::table('rstxn_rjhdrs')
+        //     ->where('rj_no', $rjNo)
+        //     ->update([
+        //         'datadaftarpolirj_json' => json_encode($this->dataDaftarPoliRJ, true),
+        //         'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
+        //     ]);
+        $this->updateJsonRJ($rjNo, $this->dataDaftarPoliRJ);
     }
 
     private function findData($rjNo): void

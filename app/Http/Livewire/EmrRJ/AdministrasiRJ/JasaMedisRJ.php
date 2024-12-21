@@ -220,13 +220,19 @@ class JasaMedisRJ extends Component
     private function updateDataRJ($rjNo): void
     {
 
-        // update table trnsaksi
-        DB::table('rstxn_rjhdrs')
-            ->where('rj_no', $rjNo)
-            ->update([
-                'dataDaftarPoliRJ_json' => json_encode($this->dataDaftarPoliRJ, true),
-                'dataDaftarPoliRJ_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
-            ]);
+        // if ($rjNo !== $this->dataDaftarPoliRJ['rjNo']) {
+        //     dd('Data Json Tidak sesuai' . $rjNo . '  /  ' . $this->dataDaftarPoliRJ['rjNo']);
+        // }
+
+        // // update table trnsaksi
+        // DB::table('rstxn_rjhdrs')
+        //     ->where('rj_no', $rjNo)
+        //     ->update([
+        //         'dataDaftarPoliRJ_json' => json_encode($this->dataDaftarPoliRJ, true),
+        //         'dataDaftarPoliRJ_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
+        //     ]);
+
+        $this->updateJsonRJ($rjNo, $this->dataDaftarPoliRJ);
 
         toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Jasa Medis berhasil disimpan.");
     }

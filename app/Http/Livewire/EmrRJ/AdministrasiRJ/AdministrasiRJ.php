@@ -124,12 +124,18 @@ class AdministrasiRJ extends Component
                 'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
             ];
 
-            DB::table('rstxn_rjhdrs')
-                ->where('rj_no', $rjNo)
-                ->update([
-                    'dataDaftarPoliRJ_json' => json_encode($dataDaftarPoliRJ, true),
-                    'dataDaftarPoliRJ_xml' => ArrayToXml::convert($dataDaftarPoliRJ),
-                ]);
+            // if ($rjNo !== $this->dataDaftarPoliRJ['rjNo']) {
+            //     dd('Data Json Tidak sesuai' . $rjNo . '  /  ' . $dataDaftarPoliRJ['rjNo']);
+            // }
+
+            // DB::table('rstxn_rjhdrs')
+            //     ->where('rj_no', $rjNo)
+            //     ->update([
+            //         'dataDaftarPoliRJ_json' => json_encode($dataDaftarPoliRJ, true),
+            //         'dataDaftarPoliRJ_xml' => ArrayToXml::convert($dataDaftarPoliRJ),
+            //     ]);
+            $this->updateJsonRJ($rjNo, $dataDaftarPoliRJ);
+
 
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Administrasi berhasil disimpan.");
             $this->emit('syncronizeAssessmentDokterRJFindData');

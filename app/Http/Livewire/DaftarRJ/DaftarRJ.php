@@ -943,6 +943,7 @@ class DaftarRJ extends Component
     private function insertDataRJ(): void
     {
 
+
         // insert into table transaksi
         DB::table('rstxn_rjhdrs')->insert([
             'rj_no' => $this->dataDaftarPoliRJ['rjNo'],
@@ -967,14 +968,16 @@ class DaftarRJ extends Component
             'kunjungan_internal_status' => $this->dataDaftarPoliRJ['kunjunganInternalStatus'],
             'push_antrian_bpjs_status' => $this->HttpGetBpjsStatus, //status push antrian 200 /201/ 400
             'push_antrian_bpjs_json' => $this->HttpGetBpjsJson,  // response json
-            'datadaftarpolirj_json' => json_encode($this->dataDaftarPoliRJ, true),
-            'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
+            // 'datadaftarpolirj_json' => json_encode($this->dataDaftarPoliRJ, true),
+            // 'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
 
             'waktu_masuk_pelayanan' => DB::raw("to_date('" . $this->dataDaftarPoliRJ['rjDate'] . "','dd/mm/yyyy hh24:mi:ss')"), //waktu masuk = rjdate
 
             'vno_sep' => isset($this->dataDaftarPoliRJ['sep']['noSep']) ? $this->dataDaftarPoliRJ['sep']['noSep'] : "",
 
         ]);
+
+        $this->updateJsonRJ($this->dataDaftarPoliRJ['rjNo'], $this->dataDaftarPoliRJ);
 
         toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Data sudah tersimpan.");
     }
@@ -1012,13 +1015,15 @@ class DaftarRJ extends Component
                 'kunjungan_internal_status' => $this->dataDaftarPoliRJ['kunjunganInternalStatus'],
                 'push_antrian_bpjs_status' => $this->HttpGetBpjsStatus, //status push antrian 200 /201/ 400
                 'push_antrian_bpjs_json' => $this->HttpGetBpjsJson,  // response json
-                'datadaftarpolirj_json' => json_encode($this->dataDaftarPoliRJ, true),
-                'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
+                // 'datadaftarpolirj_json' => json_encode($this->dataDaftarPoliRJ, true),
+                // 'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
 
                 'waktu_masuk_pelayanan' => DB::raw("to_date('" . $this->dataDaftarPoliRJ['rjDate'] . "','dd/mm/yyyy hh24:mi:ss')"), //waktu masuk = rjdate
 
                 'vno_sep' => isset($this->dataDaftarPoliRJ['sep']['noSep']) ? $this->dataDaftarPoliRJ['sep']['noSep'] : "",
             ]);
+
+        $this->updateJsonRJ($rjNo, $this->dataDaftarPoliRJ);
 
         toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Data berhasil diupdate.");
     }
@@ -2614,13 +2619,13 @@ class DaftarRJ extends Component
                     $this->dataDaftarPoliRJ['sep']['noSep'] = $HttpGetBpjs['response']['noSep'];
 
                     // update database
-                    DB::table('rstxn_rjhdrs')
-                        ->where('rj_no', $this->dataDaftarPoliRJ['rjNo'])
-                        ->update([
-                            'datadaftarpolirj_json' => json_encode($this->dataDaftarPoliRJ, true),
-                            'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
-                        ]);
-
+                    // DB::table('rstxn_rjhdrs')
+                    //     ->where('rj_no', $this->dataDaftarPoliRJ['rjNo'])
+                    //     ->update([
+                    //         'datadaftarpolirj_json' => json_encode($this->dataDaftarPoliRJ, true),
+                    //         'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
+                    //     ]);
+                    $this->updateJsonRJ($this->dataDaftarPoliRJ['rjNo'], $this->dataDaftarPoliRJ);
 
                     toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('CetakSEP ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
                 } else {

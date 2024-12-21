@@ -457,14 +457,7 @@ class EmrRJ extends Component
 
     private function updateDataRJ($rjNo): void
     {
-
-        // update table trnsaksi
-        DB::table('rstxn_rjhdrs')
-            ->where('rj_no', $rjNo)
-            ->update([
-                'datadaftarpolirj_json' => json_encode($this->dataDaftarPoliRJ, true),
-                'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
-            ]);
+        $this->updateJsonRJ($rjNo, $this->dataDaftarPoliRJ);
 
         toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Json Berhasil di update.");
     }

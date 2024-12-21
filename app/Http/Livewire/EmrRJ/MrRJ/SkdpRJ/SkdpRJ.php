@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use App\Http\Traits\customErrorMessagesTrait;
 use App\Http\Traits\BPJS\AntrianTrait;
 use App\Http\Traits\BPJS\VclaimTrait;
+use App\Http\Traits\EmrRJ\EmrRJTrait;
 
 
 use Illuminate\Support\Str;
@@ -21,7 +22,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class SkdpRJ extends Component
 {
-    use WithPagination;
+    use WithPagination, EmrRJTrait;
 
     // listener from blade////////////////
     protected $listeners = [
@@ -273,13 +274,19 @@ class SkdpRJ extends Component
     private function updateDataRJ($rjNo): void
     {
 
-        // update table trnsaksi
-        DB::table('rstxn_rjhdrs')
-            ->where('rj_no', $rjNo)
-            ->update([
-                'datadaftarpolirj_json' => json_encode($this->dataDaftarPoliRJ, true),
-                'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
-            ]);
+        // if ($rjNo !== $this->dataDaftarPoliRJ['rjNo']) {
+        //     dd('Data Json Tidak sesuai' . $rjNo . '  /  ' . $this->dataDaftarPoliRJ['rjNo']);
+        // }
+
+        // // update table trnsaksi
+        // DB::table('rstxn_rjhdrs')
+        //     ->where('rj_no', $rjNo)
+        //     ->update([
+        //         'datadaftarpolirj_json' => json_encode($this->dataDaftarPoliRJ, true),
+        //         'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
+        //     ]);
+
+        $this->updateJsonRJ($rjNo, $this->dataDaftarPoliRJ);
 
         toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Surat Kontrol berhasil disimpan.");
     }
@@ -290,180 +297,48 @@ class SkdpRJ extends Component
     {
 
 
-        $findData = DB::table('rsview_rjkasir')
-            ->select('datadaftarpolirj_json', 'vno_sep')
-            ->where('rj_no', $rjno)
-            ->first();
+        $findDataRJ = $this->findDataRJ($rjno);
+        $this->dataDaftarPoliRJ  = $findDataRJ['dataDaftarRJ'];
 
+        // jika kontrol tidak ditemukan tambah variable kontrol pda array
+        if (isset($this->dataDaftarPoliRJ['kontrol']) == false) {
 
-        $dataDaftarPoliRJ_json = isset($findData->datadaftarpolirj_json) ? $findData->datadaftarpolirj_json : null;
-        // if meta_data_pasien_json = null
-        // then cari Data Pasien By Key Collection (exception when no data found)
-        //
-        // else json_decode
-
-        if ($dataDaftarPoliRJ_json) {
-            $this->dataDaftarPoliRJ = json_decode($findData->datadaftarpolirj_json, true);
-
-            // jika kontrol tidak ditemukan tambah variable kontrol pda array
-            if (isset($this->dataDaftarPoliRJ['kontrol']) == false) {
-
-                $this->dataDaftarPoliRJ['kontrol']['tglKontrol'] =  Carbon::now(env('APP_TIMEZONE'))->addDays(8)->format('d/m/Y');
-                $this->dataDaftarPoliRJ['kontrol']['drKontrol'] =  (isset($this->dataDaftarPoliRJ['drId'])
-                    ? ($this->dataDaftarPoliRJ['drId']
-                        ? $this->dataDaftarPoliRJ['drId']
-                        : '')
-                    : '');
-                $this->dataDaftarPoliRJ['kontrol']['drKontrolDesc'] = (isset($this->dataDaftarPoliRJ['drDesc'])
-                    ? ($this->dataDaftarPoliRJ['drDesc']
-                        ? $this->dataDaftarPoliRJ['drDesc']
-                        : '')
-                    : '');
-                $this->dataDaftarPoliRJ['kontrol']['drKontrolBPJS'] = (isset($this->dataDaftarPoliRJ['kddrbpjs'])
-                    ? ($this->dataDaftarPoliRJ['kddrbpjs']
-                        ? $this->dataDaftarPoliRJ['kddrbpjs']
-                        : '')
-                    : '');
-                $this->dataDaftarPoliRJ['kontrol']['poliKontrol'] = (isset($this->dataDaftarPoliRJ['poliId'])
-                    ? ($this->dataDaftarPoliRJ['poliId']
-                        ? $this->dataDaftarPoliRJ['poliId']
-                        : '')
-                    : '');
-                $this->dataDaftarPoliRJ['kontrol']['poliKontrolDesc'] = (isset($this->dataDaftarPoliRJ['poliDesc'])
-                    ? ($this->dataDaftarPoliRJ['poliDesc']
-                        ? $this->dataDaftarPoliRJ['poliDesc']
-                        : '')
-                    : '');
-                $this->dataDaftarPoliRJ['kontrol']['poliKontrolBPJS'] = (isset($this->dataDaftarPoliRJ['kdpolibpjs'])
-                    ? ($this->dataDaftarPoliRJ['kdpolibpjs']
-                        ? $this->dataDaftarPoliRJ['kdpolibpjs']
-                        : '')
-                    : '');
-                $this->dataDaftarPoliRJ['kontrol']['noSEP'] = (isset($findData->vno_sep)
-                    ? ($findData->vno_sep
-                        ? $findData->vno_sep
-                        : '')
-                    : '');
-            }
-        } else {
-
-
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Json Tidak ditemukan, Data sedang diproses ulang.");
-            $dataDaftarPoliRJ = DB::table('rsview_rjkasir')
-                ->select(
-                    DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
-                    DB::raw("to_char(rj_date,'yyyymmddhh24miss') AS rj_date1"),
-                    'rj_no',
-                    'reg_no',
-                    'reg_name',
-                    'sex',
-                    'address',
-                    'thn',
-                    DB::raw("to_char(birth_date,'dd/mm/yyyy') AS birth_date"),
-                    'poli_id',
-                    'poli_desc',
-                    'dr_id',
-                    'dr_name',
-                    'klaim_id',
-                    'shift',
-                    'vno_sep',
-                    'no_antrian',
-
-                    'nobooking',
-                    'push_antrian_bpjs_status',
-                    'push_antrian_bpjs_json',
-                    'kd_dr_bpjs',
-                    'kd_poli_bpjs',
-                    'rj_status',
-                    'txn_status',
-                    'erm_status',
-                )
-                ->where('rj_no', '=', $rjno)
-                ->first();
-
-            $this->dataDaftarPoliRJ = [
-                "regNo" => "" . $dataDaftarPoliRJ->reg_no . "",
-
-                "drId" => "" . $dataDaftarPoliRJ->dr_id . "",
-                "drDesc" => "" . $dataDaftarPoliRJ->dr_name . "",
-
-                "poliId" => "" . $dataDaftarPoliRJ->poli_id . "",
-                "poliDesc" => "" . $dataDaftarPoliRJ->poli_desc . "",
-
-                "kddrbpjs" => "" . $dataDaftarPoliRJ->kd_dr_bpjs . "",
-                "kdpolibpjs" => "" . $dataDaftarPoliRJ->kd_poli_bpjs . "",
-
-                "rjDate" => "" . $dataDaftarPoliRJ->rj_date . "",
-                "rjNo" => "" . $dataDaftarPoliRJ->rj_no . "",
-                "shift" => "" . $dataDaftarPoliRJ->shift . "",
-                "noAntrian" => "" . $dataDaftarPoliRJ->no_antrian . "",
-                "noBooking" => "" . $dataDaftarPoliRJ->nobooking . "",
-                "slCodeFrom" => "02",
-                "passStatus" => "",
-                "rjStatus" => "" . $dataDaftarPoliRJ->rj_status . "",
-                "txnStatus" => "" . $dataDaftarPoliRJ->txn_status . "",
-                "ermStatus" => "" . $dataDaftarPoliRJ->erm_status . "",
-                "cekLab" => "0",
-                "kunjunganInternalStatus" => "0",
-                "noReferensi" => "" . $dataDaftarPoliRJ->reg_no . "",
-                "taskIdPelayanan" => [
-                    "taskId1" => "",
-                    "taskId2" => "",
-                    "taskId3" => "" . $dataDaftarPoliRJ->rj_date . "",
-                    "taskId4" => "",
-                    "taskId5" => "",
-                    "taskId6" => "",
-                    "taskId7" => "",
-                    "taskId99" => "",
-                ],
-                'sep' => [
-                    "noSep" => "" . $dataDaftarPoliRJ->vno_sep . "",
-                    "reqSep" => [],
-                    "resSep" => [],
-                ]
-            ];
-
-
-            // jika kontrol tidak ditemukan tambah variable kontrol pda array
-            if (isset($this->dataDaftarPoliRJ['kontrol']) == false) {
-
-                $this->dataDaftarPoliRJ['kontrol']['tglKontrol'] =  Carbon::now(env('APP_TIMEZONE'))->addDays(8)->format('d/m/Y');
-                $this->dataDaftarPoliRJ['kontrol']['drKontrol'] =  (isset($this->dataDaftarPoliRJ['drId'])
-                    ? ($this->dataDaftarPoliRJ['drId']
-                        ? $this->dataDaftarPoliRJ['drId']
-                        : '')
-                    : '');
-                $this->dataDaftarPoliRJ['kontrol']['drKontrolDesc'] = (isset($this->dataDaftarPoliRJ['drDesc'])
-                    ? ($this->dataDaftarPoliRJ['drDesc']
-                        ? $this->dataDaftarPoliRJ['drDesc']
-                        : '')
-                    : '');
-                $this->dataDaftarPoliRJ['kontrol']['drKontrolBPJS'] = (isset($this->dataDaftarPoliRJ['kddrbpjs'])
-                    ? ($this->dataDaftarPoliRJ['kddrbpjs']
-                        ? $this->dataDaftarPoliRJ['kddrbpjs']
-                        : '')
-                    : '');
-                $this->dataDaftarPoliRJ['kontrol']['poliKontrol'] = (isset($this->dataDaftarPoliRJ['poliId'])
-                    ? ($this->dataDaftarPoliRJ['poliId']
-                        ? $this->dataDaftarPoliRJ['poliId']
-                        : '')
-                    : '');
-                $this->dataDaftarPoliRJ['kontrol']['poliKontrolDesc'] = (isset($this->dataDaftarPoliRJ['poliDesc'])
-                    ? ($this->dataDaftarPoliRJ['poliDesc']
-                        ? $this->dataDaftarPoliRJ['poliDesc']
-                        : '')
-                    : '');
-                $this->dataDaftarPoliRJ['kontrol']['poliKontrolBPJS'] = (isset($this->dataDaftarPoliRJ['kdpolibpjs'])
-                    ? ($this->dataDaftarPoliRJ['kdpolibpjs']
-                        ? $this->dataDaftarPoliRJ['kdpolibpjs']
-                        : '')
-                    : '');
-                $this->dataDaftarPoliRJ['kontrol']['noSEP'] = (isset($dataDaftarPoliRJ->vno_sep)
-                    ? ($dataDaftarPoliRJ->vno_sep
-                        ? $dataDaftarPoliRJ->vno_sep
-                        : '')
-                    : '');
-            }
+            $this->dataDaftarPoliRJ['kontrol']['tglKontrol'] =  Carbon::now(env('APP_TIMEZONE'))->addDays(8)->format('d/m/Y');
+            $this->dataDaftarPoliRJ['kontrol']['drKontrol'] =  (isset($this->dataDaftarPoliRJ['drId'])
+                ? ($this->dataDaftarPoliRJ['drId']
+                    ? $this->dataDaftarPoliRJ['drId']
+                    : '')
+                : '');
+            $this->dataDaftarPoliRJ['kontrol']['drKontrolDesc'] = (isset($this->dataDaftarPoliRJ['drDesc'])
+                ? ($this->dataDaftarPoliRJ['drDesc']
+                    ? $this->dataDaftarPoliRJ['drDesc']
+                    : '')
+                : '');
+            $this->dataDaftarPoliRJ['kontrol']['drKontrolBPJS'] = (isset($this->dataDaftarPoliRJ['kddrbpjs'])
+                ? ($this->dataDaftarPoliRJ['kddrbpjs']
+                    ? $this->dataDaftarPoliRJ['kddrbpjs']
+                    : '')
+                : '');
+            $this->dataDaftarPoliRJ['kontrol']['poliKontrol'] = (isset($this->dataDaftarPoliRJ['poliId'])
+                ? ($this->dataDaftarPoliRJ['poliId']
+                    ? $this->dataDaftarPoliRJ['poliId']
+                    : '')
+                : '');
+            $this->dataDaftarPoliRJ['kontrol']['poliKontrolDesc'] = (isset($this->dataDaftarPoliRJ['poliDesc'])
+                ? ($this->dataDaftarPoliRJ['poliDesc']
+                    ? $this->dataDaftarPoliRJ['poliDesc']
+                    : '')
+                : '');
+            $this->dataDaftarPoliRJ['kontrol']['poliKontrolBPJS'] = (isset($this->dataDaftarPoliRJ['kdpolibpjs'])
+                ? ($this->dataDaftarPoliRJ['kdpolibpjs']
+                    ? $this->dataDaftarPoliRJ['kdpolibpjs']
+                    : '')
+                : '');
+            $this->dataDaftarPoliRJ['kontrol']['noSEP'] = (isset($findData->vno_sep)
+                ? ($findData->vno_sep
+                    ? $findData->vno_sep
+                    : '')
+                : '');
         }
     }
 

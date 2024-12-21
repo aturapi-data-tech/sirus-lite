@@ -566,13 +566,20 @@ class Perencanaan extends Component
 
     private function updateDataRj($rjNo, $dataDaftarPoliRJArr): void
     {
-        // update table trnsaksi
-        DB::table('rstxn_rjhdrs')
-            ->where('rj_no', $rjNo)
-            ->update([
-                'datadaftarpolirj_json' => json_encode($dataDaftarPoliRJArr, true),
-                'datadaftarpolirj_xml' => ArrayToXml::convert($dataDaftarPoliRJArr),
-            ]);
+        // if ($rjNo !== $dataDaftarPoliRJArr['rjNo']) {
+        //     dd('Data Json Tidak sesuai' . $rjNo . '  /  ' . $dataDaftarPoliRJArr['rjNo']);
+        // }
+
+        // // update table trnsaksi
+        // DB::table('rstxn_rjhdrs')
+        //     ->where('rj_no', $rjNo)
+        //     ->update([
+        //         'datadaftarpolirj_json' => json_encode($dataDaftarPoliRJArr, true),
+        //         'datadaftarpolirj_xml' => ArrayToXml::convert($dataDaftarPoliRJArr),
+        //     ]);
+
+        $this->updateJsonRJ($rjNo, $dataDaftarPoliRJArr);
+
 
         $this->emit('syncronizeAssessmentDokterRJFindData');
         $this->emit('syncronizeAssessmentPerawatRJFindData');

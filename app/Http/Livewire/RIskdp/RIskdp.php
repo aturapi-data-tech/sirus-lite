@@ -680,6 +680,7 @@ class RIskdp extends Component
     //             'datadaftarpolirj_xml' => ArrayToXml::convert($this->dataDaftarRi),
     //         ]);
 
+
     //     toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess( "Surat Kontrol berhasil disimpan.");
     // }
     // insert and update record end////////////////
