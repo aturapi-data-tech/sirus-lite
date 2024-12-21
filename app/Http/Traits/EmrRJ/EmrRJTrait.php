@@ -253,8 +253,8 @@ trait EmrRJTrait
 
     public static function updateJsonRJ($rjNo, array $rjArr): void
     {
-        if ($rjNo !== $rjArr['rjNo']) {
-            dd('Data Json Tidak sesuai' . $rjNo . '  /  ' . $rjArr['rjNo']);
+        if (intval($rjNo) !== intval($rjArr['rjNo'])) {
+            dd('Data Json Tidak sesuai ' . $rjNo . '  /  ' . $rjArr['rjNo']);
         }
 
         DB::table('rstxn_rjhdrs')
