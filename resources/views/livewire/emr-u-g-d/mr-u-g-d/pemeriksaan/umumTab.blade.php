@@ -37,7 +37,7 @@
                     </x-green-button>
                 </div>
                 {{-- LOV tingkatKesadaran --}}
-                @include('livewire.mr-r-j.pemeriksaan.list-of-value-tingkatKesadaran')
+                @include('livewire.emr-u-g-d.mr-u-g-d.pemeriksaan.list-of-value-tingkatKesadaran')
             </div>
 
             <div class="grid grid-cols-1 gap-2 mt-2">
