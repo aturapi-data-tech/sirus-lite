@@ -265,7 +265,7 @@
                                         {{ $myQData->address }}
                                     </div>
                                     <div class="text-xs text-gray-900 {{ $bgChekJsonRjNo }}">
-                                        {{ $RJp->rj_no . ' / ' . $rjNoJson }}
+                                        {{ $myQData->rj_no . ' / ' . $rjNoJson }}
                                     </div>
                                 </div>
                             </td>
