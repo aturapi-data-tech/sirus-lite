@@ -131,12 +131,15 @@ class AdministrasiUGD extends Component
                 'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
             ];
 
-            DB::table('rstxn_ugdhdrs')
-                ->where('rj_no', $rjNo)
-                ->update([
-                    'datadaftarugd_json' => json_encode($dataDaftarUgd, true),
-                    'datadaftarugd_xml' => ArrayToXml::convert($dataDaftarUgd),
-                ]);
+            // DB::table('rstxn_ugdhdrs')
+            //     ->where('rj_no', $rjNo)
+            //     ->update([
+            //         'datadaftarugd_json' => json_encode($dataDaftarUgd, true),
+            //         'datadaftarugd_xml' => ArrayToXml::convert($dataDaftarUgd),
+            //     ]);
+
+            $this->updateJsonUGD($rjNo, $dataDaftarUgd);
+
 
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Administrasi berhasil disimpan.");
             $this->emit('syncronizeAssessmentDokterUGDFindData');

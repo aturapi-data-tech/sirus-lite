@@ -394,7 +394,7 @@
                                                         <li>
                                                             <x-dropdown-link
                                                                 wire:click="editGeneralConsentPasienUGD('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
-                                                                {{ __('General Consent Pasien') }}
+                                                                {{ __('Form Persetujuan Pasien') }}
                                                             </x-dropdown-link>
                                                         </li>
                                                     @endrole

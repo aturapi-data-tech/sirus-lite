@@ -465,12 +465,15 @@ class TelaahResepUGD extends Component
                     'userLogCode' => auth()->user()->myuser_code
                 ];
 
-                DB::table('rstxn_ugdhdrs')
-                    ->where('rj_no', $rjNo)
-                    ->update([
-                        'datadaftarugd_json' => json_encode($this->dataDaftarUgd, true),
-                        'datadaftarUgd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
-                    ]);
+                // DB::table('rstxn_ugdhdrs')
+                //     ->where('rj_no', $rjNo)
+                //     ->update([
+                //         'datadaftarugd_json' => json_encode($this->dataDaftarUgd, true),
+                //         'datadaftarUgd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
+                //     ]);
+
+                $this->updateJsonUGD($rjNo, $this->dataDaftarUgd);
+
 
                 $this->emit('syncronizeAssessmentDokterUGDFindData');
                 $this->emit('syncronizeAssessmentPerawatUGDFindData');
@@ -492,12 +495,15 @@ class TelaahResepUGD extends Component
                     'userLogCode' => auth()->user()->myuser_code
                 ];
 
-                DB::table('rstxn_ugdhdrs')
-                    ->where('rj_no', $rjNo)
-                    ->update([
-                        'datadaftarugd_json' => json_encode($this->dataDaftarUgd, true),
-                        'datadaftarUgd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
-                    ]);
+                // DB::table('rstxn_ugdhdrs')
+                //     ->where('rj_no', $rjNo)
+                //     ->update([
+                //         'datadaftarugd_json' => json_encode($this->dataDaftarUgd, true),
+                //         'datadaftarUgd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
+                //     ]);
+
+                $this->updateJsonUGD($rjNo, $this->dataDaftarUgd);
+
 
                 $this->emit('syncronizeAssessmentDokterUGDFindData');
                 $this->emit('syncronizeAssessmentPerawatUGDFindData');

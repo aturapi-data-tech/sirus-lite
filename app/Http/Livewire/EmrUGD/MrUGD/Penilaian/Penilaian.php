@@ -416,12 +416,14 @@ class Penilaian extends Component
     {
 
         // update table trnsaksi
-        DB::table('rstxn_ugdhdrs')
-            ->where('rj_no', $rjNo)
-            ->update([
-                'dataDaftarUgd_json' => json_encode($this->dataDaftarUgd, true),
-                'dataDaftarUgd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
-            ]);
+        // DB::table('rstxn_ugdhdrs')
+        //     ->where('rj_no', $rjNo)
+        //     ->update([
+        //         'dataDaftarUgd_json' => json_encode($this->dataDaftarUgd, true),
+        //         'dataDaftarUgd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
+        //     ]);
+
+        $this->updateJsonUGD($rjNo, $this->dataDaftarUgd);
 
         toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Penilaian berhasil disimpan.");
     }

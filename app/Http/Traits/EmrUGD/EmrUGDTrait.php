@@ -153,6 +153,10 @@ trait EmrUGDTrait
 
     public static function updateJsonUGD($rjNo, array $rjArr): void
     {
+        if (intval($rjNo) !== intval($rjArr['rjNo'])) {
+            dd('Data Json Tidak sesuai ' . $rjNo . '  /  ' . $rjArr['rjNo']);
+        }
+
         DB::table('rstxn_ugdhdrs')
             ->where('rj_no', $rjNo)
             ->update([

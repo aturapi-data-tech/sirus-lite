@@ -408,14 +408,14 @@ class Anamnesa extends Component
         DB::table('rstxn_ugdhdrs')
             ->where('rj_no', $rjNo)
             ->update([
-                'datadaftarugd_json' => json_encode($this->dataDaftarUgd, true),
-                'datadaftarUgd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
+                // 'datadaftarugd_json' => json_encode($this->dataDaftarUgd, true),
+                // 'datadaftarUgd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
                 'p_status' => $p_status,
                 'waktu_pasien_datang' => DB::raw("to_date('" . $waktu_pasien_datang . "','dd/mm/yyyy hh24:mi:ss')"),
                 'waktu_pasien_dilayani' => DB::raw("to_date('" . $waktu_pasien_dilayani . "','dd/mm/yyyy hh24:mi:ss')"),
-
-
             ]);
+
+        $this->updateJsonUGD($rjNo, $this->dataDaftarUgd);
 
         toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Anamnesa berhasil disimpan.");
     }

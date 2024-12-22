@@ -88,12 +88,14 @@ class GeneralConsentPasienUGD extends Component
     private function updateDataUgd($rjNo): void
     {
         // update table trnsaksi
-        DB::table('rstxn_ugdhdrs')
-            ->where('rj_no', $rjNo)
-            ->update([
-                'datadaftarugd_json' => json_encode($this->dataDaftarUgd, true),
-                'datadaftarUgd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
-            ]);
+        // DB::table('rstxn_ugdhdrs')
+        //     ->where('rj_no', $rjNo)
+        //     ->update([
+        //         'datadaftarugd_json' => json_encode($this->dataDaftarUgd, true),
+        //         'datadaftarUgd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
+        //     ]);
+
+        $this->updateJsonUGD($rjNo, $this->dataDaftarUgd);
 
         toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Signature berhasil disimpan.");
     }
