@@ -103,17 +103,17 @@ class BookingRJ extends Component
 
     public function setBelum($nobooking): void
     {
-        DB::table('rstxn_rjhdrs')->where('nobooking', $nobooking)->update(['status' => 'Belum']);
+        DB::table('referensi_mobilejkn_bpjs')->where('nobooking', $nobooking)->update(['status' => 'Belum']);
         $this->render();
     }
     public function setCheckin($nobooking): void
     {
-        DB::table('rstxn_rjhdrs')->where('nobooking', $nobooking)->update(['status' => 'Checkin']);
+        DB::table('referensi_mobilejkn_bpjs')->where('nobooking', $nobooking)->update(['status' => 'Checkin']);
         $this->render();
     }
     public function setBatal($nobooking): void
     {
-        DB::table('rstxn_rjhdrs')->where('nobooking', $nobooking)->update(['status' => 'Batal']);
+        DB::table('referensi_mobilejkn_bpjs')->where('nobooking', $nobooking)->update(['status' => 'Batal']);
         $this->render();
     }
 

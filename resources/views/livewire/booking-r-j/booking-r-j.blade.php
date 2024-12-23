@@ -249,12 +249,12 @@
                                 <div wire:loading wire:target="setCheckin">
                                     <x-loading />
                                 </div> --}}
-                                {{-- <x-light-button :disabled=false
+                                <x-light-button :disabled=false
                                     wire:click.prevent="setBatal('{{ $myQData->nobooking }}')" type="button"
                                     wire:loading.remove>Batal</x-light-button>
                                 <div wire:loading wire:target="setBatal">
                                     <x-loading />
-                                </div> --}}
+                                </div>
                             </td>
                         </tr>
                     @endforeach
