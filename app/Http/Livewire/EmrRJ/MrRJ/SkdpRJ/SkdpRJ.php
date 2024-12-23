@@ -296,6 +296,10 @@ class SkdpRJ extends Component
     private function findData($rjno): void
     {
 
+        $findData = DB::table('rsview_rjkasir')
+            ->select('vno_sep')
+            ->where('rj_no', $rjno)
+            ->first();
 
         $findDataRJ = $this->findDataRJ($rjno);
         $this->dataDaftarPoliRJ  = $findDataRJ['dataDaftarRJ'];
