@@ -17,7 +17,7 @@
 
                     <!-- myTitle-->
                     <h3 class="w-full text-2xl font-semibold text-white ">
-                        {{ 'General Consent Pasien' }}
+                        {{ 'Form Persetujuan Pasien' }}
                     </h3>
 
                     {{-- rjDate & Shift Input Rj --}}
@@ -91,7 +91,8 @@
                             'active': activeTabGeneralConsentPasienUGD === 'informConsentPasienUGD'
                         }"
                         x-show.transition.in.opacity.duration.600="activeTabGeneralConsentPasienUGD === 'informConsentPasienUGD'">
-                        xxxxxx
+                        <livewire:emr-u-g-d.inform-consent-pasien-u-g-d.inform-consent-pasien-u-g-d
+                            :wire:key="'content-informConsentPasienUGD'.$rjNoRef" :rjNoRef="$rjNoRef" :regNoRef="$regNoRef">
                     </div>
 
                 </div>
