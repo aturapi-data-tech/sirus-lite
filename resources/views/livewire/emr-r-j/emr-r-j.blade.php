@@ -153,6 +153,10 @@
                 @include('livewire.emr-r-j.create-screening-r-j')
             @endif
 
+            @if ($isOpenGeneralConsentPasienRJ)
+                @include('livewire.emr-r-j.create-general-consent-r-j-pasien')
+            @endif
+
         </div>
         {{-- Top Bar --}}
 
@@ -474,6 +478,12 @@
                                                                 {{ __('Assessment Perawat') }}
                                                             </x-dropdown-link>
                                                         </li>
+                                                        <li>
+                                                            <x-dropdown-link
+                                                                wire:click="editGeneralConsentPasienRJ('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
+                                                                {{ __('Form Persetujuan Pasien') }}
+                                                            </x-dropdown-link>
+                                                        </li>
                                                     @endrole
                                                     @role('Mr')
                                                         <li>
@@ -508,6 +518,12 @@
                                                             <x-dropdown-link
                                                                 wire:click="edit('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
                                                                 {{ __('Assessment Perawat') }}
+                                                            </x-dropdown-link>
+                                                        </li>
+                                                        <li>
+                                                            <x-dropdown-link
+                                                                wire:click="editGeneralConsentPasienRJ('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
+                                                                {{ __('Form Persetujuan Pasien') }}
                                                             </x-dropdown-link>
                                                         </li>
                                                     @endrole
@@ -799,6 +815,34 @@
                     window.livewire.emit('confirm_doble_record_UGDp', key, name);
                 }
             });
+        </script>
+
+        <script src="assets/js/signature_pad.umd.min.js"></script>
+        <script>
+            document.addEventListener('alpine:init', () => {
+                Alpine.data('signaturePad', (value) => ({
+                    signaturePadInstance: null,
+                    value: value,
+                    init() {
+
+                        this.signaturePadInstance = new SignaturePad(this.$refs.signature_canvas, {
+                                minWidth: 2,
+                                maxWidth: 2,
+                                penColor: "rgb(11, 73, 182)"
+                            }
+
+                        );
+                        this.signaturePadInstance.addEventListener("endStroke", () => {
+                            // this.value = this.signaturePadInstance.toDataURL('image/png');signaturePad.toSVG()
+                            // https://github.com/aturapi-data-tech/signature_pad
+                            // https://gist.github.com/jonneroelofs/a4a372fe4b55c5f9c0679d432f2c0231
+                            this.value = this.signaturePadInstance.toSVG();
+
+                            // console.log(this.signaturePadInstance)
+                        });
+                    },
+                }))
+            })
         </script>
     @endpush
 

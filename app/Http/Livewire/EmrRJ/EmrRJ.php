@@ -149,6 +149,9 @@ class EmrRJ extends Component
     public bool $isOpenDokter = false;
     public string $isOpenModeDokter = 'insert';
 
+    public bool $isOpenGeneralConsentPasienRJ = false;
+    public string $isOpenModeGeneralConsentPasienRJ = 'insert';
+
     public bool $isOpenScreening = false;
     public string $isOpenModeScreening = 'insert';
 
@@ -178,6 +181,14 @@ class EmrRJ extends Component
         $this->regNoRef = $regNoRef;
     }
 
+    private function openModalEditGeneralConsentPasienRJ($rjNo, $regNoRef): void
+    {
+        $this->isOpenGeneralConsentPasienRJ = true;
+        $this->isOpenModeGeneralConsentPasienRJ = 'update';
+        $this->rjNoRef = $rjNo;
+        $this->regNoRef = $regNoRef;
+    }
+
     private function openModalEditScreening($rjNo, $regNoRef): void
     {
         $this->isOpenScreening = true;
@@ -203,6 +214,13 @@ class EmrRJ extends Component
     {
         $this->isOpenDokter = false;
         $this->isOpenModeDokter = 'insert';
+        $this->resetInputFields();
+    }
+
+    public function closeModalGeneralConsentPasienRJ(): void
+    {
+        $this->isOpenGeneralConsentPasienRJ = false;
+        $this->isOpenModeGeneralConsentPasienRJ = 'insert';
         $this->resetInputFields();
     }
 
@@ -236,6 +254,12 @@ class EmrRJ extends Component
     public function editDokter($rjNo, $regNoRef)
     {
         $this->openModalEditDokter($rjNo, $regNoRef);
+        // $this->findData($id);
+    }
+
+    public function editGeneralConsentPasienRJ($rjNo, $regNoRef)
+    {
+        $this->openModalEditGeneralConsentPasienRJ($rjNo, $regNoRef);
         // $this->findData($id);
     }
 
@@ -293,6 +317,8 @@ class EmrRJ extends Component
 
     public string $activeTab = "rekamMedis";
     public string $activeTabDokter = "assessmentDokter";
+    public string $activeTabGeneralConsentPasienRJ = "generalConsentPasienRJ";
+
 
 
 
@@ -368,6 +394,17 @@ class EmrRJ extends Component
             'ermMenuName' => 'Resume Medis'
         ],
 
+    ];
+
+    public array $EmrMenuGeneralConsentPasienRJ = [
+        [
+            'ermMenuId' => 'generalConsentPasienRJ',
+            'ermMenuName' => 'General Consent Pasien RJ'
+        ],
+        [
+            'ermMenuId' => 'informConsentPasienRJ',
+            'ermMenuName' => 'Inform Consent Pasien RJ'
+        ]
     ];
 
 

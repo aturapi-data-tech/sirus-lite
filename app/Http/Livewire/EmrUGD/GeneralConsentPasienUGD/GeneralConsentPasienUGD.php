@@ -39,6 +39,9 @@ class GeneralConsentPasienUGD extends Component
         'signatureDate' => '',
         'wali' => '',
         'agreement' => '1',
+        'petugasPemeriksa' => '',
+        'petugasPemeriksaDate' => '',
+        'petugasPemeriksaCode' => '',
     ];
     public $signature;
 
@@ -48,10 +51,20 @@ class GeneralConsentPasienUGD extends Component
         'dataDaftarUgd.generalConsentPasienUGD.signatureDate' => 'required|date_format:d/m/Y H:i:s',
         'dataDaftarUgd.generalConsentPasienUGD.wali' => 'required',
         'dataDaftarUgd.generalConsentPasienUGD.agreement' => 'required',
+        'dataDaftarUgd.generalConsentPasienUGD.petugasPemeriksa' => 'required',
+        'dataDaftarUgd.generalConsentPasienUGD.petugasPemeriksaDate' => 'required|date_format:d/m/Y H:i:s',
+        'dataDaftarUgd.generalConsentPasienUGD.petugasPemeriksaCode' => 'required',
+
 
     ];
 
-    protected $attribute = ['dataDaftarUgd.generalConsentPasienUGD.signature' => 'Tanda Tangan'];
+    protected $attribute = [
+        'dataDaftarUgd.generalConsentPasienUGD.signature' => 'Tanda Tangan',
+        'dataDaftarUgd.generalConsentPasienUGD.petugasPemeriksa' => 'Petugas Pemeriksa',
+        'dataDaftarUgd.generalConsentPasienUGD.petugasPemeriksaCode' => 'Kode Petugas Pemeriksa',
+        'dataDaftarUgd.generalConsentPasienUGD.wali' => 'Wali',
+        'dataDaftarUgd.generalConsentPasienUGD.agreement' => 'Persetujuan',
+    ];
 
     public function submit()
     {
@@ -110,6 +123,23 @@ class GeneralConsentPasienUGD extends Component
         }
     }
 
+    public function setPetugasPemeriksa()
+    {
+        // $myRoles = json_decode(auth()->user()->roles, true);
+        $myUserCodeActive = auth()->user()->myuser_code;
+        $myUserNameActive = auth()->user()->myuser_name;
+        // $myUserTtdActive = auth()->user()->myuser_ttd_image;
+
+
+        if (!$this->dataDaftarUgd['generalConsentPasienUGD']['petugasPemeriksa']) {
+            $this->dataDaftarUgd['generalConsentPasienUGD']['petugasPemeriksa'] = $myUserNameActive;
+            $this->dataDaftarUgd['generalConsentPasienUGD']['petugasPemeriksaCode'] = $myUserCodeActive;
+            $this->dataDaftarUgd['generalConsentPasienUGD']['petugasPemeriksaDate'] = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
+            $this->validateDataGeneralConsetPasienUgd();
+        } else {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Signature Petugas Pemeriksa sudah ada.");
+        }
+    }
 
     // when new form instance
     public function mount()
