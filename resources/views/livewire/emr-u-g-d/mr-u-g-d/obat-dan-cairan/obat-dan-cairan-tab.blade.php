@@ -38,6 +38,7 @@
                 <div>
                     <div class="mb-2 ">
                         <div class="grid grid-cols-7 gap-2">
+
                             <div class="col-span-2">
                                 <x-input-label for="obatDanCairan.namaObatAtauJenisCairan" :value="__('Nama Obat Atau Jenis Cairan')"
                                     :required="__(false)" />
@@ -58,12 +59,18 @@
                         </div>
 
                         <div class="grid grid-cols-7 gap-2">
-                            <div class="col-span-2">
-                                <x-text-input id="obatDanCairan.namaObatAtauJenisCairan"
-                                    placeholder="Nama Obat Atau Jenis Cairan" class="mt-1 ml-2" :errorshas="__($errors->has('obatDanCairan.namaObatAtauJenisCairan'))"
-                                    :disabled=$disabledPropertyRjStatus
-                                    wire:model.debounce.500ms="obatDanCairan.namaObatAtauJenisCairan" />
-                            </div>
+                            @if (!$collectingMyProduct)
+                                <div class="col-span-2">
+                                    @include('livewire.emr-u-g-d.mr-u-g-d.obat-dan-cairan.obat-dan-cairan-lov')
+                                </div>
+                            @else
+                                <div class="col-span-2">
+                                    <x-text-input id="obatDanCairan.namaObatAtauJenisCairan"
+                                        placeholder="Nama Obat Atau Jenis Cairan" class="mt-1 ml-2" :errorshas="__($errors->has('obatDanCairan.namaObatAtauJenisCairan'))"
+                                        :disabled=$disabledPropertyRjStatus
+                                        wire:model.debounce.500ms="obatDanCairan.namaObatAtauJenisCairan" />
+                                </div>
+                            @endif
                             <div>
                                 <x-text-input id="obatDanCairan.jumlah" placeholder="Jumlah" class="mt-1 ml-2"
                                     :errorshas="__($errors->has('obatDanCairan.jumlah'))" :disabled=$disabledPropertyRjStatus
