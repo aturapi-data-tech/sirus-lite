@@ -35,6 +35,11 @@ use App\Http\Livewire\EmrUGD\EmrUGD;
 use App\Http\Livewire\SetupHfisBpjs\SetupHfisBpjs;
 
 
+
+
+use App\Http\Livewire\EmrRI\EmrRI;
+
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -113,6 +118,13 @@ Route::group(['middleware' => ['role:Admin|Mr|Perawat|Dokter|Apoteker']], functi
 
     Route::get('EmrUGD', EmrUGD::class)->middleware('auth')->name('EmrUGD');
     Route::get('TelaahResepUGD', TelaahResepUGD::class)->middleware('auth')->name('TelaahResepUGD');
+
+
+
+
+
+    // RI
+    Route::get('EmrRI', EmrRI::class)->middleware('auth')->name('EmrRI');
 });
 
 
