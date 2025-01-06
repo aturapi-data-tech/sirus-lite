@@ -27,7 +27,15 @@
             <div
                 class="sticky top-0 flex items-center justify-between p-4 bg-opacity-75 border-b rounded-t bg-primary dark:border-gray-600">
                 @php
-                    $pasieenTitle = 'Pasien : (' . $dataPasien['pasien']['regNo'] . ') ' . $dataPasien['pasien']['regName'] . '/' . $dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] . '/' . $dataPasien['pasien']['identitas']['alamat'];
+                    $pasieenTitle =
+                        'Pasien : (' .
+                        $dataPasien['pasien']['regNo'] .
+                        ') ' .
+                        $dataPasien['pasien']['regName'] .
+                        '/' .
+                        $dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] .
+                        '/' .
+                        $dataPasien['pasien']['identitas']['alamat'];
                 @endphp
                 <h3 class="w-full text-2xl font-semibold text-white dark:text-white">
                     {{ $pasieenTitle }}
@@ -56,11 +64,14 @@
                     {{-- Transasi Rawat Jalan --}}
                     <div id="TransaksiRawatJalan" class="px-4">
                         {{-- call Program --}}
-                        @livewire('mr-r-j.skdp-r-i.skdp-r-i', [
+                        {{-- @livewire('mr-r-j.skdp-r-i.skdp-r-i', [
                             // 'isOpen' => true,
                             // 'isOpenMode' => 'insert',
-                            'riNoRef' => isset($dataDaftarRi['riHdrNo']) ? $dataDaftarRi['riHdrNo'] : '1',
-                        ])
+                            'riHdrNoRef' => isset($dataDaftarRi['riHdrNo']) ? $dataDaftarRi['riHdrNo'] : '1',
+                        ]) --}}
+
+                        <livewire:mr-r-j.skdp-r-i.skdp-r-i :riHdrNoRef="isset($dataDaftarRi['riHdrNo']) ? $dataDaftarRi['riHdrNo'] : '1'" :wire:key="'skdp-r-i-'.$dataDaftarRi['
+                            riHdrNo']">
 
                     </div>
 

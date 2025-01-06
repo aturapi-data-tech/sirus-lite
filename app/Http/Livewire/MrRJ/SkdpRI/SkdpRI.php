@@ -12,6 +12,7 @@ use App\Http\Traits\customErrorMessagesTrait;
 use App\Http\Traits\BPJS\AntrianTrait;
 use App\Http\Traits\BPJS\VclaimTrait;
 
+use App\Http\Traits\EmrRI\EmrRITrait;
 
 use Illuminate\Support\Str;
 use Spatie\ArrayToXml\ArrayToXml;
@@ -19,7 +20,7 @@ use Spatie\ArrayToXml\ArrayToXml;
 
 class SkdpRI extends Component
 {
-    use WithPagination;
+    use WithPagination, EmrRITrait;
     // listener from blade////////////////
     protected $listeners = [
         'syncronizeAssessmentPerawatRJFindData' => 'mount'
@@ -29,7 +30,7 @@ class SkdpRI extends Component
     //////////////////////////////
     // Ref on top bar
     //////////////////////////////
-    public $riNoRef = '47864';
+    public $riHdrNoRef;
 
 
 
@@ -81,7 +82,7 @@ class SkdpRI extends Component
         $this->resetValidation();
         // resert input kecuali
         $this->resetExcept([
-            'riNoRef'
+            'riHdrNoRef'
         ]);
     }
 
@@ -276,200 +277,62 @@ class SkdpRI extends Component
         $this->validateDataRJ();
 
         // Logic update mode start //////////
-        $this->updateDataRJ($this->dataDaftarRi['riHdrNo']);
+        $this->updateDataRI($this->dataDaftarRi['riHdrNo']);
         $this->emit('syncronizeAssessmentPerawatRJFindData');
     }
 
-    private function updateDataRJ($riNo): void
+    private function updateDataRI($riHdrNo): void
     {
 
-        // update table trnsaksi
-        DB::table('rstxn_rihdrs')
-            ->where('rihdr_no', $riNo)
-            ->update([
-                'datadaftarri_json' => json_encode($this->dataDaftarRi, true),
-                'datadaftarRi_xml' => ArrayToXml::convert($this->dataDaftarRi),
-            ]);
-
+        $this->updateJsonRI($this->dataDaftarRi['riHdrNo'], $this->dataDaftarRi);
         toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Surat Kontrol berhasil disimpan.");
     }
     // insert and update record end////////////////
 
 
-    private function findData($rino): void
+    private function findData($riHdrNo): void
     {
 
+        $this->dataDaftarRi = $this->findDataRI($riHdrNo);
 
-        $findData = DB::table('rsview_rihdrs')
-            ->select('datadaftarri_json', 'vno_sep')
-            ->where('rihdr_no', $rino)
-            ->first();
-
-        $datadaftarRI_json = isset($findData->datadaftarri_json) ? $findData->datadaftarri_json : null;
-        // if meta_data_pasien_json = null
-        // then cari Data Pasien By Key Collection (exception when no data found)
-        //
-        // else json_decode
-
-        if ($datadaftarRI_json) {
-            $this->dataDaftarRi = json_decode($findData->datadaftarri_json, true);
-
-
-
-            // jika kontrol tidak ditemukan tambah variable kontrol pda array
-            if (isset($this->dataDaftarRi['kontrol']) == false) {
-                $this->dataDaftarRi['kontrol']['tglKontrol'] =  Carbon::now(env('APP_TIMEZONE'))->addDays(8)->format('d/m/Y');
-                $this->dataDaftarRi['kontrol']['drKontrol'] =  (isset($this->dataDaftarRi['drId'])
-                    ? ($this->dataDaftarRi['drId']
-                        ? $this->dataDaftarRi['drId']
-                        : '')
-                    : '');
-                $this->dataDaftarRi['kontrol']['drKontrolDesc'] = (isset($this->dataDaftarRi['drDesc'])
-                    ? ($this->dataDaftarRi['drDesc']
-                        ? $this->dataDaftarRi['drDesc']
-                        : '')
-                    : '');
-                $this->dataDaftarRi['kontrol']['drKontrolBPJS'] = (isset($this->dataDaftarRi['kddrbpjs'])
-                    ? ($this->dataDaftarRi['kddrbpjs']
-                        ? $this->dataDaftarRi['kddrbpjs']
-                        : '')
-                    : '');
-                $this->dataDaftarRi['kontrol']['poliKontrol'] = (isset($this->dataDaftarRi['poliId'])
-                    ? ($this->dataDaftarRi['poliId']
-                        ? $this->dataDaftarRi['poliId']
-                        : '')
-                    : '');
-                $this->dataDaftarRi['kontrol']['poliKontrolDesc'] = (isset($this->dataDaftarRi['poliDesc'])
-                    ? ($this->dataDaftarRi['poliDesc']
-                        ? $this->dataDaftarRi['poliDesc']
-                        : '')
-                    : '');
-                $this->dataDaftarRi['kontrol']['poliKontrolBPJS'] = (isset($this->dataDaftarRi['kdpolibpjs'])
-                    ? ($this->dataDaftarRi['kdpolibpjs']
-                        ? $this->dataDaftarRi['kdpolibpjs']
-                        : '')
-                    : '');
-                $this->dataDaftarRi['kontrol']['noSEP'] = (isset($findData->vno_sep)
-                    ? ($findData->vno_sep
-                        ? $findData->vno_sep
-                        : '')
-                    : '');
-            }
-        } else {
-
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Json Tidak ditemukan, Data sedang diproses ulang.");
-            $dataDaftarRi = DB::table('rsview_rihdrs')
-                ->select(
-                    DB::raw("to_char(entry_date,'dd/mm/yyyy hh24:mi:ss') AS entry_date"),
-                    DB::raw("to_char(exit_date,'dd/mm/yyyy hh24:mi:ss') AS exit_date"),
-                    DB::raw("to_char(exit_date,'yyyymmddhh24miss') AS exit_date1"),
-
-                    'rihdr_no',
-
-                    'reg_no',
-                    'reg_name',
-                    'sex',
-                    'address',
-                    'thn',
-                    DB::raw("to_char(birth_date,'dd/mm/yyyy') AS birth_date"),
-
-                    'admin_status',
-                    'admin_age',
-                    'police_case',
-
-                    'entry_id',
-                    'entry_desc',
-
-                    'room_id',
-                    'room_name',
-                    'bed_no',
-
-                    'dr_id',
-                    'dr_name',
-
-                    'klaim_id',
-                    'klaim_desc',
-
-                    'vno_sep',
-                    'ri_status',
-
-                    'datadaftarri_json'
-                )
-                ->where('rihdr_no', '=', $rino)
-                ->first();
-
-            $this->dataDaftarRi = [
-                "entryDate" => $dataDaftarRi->entry_date,
-                "exitDate" => $dataDaftarRi->exit_date,
-
-                "riHdrNo" => $dataDaftarRi->rihdr_no,
-
-                "regNo" =>  $dataDaftarRi->reg_no,
-                "k14th" => [$dataDaftarRi->admin_age ? true : false], //Kurang dari 14 Th
-                "kPolisi" => [$dataDaftarRi->police_case == 'Y' ? true : false], //Kasus Polisi
-
-                "entryId" => $dataDaftarRi->entry_id,
-                "entryDesc" => $dataDaftarRi->entry_desc,
-
-                "roomId" => $dataDaftarRi->room_id,
-                "roomDesc" => $dataDaftarRi->room_name,
-
-                "bedNo" => $dataDaftarRi->bed_no,
-
-                "klaimId" => $dataDaftarRi->klaim_id == 'JM' ? 'JM' : 'UM',
-                "klaimDesc" => $dataDaftarRi->klaim_id == 'JM' ? 'BPJS' : 'UMUM',
-
-                "drId" =>  $dataDaftarRi->dr_id,
-                "drDesc" =>  $dataDaftarRi->dr_name,
-
-                'sep' => [
-                    "noSep" =>  $dataDaftarRi->vno_sep,
-                    "reqSep" => [],
-                    "resSep" => [],
-                ]
-            ];
-
-
-
-            // jika kontrol tidak ditemukan tambah variable kontrol pda array
-            if (isset($this->dataDaftarRi['kontrol']) == false) {
-                $this->dataDaftarRi['kontrol']['tglKontrol'] =  Carbon::now(env('APP_TIMEZONE'))->addDays(8)->format('d/m/Y');
-                $this->dataDaftarRi['kontrol']['drKontrol'] =  (isset($this->dataDaftarRi['drId'])
-                    ? ($this->dataDaftarRi['drId']
-                        ? $this->dataDaftarRi['drId']
-                        : '')
-                    : '');
-                $this->dataDaftarRi['kontrol']['drKontrolDesc'] = (isset($this->dataDaftarRi['drDesc'])
-                    ? ($this->dataDaftarRi['drDesc']
-                        ? $this->dataDaftarRi['drDesc']
-                        : '')
-                    : '');
-                $this->dataDaftarRi['kontrol']['drKontrolBPJS'] = (isset($this->dataDaftarRi['kddrbpjs'])
-                    ? ($this->dataDaftarRi['kddrbpjs']
-                        ? $this->dataDaftarRi['kddrbpjs']
-                        : '')
-                    : '');
-                $this->dataDaftarRi['kontrol']['poliKontrol'] = (isset($this->dataDaftarRi['poliId'])
-                    ? ($this->dataDaftarRi['poliId']
-                        ? $this->dataDaftarRi['poliId']
-                        : '')
-                    : '');
-                $this->dataDaftarRi['kontrol']['poliKontrolDesc'] = (isset($this->dataDaftarRi['poliDesc'])
-                    ? ($this->dataDaftarRi['poliDesc']
-                        ? $this->dataDaftarRi['poliDesc']
-                        : '')
-                    : '');
-                $this->dataDaftarRi['kontrol']['poliKontrolBPJS'] = (isset($this->dataDaftarRi['kdpolibpjs'])
-                    ? ($this->dataDaftarRi['kdpolibpjs']
-                        ? $this->dataDaftarRi['kdpolibpjs']
-                        : '')
-                    : '');
-                $this->dataDaftarRi['kontrol']['noSEP'] = (isset($dataDaftarRi->vno_sep)
-                    ? ($dataDaftarRi->vno_sep
-                        ? $dataDaftarRi->vno_sep
-                        : '')
-                    : '');
-            }
+        // jika kontrol tidak ditemukan tambah variable kontrol pda array
+        if (isset($this->dataDaftarRi['kontrol']) == false) {
+            $this->dataDaftarRi['kontrol']['tglKontrol'] =  Carbon::now(env('APP_TIMEZONE'))->addDays(8)->format('d/m/Y');
+            $this->dataDaftarRi['kontrol']['drKontrol'] =  (isset($this->dataDaftarRi['drId'])
+                ? ($this->dataDaftarRi['drId']
+                    ? $this->dataDaftarRi['drId']
+                    : '')
+                : '');
+            $this->dataDaftarRi['kontrol']['drKontrolDesc'] = (isset($this->dataDaftarRi['drDesc'])
+                ? ($this->dataDaftarRi['drDesc']
+                    ? $this->dataDaftarRi['drDesc']
+                    : '')
+                : '');
+            $this->dataDaftarRi['kontrol']['drKontrolBPJS'] = (isset($this->dataDaftarRi['kddrbpjs'])
+                ? ($this->dataDaftarRi['kddrbpjs']
+                    ? $this->dataDaftarRi['kddrbpjs']
+                    : '')
+                : '');
+            $this->dataDaftarRi['kontrol']['poliKontrol'] = (isset($this->dataDaftarRi['poliId'])
+                ? ($this->dataDaftarRi['poliId']
+                    ? $this->dataDaftarRi['poliId']
+                    : '')
+                : '');
+            $this->dataDaftarRi['kontrol']['poliKontrolDesc'] = (isset($this->dataDaftarRi['poliDesc'])
+                ? ($this->dataDaftarRi['poliDesc']
+                    ? $this->dataDaftarRi['poliDesc']
+                    : '')
+                : '');
+            $this->dataDaftarRi['kontrol']['poliKontrolBPJS'] = (isset($this->dataDaftarRi['kdpolibpjs'])
+                ? ($this->dataDaftarRi['kdpolibpjs']
+                    ? $this->dataDaftarRi['kdpolibpjs']
+                    : '')
+                : '');
+            $this->dataDaftarRi['kontrol']['noSEP'] = (isset($findData->vno_sep)
+                ? ($findData->vno_sep
+                    ? $findData->vno_sep
+                    : '')
+                : '');
         }
     }
 
@@ -547,7 +410,7 @@ class SkdpRI extends Component
     // when new form instance
     public function mount()
     {
-        $this->findData($this->riNoRef);
+        $this->findData($this->riHdrNoRef);
         // set data dokter ref
         // $this->store();
     }
