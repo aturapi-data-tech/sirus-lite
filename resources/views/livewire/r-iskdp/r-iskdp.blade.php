@@ -21,24 +21,6 @@
 
                     <div class="md:flex md:justify-between">
 
-                        {{-- search --}}
-                        <div class="relative pointer-events-auto md:w-1/2">
-                            <div class="absolute inset-y-0 left-0 flex items-center p-5 pl-3 pointer-events-none">
-                                <svg width="24" height="24" fill="none" aria-hidden="true"
-                                    class="flex-none mr-3">
-                                    <path d="m19 19-3.5-3.5" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round"></path>
-                                    <circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round"></circle>
-                                </svg>
-                            </div>
-                            <x-text-input id="simpleSearch" name="namesimpleSearch" type="text" class="p-2 pl-10"
-                                autofocus autocomplete="simpleSearch" placeholder="Cari Data"
-                                wire:model.lazy="search" />
-                        </div>
-                        {{-- end search --}}
-
-
 
                         {{-- two button --}}
                         <div class="flex justify-between mt-2 md:mt-0">
@@ -72,33 +54,6 @@
 
 
                     <div class="flex rounded-lg bg-gray-50">
-
-                        {{-- Dokter --}}
-                        <div class="mt-2 ml-2">
-                            <x-dropdown align="right" :width="__('80')" :contentclasses="__('overflow-auto max-h-[150px] py-1 bg-white dark:bg-gray-700')">
-                                <x-slot name="trigger">
-                                    {{-- Button Dokter --}}
-                                    <x-alternative-button class="inline-flex w-80">
-                                        <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
-                                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                            <path clip-rule="evenodd" fill-rule="evenodd"
-                                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-                                        </svg>
-                                        <span>{{ 'Dokter ( ' . $drRjRef['drName'] . ' )' }}</span>
-                                    </x-alternative-button>
-                                </x-slot>
-                                {{-- Open shiftcontent --}}
-                                <x-slot name="content">
-
-                                    @foreach ($drRjRef['drOptions'] as $dr)
-                                        <x-dropdown-link
-                                            wire:click="setdrRjRef('{{ $dr['drId'] }}','{{ $dr['drName'] }}')">
-                                            {{ __($dr['drName']) }}
-                                        </x-dropdown-link>
-                                    @endforeach
-                                </x-slot>
-                            </x-dropdown>
-                        </div>
 
                     </div>
 
@@ -235,9 +190,8 @@
                                                         <x-light-button id="dropdownButton{{ $RJp->rihdr_no }}"
                                                             class="inline-flex"
                                                             wire:click="$emit('pressDropdownButton','{{ $RJp->rihdr_no }}')">
-                                                            <svg class="w-5 h-5" aria-hidden="true"
-                                                                fill="currentColor" viewbox="0 0 20 20"
-                                                                xmlns="http://www.w3.org/2000/svg">
+                                                            <svg class="w-5 h-5" aria-hidden="true" fill="currentColor"
+                                                                viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                                                                 <path
                                                                     d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
                                                             </svg>

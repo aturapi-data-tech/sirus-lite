@@ -9,13 +9,13 @@ use Livewire\WithPagination;
 use Carbon\Carbon;
 
 use App\Http\Traits\customErrorMessagesTrait;
-use App\Http\Traits\BPJS\AntrianTrait;
+// use App\Http\Traits\BPJS\AntrianTrait;
 use App\Http\Traits\BPJS\VclaimTrait;
 
 use App\Http\Traits\EmrRI\EmrRITrait;
 
-use Illuminate\Support\Str;
-use Spatie\ArrayToXml\ArrayToXml;
+// use Illuminate\Support\Str;
+// use Spatie\ArrayToXml\ArrayToXml;
 
 
 class SkdpRI extends Component
@@ -292,6 +292,11 @@ class SkdpRI extends Component
 
     private function findData($riHdrNo): void
     {
+
+        $findData = DB::table('rsview_rihdrs')
+            ->select('vno_sep')
+            ->where('rihdr_no', $riHdrNo)
+            ->first();
 
         $this->dataDaftarRi = $this->findDataRI($riHdrNo);
 

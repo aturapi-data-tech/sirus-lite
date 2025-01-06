@@ -150,7 +150,7 @@ class EmrRI extends Component
 
     public bool $forceInsertRecord = false;
 
-    public int $rjNoRef;
+    public int $riHdrNoRef;
     public string $regNoRef;
 
     //
@@ -159,43 +159,43 @@ class EmrRI extends Component
         $this->isOpen = true;
         $this->isOpenMode = 'insert';
     }
-    private function openModalEdit($rjNo, $regNoRef): void
+    private function openModalEdit($riHdrNo, $regNoRef): void
     {
         $this->isOpen = true;
         $this->isOpenMode = 'update';
-        $this->rjNoRef = $rjNo;
+        $this->riHdrNoRef = $riHdrNo;
         $this->regNoRef = $regNoRef;
     }
 
-    private function openModalEditDokter($rjNo, $regNoRef): void
+    private function openModalEditDokter($riHdrNo, $regNoRef): void
     {
         $this->isOpenDokter = true;
         $this->isOpenModeDokter = 'update';
-        $this->rjNoRef = $rjNo;
+        $this->riHdrNoRef = $riHdrNo;
         $this->regNoRef = $regNoRef;
     }
 
-    private function openModalEditGeneralConsentPasienRI($rjNo, $regNoRef): void
+    private function openModalEditGeneralConsentPasienRI($riHdrNo, $regNoRef): void
     {
         $this->isOpenGeneralConsentPasienRI = true;
         $this->isOpenModeGeneralConsentPasienRI = 'update';
-        $this->rjNoRef = $rjNo;
+        $this->riHdrNoRef = $riHdrNo;
         $this->regNoRef = $regNoRef;
     }
 
-    private function openModalEditInap($rjNo, $regNoRef): void
+    private function openModalEditInap($riHdrNo, $regNoRef): void
     {
         $this->isOpenInap = true;
         $this->isOpenModeInap = 'update';
-        $this->rjNoRef = $rjNo;
+        $this->riHdrNoRef = $riHdrNo;
         $this->regNoRef = $regNoRef;
     }
 
-    private function openModalEditScreening($rjNo, $regNoRef): void
+    private function openModalEditScreening($riHdrNo, $regNoRef): void
     {
         $this->isOpenScreening = true;
         $this->isOpenModeScreening = 'update';
-        $this->rjNoRef = $rjNo;
+        $this->riHdrNoRef = $riHdrNo;
         $this->regNoRef = $regNoRef;
     }
 
@@ -254,34 +254,34 @@ class EmrRI extends Component
     // resert input private////////////////
 
     // is going to edit data/////////////////
-    public function edit($rjNo, $regNoRef)
+    public function edit($riHdrNo, $regNoRef)
     {
-        $this->openModalEdit($rjNo, $regNoRef);
+        $this->openModalEdit($riHdrNo, $regNoRef);
         // $this->findData($id);
     }
 
-    public function editDokter($rjNo, $regNoRef)
+    public function editDokter($riHdrNo, $regNoRef)
     {
-        $this->openModalEditDokter($rjNo, $regNoRef);
+        $this->openModalEditDokter($riHdrNo, $regNoRef);
         // $this->findData($id);
     }
 
-    public function editGeneralConsentPasienRI($rjNo, $regNoRef)
+    public function editGeneralConsentPasienRI($riHdrNo, $regNoRef)
     {
-        $this->openModalEditGeneralConsentPasienRI($rjNo, $regNoRef);
+        $this->openModalEditGeneralConsentPasienRI($riHdrNo, $regNoRef);
         // $this->findData($id);
     }
 
     // is going to edit data/////////////////
-    public function editInap($rjNo, $regNoRef)
+    public function editInap($riHdrNo, $regNoRef)
     {
-        $this->openModalEditInap($rjNo, $regNoRef);
+        $this->openModalEditInap($riHdrNo, $regNoRef);
         // $this->findData($id);
     }
 
-    public function editScreening($rjNo, $regNoRef)
+    public function editScreening($riHdrNo, $regNoRef)
     {
-        $this->openModalEditScreening($rjNo, $regNoRef);
+        $this->openModalEditScreening($riHdrNo, $regNoRef);
         // $this->findData($id);
     }
 

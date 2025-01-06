@@ -63,15 +63,9 @@
 
                     {{-- Transasi Rawat Jalan --}}
                     <div id="TransaksiRawatJalan" class="px-4">
-                        {{-- call Program --}}
-                        {{-- @livewire('mr-r-j.skdp-r-i.skdp-r-i', [
-                            // 'isOpen' => true,
-                            // 'isOpenMode' => 'insert',
-                            'riHdrNoRef' => isset($dataDaftarRi['riHdrNo']) ? $dataDaftarRi['riHdrNo'] : '1',
-                        ]) --}}
 
-                        <livewire:mr-r-j.skdp-r-i.skdp-r-i :riHdrNoRef="isset($dataDaftarRi['riHdrNo']) ? $dataDaftarRi['riHdrNo'] : '1'" :wire:key="'skdp-r-i-'.$dataDaftarRi['
-                            riHdrNo']">
+                        <livewire:mr-r-j.skdp-r-i.skdp-r-i :riHdrNoRef="isset($dataDaftarRi['riHdrNo']) ? $dataDaftarRi['riHdrNo'] : '1'"
+                            :wire:key="'skdp-r-i-'.$dataDaftarRi['riHdrNo']">
 
                     </div>
 
