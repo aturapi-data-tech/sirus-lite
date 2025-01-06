@@ -174,10 +174,7 @@ class RIskdp extends Component
 
 
 
-        //Jika where dokter tidak kosong
-        if ($this->drRjRef['drId'] != 'All') {
-            $query->where('dr_id', $this->drRjRef['drId']);
-        }
+
 
         $query->where(function ($q) {
             $q->Where(DB::raw('upper(reg_name)'), 'like', '%' . strtoupper($this->search) . '%')
