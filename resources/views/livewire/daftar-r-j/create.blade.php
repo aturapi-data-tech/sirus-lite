@@ -28,6 +28,54 @@
                     {{-- rjDate & Shift Input Rj --}}
                     <div id="shiftTanggal" class="flex justify-end w-full mr-4">
 
+                        {{-- rjDate & Shift Input Rj --}}
+                        <div id="shiftTanggal" class="flex justify-end w-full mr-4">
+                            <div>
+                                <div class="flex items-center mb-2">
+                                    <x-text-input id="pasporidentitas" placeholder="Tanggal [ dd/mm/yyyy hh24:mi:ss ]"
+                                        class="mt-1 ml-2 sm:w-[160px]" :errorshas="__($errors->has('dataDaftarPoliRJ.rjDate'))"
+                                        :disabled=$disabledPropertyRjStatus
+                                        wire:model.debounce.500ms="dataDaftarPoliRJ.rjDate" />
+                                </div>
+                                @error('dataDaftarPoliRJ.rjDate')
+                                    <x-input-error :messages=$message />
+                                @enderror
+                            </div>
+
+                            {{-- shift Input RJ --}}
+                            <div class="mt-1 ml-2">
+                                <x-dropdown align="right" width="48" class="mt-1 ml-2">
+                                    <x-slot name="trigger">
+                                        {{-- Button shift --}}
+                                        <x-alternative-button class="inline-flex">
+                                            <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
+                                                xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                                <path clip-rule="evenodd" fill-rule="evenodd"
+                                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                                            </svg>
+                                            <span class="">{{ 'Shift' . $dataDaftarPoliRJ['shift'] }}</span>
+                                        </x-alternative-button>
+                                    </x-slot>
+                                    {{-- Open shiftcontent --}}
+                                    <x-slot name="content">
+
+                                        @foreach ($shiftRjRef['shiftOptions'] as $shift)
+                                            <x-dropdown-link
+                                                wire:click="setShiftRJ({{ $shift['shiftId'] }},{{ $shift['shiftDesc'] }})">
+                                                {{ __($shift['shiftDesc']) }}
+                                            </x-dropdown-link>
+                                        @endforeach
+                                    </x-slot>
+                                </x-dropdown>
+
+                                @error('dataDaftarPoliRJ.shift')
+                                    <x-input-error :messages=$message />
+                                @enderror
+                            </div>
+
+                        </div>
+
+
 
                         {{-- Close Modal --}}
                         <button wire:click="closeModal()"
