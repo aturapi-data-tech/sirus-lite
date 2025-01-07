@@ -4,8 +4,6 @@
         <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
             <!-- Card header -->
 
-
-
             <div class="w-full mb-1">
                 <div class="">
 
@@ -77,7 +75,7 @@
                                         class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                         <tr>
                                             <th scope="col" class="w-1/3 px-4 py-3 ">
-                                                <x-sort-link :active=false wire:click.prevent="sortBy('RJp_id')"
+                                                <x-sort-link :active=false wire:click.prevent="sortBy('RIp_id')"
                                                     role="button" href="#">
                                                     Pasien
                                                 </x-sort-link>
@@ -112,7 +110,7 @@
                                     <tbody class="bg-white dark:bg-gray-800">
 
 
-                                        @foreach ($RJpasiens as $RJp)
+                                        @foreach ($PasienRI as $RIp)
                                             <tr class="border-b group dark:border-gray-700">
 
                                                 <td
@@ -121,12 +119,12 @@
                                                         alt="Jese image">
                                                     <div class="pl-3">
                                                         <div class="text-base font-semibold text-gray-700">
-                                                            {{ $RJp->reg_no }}</div>
+                                                            {{ $RIp->reg_no }}</div>
                                                         <div class="font-semibold text-primary">
-                                                            {{ $RJp->reg_name . ' / (' . $RJp->sex . ')' . ' / ' . $RJp->thn }}
+                                                            {{ $RIp->reg_name . ' / (' . $RIp->sex . ')' . ' / ' . $RIp->thn }}
                                                         </div>
                                                         <div class="font-normal text-gray-900">
-                                                            {{ $RJp->address }}
+                                                            {{ $RIp->address }}
                                                         </div>
                                                     </div>
                                                 </td>
@@ -134,27 +132,27 @@
 
                                                 <td
                                                     class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-primary whitespace-nowrap dark:text-white">
-                                                    {{ $RJp->vno_sep }}
+                                                    {{ $RIp->vno_sep }}
                                                 </td>
 
 
                                                 <td
                                                     class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
                                                     <div class="">
-                                                        <div class="font-semibold text-primary">{{ $RJp->poli_desc }}
+                                                        <div class="font-semibold text-primary">{{ $RIp->poli_desc }}
                                                         </div>
                                                         <div class="font-semibold text-gray-900">
-                                                            {{ $RJp->dr_name . ' / ' }}
-                                                            {{ $RJp->klaim_id == 'UM'
+                                                            {{ $RIp->dr_name . ' / ' }}
+                                                            {{ $RIp->klaim_id == 'UM'
                                                                 ? 'UMUM'
-                                                                : ($RJp->klaim_id == 'JM'
+                                                                : ($RIp->klaim_id == 'JM'
                                                                     ? 'BPJS'
-                                                                    : ($RJp->klaim_id == 'KR'
+                                                                    : ($RIp->klaim_id == 'KR'
                                                                         ? 'Kronis'
                                                                         : 'Asuransi Lain')) }}
                                                         </div>
                                                         <div class="font-normal text-gray-900">
-                                                            {{ 'Tanggal : ' . $RJp->rj_date }}
+                                                            {{ 'Tanggal : ' . $RIp->rj_date }}
                                                         </div>
                                                     </div>
                                                 </td>
@@ -164,17 +162,17 @@
                                                     <div class="overflow-auto w-52">
                                                         <div class="italic font-normal text-gray-900">
                                                             {{ 'Kontrol RS : ' .
-                                                                (isset(json_decode($RJp->datadaftarri_json)->kontrol->noKontrolRS)
-                                                                    ? (json_decode($RJp->datadaftarri_json)->kontrol->noKontrolRS
-                                                                        ? json_decode($RJp->datadaftarri_json)->kontrol->noKontrolRS
+                                                                (isset(json_decode($RIp->datadaftarri_json)->kontrol->noKontrolRS)
+                                                                    ? (json_decode($RIp->datadaftarri_json)->kontrol->noKontrolRS
+                                                                        ? json_decode($RIp->datadaftarri_json)->kontrol->noKontrolRS
                                                                         : '')
                                                                     : '') }}
                                                         </div>
                                                         <div class="italic font-normal text-gray-900">
                                                             {{ 'SKDP BPJS : ' .
-                                                                (isset(json_decode($RJp->datadaftarri_json)->kontrol->noSKDPBPJS)
-                                                                    ? (json_decode($RJp->datadaftarri_json)->kontrol->noSKDPBPJS
-                                                                        ? json_decode($RJp->datadaftarri_json)->kontrol->noSKDPBPJS
+                                                                (isset(json_decode($RIp->datadaftarri_json)->kontrol->noSKDPBPJS)
+                                                                    ? (json_decode($RIp->datadaftarri_json)->kontrol->noSKDPBPJS
+                                                                        ? json_decode($RIp->datadaftarri_json)->kontrol->noSKDPBPJS
                                                                         : '')
                                                                     : '') }}
                                                         </div>
@@ -187,9 +185,9 @@
 
                                                     <!-- Dropdown Action menu Flowbite-->
                                                     <div>
-                                                        <x-light-button id="dropdownButton{{ $RJp->rihdr_no }}"
+                                                        <x-light-button id="dropdownButton{{ $RIp->rihdr_no }}"
                                                             class="inline-flex"
-                                                            wire:click="$emit('pressDropdownButton','{{ $RJp->rihdr_no }}')">
+                                                            wire:click="$emit('pressDropdownButton','{{ $RIp->rihdr_no }}')">
                                                             <svg class="w-5 h-5" aria-hidden="true" fill="currentColor"
                                                                 viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                                                                 <path
@@ -198,14 +196,14 @@
                                                         </x-light-button>
 
                                                         <!-- Dropdown Action Open menu -->
-                                                        <div id="dropdownMenu{{ $RJp->rihdr_no }}"
+                                                        <div id="dropdownMenu{{ $RIp->rihdr_no }}"
                                                             class="z-10 hidden w-auto bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700">
                                                             <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
-                                                                aria-labelledby="dropdownButton{{ $RJp->rihdr_no }}">
+                                                                aria-labelledby="dropdownButton{{ $RIp->rihdr_no }}">
 
                                                                 <li>
                                                                     <x-dropdown-link
-                                                                        wire:click="edit('{{ $RJp->rihdr_no }}')">
+                                                                        wire:click="edit('{{ $RIp->rihdr_no }}')">
                                                                         {{ __('Buat SKDP') }}
                                                                     </x-dropdown-link>
                                                                 </li>
@@ -229,7 +227,7 @@
 
 
                                 {{-- no data found start --}}
-                                @if ($RJpasiens->count() == 0)
+                                @if ($PasienRI->count() == 0)
                                     <div class="w-full p-4 text-sm text-center text-gray-900 dark:text-gray-400">
                                         {{ 'Data ' . $myProgram . ' Tidak ditemukan' }}
                                     </div>
@@ -247,8 +245,8 @@
 
                 <!-- Pagination start -->
                 <div class="flex items-center justify-end pt-3 sm:pt-6">
-                    {{-- {{ $RJpasiens->links() }} --}}
-                    {{ $RJpasiens->links('vendor.livewire.tailwind') }}
+                    {{-- {{ $PasienRI->links() }} --}}
+                    {{ $PasienRI->links('vendor.livewire.tailwind') }}
                 </div>
                 <!-- Pagination end -->
 
@@ -322,7 +320,7 @@
                 let cfn = confirm('Apakah anda ingin menghapus data ini ' + name + '?');
 
                 if (cfn) {
-                    window.livewire.emit('confirm_remove_record_RJp', key, name);
+                    window.livewire.emit('confirm_remove_record_RIp', key, name);
                 }
             });
 

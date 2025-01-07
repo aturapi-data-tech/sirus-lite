@@ -23,17 +23,15 @@ class RIskdp extends Component
     public array $dataPasien = [];
 
     // dataDaftarRi
-    public $dataDaftarRi = [];
-    public $limitPerPage = 10;
+    public array $dataDaftarRi = [];
+    public int $limitPerPage = 10;
 
     //  modal status////////////////
     public $isOpen = 0;
     public $isOpenMode = 'insert';
 
     // search logic -resetExcept////////////////
-    public $search;
     protected $queryString = [
-        'search' => ['except' => '', 'as' => 'cariData'],
         'page' => ['except' => 1, 'as' => 'p'],
     ];
 
@@ -45,43 +43,18 @@ class RIskdp extends Component
 
 
 
-
-
-    // resert input private////////////////
-    private function resetInputFields(): void
-    {
-
-        // resert validation
-        $this->resetValidation();
-        // resert input kecuali
-        $this->resetExcept([
-            'limitPerPage',
-            'search',
-            'drRjRef',
-
-
-        ]);
-    }
-
-
-
-
     // open and close modal start////////////////
 
     private function openModalEdit(): void
     {
-        $this->resetInputFields();
         $this->isOpen = true;
         $this->isOpenMode = 'update';
     }
 
 
-
-
-
     public function closeModal(): void
     {
-        $this->resetInputFields();
+        $this->reset(['isOpen', 'isOpenMode']);
     }
     // open and close modal end////////////////
 
@@ -92,20 +65,7 @@ class RIskdp extends Component
     public function setLimitPerPage($value): void
     {
         $this->limitPerPage = $value;
-        $this->resetValidation();
     }
-
-
-    // search
-    public function updatedSearch(): void
-    {
-        //  toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError( "search.");
-
-        $this->resetPage();
-        $this->resetValidation();
-        $this->resetInputFields();
-    }
-
 
 
     // is going to edit data/////////////////
@@ -121,20 +81,6 @@ class RIskdp extends Component
         $this->dataDaftarRi = $this->findDataRI($riHdrNo);
         $this->dataPasien = $this->findDataMasterPasien($this->dataDaftarRi['regNo'] ?? '');
     }
-
-    // set data RiHdrNo / NoBooking / NoAntrian / klaimId / kunjunganId
-    private function setDataPrimer(): void
-    {
-        $noKontrol = Carbon::now(env('APP_TIMEZONE'))->addDays(8)->format('dmY') . $this->dataDaftarRi['kontrol']['drKontrol'] . $this->dataDaftarRi['kontrol']['poliKontrol'];
-        $this->dataDaftarRi['kontrol']['noKontrolRS'] =  $this->dataDaftarRi['kontrol']['noKontrolRS'] ? $this->dataDaftarRi['kontrol']['noKontrolRS'] : $noKontrol;
-    }
-
-
-
-    // when new form instance
-    public function mount() {}
-
-
 
     // select data start////////////////
     public function render()
@@ -170,16 +116,7 @@ class RIskdp extends Component
             )
             // ->whereNotIn('rj_status', ['A', 'F'])
             ->where('ri_status', 'P')
-            ->where('reg_no', '=', $this->regNoRef);
-
-
-
-
-
-        $query->where(function ($q) {
-            $q->Where(DB::raw('upper(reg_name)'), 'like', '%' . strtoupper($this->search) . '%')
-                ->orWhere(DB::raw('upper(reg_no)'), 'like', '%' . strtoupper($this->search) . '%');
-        })
+            ->where('reg_no', '=', $this->regNoRef)
             ->orderBy('rj_date1',  'desc')
             ->orderBy('dr_name',  'desc');
 
@@ -191,10 +128,10 @@ class RIskdp extends Component
         return view(
             'livewire.r-iskdp.r-iskdp',
             [
-                'RJpasiens' => $query->paginate($this->limitPerPage),
-                'myTitle' => 'Data SKDP Pasien Rawat Jalan',
+                'PasienRI' => $query->paginate($this->limitPerPage),
+                'myTitle' => 'Data SKDP Pasien Rawat Inap',
                 'mySnipt' => 'Rekam Medis Pasien',
-                'myProgram' => 'Pasien Rawat Jalan',
+                'myProgram' => 'Pasien Rawat Inap',
                 'myLimitPerPages' => [5, 10, 15, 20, 100],
             ]
         );
