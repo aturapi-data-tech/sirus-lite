@@ -23,34 +23,12 @@ class EmrRI extends Component
     // limit record per page -resetExcept////////////////
     public int $limitPerPage = 10;
 
-    // my Reg No
-
-    public string $regNo = '';
-
-    public bool $callMasterPasien = false;
-
-
-
-
-
     // my Top Bar
     public array $myTopBar = [
-        'refDate' => '',
 
-        'refShiftId' => '1',
-        'refShiftDesc' => '1',
-        'refShiftOptions' => [
-            ['refShiftId' => '1', 'refShiftDesc' => '1'],
-            ['refShiftId' => '2', 'refShiftDesc' => '2'],
-            ['refShiftId' => '3', 'refShiftDesc' => '3'],
-        ],
 
         'refStatusId' => 'I',
         'refStatusDesc' => 'Antrian',
-        'refStatusOptions' => [
-            ['refStatusId' => 'I', 'refStatusDesc' => 'Inap'],
-            ['refStatusId' => 'P', 'refStatusDesc' => 'Pulang'],
-        ],
 
         'roomId' => 'All',
         'roomName' => 'All',
@@ -75,34 +53,8 @@ class EmrRI extends Component
         $this->resetPage();
     }
 
-    public function updatedMytopbarRefdate()
-    {
-        $this->resetPage();
-    }
-
-    public function updatedMytopbarRefstatusid()
-    {
-        $this->resetPage();
-    }
-
-    // setter myTopBar Shift and myTopBar refDate
-    private function settermyTopBarShiftandmyTopBarrefDate(): void
-    {
-        // dd/mm/yyyy hh24:mi:ss
-        $this->myTopBar['refDate'] = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y');
-        // dd(Carbon::now(env('APP_TIMEZONE'))->format('H:i:s'));
-
-        // shift
-        $findShift = DB::table('rstxn_shiftctls')->select('shift')
-            ->whereRaw("'" . Carbon::now(env('APP_TIMEZONE'))->format('H:i:s') . "' between
-             shift_start and shift_end")
-            ->first();
-        $this->myTopBar['refShiftId'] = isset($findShift->shift) && $findShift->shift ? $findShift->shift : 3;
-    }
-
     private function gettermyTopBarRoomOptions(): void
     {
-
 
         // // Query
         $query = DB::table('rsmst_bangsals')
@@ -245,7 +197,6 @@ class EmrRI extends Component
     // resert input private////////////////
     private function resetInputFields(): void
     {
-
         // resert validation
         $this->resetValidation();
         // resert input
@@ -285,22 +236,6 @@ class EmrRI extends Component
         // $this->findData($id);
     }
 
-
-    // listener from blade////////////////
-    protected $listeners = [
-        'ListenerisOpenUgd' => 'ListenerisOpenUgd',
-        'confirm_remove_record_RIp' => 'delete'
-    ];
-
-    public function ListenerisOpenUgd($ListenerisOpenUgd): void
-    {
-        // dd($ListenerisOpenUgd);
-        $this->isOpen = $ListenerisOpenUgd['isOpen'];
-        $this->isOpenMode = $ListenerisOpenUgd['isOpenMode'];
-        $this->render();
-    }
-
-
     ////////////////////////////////////////////////
     ///////////begin////////////////////////////////
     ////////////////////////////////////////////////
@@ -321,12 +256,6 @@ class EmrRI extends Component
         toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Fitur dalam masa pengembangan');
     }
 
-
-    public function callFormPasien(): void
-    {
-        // set Call MasterPasien True
-        $this->callMasterPasien = true;
-    }
 
     public string $activeTab = "rekamMedis";
     public string $activeTabDokter = "assessmentDokter";
@@ -423,10 +352,7 @@ class EmrRI extends Component
 
 
     // when new form instance
-    public function mount()
-    {
-        $this->settermyTopBarShiftandmyTopBarrefDate();
-    }
+    public function mount() {}
 
     // select data start////////////////
     public function render()
@@ -435,8 +361,6 @@ class EmrRI extends Component
 
         // set mySearch
         $mySearch = $this->refFilter;
-        $myRefdate = $this->myTopBar['refDate'];
-        // $myRefshift = $this->myTopBar['refShiftId'];
         $myRefstatusId = $this->myTopBar['refStatusId'];
         $myRefroomId = $this->myTopBar['roomId'];
 
@@ -459,18 +383,18 @@ class EmrRI extends Component
                 'dr_id',
                 'dr_name',
                 'klaim_id',
-                // 'shift',
                 'vno_sep',
-                // 'no_antrian',
                 'ri_status',
                 'datadaftarri_json',
                 DB::raw("(select count(*) from lbtxn_checkuphdrs where status_rjri='RI' and checkup_status!='B' and ref_no = rsview_rihdrs.rihdr_no) AS lab_status"),
-                DB::raw("(select count(*) from rstxn_riradiologs where rihdr_no = rsview_rihdrs.rihdr_no) AS rad_status")
+                DB::raw("(select count(*) from rstxn_riradiologs where rihdr_no = rsview_rihdrs.rihdr_no) AS rad_status"),
+                'room_id',
+                'room_name',
+                'bangsal_id',
+                'bangsal_name',
+                'bed_no'
             )
             ->where(DB::raw("nvl(ri_status,'I')"), '=', $myRefstatusId);
-
-        // ->where('shift', '=', $myRefshift)
-        // ->where(DB::raw("to_char(entry_date,'dd/mm/yyyy')"), '=', $myRefdate);
 
         // Jika where dokter tidak kosong
         if ($myRefroomId != 'All') {

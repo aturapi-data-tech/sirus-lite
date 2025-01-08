@@ -47,13 +47,13 @@
                 {{-- Display Pasien Componen --}}
                 <div class="">
                     {{-- Display Pasien --}}
-                    {{-- :rjNo="" disi dari emit ListeneropenModalEditRj --}}
+                    {{-- :riHdrNoRef="" disi dari emit ListeneropenModalEditRj --}}
 
-                    <livewire:emr-u-g-d.display-pasien.display-pasien :wire:key="$rjNoRef.'display-pasien'"
-                        :rjNoRef="$rjNoRef">
+                    <livewire:emr-r-i.display-pasien.display-pasien :wire:key="$riHdrNoRef.'display-pasien'"
+                        :riHdrNoRef="$riHdrNoRef">
 
-                        {{-- <livewire:emr-u-g-d.form-entry-u-g-d.form-entry-u-g-d :rjNo="$regNo"
-                            :wire:key="$regNo.'form-entry-u-g-d'"> --}}
+                        {{-- <livewire:emr-r-i.form-entry-r-i.form-entry-r-i :riHdrNoRef="$regNo"
+                            :wire:key="$regNo.'form-entry-r-i'"> --}}
                 </div>
 
 

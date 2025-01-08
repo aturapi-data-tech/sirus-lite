@@ -28,7 +28,7 @@ trait EmrRITrait
                 $dataDaftarRi = json_decode($findData->datadaftarri_json, true);
             } else {
 
-                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data tidak dapat di proses json.");
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data tidak dapat di proses json Ri Trait.");
                 $dataDaftarRi = DB::table('rsview_rihdrs')
                     ->select(
                         DB::raw("to_char(entry_date,'dd/mm/yyyy hh24:mi:ss') AS entry_date"),
@@ -54,6 +54,8 @@ trait EmrRITrait
                         'room_id',
                         'room_name',
                         'bed_no',
+                        'bangsal_id',
+                        'bangsal_name',
 
                         'dr_id',
                         'dr_name',
@@ -69,10 +71,9 @@ trait EmrRITrait
                     ->where('rihdr_no', '=', $rino)
                     ->first();
 
-
                 $dataDaftarRi = [
                     "entryDate" => $dataDaftarRi->entry_date,
-                    "exitDate" => $dataDaftarRi->exit_date,
+                    "exitDate" => $dataDaftarRi->exit_date ?? '',
 
                     "riHdrNo" => $dataDaftarRi->rihdr_no,
 
@@ -82,6 +83,9 @@ trait EmrRITrait
 
                     "entryId" => $dataDaftarRi->entry_id,
                     "entryDesc" => $dataDaftarRi->entry_desc,
+
+                    "bangsalId" => $dataDaftarRi->bangsal_id,
+                    "bangsalDesc" => $dataDaftarRi->bangsal_name,
 
                     "roomId" => $dataDaftarRi->room_id,
                     "roomDesc" => $dataDaftarRi->room_name,
@@ -104,7 +108,7 @@ trait EmrRITrait
 
             return $dataDaftarRi;
         } catch (Exception $e) {
-            dd($e->getMessage());
+            // dd($e->getMessage());
             return ["errorMessages" => $e->getMessage()];
         }
     }

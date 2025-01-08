@@ -32,39 +32,12 @@
                     <x-text-input type="text" class="w-full p-2 pl-10" placeholder="Cari Data" autofocus
                         wire:model="refFilter" />
                 </div>
-                {{-- Cari Data --}}
 
-
-                {{-- Shift --}}
-                {{-- <div class="relative w-[75px]">
-                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                        <svg class="w-5 h-5 text-gray-800 dark:text-white" aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                            <path
-                                d="M1 5h1.424a3.228 3.228 0 0 0 6.152 0H19a1 1 0 1 0 0-2H8.576a3.228 3.228 0 0 0-6.152 0H1a1 1 0 1 0 0 2Zm18 4h-1.424a3.228 3.228 0 0 0-6.152 0H1a1 1 0 1 0 0 2h10.424a3.228 3.228 0 0 0 6.152 0H19a1 1 0 0 0 0-2Zm0 6H8.576a3.228 3.228 0 0 0-6.152 0H1a1 1 0 0 0 0 2h1.424a3.228 3.228 0 0 0 6.152 0H19a1 1 0 0 0 0-2Z" />
-                        </svg>
-                    </div>
-
-                    <x-text-input type="text" class="w-full p-2 pl-10 " placeholder="[Shift 1/2/3]"
-                        wire:model="myTopBar.refShiftId" />
-                </div> --}}
-                {{-- Shift --}}
-
-                {{-- Status Transaksi --}}
-                <div class="flex ml-2">
-                    @foreach ($myTopBar['refStatusOptions'] as $refStatus)
-                        {{-- @dd($refStatus) --}}
-                        <x-radio-button :label="__($refStatus['refStatusDesc'])" value="{{ $refStatus['refStatusId'] }}"
-                            wire:model="myTopBar.refStatusId" />
-                    @endforeach
-                </div>
-                {{-- Status Transaksi --}}
-
-                {{-- Dokter --}}
+                {{-- Room --}}
                 <div>
                     <x-dropdown align="right" :width="__('80')" :contentclasses="__('overflow-auto max-h-[150px] py-1 bg-white dark:bg-gray-700')">
                         <x-slot name="trigger">
-                            {{-- Button Dokter --}}
+                            {{-- Button Room --}}
                             <x-alternative-button class="inline-flex whitespace-nowrap">
                                 <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
                                     xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -119,24 +92,24 @@
 
 
             @if ($isOpen)
-                @include('livewire.emr-u-g-d.create-emr-u-g-d')
+                @include('livewire.emr-r-i.create-emr-r-i')
             @endif
 
             @if ($isOpenDokter)
-                @include('livewire.emr-u-g-d.create-emr-u-g-d-dokter')
+                @include('livewire.emr-r-i.create-emr-r-i-dokter')
             @endif
 
             @if ($isOpenGeneralConsentPasienRI)
-                @include('livewire.emr-u-g-d.create-general-consent-u-g-d-pasien')
+                @include('livewire.emr-r-i.create-general-consent-r-i-pasien')
             @endif
 
 
             {{-- @if ($isOpenInap)
-                @include('livewire.emr-u-g-d.create-emr-u-g-d-inap')
+                @include('livewire.emr-r-i.create-emr-r-i-inap')
             @endif --}}
 
             {{-- @if ($isOpenScreening)
-                @include('livewire.emr-u-g-d.create-screening-u-g-d')
+                @include('livewire.emr-r-i.create-screening-r-i')
             @endif --}}
 
         </div>
@@ -279,33 +252,33 @@
 
                             <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap ">
                                 <div class="">
-                                    <div class="font-semibold text-primary">
-                                        {{ $myQData->entry_date }}
+                                    <div class="text-sm font-semibold text-primary">
+                                        {{ 'Tgl Masuk :' . $myQData->entry_date }}
                                     </div>
                                     <div class="flex italic font-semibold text-gray-900">
                                         <x-badge :badgecolor="__($badgecolorStatus)">
-                                            {{ isset($myQData->ri_status)
-                                                ? ($myQData->ri_status === 'I'
-                                                    ? 'Inap'
-                                                    : ($myQData->ri_status === 'P'
-                                                        ? 'Pulang'
-                                                        : ($myQData->ri_status === 'I'
-                                                            ? 'Transfer Inap'
-                                                            : ($myQData->ri_status === 'F'
-                                                                ? 'Batal Transaksi'
-                                                                : ''))))
-                                                : '' }}
+                                            @php
+                                                switch ($myQData->ri_status) {
+                                                    case 'I':
+                                                        $riStatus = 'Inap';
+                                                        break;
+
+                                                    case 'P':
+                                                        $riStatus = 'Pulang';
+                                                        break;
+
+                                                    default:
+                                                        $riStatus = 'Inap';
+                                                        break;
+                                                }
+                                            @endphp
+                                            {{ $riStatus }}
                                         </x-badge>
                                         <x-badge :badgecolor="__($badgecolorEmr)">
                                             Emr: {{ $prosentaseEMR . '%' }}
                                         </x-badge>
                                     </div>
-                                    {{-- <div class="font-normal text-gray-900">
-                                        {{ '' . $myQData->nobooking }}
-                                    </div> --}}
-                                    {{-- <div class="font-normal text-gray-900 ">
-                                        {{ '' . $myQData->push_antrian_bpjs_status . $myQData->push_antrian_bpjs_json }}
-                                    </div> --}}
+
                                     <div class="font-normal text-gray-700">
                                         <x-badge :badgecolor="__($badgecolorAdministrasiRj)">
                                             Administrasi :
@@ -316,6 +289,13 @@
                                             @endisset
                                         </x-badge>
                                     </div>
+                                    <div>
+                                        <span class="text-sm font-semibold">{{ $myQData->bangsal_name }}</span>
+                                        </br>
+                                        <span class="text-sm">{{ $myQData->room_name }}</span>
+                                        <span class="text-sm">{{ 'Bed :' . $myQData->bed_no }}</span>
+
+                                    </div>
 
                                 </div>
                             </td>
@@ -323,10 +303,123 @@
                             <td class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-primary">
 
 
-                                <div class="inline-flex">
-                                    xxxx
-                                </div>
+                                <!-- Dropdown Action menu Flowbite-->
+                                <div>
+                                    <div>
+                                        <x-light-button id="dropdownButton{{ $myQData->rihdr_no }}" class="inline-flex"
+                                            wire:click="$emit('pressDropdownButtonUgd','{{ $myQData->rihdr_no }}')">
+                                            <svg class="w-5 h-5" aria-hidden="true" fill="currentColor"
+                                                viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                                <path
+                                                    d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
+                                            </svg>
+                                        </x-light-button>
+                                    </div>
 
+                                    <!-- Dropdown Action Open menu -->
+                                    <div id="dropdownMenu{{ $myQData->rihdr_no }}"
+                                        class="z-10 hidden w-auto bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700">
+                                        <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
+                                            aria-labelledby="dropdownButton{{ $myQData->rihdr_no }}">
+                                            {{-- <li>
+                                                <x-dropdown-link wire:click="tampil('{{ $myQData->rihdr_no }}')">
+                                                    {{ __('Tampil | ' . $myQData->reg_name) }}
+                                                </x-dropdown-link>
+                                            </li> --}}
+
+
+                                            @role('Admin')
+                                                {{-- <li>
+                                                    <x-dropdown-link
+                                                        wire:click="editScreening('{{ $myQData->rihdr_no }}','{{ $myQData->reg_no }}')">
+                                                        {{ __('Screening') }}
+                                                    </x-dropdown-link>
+                                                </li> --}}
+
+                                                <li>
+                                                    <x-dropdown-link
+                                                        wire:click="editDokter('{{ $myQData->rihdr_no }}','{{ $myQData->reg_no }}')">
+                                                        {{ __('Assessment Dokter') }}
+                                                    </x-dropdown-link>
+                                                </li>
+
+                                                <li>
+                                                    <x-dropdown-link
+                                                        wire:click="edit('{{ $myQData->rihdr_no }}','{{ $myQData->reg_no }}')">
+                                                        {{ __('Assessment Perawat') }}
+                                                    </x-dropdown-link>
+                                                </li>
+
+                                                <li>
+                                                    <x-dropdown-link
+                                                        wire:click="editGeneralConsentPasienUGD('{{ $myQData->rihdr_no }}','{{ $myQData->reg_no }}')">
+                                                        {{ __('Form Persetujuan Pasien') }}
+                                                    </x-dropdown-link>
+                                                </li>
+                                            @endrole
+                                            @role('Mr')
+                                                {{-- <li>
+                                                    <x-dropdown-link
+                                                        wire:click="editScreening('{{ $myQData->rihdr_no }}','{{ $myQData->reg_no }}')">
+                                                        {{ __('Screening') }}
+                                                    </x-dropdown-link>
+                                                </li> --}}
+
+                                                {{-- <li>
+                                                    <x-dropdown-link
+                                                        wire:click="editDokter('{{ $myQData->rihdr_no }}','{{ $myQData->reg_no }}')">
+                                                        {{ __('Assessment Dokter') }}
+                                                    </x-dropdown-link>
+                                                </li> --}}
+
+                                                <li>
+                                                    <x-dropdown-link
+                                                        wire:click="edit('{{ $myQData->rihdr_no }}','{{ $myQData->reg_no }}')">
+                                                        {{ __('Assessment Perawat') }}
+                                                    </x-dropdown-link>
+                                                </li>
+                                            @endrole
+                                            @role('Perawat')
+                                                {{-- <li>
+                                                    <x-dropdown-link
+                                                        wire:click="editScreening('{{ $myQData->rihdr_no }}','{{ $myQData->reg_no }}')">
+                                                        {{ __('Screening') }}
+                                                    </x-dropdown-link>
+                                                </li> --}}
+                                                <li>
+                                                    <x-dropdown-link
+                                                        wire:click="edit('{{ $myQData->rihdr_no }}','{{ $myQData->reg_no }}')">
+                                                        {{ __('Assessment Perawat') }}
+                                                    </x-dropdown-link>
+                                                </li>
+                                                <li>
+                                                    <x-dropdown-link
+                                                        wire:click="editGeneralConsentPasienUGD('{{ $myQData->rihdr_no }}','{{ $myQData->reg_no }}')">
+                                                        {{ __('Form Persetujuan Pasien') }}
+                                                    </x-dropdown-link>
+                                                </li>
+                                            @endrole
+                                            @role('Dokter')
+                                                <li>
+                                                    <x-dropdown-link
+                                                        wire:click="editDokter('{{ $myQData->rihdr_no }}','{{ $myQData->reg_no }}')">
+                                                        {{ __('Assessment Dokter') }}
+                                                    </x-dropdown-link>
+                                                </li>
+                                            @endrole
+
+                                            {{-- <li>
+                                                <x-dropdown-link
+                                                    wire:click="$emit('confirm_remove_record', '{{ $myQData->rihdr_no }}', '{{ $myQData->reg_name }}')">
+                                                    {{ __('Hapus') }}
+                                                </x-dropdown-link>
+                                            </li> --}}
+
+                                        </ul>
+                                    </div>
+
+                                </div>
+                                <!-- End Dropdown Action Open menu -->
 
 
                             </td>
