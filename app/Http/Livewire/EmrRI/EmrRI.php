@@ -269,6 +269,14 @@ class EmrRI extends Component
         //     'ermMenuName' => 'Keperawatan'
         // ],
         [
+            'ermMenuId' => 'pengkajianAwalPasienRawatInap',
+            'ermMenuName' => 'Pengkajian Awal Pasien Rawat Inap'
+        ],
+        [
+            'ermMenuId' => 'pengkajianDokter',
+            'ermMenuName' => 'Pengkajian Dokter'
+        ],
+        [
             'ermMenuId' => 'anamnesa',
             'ermMenuName' => 'Anamnesa'
         ],

@@ -47,7 +47,7 @@
                 {{-- Display Pasien Componen --}}
                 <div class="">
                     {{-- Display Pasien --}}
-                    {{-- :rjNo="" disi dari emit ListeneropenModalEditUgd --}}
+                    {{-- :rjNo="" disi dari emit ListeneropenModalEditRi --}}
 
                     <livewire:emr-r-i.display-pasien.display-pasien :wire:key="$riHdrNoRef.'display-pasien'"
                         :riHdrNoRef="$riHdrNoRef">
@@ -82,11 +82,32 @@
 
                     <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50"
                         :class="{
+                            'active': activeTab === 'pengkajianAwalPasienRawatInap'
+                        }"
+                        x-show.transition.in.opacity.duration.600="activeTab === 'pengkajianAwalPasienRawatInap'">
+
+                        <livewire:emr-r-i.mr-r-i.pengkajian-awal-pasien-rawat-inap.pengkajian-awal-pasien-rawat-inap
+                            :wire:key="'content-pengkajian-awal-pasien-rawat-inapRi'" :riHdrNoRef="$riHdrNoRef">
+                    </div>
+
+                    <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50"
+                        :class="{
+                            'active': activeTab === 'pengkajianDokter'
+                        }"
+                        x-show.transition.in.opacity.duration.600="activeTab === 'pengkajianDokter'">
+
+                        <livewire:emr-r-i.mr-r-i.pengkajian-dokter.pengkajian-dokter
+                            :wire:key="'content-pengkajian-dokterRi'" :riHdrNoRef="$riHdrNoRef">
+                    </div>
+
+
+                    <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50"
+                        :class="{
                             'active': activeTab === 'anamnesa'
                         }"
                         x-show.transition.in.opacity.duration.600="activeTab === 'anamnesa'">
 
-                        <livewire:emr-r-i.mr-r-i.anamnesa.anamnesa :wire:key="'content-anamnesaUgd'" :riHdrNoRef="$riHdrNoRef">
+                        <livewire:emr-r-i.mr-r-i.anamnesa.anamnesa :wire:key="'content-anamnesaRi'" :riHdrNoRef="$riHdrNoRef">
                     </div>
 
 
@@ -97,7 +118,7 @@
                         x-show.transition.in.opacity.duration.600="activeTab === 'pemeriksaan'">
 
 
-                        <livewire:emr-r-i.mr-r-i.pemeriksaan.pemeriksaan :wire:key="'content-pemeriksaanUgd'"
+                        <livewire:emr-r-i.mr-r-i.pemeriksaan.pemeriksaan :wire:key="'content-pemeriksaanRi'"
                             :riHdrNoRef="$riHdrNoRef">
                     </div>
 
@@ -108,7 +129,7 @@
                         }"
                         x-show.transition.in.opacity.duration.600="activeTab === 'penilaian'">
 
-                        <livewire:emr-r-i.mr-r-i.penilaian.penilaian :wire:key="'content-penilaianUgd'"
+                        <livewire:emr-r-i.mr-r-i.penilaian.penilaian :wire:key="'content-penilaianRi'"
                             :riHdrNoRef="$riHdrNoRef">
                     </div>
 
@@ -120,9 +141,9 @@
 
 
                         <livewire:emr-r-i.mr-r-i.obat-dan-cairan.obat-dan-cairan
-                            :wire:key="'content-obat-dan-cairan-Ugd'" :riHdrNoRef="$riHdrNoRef">
+                            :wire:key="'content-obat-dan-cairan-Ri'" :riHdrNoRef="$riHdrNoRef">
 
-                            <livewire:emr-r-i.mr-r-i.observasi.observasi :wire:key="'content-observasiUgd'"
+                            <livewire:emr-r-i.mr-r-i.observasi.observasi :wire:key="'content-observasiRi'"
                                 :riHdrNoRef="$riHdrNoRef">
 
 
@@ -136,7 +157,7 @@
 
 
 
-                        <livewire:emr-r-i.mr-r-i.diagnosis.diagnosis :wire:key="'content-diagnosisUgd'"
+                        <livewire:emr-r-i.mr-r-i.diagnosis.diagnosis :wire:key="'content-diagnosisRi'"
                             :riHdrNoRef="$riHdrNoRef">
                     </div>
 
@@ -147,7 +168,7 @@
                         }"
                         x-show.transition.in.opacity.duration.600="activeTab === 'perencanaan'">
 
-                        <livewire:emr-r-i.mr-r-i.perencanaan.perencanaan :wire:key="'content-perencanaanUgd'"
+                        <livewire:emr-r-i.mr-r-i.perencanaan.perencanaan :wire:key="'content-perencanaanRi'"
                             :riHdrNoRef="$riHdrNoRef">
                     </div>
 
@@ -158,7 +179,7 @@
                         x-show.transition.in.opacity.duration.600="activeTab === 'rekamMedis'">
 
 
-                        <livewire:emr.rekam-medis.rekam-medis :wire:key="'content-layananUgd'" :regNoRef="$regNoRef">
+                        <livewire:emr.rekam-medis.rekam-medis :wire:key="'content-layananRi'" :regNoRef="$regNoRef">
                     </div>
 
 
@@ -168,7 +189,7 @@
                         }"
                         x-show.transition.in.opacity.duration.600="activeTab === 'administrasi'">
                         {{ 'Admin RI' }}
-                        {{-- <livewire:emr-r-i.administrasi-r-i.administrasi-r-i :wire:key="'content-administrasiUgd'"
+                        {{-- <livewire:emr-r-i.administrasi-r-i.administrasi-r-i :wire:key="'content-administrasiRi'"
                             :riHdrNoRef="$riHdrNoRef"> --}}
 
                     </div>
