@@ -14,46 +14,69 @@
             @enderror
         </div>
 
-        <!-- Nama Petugas -->
+
+        <!-- Jam Pengkaji -->
         <div>
-            <x-input-label for="dataDaftarRi.pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.namaPetugas"
-                :value="__('Nama Petugas')" :required="__(true)" />
-            <x-text-input id="dataDaftarRi.pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.namaPetugas"
-                placeholder="Nama Petugas" class="mt-1" :errorshas="__(
-                    $errors->has('dataDaftarRi.pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.namaPetugas'),
-                )" :disabled="$disabledPropertyRjStatus"
-                wire:model.debounce.500ms="dataDaftarRi.pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.namaPetugas" />
-            @error('dataDaftarRi.pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.namaPetugas')
+            <x-input-label for="dataDaftarRi.pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.jamPengkaji"
+                :value="__('Jam Pengkaji')" :required="__(true)" />
+
+            <div class="mb-2">
+                <div class="flex items-center mb-2">
+                    <x-text-input
+                        id="dataDaftarRi.pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.jamPengkaji"
+                        placeholder="dd/mm/yyyy hh24:mi:ss" class="mt-1 ml-2" :errorshas="__(
+                            $errors->has(
+                                'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.jamPengkaji',
+                            ),
+                        )" :disabled="$disabledPropertyRjStatus"
+                        wire:model.debounce.500ms="dataDaftarRi.pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.jamPengkaji" />
+
+                    @if (!$dataDaftarRi['pengkajianAwalPasienRawatInap']['bagian5CatatanDanTandaTangan']['jamPengkaji'])
+                        <div class="w-1/2 ml-2">
+                            <div wire:loading wire:target="setJamPengkaji">
+                                <x-loading />
+                            </div>
+
+                            <x-green-button :disabled="false"
+                                wire:click.prevent="setJamPengkaji('{{ date('d/m/Y H:i:s') }}')" type="button"
+                                wire:loading.remove>
+                                <div wire:poll>
+                                    Set Jam Pengkaji: {{ date('d/m/Y H:i:s') }}
+                                </div>
+                            </x-green-button>
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            @error('dataDaftarRi.pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.jamPengkaji')
                 <x-input-error :messages="$message" />
             @enderror
         </div>
 
-        <!-- Tanda Tangan -->
+        <!-- Petugas Pengkaji  -->
         <div>
-            <x-input-label for="dataDaftarRi.pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.tandaTangan"
-                :value="__('Tanda Tangan')" :required="__(true)" />
-            <x-text-input id="dataDaftarRi.pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.tandaTangan"
-                placeholder="Tanda Tangan" class="mt-1" :errorshas="__(
-                    $errors->has('dataDaftarRi.pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.tandaTangan'),
-                )" :disabled="$disabledPropertyRjStatus"
-                wire:model.debounce.500ms="dataDaftarRi.pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.tandaTangan" />
-            @error('dataDaftarRi.pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.tandaTangan')
+            <x-input-label for="dataDaftarRi.pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.petugasPengkaji"
+                :value="__('Petugas Pengkaji')" :required="__(true)" />
+            <x-text-input id="dataDaftarRi.pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.petugasPengkaji"
+                placeholder="Petugas Pengkaji" class="mt-1" :errorshas="__(
+                    $errors->has(
+                        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.petugasPengkaji',
+                    ),
+                )" :disabled="true"
+                wire:model.debounce.500ms="dataDaftarRi.pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.petugasPengkaji" />
+            @error('dataDaftarRi.pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.petugasPengkaji')
                 <x-input-error :messages="$message" />
             @enderror
         </div>
 
-        <!-- Tanggal -->
+        <!-- Tombol TTD Petugas Pengkaji -->
         <div>
-            <x-input-label for="dataDaftarRi.pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.tanggal"
-                :value="__('Tanggal')" :required="__(true)" />
-            <x-text-input id="dataDaftarRi.pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.tanggal"
-                placeholder="dd/mm/yyyy hh24:mi:ss" class="mt-1" :errorshas="__(
-                    $errors->has('dataDaftarRi.pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.tanggal'),
-                )" :disabled="$disabledPropertyRjStatus"
-                wire:model.debounce.500ms="dataDaftarRi.pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.tanggal" />
-            @error('dataDaftarRi.pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.tanggal')
-                <x-input-error :messages="$message" />
-            @enderror
+            <x-yellow-button :disabled="false" wire:click.prevent="setPetugasPengkaji()" type="button"
+                wire:loading.remove>
+                TTD Petugas Pengkaji
+            </x-yellow-button>
         </div>
+
     </div>
 </div>

@@ -30,8 +30,6 @@ class PengkajianAwalPasienRawatInap extends Component
 
     public array $dataDaftarRi = [];
 
-    public array $rekonsiliasiObat = ["namaObat" => "", "dosis" => "", "rute" => ""];
-
     public array $pengkajianAwalPasienRawatInap = [
         "bagian1DataUmum" => [
             "kondisiSaatMasuk" => "",
@@ -126,7 +124,6 @@ class PengkajianAwalPasienRawatInap extends Component
                 "gda" => "", //number
                 "tb" => "",
                 "bb" => "",
-
             ],
             "keluhanUtama" => "",
             "pemeriksaanSistemOrgan" => [
@@ -164,11 +161,12 @@ class PengkajianAwalPasienRawatInap extends Component
         ],
         "bagian5CatatanDanTandaTangan" => [
             "catatanUmum" => "",
-            "namaPetugas" => "",
-            "tandaTangan" => "",
-            "tanggal" => ""
+            "petugasPengkaji" => "", //
+            "petugasPengkajiCode" => "", //
+            "jamPengkaji" => "" //
         ]
     ];
+
     // Opsi untuk radio button
     public $options = [
         "kondisiSaatMasukOptions" => ["mandiri", "dibantu", "tirahBaring"],
@@ -361,41 +359,6 @@ class PengkajianAwalPasienRawatInap extends Component
 
 
 
-    public function addRekonsiliasiObat()
-    {
-        if ($this->rekonsiliasiObat['namaObat']) {
-
-            // check exist
-            $cekRekonsiliasiObat = collect($this->dataDaftarRi['pengkajianAwalPasienRawatInap']['rekonsiliasiObat'])
-                ->where("namaObat", '=', $this->rekonsiliasiObat['namaObat'])
-                ->count();
-
-            if (!$cekRekonsiliasiObat) {
-                $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['rekonsiliasiObat'][] = [
-                    "namaObat" => $this->rekonsiliasiObat['namaObat'],
-                    "dosis" => $this->rekonsiliasiObat['dosis'],
-                    "rute" => $this->rekonsiliasiObat['rute']
-                ];
-
-                $this->store();
-                // reset rekonsiliasiObat
-                $this->reset(['rekonsiliasiObat']);
-            } else {
-                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Nama Obat Sudah ada.");
-            }
-        } else {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Nama Obat Kosong.");
-        }
-    }
-
-    public function removeRekonsiliasiObat($namaObat)
-    {
-
-        $rekonsiliasiObat = collect($this->dataDaftarRi['pengkajianAwalPasienRawatInap']['rekonsiliasiObat'])->where("namaObat", '!=', $namaObat)->toArray();
-        $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['rekonsiliasiObat'] = $rekonsiliasiObat;
-        $this->store();
-    }
-
 
     private function matchingMyVariable()
     {
@@ -410,9 +373,9 @@ class PengkajianAwalPasienRawatInap extends Component
     }
 
 
-    public function setJamDatang($myTime)
+    public function setJamPengkaji($jam)
     {
-        $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['pengkajianPerawatan']['jamDatang'] = $myTime;
+        $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['bagian5CatatanDanTandaTangan']['jamPengkaji'] = $jam;
     }
 
     private function validatePerawatPenerima()
@@ -431,24 +394,26 @@ class PengkajianAwalPasienRawatInap extends Component
         // Validasi dulu
     }
 
-    public function setPerawatPenerima()
+    public function setPetugasPengkaji()
     {
-        // $myRoles = json_decode(auth()->user()->roles, true);
+        // Ambil data user yang sedang login
         $myUserCodeActive = auth()->user()->myuser_code;
         $myUserNameActive = auth()->user()->myuser_name;
-        // $myUserTtdActive = auth()->user()->myuser_ttd_image;
 
-        // Validasi dulu
-        // cek apakah data pemeriksaan sudah dimasukkan atau blm
-        $this->validatePerawatPenerima();
-        //  toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError( "Role " . $myUserNameActive);
+        // Validasi apakah pengguna memiliki peran yang sesuai
         if (auth()->user()->hasRole('Perawat')) {
-            $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['pengkajianPerawatan']['perawatPenerima'] = $myUserNameActive;
-            $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['pengkajianPerawatan']['perawatPenerimaCode'] = $myUserCodeActive;
-            $this->store();
-        } else {
+            // Isi data petugas pengkaji
+            $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['bagian5CatatanDanTandaTangan']['petugasPengkaji'] = $myUserNameActive;
+            $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['bagian5CatatanDanTandaTangan']['petugasPengkajiCode'] = $myUserCodeActive;
 
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Anda tidak dapat melakukan TTD-E karena User Role " . $myUserNameActive . ' Bukan Perawat.');
+            // Simpan perubahan
+            $this->store();
+
+            // Notifikasi sukses
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("TTD Petugas Pengkaji berhasil diisi oleh " . $myUserNameActive);
+        } else {
+            // Notifikasi error jika peran tidak sesuai
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Anda tidak dapat melakukan TTD karena User Role " . $myUserNameActive . ' bukan Petugas Pengkaji.');
             return;
         }
     }

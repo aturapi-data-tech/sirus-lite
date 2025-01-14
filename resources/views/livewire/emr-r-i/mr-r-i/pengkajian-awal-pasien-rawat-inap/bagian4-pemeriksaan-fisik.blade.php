@@ -143,7 +143,7 @@
         <div>
             <x-input-label for="dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.keluhanUtama"
                 :value="__('Keluhan Utama')" :required="__(true)" />
-            <x-text-input id="dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.keluhanUtama"
+            <x-text-input-area id="dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.keluhanUtama"
                 placeholder="Keluhan Utama" class="mt-1" :errorshas="__(
                     $errors->has('dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.keluhanUtama'),
                 )" :disabled="$disabledPropertyRjStatus"
