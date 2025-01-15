@@ -285,19 +285,6 @@ class PengkajianAwalPasienRawatInap extends Component
 
 
 
-    // resert input private////////////////
-    private function resetInputFields(): void
-    {
-
-        // resert validation
-        $this->resetValidation();
-        // resert input kecuali
-        $this->reset(['']);
-    }
-
-
-
-
 
     // ////////////////
     // RJ Logic
@@ -305,7 +292,7 @@ class PengkajianAwalPasienRawatInap extends Component
 
 
     // validate Data RJ//////////////////////////////////////////////////
-    private function validateDataAnamnesadRi(): void
+    private function validatePengkajianAwalPasienRawatInap(): void
     {
         // customErrorMessages
         // $messages = customErrorMessagesTrait::messages();
@@ -326,7 +313,7 @@ class PengkajianAwalPasienRawatInap extends Component
     public function store()
     {
         // Validate RJ
-        $this->validateDataAnamnesadRi();
+        $this->validatePengkajianAwalPasienRawatInap();
 
         // Logic update mode start //////////
         $this->updateDataRi($this->dataDaftarRi['riHdrNo']);
@@ -343,10 +330,10 @@ class PengkajianAwalPasienRawatInap extends Component
     // insert and update record end////////////////
 
 
-    private function findData($rjno): void
+    private function findData($riHdrNo): void
     {
 
-        $this->dataDaftarRi = $this->findDataRI($rjno);
+        $this->dataDaftarRi = $this->findDataRI($riHdrNo);
         // dd($this->dataDaftarRi);
         // jika pengkajianAwalPasienRawatInap tidak ditemukan tambah variable pengkajianAwalPasienRawatInap pda array
         if (isset($this->dataDaftarRi['pengkajianAwalPasienRawatInap']) == false) {
@@ -378,21 +365,6 @@ class PengkajianAwalPasienRawatInap extends Component
         $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['bagian5CatatanDanTandaTangan']['jamPengkaji'] = $jam;
     }
 
-    private function validatePerawatPenerima()
-    {
-        // Validasi dulu
-        $messages = [];
-
-        // Proses Validasi///////////////////////////////////////////
-        try {
-            $this->validate($this->rules, $messages);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Anda tidak dapat melakukan TTD-E karena data pemeriksaan belum lengkap." . $e->getMessage());
-            $this->validate($this->rules, $messages);
-        }
-        // Validasi dulu
-    }
 
     public function setPetugasPengkaji()
     {

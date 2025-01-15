@@ -2,8 +2,8 @@
     <!-- Keluhan Utama -->
     <div>
         <x-input-label for="dataDaftarRi.pengkajianDokter.anamnesa.keluhanUtama" :value="__('Keluhan Utama')" :required="true" />
-        <x-text-input id="dataDaftarRi.pengkajianDokter.anamnesa.keluhanUtama" placeholder="Keluhan Utama" class="mt-1"
-            wire:model.debounce.500ms="dataDaftarRi.pengkajianDokter.anamnesa.keluhanUtama" />
+        <x-text-input-area id="dataDaftarRi.pengkajianDokter.anamnesa.keluhanUtama" placeholder="Keluhan Utama"
+            class="mt-1" wire:model.debounce.500ms="dataDaftarRi.pengkajianDokter.anamnesa.keluhanUtama" />
         @error('dataDaftarRi.pengkajianDokter.anamnesa.keluhanUtama')
             <x-input-error :messages="$message" />
         @enderror
@@ -13,7 +13,7 @@
     <div>
         <x-input-label for="dataDaftarRi.pengkajianDokter.anamnesa.keluhanTambahan" :value="__('Keluhan Tambahan')"
             :required="true" />
-        <x-text-input id="dataDaftarRi.pengkajianDokter.anamnesa.keluhanTambahan" placeholder="Keluhan Tambahan"
+        <x-text-input-area id="dataDaftarRi.pengkajianDokter.anamnesa.keluhanTambahan" placeholder="Keluhan Tambahan"
             class="mt-1" wire:model.debounce.500ms="dataDaftarRi.pengkajianDokter.anamnesa.keluhanTambahan" />
         @error('dataDaftarRi.pengkajianDokter.anamnesa.keluhanTambahan')
             <x-input-error :messages="$message" />
@@ -25,14 +25,14 @@
         <x-input-label for="dataDaftarRi.pengkajianDokter.anamnesa.riwayatPenyakit" :value="__('Riwayat Penyakit')"
             :required="true" />
         <div class="space-y-2">
-            <x-text-input id="dataDaftarRi.pengkajianDokter.anamnesa.riwayatPenyakit.sekarang" placeholder="Sekarang"
-                class="mt-1"
+            <x-text-input-area id="dataDaftarRi.pengkajianDokter.anamnesa.riwayatPenyakit.sekarang"
+                placeholder="Sekarang" class="mt-1"
                 wire:model.debounce.500ms="dataDaftarRi.pengkajianDokter.anamnesa.riwayatPenyakit.sekarang" />
-            <x-text-input id="dataDaftarRi.pengkajianDokter.anamnesa.riwayatPenyakit.dahulu" placeholder="Dahulu"
+            <x-text-input-area id="dataDaftarRi.pengkajianDokter.anamnesa.riwayatPenyakit.dahulu" placeholder="Dahulu"
                 class="mt-1"
                 wire:model.debounce.500ms="dataDaftarRi.pengkajianDokter.anamnesa.riwayatPenyakit.dahulu" />
-            <x-text-input id="dataDaftarRi.pengkajianDokter.anamnesa.riwayatPenyakit.keluarga" placeholder="Keluarga"
-                class="mt-1"
+            <x-text-input-area id="dataDaftarRi.pengkajianDokter.anamnesa.riwayatPenyakit.keluarga"
+                placeholder="Keluarga" class="mt-1"
                 wire:model.debounce.500ms="dataDaftarRi.pengkajianDokter.anamnesa.riwayatPenyakit.keluarga" />
         </div>
         @error('dataDaftarRi.pengkajianDokter.anamnesa.riwayatPenyakit.*')
