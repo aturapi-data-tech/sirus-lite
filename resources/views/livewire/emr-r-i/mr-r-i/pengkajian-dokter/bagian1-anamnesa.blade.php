@@ -40,20 +40,20 @@
         @enderror
     </div>
 
-    <!-- Riwayat Penggunaan Obat -->
+    <!-- Jenis Alergi -->
     <div>
-        <x-input-label for="dataDaftarRi.pengkajianDokter.anamnesa.riwayatPenggunaanObat" :value="__('Riwayat Penggunaan Obat')"
-            :required="true" />
+        <x-input-label for="dataDaftarRi.pengkajianDokter.anamnesa.jenisAlergi" :value="__('Jenis Alergi / Alergi [Makanan / Obat / Udara]')" :required="true" />
         <div class="space-y-2">
-            <x-text-input id="dataDaftarRi.pengkajianDokter.anamnesa.riwayatPenggunaanObat.alergiObat"
-                placeholder="Alergi Obat" class="mt-1"
-                wire:model.debounce.500ms="dataDaftarRi.pengkajianDokter.anamnesa.riwayatPenggunaanObat.alergiObat" />
-            <x-text-input id="dataDaftarRi.pengkajianDokter.anamnesa.riwayatPenggunaanObat.obatKronis"
-                placeholder="Obat Kronis" class="mt-1"
-                wire:model.debounce.500ms="dataDaftarRi.pengkajianDokter.anamnesa.riwayatPenggunaanObat.obatKronis" />
+            <x-text-input-area id="dataDaftarRi.pengkajianDokter.anamnesa.jenisAlergi"
+                placeholder="Jenis Alergi / Alergi [Makanan / Obat / Udara]" class="mt-1"
+                wire:model.debounce.500ms="dataDaftarRi.pengkajianDokter.anamnesa.jenisAlergi" />
         </div>
-        @error('dataDaftarRi.pengkajianDokter.anamnesa.riwayatPenggunaanObat.*')
+        @error('dataDaftarRi.pengkajianDokter.anamnesa.jenisAlergi')
             <x-input-error :messages="$message" />
         @enderror
+    </div>
+
+    <div>
+        @include('livewire.emr-r-i.mr-r-i.pengkajian-dokter.bagian1-rekonsiliasi-obat')
     </div>
 </div>

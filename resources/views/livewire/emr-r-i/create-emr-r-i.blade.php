@@ -100,17 +100,6 @@
                             :wire:key="'content-pengkajian-dokterRi'" :riHdrNoRef="$riHdrNoRef">
                     </div>
 
-
-                    <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50"
-                        :class="{
-                            'active': activeTab === 'anamnesa'
-                        }"
-                        x-show.transition.in.opacity.duration.600="activeTab === 'anamnesa'">
-
-                        <livewire:emr-r-i.mr-r-i.anamnesa.anamnesa :wire:key="'content-anamnesaRi'" :riHdrNoRef="$riHdrNoRef">
-                    </div>
-
-
                     <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50"
                         :class="{
                             'active': activeTab === 'pemeriksaan'

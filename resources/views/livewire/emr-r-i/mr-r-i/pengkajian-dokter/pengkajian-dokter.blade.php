@@ -46,9 +46,26 @@
                             <li class="mr-2">
                                 <label
                                     class="inline-block p-2 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
-                                    :class="activeTab === 'Bagian 4: Tanda Tangan Dokter' ?
+                                    :class="activeTab === 'Bagian 4: Hasil Pemeriksaan Penunjang' ?
                                         'text-primary border-primary bg-gray-100' : ''"
-                                    @click="activeTab = 'Bagian 4: Tanda Tangan Dokter'">Bagian 4: Tanda Tangan
+                                    @click="activeTab = 'Bagian 4: Hasil Pemeriksaan Penunjang'">Bagian 4: Hasil
+                                    Pemeriksaan
+                                    Penunjang</label>
+                            </li>
+                            <li class="mr-2">
+                                <label
+                                    class="inline-block p-2 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
+                                    :class="activeTab === 'Bagian 5: Diagnosa & Rencana' ?
+                                        'text-primary border-primary bg-gray-100' : ''"
+                                    @click="activeTab = 'Bagian 5: Diagnosa & Rencana'">Bagian 5: Diagnosa &
+                                    Rencana</label>
+                            </li>
+                            <li class="mr-2">
+                                <label
+                                    class="inline-block p-2 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
+                                    :class="activeTab === 'Bagian 6: Tanda Tangan Dokter' ?
+                                        'text-primary border-primary bg-gray-100' : ''"
+                                    @click="activeTab = 'Bagian 6: Tanda Tangan Dokter'">Bagian 6: Tanda Tangan
                                     Dokter</label>
                             </li>
                         </ul>
@@ -79,9 +96,21 @@
                     </div>
 
                     <div class="p-2 rounded-lg bg-gray-50"
-                        :class="{ 'active': activeTab === 'Bagian 4: Tanda Tangan Dokter' }"
-                        x-show.transition.in.opacity.duration.600="activeTab === 'Bagian 4: Tanda Tangan Dokter'">
-                        @include('livewire.emr-r-i.mr-r-i.pengkajian-dokter.bagian4-tangan-dokter')
+                        :class="{ 'active': activeTab === 'Bagian 4: Hasil Pemeriksaan Penunjang' }"
+                        x-show.transition.in.opacity.duration.600="activeTab === 'Bagian 4: Hasil Pemeriksaan Penunjang'">
+                        @include('livewire.emr-r-i.mr-r-i.pengkajian-dokter.bagian4-hasil-pemeriksaan-penunjang')
+                    </div>
+
+                    <div class="p-2 rounded-lg bg-gray-50"
+                        :class="{ 'active': activeTab === 'Bagian 5: Diagnosa & Rencana' }"
+                        x-show.transition.in.opacity.duration.600="activeTab === 'Bagian 5: Diagnosa & Rencana'">
+                        @include('livewire.emr-r-i.mr-r-i.pengkajian-dokter.bagian5-diagnosa-rencana')
+                    </div>
+
+                    <div class="p-2 rounded-lg bg-gray-50"
+                        :class="{ 'active': activeTab === 'Bagian 6: Tanda Tangan Dokter' }"
+                        x-show.transition.in.opacity.duration.600="activeTab === 'Bagian 6: Tanda Tangan Dokter'">
+                        @include('livewire.emr-r-i.mr-r-i.pengkajian-dokter.bagian6-tanda-tangan-dokter')
                     </div>
                 </div>
             </div>

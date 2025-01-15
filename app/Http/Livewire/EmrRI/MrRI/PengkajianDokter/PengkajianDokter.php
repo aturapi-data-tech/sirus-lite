@@ -30,10 +30,7 @@ class PengkajianDokter extends Component
 
     public array $dataDaftarRi = [];
 
-    public array $rekonsiliasiObat = ["namaObat" => "", "dosis" => "", "rute" => ""];
-
     public array $pengkajianDokter = [
-
         "anamnesa" => [
             "keluhanUtama" => "",
             "keluhanTambahan" => "",
@@ -42,10 +39,8 @@ class PengkajianDokter extends Component
                 "dahulu" => "",
                 "keluarga" => ""
             ],
-            "riwayatPenggunaanObat" => [
-                "alergiObat" => "",
-                "obatKronis" => ""
-            ]
+            "jenisAlergi" => "", // Mengubah "alergiObat" menjadi "jenisAlergi"
+            "rekonsiliasiObat" => [], // Menambahkan rekonsiliasi obat
         ],
         "fisik" => "",
         "anatomi" => [
@@ -314,6 +309,21 @@ class PengkajianDokter extends Component
         "statusLokalis" => [
             "deskripsiGambar" => ""
         ],
+        "hasilPemeriksaanPenunjang" => [
+            "laboratorium" => "",
+            "radiologi" => "",
+            "penunjangLain" => ""
+        ],
+        "diagnosaAssesment" => [
+            "diagnosaAwal" => ""
+        ],
+        "rencana" => [
+            "penegakanDiagnosa" => "",
+            "terapi" => "",
+            "diet" => "",
+            "edukasi" => "",
+            "monitoring" => ""
+        ],
         "tandaTanganDokter" => [
             "dokterPengkaji" => "",      // Nama dokter yang melakukan pengkajian
             "dokterPengkajiCode" => "",  // Kode unik atau identifikasi dokter
@@ -321,27 +331,52 @@ class PengkajianDokter extends Component
         ]
     ];
 
-
     //////////////////////////////////////////////////////////////////////
 
 
     protected $rules = [
-        'pengkajianDokter.anamnesa.keluhanUtama' => 'required|string|max:255',
-        'pengkajianDokter.anamnesa.keluhanTambahan' => 'nullable|string|max:255',
-        'pengkajianDokter.anamnesa.riwayatPenyakit.sekarang' => 'nullable|string|max:255',
-        'pengkajianDokter.anamnesa.riwayatPenyakit.dahulu' => 'nullable|string|max:255',
-        'pengkajianDokter.anamnesa.riwayatPenyakit.keluarga' => 'nullable|string|max:255',
-        'pengkajianDokter.anamnesa.riwayatPenggunaanObat.alergiObat' => 'nullable|string|max:255',
-        'pengkajianDokter.anamnesa.riwayatPenggunaanObat.obatKronis' => 'nullable|string|max:255',
+        // Anamnesa
+        'dataDaftarRi.pengkajianDokter.anamnesa.keluhanUtama' => 'required|string|max:255',
+        'dataDaftarRi.pengkajianDokter.anamnesa.keluhanTambahan' => 'nullable|string|max:255',
+        'dataDaftarRi.pengkajianDokter.anamnesa.riwayatPenyakit.sekarang' => 'nullable|string|max:255',
+        'dataDaftarRi.pengkajianDokter.anamnesa.riwayatPenyakit.dahulu' => 'nullable|string|max:255',
+        'dataDaftarRi.pengkajianDokter.anamnesa.riwayatPenyakit.keluarga' => 'nullable|string|max:255',
+        'dataDaftarRi.pengkajianDokter.anamnesa.jenisAlergi' => 'nullable|string|max:255',
 
-        'pengkajianDokter.pemeriksaanFisik.*.parameter' => 'required|string|max:255',
-        'pengkajianDokter.pemeriksaanFisik.*.status' => 'required|in:Normal,Abnormal,Tidak Diperiksa',
-        'pengkajianDokter.pemeriksaanFisik.*.keterangan' => 'nullable|string|max:255',
+        // Rekonsiliasi Obat
+        'dataDaftarRi.pengkajianDokter.anamnesa.rekonsiliasiObat.*.namaObat' => 'required|string|max:255',
+        'dataDaftarRi.pengkajianDokter.anamnesa.rekonsiliasiObat.*.dosis' => 'required|string|max:255',
+        'dataDaftarRi.pengkajianDokter.anamnesa.rekonsiliasiObat.*.rute' => 'required|string|max:255',
 
-        'pengkajianDokter.statusLokalis.deskripsiGambar' => 'nullable|string|max:1000',
+        // Fisik
+        'dataDaftarRi.pengkajianDokter.fisik' => 'nullable|string|max:255',
 
-        'pengkajianDokter.tandaTanganDokter.namaDokter' => 'required|string|max:255',
-        'pengkajianDokter.tandaTanganDokter.tandaTangan' => 'nullable|string|max:1000',
+        // Anatomi
+        'dataDaftarRi.pengkajianDokter.anatomi.*.kelainan' => 'nullable|string|in:Tidak Diperiksa,Tidak Ada Kelainan,Ada',
+        'dataDaftarRi.pengkajianDokter.anatomi.*.desc' => 'nullable|string|max:255|required_if:dataDaftarRi.pengkajianDokter.anatomi.*.kelainan,Ada',
+
+        // Status Lokalis
+        'dataDaftarRi.pengkajianDokter.statusLokalis.deskripsiGambar' => 'nullable|string|max:255',
+
+        // Hasil Pemeriksaan Penunjang
+        'dataDaftarRi.pengkajianDokter.hasilPemeriksaanPenunjang.laboratorium' => 'nullable|string|max:255',
+        'dataDaftarRi.pengkajianDokter.hasilPemeriksaanPenunjang.radiologi' => 'nullable|string|max:255',
+        'dataDaftarRi.pengkajianDokter.hasilPemeriksaanPenunjang.penunjangLain' => 'nullable|string|max:255',
+
+        // Diagnosa/Assesment
+        'dataDaftarRi.pengkajianDokter.diagnosaAssesment.diagnosaAwal' => 'nullable|string|max:255',
+
+        // Rencana
+        'dataDaftarRi.pengkajianDokter.rencana.penegakanDiagnosa' => 'nullable|string|max:255',
+        'dataDaftarRi.pengkajianDokter.rencana.terapi' => 'nullable|string|max:255',
+        'dataDaftarRi.pengkajianDokter.rencana.diet' => 'nullable|string|max:255',
+        'dataDaftarRi.pengkajianDokter.rencana.edukasi' => 'nullable|string|max:255',
+        'dataDaftarRi.pengkajianDokter.rencana.monitoring' => 'nullable|string|max:255',
+
+        // Tanda Tangan Dokter
+        'dataDaftarRi.pengkajianDokter.tandaTanganDokter.dokterPengkaji' => 'nullable|string|max:255',
+        'dataDaftarRi.pengkajianDokter.tandaTanganDokter.dokterPengkajiCode' => 'nullable|string|max:255',
+        'dataDaftarRi.pengkajianDokter.tandaTanganDokter.jamDokterPengkaji' => 'nullable|date_format:d/m/Y H:i:s',
     ];
 
 
@@ -459,6 +494,101 @@ class PengkajianDokter extends Component
             return;
         }
     }
+
+
+
+
+    public array $rekonsiliasiObat = ["namaObat" => "", "dosis" => "", "rute" => ""];
+
+    public function addRekonsiliasiObat(): void
+    {
+        // Pastikan nama obat tidak kosong
+        if (empty($this->rekonsiliasiObat['namaObat'])) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Nama Obat Kosong.");
+            return;
+        }
+
+        // Cek apakah nama obat sudah ada di dalam array rekonsiliasiObat
+        $cekRekonsiliasiObat = collect($this->dataDaftarRi['pengkajianDokter']['anamnesa']['rekonsiliasiObat'])
+            ->where("namaObat", '=', $this->rekonsiliasiObat['namaObat'])
+            ->count();
+
+        // Jika nama obat sudah ada, tampilkan pesan error
+        if ($cekRekonsiliasiObat > 0) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Nama Obat Sudah ada.");
+            return;
+        }
+
+        // Tambahkan data obat ke dalam rekonsiliasiObat
+        $this->dataDaftarRi['pengkajianDokter']['anamnesa']['rekonsiliasiObat'][] = [
+            "namaObat" => $this->rekonsiliasiObat['namaObat'],
+            "dosis" => $this->rekonsiliasiObat['dosis'],
+            "rute" => $this->rekonsiliasiObat['rute']
+        ];
+
+        // Simpan perubahan ke dalam penyimpanan (misalnya, database atau session)
+        $this->updateDataRi($this->dataDaftarRi['riHdrNo']);
+        $this->emit('syncronizeAssessmentPerawatRIFindData');
+
+        // Reset input setelah data berhasil ditambahkan
+        $this->reset(['rekonsiliasiObat']);
+
+        // Tampilkan pesan sukses
+        toastr()
+            ->closeOnHover(true)
+            ->closeDuration(3)
+            ->positionClass('toast-top-left')
+            ->addSuccess("Obat berhasil ditambahkan.");
+    }
+
+    public function removeRekonsiliasiObat(string $namaObat): void
+    {
+        // Pastikan rekonsiliasiObat ada dan merupakan array
+        if (
+            !isset($this->dataDaftarRi['pengkajianDokter']['anamnesa']['rekonsiliasiObat']) ||
+            !is_array($this->dataDaftarRi['pengkajianDokter']['anamnesa']['rekonsiliasiObat'])
+        ) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Data rekonsiliasiObat tidak valid.");
+            return;
+        }
+
+        // Filter array rekonsiliasiObat untuk menghapus data dengan namaObat yang sesuai
+        $rekonsiliasiObat = collect($this->dataDaftarRi['pengkajianDokter']['anamnesa']['rekonsiliasiObat'])
+            ->reject(function ($item) use ($namaObat) {
+                return $item['namaObat'] === $namaObat;
+            })
+            ->values() // Reset indeks array
+            ->toArray();
+
+        // Update array rekonsiliasiObat dengan data yang sudah difilter
+        $this->dataDaftarRi['pengkajianDokter']['anamnesa']['rekonsiliasiObat'] = $rekonsiliasiObat;
+
+        // Simpan perubahan ke dalam penyimpanan (misalnya, database atau session)
+        $this->updateDataRi($this->dataDaftarRi['riHdrNo']);
+        $this->emit('syncronizeAssessmentPerawatRIFindData');
+
+        // Tampilkan pesan sukses
+        toastr()
+            ->closeOnHover(true)
+            ->closeDuration(3)
+            ->positionClass('toast-top-left')
+            ->addSuccess("Obat berhasil dihapus.");
+    }
+
+
+
 
     // when new form instance
     public function mount()

@@ -24,328 +24,551 @@ class Penilaian extends Component
     // dataDaftarRi RJ
     public array $dataDaftarRi = [];
 
-    // data penilaian=>[]
-    public array $penilaian =
-    [
-        "fisikTab" => "Fisik",
-        "fisik" => [
-            "fisik" => ""
-        ],
-
-        "statusMedikTab" => "Status Medik",
-        "statusMedik" => [
-            "statusMedik" => "",
-            "statusMedikOptions" => [
-                ["statusMedik" => "Emergency Trauma"],
-                ["statusMedik" => "Emergency Non Trauma"],
-                ["statusMedik" => "Non Emergency Trauma"],
-                ["statusMedik" => "Non Emergency Non Trauma"],
-            ]
-        ],
-
+    public array $penilaian = [
         "nyeriTab" => "Nyeri",
         "nyeri" => [
             "vas" => [
-                "vas" => "",
-                "vasOptions" => [
-                    ["vas" => "0"],
-                    ["vas" => "1"],
-                    ["vas" => "2"],
-                    ["vas" => "3"],
-                    ["vas" => "4"],
-                    ["vas" => "5"],
-                    ["vas" => "6"],
-                    ["vas" => "7"],
-                    ["vas" => "8"],
-                    ["vas" => "9"],
-                    ["vas" => "10"],
-                ]
-
+                "vas" => "", // Nilai yang dipilih (misalnya, "5")
+                "vasScore" => 0, // Skor berdasarkan nilai yang dipilih
             ],
-            "nyeri" => "",
-            "nyeriOptions" => [
-                ["nyeri" => "Ya"],
-                ["nyeri" => "Tidak"],
+            "nyeri" => [
+                "nyeri" => "", // Nilai yang dipilih (misalnya, "Ya")
+                "nyeriScore" => 0, // Skor berdasarkan nilai yang dipilih
             ],
-            "nyeriKet" => "",
-            "nyeriKetOptions" => [
-                ["nyeriKet" => "Akut"],
-                ["nyeriKet" => "Kronis"],
+            "nyeriKet" => [
+                "nyeriKet" => "", // Nilai yang dipilih (misalnya, "Akut")
+                "nyeriKetScore" => 0, // Skor berdasarkan nilai yang dipilih
             ],
-            "skalaNyeri" => "",
-            "nyeriMetode" => "",
-            "nyeriMetodeOptions" => [
-                ["nyeriMetode" => "NRS"],
-                ["nyeriMetode" => "BPS"],
-                ["nyeriMetode" => "NIPS"],
-                ["nyeriMetode" => "FLACC"],
-                ["nyeriMetode" => "VAS"],
+            "skalaNyeri" => "", // Skala nyeri yang digunakan (misalnya, "NRS")
+            "nyeriMetode" => [
+                "nyeriMetode" => "", // Metode yang dipilih (misalnya, "NRS")
+                "nyeriMetodeScore" => 0, // Skor berdasarkan metode yang dipilih
             ],
-            "pencetus" => "",
-            "gambar" => "",
-            "durasi" => "",
-            "lokasi" => "",
+            "pencetus" => "", // Pencetus nyeri
+            "gambar" => "", // Gambar atau ilustrasi terkait nyeri
+            "durasi" => "", // Durasi nyeri
+            "lokasi" => "", // Lokasi nyeri
         ],
 
         "statusPediatrikTab" => "Status Pediatrik",
         "statusPediatrik" => [
-            "statusPediatrik" => "",
-            "statusPediatrikOptions" => [
-                ["statusPediatrik" => "Gizi Kurang"],
-                ["statusPediatrik" => "Gizi Cukup"],
-                ["statusPediatrik" => "Gizi Lebih"],
-            ]
+            "statusGizi" => [
+                "statusGizi" => "", // Nilai yang dipilih (misalnya, "Gizi Normal")
+                "statusGiziScore" => 0, // Skor berdasarkan nilai yang dipilih
+            ],
+            "perkembangan" => [
+                "perkembangan" => "", // Nilai yang dipilih (misalnya, "Sesuai Usia")
+                "perkembanganScore" => 0, // Skor berdasarkan nilai yang dipilih
+            ],
+            "kesehatanUmum" => [
+                "kesehatanUmum" => "", // Nilai yang dipilih (misalnya, "Sehat")
+                "kesehatanUmumScore" => 0, // Skor berdasarkan nilai yang dipilih
+            ],
         ],
 
         "diagnosisTab" => "Diagnosis",
         "diagnosis" => [
-            "diagnosis" => "",
+            "diagnosis" => "", // Diagnosis pasien
         ],
 
         "resikoJatuhTab" => "Resiko Jatuh",
         "resikoJatuh" => [
             "skalaMorse" => [
                 "skalaMorseTab" => "Skala Morse Score",
-                "skalaMorseScore" => 0,
-                "skalaMorseDesc" => "",
-
-
-                "riwayatJatuh3blnTerakhir" => "",
-                "riwayatJatuh3blnTerakhirScore" => 0,
-                "riwayatJatuh3blnTerakhirOptions" => [
-                    ["riwayatJatuh3blnTerakhir" => "Ya", "score" => 25],
-                    ["riwayatJatuh3blnTerakhir" => "Tidak", "score" => 0],
+                "skalaMorseScore" => 0, // Total skor Skala Morse
+                "skalaMorseDesc" => "", // Deskripsi risiko berdasarkan skor
+                "riwayatJatuh3blnTerakhir" => [
+                    "riwayatJatuh3blnTerakhir" => "", // Nilai yang dipilih (misalnya, "Ya")
+                    "riwayatJatuh3blnTerakhirScore" => 0, // Skor berdasarkan nilai yang dipilih
                 ],
-                "diagSekunder" => "",
-                "diagSekunderScore" => 0,
-                "diagSekunderOptions" => [
-                    ["diagSekunder" => "Ya", "score" => 15],
-                    ["diagSekunder" => "Tidak", "score" => 0],
+                "diagSekunder" => [
+                    "diagSekunder" => "", // Nilai yang dipilih (misalnya, "Tidak")
+                    "diagSekunderScore" => 0, // Skor berdasarkan nilai yang dipilih
                 ],
-                "alatBantu" => "",
-                "alatBantuScore" => 0,
-                "alatBantuOptions" => [
-                    ["alatBantu" => "Tidak Ada / Bed Rest", "score" => 0],
-                    ["alatBantu" => "Tongkat / Alat Penopang / Walker", "score" => 15],
-                    ["alatBantu" => "Furnitur", "score" => 30],
-
+                "alatBantu" => [
+                    "alatBantu" => "", // Nilai yang dipilih (misalnya, "Tongkat")
+                    "alatBantuScore" => 0, // Skor berdasarkan nilai yang dipilih
                 ],
-                "heparin" => "",
-                "heparinScore" => 0,
-                "heparinOptions" => [
-                    ["heparin" => "Ya", "score" => 20],
-                    ["heparin" => "Tidak", "score" => 0],
+                "heparin" => [
+                    "heparin" => "", // Nilai yang dipilih (misalnya, "Ya")
+                    "heparinScore" => 0, // Skor berdasarkan nilai yang dipilih
                 ],
-                "gayaBerjalan" => "",
-                "gayaBerjalanScore" => 0,
-                "gayaBerjalanOptions" => [
-                    ["gayaBerjalan" => "Normal / Tirah Baring / Tidak Bergerak", "score" => 0],
-                    ["gayaBerjalan" => "Lemah", "score" => 10],
-                    ["gayaBerjalan" => "Terganggu", "score" => 20],
+                "gayaBerjalan" => [
+                    "gayaBerjalan" => "", // Nilai yang dipilih (misalnya, "Lemah")
+                    "gayaBerjalanScore" => 0, // Skor berdasarkan nilai yang dipilih
                 ],
-                "kesadaran" => "",
-                "kesadaranScore" => 0,
-                "kesadaranOptions" => [
-                    ["kesadaran" => "Baik", "score" => 0],
-                    ["kesadaran" => "Lupa / Pelupa", "score" => 15],
+                "statusMental" => [
+                    "statusMental" => "", // Nilai yang dipilih (misalnya, "Baik")
+                    "statusMentalScore" => 0, // Skor berdasarkan nilai yang dipilih
                 ],
             ],
 
             "skalaHumptyDumpty" => [
                 "skalaHumptyDumptyTab" => "Skala Humpty Dumpty Score",
-                "skalaHumptyDumptyScore" => 0,
-                "skalaHumptyDumptyDesc" => "",
-
-                "umur" => "",
-                "umurScore" => 0,
-                "umurOptions" => [
-                    ["umur" => "< 3 tahun", "score" => 4],
-                    ["umur" => "3-7 tahun", "score" => 3],
-                    ["umur" => "7-13 tahun", "score" => 2],
-                    ["umur" => "13-18 tahun", "score" => 1],
-
+                "skalaHumptyDumptyScore" => 0, // Total skor Skala Humpty Dumpty
+                "skalaHumptyDumptyDesc" => "", // Deskripsi risiko berdasarkan skor
+                "umur" => [
+                    "umur" => "", // Nilai yang dipilih (misalnya, "3-7 tahun")
+                    "umurScore" => 0, // Skor berdasarkan nilai yang dipilih
                 ],
-
-                "sex" => "",
-                "sexScore" => 0,
-                "sexOptions" => [
-                    ["sex" => "Laki-laki", "score" => 2],
-                    ["sex" => "Perempuan", "score" => 1],
+                "jenisKelamin" => [
+                    "jenisKelamin" => "", // Nilai yang dipilih (misalnya, "Perempuan")
+                    "jenisKelaminScore" => 0, // Skor berdasarkan nilai yang dipilih
                 ],
-
-                "diagnosa" => "",
-                "diagnosaScore" => 0,
-                "diagnosaOptions" => [
-                    ["diagnosa" => "Kelainan Neurologi", "score" => 4],
-                    ["diagnosa" => "Perubahan dalam Oksigenasi (Masalah Saluran Nafas, Dehidrasi, Anemia, Anoreksi, Slokop/sakit kepala, dll)", "score" => 3],
-                    ["diagnosa" => "Kelamin Priksi/Perilaku", "score" => 2],
-                    ["diagnosa" => "Diagnosa Lain", "score" => 1],
+                "diagnosis" => [
+                    "diagnosis" => "", // Nilai yang dipilih (misalnya, "Diagnosis neurologis")
+                    "diagnosisScore" => 0, // Skor berdasarkan nilai yang dipilih
                 ],
-                "gangguanKognitif" => "",
-                "gangguanKognitifScore" => 0,
-                "gangguanKognitifOptions" => [
-                    ["gangguanKognitif" => "Tidak Sadar terhadap Keterbatasan", "score" => 3],
-                    ["gangguanKognitif" => "Lupa keterbatasan", "score" => 2],
-                    ["gangguanKognitif" => "Mengetahui Kemampuan Diri", "score" => 1],
+                "gangguanKognitif" => [
+                    "gangguanKognitif" => "", // Nilai yang dipilih (misalnya, "Gangguan ringan")
+                    "gangguanKognitifScore" => 0, // Skor berdasarkan nilai yang dipilih
                 ],
-                "faktorLingkungan" => "",
-                "faktorLingkunganScore" => 0,
-                "faktorLingkunganOptions" => [
-                    ["faktorLingkungan" => "Riwayat jatuh dari tempat tidur saat bayi anak", "score" => 4],
-                    ["faktorLingkungan" => "Pasien menggunakan alat bantu box atau mobel", "score" => 3],
-                    ["faktorLingkungan" => "Pasien berada ditempat tidur", "score" => 2],
-                    ["faktorLingkungan" => "Diluar ruang rawat", "score" => 1],
+                "faktorLingkungan" => [
+                    "faktorLingkungan" => "", // Nilai yang dipilih (misalnya, "Lingkungan berisiko sedang")
+                    "faktorLingkunganScore" => 0, // Skor berdasarkan nilai yang dipilih
                 ],
-                "penggunaanObat" => "",
-                "penggunaanObatScore" => 0,
-                "penggunaanObatOptions" => [
-                    ["penggunaanObat" => "Bermacam-macam obat yang digunakan: obat sedarif (kecuali pasien ICU yang menggunakan sedasi dan paralisis), Hipnotik, Barbiturat, Fenotiazin, Antidepresan, Laksans/Diuretika,Narketik", "score" => 3],
-                    ["penggunaanObat" => "Salah satu pengobatan diatas", "score" => 2],
-                    ["penggunaanObat" => "Pengobatan lain", "score" => 1],
-                ],
-                "responTerhadapOperasi" => "",
-                "responTerhadapOperasiScore" => 0,
-                "responTerhadapOperasiOptions" => [
-                    ["responTerhadapOperasi" => "Dalam 24 Jam", "score" => 3],
-                    ["responTerhadapOperasi" => "Dalam 48 jam riwayat jatuh", "score" => 2],
-                    ["responTerhadapOperasi" => "> 48 jam", "score" => 1],
+                "responObat" => [
+                    "responObat" => "", // Nilai yang dipilih (misalnya, "Tidak ada efek samping")
+                    "responObatScore" => 0, // Skor berdasarkan nilai yang dipilih
                 ],
             ],
-
-            "edmonson" => [
-                "edmonsonTab" => "Edmonson Psychiatric Fall Risk Assesment",
-                "edmonsonScore" => "",
-                "edmonsonUsia" => "< 50 Tahun",
-
-                "statusMental" => "",
-                "statusMentalOptions" => [
-                    ["statusMental" => "Sadar penuh dan orientasi waktu baik"],
-                    ["statusMental" => "Agitasi / Cemas"],
-                    ["statusMental" => "Sering bingung"],
-                    ["statusMental" => "Bingung dan disorientasi"],
-                ],
-
-                "eliminasi" => "",
-                "eliminasiOptions" => [
-                    ["eliminasi" => "Mandiri untuk BAB dan BAK"],
-                    ["eliminasi" => "Memakai Kateter / Ostomy"],
-                    ["eliminasi" => "BAB dan BAK dengan bantuan"],
-                    ["eliminasi" => "Gangguan eliminasi (inkontinensia, banyak BAK di malam hari, sering BAB dan BAK)"],
-                    ["eliminasi" => "Inkontinensia tetapi bisa ambulasi mandiri"],
-                ],
-
-                "medikasi" => "",
-                "medikasiOptions" => [
-                    ["medikasi" => "Tidak ada pengobatan yang diberikan"],
-                    ["medikasi" => "Obat-obatan jantung"],
-                    ["medikasi" => "Obat psikiatri termasuk benzodiazepin dan anti depresan"],
-                    ["medikasi" => "Meningkatnya dosis obat yang dikonsumsi / ditambahkan dalam 24 jam terakhir"],
-                ],
-
-                "diagnosis" => "",
-                "diagnosisOptions" => [
-                    ["diagnosis" => "Bipolar / gangguan scizo affective"],
-                    ["diagnosis" => "Penyalahgunaan zat terlarang dan alkohol"],
-                    ["diagnosis" => "Gangguan depresi mayor"],
-                    ["diagnosis" => "Dimensia / Delirium"],
-                ],
-
-                "ambulasi" => "",
-                "ambulasiOptions" => [
-                    ["ambulasi" => "Ambulasi mandiri dan langkah stabil atau pasien imobil"],
-                    ["ambulasi" => "Penggunaan alat bantu yang tepat (tongkat, walker, tripod, dll)"],
-                    ["ambulasi" => "Vertigo / Hipotensi Ortostatik / Kelemahan"],
-                    ["ambulasi" => "Langkah tidak stabil, butuh bantuan dan menyadari kemampuannya"],
-                ],
-
-                "nutrisi" => "",
-                "nutrisiOptions" => [
-                    ["nutrisi" => "Hanya sedikit mendapatkan asupan makanan / minum dalam 24 jam terakhir"],
-                    ["nutrisi" => "Nafsu makan baik"],
-                ],
-
-                "ganguanTidur" => "",
-                "ganguanTidurOptions" => [
-                    ["ganguanTidur" => "Tidak ada gangguan tidur"],
-                    ["ganguanTidur" => "Ada gangguan tidur yang dilaporkan keluarga pasien / staf"],
-                ],
-
-                "riwayatJatuh" => "",
-                "riwayatJatuhOptions" => [
-                    ["riwayatJatuh" => "Tidak ada riwayat jatuh"],
-                    ["riwayatJatuh" => "Ada riwayat jatuh dalam 3 bulan terakhir"],
-                ],
-
-
-                "faktorLingkungan" => "",
-                "faktorLingkunganOptions" => [
-                    ["faktorLingkungan" => "Riwayat jatuh dari tempat tidur saat bayi anak"],
-                    ["faktorLingkungan" => "Pasien menggunakan alat bantu box atau mobel"],
-                    ["faktorLingkungan" => "Pasien berada ditempat tidur"],
-                    ["faktorLingkungan" => "Diluar ruang rawat"],
-                ],
-                "penggunaanObat" => "",
-                "penggunaanObatOptions" => [
-                    ["penggunaanObat" => "Bermacam-macam obat yang digunakan: obat sedarif (kecuali pasien ICU yang menggunakan sedasi dan paralisis), Hipnotik, Barbiturat, Fenotiazin, Antidepresan, Laksans/Diuretika,Narketik"],
-                    ["penggunaanObat" => "Salah satu pengobatan diatas"],
-                    ["penggunaanObat" => "Pengobatan lain"],
-                ],
-                "responTerhadapOperasi" => "",
-                "responTerhadapOperasiOptions" => [
-                    ["responTerhadapOperasi" => "Dalam 24 Jam"],
-                    ["responTerhadapOperasi" => "Dalam 48 jam riwayat jatuh"],
-                    ["responTerhadapOperasi" => "> 48 jam"],
-                ],
-            ],
-
         ],
 
         "dekubitus" => [
             "dekubitusTab" => "Dekubitus",
-            "kodisiFisik" => "",
-            "kodisiFisikOptions" => [
-                ["kodisiFisik" => "Baik"],
-                ["kodisiFisik" => "Lumayan"],
-                ["kodisiFisik" => "Buruk"],
-                ["kodisiFisik" => "Sangat Buruk"],
+            "sensoryPerception" => [
+                "sensoryPerception" => "", // Nilai yang dipilih (misalnya, "Tidak ada gangguan sensorik")
+                "sensoryPerceptionScore" => 0, // Skor berdasarkan nilai yang dipilih
             ],
-
-            "kesadaran" => "",
-            "kesadaranOptions" => [
-                ["kesadaran" => "Kompos Mentis"],
-                ["kesadaran" => "Apatis"],
-                ["kesadaran" => "Konfus/Soporis"],
-                ["kesadaran" => "Stupor/Koma"],
+            "moisture" => [
+                "moisture" => "", // Nilai yang dipilih (misalnya, "Kulit kering")
+                "moistureScore" => 0, // Skor berdasarkan nilai yang dipilih
             ],
-
-            "aktifitas" => "",
-            "aktifitasOptions" => [
-                ["aktifitas" => "Dapat Berpindah"],
-                ["aktifitas" => "Berjalan Dengan Bantuan"],
-                ["aktifitas" => "Terbatas di Kursi"],
-                ["aktifitas" => "Terbatas di Tempat Tidur"],
+            "activity" => [
+                "activity" => "", // Nilai yang dipilih (misalnya, "Berjalan secara teratur")
+                "activityScore" => 0, // Skor berdasarkan nilai yang dipilih
             ],
-
-            "mobilitas" => "",
-            "mobilitasOptions" => [
-                ["mobilitas" => "Bergerak Bebas"],
-                ["mobilitas" => "Sedikit Terbatas"],
-                ["mobilitas" => "Sangat Terbatas"],
-                ["mobilitas" => "Tak Bisa Bergerak"],
+            "mobility" => [
+                "mobility" => "", // Nilai yang dipilih (misalnya, "Mobilitas penuh")
+                "mobilityScore" => 0, // Skor berdasarkan nilai yang dipilih
             ],
+            "nutrition" => [
+                "nutrition" => "", // Nilai yang dipilih (misalnya, "Asupan nutrisi baik")
+                "nutritionScore" => 0, // Skor berdasarkan nilai yang dipilih
+            ],
+            "frictionShear" => [
+                "frictionShear" => "", // Nilai yang dipilih (misalnya, "Tidak ada masalah gesekan")
+                "frictionShearScore" => 0, // Skor berdasarkan nilai yang dipilih
+            ],
+            "totalScore" => 0, // Total skor dekubitus
+            "riskDescription" => "", // Deskripsi risiko berdasarkan skor
+        ],
 
-            "inkontinensia" => "",
-            "inkontinensiaOptions" => [
-                ["inkontinensia" => "Tidak Ngompol"],
-                ["inkontinensia" => "Kadang-kadang"],
-                ["inkontinensia" => "Sering Inkontinensia Urin"],
-                ["inkontinensia" => "Sering Inkontinensia Alvi dan Urin"],
+        "giziTab" => "Gizi",
+        "gizi" => [
+            "skriningGiziAwal" => [
+                "perubahanBeratBadan" => [
+                    "perubahanBeratBadan" => "", // Nilai yang dipilih (misalnya, "Turun 5-10%")
+                    "perubahanBeratBadanScore" => 0, // Skor berdasarkan nilai yang dipilih
+                ],
+                "asupanMakanan" => [
+                    "asupanMakanan" => "", // Nilai yang dipilih (misalnya, "Cukup")
+                    "asupanMakananScore" => 0, // Skor berdasarkan nilai yang dipilih
+                ],
+                "penyakit" => [
+                    "penyakit" => "", // Nilai yang dipilih (misalnya, "Tidak ada")
+                    "penyakitScore" => 0, // Skor berdasarkan nilai yang dipilih
+                ],
+            ],
+            "penilaianGiziLengkap" => [
+                "antropometri" => [
+                    "antropometri" => "", // Nilai yang dipilih (misalnya, "Berat badan normal")
+                    "antropometriScore" => 0, // Skor berdasarkan nilai yang dipilih
+                ],
+                "biokimia" => [
+                    "biokimia" => "", // Nilai yang dipilih (misalnya, "Albumin normal")
+                    "biokimiaScore" => 0, // Skor berdasarkan nilai yang dipilih
+                ],
+                "klinis" => [
+                    "klinis" => "", // Nilai yang dipilih (misalnya, "Tidak ada tanda malnutrisi")
+                    "klinisScore" => 0, // Skor berdasarkan nilai yang dipilih
+                ],
+            ],
+            "pemantauanGizi" => [
+                "perubahanBeratBadan" => [
+                    "perubahanBeratBadan" => "", // Nilai yang dipilih (misalnya, "Stabil")
+                    "perubahanBeratBadanScore" => 0, // Skor berdasarkan nilai yang dipilih
+                ],
+                "asupanMakanan" => [
+                    "asupanMakanan" => "", // Nilai yang dipilih (misalnya, "Cukup")
+                    "asupanMakananScore" => 0, // Skor berdasarkan nilai yang dipilih
+                ],
+            ],
+            "intervensiGizi" => [
+                "diet" => [
+                    "diet" => "", // Nilai yang dipilih (misalnya, "Diet tinggi protein")
+                ],
+                "suplementasi" => [
+                    "suplementasi" => "", // Nilai yang dipilih (misalnya, "Susu tinggi kalori")
+                ],
+                "nutrisiEnteral" => [
+                    "nutrisiEnteral" => "", // Nilai yang dipilih (misalnya, "Nutrisi enteral standar")
+                ],
+                "nutrisiParenteral" => [
+                    "nutrisiParenteral" => "", // Nilai yang dipilih (misalnya, "Nutrisi parenteral total")
+                ],
             ],
         ],
     ];
     //////////////////////////////////////////////////////////////////////
+    public array $nyeriOptions = [
+        ["nyeri" => "Ya"],
+        ["nyeri" => "Tidak"],
+    ];
+
+    public array $nyeriKetOptions = [
+        ["nyeriKet" => "Akut"],
+        ["nyeriKet" => "Kronis"],
+    ];
+
+    public array $nyeriMetodeOptions = [
+        ["nyeriMetode" => "NRS"],
+        ["nyeriMetode" => "BPS"],
+        ["nyeriMetode" => "NIPS"],
+        ["nyeriMetode" => "FLACC"],
+        ["nyeriMetode" => "VAS"],
+    ];
+
+    //1. Nyeri
+    public array $vasOptions = [
+        ["vas" => "0"],
+        ["vas" => "1"],
+        ["vas" => "2"],
+        ["vas" => "3"],
+        ["vas" => "4"],
+        ["vas" => "5"],
+        ["vas" => "6"],
+        ["vas" => "7"],
+        ["vas" => "8"],
+        ["vas" => "9"],
+        ["vas" => "10"],
+    ];
+
+    public array $nrsOptions = [
+        ["nrs" => "0", "description" => "Tidak ada nyeri"],
+        ["nrs" => "1", "description" => "Nyeri sangat ringan"],
+        ["nrs" => "2", "description" => "Nyeri ringan"],
+        ["nrs" => "3", "description" => "Nyeri ringan hingga sedang"],
+        ["nrs" => "4", "description" => "Nyeri sedang"],
+        ["nrs" => "5", "description" => "Nyeri sedang hingga berat"],
+        ["nrs" => "6", "description" => "Nyeri berat"],
+        ["nrs" => "7", "description" => "Nyeri berat sekali"],
+        ["nrs" => "8", "description" => "Nyeri sangat berat"],
+        ["nrs" => "9", "description" => "Nyeri sangat berat dan tidak tertahankan"],
+        ["nrs" => "10", "description" => "Nyeri terburuk yang pernah dirasakan"],
+    ];
+
+    public array $bpsOptions = [
+        "ekspresiWajah" => [
+            ["score" => 1, "description" => "Relaks, ekspresi netral"],
+            ["score" => 2, "description" => "Sedikit tegang (mengerutkan kening, alis mengerut)"],
+            ["score" => 3, "description" => "Sangat tegang (kelopak mata tertutup rapat)"],
+            ["score" => 4, "description" => "Meringis (ekspresi wajah menunjukkan ketidaknyamanan ekstrem)"],
+        ],
+        "gerakanTubuh" => [
+            ["score" => 1, "description" => "Tidak ada gerakan"],
+            ["score" => 2, "description" => "Gerakan perlahan, hati-hati"],
+            ["score" => 3, "description" => "Gerakan gelisah, sering berganti posisi"],
+            ["score" => 4, "description" => "Gerakan agresif, mencoba melepaskan diri"],
+        ],
+        "kepatuhanVentilator" => [
+            ["score" => 1, "description" => "Toleransi baik terhadap ventilator"],
+            ["score" => 2, "description" => "Batuk sesekali, tetapi toleransi baik"],
+            ["score" => 3, "description" => "Batuk berulang, sering melawan ventilator"],
+            ["score" => 4, "description" => "Tidak dapat mentolerir ventilator, sering melawan"],
+        ],
+    ];
+
+    public array $nipsOptions = [
+        "ekspresiWajah" => [
+            ["score" => 0, "description" => "Relaks, ekspresi netral"],
+            ["score" => 1, "description" => "Meringis, ekspresi wajah tegang"],
+        ],
+        "menangis" => [
+            ["score" => 0, "description" => "Tidak menangis"],
+            ["score" => 1, "description" => "Merintih, mengerang"],
+            ["score" => 2, "description" => "Menangis kencang"],
+        ],
+        "polaPernapasan" => [
+            ["score" => 0, "description" => "Pernapasan normal"],
+            ["score" => 1, "description" => "Pernapasan tidak teratur, cepat, atau tersedak"],
+        ],
+        "lengan" => [
+            ["score" => 0, "description" => "Relaks, tidak ada gerakan"],
+            ["score" => 1, "description" => "Lengan kaku, menekuk, atau gerakan menyentak"],
+        ],
+        "kaki" => [
+            ["score" => 0, "description" => "Relaks, tidak ada gerakan"],
+            ["score" => 1, "description" => "Kaki kaku, menekuk, atau gerakan menyentak"],
+        ],
+        "keadaanSadar" => [
+            ["score" => 0, "description" => "Tenang, tidur, atau terjaga dengan tenang"],
+            ["score" => 1, "description" => "Gelisah, rewel, atau menangis"],
+        ],
+    ];
+
+    public array $flaccOptions = [
+        "face" => [
+            ["score" => 0, "description" => "Ekspresi wajah netral atau tersenyum"],
+            ["score" => 1, "description" => "Ekspresi wajah sedikit cemberut, menarik diri"],
+            ["score" => 2, "description" => "Ekspresi wajah meringis, rahang mengatup rapat"],
+        ],
+        "legs" => [
+            ["score" => 0, "description" => "Posisi normal atau relaks"],
+            ["score" => 1, "description" => "Gelisah, tegang, atau menarik kaki"],
+            ["score" => 2, "description" => "Menendang, atau kaki ditarik ke arah tubuh"],
+        ],
+        "activity" => [
+            ["score" => 0, "description" => "Berbaring tenang, posisi normal, bergerak dengan mudah"],
+            ["score" => 1, "description" => "Menggeliat, bergerak bolak-balik, tegang"],
+            ["score" => 2, "description" => "Melengkungkan tubuh, kaku, atau menggeliat hebat"],
+        ],
+        "cry" => [
+            ["score" => 0, "description" => "Tidak menangis (tertidur atau terjaga)"],
+            ["score" => 1, "description" => "Merintih atau mengerang, sesekali menangis"],
+            ["score" => 2, "description" => "Menangis terus-menerus, berteriak, atau merintih"],
+        ],
+        "consolability" => [
+            ["score" => 0, "description" => "Tenang, tidak perlu ditenangkan"],
+            ["score" => 1, "description" => "Dapat ditenangkan dengan sentuhan atau pelukan"],
+            ["score" => 2, "description" => "Sulit ditenangkan, terus menangis atau merintih"],
+        ],
+    ];
+
+    //2. Gizi
+    public array $skriningGiziAwalOptions = [
+        "perubahanBeratBadan" => [
+            ["perubahan" => "Tidak ada perubahan", "score" => 0],
+            ["perubahan" => "Turun 5-10%", "score" => 1],
+            ["perubahan" => "Turun >10%", "score" => 2],
+        ],
+        "asupanMakanan" => [
+            ["asupan" => "Cukup", "score" => 0],
+            ["asupan" => "Kurang", "score" => 1],
+            ["asupan" => "Sangat kurang", "score" => 2],
+        ],
+        "penyakit" => [
+            ["penyakit" => "Tidak ada", "score" => 0],
+            ["penyakit" => "Ringan", "score" => 1],
+            ["penyakit" => "Berat", "score" => 2],
+        ],
+    ];
+
+    public array $penilaianGiziLengkapOptions = [
+        "antropometri" => [
+            ["kategori" => "Berat badan normal", "score" => 3],
+            ["kategori" => "Berat badan kurang", "score" => 2],
+            ["kategori" => "Berat badan sangat kurang", "score" => 1],
+        ],
+        "biokimia" => [
+            ["kategori" => "Albumin normal", "score" => 3],
+            ["kategori" => "Albumin rendah", "score" => 2],
+            ["kategori" => "Albumin sangat rendah", "score" => 1],
+        ],
+        "klinis" => [
+            ["kategori" => "Tidak ada tanda malnutrisi", "score" => 3],
+            ["kategori" => "Tanda malnutrisi ringan", "score" => 2],
+            ["kategori" => "Tanda malnutrisi berat", "score" => 1],
+        ],
+    ];
+
+    public array $pemantauanGiziOptions = [
+        "perubahanBeratBadan" => [
+            ["perubahan" => "Stabil", "score" => 3],
+            ["perubahan" => "Turun sedikit", "score" => 2],
+            ["perubahan" => "Turun signifikan", "score" => 1],
+        ],
+        "asupanMakanan" => [
+            ["asupan" => "Cukup", "score" => 3],
+            ["asupan" => "Kurang", "score" => 2],
+            ["asupan" => "Sangat kurang", "score" => 1],
+        ],
+    ];
+
+    public array $intervensiGiziOptions = [
+        "diet" => [
+            ["jenis" => "Diet biasa"],
+            ["jenis" => "Diet tinggi protein"],
+            ["jenis" => "Diet rendah garam"],
+        ],
+        "suplementasi" => [
+            ["jenis" => "Susu tinggi kalori"],
+            ["jenis" => "Suplemen vitamin"],
+        ],
+        "nutrisiEnteral" => [
+            ["jenis" => "Nutrisi enteral standar"],
+            ["jenis" => "Nutrisi enteral khusus"],
+        ],
+        "nutrisiParenteral" => [
+            ["jenis" => "Nutrisi parenteral parsial"],
+            ["jenis" => "Nutrisi parenteral total"],
+        ],
+    ];
+
+    // Contoh Alur Penilaian Gizi di Rawat Inap
+    // Hari 1 (Skrining Awal):
+    //     Lakukan skrining gizi menggunakan alat seperti MUST atau NRS-2002.
+    //     Identifikasi pasien yang berisiko malnutrisi.
+    // Hari 2-3 (Penilaian Lengkap):
+    //     Jika skrining menunjukkan risiko, lakukan penilaian gizi lengkap.
+    //     Tentukan intervensi gizi yang sesuai.
+    // Hari 4-7 (Pemantauan Berkala):
+    //     Pantau perubahan berat badan dan asupan makanan.
+    //     Evaluasi respons terhadap intervensi gizi.
+    // Hari 8 dan Seterusnya:
+    //     Lanjutkan pemantauan dan sesuaikan intervensi gizi jika diperlukan.
 
 
+    public array $statusPediatrikOptions = [
+        "statusGizi" => [
+            ["statusGizi" => "Gizi Buruk", "score" => 1],
+            ["statusGizi" => "Gizi Kurang", "score" => 2],
+            ["statusGizi" => "Gizi Normal", "score" => 3],
+            ["statusGizi" => "Gizi Lebih", "score" => 4],
+            ["statusGizi" => "Obesitas", "score" => 5],
+        ],
+        "perkembangan" => [
+            ["perkembangan" => "Sesuai Usia", "score" => 3],
+            ["perkembangan" => "Meragukan", "score" => 2],
+            ["perkembangan" => "Menyimpang", "score" => 1],
+        ],
+        "kesehatanUmum" => [
+            ["kesehatanUmum" => "Sehat", "score" => 3],
+            ["kesehatanUmum" => "Kurang Sehat", "score" => 2],
+            ["kesehatanUmum" => "Tidak Sehat", "score" => 1],
+        ],
+    ];
+    // Baik: Total skor 7-9.
+    // Kurang: Total skor 4-6.
+    // Buruk: Total skor 1-3.
+
+    //3. Resiko Jatuh (Skala Morse)
+    public array $skalaMorseOptions = [
+        "riwayatJatuh" => [
+            ["riwayatJatuh" => "Ya", "score" => 25],
+            ["riwayatJatuh" => "Tidak", "score" => 0],
+        ],
+        "diagnosisSekunder" => [
+            ["diagnosisSekunder" => "Ya", "score" => 15],
+            ["diagnosisSekunder" => "Tidak", "score" => 0],
+        ],
+        "alatBantu" => [
+            ["alatBantu" => "Tidak Ada / Bed Rest", "score" => 0],
+            ["alatBantu" => "Tongkat / Alat Penopang / Walker", "score" => 15],
+            ["alatBantu" => "Furnitur", "score" => 30],
+        ],
+        "terapiIV" => [
+            ["terapiIV" => "Ya", "score" => 20],
+            ["terapiIV" => "Tidak", "score" => 0],
+        ],
+        "gayaBerjalan" => [
+            ["gayaBerjalan" => "Normal / Tirah Baring / Tidak Bergerak", "score" => 0],
+            ["gayaBerjalan" => "Lemah", "score" => 10],
+            ["gayaBerjalan" => "Terganggu", "score" => 20],
+        ],
+        "statusMental" => [
+            ["statusMental" => "Baik", "score" => 0],
+            ["statusMental" => "Lupa / Pelupa", "score" => 15],
+        ],
+    ];
+
+    // 0-24: Risiko rendah.
+    // 25-44: Risiko sedang.
+    // 45+: Risiko tinggi.
+
+
+    //4. Resiko Jatuh (Skala Humpty Dumpty)
+    public array $humptyDumptyOptions = [
+        "umur" => [
+            ["umur" => "< 3 tahun", "score" => 4],
+            ["umur" => "3-7 tahun", "score" => 3],
+            ["umur" => "7-13 tahun", "score" => 2],
+            ["umur" => "13-18 tahun", "score" => 1],
+        ],
+        "jenisKelamin" => [
+            ["jenisKelamin" => "Laki-laki", "score" => 2],
+            ["jenisKelamin" => "Perempuan", "score" => 1],
+        ],
+        "diagnosis" => [
+            ["diagnosis" => "Diagnosis neurologis atau perkembangan", "score" => 4],
+            ["diagnosis" => "Diagnosis ortopedi", "score" => 3],
+            ["diagnosis" => "Diagnosis lainnya", "score" => 2],
+            ["diagnosis" => "Tidak ada diagnosis khusus", "score" => 1],
+        ],
+        "gangguanKognitif" => [
+            ["gangguanKognitif" => "Gangguan kognitif berat", "score" => 3],
+            ["gangguanKognitif" => "Gangguan kognitif sedang", "score" => 2],
+            ["gangguanKognitif" => "Gangguan kognitif ringan", "score" => 1],
+            ["gangguanKognitif" => "Tidak ada gangguan kognitif", "score" => 0],
+        ],
+        "faktorLingkungan" => [
+            ["faktorLingkungan" => "Lingkungan berisiko tinggi (misalnya, lantai licin, peralatan medis)", "score" => 3],
+            ["faktorLingkungan" => "Lingkungan berisiko sedang", "score" => 2],
+            ["faktorLingkungan" => "Lingkungan berisiko rendah", "score" => 1],
+            ["faktorLingkungan" => "Lingkungan aman", "score" => 0],
+        ],
+        "responObat" => [
+            ["responObat" => "Efek samping obat yang meningkatkan risiko jatuh", "score" => 3],
+            ["responObat" => "Efek samping obat ringan", "score" => 2],
+            ["responObat" => "Tidak ada efek samping obat", "score" => 1],
+        ],
+    ];
+    // 7-11: Risiko rendah.
+    // 12-14: Risiko sedang.
+    // 15-19: Risiko tinggi.
+
+    // 5. Dekubitus
+    public array $bradenScaleOptions = [
+        "sensoryPerception" => [
+            ["score" => 4, "description" => "Tidak ada gangguan sensorik"],
+            ["score" => 3, "description" => "Gangguan sensorik ringan"],
+            ["score" => 2, "description" => "Gangguan sensorik sedang"],
+            ["score" => 1, "description" => "Gangguan sensorik berat"],
+        ],
+        "moisture" => [
+            ["score" => 4, "description" => "Kulit kering"],
+            ["score" => 3, "description" => "Kulit lembab"],
+            ["score" => 2, "description" => "Kulit basah"],
+            ["score" => 1, "description" => "Kulit sangat basah"],
+        ],
+        "activity" => [
+            ["score" => 4, "description" => "Berjalan secara teratur"],
+            ["score" => 3, "description" => "Berjalan dengan bantuan"],
+            ["score" => 2, "description" => "Duduk di kursi"],
+            ["score" => 1, "description" => "Terbaring di tempat tidur"],
+        ],
+        "mobility" => [
+            ["score" => 4, "description" => "Mobilitas penuh"],
+            ["score" => 3, "description" => "Mobilitas sedikit terbatas"],
+            ["score" => 2, "description" => "Mobilitas sangat terbatas"],
+            ["score" => 1, "description" => "Tidak bisa bergerak"],
+        ],
+        "nutrition" => [
+            ["score" => 4, "description" => "Asupan nutrisi baik"],
+            ["score" => 3, "description" => "Asupan nutrisi cukup"],
+            ["score" => 2, "description" => "Asupan nutrisi kurang"],
+            ["score" => 1, "description" => "Asupan nutrisi sangat kurang"],
+        ],
+        "frictionShear" => [
+            ["score" => 3, "description" => "Tidak ada masalah gesekan atau geseran"],
+            ["score" => 2, "description" => "Potensi masalah gesekan atau geseran"],
+            ["score" => 1, "description" => "Masalah gesekan atau geseran yang signifikan"],
+        ],
+    ];
+    // 19-23: Risiko rendah.
+    // 15-18: Risiko sedang.
+    // 13-14: Risiko tinggi.
+    // ≤12: Risiko sangat tinggi.
 
     ////////////////////////////////////////////////
     ///////////begin////////////////////////////////
