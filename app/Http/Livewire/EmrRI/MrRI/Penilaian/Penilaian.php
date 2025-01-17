@@ -4,6 +4,7 @@ namespace App\Http\Livewire\EmrRI\MrRI\Penilaian;
 
 use Livewire\Component;
 use Livewire\WithPagination;
+use Carbon\Carbon;
 
 use App\Http\Traits\EmrRI\EmrRITrait;
 
@@ -276,6 +277,10 @@ class Penilaian extends Component
     // ADD REMOVE RESIKO JATUH////////////////////////////////////
     public function addAssessmentResikoJatuh(): void
     {
+
+        $this->formEntryResikoJatuh['petugasPenilai'] = auth()->user()->myuser_name;
+        $this->formEntryResikoJatuh['petugasPenilaiCode'] = auth()->user()->myuser_code;
+        // $this->formEntryResikoJatuh['tglPenilaian'] = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
         // Aturan validasi
         $rules = [
             'formEntryResikoJatuh.tglPenilaian' => 'required|date_format:d/m/Y H:i:s', // Tanggal penilaian harus diisi dan berupa tanggal
@@ -673,6 +678,11 @@ class Penilaian extends Component
     ////////ADD/REMOVE ASSESSMENT NYERI///////////////////////////////////////////////////////
     public function addAssessmentNyeri(): void
     {
+        $this->formEntryNyeri['petugasPenilai'] = auth()->user()->myuser_name;
+        $this->formEntryNyeri['petugasPenilaiCode'] = auth()->user()->myuser_code;
+        // $this->formEntryNyeri['tglPenilaian'] = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
+
+
         $rules = [
             'formEntryNyeri.tglPenilaian' => 'required|date_format:d/m/Y H:i:s', // Tanggal penilaian harus diisi dan berupa tanggal
             'formEntryNyeri.petugasPenilai' => 'required|string|max:100', // Nama petugas penilai harus diisi, berupa string, maksimal 100 karakter

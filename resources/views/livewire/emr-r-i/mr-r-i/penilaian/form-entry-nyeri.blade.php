@@ -222,24 +222,24 @@
         </div>
 
         <!-- Petugas Penilai -->
-        <div>
+        {{-- <div>
             <x-input-label for="formEntryNyeri.petugasPenilai" :value="__('Petugas Penilai')" :required="__(true)" />
             <x-text-input id="formEntryNyeri.petugasPenilai" placeholder="Nama Petugas Penilai" class="mt-1"
                 :errorshas="__($errors->has('formEntryNyeri.petugasPenilai'))" wire:model.debounce.500ms="formEntryNyeri.petugasPenilai" />
             @error('formEntryNyeri.petugasPenilai')
                 <x-input-error :messages="$message" />
             @enderror
-        </div>
+        </div> --}}
 
         <!-- Kode Petugas Penilai -->
-        <div>
+        {{-- <div>
             <x-input-label for="formEntryNyeri.petugasPenilaiCode" :value="__('Kode Petugas Penilai')" :required="__(true)" />
             <x-text-input id="formEntryNyeri.petugasPenilaiCode" placeholder="Kode Petugas Penilai" class="mt-1"
                 :errorshas="__($errors->has('formEntryNyeri.petugasPenilaiCode'))" wire:model.debounce.500ms="formEntryNyeri.petugasPenilaiCode" />
             @error('formEntryNyeri.petugasPenilaiCode')
                 <x-input-error :messages="$message" />
             @enderror
-        </div>
+        </div> --}}
 
         <div class="grid grid-cols-4 gap-2">
             <div class="grid grid-cols-1 ml-2">

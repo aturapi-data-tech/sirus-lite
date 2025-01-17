@@ -91,24 +91,24 @@
         </div>
 
         <!-- Petugas Penilai -->
-        <div>
+        {{-- <div>
             <x-input-label for="petugasPenilai" :value="__('Petugas Penilai')" :required="true" />
             <x-text-input id="petugasPenilai" placeholder="Nama Petugas Penilai" class="w-full mt-1"
                 wire:model.debounce.500ms="formEntryResikoJatuh.petugasPenilai" />
             @error('formEntryResikoJatuh.petugasPenilai')
                 <x-input-error :messages="$message" />
             @enderror
-        </div>
+        </div> --}}
 
         <!-- Kode Petugas Penilai -->
-        <div>
+        {{-- <div>
             <x-input-label for="petugasPenilaiCode" :value="__('Kode Petugas Penilai')" :required="true" />
             <x-text-input id="petugasPenilaiCode" placeholder="Kode Petugas Penilai" class="w-full mt-1"
                 wire:model.debounce.500ms="formEntryResikoJatuh.petugasPenilaiCode" />
             @error('formEntryResikoJatuh.petugasPenilaiCode')
                 <x-input-error :messages="$message" />
             @enderror
-        </div>
+        </div> --}}
 
         <!-- Tombol Simpan -->
         <div class="grid grid-cols-4 gap-2">
