@@ -30,119 +30,257 @@ class Perencanaan extends Component
     // dataDaftarRi RJ
     public array $dataDaftarRi = [];
 
-    // data SKDP / perencanaan=>[]
-    public array $perencanaan =
-    [
-        "terapiTab" => "Terapi",
-        "terapi" => [
-            "terapi" => ""
-        ],
-
-        "tindakLanjutTab" => "Tindak Lanjut",
+    public array $perencanaan = [
         "tindakLanjut" => [
             "tindakLanjut" => "",
+            "tindakLanjutKode" => "",
             "keteranganTindakLanjut" => "",
-            "tindakLanjutOptions" => [
-                ["tindakLanjut" => "MRS"],
-                ["tindakLanjut" => "KRS"],
-                ["tindakLanjut" => "APS"],
-                ["tindakLanjut" => "Rujuk"],
-                ["tindakLanjut" => "Meninggal"],
-                ["tindakLanjut" => "Lain-lain"],
-            ],
-
         ],
 
-        "pengkajianMedisTab" => "Petugas Medis",
-        "pengkajianMedis" => [
-            "waktuPemeriksaan" => "",
-            "selesaiPemeriksaan" => "",
-            "drPemeriksa" => "",
-        ],
-        // Kontrol pakai program lama
-
-        "rawatInapTab" => "Rawat Inap",
-        "rawatInap" => [
-            "noRef" => "",
-            "tanggal" => "", //dd/mm/yyyy
-            "keterangan" => "",
-        ],
-
-        "dischargePlanningTab" => "Discharge Planning",
         "dischargePlanning" => [
             "pelayananBerkelanjutan" => [
                 "pelayananBerkelanjutan" => "Tidak Ada",
-                "pelayananBerkelanjutanOption" => [
-                    ["pelayananBerkelanjutan" => "Tidak Ada"],
-                    ["pelayananBerkelanjutan" => "Ada"],
-                ],
+                "ketPelayananBerkelanjutan" => "",
+                "pelayananBerkelanjutanData" => [],
             ],
-            "pelayananBerkelanjutanOpsi" => [
-                "rawatLuka" => [],
-                "dm" => [],
-                "ppok" => [],
-                "hivAids" => [],
-                "dmTerapiInsulin" => [],
-                "ckd" => [],
-                "tb" => [],
-                "stroke" => [],
-                "kemoterapi" => [],
-            ],
-
             "penggunaanAlatBantu" => [
                 "penggunaanAlatBantu" => "Tidak Ada",
-                "penggunaanAlatBantuOption" => [
-                    ["penggunaanAlatBantu" => "Tidak Ada"],
-                    ["penggunaanAlatBantu" => "Ada"],
-                ],
+                "ketPenggunaanAlatBantu" => "",
+                "penggunaanAlatBantuData" => [],
             ],
-            "penggunaanAlatBantuOpsi" => [
-                "kateterUrin" => [],
-                "ngt" => [],
-                "traechotomy" => [],
-                "colostomy" => [],
-            ],
-        ]
+        ],
     ];
-    //////////////////////////////////////////////////////////////////////
-
 
     protected $rules = [
+        // Rules untuk tindakLanjut
+        'dataDaftarRi.perencanaan.tindakLanjut.tindakLanjut' => 'required|string|max:255',
+        'dataDaftarRi.perencanaan.tindakLanjut.tindakLanjutKode' => 'required|string|max:50',
+        'dataDaftarRi.perencanaan.tindakLanjut.keteranganTindakLanjut' => 'nullable|string|max:200',
 
-        'dataDaftarRi.perencanaan.pengkajianMedis.waktuPemeriksaan' => 'required|date_format:d/m/Y H:i:s',
-        'dataDaftarRi.perencanaan.pengkajianMedis.selesaiPemeriksaan' => 'required|date_format:d/m/Y H:i:s'
+        // Rules untuk dischargePlanning.pelayananBerkelanjutan
+        'dataDaftarRi.perencanaan.dischargePlanning.pelayananBerkelanjutan.pelayananBerkelanjutan' => 'required|in:Ada,Tidak Ada',
+        'dataDaftarRi.perencanaan.dischargePlanning.pelayananBerkelanjutan.ketPelayananBerkelanjutan' => [
+            'nullable',
+            'string',
+            'max:200',
+            'required_if:dataDaftarRi.perencanaan.dischargePlanning.pelayananBerkelanjutan.pelayananBerkelanjutan,Ada',
+        ],
+        'dataDaftarRi.perencanaan.dischargePlanning.pelayananBerkelanjutan.pelayananBerkelanjutanData' => [
+            'nullable',
+            'array',
+            'required_if:dataDaftarRi.perencanaan.dischargePlanning.pelayananBerkelanjutan.pelayananBerkelanjutan,Ada',
+        ],
+        'dataDaftarRi.perencanaan.dischargePlanning.pelayananBerkelanjutan.pelayananBerkelanjutanData.*.status' => [
+            'boolean',
+        ],
 
+        // Rules untuk dischargePlanning.penggunaanAlatBantu
+        'dataDaftarRi.perencanaan.dischargePlanning.penggunaanAlatBantu.penggunaanAlatBantu' => 'required|in:Ada,Tidak Ada',
+        'dataDaftarRi.perencanaan.dischargePlanning.penggunaanAlatBantu.ketPenggunaanAlatBantu' => [
+            'nullable',
+            'string',
+            'max:200',
+            'required_if:dataDaftarRi.perencanaan.dischargePlanning.penggunaanAlatBantu.penggunaanAlatBantu,Ada',
+        ],
+        'dataDaftarRi.perencanaan.dischargePlanning.penggunaanAlatBantu.penggunaanAlatBantuData' => [
+            'nullable',
+            'array',
+            'required_if:dataDaftarRi.perencanaan.dischargePlanning.penggunaanAlatBantu.penggunaanAlatBantu,Ada',
+        ],
+        'dataDaftarRi.perencanaan.dischargePlanning.penggunaanAlatBantu.penggunaanAlatBantuData.*.status' => [
+            'boolean',
+        ],
     ];
 
+    //////////////////////////////////////////////////////////////////////
+    // Opsi-opsi untuk tindak lanjut
+    public array $tindakLanjutOptions = [
+        ["tindakLanjut" => "Pulang Sehat", "tindakLanjutKode" => "371827001"],
+        ["tindakLanjut" => "Pulang dengan Permintaan Sendiri", "tindakLanjutKode" => "266707007"],
+        ["tindakLanjut" => "Pulang Pindah / Rujuk", "tindakLanjutKode" => "306206005"],
+        ["tindakLanjut" => "Pulang Tanpa Perbaikan", "tindakLanjutKode" => "371828006"],
+        ["tindakLanjut" => "Meninggal", "tindakLanjutKode" => "419099009"],
+        ["tindakLanjut" => "Lain-lain", "tindakLanjutKode" => "74964007"],
+    ];
 
+    // Opsi-opsi untuk pelayanan berkelanjutan
+    public array $pelayananBerkelanjutanOptions = [
+        ["pelayananBerkelanjutan" => "Ada"],
+        ["pelayananBerkelanjutan" => "Tidak Ada"],
+    ];
+
+    // Opsi-opsi untuk penggunaan alat bantu
+    public array $penggunaanAlatBantuOptions = [
+        ["penggunaanAlatBantu" => "Ada"],
+        ["penggunaanAlatBantu" => "Tidak Ada"],
+    ];
+
+    public array $pelayananBerkelanjutan = [
+        [
+            "deskripsi" => "Perawatan luka",
+            "status" => false
+        ],
+        [
+            "deskripsi" => "Diabetes melitus",
+            "status" => false
+        ],
+        [
+            "deskripsi" => "Penyakit paru obstruktif kronis (PPOK)",
+            "status" => false
+        ],
+        [
+            "deskripsi" => "Infeksi HIV/AIDS",
+            "status" => false
+        ],
+        [
+            "deskripsi" => "Penyakit ginjal kronis",
+            "status" => false
+        ],
+        [
+            "deskripsi" => "Tuberkulosis (TB)",
+            "status" => false
+        ],
+        [
+            "deskripsi" => "Stroke",
+            "status" => false
+        ],
+        [
+            "deskripsi" => "Kemoterapi",
+            "status" => false
+        ],
+        [
+            "deskripsi" => "Rehabilitasi medis",
+            "status" => false
+        ],
+        [
+            "deskripsi" => "Pemantauan jantung",
+            "status" => false
+        ],
+        [
+            "deskripsi" => "Pemantauan tekanan darah",
+            "status" => false
+        ],
+        [
+            "deskripsi" => "Terapi pernapasan",
+            "status" => false
+        ],
+        [
+            "deskripsi" => "Pemantauan gula darah",
+            "status" => false
+        ],
+    ];
+
+    // Opsi-opsi untuk penggunaan alat bantu (detail)
+    public array $penggunaanAlatBantu = [
+        [
+            "deskripsi" => "Alat bantu jalan (tongkat, walker, kruk)",
+            "status" => false
+        ],
+        [
+            "deskripsi" => "Terapi oksigen (tabung oksigen, konsentrator oksigen)",
+            "status" => false
+        ],
+        [
+            "deskripsi" => "Infus intravena (untuk pemberian cairan atau obat di rumah)",
+            "status" => false
+        ],
+        [
+            "deskripsi" => "Kateter urine menetap (untuk pasien dengan gangguan buang air kecil)",
+            "status" => false
+        ],
+        [
+            "deskripsi" => "Selang nasogastrik (untuk pemberian nutrisi atau obat melalui hidung)",
+            "status" => false
+        ],
+        [
+            "deskripsi" => "Tabung trakeostomi (untuk pasien dengan gangguan pernapasan)",
+            "status" => false
+        ],
+        [
+            "deskripsi" => "Kantong kolostomi (untuk pasien pasca-operasi kolostomi)",
+            "status" => false
+        ],
+        [
+            "deskripsi" => "Alat bantu pernapasan (CPAP, ventilator portabel)",
+            "status" => false
+        ],
+        [
+            "deskripsi" => "Kursi roda (untuk pasien dengan gangguan mobilitas berat)",
+            "status" => false
+        ],
+        [
+            "deskripsi" => "Alat bantu dengar (untuk pasien dengan gangguan pendengaran)",
+            "status" => false
+        ],
+    ];
+
+    // Method untuk mereset data pelayanan berkelanjutan
+    public function updatedDataDaftarRiPerencanaanDischargePlanningPelayananBerkelanjutanPelayananBerkelanjutan($value)
+    {
+        if ($value === 'Tidak Ada') {
+            // Reset keterangan
+            $this->dataDaftarRi['perencanaan']['dischargePlanning']['pelayananBerkelanjutan']['ketPelayananBerkelanjutan'] = null;
+
+            // Reset opsi pelayanan berkelanjutan
+            foreach ($this->pelayananBerkelanjutan as $index => $opsi) {
+                $this->dataDaftarRi['perencanaan']['dischargePlanning']['pelayananBerkelanjutanData'][$index]['status'] = false;
+            }
+        }
+    }
+
+    // Method untuk mereset data penggunaan alat bantu
+    public function updatedDataDaftarRiPerencanaanDischargePlanningPenggunaanAlatBantuPenggunaanAlatBantu($value)
+    {
+        if ($value === 'Tidak Ada') {
+            // Reset keterangan
+            $this->dataDaftarRi['perencanaan']['dischargePlanning']['penggunaanAlatBantu']['ketPenggunaanAlatBantu'] = null;
+
+            // Reset opsi penggunaan alat bantu
+            foreach ($this->penggunaanAlatBantu as $index => $opsi) {
+                $this->dataDaftarRi['perencanaan']['dischargePlanning']['penggunaanAlatBantuData'][$index]['status'] = false;
+            }
+        }
+    }
+
+
+
+    // Fungsi untuk mengupdate status dan keterangan
+    public function updatedDataDaftarRiPerencanaanDischargePlanningPenggunaanAlatBantuPenggunaanAlatBantuData($value, $index)
+    {
+        $index = explode('.', $index)[6]; // Ambil index dari path
+        if ($value === true) {
+            // Jika status true, pastikan keterangan tidak kosong
+            if (empty($this->dataDaftarRi['perencanaan']['dischargePlanning']['penggunaanAlatBantu']['penggunaanAlatBantuData'][$index]['keterangan'])) {
+                $this->dataDaftarRi['perencanaan']['dischargePlanning']['penggunaanAlatBantu']['penggunaanAlatBantuData'][$index]['keterangan'] = 'Keterangan default';
+            }
+        } else {
+            // Jika status false, hapus keterangan menggunakan unset
+            unset($this->dataDaftarRi['perencanaan']['dischargePlanning']['penggunaanAlatBantu']['penggunaanAlatBantuData'][$index]['keterangan']);
+        }
+    }
+
+    public function updatedDataDaftarRiPerencanaanDischargePlanningPelayananBerkelanjutanPelayananBerkelanjutanData($value, $index)
+    {
+        $index = explode('.', $index)[6]; // Ambil index dari path
+        if ($value === true) {
+            // Jika status true, pastikan keterangan tidak kosong
+            if (empty($this->dataDaftarRi['perencanaan']['dischargePlanning']['pelayananBerkelanjutan']['pelayananBerkelanjutanData'][$index]['keterangan'])) {
+                $this->dataDaftarRi['perencanaan']['dischargePlanning']['pelayananBerkelanjutan']['pelayananBerkelanjutanData'][$index]['keterangan'] = 'Keterangan default';
+            }
+        } else {
+            // Jika status false, hapus keterangan menggunakan unset
+            unset($this->dataDaftarRi['perencanaan']['dischargePlanning']['pelayananBerkelanjutan']['pelayananBerkelanjutanData'][$index]['keterangan']);
+        }
+    }
 
     ////////////////////////////////////////////////
     ///////////begin////////////////////////////////
     ////////////////////////////////////////////////
     public function updated($propertyName)
     {
-        // dd($propertyName);
         $this->validateOnly($propertyName);
-        if ($propertyName != 'activeTabRacikanNonRacikan') {
-            $this->store();
-        }
+        $this->store();
     }
-
-
-
-
-    // resert input private////////////////
-    private function resetInputFields(): void
-    {
-
-        // resert validation
-        $this->resetValidation();
-        // resert input kecuali
-        $this->resetExcept([
-            'riHdrNoRef'
-        ]);
-    }
-
 
 
 
@@ -152,32 +290,11 @@ class Perencanaan extends Component
     // ////////////////
 
 
-    // validate Data RJ//////////////////////////////////////////////////
-    private function validateDataRi(): void
-    {
-        // customErrorMessages
-        // $messages = customErrorMessagesTrait::messages();
-        $messages = [];
-
-        // Proses Validasi///////////////////////////////////////////
-        try {
-            $this->validate($this->rules, $messages);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Lakukan Pengecekan kembali Input Data.");
-            $this->validate($this->rules, $messages);
-        }
-    }
 
 
     // insert and update record start////////////////
     public function store()
     {
-        // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
-        $this->setDataPrimer();
-
-        // Validate RJ
-        $this->validateDataRi();
 
         // Logic update mode start //////////
         $this->updateDataRi($this->dataDaftarRi['riHdrNo']);
@@ -205,137 +322,6 @@ class Perencanaan extends Component
             $this->dataDaftarRi['perencanaan'] = $this->perencanaan;
         }
     }
-
-    // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
-    private function setDataPrimer(): void {}
-
-    public function setWaktuPemeriksaan($myTime)
-    {
-        $this->dataDaftarRi['perencanaan']['pengkajianMedis']['waktuPemeriksaan'] = $myTime;
-    }
-
-    public function setSelesaiPemeriksaan($myTime)
-    {
-        $this->dataDaftarRi['perencanaan']['pengkajianMedis']['selesaiPemeriksaan'] = $myTime;
-    }
-
-    private function validateDrPemeriksa()
-    {
-        // Validasi dulu
-        $messages = [];
-        $myRules = [
-            // 'dataDaftarRi.pemeriksaan.tandaVital.sistolik' => 'required|numeric',
-            // 'dataDaftarRi.pemeriksaan.tandaVital.distolik' => 'required|numeric',
-            'dataDaftarRi.pemeriksaan.tandaVital.frekuensiNadi' => 'required|numeric',
-            'dataDaftarRi.pemeriksaan.tandaVital.frekuensiNafas' => 'required|numeric',
-            'dataDaftarRi.pemeriksaan.tandaVital.suhu' => 'required|numeric',
-            'dataDaftarRi.pemeriksaan.tandaVital.spo2' => 'numeric',
-            'dataDaftarRi.pemeriksaan.tandaVital.gda' => 'numeric',
-
-            'dataDaftarRi.pemeriksaan.nutrisi.bb' => 'required|numeric',
-            'dataDaftarRi.pemeriksaan.nutrisi.tb' => 'required|numeric',
-            'dataDaftarRi.pemeriksaan.nutrisi.imt' => 'required|numeric',
-            'dataDaftarRi.pemeriksaan.nutrisi.lk' => 'numeric',
-            'dataDaftarRi.pemeriksaan.nutrisi.lila' => 'numeric',
-
-            'dataDaftarRi.anamnesa.pengkajianPerawatan.jamDatang' => 'required|date_format:d/m/Y H:i:s',
-        ];
-        // Proses Validasi///////////////////////////////////////////
-        try {
-            $this->validate($myRules, $messages);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Anda tidak dapat melakukan TTD-E karena data pemeriksaan belum lengkap.');
-            $this->validate($myRules, $messages);
-        }
-        // Validasi dulu
-    }
-    public function setDrPemeriksa()
-    {
-        // $myRoles = json_decode(auth()->user()->roles, true);
-        $myUserCodeActive = auth()->user()->myuser_code;
-        $myUserNameActive = auth()->user()->myuser_name;
-        // $myUserTtdActive = auth()->user()->myuser_ttd_image;
-
-        // Validasi dulu
-        // cek apakah data pemeriksaan sudah dimasukkan atau blm
-        $this->validateDrPemeriksa();
-
-        if (auth()->user()->hasRole('Dokter')) {
-            if ($this->dataDaftarRi['drId'] == $myUserCodeActive) {
-                if (isset($this->dataDaftarRi['perencanaan']['pengkajianMedis']['drPemeriksa'])) {
-                    if (!$this->dataDaftarRi['perencanaan']['pengkajianMedis']['drPemeriksa']) {
-                        $this->dataDaftarRi['perencanaan']['pengkajianMedis']['drPemeriksa'] = isset($this->dataDaftarRi['drDesc']) ? ($this->dataDaftarRi['drDesc'] ? $this->dataDaftarRi['drDesc'] : 'Dokter pemeriksa') : 'Dokter pemeriksa-';
-                    }
-                } else {
-                    $this->dataDaftarRi['perencanaan']['pengkajianMedisTab'] = 'Pengkajian Medis';
-                    $this->dataDaftarRi['perencanaan']['pengkajianMedis']['drPemeriksa'] = isset($this->dataDaftarRi['drDesc']) ? ($this->dataDaftarRi['drDesc'] ? $this->dataDaftarRi['drDesc'] : 'Dokter pemeriksa') : 'Dokter pemeriksa-';
-                }
-                $this->store();
-            } else {
-                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Anda tidak dapat melakukan TTD-E karena Bukan Pasien ' . $myUserNameActive);
-            }
-        } else {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Anda tidak dapat melakukan TTD-E karena User Role ' . $myUserNameActive . ' Bukan Dokter');
-        }
-    }
-
-    // /////////////////eresep open////////////////////////
-    public bool $isOpenEresepRI = false;
-    public string $isOpenModeEresepRI = 'insert';
-
-    public function openModalEresepRI(): void
-    {
-        $this->isOpenEresepRI = true;
-        $this->isOpenModeEresepRI = 'insert';
-    }
-
-    public function closeModalEresepRI(): void
-    {
-        $this->isOpenEresepRI = false;
-        $this->isOpenModeEresepRI = 'insert';
-    }
-
-    public string $activeTabRacikanNonRacikan = 'NonRacikan';
-    public array $EmrMenuRacikanNonRacikan = [
-        [
-            'ermMenuId' => 'NonRacikan',
-            'ermMenuName' => 'NonRacikan',
-        ],
-        [
-            'ermMenuId' => 'Racikan',
-            'ermMenuName' => 'Racikan',
-        ],
-    ];
-
-    public function simpanTerapi(): void
-    {
-        $eresep = '' . PHP_EOL;
-        if (isset($this->dataDaftarRi['eresep'])) {
-
-            foreach ($this->dataDaftarRi['eresep'] as $key => $value) {
-                // NonRacikan
-                $catatanKhusus = ($value['catatanKhusus']) ? ' (' . $value['catatanKhusus'] . ')' : '';
-                $eresep .=  'R/' . ' ' . $value['productName'] . ' | No. ' . $value['qty'] . ' | S ' .  $value['signaX'] . 'dd' . $value['signaHari'] . $catatanKhusus . PHP_EOL;
-            }
-        }
-
-        $eresepRacikan = '' . PHP_EOL;
-        if (isset($this->dataDaftarRi['eresepRacikan'])) {
-            // Racikan
-            foreach ($this->dataDaftarRi['eresepRacikan'] as $key => $value) {
-                $jmlRacikan = ($value['qty']) ? 'Jml Racikan ' . $value['qty'] . ' | ' . $value['catatan'] . ' | S ' . $value['catatanKhusus'] . PHP_EOL : '';
-                $dosis = isset($value['dosis']) ? ($value['dosis'] ? $value['dosis'] : '') : '';
-                $eresepRacikan .= $value['noRacikan'] . '/ ' . $value['productName'] . ' - ' . $dosis .  PHP_EOL . $jmlRacikan;
-            };
-        }
-        $this->dataDaftarRi['perencanaan']['terapi']['terapi'] = $eresep . $eresepRacikan;
-
-        $this->store();
-        $this->closeModalEresepRI();
-    }
-
-    // /////////////////////////////////////////
-
 
     // when new form instance
     public function mount()

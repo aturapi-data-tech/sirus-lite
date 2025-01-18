@@ -83,7 +83,6 @@
                             <!-- Konten Assessment Ulang Nyeri -->
                             <div x-show="activeTab === 'Assessment Ulang Nyeri'"
                                 x-transition:enter.opacity.duration.600>
-                                <h3 class="mb-4 text-lg font-semibold">Assessment Ulang Nyeri</h3>
                                 <!-- Tambahkan form atau tabel sesuai kebutuhan -->
                                 @include('livewire.emr-r-i.mr-r-i.penilaian.form-entry-nyeri')
 
@@ -105,7 +104,6 @@
 
                             <!-- Konten Resiko Jatuh -->
                             <div x-show="activeTab === 'Resiko Jatuh'" x-transition:enter.opacity.duration.600>
-                                <h3 class="mb-4 text-lg font-semibold">Resiko Jatuh</h3>
                                 @include('livewire.emr-r-i.mr-r-i.penilaian.form-entry-resiko-jatuh')
                                 <!-- Tambahkan form atau tabel sesuai kebutuhan -->
                             </div>

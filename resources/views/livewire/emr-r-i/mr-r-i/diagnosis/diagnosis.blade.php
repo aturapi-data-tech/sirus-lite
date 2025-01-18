@@ -12,7 +12,7 @@
 
             @role(['Mr', 'Admin'])
                 <div id="TransaksiRawatJalan" class="px-4">
-                    <x-input-label for="" :value="__('Diagnosis ICD')" :required="__(false)" class="pt-2 sm:text-xl" />
+                    <x-input-label for="" :value="__('Diagnosis ICD Tegak')" :required="__(false)" class="pt-2 sm:text-xl" />
 
                     {{-- ICD10 --}}
                     <div>

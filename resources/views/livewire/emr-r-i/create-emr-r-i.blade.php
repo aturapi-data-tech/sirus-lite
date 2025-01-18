@@ -124,6 +124,15 @@
 
                     <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50"
                         :class="{
+                            'active': activeTab === 'cppt'
+                        }"
+                        x-show.transition.in.opacity.duration.600="activeTab === 'cppt'">
+
+                        <livewire:emr-r-i.mr-r-i.c-p-p-t.c-p-p-t :wire:key="'content-cpptRi'" :riHdrNoRef="$riHdrNoRef">
+                    </div>
+
+                    <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50"
+                        :class="{
                             'active': activeTab === 'observasi'
                         }"
                         x-show.transition.in.opacity.duration.600="activeTab === 'observasi'">

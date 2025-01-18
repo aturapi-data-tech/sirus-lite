@@ -264,10 +264,6 @@ class EmrRI extends Component
 
 
     public array $EmrMenu = [
-        // [
-        //     'ermMenuId' => 'keperawatan',
-        //     'ermMenuName' => 'Keperawatan'
-        // ],
         [
             'ermMenuId' => 'pengkajianAwalPasienRawatInap',
             'ermMenuName' => 'Pengkajian Awal Pasien Rawat Inap'
@@ -289,13 +285,14 @@ class EmrRI extends Component
             'ermMenuName' => 'Observasi'
         ],
         [
+            'ermMenuId' => 'cppt',
+            'ermMenuName' => 'CPPT'
+        ],
+        [
             'ermMenuId' => 'diagnosis',
             'ermMenuName' => 'Diagnosis (ICD)'
         ],
-        // [
-        //     'ermMenuId' => 'penandaanGbr',
-        //     'ermMenuName' => 'Penandaan Gambar'
-        // ],
+
         [
             'ermMenuId' => 'perencanaan',
             'ermMenuName' => 'Perencanaan'
@@ -304,18 +301,7 @@ class EmrRI extends Component
             'ermMenuId' => 'administrasi',
             'ermMenuName' => 'Administrasi'
         ],
-        // [
-        //     'ermMenuId' => 'cppt',
-        //     'ermMenuName' => 'CPPT'
-        // ],
-        // [
-        //     'ermMenuId' => 'resumeMds',
-        //     'ermMenuName' => 'Resume Medis'
-        // ],
-        // [
-        //     'ermMenuId' => 'penerbitanSrt',
-        //     'ermMenuName' => 'Penerbitan Surat'
-        // ],
+
         [
             'ermMenuId' => 'rekamMedis',
             'ermMenuName' => 'Rekam Medis'

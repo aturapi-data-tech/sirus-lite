@@ -35,9 +35,7 @@ class Pemeriksaan extends Component
     public array $dataDaftarRi = [];
 
     // data pemeriksaan=>[]
-    public array $pemeriksaan = [
-        "penunjang" => ""
-    ];
+    public array $pemeriksaan = [];
 
     public $filePDF, $descPDF;
     public bool $isOpenRekamMedisuploadpenunjangHasil;
@@ -374,104 +372,17 @@ class Pemeriksaan extends Component
 
 
 
-    // /////////tingkatKesadaran////////////
-    public function clicktingkatKesadaranlov()
-    {
-        $this->tingkatKesadaranLovStatus = true;
-        $this->tingkatKesadaranLov = $this->dataDaftarRi['pemeriksaan']['tandaVital']['tingkatKesadaranOptions'];
-    }
-    public function updatedtingkatKesadaranlovsearch()
-    {
-        // Variable Search
-        $search = $this->tingkatKesadaranLovSearch;
-
-        // check LOV by id
-        $tingkatKesadaran = collect($this->dataDaftarRi['pemeriksaan']['tandaVital']['tingkatKesadaranOptions'])
-            ->where('tingkatKesadaran', '=', $search)
-            ->first();
-
-        if ($tingkatKesadaran) {
-            $this->dataDaftarRi['pemeriksaan']['tandaVital']['tingkatKesadaranOptions'] = $tingkatKesadaran['tingkatKesadaran'];
-
-            $this->tingkatKesadaranLovStatus = false;
-            $this->tingkatKesadaranLovSearch = '';
-        } else {
-            // if there is no id found and check (min 3 char on search)
-            if (strlen($search) < 3) {
-                $this->tingkatKesadaranLov = $this->dataDaftarRi['pemeriksaan']['tandaVital']['tingkatKesadaranOptions'];
-            } else {
-                $this->tingkatKesadaranLov = collect($this->dataDaftarRi['pemeriksaan']['tandaVital']['tingkatKesadaranOptions'])
-                    ->filter(function ($item) use ($search) {
-                        return false !== stristr($item['tingkatKesadaran'], $search);
-                    });
-            }
-            $this->tingkatKesadaranLovStatus = true;
-            $this->dataDaftarRi['pemeriksaan']['tandaVital']['tingkatKesadaran'] = '';
-        }
-    }
-    // /////////////////////
-    // LOV selected start
-    public function setMytingkatKesadaranLov($id)
-    {
-        $this->dataDaftarRi['pemeriksaan']['tandaVital']['tingkatKesadaran'] = $id;
-        $this->tingkatKesadaranLovStatus = false;
-        $this->tingkatKesadaranLovSearch = '';
-    }
-    // LOV selected end
-    // /////////////////////
-
-
-
 
     // ////////////////
     // RJ Logic
     // ////////////////
 
 
-    // validate Data RJ//////////////////////////////////////////////////
-    private function validateDataRi(): void
-    {
-        // customErrorMessages
-        // $messages = customErrorMessagesTrait::messages();
-        $messages = [];
-
-        //Cek Usia Anak dibawah 13th tidak di cek tekanan darah
-        $sql = "select birth_date from rsmst_pasiens where reg_no=:regNo";
-        $birthDate = DB::scalar($sql, [
-            "regNo" => $this->dataDaftarRi['regNo'],
-        ]);
-        $cekUsia = Carbon::createFromFormat('Y-m-d H:i:s', $birthDate)->diff(Carbon::now(env('APP_TIMEZONE')))->format('%y');
-
-        if ($cekUsia > 13) {
-            $this->rules['dataDaftarRi.pemeriksaan.tandaVital.sistolik'] = 'required|numeric';
-            $this->rules['dataDaftarRi.pemeriksaan.tandaVital.distolik'] = 'required|numeric';
-        }
-
-        // $rules = [];
-
-
-
-        // Proses Validasi///////////////////////////////////////////
-        try {
-            $this->validate($this->rules, $messages);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Lakukan Pengecekan kembali Input Data.");
-            $this->validate($this->rules, $messages);
-        }
-    }
 
 
     // insert and update record start////////////////
     public function store()
     {
-        // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
-        $this->setDataPrimer();
-
-        // Validate RJ
-        $this->validateDataRi();
-
-        // Logic update mode start //////////
         $this->updateDataRi($this->dataDaftarRi['riHdrNo']);
 
         $this->emit('syncronizeAssessmentPerawatRIFindData');
@@ -500,7 +411,6 @@ class Pemeriksaan extends Component
 
 
     // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
-    private function setDataPrimer(): void {}
 
     private function scoringIMT(): void
     {

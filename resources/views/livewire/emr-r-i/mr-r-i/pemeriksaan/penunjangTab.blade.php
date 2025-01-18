@@ -1,22 +1,6 @@
 <div>
     <div class="w-full mb-1">
-
-
         <div class="pt-0">
-
-            <x-input-label for="dataDaftarRi.pemeriksaan.penunjang" :value="__('Penunjang')" :required="__(false)"
-                class="pt-2 sm:text-xl" />
-
-            <div class="mb-2">
-                <x-input-label for="dataDaftarRi.pemeriksaan.penunjang" :value="__('Pemeriksaan Penunjang Lab / Foto / EKG / Lan-lain')" :required="__(false)" />
-
-                <x-text-input-area id="dataDaftarRi.pemeriksaan.penunjang" placeholder="Penunjang" class="mt-1 ml-2"
-                    :errorshas="__($errors->has('dataDaftarRi.pemeriksaan.penunjang'))" :disabled=$disabledPropertyRjStatus
-                    wire:model.debounce.500ms="dataDaftarRi.pemeriksaan.penunjang" :rows="__('3')" />
-            </div>
-
-            {{-- tab Penunjang --}}
-
             {{-- Lab --}}
             <div>
                 <!-- Table -->

@@ -293,7 +293,44 @@ class Penilaian extends Component
             'formEntryResikoJatuh.resikoJatuh.rekomendasi' => 'nullable|string|max:500', // Rekomendasi opsional, berupa string, maksimal 500 karakter
         ];
 
-        $messages = [];
+        $messages = [
+            // Tanggal penilaian
+            'formEntryResikoJatuh.tglPenilaian.required' => 'Tanggal penilaian wajib diisi.',
+            'formEntryResikoJatuh.tglPenilaian.date_format' => 'Format tanggal penilaian harus dd/mm/yyyy hh24:mi:ss.',
+
+            // Nama petugas penilai
+            'formEntryResikoJatuh.petugasPenilai.required' => 'Nama petugas penilai wajib diisi.',
+            'formEntryResikoJatuh.petugasPenilai.string' => 'Nama petugas penilai harus berupa teks.',
+            'formEntryResikoJatuh.petugasPenilai.max' => 'Nama petugas penilai tidak boleh lebih dari 100 karakter.',
+
+            // Kode petugas penilai
+            'formEntryResikoJatuh.petugasPenilaiCode.required' => 'Kode petugas penilai wajib diisi.',
+            'formEntryResikoJatuh.petugasPenilaiCode.string' => 'Kode petugas penilai harus berupa teks.',
+            'formEntryResikoJatuh.petugasPenilaiCode.max' => 'Kode petugas penilai tidak boleh lebih dari 50 karakter.',
+
+            // Risiko jatuh
+            'formEntryResikoJatuh.resikoJatuh.resikoJatuh.required' => 'Risiko jatuh wajib diisi.',
+            'formEntryResikoJatuh.resikoJatuh.resikoJatuh.in' => 'Risiko jatuh hanya boleh "Ya" atau "Tidak".',
+
+            // Metode penilaian risiko jatuh
+            'formEntryResikoJatuh.resikoJatuh.resikoJatuhMetode.resikoJatuhMetode.required_if' => 'Metode penilaian wajib diisi jika risiko jatuh "Ya".',
+            'formEntryResikoJatuh.resikoJatuh.resikoJatuhMetode.resikoJatuhMetode.string' => 'Metode penilaian harus berupa teks.',
+            'formEntryResikoJatuh.resikoJatuh.resikoJatuhMetode.resikoJatuhMetode.max' => 'Metode penilaian tidak boleh lebih dari 50 karakter.',
+
+            // Skor risiko jatuh
+            'formEntryResikoJatuh.resikoJatuh.resikoJatuhMetode.resikoJatuhMetodeScore.required_if' => 'Skor risiko jatuh wajib diisi jika risiko jatuh "Ya".',
+            'formEntryResikoJatuh.resikoJatuh.resikoJatuhMetode.resikoJatuhMetodeScore.numeric' => 'Skor risiko jatuh harus berupa angka.',
+            'formEntryResikoJatuh.resikoJatuh.resikoJatuhMetode.resikoJatuhMetodeScore.min' => 'Skor risiko jatuh tidak boleh kurang dari 0.',
+            'formEntryResikoJatuh.resikoJatuh.resikoJatuhMetode.resikoJatuhMetodeScore.max' => 'Skor risiko jatuh tidak boleh lebih dari 100.',
+
+            // Kategori risiko
+            'formEntryResikoJatuh.resikoJatuh.kategoriResiko.string' => 'Kategori risiko harus berupa teks.',
+            'formEntryResikoJatuh.resikoJatuh.kategoriResiko.max' => 'Kategori risiko tidak boleh lebih dari 100 karakter.',
+
+            // Rekomendasi
+            'formEntryResikoJatuh.resikoJatuh.rekomendasi.string' => 'Rekomendasi harus berupa teks.',
+            'formEntryResikoJatuh.resikoJatuh.rekomendasi.max' => 'Rekomendasi tidak boleh lebih dari 500 karakter.',
+        ];
 
         // Proses Validasi
         try {
@@ -708,7 +745,109 @@ class Penilaian extends Component
             'formEntryNyeri.nyeri.catatanTambahan' => 'nullable|string|max:500', // Catatan tambahan opsional, berupa string, maksimal 500 karakter
         ];
 
-        $messages = [];
+        $messages = [
+            // Tanggal penilaian
+            'formEntryNyeri.tglPenilaian.required' => 'Tanggal penilaian wajib diisi.',
+            'formEntryNyeri.tglPenilaian.date_format' => 'Format tanggal penilaian harus dd/mm/yyyy hh24:mi:ss.',
+
+            // Nama petugas penilai
+            'formEntryNyeri.petugasPenilai.required' => 'Nama petugas penilai wajib diisi.',
+            'formEntryNyeri.petugasPenilai.string' => 'Nama petugas penilai harus berupa teks.',
+            'formEntryNyeri.petugasPenilai.max' => 'Nama petugas penilai tidak boleh lebih dari 100 karakter.',
+
+            // Kode petugas penilai
+            'formEntryNyeri.petugasPenilaiCode.required' => 'Kode petugas penilai wajib diisi.',
+            'formEntryNyeri.petugasPenilaiCode.string' => 'Kode petugas penilai harus berupa teks.',
+            'formEntryNyeri.petugasPenilaiCode.max' => 'Kode petugas penilai tidak boleh lebih dari 50 karakter.',
+
+            // Nyeri
+            'formEntryNyeri.nyeri.nyeri.required' => 'Nyeri wajib diisi.',
+            'formEntryNyeri.nyeri.nyeri.in' => 'Nyeri hanya boleh "Ya" atau "Tidak".',
+
+            // Metode nyeri
+            'formEntryNyeri.nyeri.nyeriMetode.nyeriMetode.required_if' => 'Metode nyeri wajib diisi jika nyeri "Ya".',
+            'formEntryNyeri.nyeri.nyeriMetode.nyeriMetode.string' => 'Metode nyeri harus berupa teks.',
+            'formEntryNyeri.nyeri.nyeriMetode.nyeriMetode.max' => 'Metode nyeri tidak boleh lebih dari 50 karakter.',
+
+            // Skor nyeri
+            'formEntryNyeri.nyeri.nyeriMetode.nyeriMetodeScore.required_if' => 'Skor nyeri wajib diisi jika nyeri "Ya".',
+            'formEntryNyeri.nyeri.nyeriMetode.nyeriMetodeScore.numeric' => 'Skor nyeri harus berupa angka.',
+            'formEntryNyeri.nyeri.nyeriMetode.nyeriMetodeScore.min' => 'Skor nyeri tidak boleh kurang dari 0.',
+            'formEntryNyeri.nyeri.nyeriMetode.nyeriMetodeScore.max' => 'Skor nyeri tidak boleh lebih dari 10.',
+
+            // Data nyeri
+            'formEntryNyeri.nyeri.nyeriMetode.dataNyeri.array' => 'Data nyeri harus berupa array.',
+
+            // Jenis nyeri
+            'formEntryNyeri.nyeri.nyeriKet.string' => 'Jenis nyeri harus berupa teks.',
+            'formEntryNyeri.nyeri.nyeriKet.max' => 'Jenis nyeri tidak boleh lebih dari 100 karakter.',
+
+            // Pencetus nyeri
+            'formEntryNyeri.nyeri.pencetus.string' => 'Pencetus nyeri harus berupa teks.',
+            'formEntryNyeri.nyeri.pencetus.max' => 'Pencetus nyeri tidak boleh lebih dari 255 karakter.',
+
+            // Durasi nyeri
+            'formEntryNyeri.nyeri.durasi.string' => 'Durasi nyeri harus berupa teks.',
+            'formEntryNyeri.nyeri.durasi.max' => 'Durasi nyeri tidak boleh lebih dari 50 karakter.',
+
+            // Lokasi nyeri
+            'formEntryNyeri.nyeri.lokasi.string' => 'Lokasi nyeri harus berupa teks.',
+            'formEntryNyeri.nyeri.lokasi.max' => 'Lokasi nyeri tidak boleh lebih dari 100 karakter.',
+
+            // Waktu nyeri
+            'formEntryNyeri.nyeri.waktuNyeri.string' => 'Waktu nyeri harus berupa teks.',
+            'formEntryNyeri.nyeri.waktuNyeri.max' => 'Waktu nyeri tidak boleh lebih dari 50 karakter.',
+
+            // Tingkat kesadaran
+            'formEntryNyeri.nyeri.tingkatKesadaran.string' => 'Tingkat kesadaran harus berupa teks.',
+            'formEntryNyeri.nyeri.tingkatKesadaran.max' => 'Tingkat kesadaran tidak boleh lebih dari 50 karakter.',
+
+            // Tingkat aktivitas
+            'formEntryNyeri.nyeri.tingkatAktivitas.string' => 'Tingkat aktivitas harus berupa teks.',
+            'formEntryNyeri.nyeri.tingkatAktivitas.max' => 'Tingkat aktivitas tidak boleh lebih dari 50 karakter.',
+
+            // Tekanan darah sistolik
+            'formEntryNyeri.nyeri.sistolik.required' => 'Tekanan darah sistolik wajib diisi.',
+            'formEntryNyeri.nyeri.sistolik.numeric' => 'Tekanan darah sistolik harus berupa angka.',
+            'formEntryNyeri.nyeri.sistolik.min' => 'Tekanan darah sistolik tidak boleh kurang dari 0.',
+            'formEntryNyeri.nyeri.sistolik.max' => 'Tekanan darah sistolik tidak boleh lebih dari 300.',
+
+            // Tekanan darah diastolik
+            'formEntryNyeri.nyeri.distolik.required' => 'Tekanan darah diastolik wajib diisi.',
+            'formEntryNyeri.nyeri.distolik.numeric' => 'Tekanan darah diastolik harus berupa angka.',
+            'formEntryNyeri.nyeri.distolik.min' => 'Tekanan darah diastolik tidak boleh kurang dari 0.',
+            'formEntryNyeri.nyeri.distolik.max' => 'Tekanan darah diastolik tidak boleh lebih dari 200.',
+
+            // Frekuensi nafas
+            'formEntryNyeri.nyeri.frekuensiNafas.required' => 'Frekuensi nafas wajib diisi.',
+            'formEntryNyeri.nyeri.frekuensiNafas.numeric' => 'Frekuensi nafas harus berupa angka.',
+            'formEntryNyeri.nyeri.frekuensiNafas.min' => 'Frekuensi nafas tidak boleh kurang dari 0.',
+            'formEntryNyeri.nyeri.frekuensiNafas.max' => 'Frekuensi nafas tidak boleh lebih dari 100.',
+
+            // Frekuensi nadi
+            'formEntryNyeri.nyeri.frekuensiNadi.required' => 'Frekuensi nadi wajib diisi.',
+            'formEntryNyeri.nyeri.frekuensiNadi.numeric' => 'Frekuensi nadi harus berupa angka.',
+            'formEntryNyeri.nyeri.frekuensiNadi.min' => 'Frekuensi nadi tidak boleh kurang dari 0.',
+            'formEntryNyeri.nyeri.frekuensiNadi.max' => 'Frekuensi nadi tidak boleh lebih dari 200.',
+
+            // Suhu tubuh
+            'formEntryNyeri.nyeri.suhu.required' => 'Suhu tubuh wajib diisi.',
+            'formEntryNyeri.nyeri.suhu.numeric' => 'Suhu tubuh harus berupa angka.',
+            'formEntryNyeri.nyeri.suhu.min' => 'Suhu tubuh tidak boleh kurang dari 30.',
+            'formEntryNyeri.nyeri.suhu.max' => 'Suhu tubuh tidak boleh lebih dari 45.',
+
+            // Keterangan intervensi farmakologi
+            'formEntryNyeri.nyeri.ketIntervensiFarmakologi.string' => 'Keterangan intervensi farmakologi harus berupa teks.',
+            'formEntryNyeri.nyeri.ketIntervensiFarmakologi.max' => 'Keterangan intervensi farmakologi tidak boleh lebih dari 255 karakter.',
+
+            // Keterangan intervensi non-farmakologi
+            'formEntryNyeri.nyeri.ketIntervensiNonFarmakologi.string' => 'Keterangan intervensi non-farmakologi harus berupa teks.',
+            'formEntryNyeri.nyeri.ketIntervensiNonFarmakologi.max' => 'Keterangan intervensi non-farmakologi tidak boleh lebih dari 255 karakter.',
+
+            // Catatan tambahan
+            'formEntryNyeri.nyeri.catatanTambahan.string' => 'Catatan tambahan harus berupa teks.',
+            'formEntryNyeri.nyeri.catatanTambahan.max' => 'Catatan tambahan tidak boleh lebih dari 500 karakter.',
+        ];
 
         // Proses Validasi///////////////////////////////////////////
         try {
