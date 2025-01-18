@@ -19,7 +19,8 @@ class Observasi extends Component
         'syncronizeAssessmentPerawatRIFindData' => 'mount'
     ];
 
-
+    public $labels = ['Januari', 'Februari', 'Maret', 'April', 'Mei'];
+    public $data = [65, 59, 80, 81, 56];
 
     //////////////////////////////
     // Ref on top bar

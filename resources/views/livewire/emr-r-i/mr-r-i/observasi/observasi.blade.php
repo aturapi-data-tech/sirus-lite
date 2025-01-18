@@ -58,5 +58,41 @@
 
         </div>
     @endif
+    <div wire:ignore>
+        <div>Grafik Garis dengan 2 Dataset DEMO</div>
+        <canvas id="myChart"></canvas>
+    </div>
 
+    <script>
+        const ctx = document.getElementById('myChart');
+
+        new Chart(ctx, {
+            type: 'line', // Ubah type dari 'bar' menjadi 'line'
+            data: {
+                labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                datasets: [{
+                        label: '# of Votes (Dataset 1)', // Label untuk dataset pertama
+                        data: [12, 19, 3, 5, 2, 3], // Data untuk dataset pertama
+                        borderColor: 'rgba(255, 99, 132, 1)', // Warna garis
+                        borderWidth: 2, // Ketebalan garis
+                        fill: false // Tidak mengisi area di bawah garis
+                    },
+                    {
+                        label: '# of Votes (Dataset 2)', // Label untuk dataset kedua
+                        data: [7, 11, 5, 8, 3, 10], // Data untuk dataset kedua
+                        borderColor: 'rgba(54, 162, 235, 1)', // Warna garis
+                        borderWidth: 2, // Ketebalan garis
+                        fill: false // Tidak mengisi area di bawah garis
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
 </div>
