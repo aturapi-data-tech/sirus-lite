@@ -356,7 +356,7 @@
 
                                                 <li>
                                                     <x-dropdown-link
-                                                        wire:click="editGeneralConsentPasienUGD('{{ $myQData->rihdr_no }}','{{ $myQData->reg_no }}')">
+                                                        wire:click="editGeneralConsentPasienRI('{{ $myQData->rihdr_no }}','{{ $myQData->reg_no }}')">
                                                         {{ __('Form Persetujuan Pasien') }}
                                                     </x-dropdown-link>
                                                 </li>
@@ -398,7 +398,7 @@
                                                 </li>
                                                 <li>
                                                     <x-dropdown-link
-                                                        wire:click="editGeneralConsentPasienUGD('{{ $myQData->rihdr_no }}','{{ $myQData->reg_no }}')">
+                                                        wire:click="editGeneralConsentPasienRI('{{ $myQData->rihdr_no }}','{{ $myQData->reg_no }}')">
                                                         {{ __('Form Persetujuan Pasien') }}
                                                     </x-dropdown-link>
                                                 </li>

@@ -3,7 +3,7 @@
     <div class="w-full mb-1 ">
 
         <div class="w-full p-4 text-sm ">
-            <h2 class="text-2xl font-bold text-center">Formulir Persetujuan Umum</h2>
+            <h2 class="text-2xl font-bold text-center">FORMULIR PERSETUJUAN UMUM UGD</h2>
             </br>
 
             <div class="w-full p-2 m-2 mx-auto bg-white rounded-lg shadow-md">

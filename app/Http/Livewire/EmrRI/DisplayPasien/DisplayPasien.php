@@ -31,7 +31,6 @@ class DisplayPasien extends Component
 
     public function mount()
     {
-
         $this->findData($this->riHdrNoRef);
     }
 
