@@ -97,6 +97,9 @@ class EmrRI extends Component
     public bool $isOpenGeneralConsentPasienRI = false;
     public string $isOpenModeGeneralConsentPasienRI = 'insert';
 
+    public bool $isOpenEdukasiPasienRI = false;
+    public string $isOpenModeEdukasiPasienRI = 'insert';
+
     public bool $isOpenScreening = false;
     public string $isOpenModeScreening = 'insert';
 
@@ -131,6 +134,14 @@ class EmrRI extends Component
     {
         $this->isOpenGeneralConsentPasienRI = true;
         $this->isOpenModeGeneralConsentPasienRI = 'update';
+        $this->riHdrNoRef = $riHdrNo;
+        $this->regNoRef = $regNoRef;
+    }
+
+    private function openModalEditEdukasiPasienRI($riHdrNo, $regNoRef): void
+    {
+        $this->isOpenEdukasiPasienRI = true;
+        $this->isOpenModeEdukasiPasienRI = 'update';
         $this->riHdrNoRef = $riHdrNo;
         $this->regNoRef = $regNoRef;
     }
@@ -175,6 +186,13 @@ class EmrRI extends Component
     {
         $this->isOpenGeneralConsentPasienRI = false;
         $this->isOpenModeGeneralConsentPasienRI = 'insert';
+        $this->resetInputFields();
+    }
+
+    public function closeModalEdukasiPasienRI(): void
+    {
+        $this->isOpenEdukasiPasienRI = false;
+        $this->isOpenModeEdukasiPasienRI = 'insert';
         $this->resetInputFields();
     }
 
@@ -223,6 +241,12 @@ class EmrRI extends Component
         // $this->findData($id);
     }
 
+    public function editEdukasiPasienRI($riHdrNo, $regNoRef)
+    {
+        $this->openModalEditEdukasiPasienRI($riHdrNo, $regNoRef);
+        // $this->findData($id);
+    }
+
     // is going to edit data/////////////////
     public function editInap($riHdrNo, $regNoRef)
     {
@@ -260,6 +284,8 @@ class EmrRI extends Component
     public string $activeTab = "rekamMedis";
     public string $activeTabDokter = "assessmentDokter";
     public string $activeTabGeneralConsentPasienRI = "generalConsentPasienRI";
+    public string $activeTabEdukasiPasienRI = "edukasiPasienRI";
+
 
 
 
@@ -337,6 +363,13 @@ class EmrRI extends Component
         [
             'ermMenuId' => 'informConsentPasienRI',
             'ermMenuName' => 'Inform Consent Pasien RI'
+        ]
+    ];
+
+    public array $EmrMenuEdukasiPasienRI = [
+        [
+            'ermMenuId' => 'edukasiPasienRI',
+            'ermMenuName' => 'Form Edukasi Pasien RI'
         ]
     ];
 

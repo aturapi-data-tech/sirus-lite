@@ -107,6 +107,10 @@
                 @include('livewire.emr-r-i.create-general-consent-r-i-pasien')
             @endif
 
+            @if ($isOpenEdukasiPasienRI)
+                @include('livewire.emr-r-i.create-edukasi-r-i-pasien')
+            @endif
+
 
             {{-- @if ($isOpenInap)
                 @include('livewire.emr-r-i.create-emr-r-i-inap')
@@ -325,21 +329,8 @@
                                         class="z-10 hidden w-auto bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700">
                                         <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
                                             aria-labelledby="dropdownButton{{ $myQData->rihdr_no }}">
-                                            {{-- <li>
-                                                <x-dropdown-link wire:click="tampil('{{ $myQData->rihdr_no }}')">
-                                                    {{ __('Tampil | ' . $myQData->reg_name) }}
-                                                </x-dropdown-link>
-                                            </li> --}}
-
 
                                             @role('Admin')
-                                                {{-- <li>
-                                                    <x-dropdown-link
-                                                        wire:click="editScreening('{{ $myQData->rihdr_no }}','{{ $myQData->reg_no }}')">
-                                                        {{ __('Screening') }}
-                                                    </x-dropdown-link>
-                                                </li> --}}
-
                                                 <li>
                                                     <x-dropdown-link
                                                         wire:click="editDokter('{{ $myQData->rihdr_no }}','{{ $myQData->reg_no }}')">
@@ -360,22 +351,14 @@
                                                         {{ __('Form Persetujuan Pasien') }}
                                                     </x-dropdown-link>
                                                 </li>
+                                                <li>
+                                                    <x-dropdown-link
+                                                        wire:click="editEdukasiPasienRI('{{ $myQData->rihdr_no }}','{{ $myQData->reg_no }}')">
+                                                        {{ __('Form Edukasi Pasien') }}
+                                                    </x-dropdown-link>
+                                                </li>
                                             @endrole
                                             @role('Mr')
-                                                {{-- <li>
-                                                    <x-dropdown-link
-                                                        wire:click="editScreening('{{ $myQData->rihdr_no }}','{{ $myQData->reg_no }}')">
-                                                        {{ __('Screening') }}
-                                                    </x-dropdown-link>
-                                                </li> --}}
-
-                                                {{-- <li>
-                                                    <x-dropdown-link
-                                                        wire:click="editDokter('{{ $myQData->rihdr_no }}','{{ $myQData->reg_no }}')">
-                                                        {{ __('Assessment Dokter') }}
-                                                    </x-dropdown-link>
-                                                </li> --}}
-
                                                 <li>
                                                     <x-dropdown-link
                                                         wire:click="edit('{{ $myQData->rihdr_no }}','{{ $myQData->reg_no }}')">
@@ -384,12 +367,6 @@
                                                 </li>
                                             @endrole
                                             @role('Perawat')
-                                                {{-- <li>
-                                                    <x-dropdown-link
-                                                        wire:click="editScreening('{{ $myQData->rihdr_no }}','{{ $myQData->reg_no }}')">
-                                                        {{ __('Screening') }}
-                                                    </x-dropdown-link>
-                                                </li> --}}
                                                 <li>
                                                     <x-dropdown-link
                                                         wire:click="edit('{{ $myQData->rihdr_no }}','{{ $myQData->reg_no }}')">
@@ -400,6 +377,12 @@
                                                     <x-dropdown-link
                                                         wire:click="editGeneralConsentPasienRI('{{ $myQData->rihdr_no }}','{{ $myQData->reg_no }}')">
                                                         {{ __('Form Persetujuan Pasien') }}
+                                                    </x-dropdown-link>
+                                                </li>
+                                                <li>
+                                                    <x-dropdown-link
+                                                        wire:click="editEdukasiPasienRI('{{ $myQData->rihdr_no }}','{{ $myQData->reg_no }}')">
+                                                        {{ __('Form Edukasi Pasien') }}
                                                     </x-dropdown-link>
                                                 </li>
                                             @endrole
@@ -410,14 +393,19 @@
                                                         {{ __('Assessment Dokter') }}
                                                     </x-dropdown-link>
                                                 </li>
+                                                <li>
+                                                    <x-dropdown-link
+                                                        wire:click="editGeneralConsentPasienRI('{{ $myQData->rihdr_no }}','{{ $myQData->reg_no }}')">
+                                                        {{ __('Form Persetujuan Pasien') }}
+                                                    </x-dropdown-link>
+                                                </li>
+                                                <li>
+                                                    <x-dropdown-link
+                                                        wire:click="editEdukasiPasienRI('{{ $myQData->rihdr_no }}','{{ $myQData->reg_no }}')">
+                                                        {{ __('Form Edukasi Pasien') }}
+                                                    </x-dropdown-link>
+                                                </li>
                                             @endrole
-
-                                            {{-- <li>
-                                                <x-dropdown-link
-                                                    wire:click="$emit('confirm_remove_record', '{{ $myQData->rihdr_no }}', '{{ $myQData->reg_name }}')">
-                                                    {{ __('Hapus') }}
-                                                </x-dropdown-link>
-                                            </li> --}}
 
                                         </ul>
                                     </div>
