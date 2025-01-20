@@ -347,8 +347,7 @@ class RekamMedisDisplay extends Component
             ->first();
 
 
-        // dd($kodeDokter);
-        if ($kodeDokter->kd_dr_bpjs == null) {
+        if (!$kodeDokter || $kodeDokter->kd_dr_bpjs == null) {
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Dokter tidak memiliki hak akses untuk I-Care.");
             return;
         }

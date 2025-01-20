@@ -10,11 +10,12 @@ use Carbon\Carbon;
 use Spatie\ArrayToXml\ArrayToXml;
 use App\Http\Traits\BPJS\AntrianTrait;
 use App\Http\Traits\EmrRJ\EmrRJTrait;
+use App\Http\Traits\BPJS\iCareTrait;
 
 
 class EmrRJ extends Component
 {
-    use WithPagination, EmrRJTrait;
+    use WithPagination, EmrRJTrait, iCareTrait;
 
     // primitive Variable
     public string $myTitle = 'Rekam Medis Rawat Jalan';
@@ -179,6 +180,16 @@ class EmrRJ extends Component
         $this->isOpenModeDokter = 'update';
         $this->rjNoRef = $rjNo;
         $this->regNoRef = $regNoRef;
+
+        //iCare
+        if ($this->dataDaftarPoliRJ['klaimId'] === 'JM') {
+            $this->findData($rjNo);
+            $sep = $this->dataDaftarPoliRJ['sep']['noSep'] ?? '';
+            $nomorKartu = $this->dataDaftarPoliRJ['sep']['reqSep']['request']['t_sep']['noKartu'] ?? '';
+            $this->myiCare($nomorKartu, $sep);
+        }
+        //iCare
+
     }
 
     private function openModalEditGeneralConsentPasienRJ($rjNo, $regNoRef): void
@@ -530,7 +541,43 @@ class EmrRJ extends Component
         $this->settermyTopBarShiftandmyTopBarrefDate();
     }
 
+    //Otomatis Buka Icare
+    public bool $isOpenRekamMedisicare;
+    public string $icareUrlResponse;
+    private function myiCare($nomorKartu, $sep)
+    {
+        if (!$sep) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Belum Terbit SEP.");
+            return;
+        }
 
+        $kodeDokter = DB::table('rsmst_doctors')
+            ->select('kd_dr_bpjs')
+            ->where('rsmst_doctors.dr_id', $this->dataDaftarPoliRJ['drId'])
+            ->first();
+
+
+        if (!$kodeDokter || $kodeDokter->kd_dr_bpjs == null) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Dokter tidak memiliki hak akses untuk I-Care.");
+            return;
+        }
+
+        // trait
+        $HttpGetBpjs  = $this->icare($nomorKartu, $kodeDokter->kd_dr_bpjs)->getOriginalContent();
+        // $HttpGetBpjs =  iCareTrait::icare($nomorKartu, $kodeDokter)->getOriginalContent();
+        // set http response to public
+        $HttpGetBpjsStatus = $HttpGetBpjs['metadata']['code']; //status 200 201 400 ..
+        $HttpGetBpjsJson = $HttpGetBpjs; //Return Response
+        if ($HttpGetBpjsStatus == 200) {
+            $this->icareUrlResponse = $HttpGetBpjsJson['response']['url'];
+            // offkan modalIcare hanya untuk penilaian BPJS
+            // $this->openModalicare();
+            // return redirect()->to($HttpGetBpjsJson['response']['url']);
+        } else {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError(json_encode($HttpGetBpjsJson['metadata']['message'], true));
+            return;
+        }
+    }
 
 
     // select data start////////////////
