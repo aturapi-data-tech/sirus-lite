@@ -182,7 +182,8 @@ class EmrRJ extends Component
         $this->regNoRef = $regNoRef;
 
         //iCare
-        if ($this->dataDaftarPoliRJ['klaimId'] === 'JM') {
+        $klaimId = $this->dataDaftarPoliRJ['klaimId'] ?? '';
+        if ($klaimId  === 'JM') {
             $this->findData($rjNo);
             $sep = $this->dataDaftarPoliRJ['sep']['noSep'] ?? '';
             $nomorKartu = $this->dataDaftarPoliRJ['sep']['reqSep']['request']['t_sep']['noKartu'] ?? '';
