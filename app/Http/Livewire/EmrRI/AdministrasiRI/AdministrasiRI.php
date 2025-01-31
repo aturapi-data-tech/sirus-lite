@@ -23,55 +23,111 @@ class AdministrasiRI extends Component
     // dataDaftarRi RJ
     public $riHdrNoRef;
 
-    public int $sumRsAdmin;
-    public int $sumRjAdmin;
-    public int $sumPoliPrice;
+    //Admin:
+    public int $sumAdminAge;
+    public int $sumAdminStatus;
+    //Jasa:
+    public int $sumRiVisit;
+    public int $sumRiKonsul;
+    public int $sumRiActParams;
+    public int $sumRiActDocs;
+    public int $sumRiLab;
+    public int $sumRiRad;
+    public int $sumUgdRj;
+    public int $sumRiOther;
 
-    public int $sumJasaKaryawan;
-    public int $sumJasaDokter;
-    public int $sumJasaMedis;
+    //Operasi:
+    public int $sumRiOk;
 
-    public int $sumObat;
-    public int $sumLaboratorium;
-    public int $sumRadiologi;
+    //Kamar:
+    public int $sumRiRoom;
+    public int $sumCService;
+    public int $sumRiPerawatan;
 
-    public int $sumLainLain;
-    public int $sumtrfRJ;
+    //Bon:
+    public int $sumRiBonResep;
 
-    public int $sumTotalRJ;
+    //Lain-lain:
+
+    public int $sumRiRtnObat;
+    //Obat Pinjam
+    public int $sumRsObat;
+
+    public int $sumTotalRI;
 
 
-    public string $activeTabAdministrasi = "JasaKaryawan";
+    public string $activeTabAdministrasi = "RiVisit";
     public array $EmrMenuAdministrasi = [
+
+        // Jasa
         [
-            'ermMenuId' => 'JasaKaryawan',
-            'ermMenuName' => 'Jasa Karyawan'
+            'ermMenuId' => 'RiVisit',
+            'ermMenuName' => 'Kunjungan'
         ],
         [
-            'ermMenuId' => 'JasaDokter',
-            'ermMenuName' => 'Jasa Dokter'
+            'ermMenuId' => 'RiKonsul',
+            'ermMenuName' => 'Konsultasi'
         ],
         [
-            'ermMenuId' => 'JasaMedis',
+            'ermMenuId' => 'RiActParams',
             'ermMenuName' => 'Jasa Medis'
         ],
         [
-            'ermMenuId' => 'Obat',
-            'ermMenuName' => 'Obat'
+            'ermMenuId' => 'RiActDocs',
+            'ermMenuName' => 'Jasa Dokter'
         ],
         [
-            'ermMenuId' => 'Laboratorium',
+            'ermMenuId' => 'RiLab',
             'ermMenuName' => 'Laboratorium'
         ],
         [
-            'ermMenuId' => 'Radiologi',
+            'ermMenuId' => 'RiRad',
             'ermMenuName' => 'Radiologi'
         ],
         [
-            'ermMenuId' => 'LainLain',
+            'ermMenuId' => 'UgdRj',
+            'ermMenuName' => 'Trf UGD/Rawat Jalan'
+        ],
+        [
+            'ermMenuId' => 'RiOther',
             'ermMenuName' => 'Lain-Lain'
         ],
 
+        // Operasi
+        [
+            'ermMenuId' => 'RiOk',
+            'ermMenuName' => 'Operasi(OK)'
+        ],
+
+        // Kamar
+        [
+            'ermMenuId' => 'RiRoom',
+            'ermMenuName' => 'Kamar'
+        ],
+        [
+            'ermMenuId' => 'CService',
+            'ermMenuName' => 'Layanan Pelanggan'
+        ],
+
+        // Bon
+        [
+            'ermMenuId' => 'RiBonResep',
+            'ermMenuName' => 'Bon Resep'
+        ],
+
+        // Lain-lain
+        [
+            'ermMenuId' => 'RiPerawatan',
+            'ermMenuName' => 'Perawatan RI'
+        ],
+        [
+            'ermMenuId' => 'RiRtnObat',
+            'ermMenuName' => 'Return Obat RI'
+        ],
+        [
+            'ermMenuId' => 'TotalRI',
+            'ermMenuName' => 'Total RI'
+        ]
     ];
 
 
@@ -82,184 +138,303 @@ class AdministrasiRI extends Component
 
     private function sumAdmin()
     {
-        $sumAdmin = $this->findData($this->riHdrNoRef);
+        $dataRawatInap = $this->findData($this->riHdrNoRef);
 
-        $this->sumRsAdmin = $sumAdmin['rsAdmin'] ? $sumAdmin['rsAdmin'] : 0;
-        $this->sumRjAdmin = $sumAdmin['rjAdmin'] ? $sumAdmin['rjAdmin'] : 0;
-        $this->sumPoliPrice = $sumAdmin['poliPrice'] ? $sumAdmin['poliPrice'] : 0;
+        // Admin:
+        $this->sumAdminAge = $dataRawatInap['adminAge'] ?? 0;
+        $this->sumAdminStatus = $dataRawatInap['adminStatus'] ?? 0;
 
-        $this->sumJasaKaryawan = isset($sumAdmin['JasaKaryawan']) ? collect($sumAdmin['JasaKaryawan'])->sum('JasaKaryawanPrice') : 0;
-        $this->sumJasaMedis = isset($sumAdmin['JasaMedis']) ? collect($sumAdmin['JasaMedis'])->sum('JasaMedisPrice') : 0;
-        $this->sumJasaDokter = isset($sumAdmin['JasaDokter']) ? collect($sumAdmin['JasaDokter'])->sum('JasaDokterPrice') : 0;
-
-
-        $this->sumObat = collect($sumAdmin['rjObat'])->sum((function ($obat) {
-            return $obat['qty'] * $obat['price'];
-        }));
-
-        $this->sumLaboratorium = collect($sumAdmin['rjLab'])->sum((function ($rjLab) {
-            return $rjLab['lab_price'];
-        }));
-
-        $this->sumRadiologi = collect($sumAdmin['rjRad'])->sum((function ($rjRad) {
-            return $rjRad['rad_price'];
-        }));
-
-
-        $this->sumLainLain = isset($sumAdmin['LainLain']) ? collect($sumAdmin['LainLain'])->sum('LainLainPrice') : 0;
-
-        $this->sumtrfRJ = collect($sumAdmin['rjtrfRj'])->sum((function ($trfRj) {
-            return $trfRj['rj_admin'] + $trfRj['poli_price'] + $trfRj['acte_price'] + $trfRj['actp_price'] + $trfRj['actd_price'] + $trfRj['obat'] + $trfRj['lab'] + $trfRj['rad'] + $trfRj['other'] + $trfRj['rs_admin'];
-        }));
-
+        // Jasa (Services):
+        $this->sumRiVisit = collect($dataRawatInap['riVisit'])->sum(function ($visit) {
+            return $visit['visit_price'] * ($visit['qty'] ?? 1);  // Multiply by qty if it exists
+        });
+        $this->sumRiKonsul = collect($dataRawatInap['riKonsul'])->sum(function ($konsul) {
+            return $konsul['konsul_price'] * ($konsul['qty'] ?? 1);  // Multiply by qty if it exists
+        });
+        $this->sumRiActParams = collect($dataRawatInap['riActParams'])->sum(function ($actParam) {
+            return $actParam['actp_price'] * ($actParam['actp_qty'] ?? 1);  // Multiply by qty if it exists
+        });
+        $this->sumRiActDocs = collect($dataRawatInap['riActDocs'])->sum(function ($actDoc) {
+            return $actDoc['actd_price'] * ($actDoc['actd_qty'] ?? 1);  // Multiply by qty if it exists
+        });
+        $this->sumRiLab = collect($dataRawatInap['riLab'])->sum(function ($lab) {
+            return $lab['lab_price'] * ($lab['qty'] ?? 1);  // Multiply by qty or detail if it exists
+        });
+        $this->sumRiRad = collect($dataRawatInap['riRad'])->sum(function ($rad) {
+            return $rad['rirad_price'] * ($rad['qty'] ?? 1);  // Multiply by qty if it exists
+        });
+        $this->sumUgdRj = collect($dataRawatInap['rstrfRj'])->sum(function ($rj) {
+            return ($rj['rj_admin'] + $rj['poli_price']) * ($rj['qty'] ?? 1);  // Multiply by qty if it exists
+        });
 
 
+        // Operasi (Operation):
+        $this->sumRiOk = collect($dataRawatInap['riOk'])->sum(function ($ok) {
+            return $ok['ok_price'] * ($ok['qty'] ?? 1);  // Multiply by qty if it exists
+        });
 
-        $this->sumTotalRJ = $this->sumPoliPrice + $this->sumRjAdmin + $this->sumRsAdmin  + $this->sumJasaKaryawan + $this->sumJasaDokter + $this->sumJasaMedis + $this->sumLainLain + $this->sumObat + $this->sumLaboratorium + $this->sumRadiologi + $this->sumtrfRJ;
+        // Kamar (Room):
+        $this->sumRiRoom = collect($dataRawatInap['riRoom'])->sum(function ($room) {
+            return $room['room_price'] * ($room['day'] ?? 1);  // Multiply by day or quantity if it exists
+        });
+        $this->sumCService = collect($dataRawatInap['riRoom'])->sum(function ($room) {
+            return $room['common_service'] * ($room['day'] ?? 1);  // Multiply by day if it exists
+        });
+        $this->sumRiPerawatan = collect($dataRawatInap['riRoom'])->sum(function ($room) {
+            return $room['perawatan_price'] * ($room['day'] ?? 1);  // Multiply by day if it exists
+        });
+
+        // Bon (Prescription):
+        $this->sumRiBonResep = collect($dataRawatInap['riBonResep'])->sum(function ($bonResep) {
+            return $bonResep['ribon_price'] * ($bonResep['qty'] ?? 1);  // Multiply by qty if it exists
+        });
+
+        // Lain-lain (Others):
+        $this->sumRiOther = collect($dataRawatInap['riOther'])->sum(function ($other) {
+            return $other['other_price'] * ($other['qty'] ?? 1);  // Multiply by qty if it exists
+        });
+
+        // Return Obat (Return Medicine):
+        $this->sumRiRtnObat = collect($dataRawatInap['riRtnObat'])->sum(function ($obat) {
+            return $obat['riobat_qty'] * $obat['riobat_price'];  // Quantity * price
+        });
+        //ObatPinjam
+        $this->sumRsObat = collect($dataRawatInap['rsObat'])->sum(function ($obat) {
+            return $obat['riobat_qty'] * $obat['riobat_price'];  // Quantity * price
+        });
+
+        // Total Rawat Inap:
+        $this->sumTotalRI = $this->sumRiVisit +
+            $this->sumRiKonsul +
+            $this->sumRiActParams +
+            $this->sumRiActDocs +
+            $this->sumRiLab +
+            $this->sumRiRad +
+            $this->sumUgdRj + $this->sumRiOther +
+            $this->sumRiOk +
+            $this->sumRiRoom +
+            $this->sumCService +
+            $this->sumRiBonResep +
+            $this->sumRiPerawatan +
+            $this->sumRsObat -
+            $this->sumRiRtnObat;
     }
 
 
-    public function setSelesaiAdministrasiStatus($rjNo)
+
+    private function findData($riHdrNo): array
     {
+        $dataRawatInap = [];
 
-        $dataDaftarRi = $this->findData($rjNo);
+        $findDataRI = $this->findDataRI($riHdrNo);
+        $dataRawatInap  = $findDataRI;
 
-        if (isset($dataDaftarRi['AdministrasiRj']) == false) {
-            $dataDaftarRi['AdministrasiRj'] = [
-                'userLog' => auth()->user()->myuser_name,
-                'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
-            ];
+        // JD - Jasa Dokter
+        $riActDocs = DB::table('rstxn_riactdocs')
+            ->join('rsmst_accdocs', 'rsmst_accdocs.accdoc_id', '=', 'rstxn_riactdocs.accdoc_id')
+            ->join('rsmst_doctors', 'rsmst_doctors.dr_id', '=', 'rstxn_riactdocs.dr_id')
+            ->select(
+                'rstxn_riactdocs.actd_date',
+                'rstxn_riactdocs.dr_id',
+                'rsmst_doctors.dr_name',
+                'rstxn_riactdocs.accdoc_id',
+                'rsmst_accdocs.accdoc_desc',
+                'rstxn_riactdocs.actd_price',
+                'rstxn_riactdocs.actd_qty',
+                'rstxn_riactdocs.rihdr_no',
+                'rstxn_riactdocs.actd_no'
+            )
+            ->where('rstxn_riactdocs.rihdr_no', $riHdrNo)
+            ->get();
+        $dataRawatInap['riActDocs'] = json_decode(json_encode($riActDocs, true), true);
 
-            // DB::table('rstxn_rihdrs')
-            //     ->where('rihdr_no', $rjNo)
-            //     ->update([
-            //         'datadaftarri_json' => json_encode($dataDaftarRi, true),
-            //         'datadaftarri_xml' => ArrayToXml::convert($dataDaftarRi),
-            //     ]);
+        // JM - Jasa Medis
+        $riActParams = DB::table('rstxn_riactparams')
+            ->join('rsmst_actparamedics', 'rsmst_actparamedics.pact_id', '=', 'rstxn_riactparams.pact_id')
+            ->select(
+                'rstxn_riactparams.actp_date',
+                'rstxn_riactparams.pact_id',
+                'rsmst_actparamedics.pact_desc',
+                'rstxn_riactparams.actp_price',
+                'rstxn_riactparams.actp_qty',
+                'rstxn_riactparams.rihdr_no',
+                'rstxn_riactparams.actp_no'
 
-            $this->updateJsonRI($rjNo, $dataDaftarRi);
+            )
+            ->where('rstxn_riactparams.rihdr_no', $riHdrNo)
+            ->get();
+        $dataRawatInap['riActParams'] = json_decode(json_encode($riActParams, true), true);
 
+        // Konsultasi
+        $riKonsul = DB::table('rstxn_rikonsuls')
+            ->join('rsmst_doctors', 'rstxn_rikonsuls.dr_id', '=', 'rsmst_doctors.dr_id')
+            ->select(
+                'rstxn_rikonsuls.konsul_date',
+                'rstxn_rikonsuls.dr_id',
+                'rsmst_doctors.dr_name',
+                'rstxn_rikonsuls.konsul_price',
+                'rstxn_rikonsuls.rihdr_no',
+                'rstxn_rikonsuls.konsul_no'
 
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Administrasi berhasil disimpan.");
-            $this->emit('syncronizeAssessmentDokterRIFindData');
-            $this->emit('syncronizeAssessmentPerawatRIFindData');
-        } else {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Administrasi sudah tersimpan oleh." . $dataDaftarRi['AdministrasiRj']['userLog']);
-        }
-    }
+            )
+            ->where('rihdr_no', $riHdrNo)
+            ->get();
+        $dataRawatInap['riKonsul'] = json_decode(json_encode($riKonsul, true), true);
 
-    private function findData($rjNo): array
-    {
-        $dataRawatJalan = [];
+        // Kunjungan Dokter
+        $riVisit = DB::table('rstxn_rivisits')
+            ->join('rsmst_doctors', 'rstxn_rivisits.dr_id', '=', 'rsmst_doctors.dr_id')
+            ->select(
+                'rstxn_rivisits.visit_date',
+                'rstxn_rivisits.dr_id',
+                'rsmst_doctors.dr_name',
+                'rstxn_rivisits.visit_price',
+                'rstxn_rivisits.rihdr_no',
+                'rstxn_rivisits.visit_no'
 
-        $findDataRI = $this->findDataRI($rjNo);
-        $dataRawatJalan  = $findDataRI;
+            )
+            ->where('rihdr_no', $riHdrNo)
+            ->get();
+        $dataRawatInap['riVisit'] = json_decode(json_encode($riVisit, true), true);
 
-
-
+        // Administrasi
         $rsAdmin = DB::table('rstxn_rihdrs')
-            ->select('rs_admin', 'rj_admin', 'poli_price', 'klaim_id', 'pass_status')
-            ->where('rihdr_no', $rjNo)
+            ->select('admin_status', 'admin_age', 'rihdr_no')
+            ->where('rihdr_no', $riHdrNo)
             ->first();
+        $dataRawatInap['adminAge'] = $rsAdmin->admin_age ?? 0;
+        $dataRawatInap['adminStatus'] = $rsAdmin->admin_status ?? 0;
+        $dataRawatInap['rihdr_no'] = $rsAdmin->rihdr_no ?? 0;
 
+        // Bon Resep
+        $riBonResep = DB::table('rstxn_ribonobats')
+            ->select(
+                'ribon_date',
+                'ribon_desc',
+                'ribon_price',
+                'rihdr_no',
+                'ribon_no',
+                'sls_no'
+            )
+            ->where('rihdr_no', $riHdrNo)
+            ->get();
+        $dataRawatInap['riBonResep'] = json_decode(json_encode($riBonResep, true), true);
+
+        // Obat Pinjam
         $rsObat = DB::table('rstxn_riobats')
-            ->join('immst_products', 'immst_products.product_id', 'rstxn_riobats.product_id')
-            ->select('rstxn_riobats.product_id as product_id', 'product_name', 'qty', 'price', 'rjobat_dtl')
-            ->where('rihdr_no', $rjNo)
+            ->join('immst_products', 'immst_products.product_id', '=', 'rstxn_riobats.product_id')
+            ->select(
+                'rstxn_riobats.riobat_date',
+                'rstxn_riobats.product_id as product_id',
+                'immst_products.product_name',
+                'rstxn_riobats.riobat_qty',
+                'rstxn_riobats.riobat_price',
+                'rstxn_riobats.rihdr_no',
+                'rstxn_riobats.riobat_no'
+            )
+            ->where('rihdr_no', $riHdrNo)
             ->get();
+        $dataRawatInap['rsObat'] = json_decode(json_encode($rsObat, true), true);
 
-        $rsLab = DB::table('rstxn_rilabs')
-            ->select('lab_desc', 'lab_price', 'lab_dtl')
-            ->where('rihdr_no', $rjNo)
+        // Return Obat
+        $riRtnObat = DB::table('rstxn_riobatrtns')
+            ->join('immst_products', 'immst_products.product_id', '=', 'rstxn_riobatrtns.product_id')
+            ->select(
+                'rstxn_riobatrtns.riobat_date',
+                'rstxn_riobatrtns.product_id as product_id',
+                'immst_products.product_name',
+                'rstxn_riobatrtns.riobat_qty',
+                'rstxn_riobatrtns.riobat_price',
+                'rstxn_riobatrtns.rihdr_no',
+                'rstxn_riobatrtns.riobat_no'
+            )
+            ->where('rihdr_no', $riHdrNo)
             ->get();
+        $dataRawatInap['riRtnObat'] = json_decode(json_encode($riRtnObat, true), true);
 
-        $rsRad = DB::table('rstxn_rirads')
-            ->join('rsmst_radiologis', 'rsmst_radiologis.rad_id', 'rstxn_rirads.rad_id')
-            ->select('rad_desc', 'rstxn_rirads.rad_price as rad_price', 'rad_dtl')
-            ->where('rihdr_no', $rjNo)
+        // Radiologi
+        $riRad = DB::table('rstxn_riradiologs')
+            ->join('rsmst_radiologis', 'rstxn_riradiologs.rad_id', '=', 'rsmst_radiologis.rad_id')
+            ->select(
+                'rstxn_riradiologs.rirad_date',
+                'rstxn_riradiologs.rad_id',
+                'rsmst_radiologis.rad_desc',
+                'rstxn_riradiologs.rirad_price',
+                'rstxn_riradiologs.rihdr_no',
+                'rstxn_riradiologs.rirad_no'
+            )
+            ->where('rihdr_no', $riHdrNo)
             ->get();
+        $dataRawatInap['riRad'] = json_decode(json_encode($riRad, true), true);
 
+        // Laboratorium
+        $riLab = DB::table('rstxn_rilabs')
+            ->select(
+                'lab_date',
+                'lab_desc',
+                'lab_price',
+                'rihdr_no',
+                'lab_dtl',
+                'checkup_no'
+            )
+            ->where('rihdr_no', $riHdrNo)
+            ->get();
+        $dataRawatInap['riLab'] = json_decode(json_encode($riLab, true), true);
+
+        // Operasi
+        $riOk = DB::table('rstxn_rioks')
+            ->select('ok_date', 'ok_desc', 'ok_price', 'rihdr_no', 'ok_no')
+            ->where('rihdr_no', $riHdrNo)
+            ->get();
+        $dataRawatInap['riOk'] = json_decode(json_encode($riOk, true), true);
+
+        // Lain-lain
+        $riOther = DB::table('rstxn_riothers')
+            ->join('rsmst_others', 'rstxn_riothers.other_id', '=', 'rsmst_others.other_id')
+            ->select(
+                'rstxn_riothers.other_date',
+                'rstxn_riothers.other_id',
+                'rsmst_others.other_desc',
+                'rstxn_riothers.other_price',
+                'rstxn_riothers.rihdr_no',
+                'rstxn_riothers.other_no'
+            )
+            ->where('rihdr_no', $riHdrNo)
+            ->get();
+        $dataRawatInap['riOther'] = json_decode(json_encode($riOther, true), true);
+
+        // Tarif Rawat Jalan / UGD
         $rstrfRj = DB::table('rstxn_ritempadmins')
-            ->select('rihdr_no', 'tempadm_date', 'rj_admin', 'poli_price', 'acte_price', 'actp_price', 'actd_price', 'obat', 'lab', 'rad', 'other', 'rs_admin')
-            ->where('rihdr_no', $rjNo)
+            ->select(
+                'tempadm_date',
+                'rj_admin',
+                'poli_price',
+                'acte_price',
+                'actp_price',
+                'actd_price',
+                'obat',
+                'lab',
+                'rad',
+                'other',
+                'rs_admin',
+                'rihdr_no',
+                'tempadm_no',
+                'tempadm_flag'
+            )
+            ->where('rihdr_no', $riHdrNo)
             ->get();
+        $dataRawatInap['rstrfRj'] = json_decode(json_encode($rstrfRj, true), true);
+
+        // Kamar Rawat Inap
+        $riRoom = DB::table('rsmst_trfrooms')
+            ->select('start_date', 'end_date', 'room_id', 'room_price', 'perawatan_price', 'common_service', 'day', 'rihdr_no', 'trfr_no')
+            ->where('rihdr_no', $riHdrNo)
+            ->get();
+        $dataRawatInap['riRoom'] = json_decode(json_encode($riRoom, true), true);
 
 
 
-        // RJ Admin
-        if ($rsAdmin->pass_status == 'N') {
-            $rsAdminParameter = DB::table('rsmst_parameters')
-                ->select('par_value')
-                ->where('par_id', '1')
-                ->first();
-            if (isset($dataRawatJalan['rjAdmin'])) {
-                $dataRawatJalan['rjAdmin'] = $rsAdmin->rj_admin;
-            } else {
-                $dataRawatJalan['rjAdmin'] = $rsAdminParameter->par_value;
-                // update table trnsaksi
-                DB::table('rstxn_rihdrs')
-                    ->where('rihdr_no', $rjNo)
-                    ->update([
-                        'rj_admin' => $dataRawatJalan['rjAdmin'],
-                    ]);
-            }
-        } else {
-            $dataRawatJalan['rjAdmin'] = 0;
-        }
-
-        // RS Admin
-        $rsAdminDokter = DB::table('rsmst_doctors')
-            ->select('rs_admin', 'poli_price')
-            ->where('dr_id', $dataRawatJalan['drId'])
-            ->first();
-
-
-        if (isset($dataRawatJalan['rsAdmin'])) {
-            $dataRawatJalan['rsAdmin'] = $rsAdmin->rs_admin ? $rsAdmin->rs_admin : 0;
-        } else {
-            $dataRawatJalan['rsAdmin'] = $rsAdminDokter->rs_admin ? $rsAdminDokter->rs_admin : 0;
-            // update table trnsaksi
-            DB::table('rstxn_rihdrs')
-                ->where('rihdr_no', $rjNo)
-                ->update([
-                    'rs_admin' => $dataRawatJalan['rsAdmin'],
-                ]);
-        }
-
-        // PoliPrice
-        if (isset($dataRawatJalan['poliPrice'])) {
-            $dataRawatJalan['poliPrice'] = $rsAdmin->poli_price ? $rsAdmin->poli_price : 0;
-        } else {
-            $dataRawatJalan['poliPrice'] = $rsAdminDokter->poli_price ? $rsAdminDokter->poli_price : 0;
-            // update table trnsaksi
-            DB::table('rstxn_rihdrs')
-                ->where('rihdr_no', $rjNo)
-                ->update([
-                    'poli_price' => $dataRawatJalan['poliPrice'],
-                ]);
-        }
-
-        // Ketika Kronis
-        if ($rsAdmin->klaim_id == 'KR') {
-            $dataRawatJalan['rjAdmin'] = 0;
-            $dataRawatJalan['rsAdmin'] = 0;
-            $dataRawatJalan['poliPrice'] = 0;
-            // update table trnsaksi
-            DB::table('rstxn_rihdrs')
-                ->where('rihdr_no', $rjNo)
-                ->update([
-                    'rj_admin' => $dataRawatJalan['rjAdmin'],
-                    'rs_admin' => $dataRawatJalan['rsAdmin'],
-                    'poli_price' => $dataRawatJalan['poliPrice'],
-                ]);
-        }
-
-        $dataRawatJalan['rjObat'] = json_decode(json_encode($rsObat, true), true);
-        $dataRawatJalan['rjLab'] = json_decode(json_encode($rsLab, true), true);
-        $dataRawatJalan['rjRad'] = json_decode(json_encode($rsRad, true), true);
-        $dataRawatJalan['rjtrfRj'] = json_decode(json_encode($rstrfRj, true), true);
-
-        return ($dataRawatJalan);
+        return ($dataRawatInap);
     }
 
     // when new form instance

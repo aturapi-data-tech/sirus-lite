@@ -7,132 +7,194 @@
             {{-- Transasi EMR --}}
             <div class="flex justify-between m-4 m-x-auto">
 
-                <div class="grid grid-cols-6 gap-2 mx-2">
+                <div class="grid grid-cols-9 gap-2 mx-2">
 
                     <div class="relative">
-                        <input type="text" id="RsAdmin" disabled
-                            class=" block rounded-t-lg px-2.5 pb-1 pt-5 w-full text-sm text-gray-700 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                            placeholder=" " value="{{ number_format($sumRsAdmin) }}" />
-                        <label for="RsAdmin"
-                            class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] start-2.5 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">
-                            RS Admin
+                        <input type="text" id="usiaAdmin" disabled
+                            class="block rounded-t-lg px-2.5 pb-1 pt-5 w-full text-sm text-gray-700 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-secondary focus:outline-none focus:ring-0 focus:border-primary peer"
+                            placeholder=" " value="{{ number_format($sumAdminAge) }}" />
+                        <label for="usiaAdmin"
+                            class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] start-2.5 peer-focus:text-primary peer-focus:dark:text-secondary peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">
+                            Admin Usia
                         </label>
                     </div>
 
                     <div class="relative">
-                        <input type="text" id="RjAdmin" disabled
-                            class=" block rounded-t-lg px-2.5 pb-1 pt-5 w-full text-sm text-gray-700 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                            placeholder=" " value="{{ number_format($sumRjAdmin) }}" />
-                        <label for="RjAdmin"
-                            class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] start-2.5 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">
-                            Admin OB
+                        <input type="text" id="statusAdmin" disabled
+                            class="block rounded-t-lg px-2.5 pb-1 pt-5 w-full text-sm text-gray-700 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-secondary focus:outline-none focus:ring-0 focus:border-primary peer"
+                            placeholder=" " value="{{ number_format($sumAdminStatus) }}" />
+                        <label for="statusAdmin"
+                            class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] start-2.5 peer-focus:text-primary peer-focus:dark:text-secondary peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">
+                            Admin Status
                         </label>
                     </div>
 
                     <div class="relative">
-                        <input type="text" id="PoliPrice" disabled
-                            class=" block rounded-t-lg px-2.5 pb-1 pt-5 w-full text-sm text-gray-700 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                            placeholder=" " value="{{ number_format($sumPoliPrice) }}" />
-                        <label for="PoliPrice"
-                            class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] start-2.5 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">
-                            Uang Periksa
+                        <input type="text" id="totalRiVisit" disabled
+                            class="block rounded-t-lg px-2.5 pb-1 pt-5 w-full text-sm text-gray-700 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-secondary focus:outline-none focus:ring-0 focus:border-primary peer"
+                            placeholder=" " value="{{ number_format($sumRiVisit) }}" />
+                        <label for="totalRiVisit"
+                            class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] start-2.5 peer-focus:text-primary peer-focus:dark:text-secondary peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">
+                            Visit
                         </label>
                     </div>
 
                     <div class="relative">
-                        <input type="text" id="JasaKaryawan" disabled
-                            class=" block rounded-t-lg px-2.5 pb-1 pt-5 w-full text-sm text-gray-700 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                            placeholder=" " value="{{ number_format($sumJasaKaryawan) }}" />
-                        <label for="JasaKaryawan"
-                            class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] start-2.5 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">
-                            Jasa Karyawan
+                        <input type="text" id="konsultasiRi" disabled
+                            class="block rounded-t-lg px-2.5 pb-1 pt-5 w-full text-sm text-gray-700 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-secondary focus:outline-none focus:ring-0 focus:border-primary peer"
+                            placeholder=" " value="{{ number_format($sumRiKonsul) }}" />
+                        <label for="konsultasiRi"
+                            class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] start-2.5 peer-focus:text-primary peer-focus:dark:text-secondary peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">
+                            Konsul
                         </label>
                     </div>
 
                     <div class="relative">
-                        <input type="text" id="sumJasaDokter" disabled
-                            class=" block rounded-t-lg px-2.5 pb-1 pt-5 w-full text-sm text-gray-700 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                            placeholder=" " value="{{ number_format($sumJasaDokter) }}" />
-                        <label for="sumJasaDokter"
-                            class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] start-2.5 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">
-                            Jasa Dokter
+                        <input type="text" id="aktivitasiRiParams" disabled
+                            class="block rounded-t-lg px-2.5 pb-1 pt-5 w-full text-sm text-gray-700 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-secondary focus:outline-none focus:ring-0 focus:border-primary peer"
+                            placeholder=" " value="{{ number_format($sumRiActParams) }}" />
+                        <label for="aktivitasiRiParams"
+                            class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] start-2.5 peer-focus:text-primary peer-focus:dark:text-secondary peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">
+                            JM
                         </label>
                     </div>
 
                     <div class="relative">
-                        <input type="text" id="sumJasaMedis" disabled
-                            class=" block rounded-t-lg px-2.5 pb-1 pt-5 w-full text-sm text-gray-700 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                            placeholder=" " value="{{ number_format($sumJasaMedis) }}" />
-                        <label for="sumJasaMedis"
-                            class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] start-2.5 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">
-                            Jasa Medis
+                        <input type="text" id="dokumenRiAktifitas" disabled
+                            class="block rounded-t-lg px-2.5 pb-1 pt-5 w-full text-sm text-gray-700 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-secondary focus:outline-none focus:ring-0 focus:border-primary peer"
+                            placeholder=" " value="{{ number_format($sumRiActDocs) }}" />
+                        <label for="dokumenRiAktifitas"
+                            class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] start-2.5 peer-focus:text-primary peer-focus:dark:text-secondary peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">
+                            JD
                         </label>
                     </div>
 
                     <div class="relative">
-                        <input type="text" id="sumObat" disabled
-                            class=" block rounded-t-lg px-2.5 pb-1 pt-5 w-full text-sm text-gray-700 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                            placeholder=" " value="{{ number_format($sumObat) }}" />
-                        <label for="sumObat"
-                            class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] start-2.5 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">
-                            Obat
-                        </label>
-                    </div>
-
-                    <div class="relative">
-                        <input type="text" id="sumLaboratorium" disabled
-                            class=" block rounded-t-lg px-2.5 pb-1 pt-5 w-full text-sm text-gray-700 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                            placeholder=" " value="{{ number_format($sumLaboratorium) }}" />
-                        <label for="sumLaboratorium"
-                            class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] start-2.5 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">
+                        <input type="text" id="hasilLabRi" disabled
+                            class="block rounded-t-lg px-2.5 pb-1 pt-5 w-full text-sm text-gray-700 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-secondary focus:outline-none focus:ring-0 focus:border-primary peer"
+                            placeholder=" " value="{{ number_format($sumRiLab) }}" />
+                        <label for="hasilLabRi"
+                            class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] start-2.5 peer-focus:text-primary peer-focus:dark:text-secondary peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">
                             Laboratorium
                         </label>
                     </div>
 
                     <div class="relative">
-                        <input type="text" id="sumRadiologi" disabled
-                            class=" block rounded-t-lg px-2.5 pb-1 pt-5 w-full text-sm text-gray-700 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                            placeholder=" " value="{{ number_format($sumRadiologi) }}" />
-                        <label for="sumRadiologi"
-                            class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] start-2.5 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">
+                        <input type="text" id="pemeriksaanRadRi" disabled
+                            class="block rounded-t-lg px-2.5 pb-1 pt-5 w-full text-sm text-gray-700 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-secondary focus:outline-none focus:ring-0 focus:border-primary peer"
+                            placeholder=" " value="{{ number_format($sumRiRad) }}" />
+                        <label for="pemeriksaanRadRi"
+                            class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] start-2.5 peer-focus:text-primary peer-focus:dark:text-secondary peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">
                             Radiologi
                         </label>
                     </div>
 
                     <div class="relative">
-                        <input type="text" id="sumLainLain" disabled
-                            class=" block rounded-t-lg px-2.5 pb-1 pt-5 w-full text-sm text-gray-700 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                            placeholder=" " value="{{ number_format($sumLainLain) }}" />
-                        <label for="sumLainLain"
-                            class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] start-2.5 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">
+                        <input type="text" id="totalUgdRj" disabled
+                            class="block rounded-t-lg px-2.5 pb-1 pt-5 w-full text-sm text-gray-700 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-secondary focus:outline-none focus:ring-0 focus:border-primary peer"
+                            placeholder=" " value="{{ number_format($sumUgdRj) }}" />
+                        <label for="totalUgdRj"
+                            class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] start-2.5 peer-focus:text-primary peer-focus:dark:text-secondary peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">
+                            Trf RJ/UGD
+                        </label>
+                    </div>
+
+                    <div class="relative">
+                        <input type="text" id="riLainnya" disabled
+                            class="block rounded-t-lg px-2.5 pb-1 pt-5 w-full text-sm text-gray-700 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-secondary focus:outline-none focus:ring-0 focus:border-primary peer"
+                            placeholder=" " value="{{ number_format($sumRiOther) }}" />
+                        <label for="riLainnya"
+                            class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] start-2.5 peer-focus:text-primary peer-focus:dark:text-secondary peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">
                             Lain-Lain
                         </label>
                     </div>
 
                     <div class="relative">
-                        <input type="text" id="sumtrfRJ" disabled
-                            class=" block rounded-t-lg px-2.5 pb-1 pt-5 w-full text-sm text-gray-700 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                            placeholder=" " value="{{ number_format($sumtrfRJ) }}" />
-                        <label for="sumtrfRJ"
-                            class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] start-2.5 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">
-                            Trf RJ
+                        <input type="text" id="sumRiOk" disabled
+                            class="block rounded-t-lg px-2.5 pb-1 pt-5 w-full text-sm text-gray-700 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-secondary focus:outline-none focus:ring-0 focus:border-primary peer"
+                            placeholder=" " value="{{ number_format($sumRiOk) }}" />
+                        <label for="sumRiOk"
+                            class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] start-2.5 peer-focus:text-primary peer-focus:dark:text-secondary peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">
+                            OK
                         </label>
                     </div>
 
-
-                </div>
-
-                <div>
                     <div class="relative">
-                        <input type="text" id="sumTotalRJ" disabled
-                            class=" block rounded-t-lg px-2.5 pb-2.5 pt-5 w-full text-3xl font-semibold text-gray-900 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                            placeholder=" " value="{{ number_format($sumTotalRJ) }}" />
-                        <label for="sumTotalRJ"
-                            class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] start-2.5 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">
-                            TOTAL
+                        <input type="text" id="sumRiRoom" disabled
+                            class="block rounded-t-lg px-2.5 pb-1 pt-5 w-full text-sm text-gray-700 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-secondary focus:outline-none focus:ring-0 focus:border-primary peer"
+                            placeholder=" " value="{{ number_format($sumRiRoom) }}" />
+                        <label for="sumRiRoom"
+                            class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] start-2.5 peer-focus:text-primary peer-focus:dark:text-secondary peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">
+                            Kamar
                         </label>
                     </div>
+
+                    <div class="relative">
+                        <input type="text" id="sumCService" disabled
+                            class="block rounded-t-lg px-2.5 pb-1 pt-5 w-full text-sm text-gray-700 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-secondary focus:outline-none focus:ring-0 focus:border-primary peer"
+                            placeholder=" " value="{{ number_format($sumCService) }}" />
+                        <label for="sumCService"
+                            class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] start-2.5 peer-focus:text-primary peer-focus:dark:text-secondary peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">
+                            Layanan
+                        </label>
+                    </div>
+
+                    <div class="relative">
+                        <input type="text" id="sumRiPerawatan" disabled
+                            class="block rounded-t-lg px-2.5 pb-1 pt-5 w-full text-sm text-gray-700 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-secondary focus:outline-none focus:ring-0 focus:border-primary peer"
+                            placeholder=" " value="{{ number_format($sumRiPerawatan) }}" />
+                        <label for="sumRiPerawatan"
+                            class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] start-2.5 peer-focus:text-primary peer-focus:dark:text-secondary peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">
+                            Perawatan
+                        </label>
+                    </div>
+
+                    <div class="relative">
+                        <input type="text" id="sumRiBonResep" disabled
+                            class="block rounded-t-lg px-2.5 pb-1 pt-5 w-full text-sm text-gray-700 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-secondary focus:outline-none focus:ring-0 focus:border-primary peer"
+                            placeholder=" " value="{{ number_format($sumRiBonResep) }}" />
+                        <label for="sumRiBonResep"
+                            class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] start-2.5 peer-focus:text-primary peer-focus:dark:text-secondary peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">
+                            Bon Resep
+                        </label>
+                    </div>
+
+                    <div class="relative">
+                        <input type="text" id="sumRiRtnObat" disabled
+                            class="block rounded-t-lg px-2.5 pb-1 pt-5 w-full text-sm text-gray-700 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-secondary focus:outline-none focus:ring-0 focus:border-primary peer"
+                            placeholder=" " value="{{ number_format($sumRiRtnObat) }}" />
+                        <label for="sumRiRtnObat"
+                            class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] start-2.5 peer-focus:text-primary peer-focus:dark:text-secondary peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">
+                            Retur Obat
+                        </label>
+                    </div>
+
+                    <div class="relative">
+                        <input type="text" id="sumRsObat" disabled
+                            class="block rounded-t-lg px-2.5 pb-1 pt-5 w-full text-sm text-gray-700 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-secondary focus:outline-none focus:ring-0 focus:border-primary peer"
+                            placeholder=" " value="{{ number_format($sumRsObat) }}" />
+                        <label for="sumRsObat"
+                            class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] start-2.5 peer-focus:text-primary peer-focus:dark:text-secondary peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">
+                            Obat Pinjam
+                        </label>
+                    </div>
+
+                    <div class="relative">
+                        <input type="text" id="sumTotalRI" disabled
+                            class="block rounded-t-lg px-2.5 pb-1 pt-5 w-full text-lg font-semibold text-gray-700 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-secondary focus:outline-none focus:ring-0 focus:border-primary peer"
+                            placeholder=" " value="{{ number_format($sumTotalRI) }}" />
+                        <label for="sumTotalRI"
+                            class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] start-2.5 peer-focus:text-primary peer-focus:dark:text-secondary peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">
+                            Total RI
+                        </label>
+                    </div>
+
+
+
+
                 </div>
+
+
             </div>
 
             <div>
@@ -160,7 +222,7 @@
                                 </ul>
                             </div>
 
-                            <div class="p-2 rounded-lg bg-gray-50"
+                            {{-- <div class="p-2 rounded-lg bg-gray-50"
                                 :class="{
                                     'active': activeTabAdministrasi === 'JasaKaryawan'
                                 }"
@@ -228,7 +290,7 @@
                                 <livewire:emr-u-g-d.administrasi-u-g-d.lain-lain-u-g-d
                                     :wire:key="'content-lain-lain-u-g-d2'" :rjNoRef="$rjNoRef">
 
-                            </div>
+                            </div> --}}
 
 
                         </div>
@@ -255,16 +317,7 @@
             <div class="">
                 {{-- null --}}
             </div>
-            <div>
-                <div wire:loading wire:target="">
-                    <x-loading />
-                </div>
 
-                <x-green-button :disabled=false wire:click.prevent="setSelesaiAdministrasiStatus({{ $rjNoRef }})"
-                    type="button" wire:loading.remove>
-                    Adminsitrasi Selesai
-                </x-green-button>
-            </div>
         </div>
 
 

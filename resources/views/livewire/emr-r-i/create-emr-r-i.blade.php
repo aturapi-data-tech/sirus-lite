@@ -186,9 +186,8 @@
                             'active': activeTab === 'administrasi'
                         }"
                         x-show.transition.in.opacity.duration.600="activeTab === 'administrasi'">
-                        {{ 'Admin RI' }}
-                        {{-- <livewire:emr-r-i.administrasi-r-i.administrasi-r-i :wire:key="'content-administrasiRi'"
-                            :riHdrNoRef="$riHdrNoRef"> --}}
+                        <livewire:emr-r-i.administrasi-r-i.administrasi-r-i :wire:key="'content-administrasiRi'"
+                            :riHdrNoRef="$riHdrNoRef">
 
                     </div>
 
