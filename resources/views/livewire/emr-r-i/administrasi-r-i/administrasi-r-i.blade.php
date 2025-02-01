@@ -280,6 +280,33 @@
                                     :riHdrNoRef="$riHdrNoRef">
                             </div>
 
+                            <div class="p-2 rounded-lg bg-gray-50"
+                                :class="{
+                                    'active': activeTabAdministrasi === 'UgdRj'
+                                }"
+                                x-show.transition.in.opacity.duration.600="activeTabAdministrasi === 'UgdRj'">
+                                <livewire:emr-r-i.administrasi-r-i.trf-ugd-rj-r-i :wire:key="'content-trf-ugd-rj-r-i'"
+                                    :riHdrNoRef="$riHdrNoRef">
+                            </div>
+
+                            <div class="p-2 rounded-lg bg-gray-50"
+                                :class="{
+                                    'active': activeTabAdministrasi === 'RiOther'
+                                }"
+                                x-show.transition.in.opacity.duration.600="activeTabAdministrasi === 'RiOther'">
+                                <livewire:emr-r-i.administrasi-r-i.lain-lain-r-i :wire:key="'content-lain-lain-r-i'"
+                                    :riHdrNoRef="$riHdrNoRef">
+                            </div>
+
+                            <div class="p-2 rounded-lg bg-gray-50"
+                                :class="{
+                                    'active': activeTabAdministrasi === 'RiOk'
+                                }"
+                                x-show.transition.in.opacity.duration.600="activeTabAdministrasi === 'RiOk'">
+                                <livewire:emr-r-i.administrasi-r-i.o-k-r-i :wire:key="'content-o-k-r-i'"
+                                    :riHdrNoRef="$riHdrNoRef">
+                            </div>
+
                             {{-- <div class="p-2 rounded-lg bg-gray-50"
                                 :class="{
                                     'active': activeTabAdministrasi === 'JasaDokter'
