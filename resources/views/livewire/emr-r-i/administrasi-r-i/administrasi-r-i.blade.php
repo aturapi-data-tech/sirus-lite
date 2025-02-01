@@ -271,6 +271,15 @@
                                     :wire:key="'content-laboratorium-r-i'" :riHdrNoRef="$riHdrNoRef">
                             </div>
 
+                            <div class="p-2 rounded-lg bg-gray-50"
+                                :class="{
+                                    'active': activeTabAdministrasi === 'RiRad'
+                                }"
+                                x-show.transition.in.opacity.duration.600="activeTabAdministrasi === 'RiRad'">
+                                <livewire:emr-r-i.administrasi-r-i.radiologi-r-i :wire:key="'content-radiologi-r-i'"
+                                    :riHdrNoRef="$riHdrNoRef">
+                            </div>
+
                             {{-- <div class="p-2 rounded-lg bg-gray-50"
                                 :class="{
                                     'active': activeTabAdministrasi === 'JasaDokter'
