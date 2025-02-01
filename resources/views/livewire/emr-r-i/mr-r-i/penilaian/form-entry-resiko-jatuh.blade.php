@@ -77,7 +77,7 @@
                             <x-green-button :disabled="false"
                                 wire:click.prevent="setTglPenilaianResikoJatuh('{{ date('d/m/Y H:i:s') }}')"
                                 type="button" wire:loading.remove>
-                                <div wire:poll>
+                                <div wire:poll.20s>
                                     Set Tanggal Penilaian: {{ date('d/m/Y H:i:s') }}
                                 </div>
                             </x-green-button>

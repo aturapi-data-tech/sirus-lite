@@ -30,7 +30,7 @@
                                     <x-green-button :disabled="false"
                                         wire:click.prevent="setTglEdukasi('{{ date('d/m/Y H:i:s') }}')" type="button"
                                         wire:loading.remove>
-                                        <div wire:poll>
+                                        <div wire:poll.20s>
                                             Set Tanggal Edukasi: {{ date('d/m/Y H:i:s') }}
                                         </div>
                                     </x-green-button>
@@ -121,7 +121,7 @@
                                         <x-green-button :disabled="false"
                                             wire:click.prevent="setTglReEdukasi('{{ date('d/m/Y H:i:s') }}')"
                                             type="button" wire:loading.remove>
-                                            <div wire:poll>
+                                            <div wire:poll.20s>
                                                 Set Tanggal Re-Edukasi: {{ date('d/m/Y H:i:s') }}
                                             </div>
                                         </x-green-button>

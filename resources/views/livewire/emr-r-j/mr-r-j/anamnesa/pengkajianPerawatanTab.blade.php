@@ -21,7 +21,7 @@
                             <x-green-button :disabled=false
                                 wire:click.prevent="setJamDatang('{{ date('d/m/Y H:i:s') }}')" type="button"
                                 wire:loading.remove>
-                                <div wire:poll>
+                                <div wire:poll.20s>
 
                                     Set Jam Datang: {{ date('d/m/Y H:i:s') }}
 
@@ -95,7 +95,7 @@
 
                 <div class="grid grid-cols-4 gap-2 mt-2 ml-2">
                     @foreach ($dataDaftarPoliRJ['anamnesa']['pengkajianPerawatan']['tingkatKegawatanOption'] as $tingkatKegawatanOption)
-                       
+
                         <x-radio-button :label="__($tingkatKegawatanOption['tingkatKegawatan'])" value="{{ $tingkatKegawatanOption['tingkatKegawatan'] }}"
                             wire:model="dataDaftarPoliRJ.anamnesa.pengkajianPerawatan.tingkatKegawatan" />
                     @endforeach

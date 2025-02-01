@@ -16,8 +16,7 @@ class AdministrasiRI extends Component
     use WithPagination, EmrRITrait;
 
     protected $listeners = [
-        'syncronizeAssessmentDokterRIFindData' => 'sumAll',
-        'syncronizeAssessmentPerawatRIFindData' => 'sumAll'
+        'SyncAdministrasiRI' => 'sumAll',
     ];
 
     // dataDaftarRi RJ
@@ -62,11 +61,11 @@ class AdministrasiRI extends Component
         // Jasa
         [
             'ermMenuId' => 'RiVisit',
-            'ermMenuName' => 'Kunjungan'
+            'ermMenuName' => 'Visit'
         ],
         [
             'ermMenuId' => 'RiKonsul',
-            'ermMenuName' => 'Konsultasi'
+            'ermMenuName' => 'Konsul'
         ],
         [
             'ermMenuId' => 'RiActParams',
@@ -104,10 +103,6 @@ class AdministrasiRI extends Component
             'ermMenuId' => 'RiRoom',
             'ermMenuName' => 'Kamar'
         ],
-        [
-            'ermMenuId' => 'CService',
-            'ermMenuName' => 'Layanan Pelanggan'
-        ],
 
         // Bon
         [
@@ -117,12 +112,12 @@ class AdministrasiRI extends Component
 
         // Lain-lain
         [
-            'ermMenuId' => 'RiPerawatan',
-            'ermMenuName' => 'Perawatan RI'
-        ],
-        [
             'ermMenuId' => 'RiRtnObat',
             'ermMenuName' => 'Return Obat RI'
+        ],
+        [
+            'ermMenuId' => 'RiObat',
+            'ermMenuName' => 'Obat Pinjam'
         ],
         [
             'ermMenuId' => 'TotalRI',

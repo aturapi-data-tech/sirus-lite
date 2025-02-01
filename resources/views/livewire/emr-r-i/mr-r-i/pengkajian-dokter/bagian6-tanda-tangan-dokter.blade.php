@@ -20,7 +20,7 @@
                         <x-green-button :disabled="false"
                             wire:click.prevent="setJamDokterPengkaji('{{ date('d/m/Y H:i:s') }}')" type="button"
                             wire:loading.remove>
-                            <div wire:poll>
+                            <div wire:poll.20s>
                                 Set Jam Dokter Pengkaji: {{ date('d/m/Y H:i:s') }}
                             </div>
                         </x-green-button>
