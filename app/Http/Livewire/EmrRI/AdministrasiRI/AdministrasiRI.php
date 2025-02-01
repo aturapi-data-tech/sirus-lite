@@ -118,10 +118,6 @@ class AdministrasiRI extends Component
         [
             'ermMenuId' => 'RiObat',
             'ermMenuName' => 'Obat Pinjam'
-        ],
-        [
-            'ermMenuId' => 'TotalRI',
-            'ermMenuName' => 'Total RI'
         ]
     ];
 
@@ -170,13 +166,13 @@ class AdministrasiRI extends Component
 
         // Kamar (Room):
         $this->sumRiRoom = collect($dataRawatInap['riRoom'])->sum(function ($room) {
-            return $room['room_price'] * ($room['day'] ?? 1);  // Multiply by day or quantity if it exists
+            return $room['room_price'] * ($room['day']);  // Multiply by day or quantity if it exists
         });
         $this->sumCService = collect($dataRawatInap['riRoom'])->sum(function ($room) {
-            return $room['common_service'] * ($room['day'] ?? 1);  // Multiply by day if it exists
+            return $room['common_service'] * ($room['day']);  // Multiply by day if it exists
         });
         $this->sumRiPerawatan = collect($dataRawatInap['riRoom'])->sum(function ($room) {
-            return $room['perawatan_price'] * ($room['day'] ?? 1);  // Multiply by day if it exists
+            return $room['perawatan_price'] * ($room['day']);  // Multiply by day if it exists
         });
 
         // Bon (Prescription):

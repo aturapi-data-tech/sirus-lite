@@ -307,6 +307,42 @@
                                     :riHdrNoRef="$riHdrNoRef">
                             </div>
 
+                            <div class="p-2 rounded-lg bg-gray-50"
+                                :class="{
+                                    'active': activeTabAdministrasi === 'RiRoom'
+                                }"
+                                x-show.transition.in.opacity.duration.600="activeTabAdministrasi === 'RiRoom'">
+                                <livewire:emr-r-i.administrasi-r-i.room-r-i :wire:key="'content-room-r-i'"
+                                    :riHdrNoRef="$riHdrNoRef">
+                            </div>
+
+                            <div class="p-2 rounded-lg bg-gray-50"
+                                :class="{
+                                    'active': activeTabAdministrasi === 'RiBonResep'
+                                }"
+                                x-show.transition.in.opacity.duration.600="activeTabAdministrasi === 'RiBonResep'">
+                                <livewire:emr-r-i.administrasi-r-i.bon-resep-r-i :wire:key="'content-bon-resep-r-i'"
+                                    :riHdrNoRef="$riHdrNoRef">
+                            </div>
+
+                            <div class="p-2 rounded-lg bg-gray-50"
+                                :class="{
+                                    'active': activeTabAdministrasi === 'RiRtnObat'
+                                }"
+                                x-show.transition.in.opacity.duration.600="activeTabAdministrasi === 'RiRtnObat'">
+                                <livewire:emr-r-i.administrasi-r-i.rtn-obat-r-i :wire:key="'content-rtn-obat-r-i'"
+                                    :riHdrNoRef="$riHdrNoRef">
+                            </div>
+
+                            <div class="p-2 rounded-lg bg-gray-50"
+                                :class="{
+                                    'active': activeTabAdministrasi === 'RiObat'
+                                }"
+                                x-show.transition.in.opacity.duration.600="activeTabAdministrasi === 'RiObat'">
+                                <livewire:emr-r-i.administrasi-r-i.obat-pinjam-r-i :wire:key="'content-obat-pinjam-r-i'"
+                                    :riHdrNoRef="$riHdrNoRef">
+                            </div>
+
                             {{-- <div class="p-2 rounded-lg bg-gray-50"
                                 :class="{
                                     'active': activeTabAdministrasi === 'JasaDokter'
