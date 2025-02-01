@@ -53,7 +53,7 @@
 
                         </div>
                     @endif
-                    @error('formEntryJasaMedis.drId')
+                    @error('formEntryJasaMedis.jasaMedisId')
                         <x-input-error :messages=$message />
                     @enderror
                 </div>
@@ -127,19 +127,19 @@
 
                                 <th scope="col" class="px-4 py-3 ">
                                     <x-sort-link :active=false wire:click.prevent="" role="button" href="#">
-                                        Tgl Kunjungan
+                                        Tgl
                                     </x-sort-link>
                                 </th>
 
                                 <th scope="col" class="px-4 py-3 ">
                                     <x-sort-link :active=false wire:click.prevent="" role="button" href="#">
-                                        JasaMedis))
+                                        JasaMedis
                                     </x-sort-link>
                                 </th>
 
                                 <th scope="col" class="px-4 py-3 ">
                                     <x-sort-link :active=false wire:click.prevent="" role="button" href="#">
-                                        Tarif Kunjungan
+                                        Tarif
                                     </x-sort-link>
                                 </th>
 

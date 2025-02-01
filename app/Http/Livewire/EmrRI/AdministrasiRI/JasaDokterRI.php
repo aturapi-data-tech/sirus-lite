@@ -6,7 +6,9 @@ use Illuminate\Support\Facades\DB;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Http\Traits\LOV\LOVJasaMedis\LOVJasaMedisTrait;
+use App\Http\Traits\LOV\LOVJasaDokter\LOVJasaDokterTrait;
+use App\Http\Traits\LOV\LOVDokter\LOVDokterTrait;
+
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 
@@ -18,7 +20,7 @@ use Exception;
 
 class JasaDokterRI extends Component
 {
-    use WithPagination, EmrRITrait, LOVJasaMedisTrait;
+    use WithPagination, EmrRITrait, LOVJasaDokterTrait, LOVDokterTrait;
 
 
     // listener from blade////////////////
@@ -32,44 +34,49 @@ class JasaDokterRI extends Component
     public array $dataDaftarRi = [];
 
     // LOV Nested
-    public array $jasaMedis;
+    public array $jasaDokter;
+    public array $dokter;
     // LOV Nested
 
     //////////////////////////////////////////////////////////////////////
-    public array $formEntryJasaMedis = [
-        'jasaMedisDate' => '', // Format tanggal wajib: dd/mm/yyyy hh24:mi:ss
-        'jasaMedisId' => '',
-        'jasaMedisPrice' => '', // Harga kunjungan minimal 0
-        'jasaMedisQty' => '',
+    public array $formEntryJasaDokter = [
+        'jasaDokterDate' => '', // Format tanggal wajib: dd/mm/yyyy hh24:mi:ss
+        'drId' => '',
+        'jasaDokterId' => '',
+        'jasaDokterPrice' => '', // Harga kunjungan minimal 0
+        'jasaDokterQty' => '',
     ];
-    public array $dataJasaMedis = [];
+    public array $dataJasaDokter = [];
     ////////////////////////////////////////////////
     ///////////begin////////////////////////////////
     ////////////////////////////////////////////////
 
-    public function insertJasaMedis(): void
+    public function insertJasaDokter(): void
     {
         // validate
         $this->checkRiStatus();
 
         $rules = [
-            'formEntryJasaMedis.jasaMedisDate' => 'required|date_format:d/m/Y H:i:s', // Format tanggal wajib: dd/mm/yyyy hh24:mi:ss
-            'formEntryJasaMedis.jasaMedisId' => 'required|exists:rsmst_actparamedics,pact_id', // ID jasaMedis harus ada di tabel rsmst_actparamedics kolom pact_id
-            'formEntryJasaMedis.jasaMedisPrice' => 'required|numeric|min:0', // Harga kunjungan minimal 0
-            'formEntryJasaMedis.jasaMedisQty' => 'required|numeric|min:1', // Jumlah minimal 1
+            'formEntryJasaDokter.jasaDokterDate' => 'required|date_format:d/m/Y H:i:s',
+            'formEntryJasaDokter.drId' => 'required|exists:rsmst_doctors,dr_id',
+            'formEntryJasaDokter.jasaDokterId' => 'required|exists:rsmst_accdocs,accdoc_id',
+            'formEntryJasaDokter.jasaDokterPrice' => 'required|numeric|min:0',
+            'formEntryJasaDokter.jasaDokterQty' => 'required|numeric|min:1',
         ];
 
         $messages = [
-            'formEntryJasaMedis.jasaMedisDate.required' => 'Tanggal jasa medis wajib diisi.',
-            'formEntryJasaMedis.jasaMedisDate.date_format' => 'Format tanggal jasa medis harus dd/mm/yyyy hh24:mi:ss.',
-            'formEntryJasaMedis.jasaMedisId.required' => 'ID jasa medis wajib diisi.',
-            'formEntryJasaMedis.jasaMedisId.exists' => 'ID jasa medis tidak valid atau tidak ditemukan.',
-            'formEntryJasaMedis.jasaMedisPrice.required' => 'Harga jasa medis wajib diisi.',
-            'formEntryJasaMedis.jasaMedisPrice.numeric' => 'Harga jasa medis harus berupa angka.',
-            'formEntryJasaMedis.jasaMedisPrice.min' => 'Harga jasa medis minimal 0.',
-            'formEntryJasaMedis.jasaMedisQty.required' => 'Jumlah jasa medis wajib diisi.',
-            'formEntryJasaMedis.jasaMedisQty.numeric' => 'Jumlah jasa medis harus berupa angka.',
-            'formEntryJasaMedis.jasaMedisQty.min' => 'Jumlah jasa medis minimal 1.',
+            'formEntryJasaDokter.jasaDokterDate.required' => 'Tanggal jasa dokter wajib diisi.',
+            'formEntryJasaDokter.jasaDokterDate.date_format' => 'Format tanggal jasa dokter harus dd/mm/yyyy hh24:mi:ss.',
+            'formEntryJasaDokter.drId.required' => 'ID dokter wajib diisi.',
+            'formEntryJasaDokter.drId.exists' => 'ID dokter tidak valid atau tidak ditemukan.',
+            'formEntryJasaDokter.jasaDokterId.required' => 'ID jasa dokter wajib diisi.',
+            'formEntryJasaDokter.jasaDokterId.exists' => 'ID jasa dokter tidak valid atau tidak ditemukan.',
+            'formEntryJasaDokter.jasaDokterPrice.required' => 'Harga jasa dokter wajib diisi.',
+            'formEntryJasaDokter.jasaDokterPrice.numeric' => 'Harga jasa dokter harus berupa angka.',
+            'formEntryJasaDokter.jasaDokterPrice.min' => 'Harga jasa dokter minimal 0.',
+            'formEntryJasaDokter.jasaDokterQty.required' => 'Jumlah jasa dokter wajib diisi.',
+            'formEntryJasaDokter.jasaDokterQty.numeric' => 'Jumlah jasa dokter harus berupa angka.',
+            'formEntryJasaDokter.jasaDokterQty.min' => 'Jumlah jasa dokter minimal 1.',
         ];
 
         // Proses validasi
@@ -85,29 +92,25 @@ class JasaDokterRI extends Component
         // start:
         try {
 
-            $lastInserted = DB::table('rstxn_riactparams')
-                ->select(DB::raw("nvl(max(actp_no)+1,1) as actp_no_max"))
+            $lastInserted = DB::table('rstxn_riactdocs')
+                ->select(DB::raw("nvl(max(actd_no)+1,1) as actd_no_max"))
                 ->first();
             // insert into table transaksi
-            DB::table('rstxn_riactparams')
+            DB::table('rstxn_riactdocs')
                 ->insert([
-                    'actp_date' => DB::raw("to_date('" . $this->formEntryJasaMedis['jasaMedisDate'] . "','dd/mm/yyyy hh24:mi:ss')"),
-                    'pact_id' =>  $this->formEntryJasaMedis['jasaMedisId'],
-                    'actp_price' =>  $this->formEntryJasaMedis['jasaMedisPrice'],
-                    'actp_qty' =>  $this->formEntryJasaMedis['jasaMedisQty'],
+                    'actd_date' => DB::raw("to_date('" . $this->formEntryJasaDokter['jasaDokterDate'] . "','dd/mm/yyyy hh24:mi:ss')"),
+                    'accdoc_id' =>  $this->formEntryJasaDokter['jasaDokterId'],
+                    'actd_price' =>  $this->formEntryJasaDokter['jasaDokterPrice'],
+                    'actd_qty' =>  $this->formEntryJasaDokter['jasaDokterQty'],
+                    'dr_id' =>  $this->formEntryJasaDokter['drId'],
                     'rihdr_no' =>  $this->riHdrNoRef,
-                    'actp_no' =>  $lastInserted->actp_no_max,
+                    'actd_no' =>  $lastInserted->actd_no_max,
                 ]);
 
-            //Loop Paket Sesuai Jml
-            foreach (range(1, $this->formEntryJasaMedis['jasaMedisQty']) as $i) {
-                $this->paketLainLainJasaMedis($this->formEntryJasaMedis['jasaMedisId'], $this->riHdrNoRef);
-            }
 
-
-            $this->administrasiRIuserLog($this->riHdrNoRef, 'JasaMedis ' . $this->formEntryJasaMedis['jasaMedisDesc'] . ' Tarif:' . $this->formEntryJasaMedis['jasaMedisPrice'] . 'Jml' . $this->formEntryJasaMedis['jasaMedisQty'] . ' Txn No:' . $lastInserted->actp_no_max);
+            $this->administrasiRIuserLog($this->riHdrNoRef, 'JasaDokter ' . $this->formEntryJasaDokter['jasaDokterDesc'] . ' Tarif:' . $this->formEntryJasaDokter['jasaDokterPrice'] . 'Jml' . $this->formEntryJasaDokter['jasaDokterQty'] . ' Txn No:' . $lastInserted->actd_no_max);
             $this->emit('SyncAdministrasiRI');
-            $this->resetformEntryJasaMedis();
+            $this->resetformEntryJasaDokter();
             //
         } catch (Exception $e) {
             // display an error to user
@@ -117,96 +120,7 @@ class JasaDokterRI extends Component
     }
 
 
-    private function paketLainLainJasaMedis($pactId, $riHdrNo): void
-    {
-        $classId = DB::table('rstxn_rihdrs')
-            ->join('rsmst_rooms', 'rstxn_rihdrs.room_id', '=', 'rsmst_rooms.room_id')
-            ->where('rihdr_no', $riHdrNo)
-            ->value('class_id');
-
-        // Jika class_id ditemukan
-        if ($classId) {
-            $collection = DB::table('rsmst_actpoclasses')
-                ->join('rsmst_actpclasses', 'rsmst_actpoclasses.id', '=', 'rsmst_actpclasses.id')
-                ->select('other_id', 'actpo_price')
-                ->where('pact_id', $pactId)
-                ->where('class_id', $classId)
-                ->orderBy('pact_id')
-                ->get();
-
-            foreach ($collection as $item) {
-                $this->insertLainLain($pactId, $riHdrNo, $item->other_id, $item->actpo_price);
-            }
-        }
-    }
-
-    private function insertLainLain($pactId, $riHdrNo, $otherId, $otherPrice): void
-    {
-        // require nik ketika pasien tidak dikenal
-        $collectingMyLainLain =
-            [
-                "LainLainId" => $otherId,
-                "LainLainPrice" => $otherPrice,
-                "pactId" => $pactId,
-                "riHdrNo" => $riHdrNo,
-
-            ];
-
-        $rules = [
-            'LainLainId' => 'required|exists:rsmst_actpoclasses,other_id', // Wajib diisi dan harus ada di tabel rsmst_lain_lain kolom id
-            'LainLainPrice' => 'required|numeric|min:0', // Wajib diisi, harus angka, dan minimal 0
-            'pactId' => 'required|exists:rsmst_actparamedics,pact_id', // Wajib diisi dan harus ada di tabel rsmst_actparamedics kolom pact_id
-            'riHdrNo' => 'required|exists:rstxn_rihdrs,rihdr_no', // Wajib diisi dan harus ada di tabel rstxn_rihdrs kolom rihdr_no
-        ];
-
-        $messages = [
-            'LainLainId.required' => 'ID Lain-Lain wajib diisi.',
-            'LainLainId.exists' => 'ID Lain-Lain tidak valid atau tidak ditemukan.',
-            'LainLainPrice.required' => 'Harga Lain-Lain wajib diisi.',
-            'LainLainPrice.numeric' => 'Harga Lain-Lain harus berupa angka.',
-            'LainLainPrice.min' => 'Harga Lain-Lain minimal 0.',
-            'pactId.required' => 'ID Pact wajib diisi.',
-            'pactId.exists' => 'ID Pact tidak valid atau tidak ditemukan.',
-            'riHdrNo.required' => 'Nomor RIHDR wajib diisi.',
-            'riHdrNo.exists' => 'Nomor RIHDR tidak valid atau tidak ditemukan.',
-        ];
-
-
-        // Proses Validasi///////////////////////////////////////////
-        $validator = Validator::make($collectingMyLainLain, $rules, $messages);
-
-        if ($validator->fails()) {
-            dd($validator->errors());
-        }
-
-
-        // pengganti race condition
-        // start:
-        try {
-
-            $lastInserted = DB::table('rstxn_riothers')
-                ->select(DB::raw("nvl(max(other_no)+1,1) as other_no_max"))
-                ->first();
-            // insert into table transaksi
-            DB::table('rstxn_riothers')
-                ->insert([
-                    'other_no' => $lastInserted->other_no_max,
-                    'rihdr_no' => $collectingMyLainLain['riHdrNo'],
-                    'other_id' => $collectingMyLainLain['LainLainId'],
-                    'other_price' => $collectingMyLainLain['LainLainPrice'],
-                    'other_date' => DB::raw("to_date('" . Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s') . "','dd/mm/yyyy hh24:mi:ss')"),
-                ]);
-            //
-        } catch (Exception $e) {
-            // display an error to user
-            dd($e->getMessage());
-        }
-        // goto start;
-    }
-
-
-
-    public function removeJasaMedis($JasaMedisNo)
+    public function removeJasaDokter($JasaDokterNo)
     {
         $this->checkRiStatus();
         // pengganti race condition
@@ -214,14 +128,14 @@ class JasaDokterRI extends Component
         try {
 
             // remove into table transaksi
-            DB::table('rstxn_riactparams')
-                ->where('actp_no', $JasaMedisNo)
+            DB::table('rstxn_riactdocs')
+                ->where('actd_no', $JasaDokterNo)
                 ->delete();
             //
-            $this->administrasiRIuserLog($this->riHdrNoRef, 'JasaMedis Remove Txn No:' . $JasaMedisNo);
+            $this->administrasiRIuserLog($this->riHdrNoRef, 'JasaDokter Remove Txn No:' . $JasaDokterNo);
             $this->emit('SyncAdministrasiRI');
 
-            $this->resetformEntryJasaMedis();
+            $this->resetformEntryJasaDokter();
         } catch (Exception $e) {
             // display an error to user
             dd($e->getMessage());
@@ -231,16 +145,18 @@ class JasaDokterRI extends Component
 
     }
 
-    public function setJasaMedisDate($date)
+    public function setJasaDokterDate($date)
     {
-        $this->formEntryJasaMedis['jasaMedisDate'] = $date;
+        $this->formEntryJasaDokter['jasaDokterDate'] = $date;
     }
 
-    public function resetformEntryJasaMedis()
+    public function resetformEntryJasaDokter()
     {
         $this->reset([
-            'formEntryJasaMedis',
-            'collectingMyJasaMedis' //Reset LOV / render  / empty NestLov
+            'formEntryJasaDokter',
+            'collectingMyJasaDokter', //Reset LOV / render  / empty NestLov
+            'collectingMyDokter', //Reset LOV / render  / empty NestLov
+
         ]);
         $this->resetValidation();
     }
@@ -261,9 +177,9 @@ class JasaDokterRI extends Component
     private function syncDataPrimer(): void
     {
         // sync data primer untuk LOV
-        // Jika data JasaMedisId ada
-        if ($this->formEntryJasaMedis['jasaMedisId']) {
-            $this->addJasaMedis($this->formEntryJasaMedis['jasaMedisId'] ?? '', $this->formEntryJasaMedis['jasaMedisDesc'] ?? '', $this->formEntryJasaMedis['jasaMedisPrice'] ?? '');
+        // Jika data JasaDokterId ada
+        if ($this->formEntryJasaDokter['jasaDokterId']) {
+            $this->addJasaDokter($this->formEntryJasaDokter['jasaDokterId'] ?? '', $this->formEntryJasaDokter['jasaDokterDesc'] ?? '', $this->formEntryJasaDokter['jasaDokterPrice'] ?? '');
         }
     }
 
@@ -278,20 +194,23 @@ class JasaDokterRI extends Component
     {
 
 
-        $riJasaMedis = DB::table('rstxn_riactparams')
-            ->join('rsmst_actparamedics', 'rsmst_actparamedics.pact_id', '=', 'rstxn_riactparams.pact_id')
+        $riJasaDokter = DB::table('rstxn_riactdocs')
+            ->join('rsmst_accdocs', 'rsmst_accdocs.accdoc_id', '=', 'rstxn_riactdocs.accdoc_id')
+            ->join('rsmst_doctors', 'rsmst_doctors.dr_id', '=', 'rstxn_riactdocs.dr_id')
             ->select(
-                'rstxn_riactparams.actp_date',
-                'rstxn_riactparams.pact_id',
-                'rsmst_actparamedics.pact_desc',
-                'rstxn_riactparams.actp_price',
-                'rstxn_riactparams.actp_qty',
-                'rstxn_riactparams.rihdr_no',
-                'rstxn_riactparams.actp_no'
+                'rstxn_riactdocs.actd_date',
+                'rstxn_riactdocs.dr_id',
+                'rsmst_doctors.dr_name',
+                'rstxn_riactdocs.accdoc_id',
+                'rsmst_accdocs.accdoc_desc',
+                'rstxn_riactdocs.actd_price',
+                'rstxn_riactdocs.actd_qty',
+                'rstxn_riactdocs.rihdr_no',
+                'rstxn_riactdocs.actd_no'
             )
             ->where('rihdr_no', $riHdrNo)
             ->get();
-        $this->dataJasaMedis['riJasaMedis'] = json_decode(json_encode($riJasaMedis, true), true);
+        $this->dataJasaDokter['riJasaDokter'] = json_decode(json_encode($riJasaDokter, true), true);
         $this->syncDataPrimer();
     }
 
@@ -311,43 +230,53 @@ class JasaDokterRI extends Component
 
     private function syncDataFormEntry(): void
     {
-        // Synk Lov JasaMedis
-        $this->formEntryJasaMedis['jasaMedisId'] = $this->jasaMedis['JasaMedisId'] ?? '';
-        $this->formEntryJasaMedis['jasaMedisDesc'] = $this->jasaMedis['JasaMedisDesc'] ?? '';
-        $this->formEntryJasaMedis['jasaMedisPrice'] = $this->jasaMedis['JasaMedisPrice'] ?? '';
+        // Synk Lov JasaDokter
+        $this->formEntryJasaDokter['jasaDokterId'] = $this->jasaDokter['JasaDokterId'] ?? '';
+        $this->formEntryJasaDokter['jasaDokterDesc'] = $this->jasaDokter['JasaDokterDesc'] ?? '';
+        // $this->formEntryJasaDokter['jasaDokterPrice'] = $this->jasaDokter['JasaDokterPrice'] ?? '';
 
         //qty
-        if (!isset($this->formEntryJasaMedis['jasaMedisQty']) || empty($this->formEntryJasaMedis['jasaMedisQty'])) {
-            $this->formEntryJasaMedis['jasaMedisQty'] = 1;
+        if (!isset($this->formEntryJasaDokter['jasaDokterQty']) || empty($this->formEntryJasaDokter['jasaDokterQty'])) {
+            $this->formEntryJasaDokter['jasaDokterQty'] = 1;
         }
 
         //price
-        if (!isset($this->formEntryJasaMedis['jasaMedisPrice']) || empty($this->formEntryJasaMedis['jasaMedisPrice'])) {
+        if (!isset($this->formEntryJasaDokter['jasaDokterPrice']) || empty($this->formEntryJasaDokter['jasaDokterPrice'])) {
             // Ambil class_id dari tabel rstxn_rihdrs
             $classId = DB::table('rstxn_rihdrs')
                 ->join('rsmst_rooms', 'rstxn_rihdrs.room_id', '=', 'rsmst_rooms.room_id')
                 ->where('rihdr_no', $this->riHdrNoRef)
                 ->value('class_id');
 
-            // Jika class_id ditemukan, ambil jasaMedis_price dari tabel rsmst_actpclasses
+            // Jika class_id ditemukan, ambil jasaDokter_price dari tabel rsmst_actdclasses
             if ($classId) {
-                $jasaMedisPrice = DB::table('rsmst_actpclasses')
-                    ->where('pact_id', $this->jasaMedis['JasaMedisId'] ?? '')
+                $jasaDokterPrice = DB::table('rsmst_actdclasses')
+                    ->where('accdoc_id', $this->jasaDokter['JasaDokterId'] ?? '')
                     ->where('class_id', $classId)
-                    ->value('actp_price');
+                    ->value('actd_price');
 
-                // Set jasaMedisPrice jika ditemukan, jika tidak set ke 0
-                $this->formEntryJasaMedis['jasaMedisPrice'] = $jasaMedisPrice ?? 0;
+                // Set jasaDokterPrice jika ditemukan, jika tidak set ke 0
+                $this->formEntryJasaDokter['jasaDokterPrice'] = $jasaDokterPrice ?? 0;
             } else {
-                // Jika class_id tidak ditemukan, set jasaMedisPrice ke 0
-                $this->formEntryJasaMedis['jasaMedisPrice'] = 0;
+                // Jika class_id tidak ditemukan, set jasaDokterPrice ke 0
+                $this->formEntryJasaDokter['jasaDokterPrice'] = 0;
             }
         }
+
+
+        // Synk Lov Dokter
+        $this->formEntryJasaDokter['drId'] = $this->dokter['DokterId'] ?? '';
+        $this->formEntryJasaDokter['drName'] = $this->dokter['DokterDesc'] ?? '';
+        $this->formEntryJasaDokter['poliId'] = $this->dokter['PoliId'] ?? '';
+        $this->formEntryJasaDokter['poliDesc'] = $this->dokter['PoliDesc'] ?? '';
+        $this->formEntryJasaDokter['kdpolibpjs'] =  $this->dokter['kdPoliBpjs'] ?? '';
+        $this->formEntryJasaDokter['kddrbpjs'] =  $this->dokter['kdDokterBpjs'] ?? '';
     }
 
     private function syncLOV(): void
     {
-        $this->jasaMedis = $this->collectingMyJasaMedis;
+        $this->jasaDokter = $this->collectingMyJasaDokter;
+        $this->dokter = $this->collectingMyDokter;
     }
     // select data start////////////////
     public function render()
@@ -364,7 +293,7 @@ class JasaDokterRI extends Component
                 // 'RJpasiens' => $query->paginate($this->limitPerPage),
                 'myTitle' => 'Data Pasien Inap',
                 'mySnipt' => 'Rekam Medis Pasien',
-                'myProgram' => 'JasaMedis',
+                'myProgram' => 'JasaDokter',
             ]
         );
     }

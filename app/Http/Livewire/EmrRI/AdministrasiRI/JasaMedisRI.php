@@ -314,7 +314,7 @@ class JasaMedisRI extends Component
         // Synk Lov JasaMedis
         $this->formEntryJasaMedis['jasaMedisId'] = $this->jasaMedis['JasaMedisId'] ?? '';
         $this->formEntryJasaMedis['jasaMedisDesc'] = $this->jasaMedis['JasaMedisDesc'] ?? '';
-        $this->formEntryJasaMedis['jasaMedisPrice'] = $this->jasaMedis['JasaMedisPrice'] ?? '';
+        // $this->formEntryJasaMedis['jasaMedisPrice'] = $this->jasaMedis['JasaMedisPrice'] ?? '';
 
         //qty
         if (!isset($this->formEntryJasaMedis['jasaMedisQty']) || empty($this->formEntryJasaMedis['jasaMedisQty'])) {

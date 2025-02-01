@@ -9,17 +9,17 @@
         <div id="TransaksiRawatInap">
             <div class="grid grid-cols-10 gap-2" x-data>
                 <div class="col-span-2">
-                    <x-input-label for="formEntryJasaMedis.jasaMedisDate" :value="__('Tanggal Kunjungan')" :required="__(true)" />
+                    <x-input-label for="formEntryJasaDokter.jasaDokterDate" :value="__('Tanggal Kunjungan')" :required="__(true)" />
                     <div>
                         <div class="flex items-center mb-2">
-                            @if (!$formEntryJasaMedis['jasaMedisDate'])
+                            @if (!$formEntryJasaDokter['jasaDokterDate'])
                                 <div class="w-full mt-2 ml-2">
-                                    <div wire:loading wire:target="setJasaMedisDate">
+                                    <div wire:loading wire:target="setJasaDokterDate">
                                         <x-loading />
                                     </div>
 
                                     <x-yellow-button :disabled="false"
-                                        wire:click.prevent="setJasaMedisDate('{{ date('d/m/Y H:i:s') }}')" type="button"
+                                        wire:click.prevent="setJasaDokterDate('{{ date('d/m/Y H:i:s') }}')" type="button"
                                         wire:loading.remove class="w-full">
                                         <div wire:poll.20s>
                                             {{ date('d/m/Y H:i:s') }}
@@ -27,73 +27,93 @@
                                     </x-yellow-button>
                                 </div>
                             @else
-                                <x-text-input id="formEntryJasaMedis.jasaMedisDate" type="text"
-                                    placeholder="dd/mm/yyyy hh24:mi:ss" class="mt-1 ml-2" :errorshas="__($errors->has('formEntryJasaMedis.jasaMedisDate'))"
-                                    wire:model="formEntryJasaMedis.jasaMedisDate" :disabled="$disabledPropertyRjStatus" />
+                                <x-text-input id="formEntryJasaDokter.jasaDokterDate" type="text"
+                                    placeholder="dd/mm/yyyy hh24:mi:ss" class="mt-1 ml-2" :errorshas="__($errors->has('formEntryJasaDokter.jasaDokterDate'))"
+                                    wire:model="formEntryJasaDokter.jasaDokterDate" :disabled="$disabledPropertyRjStatus" />
                             @endif
                         </div>
-                        @error('formEntryJasaMedis.jasaMedisDate')
+                        @error('formEntryJasaDokter.jasaDokterDate')
                             <x-input-error :messages=$message />
                         @enderror
                     </div>
                 </div>
 
                 <div class="col-span-2">
-                    {{-- LOV JasaMedis) --}}
-                    @if (empty($collectingMyJasaMedis))
+                    {{-- LOV Dokter --}}
+                    @if (empty($collectingMyDokter))
                         <div class="">
-                            @include('livewire.component.l-o-v.list-of-value-jasa-medis.list-of-value-jasa-medis')
+                            @include('livewire.component.l-o-v.list-of-value-dokter.list-of-value-dokter')
                         </div>
                     @else
-                        <x-input-label for="formEntryJasaMedis.jasaMedisDesc" :value="__('Nama JasaMedis')" :required="__(true)" />
+                        <x-input-label for="formEntryJasaDokter.drName" :value="__('Nama Dokter')" :required="__(true)" />
                         <div>
-                            <x-text-input id="formEntryJasaMedis.jasaMedisDesc" placeholder="Nama JasaMedis"
-                                class="mt-1 ml-2" :errorshas="__($errors->has('formEntryJasaMedis.jasaMedisDesc'))" wire:model="formEntryJasaMedis.jasaMedisDesc"
+                            <x-text-input id="formEntryJasaDokter.drName" placeholder="Nama Dokter" class="mt-1 ml-2"
+                                :errorshas="__($errors->has('formEntryJasaDokter.drName'))" wire:model="formEntryJasaDokter.drName" :disabled="true" />
+
+                        </div>
+                    @endif
+                    @error('formEntryJasaDokter.drId')
+                        <x-input-error :messages=$message />
+                    @enderror
+                </div>
+
+
+                <div class="col-span-2">
+                    {{-- LOV JasaDokter) --}}
+                    @if (empty($collectingMyJasaDokter))
+                        <div class="">
+                            @include('livewire.component.l-o-v.list-of-value-jasa-dokter.list-of-value-jasa-dokter')
+                        </div>
+                    @else
+                        <x-input-label for="formEntryJasaDokter.jasaDokterDesc" :value="__('Nama JasaDokter')" :required="__(true)" />
+                        <div>
+                            <x-text-input id="formEntryJasaDokter.jasaDokterDesc" placeholder="Nama JasaDokter"
+                                class="mt-1 ml-2" :errorshas="__($errors->has('formEntryJasaDokter.jasaDokterDesc'))" wire:model="formEntryJasaDokter.jasaDokterDesc"
                                 :disabled="true" />
 
                         </div>
                     @endif
-                    @error('formEntryJasaMedis.drId')
+                    @error('formEntryJasaDokter.jasaDokterId')
                         <x-input-error :messages=$message />
                     @enderror
                 </div>
 
                 <div class="col-span-1">
-                    <x-input-label for="formEntryJasaMedis.jasaMedisQty" :value="__('Jml')" :required="__(true)" />
+                    <x-input-label for="formEntryJasaDokter.jasaDokterQty" :value="__('Jml')" :required="__(true)" />
                     <div>
-                        <x-text-input id="formEntryJasaMedis.jasaMedisQty" placeholder="Jml" class="mt-1 ml-2"
-                            :errorshas="__($errors->has('formEntryJasaMedis.jasaMedisQty'))" wire:model="formEntryJasaMedis.jasaMedisQty" :disabled="$disabledPropertyRjStatus" />
-                        @error('formEntryJasaMedis.jasaMedisQty')
+                        <x-text-input id="formEntryJasaDokter.jasaDokterQty" placeholder="Jml" class="mt-1 ml-2"
+                            :errorshas="__($errors->has('formEntryJasaDokter.jasaDokterQty'))" wire:model="formEntryJasaDokter.jasaDokterQty" :disabled="$disabledPropertyRjStatus" />
+                        @error('formEntryJasaDokter.jasaDokterQty')
                             <x-input-error :messages=$message />
                         @enderror
                     </div>
                 </div>
 
-                <div class="col-span-2">
-                    <x-input-label for="formEntryJasaMedis.jasaMedisPrice" :value="__('Tarif')" :required="__(true)" />
+                <div class="col-span-1">
+                    <x-input-label for="formEntryJasaDokter.jasaDokterPrice" :value="__('Tarif')" :required="__(true)" />
                     <div>
-                        <x-text-input id="formEntryJasaMedis.jasaMedisPrice" placeholder="Tarif" class="mt-1 ml-2"
-                            :errorshas="__($errors->has('formEntryJasaMedis.jasaMedisPrice'))" wire:model="formEntryJasaMedis.jasaMedisPrice" :disabled="$disabledPropertyRjStatus"
-                            x-on:keyup.enter="$wire.insertJasaMedis()" />
-                        @error('formEntryJasaMedis.jasaMedisPrice')
+                        <x-text-input id="formEntryJasaDokter.jasaDokterPrice" placeholder="Tarif" class="mt-1 ml-2"
+                            :errorshas="__($errors->has('formEntryJasaDokter.jasaDokterPrice'))" wire:model="formEntryJasaDokter.jasaDokterPrice" :disabled="$disabledPropertyRjStatus"
+                            x-on:keyup.enter="$wire.insertJasaDokter()" />
+                        @error('formEntryJasaDokter.jasaDokterPrice')
                             <x-input-error :messages=$message />
                         @enderror
                     </div>
                 </div>
 
-                <div class="col-span-2">
-                    <x-input-label for="formEntryJasaMedis.jasaMedisTotal" :value="__('Total')" :required="__(true)" />
+                <div class="col-span-1">
+                    <x-input-label for="formEntryJasaDokter.jasaDokterTotal" :value="__('Total')" :required="__(true)" />
                     <div>
-                        <x-text-input id="formEntryJasaMedis.jasaMedisTotal" placeholder="Total" class="mt-1 ml-2"
-                            :errorshas="__($errors->has('formEntryJasaMedis.jasaMedisTotal'))"
-                            value="{{ number_format($formEntryJasaMedis['jasaMedisPrice'] * $formEntryJasaMedis['jasaMedisQty']) }}"
+                        <x-text-input id="formEntryJasaDokter.jasaDokterTotal" placeholder="Total" class="mt-1 ml-2"
+                            :errorshas="__($errors->has('formEntryJasaDokter.jasaDokterTotal'))"
+                            value="{{ number_format($formEntryJasaDokter['jasaDokterPrice'] * $formEntryJasaDokter['jasaDokterQty']) }}"
                             :disabled="true" />
                     </div>
                 </div>
 
                 <div class="col-span-1">
                     <x-input-label for="" :value="__('Hapus')" :required="__(true)" />
-                    <x-alternative-button class="inline-flex ml-2" wire:click.prevent="resetformEntryJasaMedis()">
+                    <x-alternative-button class="inline-flex ml-2" wire:click.prevent="resetformEntryJasaDokter()">
                         <svg class="w-5 h-5 text-gray-800 dark:text-white" aria-hidden="true"
                             xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 20">
                             <path
@@ -105,13 +125,13 @@
 
             {{-- Simpan --}}
             <div class="w-full">
-                <div wire:loading wire:target="insertJasaMedis">
+                <div wire:loading wire:target="insertJasaDokter">
                     <x-loading />
                 </div>
 
-                <x-primary-button :disabled="false" wire:click.prevent="insertJasaMedis()" type="button"
+                <x-primary-button :disabled="false" wire:click.prevent="insertJasaDokter()" type="button"
                     wire:loading.remove class="w-full">
-                    Simpan JasaMedis
+                    Simpan JasaDokter
                 </x-primary-button>
             </div>
         </div>
@@ -127,19 +147,19 @@
 
                                 <th scope="col" class="px-4 py-3 ">
                                     <x-sort-link :active=false wire:click.prevent="" role="button" href="#">
-                                        Tgl Kunjungan
+                                        Tgl
                                     </x-sort-link>
                                 </th>
 
                                 <th scope="col" class="px-4 py-3 ">
                                     <x-sort-link :active=false wire:click.prevent="" role="button" href="#">
-                                        JasaMedis))
+                                        JasaDokter
                                     </x-sort-link>
                                 </th>
 
                                 <th scope="col" class="px-4 py-3 ">
                                     <x-sort-link :active=false wire:click.prevent="" role="button" href="#">
-                                        Tarif Kunjungan
+                                        Tarif
                                     </x-sort-link>
                                 </th>
 
@@ -151,26 +171,28 @@
                         </thead>
                         <tbody class="bg-white dark:bg-gray-800">
 
-                            @isset($dataJasaMedis['riJasaMedis'])
-                                @foreach ($dataJasaMedis['riJasaMedis'] as $key => $JasaMedis)
+                            @isset($dataJasaDokter['riJasaDokter'])
+                                @foreach ($dataJasaDokter['riJasaDokter'] as $key => $JasaDokter)
                                     <tr class="border-b group dark:border-gray-700">
 
                                         <td
                                             class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                            {{ $JasaMedis['actp_date'] }}
+                                            {{ $JasaDokter['actd_date'] }}
                                         </td>
 
                                         <td
                                             class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                            {{ $JasaMedis['pact_id'] }} {{ $JasaMedis['pact_desc'] }}
+                                            {{ $JasaDokter['dr_id'] }} {{ $JasaDokter['dr_name'] }}
+                                            </br>
+                                            {{ $JasaDokter['accdoc_id'] }} {{ $JasaDokter['accdoc_desc'] }}
                                         </td>
 
 
                                         <td
                                             class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                            {{ number_format($JasaMedis['actp_qty']) }}x
-                                            {{ number_format($JasaMedis['actp_price']) }}=
-                                            {{ number_format($JasaMedis['actp_price'] * $JasaMedis['actp_qty']) }}
+                                            {{ number_format($JasaDokter['actd_qty']) }}x
+                                            {{ number_format($JasaDokter['actd_price']) }}=
+                                            {{ number_format($JasaDokter['actd_price'] * $JasaDokter['actd_qty']) }}
 
                                         </td>
 
@@ -179,14 +201,14 @@
                                             class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
 
                                             <x-alternative-button class="inline-flex"
-                                                wire:click.prevent="removeJasaMedis('{{ $JasaMedis['actp_no'] }}')">
+                                                wire:click.prevent="removeJasaDokter('{{ $JasaDokter['actd_no'] }}')">
                                                 <svg class="w-5 h-5 text-gray-800 dark:text-white" aria-hidden="true"
                                                     xmlns="http://www.w3.org/2000/svg" fill="currentColor"
                                                     viewBox="0 0 18 20">
                                                     <path
                                                         d="M17 4h-4V2a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v2H1a1 1 0 0 0 0 2h1v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1a1 1 0 1 0 0-2ZM7 2h4v2H7V2Zm1 14a1 1 0 1 1-2 0V8a1 1 0 0 1 2 0v8Zm4 0a1 1 0 0 1-2 0V8a1 1 0 0 1 2 0v8Z" />
                                                 </svg>
-                                                {{ 'Hapus ' . $JasaMedis['actp_no'] }}
+                                                {{ 'Hapus ' . $JasaDokter['actd_no'] }}
                                             </x-alternative-button>
 
                                         </td>
