@@ -262,6 +262,15 @@
 
                             </div>
 
+                            <div class="p-2 rounded-lg bg-gray-50"
+                                :class="{
+                                    'active': activeTabAdministrasi === 'RiLab'
+                                }"
+                                x-show.transition.in.opacity.duration.600="activeTabAdministrasi === 'RiLab'">
+                                <livewire:emr-r-i.administrasi-r-i.laboratorium-r-i
+                                    :wire:key="'content-laboratorium-r-i'" :riHdrNoRef="$riHdrNoRef">
+                            </div>
+
                             {{-- <div class="p-2 rounded-lg bg-gray-50"
                                 :class="{
                                     'active': activeTabAdministrasi === 'JasaDokter'
