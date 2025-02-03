@@ -343,65 +343,16 @@
                                     :riHdrNoRef="$riHdrNoRef">
                             </div>
 
-                            {{-- <div class="p-2 rounded-lg bg-gray-50"
-                                :class="{
-                                    'active': activeTabAdministrasi === 'JasaDokter'
-                                }"
-                                x-show.transition.in.opacity.duration.600="activeTabAdministrasi === 'JasaDokter'">
-                                <livewire:emr-r-i.administrasi-r-i.jasa-dokter-r-i
-                                    :wire:key="'content-jasa-dokter-r-i2'" :riHdrNoRef="$riHdrNoRef">
-
-                            </div>
-
                             <div class="p-2 rounded-lg bg-gray-50"
                                 :class="{
-                                    'active': activeTabAdministrasi === 'JasaMedis'
+                                    'active': activeTabAdministrasi === 'RiAdminLogs'
                                 }"
-                                x-show.transition.in.opacity.duration.600="activeTabAdministrasi === 'JasaMedis'">
-                                <livewire:emr-r-i.administrasi-r-i.jasa-medis-r-i
-                                    :wire:key="'content-jasa-medis-r-i'" :riHdrNoRef="$riHdrNoRef">
-
-                            </div>
-
-                            <div class="p-2 rounded-lg bg-gray-50"
-                                :class="{
-                                    'active': activeTabAdministrasi === 'Obat'
-                                }"
-                                x-show.transition.in.opacity.duration.600="activeTabAdministrasi === 'Obat'">
-                                <livewire:emr-r-i.administrasi-r-i.obat-r-i :wire:key="'content-obat-r-i'"
+                                x-show.transition.in.opacity.duration.600="activeTabAdministrasi === 'RiAdminLogs'">
+                                <livewire:emr-r-i.administrasi-r-i.admin-log-r-i :wire:key="'content-admin-log-r-i'"
                                     :riHdrNoRef="$riHdrNoRef">
-
                             </div>
 
-                            <div class="p-2 rounded-lg bg-gray-50"
-                                :class="{
-                                    'active': activeTabAdministrasi === 'Laboratorium'
-                                }"
-                                x-show.transition.in.opacity.duration.600="activeTabAdministrasi === 'Laboratorium'">
-                                <livewire:emr-r-i.administrasi-r-i.laboratorium-r-i
-                                    :wire:key="'content-laboratorium-r-i'" :riHdrNoRef="$riHdrNoRef">
 
-                            </div>
-
-                            <div class="p-2 rounded-lg bg-gray-50"
-                                :class="{
-                                    'active': activeTabAdministrasi === 'Radiologi'
-                                }"
-                                x-show.transition.in.opacity.duration.600="activeTabAdministrasi === 'Radiologi'">
-                                <livewire:emr-r-i.administrasi-r-i.radiologi-r-i
-                                    :wire:key="'content-radiologi-r-i'" :riHdrNoRef="$riHdrNoRef">
-
-                            </div>
-
-                            <div class="p-2 rounded-lg bg-gray-50"
-                                :class="{
-                                    'active': activeTabAdministrasi === 'LainLain'
-                                }"
-                                x-show.transition.in.opacity.duration.600="activeTabAdministrasi === 'LainLain'">
-                                <livewire:emr-r-i.administrasi-r-i.lain-lain-r-i
-                                    :wire:key="'content-lain-lain-r-i2'" :riHdrNoRef="$riHdrNoRef">
-
-                            </div> --}}
 
 
                         </div>

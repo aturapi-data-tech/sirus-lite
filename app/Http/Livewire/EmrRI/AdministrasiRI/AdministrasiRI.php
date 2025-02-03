@@ -118,6 +118,10 @@ class AdministrasiRI extends Component
         [
             'ermMenuId' => 'RiObat',
             'ermMenuName' => 'Obat Pinjam'
+        ],
+        [
+            'ermMenuId' => 'RiAdminLogs',
+            'ermMenuName' => 'AdminLogs'
         ]
     ];
 
