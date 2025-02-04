@@ -292,7 +292,7 @@ class EmrRI extends Component
     public array $EmrMenu = [
         [
             'ermMenuId' => 'pengkajianAwalPasienRawatInap',
-            'ermMenuName' => 'Pengkajian Awal Pasien Rawat Inap'
+            'ermMenuName' => 'Pengkajian Pasien Rawat Inap'
         ],
         [
             'ermMenuId' => 'pengkajianDokter',
