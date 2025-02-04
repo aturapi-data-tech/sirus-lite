@@ -3,10 +3,7 @@
         <!-- Kondisi Saat Masuk -->
         <div>
             <x-input-label for="dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.kondisiSaatMasuk"
-                :value="__('Kondisi Saat Masuk')" :required="isFieldRequired(
-                    'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.kondisiSaatMasuk',
-                    $rules,
-                )" />
+                :value="__('Kondisi Saat Masuk')" :required="false" />
             <div class="grid grid-cols-4 gap-2">
                 @foreach ($options['kondisiSaatMasukOptions'] as $option)
                     <x-radio-button :label="__($option)" value="{{ $option }}"
@@ -21,10 +18,7 @@
         <!-- Asal Pasien -->
         <div>
             <x-input-label for="dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.asalPasien" :value="__('Asal Pasien')"
-                :required="isFieldRequired(
-                    'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.asalPasien.pilihan',
-                    $rules,
-                )" />
+                :required="false" />
             <div class="grid grid-cols-4 gap-2">
                 @foreach ($options['asalPasienOptions'] as $option)
                     <x-radio-button :label="__($option)" value="{{ $option }}"
@@ -50,10 +44,7 @@
         <!-- Diagnosa Masuk -->
         <div>
             <x-input-label for="dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.diagnosaMasuk"
-                :value="__('Diagnosa Masuk')" :required="isFieldRequired(
-                    'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.diagnosaMasuk',
-                    $rules,
-                )" />
+                :value="__('Diagnosa Masuk')" :required="false" />
             <x-text-input id="dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.diagnosaMasuk"
                 placeholder="Diagnosa Masuk" class="mt-1" :errorshas="$errors->has('dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.diagnosaMasuk')" :disabled="$disabledPropertyRjStatus"
                 wire:model.debounce.500ms="dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.diagnosaMasuk" />
@@ -65,7 +56,7 @@
         <!-- DPJP -->
         <div>
             <x-input-label for="dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.dpjp" :value="__('DPJP')"
-                :required="isFieldRequired('dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.dpjp', $rules)" />
+                :required="false" />
             <x-text-input id="dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.dpjp" placeholder="DPJP"
                 class="mt-1" :errorshas="$errors->has('dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.dpjp')" :disabled="$disabledPropertyRjStatus"
                 wire:model.debounce.500ms="dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.dpjp" />
@@ -77,10 +68,7 @@
         <!-- Barang Berharga -->
         <div>
             <x-input-label for="dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.barangBerharga.pilihan"
-                :value="__('Barang Berharga')" :required="isFieldRequired(
-                    'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.barangBerharga.pilihan',
-                    $rules,
-                )" />
+                :value="__('Barang Berharga')" :required="false" />
             <div class="grid grid-cols-2 gap-2">
                 @foreach (['ada', 'tidakAda'] as $option)
                     <x-radio-button :label="__($option)" value="{{ $option }}"
@@ -106,10 +94,7 @@
         <!-- Alat Bantu -->
         <div>
             <x-input-label for="dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.alatBantu.pilihan"
-                :value="__('Alat Bantu')" :required="isFieldRequired(
-                    'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.alatBantu.pilihan',
-                    $rules,
-                )" />
+                :value="__('Alat Bantu')" :required="false" />
             <div class="grid grid-cols-4 gap-2">
                 @foreach ($options['alatBantuOptions'] as $option)
                     <x-radio-button :label="__($option)" value="{{ $option }}"

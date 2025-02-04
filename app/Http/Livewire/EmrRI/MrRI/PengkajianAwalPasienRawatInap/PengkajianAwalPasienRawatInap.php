@@ -349,10 +349,7 @@ class PengkajianAwalPasienRawatInap extends Component
         'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.jamPengkaji.date_format' => 'Format jam pengkajian harus sesuai dengan d/m/Y H:i:s.',
     ];
 
-    public function isFieldRequired($field, $rules)
-    {
-        return isset($rules[$field]) && in_array('required', $rules[$field]);
-    }
+
 
 
     ////////////////////////////////////////////////
