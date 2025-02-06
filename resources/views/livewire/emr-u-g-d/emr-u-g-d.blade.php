@@ -288,7 +288,7 @@
                                     </div>
 
                                     <div
-                                        class="w-full mt-2 text-gray-900 rounded-lg table-auto bg-opacity-20 {{ $tingkatKegawatanBgColor }}">
+                                        class="w-full mt-2 text-gray-900 rounded-lg table-auto {{ $tingkatKegawatanBgColor }}">
                                         <span class="font-semibold ">
                                             Tingkat Kegawatan :
                                         </span>
