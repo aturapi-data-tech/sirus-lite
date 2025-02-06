@@ -98,7 +98,7 @@ class RekamMedis extends Component
                 $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminId'] = ($findData->sex == 'L') ? 1 : 2;
                 $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] = ($findData->sex == 'L') ? 'Laki-laki' : 'Perempuan';
                 $this->dataPasien['pasien']['tglLahir'] = $findData->birth_date;
-                $this->dataPasien['pasien']['thn'] = Carbon::createFromFormat('d/m/Y', $findData->birth_date)->diff(Carbon::now(env('APP_TIMEZONE')))->format('%y Thn, %m Bln %d Hr'); //$findData->thn;
+                $this->dataPasien['pasien']['thn'] = Carbon::createFromFormat('d/m/Y', $findData->birth_date ?? Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y'))->diff(Carbon::now(env('APP_TIMEZONE')))->format('%y Thn, %m Bln %d Hr'); //$findData->thn;
                 $this->dataPasien['pasien']['bln'] = $findData->bln;
                 $this->dataPasien['pasien']['hari'] = $findData->hari;
                 $this->dataPasien['pasien']['tempatLahir'] = $findData->birth_place;
