@@ -70,12 +70,12 @@
                         <tr>
                             <td class="p-1 m-1">No. Resep / Tanggal</td>
                             <td class="p-1 m-1">:</td>
-                            <td class="p-1 m-1 font-semibold">
+                            <td class="p-1 m-1 text-lg font-semibold">
                                 {{ isset($dataDaftarPoliRJ['rjNo']) ? $dataDaftarPoliRJ['rjNo'] : '-' }} /
                                 {{ isset($dataDaftarPoliRJ['rjDate']) ? $dataDaftarPoliRJ['rjDate'] : '-' }}
                                 @isset($dataDaftarPoliRJ['statusPRB']['penanggungJawab']['statusPRB'])
                                     @if ($dataDaftarPoliRJ['statusPRB']['penanggungJawab']['statusPRB'])
-                                        / PRB
+                                        <span style="color: red;"> / PRB</span>
                                     @else
                                         {{-- NonPRB --}}
                                     @endif
