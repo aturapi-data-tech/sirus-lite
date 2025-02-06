@@ -880,7 +880,7 @@ class Pemeriksaan extends Component
         $birthDate = DB::scalar($sql, [
             "regNo" => $this->dataDaftarPoliRJ['regNo'],
         ]);
-        $cekUsia = Carbon::createFromFormat('Y-m-d H:i:s', $birthDate)->diff(Carbon::now(env('APP_TIMEZONE')))->format('%y');
+        $cekUsia = Carbon::createFromFormat('Y-m-d H:i:s', $birthDate ?? Carbon::now(env('APP_TIMEZONE'))->format('Y-m-d H:i:s'))->diff(Carbon::now(env('APP_TIMEZONE')))->format('%y');
 
         if ($cekUsia > 13) {
             $this->rules['dataDaftarPoliRJ.pemeriksaan.tandaVital.sistolik'] = 'required|numeric';
