@@ -229,6 +229,17 @@
                                             : 'red'));
 
                             $badgecolorAdministrasiRj = isset($datadaftar_json['AdministrasiRj']) ? 'green' : 'red';
+
+                            $tingkatKegawatan =
+                                $datadaftar_json['anamnesa']['pengkajianPerawatan']['tingkatKegawatan'] ?? 'P0';
+
+                            $tingkatKegawatanBgColor = match ($tingkatKegawatan) {
+                                'P1' => 'bg-red-500',
+                                'P2' => 'bg-yellow-500',
+                                'P3' => 'bg-green-500',
+                                'P0' => 'bg-gray-500',
+                                default => 'bg-white',
+                            };
                         @endphp
 
 
@@ -274,6 +285,15 @@
 
                                     <div class="font-normal">
                                         {{ $myQData->vno_sep }}
+                                    </div>
+
+                                    <div
+                                        class="w-full mt-2 text-gray-900 rounded-lg table-auto bg-opacity-20 {{ $tingkatKegawatanBgColor }}">
+                                        <span class="font-semibold ">
+                                            Tingkat Kegawatan :
+                                        </span>
+                                        {{ isset($datadaftar_json['anamnesa']['pengkajianPerawatan']['tingkatKegawatan']) ? $datadaftar_json['anamnesa']['pengkajianPerawatan']['tingkatKegawatan'] : '-' }}
+
                                     </div>
 
                                     <div class="flex my-2 space-x-2">
