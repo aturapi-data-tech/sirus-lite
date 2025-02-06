@@ -5,7 +5,23 @@
         <div class="px-4 bg-white snap-mandatory snap-y">
 
             @php
-                $pasieenTitle = 'Pasien RegNo : ' . $dataPasien['pasien']['regNo'] . ' Nomer Pelayanan :' . $dataDaftarUgd['noAntrian'];
+                $pasieenTitle =
+                    'Pasien RegNo : ' .
+                    $dataPasien['pasien']['regNo'] .
+                    ' Nomer Pelayanan :' .
+                    $dataDaftarUgd['noAntrian'];
+
+                $tingkatKegawatan = $dataDaftarUgd['anamnesa']['pengkajianPerawatan']['tingkatKegawatan']
+                    ? $dataDaftarUgd['anamnesa']['pengkajianPerawatan']['tingkatKegawatan']
+                    : 'P0';
+
+                $tingkatKegawatanBgColor = match ($tingkatKegawatan) {
+                    'P1' => 'red',
+                    'P2' => 'yellow',
+                    'P3' => 'green',
+                    'P0' => 'gray',
+                    default => 'white',
+                };
             @endphp
 
             <div class="grid grid-cols-2 pl-3 bg-gray-100 rounded-lg">
@@ -40,7 +56,13 @@
                     </div>
                 </div>
             </div>
+            <div class="w-full table-auto" style="background-color:{{ $tingkatKegawatanBgColor }};">
+                <span class="font-semibold text-gray-700">
+                    Tingkat Kegawatan :
+                </span>
+                {{ isset($dataDaftarUgd['anamnesa']['pengkajianPerawatan']['tingkatKegawatan']) ? $dataDaftarUgd['anamnesa']['pengkajianPerawatan']['tingkatKegawatan'] : '-' }}
 
+            </div>
 
 
 

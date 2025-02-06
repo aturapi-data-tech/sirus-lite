@@ -161,7 +161,7 @@
                 };
             @endphp
 
-            <table class="w-full table-auto" style="background-color:{{ $tingkatKegawatanBgColor }};">>
+            <table class="w-full table-auto" style="background-color:{{ $tingkatKegawatanBgColor }};">
                 <tbody>
                     <tr>
                         <td
