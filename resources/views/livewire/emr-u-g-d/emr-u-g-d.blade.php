@@ -235,7 +235,7 @@
 
                             $tingkatKegawatanBgColor = match ($tingkatKegawatan) {
                                 'P1' => 'bg-red-500',
-                                'P2' => 'bg-yellow-500',
+                                'P2' => 'bg-yellow-200',
                                 'P3' => 'bg-green-500',
                                 'P0' => 'bg-gray-500',
                                 default => 'bg-white',
