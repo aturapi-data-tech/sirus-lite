@@ -11,9 +11,7 @@
                     ' Nomer Pelayanan :' .
                     $dataDaftarUgd['noAntrian'];
 
-                $tingkatKegawatan = $dataDaftarUgd['anamnesa']['pengkajianPerawatan']['tingkatKegawatan']
-                    ? $dataDaftarUgd['anamnesa']['pengkajianPerawatan']['tingkatKegawatan']
-                    : 'P0';
+                $tingkatKegawatan = $dataDaftarUgd['anamnesa']['pengkajianPerawatan']['tingkatKegawatan'] ?? 'P0';
 
                 $tingkatKegawatanBgColor = match ($tingkatKegawatan) {
                     'P1' => 'red',
