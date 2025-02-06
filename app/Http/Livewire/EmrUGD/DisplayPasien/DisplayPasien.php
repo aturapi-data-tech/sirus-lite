@@ -9,7 +9,9 @@ use Carbon\Carbon;
 
 class DisplayPasien extends Component
 {
-    protected $listeners = [];
+    protected $listeners = [
+        'syncronizeAssessmentPerawatRJFindData' => 'mount'
+    ];
 
     // public function listenerRegNo($newRegNo): void
     // {
