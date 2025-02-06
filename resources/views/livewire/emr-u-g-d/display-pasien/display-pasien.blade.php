@@ -56,8 +56,9 @@
                     </div>
                 </div>
             </div>
-            <div class="w-full table-auto" style="background-color:{{ $tingkatKegawatanBgColor }};">
-                <span class="font-semibold text-gray-700">
+            <div class="w-full text-gray-900 table-auto bg-opacity-20"
+                style="background-color:{{ $tingkatKegawatanBgColor }};">
+                <span class="font-semibold ">
                     Tingkat Kegawatan :
                 </span>
                 {{ isset($dataDaftarUgd['anamnesa']['pengkajianPerawatan']['tingkatKegawatan']) ? $dataDaftarUgd['anamnesa']['pengkajianPerawatan']['tingkatKegawatan'] : '-' }}
