@@ -7,10 +7,14 @@ use Livewire\WithPagination;
 
 use App\Http\Traits\EmrRI\EmrRITrait;
 use App\Http\Traits\customErrorMessagesTrait;
+use App\Http\Traits\LOV\LOVDokter\LOVDokterTrait;
+use Carbon\Carbon;
+
+use Exception;
 
 class PengkajianAwalPasienRawatInap extends Component
 {
-    use WithPagination, EmrRITrait, customErrorMessagesTrait;
+    use WithPagination, EmrRITrait, customErrorMessagesTrait, LOVDokterTrait;
 
     // listener from blade////////////////
     protected $listeners = [
@@ -166,6 +170,10 @@ class PengkajianAwalPasienRawatInap extends Component
             "jamPengkaji" => "" //
         ]
     ];
+
+    // LOV Nested
+    public array $dokter;
+    // LOV Nested
 
     // Opsi untuk radio button
     public $options = [
@@ -468,6 +476,123 @@ class PengkajianAwalPasienRawatInap extends Component
         }
     }
 
+
+
+    //////////////////////levelingDokter////////////////////////////
+    public array $levelingDokter = [
+        'drId' => '',
+        'drName' => '',
+        'poliId' => '',
+        'poliDesc' => '',
+        'tglEntry' => '',
+        'levelDokter' => 'Utama', //Utama/RawatGabung
+    ];
+
+
+    public function addLevelingDokter()
+    {
+        $this->levelingDokter['tglEntry'] = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
+        // validasi
+        $this->validateDataLevelingDokterRi();
+        // check exist
+        $cekdLevelingDokter = collect($this->dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokter'] ?? [])
+            ->where("tglEntry", '=', $this->levelingDokter['tglEntry'])
+            ->count();
+        if (!$cekdLevelingDokter) {
+            $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokter'][] = [
+                "drId" => $this->levelingDokter['drId'],
+                "drName" => $this->levelingDokter['drName'],
+                "poliId" => $this->levelingDokter['poliId'],
+                "poliDesc" => $this->levelingDokter['poliDesc'],
+                "tglEntry" => $this->levelingDokter['tglEntry'],
+                "levelDokter" => $this->levelingDokter['levelDokter'],
+            ];
+
+            $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokter']['levelingDokterLog'] =
+                [
+                    'userLogDesc' => 'Form Entry levelingDokter ' . $this->levelingDokter['drName'] . $this->levelingDokter['levelDokter'],
+                    'userLog' => auth()->user()->myuser_name,
+                    'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
+                ];
+
+            $this->store();
+            // reset levelingDokter
+            $this->reset(['levelingDokter']);
+        } else {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("LevelingDokter Sudah ada.");
+        }
+    }
+
+    public function removeLevelingDokter($tglEntry)
+    {
+
+        $levelingDokter = collect($this->dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokter'])->where("tglEntry", '!=', $tglEntry)->toArray();
+        $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokter'] = $levelingDokter;
+
+        $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokter']['levelingDokterLog'] =
+            [
+                'userLogDesc' => 'Hapus levelingDokter',
+                'userLog' => auth()->user()->myuser_name,
+                'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
+            ];
+        $this->store();
+    }
+    public function resetlevelingDokter()
+    {
+        $this->reset([
+            'levelingDokter',
+            'collectingMyDokter', //Reset LOV / render  / empty NestLov
+
+        ]);
+        $this->resetValidation();
+    }
+
+    private function validateDataLevelingDokterRi(): void
+    {
+        $rules = [
+            'levelingDokter.drId' => 'required|string|max:10',
+            'levelingDokter.drName' => 'required|string|max:200',
+            'levelingDokter.poliId' => 'required|string|max:10',
+            'levelingDokter.poliDesc' => 'required|string|max:50',
+            'levelingDokter.tglEntry' => 'required|date_format:d/m/Y H:i:s',
+            'levelingDokter.levelDokter' => 'required|in:Utama,RawatGabung',
+        ];
+        $messages = [
+            'levelingDokter.drId.required' => 'ID Dokter pada form Entry Leveling Dokter harus diisi.',
+            'levelingDokter.drId.string' => 'ID Dokter pada form Entry Leveling Dokter harus berupa string.',
+            'levelingDokter.drId.max' => 'ID Dokter pada form Entry Leveling Dokter maksimal 10 karakter.',
+
+            'levelingDokter.drName.required' => 'Nama Dokter pada form Entry Leveling Dokter harus diisi.',
+            'levelingDokter.drName.string' => 'Nama Dokter pada form Entry Leveling Dokter harus berupa string.',
+            'levelingDokter.drName.max' => 'Nama Dokter pada form Entry Leveling Dokter maksimal 200 karakter.',
+
+            'levelingDokter.poliId.required' => 'ID Poli pada form Entry Leveling Dokter harus diisi.',
+            'levelingDokter.poliId.string' => 'ID Poli pada form Entry Leveling Dokter harus berupa string.',
+            'levelingDokter.poliId.max' => 'ID Poli pada form Entry Leveling Dokter maksimal 10 karakter.',
+
+            'levelingDokter.poliDesc.required' => 'Nama Poli pada form Entry Leveling Dokter harus diisi.',
+            'levelingDokter.poliDesc.string' => 'Nama Poli pada form Entry Leveling Dokter harus berupa string.',
+            'levelingDokter.poliDesc.max' => 'Nama Poli pada form Entry Leveling Dokter maksimal 50 karakter.',
+
+            'levelingDokter.tglEntry.required' => 'Tanggal Entry pada form Entry Leveling Dokter harus diisi.',
+            'levelingDokter.tglEntry.date_format' => 'Format Tanggal Entry pada form Entry Leveling Dokter tidak valid. Gunakan format: d/m/Y H:i:s.',
+
+            'levelingDokter.levelDokter.required' => 'Level Dokter pada form Entry Leveling Dokter harus diisi.',
+            'levelingDokter.levelDokter.in' => 'Level Dokter pada form Entry Leveling Dokter hanya boleh "Utama" atau "RawatGabung".',
+        ];
+
+        // Proses Validasi///////////////////////////////////////////
+        try {
+            $this->validate($rules, $messages);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Lakukan Pengecekan kembali Input Data." . $e->getMessage());
+            $this->validate($rules, $messages);
+        }
+    }
+
+    //////////////////////////////////////////////////////////////
+
     // when new form instance
     public function mount()
     {
@@ -475,12 +600,29 @@ class PengkajianAwalPasienRawatInap extends Component
         $this->findData($this->riHdrNoRef);
     }
 
+    private function syncLOV(): void
+    {
+        $this->dokter = $this->collectingMyDokter;
+    }
 
+    private function syncDataFormEntry(): void
+    {
+        $this->levelingDokter['drId'] = $this->dokter['DokterId'] ?? '';
+        $this->levelingDokter['drName'] = $this->dokter['DokterDesc'] ?? '';
+        $this->levelingDokter['poliId'] = $this->dokter['PoliId'] ?? '';
+        $this->levelingDokter['poliDesc'] = $this->dokter['PoliDesc'] ?? '';
+        $this->levelingDokter['kdpolibpjs'] =  $this->dokter['kdPoliBpjs'] ?? '';
+        $this->levelingDokter['kddrbpjs'] =  $this->dokter['kdDokterBpjs'] ?? '';
+    }
 
     // select data start////////////////
     public function render()
     {
 
+        // LOV
+        $this->syncLOV();
+        // FormEntry
+        $this->syncDataFormEntry();
         return view(
             'livewire.emr-r-i.mr-r-i.pengkajian-awal-pasien-rawat-inap.pengkajian-awal-pasien-rawat-inap',
             [

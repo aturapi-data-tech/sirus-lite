@@ -54,7 +54,7 @@
         </div>
 
         <!-- DPJP -->
-        <div>
+        {{-- <div>
             <x-input-label for="dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.dpjp" :value="__('DPJP')"
                 :required="false" />
             <x-text-input id="dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.dpjp" placeholder="DPJP"
@@ -63,6 +63,10 @@
             @error('dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.dpjp')
                 <x-input-error :messages="$message" />
             @enderror
+        </div> --}}
+
+        <div class="p-4 m-2 bg-yellow-100 rounded-lg ">
+            @include('livewire.emr-r-i.mr-r-i.pengkajian-awal-pasien-rawat-inap.bagian1-1-data-umum-leveling-dokter')
         </div>
 
         <!-- Barang Berharga -->
