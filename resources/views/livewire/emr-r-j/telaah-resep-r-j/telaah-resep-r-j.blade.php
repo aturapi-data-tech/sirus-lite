@@ -243,6 +243,7 @@
                                 : false)
                             : false;
 
+                        $statusPRB = $this->dataDaftarPoliRJ['statusPRB']['penanggungJawab']['statusPRB'] ?? 0;
                     @endphp
 
 
@@ -301,6 +302,14 @@
                                     @if ($myQData->rad_status)
                                         <x-badge :badgecolor="__('default')">
                                             {{ 'Radiologi' }}
+                                        </x-badge>
+                                    @endif
+                                </div>
+
+                                <div>
+                                    @if ($statusPRB)
+                                        <x-badge :badgecolor="__('red')">
+                                            {{ 'PRB' }}
                                         </x-badge>
                                     @endif
                                 </div>
