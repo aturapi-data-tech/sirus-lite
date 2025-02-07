@@ -537,6 +537,46 @@ class PengkajianAwalPasienRawatInap extends Component
             ];
         $this->store();
     }
+
+
+    public function setLevelingDokterUtama($index, $level = "Utama")
+    {
+        if ($this->dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokter'][$index]['levelDokter'] === $level) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Status Dokter " . $level);
+            return;
+        }
+
+        $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokter']['levelingDokterLog'] =
+            [
+                'userLogDesc' => 'Ubah levelingDokter' . $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokter'][$index]['drName'] . ' dari ' . $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokter'][$index]['levelDokter'] . 'ke' . $level,
+                'userLog' => auth()->user()->myuser_name,
+                'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
+            ];
+
+        $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokter'][$index]['levelDokter'] = $level;
+
+        $this->store();
+    }
+
+    public function setLevelingDokterRawatGabung($index, $level = "RawatGabung")
+    {
+
+        if ($this->dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokter'][$index]['levelDokter'] === $level) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Status Dokter " . $level);
+            return;
+        }
+
+        $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokter']['levelingDokterLog'] =
+            [
+                'userLogDesc' => 'Ubah levelingDokter' . $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokter'][$index]['drName'] . ' dari ' . $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokter'][$index]['levelDokter'] . 'ke' . $level,
+                'userLog' => auth()->user()->myuser_name,
+                'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
+            ];
+
+        $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokter'][$index]['levelDokter'] = $level;
+
+        $this->store();
+    }
     public function resetlevelingDokter()
     {
         $this->reset([

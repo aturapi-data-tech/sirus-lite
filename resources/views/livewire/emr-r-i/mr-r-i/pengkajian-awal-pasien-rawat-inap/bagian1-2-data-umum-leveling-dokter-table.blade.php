@@ -50,17 +50,49 @@
                                 {{ $lvlDokter['tglEntry'] ?? '-' }}
                             </td>
                             <td class="px-2 py-2 text-center group-hover:bg-gray-100 group-hover:text-primary">
-                                {{ $lvlDokter['levelDokter'] ?? '-' }}
+                                <div>
+                                    {{ $lvlDokter['levelDokter'] ?? '-' }}
+                                </div>
+
+                                @if (!empty($lvlDokter['tglEntry']))
+                                    <div class="grid grid-cols-2 gap-2 ml-2">
+                                        <div class="grid grid-cols-1">
+                                            <div wire:loading wire:target="setLevelingDokterUtama">
+                                                <x-loading />
+                                            </div>
+
+                                            <x-green-button :disabled="$disabledPropertyRjStatus"
+                                                wire:click.prevent="setLevelingDokterUtama({{ $key }})"
+                                                type="button" wire:loading.remove>
+                                                Set Utama
+                                            </x-green-button>
+                                        </div>
+                                        <div class="grid grid-cols-1">
+                                            <div wire:loading wire:target="setLevelingDokterRawatGabung">
+                                                <x-loading />
+                                            </div>
+
+                                            <x-yellow-button :disabled="$disabledPropertyRjStatus"
+                                                wire:click.prevent="setLevelingDokterRawatGabung({{ $key }})"
+                                                type="button" wire:loading.remove>
+                                                Set RawatGabung
+                                            </x-yellow-button>
+                                        </div>
+                                    </div>
+                                @endif
+
                             </td>
                             <td class="px-2 py-2 text-center group-hover:bg-gray-100 group-hover:text-primary">
-                                <x-alternative-button class="inline-flex"
-                                    wire:click.prevent="removeLevelingDokter('{{ $lvlDokter['tglEntry'] ?? '' }}')">
-                                    <svg class="w-5 h-5 text-gray-800 dark:text-gray-200" aria-hidden="true"
-                                        xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 20">
-                                        <path
-                                            d="M17 4h-4V2a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v2H1a1 1 0 0 0 0 2h1v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1a1 1 0 1 0 0-2ZM7 2h4v2H7V2Zm1 14a1 1 0 1 1-2 0V8a1 1 0 0 1 2 0v8Zm4 0a1 1 0 0 1-2 0V8a1 1 0 0 1 2 0v8Z" />
-                                    </svg>
-                                </x-alternative-button>
+                                @if (!empty($lvlDokter['tglEntry']))
+                                    <x-alternative-button class="inline-flex"
+                                        wire:click.prevent="removeLevelingDokter('{{ $lvlDokter['tglEntry'] ?? '' }}')">
+                                        <svg class="w-5 h-5 text-gray-800 dark:text-gray-200" aria-hidden="true"
+                                            xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 20">
+                                            <path
+                                                d="M17 4h-4V2a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v2H1a1 1 0 0 0 0 2h1v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1a1 1 0 1 0 0-2ZM7 2h4v2H7V2Zm1 14a1 1 0 1 1-2 0V8a1 1 0 0 1 2 0v8Zm4 0a1 1 0 0 1-2 0V8a1 1 0 0 1 2 0v8Z" />
+                                        </svg>
+                                    </x-alternative-button>
+                                @endif
                             </td>
                         </tr>
                     @endforeach
