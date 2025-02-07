@@ -243,7 +243,7 @@
                                 : false)
                             : false;
 
-                        $statusPRB = $this->dataDaftarPoliRJ['statusPRB']['penanggungJawab']['statusPRB'] ?? 0;
+                        $statusPRB = $datadaftar_json['statusPRB']['penanggungJawab']['statusPRB'] ?? 0;
                     @endphp
 
 
@@ -309,9 +309,12 @@
                                 <div>
                                     @if ($statusPRB)
                                         <x-badge :badgecolor="__('red')">
-                                            {{ 'PRB' }}
+                                            {{ 'PRB' }}{{ $statusPRB }}
                                         </x-badge>
                                     @endif
+                                    <x-badge :badgecolor="__('red')">
+                                        {{ 'PRB' }}{{ $statusPRB }}
+                                    </x-badge>
                                 </div>
 
 
