@@ -113,6 +113,10 @@ class RekamMedisDisplay extends Component
                             ->select(DB::raw("nvl(max(rjobat_dtl)+1,1) as rjobat_dtl_max"))
                             ->first();
 
+                        $productPrice = DB::table('immst_products')
+                            ->where('product_id', $toEresep['productId'])
+                            ->value('product_price');
+
                         // insert into table transaksi
                         DB::table('rstxn_rjobats')
                             ->insert([
@@ -120,7 +124,7 @@ class RekamMedisDisplay extends Component
                                 'rj_no' => $this->rjNoRefCopyTo,
                                 'product_id' => $toEresep['productId'],
                                 'qty' => $toEresep['qty'],
-                                'price' => $toEresep['productPrice'],
+                                'price' => $productPrice ?? 0,
                                 'rj_carapakai' => $toEresep['signaX'],
                                 'rj_kapsul' => $toEresep['signaHari'],
                                 'rj_takar' => 'Tablet',
@@ -132,6 +136,7 @@ class RekamMedisDisplay extends Component
 
                         // replace rjobatdtl dan rjno ke obat yang baru
                         $to['eresep'][$key]['rjObatDtl'] = $lastInserted->rjobat_dtl_max;
+                        $to['eresep'][$key]['productPrice'] = $productPrice ?? 0;
                         $to['eresep'][$key]['rjNo'] = $this->rjNoRefCopyTo;
                     }
                     //
