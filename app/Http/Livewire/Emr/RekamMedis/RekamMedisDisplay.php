@@ -115,7 +115,7 @@ class RekamMedisDisplay extends Component
 
                         $productPrice = DB::table('immst_products')
                             ->where('product_id', $toEresep['productId'])
-                            ->value('product_price');
+                            ->value('sales_price');
 
                         // insert into table transaksi
                         DB::table('rstxn_rjobats')
