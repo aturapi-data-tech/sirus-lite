@@ -309,12 +309,10 @@
                                 <div>
                                     @if ($statusPRB)
                                         <x-badge :badgecolor="__('red')">
-                                            {{ 'PRB' }}{{ $statusPRB }}
+                                            {{ 'PRB' }}
                                         </x-badge>
                                     @endif
-                                    <x-badge :badgecolor="__('red')">
-                                        {{ 'PRB' }}{{ $statusPRB }}
-                                    </x-badge>
+
                                 </div>
 
 
