@@ -183,6 +183,7 @@
 
                                     </thead>
                                     <tbody class="bg-white dark:bg-gray-800">
+                                        @inject('carbon', 'Carbon\Carbon')
 
                                         @foreach ($RJpasiens as $RJp)
                                             @php
