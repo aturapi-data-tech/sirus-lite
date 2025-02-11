@@ -13,9 +13,9 @@
             $alignmentClasses = 'origin-top-right right-0';
             break;
     }
-    
+
     $dropdownWidth = 'w-' . $width;
-    
+
 @endphp
 
 {{-- @dd($dropdownWidth) --}}

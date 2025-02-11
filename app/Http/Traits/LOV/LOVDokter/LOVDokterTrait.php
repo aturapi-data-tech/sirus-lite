@@ -18,7 +18,7 @@ trait LOVDokterTrait
     // Lov dataDokterLov //////////////////////
     ////////////////////////////////////////////////
 
-    public function updateddataDokterLovsearch()
+    public function updateddataDokterLovsearch($value)
     {
 
         // Reset index of LoV

@@ -21,9 +21,9 @@
         {{-- Top Bar --}}
         <div class="flex justify-between">
 
-            <div class="flex w-full">
+            <div class="flex items-end w-full">
                 {{-- Cari Data --}}
-                <div class="relative w-1/3 mr-2 pointer-events-auto">
+                <div class="relative w-1/3 py-2 mr-2 pointer-events-auto">
                     <div class="absolute inset-y-0 left-0 flex items-center p-5 pl-3 pointer-events-none ">
                         <svg width="24" height="24" fill="none" aria-hidden="true" class="flex-none mr-3 ">
                             <path d="m19 19-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -64,12 +64,31 @@
                     </x-dropdown>
                 </div>
 
+                {{-- Dokter --}}
+                <div class="py-2">
+                    {{-- LOV Dokter --}}
+                    @if (empty($collectingMyDokter))
+                        @include('livewire.component.l-o-v.list-of-value-dokter.list-of-value-dokter')
+                    @else
+                        <x-input-label for="myTopBar.drName" :value="__('Nama Dokter')" :required="__(true)"
+                            wire:click='resetDokter()' />
+                        <div>
+                            <x-text-input id="myTopBar.drName" placeholder="Nama Dokter" class="mt-1 ml-2"
+                                :errorshas="__($errors->has('myTopBar.drName'))" wire:model="myTopBar.drName" :disabled="true" />
+
+                        </div>
+                    @endif
+                    @error('levelingDokter.drId')
+                        <x-input-error :messages=$message />
+                    @enderror
+                </div>
+
 
             </div>
 
 
 
-            <div class="flex justify-end w-1/2">
+            <div class="flex justify-end w-1/2 pt-8">
                 <x-dropdown align="right" :width="__('20')">
                     <x-slot name="trigger">
                         {{-- Button myLimitPerPage --}}
@@ -130,19 +149,19 @@
 
         <div class="h-[calc(100vh-250px)] mt-2 overflow-auto">
             <!-- Table -->
-            <table class="w-full text-sm text-left text-gray-700 table-auto ">
+            <table class="w-full text-sm text-left text-gray-700 table-auto">
                 <thead class="sticky top-0 text-xs text-gray-900 uppercase bg-gray-100 ">
                     <tr>
-                        <th scope="col" class="w-1/4 px-4 py-3 ">
+                        <th scope="col" class="w-1/5 px-4 py-3 ">
                             Pasien
                         </th>
-                        <th scope="col" class="w-1/4 px-4 py-3 ">
-                            Poli
+                        <th scope="col" class="w-3/5 px-4 py-3 ">
+                            Inap
                         </th>
-                        <th scope="col" class="w-1/4 px-4 py-3 ">
+                        <th scope="col" class="w-1/5 px-4 py-3 ">
                             Status Layanan
                         </th>
-                        <th scope="col" class="w-1/4 px-4 py-3 ">
+                        <th scope="col" class="w-32 px-4 py-3 ">
                             Action
                         </th>
                     </tr>
@@ -221,39 +240,41 @@
 
 
                             <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap ">
-                                <div class="">
-                                    {{-- <div class="font-semibold text-primary">{{ $myQData->poli_desc }}
-                                    </div> --}}
-                                    <div class="font-semibold text-gray-900">
-                                        {{ $myQData->dr_name . ' / ' }}
-                                        <x-badge :badgecolor="__($badgecolorKlaim)">
-                                            {{ $myQData->klaim_id == 'UM'
-                                                ? 'UMUM'
-                                                : ($myQData->klaim_id == 'JM'
-                                                    ? 'BPJS'
-                                                    : ($myQData->klaim_id == 'KR'
-                                                        ? 'Kronis'
-                                                        : 'Asuransi Lain')) }}
-                                        </x-badge>
-
+                                <div class="grid grid-cols-4 gap-2">
+                                    <div class="col-span-3">
+                                        @include('livewire.emr-r-i.emr-r-i-leveling-dokter-table')
                                     </div>
-
-                                    <div class="font-normal">
-                                        {{ $myQData->vno_sep }}
-                                    </div>
-
-                                    <div class="flex my-2 space-x-2">
-                                        @if ($myQData->lab_status)
-                                            <x-badge :badgecolor="__('default')">
-                                                {{ 'Laborat' }}
+                                    <div class="col-span-1">
+                                        <div class="font-semibold text-gray-900">
+                                            <x-badge :badgecolor="__($badgecolorKlaim)">
+                                                {{ $myQData->klaim_id == 'UM'
+                                                    ? 'UMUM'
+                                                    : ($myQData->klaim_id == 'JM'
+                                                        ? 'BPJS'
+                                                        : ($myQData->klaim_id == 'KR'
+                                                            ? 'Kronis'
+                                                            : 'Asuransi Lain')) }}
                                             </x-badge>
-                                        @endif
 
-                                        @if ($myQData->rad_status)
-                                            <x-badge :badgecolor="__('default')">
-                                                {{ 'Radiologi' }}
-                                            </x-badge>
-                                        @endif
+                                        </div>
+
+                                        <div class="font-normal">
+                                            {{ $myQData->vno_sep }}
+                                        </div>
+
+                                        <div class="flex my-2 space-x-2">
+                                            @if ($myQData->lab_status)
+                                                <x-badge :badgecolor="__('default')">
+                                                    {{ 'Laborat' }}
+                                                </x-badge>
+                                            @endif
+
+                                            @if ($myQData->rad_status)
+                                                <x-badge :badgecolor="__('default')">
+                                                    {{ 'Radiologi' }}
+                                                </x-badge>
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
                             </td>
@@ -263,6 +284,8 @@
                                     <div class="text-sm font-semibold text-primary">
                                         {{ 'Tgl Masuk :' . $myQData->entry_date }}
                                     </div>
+
+
                                     <div class="flex italic font-semibold text-gray-900">
                                         <x-badge :badgecolor="__($badgecolorStatus)">
                                             @php

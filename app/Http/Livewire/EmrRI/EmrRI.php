@@ -6,13 +6,13 @@ use Illuminate\Support\Facades\DB;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-use Carbon\Carbon;
+use App\Http\Traits\LOV\LOVDokter\LOVDokterTrait;
 
 
 
 class EmrRI extends Component
 {
-    use WithPagination;
+    use WithPagination, LOVDokterTrait;
 
     // primitive Variable
     public string $myTitle = 'Rekam Medis RI';
@@ -22,6 +22,28 @@ class EmrRI extends Component
     public array $myLimitPerPages = [5, 10, 15, 20, 100];
     // limit record per page -resetExcept////////////////
     public int $limitPerPage = 10;
+
+    // LOV Nested
+    public array $dokter;
+
+    private function syncDataFormEntry(): void
+    {
+        $this->myTopBar['drId'] = $this->dokter['DokterId'] ?? '';
+        $this->myTopBar['drName'] = $this->dokter['DokterDesc'] ?? '';
+    }
+    private function syncLOV(): void
+    {
+        $this->dokter = $this->collectingMyDokter;
+    }
+    public function resetDokter()
+    {
+        $this->reset([
+            'collectingMyDokter', //Reset LOV / render  / empty NestLov
+        ]);
+        $this->resetValidation();
+    }
+    // LOV Nested
+
 
     // my Top Bar
     public array $myTopBar = [
@@ -37,7 +59,10 @@ class EmrRI extends Component
                 'roomId' => 'All',
                 'roomName' => 'All'
             ]
-        ]
+        ],
+        'drId' => '',
+        'drName' => '',
+        'drOptions' => []
     ];
 
     public string $refFilter = '';
@@ -52,6 +77,7 @@ class EmrRI extends Component
     {
         $this->resetPage();
     }
+
 
     private function gettermyTopBarRoomOptions(): void
     {
@@ -382,13 +408,26 @@ class EmrRI extends Component
     {
         $this->gettermyTopBarRoomOptions();
 
+        // LOV
+        $this->syncLOV();
+        // FormEntry
+        $this->syncDataFormEntry();
+
         // set mySearch
         $mySearch = $this->refFilter;
         $myRefstatusId = $this->myTopBar['refStatusId'];
         $myRefroomId = $this->myTopBar['roomId'];
+        $myRefdrId = $this->myTopBar['drId'];
 
 
 
+        //untuk membuat where clause yang berada pada table json kita pakai metode
+        // Query Builder → Collection → Filter → Query Builder Lagi
+        // 1️⃣ Ambil data dari database (Query Builder)
+        // 2️⃣ Gunakan filter() untuk menyaring data dalam Collection
+        // 3️⃣ Ambil kembali drId hasil filter, lalu kembalikan ke Query Builder
+        // Ambil hanya ID dokter yang terfilter
+        // 4️⃣ Jalankan ulang Query Builder dengan whereIn()
         //////////////////////////////////////////
         // Query ///////////////////////////////
         //////////////////////////////////////////
@@ -424,6 +463,23 @@ class EmrRI extends Component
             $query->where('bangsal_id', $myRefroomId);
         }
 
+        if ($myRefdrId != '') {
+            $filterDataDokter = $query
+                ->get()
+                ->filter(function ($item) use ($myRefdrId) {
+                    $datadaftarri_json = json_decode($item->datadaftarri_json, true) ?? [];
+                    if (!empty($datadaftarri_json['pengkajianAwalPasienRawatInap']['levelingDokter'])) {
+                        foreach ($datadaftarri_json['pengkajianAwalPasienRawatInap']['levelingDokter'] as $levelingDokterOnMyChildren) {
+                            $levelingDokterOnMyChildrenValue = $levelingDokterOnMyChildren['drId'] ?? '';
+                            if ($levelingDokterOnMyChildrenValue === $myRefdrId) {
+                                return $item;
+                            };
+                        }
+                    }
+                })->pluck('rihdr_no')->toArray();
+
+            $query->whereIn('rihdr_no', $filterDataDokter);
+        }
 
         $query->where(function ($q) use ($mySearch) {
             $q->Where(DB::raw('upper(reg_name)'), 'like', '%' . strtoupper($mySearch) . '%')
