@@ -56,6 +56,28 @@
 
                 <x-border-form :title="__('')" :align="__('start')" :bgcolor="__('bg-gray-50')" class="pb-4 mx-4">
 
+                    <div>
+                        @php
+                            $tglRujukan = isset($reqData['request']['t_sep']['rujukan']['tglRujukan'])
+                                ? ($reqData['request']['t_sep']['rujukan']['tglRujukan']
+                                    ? $reqData['request']['t_sep']['rujukan']['tglRujukan']
+                                    : $carbon::now(env('APP_TIMEZONE'))->format('Y-m-d'))
+                                : $carbon::now(env('APP_TIMEZONE'))->format('Y-m-d');
+                            $tglRujukanAwal = $carbon::createFromFormat('Y-m-d', $tglRujukan);
+                            $tglBatasRujukan = $carbon::createFromFormat('Y-m-d', $tglRujukan)->addMonths(3);
+
+                            $diffInDays = $tglBatasRujukan->diffInDays($carbon::now(env('APP_TIMEZONE')), false);
+                            $propertyDiffInDays = $diffInDays <= 20 ? 'red' : ($diffInDays <= 30 ? 'yellow' : '');
+                        @endphp
+
+                        <div>
+                            <p class="italic font-bold {{ $propertyDiffInDays }}">Masa berlaku Rujukan
+                                {{ $tglRujukanAwal->format('d/m/Y') }} s/d
+                                {{ $tglBatasRujukan->format('d/m/Y') }}{{ '- - - sisa :' . $diffInDays . ' hari' }}
+                            </p>
+                        </div>
+                    </div>
+
                     <div class="flex">
                         <div class="flex items-center justify-end w-1/4 ">
                             <x-input-label for="regName" :value="__('Spesialis / SubSpesialis')" :required="__($errors->has('SEPJsonReq.request.t_sep.poli.tujuan'))" />
@@ -330,7 +352,9 @@
                         </div>
 
                         @php
-                            $myTujuanKunj = isset($SEPJsonReq['request']['t_sep']['tujuanKunj']) ? $SEPJsonReq['request']['t_sep']['tujuanKunj'] : '0';
+                            $myTujuanKunj = isset($SEPJsonReq['request']['t_sep']['tujuanKunj'])
+                                ? $SEPJsonReq['request']['t_sep']['tujuanKunj']
+                                : '0';
 
                         @endphp
 
