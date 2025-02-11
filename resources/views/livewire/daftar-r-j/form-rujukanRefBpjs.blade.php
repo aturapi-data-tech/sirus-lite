@@ -67,11 +67,12 @@
                             $tglBatasRujukan = $carbon::createFromFormat('Y-m-d', $tglRujukan)->addMonths(3);
 
                             $diffInDays = $tglBatasRujukan->diffInDays($carbon::now(env('APP_TIMEZONE')), false);
-                            $propertyDiffInDays = $diffInDays <= 20 ? 'red' : ($diffInDays <= 30 ? 'yellow' : '');
+                            $propertyDiffInDays =
+                                $diffInDays <= 20 ? 'bg-red-500' : ($diffInDays <= 30 ? 'bg-yellow-500' : '');
                         @endphp
 
                         <div>
-                            <p class="italic font-bold {{ $propertyDiffInDays }}">Masa berlaku Rujukan
+                            <p class="text-gray-900 italic font-bold {{ $propertyDiffInDays }}">Masa berlaku Rujukan
                                 {{ $tglRujukanAwal->format('d/m/Y') }} s/d
                                 {{ $tglBatasRujukan->format('d/m/Y') }}{{ '- - - sisa :' . $diffInDays . ' hari' }}
                             </p>
