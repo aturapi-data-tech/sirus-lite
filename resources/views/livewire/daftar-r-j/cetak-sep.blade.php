@@ -327,7 +327,7 @@
                     $tglRujukanAwal = $carbon::createFromFormat('Y-m-d', $tglRujukan);
                     $tglBatasRujukan = $carbon::createFromFormat('Y-m-d', $tglRujukan)->addMonths(3);
 
-                    $diffInDays = $tglBatasRujukan->diffInDays($carbon::now(env('APP_TIMEZONE')));
+                    $diffInDays = $tglBatasRujukan->diffInDays($carbon::now(env('APP_TIMEZONE')), false);
                     $propertyDiffInDays = $diffInDays <= 20 ? 'red' : ($diffInDays <= 30 ? 'yellow' : '');
                 @endphp
 
