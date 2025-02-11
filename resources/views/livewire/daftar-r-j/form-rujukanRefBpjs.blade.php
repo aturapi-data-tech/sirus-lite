@@ -57,6 +57,8 @@
                 <x-border-form :title="__('')" :align="__('start')" :bgcolor="__('bg-gray-50')" class="pb-4 mx-4">
 
                     <div>
+                        @inject('carbon', 'Carbon\Carbon')
+
                         @php
                             $tglRujukan = isset($reqData['request']['t_sep']['rujukan']['tglRujukan'])
                                 ? ($reqData['request']['t_sep']['rujukan']['tglRujukan']
