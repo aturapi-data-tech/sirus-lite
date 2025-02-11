@@ -60,21 +60,22 @@
                         @inject('carbon', 'Carbon\Carbon')
 
                         @php
-                            $tglRujukan = isset($reqData['request']['t_sep']['rujukan']['tglRujukan'])
-                                ? ($reqData['request']['t_sep']['rujukan']['tglRujukan']
-                                    ? $reqData['request']['t_sep']['rujukan']['tglRujukan']
+                            $tglRujukan = isset($SEPJsonReq['request']['t_sep']['rujukan']['tglRujukan'])
+                                ? ($SEPJsonReq['request']['t_sep']['rujukan']['tglRujukan']
+                                    ? $SEPJsonReq['request']['t_sep']['rujukan']['tglRujukan']
                                     : $carbon::now(env('APP_TIMEZONE'))->format('Y-m-d'))
                                 : $carbon::now(env('APP_TIMEZONE'))->format('Y-m-d');
                             $tglRujukanAwal = $carbon::createFromFormat('Y-m-d', $tglRujukan);
                             $tglBatasRujukan = $carbon::createFromFormat('Y-m-d', $tglRujukan)->addMonths(3);
 
-                            $diffInDays = $tglBatasRujukan->diffInDays($carbon::now(env('APP_TIMEZONE')), false);
+                            $diffInDays = $tglBatasRujukan->diffInDays($carbon::now(env('APP_TIMEZONE')));
                             $propertyDiffInDays =
-                                $diffInDays <= 20 ? 'bg-red-500' : ($diffInDays <= 30 ? 'bg-yellow-500' : '');
+                                $diffInDays <= 20 ? 'bg-red-100' : ($diffInDays <= 30 ? 'bg-yellow-400' : '');
                         @endphp
 
                         <div>
-                            <p class="text-gray-900 italic font-bold {{ $propertyDiffInDays }}">Masa berlaku Rujukan
+                            <p class="mt-2 rounded-lg text-gray-900 text-xs {{ $propertyDiffInDays }}">
+                                Masa berlaku Rujukan
                                 {{ $tglRujukanAwal->format('d/m/Y') }} s/d
                                 {{ $tglBatasRujukan->format('d/m/Y') }}{{ '- - - sisa :' . $diffInDays . ' hari' }}
                             </p>

@@ -259,10 +259,16 @@
                                                     $RJp->rj_no === $rjNoJson ? 'bg-green-100' : 'bg-red-100';
 
                                                 $tglRujukan = isset(
-                                                    $reqData['request']['t_sep']['rujukan']['tglRujukan'],
+                                                    $datadaftar_json['sep']['reqSep']['request']['t_sep']['rujukan'][
+                                                        'tglRujukan'
+                                                    ],
                                                 )
-                                                    ? ($reqData['request']['t_sep']['rujukan']['tglRujukan']
-                                                        ? $reqData['request']['t_sep']['rujukan']['tglRujukan']
+                                                    ? ($datadaftar_json['sep']['reqSep']['request']['t_sep']['rujukan'][
+                                                        'tglRujukan'
+                                                    ]
+                                                        ? $datadaftar_json['sep']['reqSep']['request']['t_sep'][
+                                                            'rujukan'
+                                                        ]['tglRujukan']
                                                         : $carbon::now(env('APP_TIMEZONE'))->format('Y-m-d'))
                                                     : $carbon::now(env('APP_TIMEZONE'))->format('Y-m-d');
                                                 $tglRujukanAwal = $carbon::createFromFormat('Y-m-d', $tglRujukan);
@@ -272,13 +278,12 @@
 
                                                 $diffInDays = $tglBatasRujukan->diffInDays(
                                                     $carbon::now(env('APP_TIMEZONE')),
-                                                    false,
                                                 );
                                                 $propertyDiffInDays =
                                                     $diffInDays <= 20
-                                                        ? 'bg-red-500'
+                                                        ? 'bg-red-100'
                                                         : ($diffInDays <= 30
-                                                            ? 'bg-yellow-500'
+                                                            ? 'bg-yellow-400'
                                                             : '');
                                             @endphp
 
@@ -380,24 +385,30 @@
                                                                 E-Resep: {{ $prosentaseEMREresep . '%' }}
                                                             </x-badge>
                                                         </div>
-                                                        <div>
-                                                            {{ $noReferensi }}
-                                                        </div>
+
+                                                        @if ($noReferensi)
+                                                            <div>
+                                                                No Ref:{{ $noReferensi }}
+                                                            </div>
+                                                        @endif
                                                         {{-- <div>
                                                             <x-primary-button
                                                                 wire:click="cekSep('{{ json_encode($datadaftar_json['sep'] ?? [], true) }}')">
                                                                 Cek SEP
                                                             </x-primary-button>
                                                         </div> --}}
-
-                                                        <div>
-                                                            <p
-                                                                class="text-gray-900 italic font-bold {{ $propertyDiffInDays }}">
-                                                                Masa berlaku Rujukan
-                                                                {{ $tglRujukanAwal->format('d/m/Y') }} s/d
-                                                                {{ $tglBatasRujukan->format('d/m/Y') }}{{ '- - - sisa :' . $diffInDays . ' hari' }}
-                                                            </p>
-                                                        </div>
+                                                        @if ($RJp->klaim_id == 'JM')
+                                                            @isset($datadaftar_json['sep']['reqSep']['request']['t_sep']['rujukan']['tglRujukan'])
+                                                                <div>
+                                                                    <p
+                                                                        class="mt-2 rounded-lg text-gray-900 text-xs {{ $propertyDiffInDays }}">
+                                                                        Masa berlaku Rujukan
+                                                                        {{ $tglRujukanAwal->format('d/m/Y') }} s/d
+                                                                        {{ $tglBatasRujukan->format('d/m/Y') }}{{ '- - - sisa :' . $diffInDays . ' hari' }}
+                                                                    </p>
+                                                                </div>
+                                                            @endisset
+                                                        @endif
                                                     </div>
                                                 </td>
                                                 @role(['Mr', 'Admin', 'Perawat'])

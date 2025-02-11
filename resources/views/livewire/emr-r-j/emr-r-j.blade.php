@@ -191,6 +191,7 @@
                 </thead>
 
                 <tbody class="bg-white ">
+                    @inject('carbon', 'Carbon\Carbon')
 
                     @foreach ($myQueryData as $myQData)
                         @php
@@ -247,6 +248,20 @@
                             $badgecolorEresep = $eresep ? 'green' : 'red';
                             $rjNoJson = $datadaftar_json['rjNo'] ?? '-';
                             $bgChekJsonRjNo = $myQData->rj_no === $rjNoJson ? 'bg-green-100' : 'bg-red-100';
+
+                            $tglRujukan = isset(
+                                $datadaftar_json['sep']['reqSep']['request']['t_sep']['rujukan']['tglRujukan'],
+                            )
+                                ? ($datadaftar_json['sep']['reqSep']['request']['t_sep']['rujukan']['tglRujukan']
+                                    ? $datadaftar_json['sep']['reqSep']['request']['t_sep']['rujukan']['tglRujukan']
+                                    : $carbon::now(env('APP_TIMEZONE'))->format('Y-m-d'))
+                                : $carbon::now(env('APP_TIMEZONE'))->format('Y-m-d');
+                            $tglRujukanAwal = $carbon::createFromFormat('Y-m-d', $tglRujukan);
+                            $tglBatasRujukan = $carbon::createFromFormat('Y-m-d', $tglRujukan)->addMonths(3);
+
+                            $diffInDays = $tglBatasRujukan->diffInDays($carbon::now(env('APP_TIMEZONE')));
+                            $propertyDiffInDays =
+                                $diffInDays <= 20 ? 'bg-red-100' : ($diffInDays <= 30 ? 'bg-yellow-400' : '');
                         @endphp
 
 
@@ -344,6 +359,18 @@
                                             E-Resep: {{ $prosentaseEMREresep . '%' }}
                                         </x-badge>
                                     </div>
+                                    @if ($myQData->klaim_id == 'JM')
+                                        @isset($datadaftar_json['sep']['reqSep']['request']['t_sep']['rujukan']['tglRujukan'])
+                                            <div>
+                                                <p
+                                                    class="mt-2 rounded-lg text-gray-900 text-xs {{ $propertyDiffInDays }}">
+                                                    Masa berlaku Rujukan
+                                                    {{ $tglRujukanAwal->format('d/m/Y') }} s/d
+                                                    {{ $tglBatasRujukan->format('d/m/Y') }}{{ '- - - sisa :' . $diffInDays . ' hari' }}
+                                                </p>
+                                            </div>
+                                        @endisset
+                                    @endif
 
 
                                 </div>
