@@ -41,7 +41,7 @@ class Perencanaan extends Component
         'tindakLanjut' => [
             'tindakLanjut' => '',
             'keteranganTindakLanjut' => '',
-            'tindakLanjutOptions' => [['tindakLanjut' => 'MRS'], ['tindakLanjut' => 'Kontrol'], ['tindakLanjut' => 'Rujuk'], ['tindakLanjut' => 'Perawatan Selesai'], ['tindakLanjut' => 'Lain-lain']],
+            'tindakLanjutOptions' => [['tindakLanjut' => 'MRS'], ['tindakLanjut' => 'Kontrol'], ['tindakLanjut' => 'Rujuk'], ['tindakLanjut' => 'Perawatan Selesai'], ['tindakLanjut' => 'PRB'], ['tindakLanjut' => 'Lain-lain']],
         ],
 
         'pengkajianMedisTab' => 'Petugas Medis',
@@ -316,8 +316,10 @@ class Perencanaan extends Component
         if (isset($this->dataDaftarPoliRJ['statusPRB']['penanggungJawab']['statusPRB'])) {
             if ($this->dataDaftarPoliRJ['statusPRB']['penanggungJawab']['statusPRB']) {
                 $statusPRB = 0;
+                $this->dataDaftarPoliRJ['perencanaan']['tindakLanjut']['tindakLanjut'] = '';
             } else {
                 $statusPRB = 1;
+                $this->dataDaftarPoliRJ['perencanaan']['tindakLanjut']['tindakLanjut'] = 'PRB';
             }
         } else {
             $statusPRB = 1;
