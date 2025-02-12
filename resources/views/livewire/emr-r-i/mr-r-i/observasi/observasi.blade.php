@@ -65,7 +65,7 @@
     @php
         use Carbon\Carbon;
 
-        $sortedTandaVital = collect($dataDaftarRi['observasi']['observasiLanjutan']['tandaVital'] ?? [])->sortByDesc(
+        $sortedTandaVital = collect($dataDaftarRi['observasi']['observasiLanjutan']['tandaVital'] ?? [])->sortBy(
             function ($item) {
                 return Carbon::createFromFormat('d/m/Y H:i:s', $item['waktuPemeriksaan'], env('APP_TIMEZONE'));
             },
