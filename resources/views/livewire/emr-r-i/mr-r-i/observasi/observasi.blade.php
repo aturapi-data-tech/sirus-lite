@@ -59,27 +59,54 @@
         </div>
     @endif
     <div wire:ignore>
-        <div>Grafik Garis dengan 2 Dataset DEMO</div>
+        <div>Grafik Garis Suhu dan Nadi</div>
         <canvas id="myChart"></canvas>
     </div>
+    @php
+        use Carbon\Carbon;
+
+        $sortedTandaVital = collect($dataDaftarRi['observasi']['observasiLanjutan']['tandaVital'] ?? [])->sortByDesc(
+            function ($item) {
+                return Carbon::createFromFormat('d/m/Y H:i:s', $item['waktuPemeriksaan'], env('APP_TIMEZONE'));
+            },
+        );
+        $labelTgl = [];
+        $labelSuhu = [];
+        $labelNadi = [];
+        foreach ($sortedTandaVital as $item) {
+            $labelTgl[] = Carbon::createFromFormat(
+                'd/m/Y H:i:s',
+                $item['waktuPemeriksaan'],
+                env('APP_TIMEZONE'),
+            )->format('d/m/Y H:i:s');
+            $labelSuhu[] = $item['suhu'];
+            $labelNadi[] = $item['frekuensiNadi'];
+        }
+
+    @endphp
+
 
     <script>
         const ctx = document.getElementById('myChart');
+        // Mengambil data dari PHP ke JavaScript
+        const labels = {!! json_encode($labelTgl) !!};
+        const suhuData = {!! json_encode($labelSuhu) !!};
+        const nadiData = {!! json_encode($labelNadi) !!};
 
         new Chart(ctx, {
             type: 'line', // Ubah type dari 'bar' menjadi 'line'
             data: {
-                labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                labels: labels,
                 datasets: [{
-                        label: '# of Votes (Dataset 1)', // Label untuk dataset pertama
-                        data: [12, 19, 3, 5, 2, 3], // Data untuk dataset pertama
+                        label: 'Suhu', // Label untuk dataset pertama
+                        data: suhuData, // Data untuk dataset pertama
                         borderColor: 'rgba(255, 99, 132, 1)', // Warna garis
                         borderWidth: 2, // Ketebalan garis
                         fill: false // Tidak mengisi area di bawah garis
                     },
                     {
-                        label: '# of Votes (Dataset 2)', // Label untuk dataset kedua
-                        data: [7, 11, 5, 8, 3, 10], // Data untuk dataset kedua
+                        label: 'Nadi', // Label untuk dataset kedua
+                        data: nadiData, // Data untuk dataset kedua
                         borderColor: 'rgba(54, 162, 235, 1)', // Warna garis
                         borderWidth: 2, // Ketebalan garis
                         fill: false // Tidak mengisi area di bawah garis
