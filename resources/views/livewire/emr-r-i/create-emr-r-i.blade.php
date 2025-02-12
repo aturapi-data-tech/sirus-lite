@@ -141,8 +141,11 @@
                         <livewire:emr-r-i.mr-r-i.obat-dan-cairan.obat-dan-cairan
                             :wire:key="'content-obat-dan-cairan-Ri'" :riHdrNoRef="$riHdrNoRef">
 
-                            <livewire:emr-r-i.mr-r-i.observasi.observasi :wire:key="'content-observasiRi'"
-                                :riHdrNoRef="$riHdrNoRef">
+                            <livewire:emr-r-i.mr-r-i.pemakaian-oksigen.pemakaian-oksigen
+                                :wire:key="'content-pemakaian-oksigenRi'" :riHdrNoRef="$riHdrNoRef">
+
+                                <livewire:emr-r-i.mr-r-i.observasi.observasi :wire:key="'content-observasiRi'"
+                                    :riHdrNoRef="$riHdrNoRef">
 
 
                     </div>
