@@ -100,14 +100,14 @@
                 datasets: [{
                         label: 'Suhu', // Label untuk dataset pertama
                         data: suhuData, // Data untuk dataset pertama
-                        borderColor: 'rgba(255, 99, 132, 1)', // Warna garis
+                        borderColor: 'rgba(54, 162, 235, 1)', // Warna garis
                         borderWidth: 2, // Ketebalan garis
                         fill: false // Tidak mengisi area di bawah garis
                     },
                     {
                         label: 'Nadi', // Label untuk dataset kedua
                         data: nadiData, // Data untuk dataset kedua
-                        borderColor: 'rgba(54, 162, 235, 1)', // Warna garis
+                        borderColor: 'rgba(255, 99, 132, 1)', // Warna garis
                         borderWidth: 2, // Ketebalan garis
                         fill: false // Tidak mengisi area di bawah garis
                     }
