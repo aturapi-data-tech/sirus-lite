@@ -9,6 +9,7 @@ use Carbon\Carbon;
 
 use App\Http\Traits\EmrRI\EmrRITrait;
 use App\Http\Traits\customErrorMessagesTrait;
+use Illuminate\Support\Facades\Validator;
 
 class PemakaianOksigen extends Component
 {
@@ -35,7 +36,8 @@ class PemakaianOksigen extends Component
         "jenisAlatOksigenDetail" => "", // Jenis alat oksigen yang digunakan
         "dosisOksigen" => "1-2 L/menit", // Dosis oksigen yang diberikan
         "dosisOksigenDetail" => "", // Dosis oksigen yang diberikan
-        "durasiPenggunaan" => "Kontinu", // Durasi penggunaan (Kontinu atau Intermiten)
+        "modelPenggunaan" => "Kontinu", // Durasi penggunaan (Kontinu atau Intermiten)
+        "durasiPenggunaan" => "", // Durasi penggunaan (Kontinu atau Intermiten)
         "tanggalWaktuMulai" => "", // Tanggal dan waktu mulai penggunaan (format: dd/mm/yyyy hh24:mi:ss)
         "tanggalWaktuSelesai" => "", // Tanggal dan waktu selesai penggunaan (format: dd/mm/yyyy hh24:mi:ss)
     ];
@@ -54,7 +56,8 @@ class PemakaianOksigen extends Component
         'pemakaianOksigen.jenisAlatOksigenDetail' => 'required_if:pemakaianOksigen.jenisAlatOksigen,Lainnya',
         'pemakaianOksigen.dosisOksigen' => 'required|in:1-2 L/menit,3-4 L/menit,2-6 L/menit (Nasal Kanul),5-10 L/menit (Masker),Lainnya',
         'pemakaianOksigen.dosisOksigenDetail' => 'required_if:pemakaianOksigen.dosisOksigen,Lainnya',
-        'pemakaianOksigen.durasiPenggunaan' => 'nullable|in:Kontinu,Intermiten',
+        'pemakaianOksigen.modelPenggunaan' => 'nullable|in:Kontinu,Intermiten',
+        'pemakaianOksigen.durasiPenggunaan' => 'nullable',
         'pemakaianOksigen.tanggalWaktuMulai' => 'required|date_format:d/m/Y H:i:s',
         'pemakaianOksigen.tanggalWaktuSelesai' => 'nullable|date_format:d/m/Y H:i:s',
     ];
@@ -125,14 +128,6 @@ class PemakaianOksigen extends Component
 
     private function updateDataRi($riHdrNo): void
     {
-        // update table trnsaksi
-        // DB::table('rstxn_ugdhdrs')
-        //     ->where('rj_no', $riHdrNo)
-        //     ->update([
-        //         'datadaftarugd_json' => json_encode($this->dataDaftarRi, true),
-        //         'datadaftarRi_xml' => ArrayToXml::convert($this->dataDaftarRi),
-        //     ]);
-
         $this->updateJsonRI($riHdrNo, $this->dataDaftarRi);
 
         toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("PemakaianOksigen berhasil disimpan.");
@@ -171,6 +166,7 @@ class PemakaianOksigen extends Component
                 "dosisOksigen" => $this->pemakaianOksigen['dosisOksigen'],
                 "dosisOksigenDetail" => $this->pemakaianOksigen['dosisOksigenDetail'],
                 "durasiPenggunaan" => $this->pemakaianOksigen['durasiPenggunaan'],
+                "modelPenggunaan" => $this->pemakaianOksigen['modelPenggunaan'],
                 "tanggalWaktuMulai" => $this->pemakaianOksigen['tanggalWaktuMulai'],
                 "tanggalWaktuSelesai" => $this->pemakaianOksigen['tanggalWaktuSelesai'],
             ];
@@ -206,6 +202,8 @@ class PemakaianOksigen extends Component
         $this->store();
     }
 
+
+
     public function setTanggalWaktuMulai($myTime)
     {
         $this->pemakaianOksigen['tanggalWaktuMulai'] = $myTime;
@@ -222,10 +220,66 @@ class PemakaianOksigen extends Component
             $mulai = Carbon::createFromFormat('d/m/Y H:i:s', $tanggalWaktuMulai, env('APP_TIMEZONE'));
             $selesai = Carbon::createFromFormat('d/m/Y H:i:s', $tanggalWaktuSelesai, env('APP_TIMEZONE'));
 
-            // Hitung selisih dalam jam
+            // Hitung selisih dalam jam dan menit
             $selisihJam = $mulai->diffInHours($selesai);
-            $this->dataDaftarRi['observasi']['pemakaianOksigen']['pemakaianOksigenData'][$index]['durasiPenggunaan'] = $selisihJam;
+            $selisihMenit = $mulai->diffInMinutes($selesai) % 60;
+            $this->dataDaftarRi['observasi']['pemakaianOksigen']['pemakaianOksigenData'][$index]['durasiPenggunaan'] = $selisihJam . ' jam ' . $selisihMenit . ' menit';
+
+            $this->dataDaftarRi['observasi']['pemakaianOksigen']['pemakaianOksigenLog'] =
+                [
+                    'userLogDesc' => 'Set TanggalWaktuSelesai pemakaianOksigen',
+                    'userLog' => auth()->user()->myuser_name,
+                    'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
+                ];
+            $this->store();
         }
+    }
+
+    public function updateTanggalWaktuSelesai($index, $myTimeStart, $myTimeEnd)
+    {
+
+        $r = ['tanggalWaktuMulai' => $myTimeStart, 'tanggalWaktuSelesai' => $myTimeEnd];
+        $rules = [
+            'tanggalWaktuMulai' => 'required|date_format:d/m/Y H:i:s',
+            'tanggalWaktuSelesai' => 'required|date_format:d/m/Y H:i:s|after:tanggalWaktuMulai',
+        ];
+
+        $messages = [
+            'tanggalWaktuMulai.required' => 'Waktu mulai harus diisi.',
+            'tanggalWaktuMulai.date_format' => 'Format waktu mulai harus sesuai dengan d/m/Y H:i:s.',
+
+            'tanggalWaktuSelesai.required' => 'Waktu akhir harus diisi.',
+            'tanggalWaktuSelesai.date_format' => 'Format waktu akhir harus sesuai dengan d/m/Y H:i:s.',
+            'tanggalWaktuSelesai.after' => 'Waktu akhir harus lebih besar dari waktu mulai.',
+        ];
+
+        $validator = Validator::make($r, $rules, $messages);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        //Set TanggalWaktuSelesai
+        $this->dataDaftarRi['observasi']['pemakaianOksigen']['pemakaianOksigenData'][$index]['tanggalWaktuSelesai'] = $r['tanggalWaktuSelesai'];
+
+        //Hitung Selisih Jam
+        if ($r['tanggalWaktuMulai'] && $r['tanggalWaktuSelesai']) {
+            $mulai = Carbon::createFromFormat('d/m/Y H:i:s', $r['tanggalWaktuMulai'], env('APP_TIMEZONE'));
+            $selesai = Carbon::createFromFormat('d/m/Y H:i:s', $r['tanggalWaktuSelesai'], env('APP_TIMEZONE'));
+
+            // Hitung selisih dalam jam dan menit
+            $selisihJam = $mulai->diffInHours($selesai);
+            $selisihMenit = $mulai->diffInMinutes($selesai) % 60;
+            $this->dataDaftarRi['observasi']['pemakaianOksigen']['pemakaianOksigenData'][$index]['durasiPenggunaan'] = $selisihJam . ' jam ' . $selisihMenit . ' menit';
+        }
+
+        $this->dataDaftarRi['observasi']['pemakaianOksigen']['pemakaianOksigenLog'] =
+            [
+                'userLogDesc' => 'Update TanggalWaktuSelesai pemakaianOksigen',
+                'userLog' => auth()->user()->myuser_name,
+                'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
+            ];
+        $this->store();
     }
 
 

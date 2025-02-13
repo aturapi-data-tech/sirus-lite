@@ -56,12 +56,12 @@
                 </div>
 
                 <div>
-                    <x-input-label for="pemakaianOksigen.durasiPenggunaan" :value="__('Durasi Penggunaan')" :required="__(false)" />
+                    <x-input-label for="pemakaianOksigen.modelPenggunaan" :value="__('Model Penggunaan')" :required="__(false)" />
                     <div class="space-y-2">
                         <div class="grid grid-cols-2 gap-2">
-                            @foreach (['Kontinu', 'Intermiten'] as $durasi)
-                                <x-radio-button :label="$durasi" :value="$durasi"
-                                    wire:model="pemakaianOksigen.durasiPenggunaan" />
+                            @foreach (['Kontinu', 'Intermiten'] as $model)
+                                <x-radio-button :label="$model" :value="$model"
+                                    wire:model="pemakaianOksigen.modelPenggunaan" />
                             @endforeach
                         </div>
                     </div>
