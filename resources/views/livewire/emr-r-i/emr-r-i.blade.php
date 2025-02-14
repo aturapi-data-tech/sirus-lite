@@ -236,27 +236,39 @@
                                         {{ $myQData->address }}
                                     </div>
 
-                                    <div>
-                                        @php
-                                            $totalrs = $myQData->totalri_temp ?? 1;
-                                            $totalinacbg = empty($myQData->totinacbg_temp)
-                                                ? $myQData->totalri_temp
-                                                : $myQData->totinacbg_temp;
-                                            $persentasiTotalRsInacbg = ($totalrs / $totalinacbg) * 100;
+                                    @if ($myQData->klaim_id == 'JM')
+                                        <div>
+                                            @php
+                                                $totalrs = $myQData->totalri_temp ?? 1;
+                                                $totalinacbg = empty($myQData->totinacbg_temp)
+                                                    ? $myQData->totalri_temp
+                                                    : $myQData->totinacbg_temp;
+                                                $persentasiTotalRsInacbg = round(($totalrs / $totalinacbg) * 100);
 
-                                            $warningColor =
-                                                $persentasiTotalRsInacbg < 50
-                                                    ? 'bg-green-500'
-                                                    : ($persentasiTotalRsInacbg < 80
-                                                        ? 'bg-yellow-500'
-                                                        : 'bg-red-500 text-white');
-                                        @endphp
-                                        <span class="text-xs text-gray-500 {{ $warningColor }}">
-                                            RS{{ $totalrs }}
-                                            INA{{ $totalinacbg }}
-                                            %{{ $persentasiTotalRsInacbg }}
-                                        </span>
-                                    </div>
+                                                // Menentukan warna berdasarkan persentase
+                                                $badgecolorKlaim =
+                                                    $persentasiTotalRsInacbg < 50
+                                                        ? 'green'
+                                                        : ($persentasiTotalRsInacbg < 80
+                                                            ? 'yellow'
+                                                            : 'red');
+
+                                                // Menentukan label klaim
+                                                $klaimLabel = match ($myQData->klaim_id) {
+                                                    'UM' => 'UMUM',
+                                                    'JM' => 'BPJS',
+                                                    'KR' => 'Kronis',
+                                                    default => 'Asuransi Lain',
+                                                };
+                                            @endphp
+
+                                            <x-badge :badgecolor="__($badgecolorKlaim)">
+                                                RS {{ $totalrs }} | INA {{ $totalinacbg }} |
+                                                %{{ $persentasiTotalRsInacbg }} - {{ $klaimLabel }}
+                                            </x-badge>
+                                        </div>
+                                    @endif
+
                                 </div>
                             </td>
 
