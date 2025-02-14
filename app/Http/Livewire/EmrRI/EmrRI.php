@@ -454,7 +454,9 @@ class EmrRI extends Component
                 'room_name',
                 'bangsal_id',
                 'bangsal_name',
-                'bed_no'
+                'bed_no',
+                'totinacbg_temp',
+                'totalri_temp',
             )
             ->where(DB::raw("nvl(ri_status,'I')"), '=', $myRefstatusId);
 

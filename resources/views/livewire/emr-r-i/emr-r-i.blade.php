@@ -235,6 +235,28 @@
                                     <div class="font-normal text-gray-900">
                                         {{ $myQData->address }}
                                     </div>
+
+                                    <div>
+                                        @php
+                                            $totalrs = $myQData->totalri_temp ?? 1;
+                                            $totalinacbg = empty($myQData->totinacbg_temp)
+                                                ? $myQData->totalri_temp
+                                                : $myQData->totinacbg_temp;
+                                            $persentasiTotalRsInacbg = ($totalrs / $totalinacbg) * 100;
+
+                                            $warningColor =
+                                                $persentasiTotalRsInacbg < 50
+                                                    ? 'bg-green-500'
+                                                    : ($persentasiTotalRsInacbg < 80
+                                                        ? 'bg-yellow-500'
+                                                        : 'bg-red-500 text-white');
+                                        @endphp
+                                        <span class="text-xs text-gray-500 {{ $warningColor }}">
+                                            RS{{ $totalrs }}
+                                            INA{{ $totalinacbg }}
+                                            %{{ $persentasiTotalRsInacbg }}
+                                        </span>
+                                    </div>
                                 </div>
                             </td>
 
