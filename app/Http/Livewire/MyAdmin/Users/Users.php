@@ -182,6 +182,13 @@ class Users extends Component
         $this->closeModal();
         $this->reset(['myData']);
     }
+
+    public function assignRoleTu($id)
+    {
+        $user = new User;
+        $user = $user->where('id', $id)->first();
+        $user->assignRole('Tu');
+    }
     public function assignRolePerawat($id)
     {
         $user = new User;
@@ -216,7 +223,12 @@ class Users extends Component
 
 
 
-
+    public function removeRoleTu($id)
+    {
+        $user = new User;
+        $user = $user->where('id', $id)->first();
+        $user->removeRole('Tu');
+    }
     public function removeRolePerawat($id)
     {
         $user = new User;
@@ -248,9 +260,7 @@ class Users extends Component
         $user->removeRole('Admin');
     }
 
-    public function mount()
-    {
-    }
+    public function mount() {}
 
     public function render()
     {

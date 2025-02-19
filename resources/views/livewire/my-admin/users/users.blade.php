@@ -138,62 +138,71 @@
                             <td class="px-4 py-2">
 
 
-
                                 <div class="grid grid-cols-2 gap-2">
-                                    <div>
-                                        <form wire:submit.prevent="assignRolePerawat({{ $myQData->id }})">
-                                            <x-primary-button type="submit">RolePerawat</x-primary-button>
-                                        </form>
-                                    </div>
-                                    <div>
-                                        <form wire:submit.prevent="assignRoleDokter({{ $myQData->id }})">
-                                            <x-primary-button type="submit">RoleDokter</x-primary-button>
-                                        </form>
-                                    </div>
-                                    <div>
-                                        <form wire:submit.prevent="assignRoleMr({{ $myQData->id }})">
-                                            <x-primary-button type="submit">RoleMr</x-primary-button>
-                                        </form>
-                                    </div>
-                                    <div>
-                                        <form wire:submit.prevent="assignRoleApoteker({{ $myQData->id }})">
-                                            <x-primary-button type="submit">RoleApoteker</x-primary-button>
-                                        </form>
-                                    </div>
-                                    <div>
-                                        <form wire:submit.prevent="assignRoleAdmin({{ $myQData->id }})">
-                                            <x-primary-button type="submit">RoleAdmin</x-primary-button>
-                                        </form>
+                                    <div class="grid grid-cols-1 gap-2">
+                                        <div>
+                                            <form wire:submit.prevent="assignRoleTu({{ $myQData->id }})">
+                                                <x-primary-button type="submit">RoleTu</x-primary-button>
+                                            </form>
+                                        </div>
+                                        <div>
+                                            <form wire:submit.prevent="assignRolePerawat({{ $myQData->id }})">
+                                                <x-primary-button type="submit">RolePerawat</x-primary-button>
+                                            </form>
+                                        </div>
+                                        <div>
+                                            <form wire:submit.prevent="assignRoleDokter({{ $myQData->id }})">
+                                                <x-primary-button type="submit">RoleDokter</x-primary-button>
+                                            </form>
+                                        </div>
+                                        <div>
+                                            <form wire:submit.prevent="assignRoleMr({{ $myQData->id }})">
+                                                <x-primary-button type="submit">RoleMr</x-primary-button>
+                                            </form>
+                                        </div>
+                                        <div>
+                                            <form wire:submit.prevent="assignRoleApoteker({{ $myQData->id }})">
+                                                <x-primary-button type="submit">RoleApoteker</x-primary-button>
+                                            </form>
+                                        </div>
+                                        <div>
+                                            <form wire:submit.prevent="assignRoleAdmin({{ $myQData->id }})">
+                                                <x-primary-button type="submit">RoleAdmin</x-primary-button>
+                                            </form>
+                                        </div>
                                     </div>
 
-
-
-
-
-                                    <div>
-                                        <form wire:submit.prevent="removeRolePerawat({{ $myQData->id }})">
-                                            <x-light-button type="submit">HapusRolePerawat</x-light-button>
-                                        </form>
-                                    </div>
-                                    <div>
-                                        <form wire:submit.prevent="removeRoleDokter({{ $myQData->id }})">
-                                            <x-light-button type="submit">HapusRoleDokter</x-light-button>
-                                        </form>
-                                    </div>
-                                    <div>
-                                        <form wire:submit.prevent="removeRoleMr({{ $myQData->id }})">
-                                            <x-light-button type="submit">HapusRoleMr</x-light-button>
-                                        </form>
-                                    </div>
-                                    <div>
-                                        <form wire:submit.prevent="removeRoleApoteker({{ $myQData->id }})">
-                                            <x-light-button type="submit">HapusRoleApoteker</x-light-button>
-                                        </form>
-                                    </div>
-                                    <div>
-                                        <form wire:submit.prevent="removeRoleAdmin({{ $myQData->id }})">
-                                            <x-light-button type="submit">HapusRoleAdmin</x-light-button>
-                                        </form>
+                                    <div class="grid grid-cols-1 gap-2">
+                                        <div>
+                                            <form wire:submit.prevent="removeRoleTu({{ $myQData->id }})">
+                                                <x-light-button type="submit">HapusRoleTu</x-light-button>
+                                            </form>
+                                        </div>
+                                        <div>
+                                            <form wire:submit.prevent="removeRolePerawat({{ $myQData->id }})">
+                                                <x-light-button type="submit">HapusRolePerawat</x-light-button>
+                                            </form>
+                                        </div>
+                                        <div>
+                                            <form wire:submit.prevent="removeRoleDokter({{ $myQData->id }})">
+                                                <x-light-button type="submit">HapusRoleDokter</x-light-button>
+                                            </form>
+                                        </div>
+                                        <div>
+                                            <form wire:submit.prevent="removeRoleMr({{ $myQData->id }})">
+                                                <x-light-button type="submit">HapusRoleMr</x-light-button>
+                                            </form>
+                                        </div>
+                                        <div>
+                                            <form wire:submit.prevent="removeRoleApoteker({{ $myQData->id }})">
+                                                <x-light-button type="submit">HapusRoleApoteker</x-light-button>
+                                            </form>
+                                        </div>
+                                        <div>
+                                            <form wire:submit.prevent="removeRoleAdmin({{ $myQData->id }})">
+                                                <x-light-button type="submit">HapusRoleAdmin</x-light-button>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
 
