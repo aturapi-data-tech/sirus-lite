@@ -2,6 +2,8 @@
 
 namespace App\Http\Livewire\EmrRI\DisplayPasien;
 
+use Illuminate\Support\Facades\DB;
+
 use Livewire\Component;
 
 use App\Http\Traits\EmrRI\EmrRITrait;
@@ -27,6 +29,26 @@ class DisplayPasien extends Component
     {
         $this->dataDaftarRi = $this->findDataRI($riHdrNo);
         $this->dataPasien = $this->findDataMasterPasien($this->dataDaftarRi['regNo'] ?? '');
+
+        // upate data array terkini
+        $dataDaftarRi = DB::table('rsview_rihdrs')
+            ->select(
+                'room_id',
+                'room_name',
+                'bed_no',
+                'bangsal_id',
+                'bangsal_name',
+                'klaim_id',
+            )
+            ->where('rihdr_no', '=', $riHdrNo)
+            ->first();
+
+        $this->dataDaftarRi['bangsalId'] = $dataDaftarRi->bangsal_id;
+        $this->dataDaftarRi['bangsalDesc'] = $dataDaftarRi->bangsal_name;
+        $this->dataDaftarRi['roomId'] = $dataDaftarRi->room_id;
+        $this->dataDaftarRi['roomDesc'] = $dataDaftarRi->room_name;
+        $this->dataDaftarRi['bedNo'] = $dataDaftarRi->bed_no;
+        $this->dataDaftarRi['klaimId'] = $dataDaftarRi->klaim_id;
     }
 
     public function mount()

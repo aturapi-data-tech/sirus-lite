@@ -429,7 +429,7 @@ class AdministrasiRI extends Component
                 'room_price',
                 'perawatan_price',
                 'common_service',
-                DB::raw("ROUND(nvl(day, nvl(end_date,sysdate)-nvl(start_date,sysdate))) as day"),
+                DB::raw("ROUND(nvl(day, nvl(end_date,sysdate+1)-nvl(start_date,sysdate))) as day"),
                 'rihdr_no',
                 'trfr_no'
             )

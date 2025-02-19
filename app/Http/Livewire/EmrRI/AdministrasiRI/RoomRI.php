@@ -105,7 +105,7 @@ class RoomRI extends Component
             if (!empty($lastInsertedFromRI->trfr_no_max)) {
 
                 $longDay = DB::table('rsmst_trfrooms')
-                    ->select(DB::raw("ROUND(nvl(day, nvl(end_date,sysdate)-nvl(start_date,sysdate))) as day"))
+                    ->select(DB::raw("ROUND(nvl(day, nvl(end_date,sysdate+1)-nvl(start_date,sysdate))) as day"))
                     ->where('rihdr_no', '=', $this->riHdrNoRef)
                     ->where('trfr_no', '=', $lastInsertedFromRI->trfr_no_max)
                     ->first();
@@ -137,6 +137,15 @@ class RoomRI extends Component
                     'rihdr_no' =>  $this->riHdrNoRef,
                     'trfr_no' =>  $lastInserted->trfr_no_max,
                 ]);
+
+            // update into table transaksi
+            DB::table('rstxn_rihdrs')
+                ->where('rihdr_no', '=', $this->riHdrNoRef)
+                ->update([
+                    'room_id' => $this->formEntryRoom['roomId'],
+                    'bed_no' =>  $this->formEntryRoom['roomBedNo'],
+                ]);
+
 
 
             $this->administrasiRIuserLog($this->riHdrNoRef, 'Room ' . $this->formEntryRoom['roomName'] . ' Tarif Room/Pereawatan/Umum:' . $this->formEntryRoom['roomPrice'] . '/' . $this->formEntryRoom['perawatanPrice'] . '/' . $this->formEntryRoom['commonService'] . ' Txn No:' . $lastInserted->trfr_no_max);
@@ -230,7 +239,7 @@ class RoomRI extends Component
                 'rsmst_trfrooms.room_price',
                 'rsmst_trfrooms.perawatan_price',
                 'rsmst_trfrooms.common_service',
-                DB::raw("ROUND(nvl(day, nvl(end_date,sysdate)-nvl(start_date,sysdate))) as day"),
+                DB::raw("ROUND(nvl(day, nvl(end_date,sysdate+1)-nvl(start_date,sysdate))) as day"),
                 'rihdr_no',
                 'trfr_no'
             )

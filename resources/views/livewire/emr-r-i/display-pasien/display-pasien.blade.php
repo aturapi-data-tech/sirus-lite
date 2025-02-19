@@ -6,9 +6,11 @@
 
             @php
                 $pasieenTitle = 'Pasien RegNo : ' . $dataPasien['pasien']['regNo'];
+                $datadaftar_json = $dataDaftarRi;
+                $klaimId = isset($dataDaftarRi['klaimId']) ? $dataDaftarRi['klaimId'] : '-';
             @endphp
 
-            <div class="grid grid-cols-2 pl-3 bg-gray-100 rounded-lg">
+            <div class="grid grid-cols-3 pl-3 bg-gray-100 rounded-lg">
 
                 <div>
                     <div class="text-base font-semibold text-gray-700">
@@ -20,26 +22,26 @@
                         {{ $dataPasien['pasien']['identitas']['alamat'] }}
                     </div>
                 </div>
-                {{--  --}}
-                <div class="grid">
-                    <div class="px-2 font-semibold text-gray-700 justify-self-end">
-                        {{ $dataDaftarRi['bangsalDesc'] ?? '-' }}
-                        </br>
-                        {{ $dataDaftarRi['roomDesc'] ?? '-' }}
-                        {{ $dataDaftarRi['bedNo'] ?? '-' }}
 
-                    </div>
-                    <div class="px-2 font-semibold text-primary justify-self-end">
-                        @php
-                            $klaimId = isset($dataDaftarRi['klaimId']) ? $dataDaftarRi['klaimId'] : '-';
-                        @endphp
-                        {{ $dataDaftarRi['drDesc'] . ' / ' }}
-                        {{ $klaimId == 'UM' ? 'UMUM' : ($klaimId == 'JM' ? 'BPJS' : ($klaimId == 'KR' ? 'Kronis' : 'Asuransi Lain')) }}
-                    </div>
-                    <div class="px-2 py-2 text-xs text-gray-700 justify-self-end">
-                        {{ 'Tgl :' . $dataDaftarRi['entryDate'] }}
-                    </div>
+                <div class="">
+                    @include('livewire.emr-r-i.emr-r-i-leveling-dokter-table')
                 </div>
+
+                <div class="px-2 text-sm text-gray-900">
+                    <p class="text-right">{{ $dataDaftarRi['bangsalDesc'] ?? '-' }}</p>
+                    <p class="font-semibold text-right">
+                        {{ $dataDaftarRi['roomDesc'] ?? '-' }} / Bed : {{ $dataDaftarRi['bedNo'] ?? '-' }}
+                    </p>
+                    <p class="text-right">
+                        Jenis Klaim:
+                        {{ $klaimId == 'UM' ? 'UMUM' : ($klaimId == 'JM' ? 'BPJS' : ($klaimId == 'KR' ? 'Kronis' : 'Asuransi Lain')) }}
+                        {{ $klaimId }}
+                    </p>
+                    <p class="text-right">
+                        Tgl Masuk: {{ $dataDaftarRi['entryDate'] }}
+                    </p>
+                </div>
+
             </div>
 
 
