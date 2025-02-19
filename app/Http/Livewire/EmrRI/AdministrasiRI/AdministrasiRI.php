@@ -422,7 +422,17 @@ class AdministrasiRI extends Component
 
         // Kamar Rawat Inap
         $riRoom = DB::table('rsmst_trfrooms')
-            ->select('start_date', 'end_date', 'room_id', 'room_price', 'perawatan_price', 'common_service', 'day', 'rihdr_no', 'trfr_no')
+            ->select(
+                'start_date',
+                'end_date',
+                'room_id',
+                'room_price',
+                'perawatan_price',
+                'common_service',
+                DB::raw("ROUND(nvl(day, nvl(end_date,sysdate)-nvl(start_date,sysdate))) as day"),
+                'rihdr_no',
+                'trfr_no'
+            )
             ->where('rihdr_no', $riHdrNo)
             ->get();
         $dataRawatInap['riRoom'] = json_decode(json_encode($riRoom, true), true);
