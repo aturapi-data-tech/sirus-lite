@@ -522,6 +522,14 @@
                                                     </x-dropdown-link>
                                                 </li>
                                             @endrole
+                                            @role('Tu')
+                                                <li>
+                                                    <x-dropdown-link
+                                                        wire:click="edit('{{ $myQData->rihdr_no }}','{{ $myQData->reg_no }}')">
+                                                        {{ __('Assessment Perawat') }}
+                                                    </x-dropdown-link>
+                                                </li>
+                                            @endrole
                                             @role('Perawat')
                                                 <li>
                                                     <x-dropdown-link

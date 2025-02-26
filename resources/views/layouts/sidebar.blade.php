@@ -217,7 +217,7 @@
 
                         <ul id="dropdown-layoutsRI" class="hidden py-2 space-y-2">
                             <li>
-                                @role(['Dokter', 'Perawat', 'Mr', 'Admin'])
+                                @role(['Dokter', 'Perawat', 'Mr', 'Admin', 'Tu'])
                                     <x-nav-link class="pl-4" :href="route('EmrRI')" :active="request()->routeIs('EmrRI')">
                                         {{ __('Rekam Medis RI') }}
                                     </x-nav-link>
