@@ -152,6 +152,16 @@
 
                     <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50"
                         :class="{
+                            'active': activeTab === 'asuhanKeperawatan'
+                        }"
+                        x-show.transition.in.opacity.duration.600="activeTab === 'asuhanKeperawatan'">
+
+                        <livewire:emr-r-i.mr-r-i.asuhan-keperawatan.asuhan-keperawatan
+                            :wire:key="'content-asuhanKeperawatanRi'" :riHdrNoRef="$riHdrNoRef">
+                    </div>
+
+                    <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50"
+                        :class="{
                             'active': activeTab === 'diagnosis'
                         }"
                         x-show.transition.in.opacity.duration.600="activeTab === 'diagnosis'">

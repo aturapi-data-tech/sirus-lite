@@ -337,6 +337,10 @@ class EmrRI extends Component
             'ermMenuName' => 'Observasi'
         ],
         [
+            'ermMenuId' => 'asuhanKeperawatan',
+            'ermMenuName' => 'Asuhan Keperawatan'
+        ],
+        [
             'ermMenuId' => 'cppt',
             'ermMenuName' => 'CPPT'
         ],
