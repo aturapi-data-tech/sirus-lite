@@ -666,6 +666,17 @@ class TelaahResepRJ extends Component
     {
         // Ambil data terkait rjNo dan set waktu masuk apotek saat ini
         $this->findData($rjNo);
+
+        // Pastikan TaskId5 (waktu keluar poli) sudah ada sebelum melanjutkan taskId6
+        if (empty($this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5'])) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Anda tidak dapat melakukan taskId6 ketika taskId5 Kosong");
+            return;
+        }
+
         $masukApotek = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
 
         // Cek apakah kolom waktu_masuk_apt sudah terisi
@@ -682,15 +693,7 @@ class TelaahResepRJ extends Component
                 ]);
         }
 
-        // Pastikan TaskId5 (waktu keluar poli) sudah ada sebelum melanjutkan taskId6
-        if (empty($this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5'])) {
-            toastr()
-                ->closeOnHover(true)
-                ->closeDuration(3)
-                ->positionClass('toast-top-left')
-                ->addError("Anda tidak dapat melakukan taskId6 ketika taskId5 Kosong");
-            return;
-        }
+
 
         $noBooking = $this->dataDaftarPoliRJ['noBooking'];
 
@@ -768,6 +771,7 @@ class TelaahResepRJ extends Component
                 $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6'],
                 env('APP_TIMEZONE')
             )->timestamp * 1000;
+
             $cekPoliSpesialis = DB::table('rsmst_polis')
                 ->where('spesialis_status', '1')
                 ->where('poli_id', $this->dataDaftarPoliRJ['poliId'])
@@ -789,6 +793,17 @@ class TelaahResepRJ extends Component
     {
         // Ambil data terkait rjNo dan waktu keluar apotek saat ini
         $this->findData($rjNo);
+
+        // Pastikan taskId6 (waktu masuk Apotek) sudah tercatat sebelum melanjutkan ke taskId7
+        if (empty($this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6'])) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Anda tidak dapat melakukan taskId7 ketika taskId6 Kosong");
+            return;
+        }
+
         $keluarApotek = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
 
         // Cek apakah kolom waktu_selesai_pelayanan sudah terisi
@@ -805,15 +820,7 @@ class TelaahResepRJ extends Component
                 ]);
         }
 
-        // Pastikan taskId6 (waktu masuk Apotek) sudah tercatat sebelum melanjutkan ke taskId7
-        if (empty($this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6'])) {
-            toastr()
-                ->closeOnHover(true)
-                ->closeDuration(3)
-                ->positionClass('toast-top-left')
-                ->addError("Anda tidak dapat melakukan taskId7 ketika taskId6 Kosong");
-            return;
-        }
+
 
         // Update taskId7 jika belum ada
         if (empty($this->dataDaftarPoliRJ['taskIdPelayanan']['taskId7'])) {
