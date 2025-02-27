@@ -426,12 +426,14 @@ class EmrRJ extends Component
 
         $this->findData($rjNo);
 
-        $sql = "select waktu_masuk_poli from rstxn_rjhdrs where rj_no=:rjNo";
-        $cek_waktu_masuk_poli = DB::scalar($sql, ['rjNo' => $rjNo]);
+        // Cek apakah waktu_masuk_poli sudah ada
+        $waktuMasukPoliDB = DB::table('rstxn_rjhdrs')
+            ->where('rj_no', $rjNo)
+            ->value('waktu_masuk_poli');
 
 
         // ketika cek_waktu_masuk_poli kosong lalu update
-        if (!$cek_waktu_masuk_poli) {
+        if (!$waktuMasukPoliDB) {
             $waktuMasukPoli = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
 
             DB::table('rstxn_rjhdrs')
@@ -441,28 +443,45 @@ class EmrRJ extends Component
                 ]);
         }
 
-        /////////////////////////
-        // Update TaskId 4
-        /////////////////////////
-        $sqlWaktuMasukPoli = "select to_char(waktu_masuk_poli,'dd/mm/yyyy hh24:mi:ss') as waktu_masuk_poli from rstxn_rjhdrs where rj_no=:rjNo";
-        $waktuMasukPoli = DB::scalar($sqlWaktuMasukPoli, ['rjNo' => $rjNo]);
 
-        if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']) {
+        // Ambil waktu_masuk_poli yang sudah diformat dari database
+        $waktuMasukPoli = DB::table('rstxn_rjhdrs')
+            ->where('rj_no', $rjNo)
+            ->select(DB::raw("to_char(waktu_masuk_poli, 'dd/mm/yyyy hh24:mi:ss') as waktu_masuk_poli"))
+            ->value('waktu_masuk_poli');
+
+        // Update TaskId 4 jika belum ada nilainya
+        if (empty($this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4'])) {
             $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4'] = $waktuMasukPoli;
-            // update DB
             $this->updateDataRJ($rjNo);
-
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Masuk Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']);
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addSuccess("Masuk Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']);
         } else {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Masuk Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']);
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Masuk Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']);
         }
+
 
         // cari no Booking
         $noBooking =  $this->dataDaftarPoliRJ['noBooking'];
 
-
         $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4'], env('APP_TIMEZONE'))->timestamp * 1000; //waktu dalam timestamp milisecond
-        $this->pushDataTaskId($noBooking, 4, $waktu);
+
+        $cekPoliSpesialis = DB::table('rsmst_polis')
+            ->select('poli_id', 'poli_desc', 'kd_poli_bpjs', 'spesialis_status')
+            ->where('spesialis_status', '=', '1')
+            ->where('poli_id', '=', $this->dataDaftarPoliRJ['poliId'])
+            ->exists();
+
+        if (($cekPoliSpesialis)) {
+            $this->pushDataTaskId($noBooking, 4, $waktu);
+        }
     }
 
 
@@ -470,32 +489,53 @@ class EmrRJ extends Component
     {
         $this->findData($rjNo);
 
-        $keluarPoli = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
-
-        // check task Id 4 sudah dilakukan atau belum
-        if ($this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']) {
-
-            if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']) {
-                $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5'] = $keluarPoli;
-                // update DB
-                $this->updateDataRJ($rjNo);
-
-                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
-            } else {
-                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
-            }
-
-            // cari no Booking
-            $noBooking =  $this->dataDaftarPoliRJ['noBooking'];
-
-
-            $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5'], env('APP_TIMEZONE'))->timestamp * 1000; //waktu dalam timestamp milisecond
-            $this->pushDataTaskId($noBooking, 5, $waktu);
-
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
-        } else {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Satus Pasien Belum melalui pelayanan Poli");
+        // Cek apakah pasien sudah melalui pelayanan Poli (TaskId 4)
+        if (empty($this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4'])) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Status Pasien Belum melalui pelayanan Poli");
+            return;
         }
+
+        // Jika TaskId 5 sudah ada, tampilkan pesan error dan hentikan proses
+        if (!empty($this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5'])) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Keluar Poli sudah tercatat pada " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
+            // return;
+        }
+
+        // Set waktu keluar poli saat ini
+        if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']) {
+            $keluarPoli = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
+            $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5'] = $keluarPoli;
+            // Update data ke database
+            $this->updateDataRJ($rjNo);
+        }
+
+        // Konversi waktu TaskId 5 ke timestamp (milisecond)
+        $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5'], env('APP_TIMEZONE'))->timestamp * 1000;
+
+
+        // Cek apakah Poli Spesialis mengirim data ke BPJS menggunakan method exists() untuk efisiensi
+        $cekPoliSpesialis = DB::table('rsmst_polis')
+            ->where('spesialis_status', '1')
+            ->where('poli_id', $this->dataDaftarPoliRJ['poliId'])
+            ->exists();
+
+        if ($cekPoliSpesialis) {
+            $this->pushDataTaskId($this->dataDaftarPoliRJ['noBooking'], 5, $waktu);
+        }
+
+        toastr()
+            ->closeOnHover(true)
+            ->closeDuration(3)
+            ->positionClass('toast-top-left')
+            ->addSuccess("Keluar Poli " . $keluarPoli);
     }
 
     private function findData($rjNo): void
