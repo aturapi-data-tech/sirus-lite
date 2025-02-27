@@ -1631,206 +1631,184 @@ class DaftarRJ extends Component
 
     private function pushDataAntrian()
     {
+
+        // Cek apakah Poli Spesialis mengirim data ke BPJS
+        $cekPoliSpesialis = DB::table('rsmst_polis')
+            ->select('poli_id', 'poli_desc', 'kd_poli_bpjs', 'spesialis_status')
+            ->where('spesialis_status', '1')
+            ->where('poli_id', $this->dataDaftarPoliRJ['poliId'])
+            ->exists();
+
+
         //push data antrian UMUM BPJS kecuali 'kronis'
         if ($this->dataDaftarPoliRJ['klaimId'] != 'KR') {
-            $rjdate = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate']); //Tgl RJ
+            $rjDate = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'], env('APP_TIMEZONE')); //Tgl RJ
+            // Mapping nama hari ke ID
+            $dayMapping = [
+                'Senin'    => 1,
+                'Selasa'   => 2,
+                'Rabu'     => 3,
+                'Kamis'    => 4,
+                'Jumat'    => 5,
+                'Sabtu'    => 6,
+                'Minggu'   => 7,
+            ];
+            $dayDesc = $rjDate->isoFormat('dddd');
+            $dayid = isset($dayMapping[$dayDesc]) ? $dayMapping[$dayDesc] : 0;
 
-            $dayDesc = $rjdate->isoFormat('dddd'); //Senin Selasa Rabu ...
-
-            $dayid = ($dayDesc == 'Senin') ? 1 //kode Senin Selasa Rabu ...
-                : ($dayDesc == 'Selasa' ? 2
-                    : ($dayDesc == 'Rabu' ? 3
-                        : ($dayDesc == 'Kamis' ? 4
-                            : ($dayDesc == 'Jumat' ? 5
-                                : 6
-                            )
-                        )
-                    )
-                );
-
-            $JadwalPraktek = json_decode(json_encode(DB::table('scmst_scpolis')
+            // Ambil Jadwal Praktek
+            $jadwalPraktekObj = DB::table('scmst_scpolis')
                 ->select(
-                    //Poli RS
                     'scmst_scpolis.dr_id as dr_id',
                     'rsmst_doctors.dr_name as dr_name',
                     'scmst_scpolis.sc_poli_ket as sc_poli_ket',
                     'scmst_scpolis.poli_id as poli_id',
                     'rsmst_polis.poli_desc as poli_desc',
-
-                    //Poli BPJS
                     'rsmst_doctors.kd_dr_bpjs as kd_dr_bpjs',
                     'rsmst_polis.kd_poli_bpjs as kd_poli_bpjs',
-
                     DB::raw("nvl(mulai_praktek,'00:00:00') as mulai_praktek"),
                     DB::raw("nvl(selesai_praktek,'00:00:00') as selesai_praktek"),
-
-                    DB::raw('nvl(kuota,35) as kuota'),
+                    DB::raw('nvl(kuota,30) as kuota')
                 )
-                ->Join('rsmst_doctors', 'rsmst_doctors.dr_id', 'scmst_scpolis.dr_id')
-                ->Join('rsmst_polis', 'rsmst_polis.poli_id', 'scmst_scpolis.poli_id')
-                ->Where('day_id', $dayid)
-                ->Where('scmst_scpolis.dr_id', $this->dataDaftarPoliRJ['drId']) //Cek Poli RS
-                ->Where('sc_poli_status_', 1)
+                ->join('rsmst_doctors', 'rsmst_doctors.dr_id', '=', 'scmst_scpolis.dr_id')
+                ->join('rsmst_polis', 'rsmst_polis.poli_id', '=', 'scmst_scpolis.poli_id')
+                ->where('day_id', $dayid)
+                ->where('scmst_scpolis.dr_id', $this->dataDaftarPoliRJ['drId'])
+                ->where('sc_poli_status_', 1)
                 ->orderBy('scmst_scpolis.no_urut', 'ASC')
                 ->orderBy('scmst_scpolis.poli_id', 'ASC')
-                ->first(), true), true);
+                ->first();
 
 
-            if (!$JadwalPraktek) {
-                $JadwalPraktek['mulai_praktek'] = '07:00:00';
-                $JadwalPraktek['selesai_praktek'] = '13:00:00';
-
-                $JadwalPraktek['kuota'] = 30;
+            // Jika tidak ada jadwal, gunakan nilai default
+            if (!$jadwalPraktekObj) {
+                $jadwalPraktek = [
+                    'mulai_praktek'   => '07:00:00',
+                    'selesai_praktek' => '13:00:00',
+                    'kuota'           => 30,
+                ];
+            } else {
+                // Ubah objek menjadi array
+                $jadwalPraktek = (array) $jadwalPraktekObj;
             }
 
-            // Pelayanan (Poli Tgl + Jam Layanan)
-            $hariLayananJamLayanan = Carbon::createFromFormat('d/m/Y H:i:s', $rjdate->format('d/m/Y') . ' ' . $JadwalPraktek['mulai_praktek']);
-            // $timestamp = $hariLayananJamLayanan->timestamp; //Timestemp Layanan
-            // off kan semsntara dan atur ulang logic jadwal_estimasi (masalah pada penambahan 10 menit per pasien tidak jalan)
-            // $jadwal_estimasi = $hariLayananJamLayanan->addMinutes(10 * ($this->dataDaftarPoliRJ['noAntrian'] + 1)); // Hari Layanan||JamPraktek + 10menit
+            // Hitung estimasi waktu pelayanan
+            // (Perhitungan estimasi disesuaikan jika diperlukan)
+            $jadwal_estimasi = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'], env('APP_TIMEZONE'))->valueOf();
 
-            // $jadwal_estimasi = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'])->timestamp * 1000; //waktu dalam timestamp milisecond
-            $jadwal_estimasi = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'])->valueOf();
-
-            // JamPraktek
-            $jampraktek = Str::substr($JadwalPraktek['mulai_praktek'], 0, 5) . '-' . Str::substr($JadwalPraktek['selesai_praktek'], 0, 5); //'00:00-00:00'
+            // Format jam praktek (misalnya: 07:00-13:00)
+            $jamPraktek = substr($jadwalPraktek['mulai_praktek'], 0, 5) . '-' . substr($jadwalPraktek['selesai_praktek'], 0, 5);
 
             $antreanadd = [
-                "kodebooking" => $this->dataDaftarPoliRJ['noBooking'],
-                "jenispasien" => ($this->dataDaftarPoliRJ['klaimId'] == 'JM') ? 'JKN' : 'NON JKN', //Layanan UMUM BPJS
-                "nomorkartu" => ($this->dataDaftarPoliRJ['klaimId'] == 'JM') ? $this->dataPasien['pasien']['identitas']['idbpjs'] : '',
-                "nik" => $this->dataPasien['pasien']['identitas']['nik'],
-                "nohp" =>  $this->dataPasien['pasien']['kontak']['nomerTelponSelulerPasien'],
-                "kodepoli" => $this->dataDaftarPoliRJ['kdpolibpjs'] ? $this->dataDaftarPoliRJ['kdpolibpjs'] : $this->dataDaftarPoliRJ['poliId'], //if null poliidRS
-                "namapoli" => $this->dataDaftarPoliRJ['poliDesc'],
-                "pasienbaru" => 0,
-                "norm" => $this->dataDaftarPoliRJ['regNo'],
-                "tanggalperiksa" => Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'], env('APP_TIMEZONE'))->format('Y-m-d'),
-                "kodedokter" => $this->dataDaftarPoliRJ['kddrbpjs'] ? $this->dataDaftarPoliRJ['kddrbpjs'] : $this->dataDaftarPoliRJ['drId'], //if Null dridRS
-                "namadokter" => $this->dataDaftarPoliRJ['drDesc'],
-                "jampraktek" => $jampraktek,
-                "jeniskunjungan" => $this->dataDaftarPoliRJ['kunjunganId'], //FKTP/FKTL/Kontrol/Internal
-                "nomorreferensi" => $this->dataDaftarPoliRJ['noReferensi'],
-                "nomorantrean" => $this->dataDaftarPoliRJ['noAntrian'],
-                "angkaantrean" => $this->dataDaftarPoliRJ['noAntrian'],
+                "kodebooking"      => $this->dataDaftarPoliRJ['noBooking'],
+                "jenispasien"      => ($this->dataDaftarPoliRJ['klaimId'] == 'JM') ? 'JKN' : 'NON JKN',
+                "nomorkartu"       => ($this->dataDaftarPoliRJ['klaimId'] == 'JM') ? $this->dataPasien['pasien']['identitas']['idbpjs'] : '',
+                "nik"              => $this->dataPasien['pasien']['identitas']['nik'],
+                "nohp"             => $this->dataPasien['pasien']['kontak']['nomerTelponSelulerPasien'],
+                "kodepoli"         => $this->dataDaftarPoliRJ['kdpolibpjs'] ?: $this->dataDaftarPoliRJ['poliId'],
+                "namapoli"         => $this->dataDaftarPoliRJ['poliDesc'],
+                "pasienbaru"       => 0,
+                "norm"             => $this->dataDaftarPoliRJ['regNo'],
+                "tanggalperiksa"   => Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'], env('APP_TIMEZONE'))->format('Y-m-d'),
+                "kodedokter"       => $this->dataDaftarPoliRJ['kddrbpjs'] ?: $this->dataDaftarPoliRJ['drId'],
+                "namadokter"       => $this->dataDaftarPoliRJ['drDesc'],
+                "jampraktek"       => $jamPraktek,
+                "jeniskunjungan"   => $this->dataDaftarPoliRJ['kunjunganId'],
+                "nomorreferensi"   => $this->dataDaftarPoliRJ['noReferensi'],
+                "nomorantrean"     => $this->dataDaftarPoliRJ['noAntrian'],
+                "angkaantrean"     => $this->dataDaftarPoliRJ['noAntrian'],
                 "estimasidilayani" => $jadwal_estimasi,
-                "sisakuotajkn" => $JadwalPraktek['kuota'] - $this->dataDaftarPoliRJ['noAntrian'],
-                "kuotajkn" => $JadwalPraktek['kuota'],
-                "sisakuotanonjkn" => $JadwalPraktek['kuota'] - $this->dataDaftarPoliRJ['noAntrian'],
-                "kuotanonjkn" => $JadwalPraktek['kuota'],
-                "keterangan" => "Peserta harap 30 menit lebih awal guna pencatatan administrasi.",
+                "sisakuotajkn"     => $jadwalPraktek['kuota'] - $this->dataDaftarPoliRJ['noAntrian'],
+                "kuotajkn"         => $jadwalPraktek['kuota'],
+                "sisakuotanonjkn"  => $jadwalPraktek['kuota'] - $this->dataDaftarPoliRJ['noAntrian'],
+                "kuotanonjkn"      => $jadwalPraktek['kuota'],
+                "keterangan"       => "Peserta harap 30 menit lebih awal guna pencatatan administrasi.",
             ];
-
-            // dd($jadwal_estimasi);
-            // dd(Carbon::createFromTimestamp($jadwal_estimasi / 1000)->toDateTimeString());
-            // dd($antreanadd);
         }
 
         // http Post
 
 
-
-        // Lakukan 2 x cek http dan BPJS untuk memastikan proses kirim data berhasil
         // dan menentukan nilai status / jika code =200 skip proses tersebut
         // jika antrean berhasil-> buat SEP
         //jika gagal ulangi-> antrean
         // (pembuatan SEP dilakukan ketika proses antrean berhasil)
 
+        // Cek status antrean di database
         $cekAntrianAntreanBPJS = DB::table('rstxn_rjhdrs')
             ->select('push_antrian_bpjs_status', 'push_antrian_bpjs_json')
             ->where('rj_no', $this->dataDaftarPoliRJ['rjNo'])
             ->first();
 
-
-        $cekAntrianAntreanBPJSStatus = isset($cekAntrianAntreanBPJS->push_antrian_bpjs_status) ? $cekAntrianAntreanBPJS->push_antrian_bpjs_status : "";
-        // 1 cek proses pada database status 208 task id sudah terbit
-        if ($cekAntrianAntreanBPJSStatus == 200 || $cekAntrianAntreanBPJSStatus == 208) {
-
-            // set http response to public
-            $this->HttpGetBpjsStatus = $cekAntrianAntreanBPJS->push_antrian_bpjs_status; //status 200 201 400 ..
-            $this->HttpGetBpjsJson = $cekAntrianAntreanBPJS->push_antrian_bpjs_json; //Return Response Tambah Antrean
-
-            //ketika Push Tambah Antrean Berhasil buat SEP
-            //////////////////////////////////////////////
-            if ($this->JenisKlaim['JenisKlaimId'] == 'JM') {
-                $this->pushInsertSEP($this->SEPJsonReq);
-            }
-            //ketika Push Tambah Antrean Berhasil buat SEP
-            //////////////////////////////////////////////
-
-        } else {
-            // Tambah Antrean
-            $HttpGetBpjs =  AntrianTrait::tambah_antrean($antreanadd)->getOriginalContent();
-            // set http response to public
-            $this->HttpGetBpjsStatus = $HttpGetBpjs['metadata']['code']; //status 200 201 400 ..
-            $this->HttpGetBpjsJson = json_encode($HttpGetBpjs, true); //Return Response Tambah Antrean
+        $cekStatus = isset($cekAntrianAntreanBPJS->push_antrian_bpjs_status) ? $cekAntrianAntreanBPJS->push_antrian_bpjs_status : "";
 
 
-            // 2 cek proses pada getHttp
-            if ($HttpGetBpjs['metadata']['code'] == 200 || $HttpGetBpjs['metadata']['code'] == 208) {
-                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Tambah Antrian ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
 
-                $this->HttpGetBpjsStatus = $HttpGetBpjs['metadata']['code']; //status 200 201 400 ..
-                $this->HttpGetBpjsJson = json_encode($HttpGetBpjs, true); //Return Response Tambah Antrean
+        // Jika status belum 200 atau 208, lakukan push data
+        if ($cekStatus !== 200 && $cekStatus !== 208) {
+            if (($cekPoliSpesialis)) {
+                $HttpGetBpjs = AntrianTrait::tambah_antrean($antreanadd)->getOriginalContent();
+                $this->HttpGetBpjsStatus = $HttpGetBpjs['metadata']['code'];
+                $this->HttpGetBpjsJson = json_encode($HttpGetBpjs);
 
-                //ketika Push Tambah Antrean Berhasil buat SEP
-                //////////////////////////////////////////////
-                if ($this->JenisKlaim['JenisKlaimId'] == 'JM') {
-                    $this->pushInsertSEP($this->SEPJsonReq);
+                if ($HttpGetBpjs['metadata']['code'] == 200 || $HttpGetBpjs['metadata']['code'] == 208) {
+                    toastr()->closeOnHover(true)
+                        ->closeDuration(3)
+                        ->positionClass('toast-top-left')
+                        ->addSuccess('Tambah Antrian ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+                } else {
+                    toastr()->closeOnHover(true)
+                        ->closeDuration(3)
+                        ->positionClass('toast-top-left')
+                        ->addError('Tambah Antrian ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+                    // Tambahkan logika retry jika diperlukan
                 }
-                //ketika Push Tambah Antrean Berhasil buat SEP
-                //////////////////////////////////////////////
-            } else {
-                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Tambah Antrian ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
-
-                $this->HttpGetBpjsStatus = $HttpGetBpjs['metadata']['code']; //status 200 201 400 ..
-                $this->HttpGetBpjsJson = json_encode($HttpGetBpjs, true); //Return Response Tambah Antrean
-
-                // Ulangi Proses pushDataAntrian;
-                // $this->emit('rePush_Data_Antrian_Confirmation');
             }
         }
 
+        // Jika klaim jenis JM, buat SEP setelah push antrean berhasil
+        if ($this->JenisKlaim['JenisKlaimId'] == 'JM') {
+            $this->pushInsertSEP($this->SEPJsonReq);
+        }
 
 
         $noBooking = $this->dataDaftarPoliRJ['noBooking'];
 
 
-        /////////////////////////
-        // Update TaskId 1&2 jika tgl registrasi = tgl rj
-        /////////////////////////
+        // Update TaskId 1 & 2 jika tanggal registrasi sama dengan tanggal RJ
         if (isset($this->dataPasien['pasien']['regDate'])) {
-            // dd($this->dataPasien['pasien']['regDate']);
             try {
-                if (
-                    Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'], env('APP_TIMEZONE'))->format('Ymd')
-                    ===
-                    Carbon::createFromFormat('d/m/Y H:i:s', $this->dataPasien['pasien']['regDate'], env('APP_TIMEZONE'))->format('Ymd')
-                ) {
-                    // taskId 1
-                    $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId1'] = $this->dataPasien['pasien']['regDate'];
-                    $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId1'], env('APP_TIMEZONE'))->timestamp * 1000; //waktu dalam timestamp milisecond
-                    $this->pushDataTaskId($noBooking, 1, $waktu);
+                $rjFormatted  = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['rjDate'], env('APP_TIMEZONE'))->format('Ymd');
+                $regFormatted = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataPasien['pasien']['regDate'], env('APP_TIMEZONE'))->format('Ymd');
 
-                    //taskId2
+                if ($rjFormatted === $regFormatted) {
+                    // TaskId 1
+                    $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId1'] = $this->dataPasien['pasien']['regDate'];
+                    $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId1'], env('APP_TIMEZONE'))->timestamp * 1000;
+                    if (($cekPoliSpesialis)) {
+                        $this->pushDataTaskId($noBooking, 1, $waktu);
+                    }
+                    // TaskId 2
                     $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId2'] = $this->dataPasien['pasien']['regDateStore'];
-                    $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId2'], env('APP_TIMEZONE'))->timestamp * 1000; //waktu dalam timestamp milisecond
-                    $this->pushDataTaskId($noBooking, 2, $waktu);
+                    $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId2'], env('APP_TIMEZONE'))->timestamp * 1000;
+                    if (($cekPoliSpesialis)) {
+                        $this->pushDataTaskId($noBooking, 2, $waktu);
+                    }
                 }
             } catch (Exception $e) {
-                // dd($e->getMessage());
-                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError($e->getMessage());
+                toastr()->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError($e->getMessage());
             }
         }
 
-
-        /////////////////////////
         // Update TaskId 3
-        /////////////////////////
-
         $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId3'] = $this->dataDaftarPoliRJ['rjDate'];
-        $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId3'], env('APP_TIMEZONE'))->timestamp * 1000; //waktu dalam timestamp milisecond
-        $this->pushDataTaskId($noBooking, 3, $waktu);
+        $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId3'], env('APP_TIMEZONE'))->timestamp * 1000;
+        if (($cekPoliSpesialis)) {
+            $this->pushDataTaskId($noBooking, 3, $waktu);
+        }
     }
 
 
@@ -2675,12 +2653,14 @@ class DaftarRJ extends Component
 
         $this->findData($rjNo);
 
-        $sql = "select waktu_masuk_poli from rstxn_rjhdrs where rj_no=:rjNo";
-        $cek_waktu_masuk_poli = DB::scalar($sql, ['rjNo' => $rjNo]);
+        // Cek apakah waktu_masuk_poli sudah ada
+        $waktuMasukPoliDB = DB::table('rstxn_rjhdrs')
+            ->where('rj_no', $rjNo)
+            ->value('waktu_masuk_poli');
 
 
         // ketika cek_waktu_masuk_poli kosong lalu update
-        if (!$cek_waktu_masuk_poli) {
+        if (!$waktuMasukPoliDB) {
             $waktuMasukPoli = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
 
             DB::table('rstxn_rjhdrs')
@@ -2690,28 +2670,45 @@ class DaftarRJ extends Component
                 ]);
         }
 
-        /////////////////////////
-        // Update TaskId 4
-        /////////////////////////
-        $sqlWaktuMasukPoli = "select to_char(waktu_masuk_poli,'dd/mm/yyyy hh24:mi:ss') as waktu_masuk_poli from rstxn_rjhdrs where rj_no=:rjNo";
-        $waktuMasukPoli = DB::scalar($sqlWaktuMasukPoli, ['rjNo' => $rjNo]);
 
-        if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']) {
+        // Ambil waktu_masuk_poli yang sudah diformat dari database
+        $waktuMasukPoli = DB::table('rstxn_rjhdrs')
+            ->where('rj_no', $rjNo)
+            ->select(DB::raw("to_char(waktu_masuk_poli, 'dd/mm/yyyy hh24:mi:ss') as waktu_masuk_poli"))
+            ->value('waktu_masuk_poli');
+
+        // Update TaskId 4 jika belum ada nilainya
+        if (empty($this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4'])) {
             $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4'] = $waktuMasukPoli;
-            // update DB
             $this->updateDataRJ($rjNo);
-
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Masuk Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']);
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addSuccess("Masuk Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']);
         } else {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Masuk Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']);
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Masuk Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']);
         }
+
 
         // cari no Booking
         $noBooking =  $this->dataDaftarPoliRJ['noBooking'];
 
-
         $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4'], env('APP_TIMEZONE'))->timestamp * 1000; //waktu dalam timestamp milisecond
-        $this->pushDataTaskId($noBooking, 4, $waktu);
+
+        $cekPoliSpesialis = DB::table('rsmst_polis')
+            ->select('poli_id', 'poli_desc', 'kd_poli_bpjs', 'spesialis_status')
+            ->where('spesialis_status', '=', '1')
+            ->where('poli_id', '=', $this->dataDaftarPoliRJ['poliId'])
+            ->exists();
+
+        if (($cekPoliSpesialis)) {
+            $this->pushDataTaskId($noBooking, 4, $waktu);
+        }
     }
 
 
@@ -2719,32 +2716,53 @@ class DaftarRJ extends Component
     {
         $this->findData($rjNo);
 
-        $keluarPoli = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
-
-        // check task Id 4 sudah dilakukan atau belum
-        if ($this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4']) {
-
-            if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']) {
-                $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5'] = $keluarPoli;
-                // update DB
-                $this->updateDataRJ($rjNo);
-
-                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
-            } else {
-                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
-            }
-
-            // cari no Booking
-            $noBooking =  $this->dataDaftarPoliRJ['noBooking'];
-
-
-            $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5'], env('APP_TIMEZONE'))->timestamp * 1000; //waktu dalam timestamp milisecond
-            $this->pushDataTaskId($noBooking, 5, $waktu);
-
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Keluar Poli " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
-        } else {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Satus Pasien Belum melalui pelayanan Poli");
+        // Cek apakah pasien sudah melalui pelayanan Poli (TaskId 4)
+        if (empty($this->dataDaftarPoliRJ['taskIdPelayanan']['taskId4'])) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Status Pasien Belum melalui pelayanan Poli");
+            return;
         }
+
+        // Jika TaskId 5 sudah ada, tampilkan pesan error dan hentikan proses
+        if (!empty($this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5'])) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Keluar Poli sudah tercatat pada " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']);
+            // return;
+        }
+
+        // Set waktu keluar poli saat ini
+        if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']) {
+            $keluarPoli = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
+            $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5'] = $keluarPoli;
+            // Update data ke database
+            $this->updateDataRJ($rjNo);
+        }
+
+        // Konversi waktu TaskId 5 ke timestamp (milisecond)
+        $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5'], env('APP_TIMEZONE'))->timestamp * 1000;
+
+
+        // Cek apakah Poli Spesialis mengirim data ke BPJS menggunakan method exists() untuk efisiensi
+        $cekPoliSpesialis = DB::table('rsmst_polis')
+            ->where('spesialis_status', '1')
+            ->where('poli_id', $this->dataDaftarPoliRJ['poliId'])
+            ->exists();
+
+        if ($cekPoliSpesialis) {
+            $this->pushDataTaskId($this->dataDaftarPoliRJ['noBooking'], 5, $waktu);
+        }
+
+        toastr()
+            ->closeOnHover(true)
+            ->closeDuration(3)
+            ->positionClass('toast-top-left')
+            ->addSuccess("Keluar Poli " . $keluarPoli);
     }
 
     public function cekSep($jsonSep)
