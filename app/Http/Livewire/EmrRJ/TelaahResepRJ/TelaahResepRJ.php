@@ -664,163 +664,203 @@ class TelaahResepRJ extends Component
 
     public function masukApotek($rjNo)
     {
+        // Ambil data terkait rjNo dan set waktu masuk apotek saat ini
         $this->findData($rjNo);
         $masukApotek = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
 
-        //////updateDB/////////////////////
-        $sql = "select waktu_masuk_apt from rstxn_rjhdrs where rj_no=:rjNo";
-        $cek_waktu_masuk_apt = DB::scalar($sql, ['rjNo' => $rjNo]);
+        // Cek apakah kolom waktu_masuk_apt sudah terisi
+        $cekWaktuMasukApt = DB::table('rstxn_rjhdrs')
+            ->where('rj_no', $rjNo)
+            ->value('waktu_masuk_apt');
 
-
-        // ketika cek_waktu_masuk_apt kosong lalu update
-        if (!$cek_waktu_masuk_apt) {
+        // Jika belum, update kolom tersebut menggunakan fungsi to_date
+        if (!$cekWaktuMasukApt) {
             DB::table('rstxn_rjhdrs')
                 ->where('rj_no', $rjNo)
                 ->update([
-                    'waktu_masuk_apt' => DB::raw("to_date('" . $masukApotek . "','dd/mm/yyyy hh24:mi:ss')"), //waktu masuk = rjdate
+                    'waktu_masuk_apt' => DB::raw("to_date('" . $masukApotek . "'','dd/mm/yyyy hh24:mi:ss')")
                 ]);
         }
-        //////////////////////////////////
 
-        // add antrian Apotek
-
-        // update no antrian Apotek
-
-        // cek
-        if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5']) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Anda tidak dapat melakukan taskId6 ketika taskId5 Kosong");
+        // Pastikan TaskId5 (waktu keluar poli) sudah ada sebelum melanjutkan taskId6
+        if (empty($this->dataDaftarPoliRJ['taskIdPelayanan']['taskId5'])) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Anda tidak dapat melakukan taskId6 ketika taskId5 Kosong");
             return;
         }
 
-        $noBooking =  $this->dataDaftarPoliRJ['noBooking'];
-        //////PushDataAntrianApotek////////////////////
+        $noBooking = $this->dataDaftarPoliRJ['noBooking'];
 
-        // cekNoantrian Apotek sudah ada atau belum
-        if (!isset($this->dataDaftarPoliRJ['noAntrianApotek'])) {
-            $cekAntrianEresep = $this->findData($rjNo);
-            $eresepRacikan = collect(isset($cekAntrianEresep['eresepRacikan']) ? $cekAntrianEresep['eresepRacikan'] : [])->count();
-            $jenisResep = $eresepRacikan ? 'racikan' : 'non racikan';
+        // Inisialisasi antrian Apotek jika belum ada
+        if (empty($this->dataDaftarPoliRJ['noAntrianApotek'])) {
+            // Mengambil ulang data untuk memastikan ketersediaan key 'eresepRacikan'
+            $data = $this->findData($rjNo);
+            $eresepRacikanCount = collect($data['eresepRacikan'] ?? [])->count();
+            $jenisResep = ($eresepRacikanCount > 0) ? 'racikan' : 'non racikan';
 
+            // Query untuk mengambil data hari ini berdasarkan refDate dari myTopBar
             $query = DB::table('rstxn_rjhdrs')
                 ->select(
                     DB::raw("to_char(rj_date,'dd/mm/yyyy') AS rj_date"),
                     DB::raw("to_char(rj_date,'yyyymmdd') AS rj_date1"),
                     'datadaftarpolirj_json'
                 )
-                ->where('rj_status', '!=', ['F'])
+                ->where('rj_status', '!=', 'F')
                 ->where('klaim_id', '!=', 'KR')
                 ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $this->myTopBar['refDate'])
                 ->get();
 
+            // Hitung jumlah data yang sudah memiliki noAntrianApotek
             $nomerAntrian = $query->filter(function ($item) {
-                try {
-                    $datadaftarpolirj_json = json_decode($item->datadaftarpolirj_json, true);
-                } catch (Exception $e) {
-                    $datadaftarpolirj_json = [];
-                }
-
-                $noAntrianApotek = isset($datadaftarpolirj_json['noAntrianApotek']) ? 1 : 0;
-                if ($noAntrianApotek > 0) {
-                    return 'x';
-                }
+                $dataJson = json_decode($item->datadaftarpolirj_json, true) ?: [];
+                return isset($dataJson['noAntrianApotek']);
             })->count();
 
+            // Jika klaim bukan 'KR', antrian bertambah; jika 'KR' maka tetap 999
+            $noAntrian = ($this->dataDaftarPoliRJ['klaimId'] != 'KR') ? $nomerAntrian + 1 : 999;
 
-            // Antrian ketika data antrian kosong
-            // proses antrian
-            if ($this->dataDaftarPoliRJ['klaimId'] != 'KR') {
-                $noAntrian = $nomerAntrian + 1;
-            } else {
-                // Kronis
-                $noAntrian = 999;
-            }
+            // Simpan nilai antrian ke dataDaftarPoliRJ dan update ke DB
             $this->dataDaftarPoliRJ['noAntrianApotek'] = [
-                'noAntrian' => $noAntrian,
+                'noAntrian'  => $noAntrian,
                 'jenisResep' => $jenisResep
             ];
-
             $this->updateDataRJ($rjNo);
         }
-        // cekNoantrian Apotek sudah ada atau belum
 
+        // Kirim antrean Apotek
+        $cekPoliSpesialis = DB::table('rsmst_polis')
+            ->where('spesialis_status', '1')
+            ->where('poli_id', $this->dataDaftarPoliRJ['poliId'])
+            ->exists();
 
-        // tambah antrian Apotek
-        $this->pushAntreanApotek($noBooking, $this->dataDaftarPoliRJ['noAntrianApotek']['jenisResep'], $this->dataDaftarPoliRJ['noAntrianApotek']['noAntrian']);
-        //////////////////////////
+        if ($cekPoliSpesialis) {
+            $this->pushAntreanApotek(
+                $noBooking,
+                $this->dataDaftarPoliRJ['noAntrianApotek']['jenisResep'],
+                $this->dataDaftarPoliRJ['noAntrianApotek']['noAntrian']
+            );
+        }
 
-
-        // update taskId6
-        if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6']) {
+        // Update taskId6 (waktu masuk apotek) jika belum ada
+        if (empty($this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6'])) {
             $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6'] = $masukApotek;
-            // update DB
             $this->updateDataRJ($rjNo);
-
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("masuk Apotek " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6']);
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addSuccess("Masuk Apotek " . $masukApotek);
         } else {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("masuk Apotek " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6']);
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Masuk Apotek " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6']);
         }
 
-        // cari no Booking
+        // Jika taskId6 tersedia, konversi ke timestamp (milisecond) dan push ke BPJS
+        if (!empty($this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6'])) {
+            $waktuTimestamp = Carbon::createFromFormat(
+                'd/m/Y H:i:s',
+                $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6'],
+                env('APP_TIMEZONE')
+            )->timestamp * 1000;
+            $cekPoliSpesialis = DB::table('rsmst_polis')
+                ->where('spesialis_status', '1')
+                ->where('poli_id', $this->dataDaftarPoliRJ['poliId'])
+                ->exists();
 
-        if ($this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6']) {
-            $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6'], env('APP_TIMEZONE'))->timestamp * 1000; //waktu dalam timestamp milisecond
-            $this->pushDataTaskId($noBooking, 6, $waktu);
+            if ($cekPoliSpesialis) {
+                $this->pushDataTaskId($noBooking, 6, $waktuTimestamp);
+            }
         } else {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("waktu Masuk Apotek kosong tidak dapat dikirim");
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Waktu Masuk Apotek kosong, tidak dapat dikirim");
         }
     }
 
     public function keluarApotek($rjNo)
     {
+        // Ambil data terkait rjNo dan waktu keluar apotek saat ini
         $this->findData($rjNo);
         $keluarApotek = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
 
-        //////updateDB/////////////////////
-        $sql = "select waktu_selesai_pelayanan from rstxn_rjhdrs where rj_no=:rjNo";
-        $cek_waktu_selesai_pelayanan = DB::scalar($sql, ['rjNo' => $rjNo]);
+        // Cek apakah kolom waktu_selesai_pelayanan sudah terisi
+        $waktuSelesaiPelayanan = DB::table('rstxn_rjhdrs')
+            ->where('rj_no', $rjNo)
+            ->value('waktu_selesai_pelayanan');
 
-
-        // ketika cek_waktu_selesai_pelayanan kosong lalu update
-        if (!$cek_waktu_selesai_pelayanan) {
+        // Jika belum ada, update kolom tersebut menggunakan fungsi to_date
+        if (!$waktuSelesaiPelayanan) {
             DB::table('rstxn_rjhdrs')
                 ->where('rj_no', $rjNo)
                 ->update([
-                    'waktu_selesai_pelayanan' => DB::raw("to_date('" . $keluarApotek . "','dd/mm/yyyy hh24:mi:ss')"), //waktu masuk = rjdate
+                    'waktu_selesai_pelayanan' => DB::raw("to_date('{$keluarApotek}','dd/mm/yyyy hh24:mi:ss')")
                 ]);
         }
-        //////////////////////////////////
 
-        // add antrian Apotek
-
-        // update no antrian Apotek
-
-        // cek
-        if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6']) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Anda tidak dapat melakukan taskId7 ketika taskId6 Kosong");
+        // Pastikan taskId6 (waktu masuk Apotek) sudah tercatat sebelum melanjutkan ke taskId7
+        if (empty($this->dataDaftarPoliRJ['taskIdPelayanan']['taskId6'])) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Anda tidak dapat melakukan taskId7 ketika taskId6 Kosong");
             return;
         }
 
-        // update taskId7
-        if (!$this->dataDaftarPoliRJ['taskIdPelayanan']['taskId7']) {
+        // Update taskId7 jika belum ada
+        if (empty($this->dataDaftarPoliRJ['taskIdPelayanan']['taskId7'])) {
             $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId7'] = $keluarApotek;
-            // update DB
             $this->updateDataRJ($rjNo);
-
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("keluar Apotek " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId7']);
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addSuccess("Keluar Apotek " . $keluarApotek);
         } else {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("keluar Apotek " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId7']);
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Keluar Apotek " . $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId7']);
         }
 
-        // cari no Booking
-        $noBooking =  $this->dataDaftarPoliRJ['noBooking'];
+        // Ambil noBooking
+        $noBooking = $this->dataDaftarPoliRJ['noBooking'];
 
-        if ($this->dataDaftarPoliRJ['taskIdPelayanan']['taskId7']) {
-            $waktu = Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId7'], env('APP_TIMEZONE'))->timestamp * 1000; //waktu dalam timestamp milisecond
-            $this->pushDataTaskId($noBooking, 7, $waktu);
+        // Jika taskId7 tersedia, konversi ke timestamp (milisecond) dan push data
+        if (!empty($this->dataDaftarPoliRJ['taskIdPelayanan']['taskId7'])) {
+            $waktuTimestamp = Carbon::createFromFormat(
+                'd/m/Y H:i:s',
+                $this->dataDaftarPoliRJ['taskIdPelayanan']['taskId7'],
+                env('APP_TIMEZONE')
+            )->timestamp * 1000;
+
+            // Kirim antrean Apotek
+            $cekPoliSpesialis = DB::table('rsmst_polis')
+                ->where('spesialis_status', '1')
+                ->where('poli_id', $this->dataDaftarPoliRJ['poliId'])
+                ->exists();
+
+            if ($cekPoliSpesialis) {
+                $this->pushDataTaskId($noBooking, 7, $waktuTimestamp);
+            }
         } else {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("waktu Keluar Apotek kosong tidak dapat dikirim");
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Waktu Keluar Apotek kosong, tidak dapat dikirim");
         }
     }
+
 
     private function pushAntreanApotek($noBooking, $jenisResep, $nomerAntrean): void
     {
