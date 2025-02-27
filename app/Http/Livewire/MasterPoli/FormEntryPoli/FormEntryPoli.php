@@ -32,6 +32,8 @@ class FormEntryPoli extends Component
         'FormEntryPoli.poliDesc' => 'required',
         'FormEntryPoli.poliIdBPJS' => '',
         'FormEntryPoli.poliUuid' => '',
+        'FormEntryPoli.spesialisStatus' => '',
+
     ];
 
     protected $messages = [];
@@ -66,6 +68,8 @@ class FormEntryPoli extends Component
                     'poliDesc' => $findData->poli_desc,
                     'poliIdBPJS' => $findData->kd_poli_bpjs,
                     'poliUuid' => $findData->poli_uuid,
+                    'spesialisStatus' => $findData->spesialis_status,
+
 
                 ];
             } else {
@@ -76,6 +80,8 @@ class FormEntryPoli extends Component
                     'poliDesc' => null,
                     'poliIdBPJS' => null,
                     'poliUuid' => null,
+                    'spesialisStatus' => null,
+
                 ];
             }
         } catch (Exception $e) {
@@ -85,6 +91,8 @@ class FormEntryPoli extends Component
                 'poliDesc' => null,
                 'poliIdBPJS' => null,
                 'poliUuid' => null,
+                'spesialisStatus' => null,
+
             ];
         }
     }
@@ -99,7 +107,9 @@ class FormEntryPoli extends Component
                 'poli_id' => isset($this->FormEntryPoli['poliId']) ? $this->FormEntryPoli['poliId'] : null,
                 'poli_desc' => isset($this->FormEntryPoli['poliDesc']) ? $this->FormEntryPoli['poliDesc'] : '',
                 'kd_poli_bpjs' => isset($this->FormEntryPoli['poliIdBPJS']) ? $this->FormEntryPoli['poliIdBPJS'] : '',
-                'poli_uuid' => isset($this->FormEntryPoli['poliUuid']) ? $this->FormEntryPoli['poliUuid'] : ''
+                'poli_uuid' => isset($this->FormEntryPoli['poliUuid']) ? $this->FormEntryPoli['poliUuid'] : '',
+                'spesialis_status' => isset($this->FormEntryPoli['spesialisStatus']) ? $this->FormEntryPoli['spesialisStatus'] : ''
+
             ]);
 
         toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Data berhasil diupdate.");
@@ -114,7 +124,9 @@ class FormEntryPoli extends Component
                 'poli_id' => isset($this->FormEntryPoli['poliId']) ? $this->FormEntryPoli['poliId'] : null,
                 'poli_desc' => isset($this->FormEntryPoli['poliDesc']) ? $this->FormEntryPoli['poliDesc'] : '',
                 'kd_poli_bpjs' => isset($this->FormEntryPoli['poliIdBPJS']) ? $this->FormEntryPoli['poliIdBPJS'] : '',
-                'poli_uuid' => isset($this->FormEntryPoli['poliUuid']) ? $this->FormEntryPoli['poliUuid'] : ''
+                'poli_uuid' => isset($this->FormEntryPoli['poliUuid']) ? $this->FormEntryPoli['poliUuid'] : '',
+                'spesialis_status' => isset($this->FormEntryPoli['spesialisStatus']) ? $this->FormEntryPoli['spesialisStatus'] : ''
+
             ]);
 
         toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Data berhasil dimasukkan.");

@@ -66,6 +66,19 @@
             @enderror
         </div>
 
+        <div>
+            <x-input-label for="FormEntryPoli.spesialisStatus" :value="__('Spesialis Status')" :required="__($errors->has('FormEntryPoli.spesialisStatus'))" />
+            <div class="flex ml-2">
+                <x-radio-button :label="__('Poli Spesialis')" value="1" wire:model="FormEntryPoli.spesialisStatus" />
+                <x-radio-button :label="__('Poli Penunjang')" value="0" wire:model="FormEntryPoli.spesialisStatus" />
+            </div>
+            {{ $FormEntryPoli['spesialisStatus'] }}
+            @error('FormEntryPoli.spesialisStatus')
+                <x-input-error :messages="$message" />
+            @enderror
+        </div>
+
+
 
 
 

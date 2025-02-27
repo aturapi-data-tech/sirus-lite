@@ -1,5 +1,5 @@
 <div>
-
+    spesial
     {{-- Start Coding  --}}
 
     {{-- Canvas
@@ -124,13 +124,26 @@
                                     <div class="font-normal text-gray-900">
                                         {{ $myQData->poli_uuid }}
                                     </div>
+
                                 </div>
                             </td>
 
 
                             <td
                                 class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-primary whitespace-nowrap dark:text-white">
-                                {{ $myQData->poli_desc }}
+                                <div>
+                                    <span class="font-semibold text-primary">
+                                        {{ $myQData->poli_desc }}
+                                    </span>
+                                </div>
+                                <div class="font-normal text-gray-900">
+                                    @if ($myQData->spesialis_status)
+                                        <span class="font-semibold">Poli Spesialis</span>
+                                    @else
+                                        <span class="italic">Poli Penunjang</span>
+                                    @endif
+                                </div>
+
                             </td>
 
 

@@ -116,7 +116,8 @@ class MasterPoli extends Component
                 'poli_id',
                 'poli_desc',
                 'kd_poli_bpjs',
-                'poli_uuid'
+                'poli_uuid',
+                'spesialis_status'
             );
 
         $query->where(function ($q) use ($mySearch) {
