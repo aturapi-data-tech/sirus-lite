@@ -678,7 +678,7 @@ class TelaahResepRJ extends Component
             DB::table('rstxn_rjhdrs')
                 ->where('rj_no', $rjNo)
                 ->update([
-                    'waktu_masuk_apt' => DB::raw("to_date('" . $masukApotek . "'','dd/mm/yyyy hh24:mi:ss')")
+                    'waktu_masuk_apt' => DB::raw("to_date('" . $masukApotek . "','dd/mm/yyyy hh24:mi:ss')")
                 ]);
         }
 
