@@ -749,6 +749,77 @@ class PelayananRJ extends Component
     }
 
 
+
+
+    public array $dashboardWaktutungguBulanan = [];
+    public array $rekapDashboardWaktutungguBulanan = [];
+
+
+    public function getDashboardWaktuTungguPerbulanBPJS(): void
+    {
+        // Ambil bulan dan tahun saat ini
+        $bulan = Carbon::now()->format('m'); // Format 2 digit (ex: '02' untuk Februari)
+        $tahun = Carbon::now()->format('Y'); // Format 4 digit (ex: '2025')
+        $rs = 'rs'; // Nilai default
+
+        // Ambil data dari BPJS
+        $HttpGetBpjs = AntrianTrait::dashboard_bulan_index($bulan, $tahun, $rs)->getOriginalContent();
+
+        // Cek apakah request berhasil (status 200)
+        if (!isset($HttpGetBpjs['metadata']['code']) || $HttpGetBpjs['metadata']['code'] != 200) {
+            toastr()->closeOnHover(true)->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Data tidak ditemukan');
+
+            return; // Early return untuk keluar dari fungsi jika tidak berhasil
+        }
+
+        // Proses data hanya jika sukses
+        $this->dashboardWaktutungguBulanan = $HttpGetBpjs;
+        $this->rekapDashboardWaktutungguBulanan = $this->prosesWaktuTungguPerbulan($HttpGetBpjs['response']['list']);
+    }
+
+    private function prosesWaktuTungguPerbulan(array $data): array
+    {
+        // **1. Konversi ke Collection Laravel**
+        $collection = collect($data);
+
+        // **2. Kelompokkan Berdasarkan Kode Poli dan Bulan**
+        $groupedData = $collection->groupBy(function ($item) {
+            return $item['kodepoli'] . '_' . Carbon::parse($item['tanggal'])->format('Y-m');
+        });
+
+        // **3. Hitung Rata-rata per Bulan per Poli**
+        $processedData = $groupedData->map(function ($items, $key) {
+            // Ambil informasi poli dan bulan
+            $namapoli = $items->first()['namapoli'];
+            $kodepoli = explode('_', $key)[0];
+            $bulan = Carbon::parse($items->first()['tanggal'])->format('F Y');
+
+            // Hitung rata-rata waktu per task (dikonversi dari detik ke menit)
+            $avgTasks = [
+                'waktuTungguAdmisi' => round($items->avg('avg_waktu_task1') / 60, 2),
+                'waktuLayanAdmisi' => round($items->avg('avg_waktu_task2') / 60, 2),
+                'waktuTungguPoli' => round($items->avg('avg_waktu_task3') / 60, 2),
+                'waktuLayanPoli' => round($items->avg('avg_waktu_task4') / 60, 2),
+                'waktuTungguFarmasi' => round($items->avg('avg_waktu_task5') / 60, 2),
+                'waktuLayanFarmasi' => round($items->avg('avg_waktu_task6') / 60, 2),
+            ];
+
+            // Total jumlah antrean dalam satu bulan
+            $totalAntrean = $items->sum('jumlah_antrean');
+
+            return [
+                'kodePoli' => $kodepoli,
+                'namaPoli' => $namapoli,
+                'bulan' => $bulan,
+                'rata_rata_waktu' => $avgTasks,
+                'total_antrean' => $totalAntrean
+            ];
+        });
+
+        return $processedData->values()->toArray();
+    }
     // when new form instance
     public function mount()
     {

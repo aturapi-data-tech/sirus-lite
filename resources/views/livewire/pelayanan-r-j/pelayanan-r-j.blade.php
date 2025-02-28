@@ -427,6 +427,163 @@
     </div>
 
 
+    <div class="mx-4 my-2 md:flex md:justify-between">
+        <div>
+
+        </div>
+
+        <div class="flex justify-between mt-2 md:mt-0">
+            <x-primary-button wire:click="getDashboardWaktuTungguPerbulanBPJS()" class="flex justify-center flex-auto"
+                wire:loading.remove>
+                <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd"
+                        d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                        clip-rule="evenodd"></path>
+                </svg>
+                Dashboard Per Bulan BPJS
+            </x-primary-button>
+
+            <div wire:loading wire:target="getDashboardWaktuTungguPerbulanBPJS">
+                <x-loading />
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-5">
+        <h3 class="text-3xl font-bold text-gray-900 dark:text-white">{{ 'Rekap Waktu Tunggu Bulanan' }}</h3>
+    </div>
+    <div class="flex flex-col mt-2">
+        <div class="overflow-x-auto rounded-lg">
+            <div class="inline-block min-w-full align-middle">
+                <div class="overflow-hidden shadow sm:rounded-lg">
+                    <table class="w-full text-sm text-left text-gray-900 table-auto dark:text-gray-400">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                            <tr>
+                                <th scope="col" class="px-4 py-3">Kode Poli</th>
+                                <th scope="col" class="px-4 py-3">Nama Poli</th>
+                                <th scope="col" class="px-4 py-3">Bulan</th>
+                                <th scope="col" class="px-4 py-3 text-center">Jumlah Antrean</th>
+                                <th scope="col" class="px-4 py-3 text-center">Rata-Rata Waktu (Menit)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white dark:bg-gray-800">
+                            @if (isset($rekapDashboardWaktutungguBulanan) && !empty($rekapDashboardWaktutungguBulanan))
+                                @foreach ($rekapDashboardWaktutungguBulanan as $data)
+                                    <tr class="border-b dark:border-gray-700">
+                                        <td class="px-4 py-3">{{ $data['kodePoli'] ?? '-' }}</td>
+                                        <td class="px-4 py-3">{{ $data['namaPoli'] ?? '-' }}</td>
+                                        <td class="px-4 py-3">{{ $data['bulan'] ?? '-' }}</td>
+                                        <td class="px-4 py-3 text-center">{{ $data['total_antrean'] ?? 0 }}</td>
+                                        <td class="px-4 py-3 text-center">
+                                            <div class="flex flex-col items-start">
+                                                <span><strong>Waktu Tunggu Admisi:</strong>
+                                                    {{ $data['rata_rata_waktu']['waktuTungguAdmisi'] ?? 0 }}
+                                                    menit</span>
+                                                <span><strong>Waktu Layan Admisi:</strong>
+                                                    {{ $data['rata_rata_waktu']['waktuLayanAdmisi'] ?? 0 }}
+                                                    menit</span>
+                                                <span><strong>Waktu Tunggu Poli:</strong>
+                                                    {{ $data['rata_rata_waktu']['waktuTungguPoli'] ?? 0 }}
+                                                    menit</span>
+                                                <span><strong>Waktu Layan Poli:</strong>
+                                                    {{ $data['rata_rata_waktu']['waktuLayanPoli'] ?? 0 }}
+                                                    menit</span>
+                                                <span><strong>Waktu Tunggu Farmasi:</strong>
+                                                    {{ $data['rata_rata_waktu']['waktuTungguFarmasi'] ?? 0 }}
+                                                    menit</span>
+                                                <span><strong>Waktu Layan Farmasi:</strong>
+                                                    {{ $data['rata_rata_waktu']['waktuLayanFarmasi'] ?? 0 }}
+                                                    menit</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @else
+                                <tr>
+                                    <td colspan="5"
+                                        class="w-full p-4 text-sm text-center text-gray-900 dark:text-gray-400">
+                                        Data tidak ditemukan.
+                                    </td>
+                                </tr>
+                            @endif
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-5">
+        <h3 class="text-3xl font-bold text-gray-900 dark:text-white">{{ 'Waktu Tunggu Harian' }}</h3>
+    </div>
+
+    <div class="flex flex-col mt-2">
+        <div class="overflow-x-auto rounded-lg">
+            <div class="inline-block min-w-full align-middle">
+                <div class="overflow-hidden shadow sm:rounded-lg">
+                    <table class="w-full text-sm text-left text-gray-900 table-auto dark:text-gray-400">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                            <tr>
+                                <th scope="col" class="px-4 py-3">Nama PPK</th>
+                                <th scope="col" class="px-4 py-3">Tanggal</th>
+                                <th scope="col" class="px-4 py-3">Nama Poli</th>
+                                <th scope="col" class="px-4 py-3 text-center">Jumlah Antrean</th>
+                                <th scope="col" class="px-4 py-3 text-center">Waktu Task & AVG Waktu (Menit)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white dark:bg-gray-800">
+                            @if (isset($dashboardWaktutungguBulanan['response']['list']) && !empty($dashboardWaktutungguBulanan['response']['list']))
+                                @foreach ($dashboardWaktutungguBulanan['response']['list'] as $data)
+                                    <tr class="border-b dark:border-gray-700">
+                                        <td class="px-4 py-3">{{ $data['nmppk'] ?? '-' }}</td>
+                                        <td class="px-4 py-3">
+                                            {{ isset($data['tanggal']) ? \Carbon\Carbon::parse($data['tanggal'])->format('d M Y') : '-' }}
+                                        </td>
+                                        <td class="px-4 py-3">{{ $data['namapoli'] ?? '-' }}</td>
+                                        <td class="px-4 py-3 text-center">{{ $data['jumlah_antrean'] ?? 0 }}</td>
+                                        <td class="px-4 py-3 text-center">
+                                            <div class="flex flex-col items-start">
+                                                <span><strong>Waktu Tunggu Admisi:</strong>
+                                                    {{ round(($data['waktu_task1'] ?? 0) / 60, 2) }} menit (AVG:
+                                                    {{ round(($data['avg_waktu_task1'] ?? 0) / 60, 2) }})</span>
+                                                <span><strong>Waktu Layan Admisi:</strong>
+                                                    {{ round(($data['waktu_task2'] ?? 0) / 60, 2) }} menit (AVG:
+                                                    {{ round(($data['avg_waktu_task2'] ?? 0) / 60, 2) }})</span>
+                                                <span><strong>Waktu Tunggu Poli:</strong>
+                                                    {{ round(($data['waktu_task3'] ?? 0) / 60, 2) }} menit (AVG:
+                                                    {{ round(($data['avg_waktu_task3'] ?? 0) / 60, 2) }})</span>
+                                                <span><strong>Waktu Layan Poli:</strong>
+                                                    {{ round(($data['waktu_task4'] ?? 0) / 60, 2) }} menit (AVG:
+                                                    {{ round(($data['avg_waktu_task4'] ?? 0) / 60, 2) }})</span>
+                                                <span><strong>Waktu Tunggu Farmasi:</strong>
+                                                    {{ round(($data['waktu_task5'] ?? 0) / 60, 2) }} menit (AVG:
+                                                    {{ round(($data['avg_waktu_task5'] ?? 0) / 60, 2) }})</span>
+                                                <span><strong>Waktu Layan Farmasi:</strong>
+                                                    {{ round(($data['waktu_task6'] ?? 0) / 60, 2) }} menit (AVG:
+                                                    {{ round(($data['avg_waktu_task6'] ?? 0) / 60, 2) }})</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @else
+                                <tr>
+                                    <td colspan="8"
+                                        class="w-full p-4 text-sm text-center text-gray-900 dark:text-gray-400">
+                                        Data tidak ditemukan.
+                                    </td>
+                                </tr>
+                            @endif
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
 
 
 

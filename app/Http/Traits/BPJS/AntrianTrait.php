@@ -126,45 +126,87 @@ trait AntrianTrait
     //         'antrians',
     //     ]));
     // }
-    // public static function dashboard_bulan_index(Request $request)
-    // {
-    //     $antrians = null;
-    //     if (isset($request->tanggal)) {
-    //         $tanggal = explode('-', $request->tanggal);
-    //         $request['tahun'] = $tanggal[0];
-    //         $request['bulan'] = $tanggal[1];
-    //         $response =  self::dashboard_bulan($request);
-    //         if ($response->status() == 200) {
-    //             $antrians = $response->getData()->response->list;
-    //             Alert::success($response->getData()->metadata->message . ' ' . $response->status());
-    //         } else {
-    //             Alert::error($response->getData()->metadata->message . ' ' . $response->status());
-    //         }
-    //     }
-    //     return view('bpjs.antrian.dashboard_bulan_index', compact([
-    //         'request',
-    //         'antrians',
-    //     ]));
-    // }
+    public static function dashboard_bulan_index($bulan, $tahun, $rs)
+    {
 
-    // public static function response_no_decrypt($response)
-    // {
-    //     if ($response->json('metadata.code') == 1) {
-    //         $code = 200;
-    //     } else if ($response->json('metadata.code') == 2)
-    //         $code = 400;
-    //     else if ($response->json('metadata.code') == 204)
-    //         $code = 404;
-    //     else {
-    //         $code = 400;
-    //     }
-    //     if ($response->failed()) {
-    //         // error, msgError,Code,url,ReqtrfTime
-    //         return self::sendError($response->reason(),  $response->json('response'), $code);
-    //     } else {
-    //         return self::sendResponse($response->json('metadata.message'), $response->json('response'), $code);
-    //     }
-    // }
+
+        // customErrorMessages
+        $messages = customErrorMessagesTrait::messages();
+
+        $r = [
+            "bulan" => $bulan,
+            "tahun" =>  $tahun,
+            "rs" =>  $rs,
+        ];
+        // dd(Carbon::createFromTimestamp($waktu / 1000)->toDateTimeString());
+
+
+        $rules = [
+            "bulan" => "required",
+            "tahun" =>  "required",
+            "rs" =>  "required",
+        ];
+
+
+        $validator = Validator::make($r, $rules, $messages);
+
+        if ($validator->fails()) {
+            // error, msgError,Code,url,ReqtrfTime
+            return self::sendError($validator->errors()->first(), $validator->errors(), 201, null, null);
+        }
+
+
+        // handler when time out and off line mode
+        try {
+
+
+            $url = env('ANTRIAN_URL') . "dashboard/waktutunggu/bulan/{$bulan}/tahun/{$tahun}/waktu/{$rs}";
+            $signature = self::signature();
+            $response = Http::timeout(10)
+                ->withHeaders($signature)
+                ->get($url);
+
+
+            // dd($response->transferStats->getTransferTime()); //Get Transfertime request
+            // semua response error atau sukses dari BPJS di handle pada logic response_decrypt
+            return self::response_no_decrypt($response, $url, $response->transferStats->getTransferTime());
+            /////////////////////////////////////////////////////////////////////////////
+        } catch (Exception $e) {
+            // error, msgError,Code,url,ReqtrfTime
+
+            return self::sendError($e->getMessage(), $validator->errors(), 408, $url, null);
+        }
+    }
+
+    public static function response_no_decrypt($response, $url, $requestTransferTime)
+    {
+        // Simpan metadata code untuk menghindari pemanggilan berulang
+        $metadataCode = $response->json('metadata.code');
+
+        // Menentukan kode HTTP menggunakan switch-case
+        switch ($metadataCode) {
+            case 200:
+            case 1:
+                $code = 200;
+                break;
+            case 2:
+                $code = 400;
+                break;
+            case 204:
+                $code = 404;
+                break;
+            default:
+                $code = 400;
+                break;
+        }
+
+        // Cek jika respons gagal
+        if ($response->failed()) {
+            return self::sendError($metadataCode, $response->json('metadata.message'), $code, $url, null);
+        }
+        // Respons sukses
+        return self::sendResponse($response->json('metadata.message'), $response->json('response'), $code, $url, $requestTransferTime);
+    }
 
 
 
