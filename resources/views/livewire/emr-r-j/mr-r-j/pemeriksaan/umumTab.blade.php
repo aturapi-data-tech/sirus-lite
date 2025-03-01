@@ -11,7 +11,7 @@
             <div class="mb-2 ">
                 <x-text-input id="dataDaftarPoliRJ.pemeriksaan.tandaVital.keadaanUmum" placeholder="Keadaan Umum"
                     class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.pemeriksaan.tandaVital.keadaanUmum'))" :disabled=$disabledPropertyRjStatus
-                    wire:model.debounce.500ms="dataDaftarPoliRJ.pemeriksaan.tandaVital.keadaanUmum" />
+                    wire:model="dataDaftarPoliRJ.pemeriksaan.tandaVital.keadaanUmum" />
 
             </div>
 
@@ -97,7 +97,7 @@
                         :required="__(false)" />
                     <x-text-input id="dataDaftarPoliRJ.pemeriksaan.tandaVital.e" placeholder="E [Eye]" class="mt-1 ml-2"
                         :errorshas="__($errors->has('dataDaftarPoliRJ.pemeriksaan.tandaVital.e'))" :disabled=$disabledPropertyRjStatus
-                        wire:model.debounce.500ms="dataDaftarPoliRJ.pemeriksaan.tandaVital.e" />
+                        wire:model="dataDaftarPoliRJ.pemeriksaan.tandaVital.e" />
                 </div>
 
                 <div class="mb-2 ">
@@ -105,7 +105,7 @@
                         :required="__(false)" />
                     <x-text-input id="dataDaftarPoliRJ.pemeriksaan.tandaVital.m" placeholder="M [Motorik]"
                         class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.pemeriksaan.tandaVital.m'))" :disabled=$disabledPropertyRjStatus
-                        wire:model.debounce.500ms="dataDaftarPoliRJ.pemeriksaan.tandaVital.m" />
+                        wire:model="dataDaftarPoliRJ.pemeriksaan.tandaVital.m" />
                 </div>
 
                 <div class="mb-2 ">
@@ -113,7 +113,7 @@
                         :required="__(false)" />
                     <x-text-input id="dataDaftarPoliRJ.pemeriksaan.tandaVital.v" placeholder="V [Verbal]"
                         class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.pemeriksaan.tandaVital.v'))" :disabled=$disabledPropertyRjStatus
-                        wire:model.debounce.500ms="dataDaftarPoliRJ.pemeriksaan.tandaVital.v" />
+                        wire:model="dataDaftarPoliRJ.pemeriksaan.tandaVital.v" />
                 </div>
 
                 <div class="mb-2 ">
@@ -121,7 +121,7 @@
                         :required="__(false)" />
                     <x-text-input id="dataDaftarPoliRJ.pemeriksaan.tandaVital.gcs" placeholder="GCS" class="mt-1 ml-2"
                         :errorshas="__($errors->has('dataDaftarPoliRJ.pemeriksaan.tandaVital.gcs'))" :disabled=$disabledPropertyRjStatus
-                        wire:model.debounce.500ms="dataDaftarPoliRJ.pemeriksaan.tandaVital.gcs" />
+                        wire:model="dataDaftarPoliRJ.pemeriksaan.tandaVital.gcs" />
                 </div>
             </div> --}}
 
@@ -135,10 +135,10 @@
                 <div class="grid grid-cols-2 gap-2">
                     <x-text-input-mou id="dataDaftarPoliRJ.pemeriksaan.tandaVital.sistolik" placeholder="Sistolik"
                         class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.pemeriksaan.tandaVital.sistolik'))" :disabled=$disabledPropertyRjStatus :mou_label="__('mmHg')"
-                        wire:model.debounce.500ms="dataDaftarPoliRJ.pemeriksaan.tandaVital.sistolik" />
+                        wire:model="dataDaftarPoliRJ.pemeriksaan.tandaVital.sistolik" />
                     <x-text-input-mou id="dataDaftarPoliRJ.pemeriksaan.tandaVital.distolik" placeholder="Distolik"
                         class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.pemeriksaan.tandaVital.distolik'))" :disabled=$disabledPropertyRjStatus :mou_label="__('mmHg')"
-                        wire:model.debounce.500ms="dataDaftarPoliRJ.pemeriksaan.tandaVital.distolik" />
+                        wire:model="dataDaftarPoliRJ.pemeriksaan.tandaVital.distolik" />
                 </div>
             </div>
 
@@ -155,12 +155,12 @@
                     <x-text-input-mou id="dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNadi"
                         placeholder="Frekuensi Nadi" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNadi'))"
                         :disabled=$disabledPropertyRjStatus :mou_label="__('X/Menit')"
-                        wire:model.debounce.500ms="dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNadi" />
+                        wire:model="dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNadi" />
 
                     <x-text-input-mou id="dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNafas"
                         placeholder="Frekuensi Nafas" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNafas'))"
                         :disabled=$disabledPropertyRjStatus :mou_label="__('X/Menit')"
-                        wire:model.debounce.500ms="dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNafas" />
+                        wire:model="dataDaftarPoliRJ.pemeriksaan.tandaVital.frekuensiNafas" />
                 </div>
             </div>
 
@@ -175,11 +175,11 @@
                 <div class="grid grid-cols-2 gap-2">
                     <x-text-input-mou id="dataDaftarPoliRJ.pemeriksaan.tandaVital.suhu" placeholder="Suhu"
                         class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.pemeriksaan.tandaVital.suhu'))" :disabled=$disabledPropertyRjStatus :mou_label="__('°C')"
-                        wire:model.debounce.500ms="dataDaftarPoliRJ.pemeriksaan.tandaVital.suhu" />
+                        wire:model="dataDaftarPoliRJ.pemeriksaan.tandaVital.suhu" />
                     {{-- <x-text-input-mou id="dataDaftarPoliRJ.pemeriksaan.tandaVital.saturasiO2"
                         placeholder="Saturasi O2" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.pemeriksaan.tandaVital.saturasiO2'))"
                         :disabled=$disabledPropertyRjStatus :mou_label="__('Saturasi O2 ')"
-                        wire:model.debounce.500ms="dataDaftarPoliRJ.pemeriksaan.tandaVital.saturasiO2" /> --}}
+                        wire:model="dataDaftarPoliRJ.pemeriksaan.tandaVital.saturasiO2" /> --}}
                 </div>
             </div>
 
@@ -194,10 +194,10 @@
                 <div class="grid grid-cols-2 gap-2">
                     <x-text-input-mou id="dataDaftarPoliRJ.pemeriksaan.tandaVital.spo2" placeholder="SPO2"
                         class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.pemeriksaan.tandaVital.spo2'))" :disabled=$disabledPropertyRjStatus :mou_label="__('%')"
-                        wire:model.debounce.500ms="dataDaftarPoliRJ.pemeriksaan.tandaVital.spo2" />
+                        wire:model="dataDaftarPoliRJ.pemeriksaan.tandaVital.spo2" />
                     <x-text-input-mou id="dataDaftarPoliRJ.pemeriksaan.tandaVital.gda" placeholder="GDA"
                         class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.pemeriksaan.tandaVital.gda'))" :disabled=$disabledPropertyRjStatus :mou_label="__('g/dl')"
-                        wire:model.debounce.500ms="dataDaftarPoliRJ.pemeriksaan.tandaVital.gda" />
+                        wire:model="dataDaftarPoliRJ.pemeriksaan.tandaVital.gda" />
                 </div>
             </div>
 
@@ -208,7 +208,7 @@
                     <x-text-input id="dataDaftarPoliRJ.pemeriksaan.tandaVital.waktuPemeriksaan"
                         placeholder="Waktu Pemeriksaan [dd/mm/yyyy hh24:mi:ss]" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.pemeriksaan.tandaVital.waktuPemeriksaan'))"
                         :disabled=$disabledPropertyRjStatus
-                        wire:model.debounce.500ms="dataDaftarPoliRJ.pemeriksaan.tandaVital.waktuPemeriksaan" />
+                        wire:model="dataDaftarPoliRJ.pemeriksaan.tandaVital.waktuPemeriksaan" />
                 </div>
             </div> --}}
 
@@ -227,7 +227,7 @@
                 <x-input-label for="dataDaftarPoliRJ.pemeriksaan.nutrisi.bb" :value="__('Berat Badan')" :required="__(false)" />
                 <x-text-input-mou id="dataDaftarPoliRJ.pemeriksaan.nutrisi.bb" placeholder="Berat Badan"
                     class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.pemeriksaan.nutrisi.bb'))" :disabled=$disabledPropertyRjStatus
-                    wire:model.debounce.500ms="dataDaftarPoliRJ.pemeriksaan.nutrisi.bb" :mou_label="__('Kg')" />
+                    wire:model="dataDaftarPoliRJ.pemeriksaan.nutrisi.bb" :mou_label="__('Kg')" />
                 @error('dataDaftarPoliRJ.pemeriksaan.nutrisi.bb')
                     <x-input-error :messages=$message />
                 @enderror
@@ -237,7 +237,7 @@
                 <x-input-label for="dataDaftarPoliRJ.pemeriksaan.nutrisi.tb" :value="__('Tinggi Badan')" :required="__(false)" />
                 <x-text-input-mou id="dataDaftarPoliRJ.pemeriksaan.nutrisi.tb" placeholder="Tinggi Badan"
                     class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.pemeriksaan.nutrisi.tb'))" :disabled=$disabledPropertyRjStatus
-                    wire:model.debounce.500ms="dataDaftarPoliRJ.pemeriksaan.nutrisi.tb" :mou_label="__('Cm')" />
+                    wire:model="dataDaftarPoliRJ.pemeriksaan.nutrisi.tb" :mou_label="__('Cm')" />
                 @error('dataDaftarPoliRJ.pemeriksaan.nutrisi.tb')
                     <x-input-error :messages=$message />
                 @enderror
@@ -247,7 +247,7 @@
                 <x-input-label for="dataDaftarPoliRJ.pemeriksaan.nutrisi.imt" :value="__('Index Masa Tubuh')" :required="__(false)" />
                 <x-text-input-mou id="dataDaftarPoliRJ.pemeriksaan.nutrisi.imt" placeholder="Index Masa Tubuh"
                     class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.pemeriksaan.nutrisi.imt'))" :disabled=$disabledPropertyRjStatus
-                    wire:model.debounce.500ms="dataDaftarPoliRJ.pemeriksaan.nutrisi.imt" :mou_label="__('Kg/M2')" />
+                    wire:model="dataDaftarPoliRJ.pemeriksaan.nutrisi.imt" :mou_label="__('Kg/M2')" />
                 @error('dataDaftarPoliRJ.pemeriksaan.nutrisi.imt')
                     <x-input-error :messages=$message />
                 @enderror
@@ -262,7 +262,7 @@
                 <x-input-label for="dataDaftarPoliRJ.pemeriksaan.nutrisi.lk" :value="__('Lingkar Kepala')" :required="__(false)" />
                 <x-text-input-mou id="dataDaftarPoliRJ.pemeriksaan.nutrisi.lk" placeholder="Lingkar Kepala"
                     class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.pemeriksaan.nutrisi.lk'))" :disabled=$disabledPropertyRjStatus
-                    wire:model.debounce.500ms="dataDaftarPoliRJ.pemeriksaan.nutrisi.lk" :mou_label="__('Cm')" />
+                    wire:model="dataDaftarPoliRJ.pemeriksaan.nutrisi.lk" :mou_label="__('Cm')" />
                 @error('dataDaftarPoliRJ.pemeriksaan.nutrisi.lk')
                     <x-input-error :messages=$message />
                 @enderror
@@ -272,7 +272,7 @@
                 <x-input-label for="dataDaftarPoliRJ.pemeriksaan.nutrisi.lila" :value="__('Lingkar Lengan Atas')" :required="__(false)" />
                 <x-text-input-mou id="dataDaftarPoliRJ.pemeriksaan.nutrisi.lila" placeholder="Lingkar Lengan Atas"
                     class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.pemeriksaan.nutrisi.lila'))" :disabled=$disabledPropertyRjStatus
-                    wire:model.debounce.500ms="dataDaftarPoliRJ.pemeriksaan.nutrisi.lila" :mou_label="__('Cm')" />
+                    wire:model="dataDaftarPoliRJ.pemeriksaan.nutrisi.lila" :mou_label="__('Cm')" />
                 @error('dataDaftarPoliRJ.pemeriksaan.nutrisi.lila')
                     <x-input-error :messages=$message />
                 @enderror
@@ -291,7 +291,7 @@
                     :required="__(false)" />
                 <x-text-input id="dataDaftarPoliRJ.pemeriksaan.fungsional.alatBantu" placeholder="Alat Bantu"
                     class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.pemeriksaan.fungsional.alatBantu'))" :disabled=$disabledPropertyRjStatus
-                    wire:model.debounce.500ms="dataDaftarPoliRJ.pemeriksaan.fungsional.alatBantu" />
+                    wire:model="dataDaftarPoliRJ.pemeriksaan.fungsional.alatBantu" />
 
             </div>
 
@@ -300,7 +300,7 @@
                     :required="__(false)" />
                 <x-text-input id="dataDaftarPoliRJ.pemeriksaan.fungsional.prothesa" placeholder="Prothesa"
                     class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.pemeriksaan.fungsional.prothesa'))" :disabled=$disabledPropertyRjStatus
-                    wire:model.debounce.500ms="dataDaftarPoliRJ.pemeriksaan.fungsional.prothesa" />
+                    wire:model="dataDaftarPoliRJ.pemeriksaan.fungsional.prothesa" />
 
             </div>
 
@@ -309,7 +309,7 @@
                     :required="__(false)" />
                 <x-text-input id="dataDaftarPoliRJ.pemeriksaan.fungsional.cacatTubuh" placeholder="Cacat Tubuh"
                     class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarPoliRJ.pemeriksaan.fungsional.cacatTubuh'))" :disabled=$disabledPropertyRjStatus
-                    wire:model.debounce.500ms="dataDaftarPoliRJ.pemeriksaan.fungsional.cacatTubuh" />
+                    wire:model="dataDaftarPoliRJ.pemeriksaan.fungsional.cacatTubuh" />
 
             </div>
 
@@ -333,7 +333,7 @@
                     placeholder="Keterangan" class="mt-1 ml-2" :errorshas="__(
                         $errors->has('dataDaftarPoliRJ.pemeriksaan.suspekAkibatKerja.keteranganSuspekAkibatKerja'),
                     )" :disabled=$disabledPropertyRjStatus
-                    wire:model.debounce.500ms="dataDaftarPoliRJ.pemeriksaan.suspekAkibatKerja.keteranganSuspekAkibatKerja" />
+                    wire:model="dataDaftarPoliRJ.pemeriksaan.suspekAkibatKerja.keteranganSuspekAkibatKerja" />
             </div>
 
         </div>
