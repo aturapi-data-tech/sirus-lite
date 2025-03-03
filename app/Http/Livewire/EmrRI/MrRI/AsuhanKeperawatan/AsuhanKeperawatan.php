@@ -31,7 +31,8 @@ class AsuhanKeperawatan extends Component
 
         $this->formEntryAsuhanKeperawatan['diagKepId'] = $this->diagKep['DiagKepId'] ?? '';
         $this->formEntryAsuhanKeperawatan['diagKepDesc'] = $this->diagKep['DiagKepDesc'] ?? '';
-        $this->formEntryAsuhanKeperawatan['diagKepJson'] = $this->diagKep['DiagKepJson'] ?? '';
+        $DiagKepJson = $this->diagKep['DiagKepJson'] ?? '{}';
+        $this->formEntryAsuhanKeperawatan['diagKepJson'] = json_decode($DiagKepJson, true);
     }
     private function syncLOV(): void
     {

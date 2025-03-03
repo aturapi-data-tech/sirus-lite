@@ -308,7 +308,7 @@ class EmrRI extends Component
 
 
     public string $activeTab = "rekamMedis";
-    public string $activeTabDokter = "assessmentDokter";
+    public string $activeTabDokter = "pengkajianDokter";
     public string $activeTabGeneralConsentPasienRI = "generalConsentPasienRI";
     public string $activeTabEdukasiPasienRI = "edukasiPasienRI";
 
@@ -367,12 +367,20 @@ class EmrRI extends Component
 
     public array $EmrMenuDokter = [
         [
-            'ermMenuId' => 'assessmentDokter',
-            'ermMenuName' => 'Assessment Dokter'
+            'ermMenuId' => 'pengkajianDokter',
+            'ermMenuName' => 'Pengkajian Dokter'
         ],
         [
             'ermMenuId' => 'observasi',
             'ermMenuName' => 'Observasi'
+        ],
+        [
+            'ermMenuId' => 'cppt',
+            'ermMenuName' => 'CPPT'
+        ],
+        [
+            'ermMenuId' => 'pemeriksaanPenunjang',
+            'ermMenuName' => 'Pemeriksaan Penunjang'
         ],
         [
             'ermMenuId' => 'pelayananPenunjang',

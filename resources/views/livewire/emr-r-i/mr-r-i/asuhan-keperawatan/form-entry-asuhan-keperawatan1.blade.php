@@ -96,9 +96,6 @@
             {{-- Form Diagnosa Keperawatan --}}
             @if ($formEntryAsuhanKeperawatan['diagKepJson'])
                 <div>
-                    @php
-                        $diagnosa_keperawatan = json_decode($formEntryAsuhanKeperawatan['diagKepJson'], true) ?? [];
-                    @endphp
                     @include('livewire.emr-r-i.mr-r-i.asuhan-keperawatan.form-entry-diagnosa-keperawatan')
                 </div>
             @endif

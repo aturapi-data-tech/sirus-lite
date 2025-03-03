@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\EmrRI\MrRI\PengkajianDokter;
+namespace App\Http\Livewire\EmrRI\MrRI\AssessmentPengkajianDokter;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -8,7 +8,7 @@ use Livewire\WithPagination;
 use App\Http\Traits\EmrRI\EmrRITrait;
 use App\Http\Traits\customErrorMessagesTrait;
 
-class PengkajianDokter extends Component
+class AssessmentPengkajianDokter extends Component
 {
     use WithPagination, EmrRITrait, customErrorMessagesTrait;
 
@@ -469,6 +469,7 @@ class PengkajianDokter extends Component
     ];
 
 
+
     ////////////////////////////////////////////////
     ///////////begin////////////////////////////////
     ////////////////////////////////////////////////
@@ -690,7 +691,7 @@ class PengkajianDokter extends Component
     {
 
         return view(
-            'livewire.emr-r-i.mr-r-i.pengkajian-dokter.pengkajian-dokter',
+            'livewire.emr-r-i.mr-r-i.assessment-pengkajian-dokter.assessment-pengkajian-dokter',
             [
                 // 'RJpasiens' => $query->paginate($this->limitPerPage),
                 'myTitle' => 'Pengkajian Awal Pasien Rawat Inap',
