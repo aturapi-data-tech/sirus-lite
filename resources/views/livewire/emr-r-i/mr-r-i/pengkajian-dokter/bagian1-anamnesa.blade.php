@@ -1,4 +1,4 @@
-<div class="space-y-4">
+<div class="grid grid-cols-2 gap-2">
     <!-- Keluhan Utama -->
     <div>
         <x-input-label for="dataDaftarRi.pengkajianDokter.anamnesa.keluhanUtama" :value="__('Keluhan Utama')" :required="true" />

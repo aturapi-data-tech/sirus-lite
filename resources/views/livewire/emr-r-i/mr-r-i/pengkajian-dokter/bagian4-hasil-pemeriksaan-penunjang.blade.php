@@ -1,5 +1,5 @@
 <div>
-    <div class="space-y-4">
+    <div class="grid grid-cols-3 gap-2">
         <div>
             <x-input-label for="dataDaftarRi.pengkajianDokter.hasilPemeriksaanPenunjang.laboratorium" :value="__('Laboratorium')"
                 :required="__(false)" class="block text-sm font-medium text-gray-700" />

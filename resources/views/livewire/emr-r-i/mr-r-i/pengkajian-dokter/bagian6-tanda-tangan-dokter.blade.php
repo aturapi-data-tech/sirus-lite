@@ -1,4 +1,4 @@
-<div class="space-y-4">
+<div class="">
 
     <!-- Jam Dokter Pengkaji -->
     <div>

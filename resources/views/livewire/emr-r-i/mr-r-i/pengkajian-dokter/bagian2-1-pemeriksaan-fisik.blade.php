@@ -1,4 +1,4 @@
-<div class="space-y-4">
+<div class="">
     <div>
         <x-input-label for="dataDaftarRi.pengkajianDokter.fisik" :value="__('Fisik')" :required="true" />
         <x-text-input-area id="dataDaftarRi.pengkajianDokter.fisik" placeholder="Fisik" class="mt-1" :errorshas="__($errors->has('dataDaftarRi.pengkajianDokter.fisik'))"

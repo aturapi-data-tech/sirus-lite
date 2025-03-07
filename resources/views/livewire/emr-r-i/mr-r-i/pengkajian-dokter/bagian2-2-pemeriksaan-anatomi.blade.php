@@ -1,4 +1,4 @@
-<div class="space-y-4">
+<div class="">
     <x-input-label for="dataDaftarRi.pengkajianDokter.anatomi" :value="__('Anatomi')" :required="__(false)"
         class="pt-2 sm:text-xl" />
 
