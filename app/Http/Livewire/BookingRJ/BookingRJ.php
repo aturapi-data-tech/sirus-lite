@@ -188,7 +188,7 @@ class BookingRJ extends Component
             ->where(DB::raw("to_char(to_date(tanggalperiksa,'yyyy-mm-dd'),'dd/mm/yyyy')"), '=', $this->myTopBar['refDate'])
             ->where('status', '=', $this->myTopBar['refStatusId']);
 
-        if (!empty($myTopBar['kdDokterBpjs'])) {
+        if (!empty($this->myTopBar['kdDokterBpjs'])) {
             $query->where('kodedokter', '=', $this->myTopBar['kdDokterBpjs']);
         }
 
