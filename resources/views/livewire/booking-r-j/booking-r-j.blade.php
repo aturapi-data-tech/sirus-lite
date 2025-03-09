@@ -21,7 +21,7 @@
 
             <div class="flex w-full">
                 {{-- Cari Data --}}
-                <div class="relative w-1/3 mr-2 pointer-events-auto">
+                <div class="relative w-1/3 mt-8 mr-2 pointer-events-auto">
                     <div class="absolute inset-y-0 left-0 flex items-center p-5 pl-3 pointer-events-none ">
                         <svg width="24" height="24" fill="none" aria-hidden="true" class="flex-none mr-3 ">
                             <path d="m19 19-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -37,7 +37,7 @@
                 {{-- Cari Data --}}
 
                 {{-- Tanggal --}}
-                <div class="relative w-[150px] mr-2">
+                <div class="relative w-[150px] mr-2 mt-8">
                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                         <svg aria-hidden="true" class="w-5 h-5 text-gray-900 dark:text-gray-400" fill="currentColor"
                             viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -52,23 +52,24 @@
                 </div>
                 {{-- Tanggal --}}
 
-                {{-- Shift --}}
-                {{-- <div class="relative w-[75px]">
-                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                        <svg class="w-5 h-5 text-gray-800 " aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                            <path
-                                d="M1 5h1.424a3.228 3.228 0 0 0 6.152 0H19a1 1 0 1 0 0-2H8.576a3.228 3.228 0 0 0-6.152 0H1a1 1 0 1 0 0 2Zm18 4h-1.424a3.228 3.228 0 0 0-6.152 0H1a1 1 0 1 0 0 2h10.424a3.228 3.228 0 0 0 6.152 0H19a1 1 0 0 0 0-2Zm0 6H8.576a3.228 3.228 0 0 0-6.152 0H1a1 1 0 0 0 0 2h1.424a3.228 3.228 0 0 0 6.152 0H19a1 1 0 0 0 0-2Z" />
-                        </svg>
-                    </div>
+                {{-- Dokter --}}
+                <div class="py-2 mr-2">
+                    {{-- LOV Dokter --}}
+                    @if (empty($collectingMyDokter))
+                        @include('livewire.component.l-o-v.list-of-value-dokter.list-of-value-dokter')
+                    @else
+                        <x-input-label for="myTopBar.drName" :value="__('Nama Dokter')" :required="__(true)"
+                            wire:click='resetDokter()' />
+                        <div>
+                            <x-text-input id="myTopBar.drName" placeholder="Nama Dokter" class="mt-1 ml-2"
+                                :errorshas="__($errors->has('myTopBar.drName'))" wire:model="myTopBar.drName" :disabled="true" />
 
-                    <x-text-input type="text" class="w-full p-2 pl-10 " placeholder="[Shift 1/2/3]"
-                        wire:model="myTopBar.refShiftId" />
-                </div> --}}
-                {{-- Shift --}}
+                        </div>
+                    @endif
+                </div>
 
                 {{-- Status Transaksi --}}
-                <div class="flex ml-2">
+                <div class="flex mt-8 ml-2">
                     @foreach ($myTopBar['refStatusOptions'] as $refStatus)
                         {{-- @dd($refStatus) --}}
                         <x-radio-button :label="__($refStatus['refStatusDesc'])" value="{{ $refStatus['refStatusId'] }}"
@@ -80,7 +81,7 @@
 
 
 
-            <div class="flex justify-end w-1/2">
+            <div class="flex justify-end w-1/2 mt-8">
                 <x-dropdown align="right" :width="__('20')">
                     <x-slot name="trigger">
                         {{-- Button myLimitPerPage --}}

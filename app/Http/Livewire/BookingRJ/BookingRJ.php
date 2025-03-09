@@ -3,17 +3,17 @@
 namespace App\Http\Livewire\BookingRJ;
 
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 
 use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
+use App\Http\Traits\LOV\LOVDokter\LOVDokterTrait;
 
 
 class BookingRJ extends Component
 {
-    use WithPagination;
+    use WithPagination, LOVDokterTrait;
 
     // primitive Variable
     public string $myTitle = 'Booking Rawat Jalan';
@@ -23,6 +23,28 @@ class BookingRJ extends Component
     public array $myLimitPerPages = [5, 10, 15, 20, 100];
     // limit record per page -resetExcept////////////////
     public int $limitPerPage = 10;
+
+    // LOV Nested
+    public array $dokter;
+    private function syncDataFormEntry(): void
+    {
+        $this->myTopBar['drId'] = $this->dokter['DokterId'] ?? '';
+        $this->myTopBar['drName'] = $this->dokter['DokterDesc'] ?? '';
+        $this->myTopBar['kdDokterBpjs'] = $this->myTopBar['kdDokterBpjs'] ?? [];
+    }
+    private function syncLOV(): void
+    {
+        $this->dokter = $this->collectingMyDokter;
+    }
+    public function resetDokter()
+    {
+        $this->reset([
+            'collectingMyDokter', //Reset LOV / render  / empty NestLov
+        ]);
+        $this->resetValidation();
+    }
+    // LOV Nested
+
 
     // my Top Bar
     public array $myTopBar = [
@@ -34,7 +56,10 @@ class BookingRJ extends Component
             ['refStatusId' => 'Belum', 'refStatusDesc' => 'Belum'],
             ['refStatusId' => 'Checkin', 'refStatusDesc' => 'Checkin'],
             ['refStatusId' => 'Batal', 'refStatusDesc' => 'Batal'],
-        ]
+        ],
+        'drId' => '',
+        'drName' => '',
+        'drOptions' => []
     ];
 
     public string $refFilter = '';
@@ -43,6 +68,7 @@ class BookingRJ extends Component
         'refFilter' => ['except' => '', 'as' => 'cariData'],
         'page' => ['except' => 1, 'as' => 'p'],
     ];
+
 
     // reset page when myTopBar Change
     public function updatedReffilter()
@@ -66,38 +92,6 @@ class BookingRJ extends Component
     private function settermyTopBarmyTopBarrefDate(): void
     {
         $this->myTopBar['refDate'] = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y');
-    }
-
-
-    private function gettermyTopBardrOptions(): void
-    {
-        $myRefdate = $this->myTopBar['refDate'];
-
-        // Query
-        $query = DB::table('rsview_rjkasir')
-            ->select(
-                'dr_id',
-                'dr_name',
-            )
-            ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $myRefdate)
-            ->groupBy('dr_id')
-            ->groupBy('dr_name')
-            ->orderBy('dr_name', 'desc')
-            ->get();
-
-        // loop and set Ref
-        $query->each(function ($item, $key) {
-            $this->myTopBar['drOptions'][$key + 1]['drId'] = $item->dr_id;
-            $this->myTopBar['drOptions'][$key + 1]['drName'] = $item->dr_name;
-        })->toArray();
-    }
-
-    public function settermyTopBardrOptions($drId, $drName): void
-    {
-
-        $this->myTopBar['drId'] = $drId;
-        $this->myTopBar['drName'] = $drName;
-        $this->resetPage();
     }
 
 
@@ -145,7 +139,10 @@ class BookingRJ extends Component
     // select data start////////////////
     public function render()
     {
-        $this->gettermyTopBardrOptions();
+        // LOV
+        $this->syncLOV();
+        // FormEntry
+        $this->syncDataFormEntry();
 
         //////////////////////////////////////////
         // Query ///////////////////////////////
@@ -190,6 +187,10 @@ class BookingRJ extends Component
             ->join('rsmst_pasiens', DB::raw("upper(referensi_mobilejkn_bpjs.norm)"), '=', 'rsmst_pasiens.reg_no')
             ->where(DB::raw("to_char(to_date(tanggalperiksa,'yyyy-mm-dd'),'dd/mm/yyyy')"), '=', $this->myTopBar['refDate'])
             ->where('status', '=', $this->myTopBar['refStatusId']);
+
+        if (!empty($myTopBar['kdDokterBpjs'])) {
+            $query->where('kodedokter', '=', $this->myTopBar['kdDokterBpjs']);
+        }
 
 
         $query->where(function ($q) {
