@@ -190,7 +190,6 @@ class BookingRJ extends Component
 
         if (!empty($this->myTopBar['kdDokterBpjs'])) {
             $query->where('kodedokter', '=', $this->myTopBar['kdDokterBpjs']);
-            dd($this->myTopBar['kdDokterBpjs']);
         }
 
 
