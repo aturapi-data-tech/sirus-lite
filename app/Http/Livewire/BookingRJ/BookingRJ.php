@@ -30,7 +30,7 @@ class BookingRJ extends Component
     {
         $this->myTopBar['drId'] = $this->dokter['DokterId'] ?? '';
         $this->myTopBar['drName'] = $this->dokter['DokterDesc'] ?? '';
-        $this->myTopBar['kdDokterBpjs'] = $this->myTopBar['kdDokterBpjs'] ?? [];
+        $this->myTopBar['kdDokterBpjs'] = $this->dokter['kdDokterBpjs'] ?? '';
     }
     private function syncLOV(): void
     {
@@ -190,6 +190,7 @@ class BookingRJ extends Component
 
         if (!empty($this->myTopBar['kdDokterBpjs'])) {
             $query->where('kodedokter', '=', $this->myTopBar['kdDokterBpjs']);
+            dd($this->myTopBar['kdDokterBpjs']);
         }
 
 
