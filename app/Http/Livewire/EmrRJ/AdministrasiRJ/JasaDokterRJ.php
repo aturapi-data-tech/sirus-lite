@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Validator;
 
 use App\Http\Traits\customErrorMessagesTrait;
 use App\Http\Traits\EmrRJ\EmrRJTrait;
+use App\Http\Traits\LOV\LOVDokter\LOVDokterTrait;
 
 // use Illuminate\Support\Str;
 use Spatie\ArrayToXml\ArrayToXml;
@@ -20,7 +21,7 @@ use Exception;
 
 class JasaDokterRJ extends Component
 {
-    use WithPagination, EmrRJTrait;
+    use WithPagination, EmrRJTrait, LOVDokterTrait;
 
 
     // listener from blade////////////////
@@ -41,11 +42,35 @@ class JasaDokterRJ extends Component
     // dataDaftarPoliRJ RJ
     public array $dataDaftarPoliRJ = [];
 
+    public array $formEntryJasaDokter = [
+        'drId' => '', // ID dokter harus ada di tabel rsmst_doctors
+        'drName' => '', // Harga kunjungan minimal 0
+    ];
+
     //////////////////////////////////////////////////////////////////////
 
 
     //  table LOV////////////////
+    // LOV Nested
+    public array $dokter;
 
+    private function syncDataFormEntry(): void
+    {
+        $this->formEntryJasaDokter['drId'] = $this->dokter['DokterId'] ?? '';
+        $this->formEntryJasaDokter['drName'] = $this->dokter['DokterDesc'] ?? '';
+    }
+    private function syncLOV(): void
+    {
+        $this->dokter = $this->collectingMyDokter;
+    }
+    public function resetDokter()
+    {
+        $this->reset([
+            'collectingMyDokter', //Reset LOV / render  / empty NestLov
+        ]);
+        $this->resetValidation();
+    }
+    // LOV Nested
 
 
     public $dataJasaDokterLov = [];
@@ -274,9 +299,11 @@ class JasaDokterRJ extends Component
         $messages = customErrorMessagesTrait::messages();
         // require nik ketika pasien tidak dikenal
         $rules = [
-            "collectingMyJasaDokter.JasaDokterId" => 'bail|required|exists:rsmst_accdocs ,accdoc_id',
-            "collectingMyJasaDokter.JasaDokterDesc" => 'bail|required|',
-            "collectingMyJasaDokter.JasaDokterPrice" => 'bail|required|numeric|',
+            'collectingMyJasaDokter.JasaDokterId' => 'bail|required|exists:rsmst_accdocs ,accdoc_id',
+            'collectingMyJasaDokter.JasaDokterDesc' => 'bail|required|',
+            'collectingMyJasaDokter.JasaDokterPrice' => 'bail|required|numeric|',
+            'formEntryJasaDokter.drId' => 'bail|nullable|exists:rsmst_doctors ,dr_id',
+            'formEntryJasaDokter.drName' => 'bail|nullable|',
 
         ];
 
@@ -296,6 +323,7 @@ class JasaDokterRJ extends Component
             // insert into table transaksi
             DB::table('rstxn_rjaccdocs')
                 ->insert([
+                    'dr_id' => $this->formEntryJasaDokter['drId'],
                     'rjhn_dtl' => $lastInserted->rjhn_dtl_max,
                     'rj_no' => $this->rjNoRef,
                     'accdoc_id' => $this->collectingMyJasaDokter['JasaDokterId'],
@@ -304,6 +332,8 @@ class JasaDokterRJ extends Component
 
 
             $this->dataDaftarPoliRJ['JasaDokter'][] = [
+                'DokterId' => $this->formEntryJasaDokter['drId'],
+                'DokterName' => $this->formEntryJasaDokter['drName'],
                 'JasaDokterId' => $this->collectingMyJasaDokter['JasaDokterId'],
                 'JasaDokterDesc' => $this->collectingMyJasaDokter['JasaDokterDesc'],
                 'JasaDokterPrice' => $this->collectingMyJasaDokter['JasaDokterPrice'],
@@ -317,7 +347,7 @@ class JasaDokterRJ extends Component
             $this->paketObatJasaDokter($this->collectingMyJasaDokter['JasaDokterId'], $this->rjNoRef, $lastInserted->rjhn_dtl_max);
 
             $this->store();
-            $this->reset(['collectingMyJasaDokter']);
+            $this->reset(['collectingMyJasaDokter', 'collectingMyDokter']);
 
 
             //
@@ -364,7 +394,7 @@ class JasaDokterRJ extends Component
 
     public function resetcollectingMyJasaDokter()
     {
-        $this->reset(['collectingMyJasaDokter']);
+        $this->reset(['collectingMyJasaDokter', 'collectingMyDokter']);
     }
 
     // Paket JasaDokter -> Lain lain
@@ -676,6 +706,11 @@ class JasaDokterRJ extends Component
     // select data start////////////////
     public function render()
     {
+
+        // LOV
+        $this->syncLOV();
+        // FormEntry
+        $this->syncDataFormEntry();
 
         return view(
             'livewire.emr-r-j.administrasi-r-j.jasa-dokter-r-j',

@@ -11,6 +11,27 @@
 
         <div id="TransaksiRawatJalan" class="">
 
+
+            <div class="">
+                {{-- LOV Dokter --}}
+                @if (empty($collectingMyDokter))
+                    <div class="">
+                        @include('livewire.component.l-o-v.list-of-value-dokter.list-of-value-dokter')
+                    </div>
+                @else
+                    <x-input-label for="formEntryJasaDokter.drName" :value="__('Nama Dokter')" :required="__(false)"
+                        wire:click="$set('collectingMyDokter',[])" />
+                    <div>
+                        <x-text-input id="formEntryJasaDokter.drName" placeholder="Nama Dokter" class="mt-1 ml-2"
+                            :errorshas="__($errors->has('formEntryJasaDokter.drName'))" wire:model="formEntryJasaDokter.drName" :disabled="true" />
+
+                    </div>
+                @endif
+                @error('formEntryJasaDokter.drId')
+                    <x-input-error :messages=$message />
+                @enderror
+            </div>
+
             @if (!$collectingMyJasaDokter)
                 <div>
                     <x-input-label for="dataJasaDokterLovSearch" :value="__('Jasa Dokter')" :required="__(true)" />
