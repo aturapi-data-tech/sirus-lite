@@ -29,9 +29,10 @@
                                 <li class="mr-2">
                                     <label
                                         class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
-                                        :class="activeTab === '{{ $dataDaftarPoliRJ['perencanaan']['tindakLanjutTab'] }}' ?
+                                        :class="activeTab === '{{ $dataDaftarPoliRJ['perencanaan']['tindakLanjutTab'] ?? 0 }}'
+                                            ?
                                             'text-primary border-primary bg-gray-100' : ''"
-                                        @click="activeTab ='{{ $dataDaftarPoliRJ['perencanaan']['tindakLanjutTab'] }}'">{{ $dataDaftarPoliRJ['perencanaan']['tindakLanjutTab'] }}</label>
+                                        @click="activeTab ='{{ $dataDaftarPoliRJ['perencanaan']['tindakLanjutTab'] ?? 0 }}'">{{ $dataDaftarPoliRJ['perencanaan']['tindakLanjutTab'] }}</label>
                                 </li>
 
                                 <li class="mr-2">
