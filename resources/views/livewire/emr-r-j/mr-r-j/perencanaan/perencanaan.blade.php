@@ -32,7 +32,7 @@
                                         :class="activeTab === '{{ $dataDaftarPoliRJ['perencanaan']['tindakLanjutTab'] ?? 0 }}'
                                             ?
                                             'text-primary border-primary bg-gray-100' : ''"
-                                        @click="activeTab ='{{ $dataDaftarPoliRJ['perencanaan']['tindakLanjutTab'] ?? 0 }}'">{{ $dataDaftarPoliRJ['perencanaan']['tindakLanjutTab'] }}</label>
+                                        @click="activeTab ='{{ $dataDaftarPoliRJ['perencanaan']['tindakLanjutTab'] ?? 0 }}'">{{ $dataDaftarPoliRJ['perencanaan']['tindakLanjutTab'] ?? 0 }}</label>
                                 </li>
 
                                 <li class="mr-2">
