@@ -59,9 +59,9 @@
 
                         <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800"
                             :class="{
-                                'active': activeTab === '{{ $dataDaftarPoliRJ['perencanaan']['terapiTab'] }}'
+                                'active': activeTab === '{{ $dataDaftarPoliRJ['perencanaan']['terapiTab'] ?? 0 }}'
                             }"
-                            x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarPoliRJ['perencanaan']['terapiTab'] }}'">
+                            x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarPoliRJ['perencanaan']['terapiTab'] ?? 0 }}'">
                             @include('livewire.emr-r-j.mr-r-j.perencanaan.terapiTab')
 
                         </div>
