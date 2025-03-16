@@ -7,6 +7,8 @@ use App\Http\Livewire\MasterPasien\MasterPasien;
 
 use App\Http\Livewire\MasterPoli\MasterPoli;
 use App\Http\Livewire\MasterDokter\MasterDokter;
+use App\Http\Livewire\MasterKamarAplicares\MasterKamarAplicares;
+
 
 
 use App\Http\Livewire\PendaftaranMandiriPasienPoli\PendaftaranMandiriPasienPoli;
@@ -89,6 +91,9 @@ Route::group(['middleware' => ['role:Admin|Mr|Perawat|Dokter|Apoteker|Tu']], fun
 
     // Master Dokter
     Route::get('MasterDokter', MasterDokter::class)->middleware('auth')->name('MasterDokter');
+
+    // Master KamarAplicares
+    Route::get('MasterKamarAplicares', MasterKamarAplicares::class)->middleware('auth')->name('MasterKamarAplicares');
 
 
 

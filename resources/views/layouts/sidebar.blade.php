@@ -221,6 +221,10 @@
                                     <x-nav-link class="pl-4" :href="route('EmrRI')" :active="request()->routeIs('EmrRI')">
                                         {{ __('Rekam Medis RI') }}
                                     </x-nav-link>
+
+                                    <x-nav-link class="pl-4" :href="route('MasterKamarAplicares')" :active="request()->routeIs('MasterKamarAplicares')">
+                                        {{ __('KamarAplicares') }}
+                                    </x-nav-link>
                                 @endrole
                             </li>
                         </ul>
@@ -391,6 +395,8 @@
 
 
                             <ul id="dropdown-layoutsMaster" class="hidden py-2 space-y-2">
+
+
                                 <li>
                                     <x-nav-link class="pl-4" :href="route('MasterPoli')" :active="request()->routeIs('MasterPoli')">
                                         {{ __('Master Poli') }}

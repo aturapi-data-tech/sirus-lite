@@ -86,6 +86,13 @@
 
             </div>
 
+            <div class="">
+                <x-primary-button :disabled=false wire:click.prevent="refKamar()" type="button"
+                    wire:loading.remove>RefKamar</x-primary-button>
+                <div wire:loading wire:target="refKamar">
+                    <x-loading />
+                </div>
+            </div>
 
 
             <div class="flex justify-end w-1/2 pt-8">

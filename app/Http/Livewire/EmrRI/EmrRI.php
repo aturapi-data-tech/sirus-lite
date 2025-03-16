@@ -7,12 +7,18 @@ use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Http\Traits\LOV\LOVDokter\LOVDokterTrait;
-
+use App\Http\Traits\BPJS\AplicaresTrait;
 
 
 class EmrRI extends Component
 {
-    use WithPagination, LOVDokterTrait;
+    use WithPagination, LOVDokterTrait, AplicaresTrait;
+
+    public function refKamar()
+    {
+        $x = $this->ketersediaanKamarRS();
+        dd($x->getOriginalContent());
+    }
 
     // primitive Variable
     public string $myTitle = 'Rekam Medis RI';
