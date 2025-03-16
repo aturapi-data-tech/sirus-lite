@@ -5,16 +5,13 @@ namespace App\Http\Livewire\MasterKamarAplicares;
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
 use Livewire\WithPagination;
-use Illuminate\Support\Facades\Validator;
 use App\Http\Traits\BPJS\AplicaresTrait;
-
-use App\Http\Traits\customErrorMessagesTrait;
 
 class MasterKamarAplicares extends Component
 {
 
     use WithPagination, AplicaresTrait;
-    protected $listeners = ['masterKamarAplicaresCloseModal' => 'closeModal'];
+    protected $listeners = [];
 
 
 
@@ -23,8 +20,6 @@ class MasterKamarAplicares extends Component
     public string $mySnipt = 'Master KamarAplicares / Ruang KamarAplicares';
     public string $myProgram = 'Data KamarAplicares';
 
-    // ID
-    public string $kamarAplicaresId;
     public array $kamarLists = [];
 
     public function createKelas(): void

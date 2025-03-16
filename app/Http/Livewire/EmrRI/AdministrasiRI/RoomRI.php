@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
+use App\Http\Traits\BPJS\AplicaresTrait;
 
 use App\Http\Traits\EmrRI\EmrRITrait;
 use App\Http\Traits\LOV\LOVRoom\LOVRoomTrait;
@@ -16,7 +17,7 @@ use Exception;
 
 class RoomRI extends Component
 {
-    use WithPagination, EmrRITrait, LOVRoomTrait;
+    use WithPagination, EmrRITrait, LOVRoomTrait, AplicaresTrait;
 
 
     // listener from blade////////////////
@@ -146,7 +147,7 @@ class RoomRI extends Component
                     'bed_no' =>  $this->formEntryRoom['roomBedNo'],
                 ]);
 
-
+            $this->updateKelas($this->formEntryRoom['roomId']);
 
             $this->administrasiRIuserLog($this->riHdrNoRef, 'Room ' . $this->formEntryRoom['roomName'] . ' Tarif Room/Pereawatan/Umum:' . $this->formEntryRoom['roomPrice'] . '/' . $this->formEntryRoom['perawatanPrice'] . '/' . $this->formEntryRoom['commonService'] . ' Txn No:' . $lastInserted->trfr_no_max);
             $this->emit('SyncAdministrasiRI');
@@ -219,6 +220,39 @@ class RoomRI extends Component
             $this->addRoom($this->formEntryRoom['roomId'] ?? '', $this->formEntryRoom['roomName'] ?? '', $this->formEntryRoom['roomBedNo'] ?? '', $this->formEntryRoom['roomPrice'] ?? '', $this->formEntryRoom['perawatanPrice'] ?? '', $this->formEntryRoom['commonService'] ?? '');
         }
     }
+
+    private function updateKelas($roomId): void
+    {
+        $kodekelasRs = DB::table('rsmst_rooms')->select('class_id')->where('room_id', $roomId)->first();
+        // Daftar kodekelas dari data kamarLists
+
+        if ($kodekelasRs) {
+            $kapasitas = DB::table('rsmst_rooms as a')
+                ->where(DB::raw("to_char(a.class_id)"), $kodekelasRs->class_id ?? '')
+                ->count();
+
+            $terpakai = DB::table('rsmst_rooms as a')
+                ->join('rstxn_rihdrs as b', 'a.room_id', '=', 'b.room_id')
+                ->where('b.ri_status', 'I')
+                ->where(DB::raw("to_char(a.class_id)"), $kodekelasRs->class_id ?? '')
+                ->count();
+
+            $tersedia = $kapasitas - $terpakai;
+
+            $updateKelas = [
+                'kodekelas'          => $kode['kodekelas'] ?? '1',
+                'koderuang'          => $kode['kodekelas'] ?? '1', // default kosong, bisa diisi nilai sesuai kebutuhan
+                'namaruang'          => $kode['namakelas'] ?? '', // asumsikan namaruang sama dengan namakelas jika tidak ada data lain
+                'kapasitas'          => $kapasitas,  // default 0; sesuaikan dengan kebutuhan
+                'tersedia'           => $tersedia,
+                'tersediapria'       => 0,
+                'tersediawanita'     => 0,
+                'tersediapriawanita' => $tersedia,
+            ];
+            $this->updateKetersediaanTempatTidur($updateKelas);
+        }
+    }
+
 
     // when new form instance
     public function mount()
