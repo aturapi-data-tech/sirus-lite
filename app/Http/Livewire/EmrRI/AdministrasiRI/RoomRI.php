@@ -223,33 +223,55 @@ class RoomRI extends Component
 
     private function updateKelas($roomId): void
     {
-        $kodekelasRs = DB::table('rsmst_rooms')->select('class_id')->where('room_id', $roomId)->first();
-        // Daftar kodekelas dari data kamarLists
+        // Ambil class_id dari tabel rsmst_rooms berdasarkan room_id
+        $roomClassData = DB::table('rsmst_rooms')->select('class_id')->where('room_id', $roomId)->first();
 
-        if ($kodekelasRs) {
-            $kapasitas = DB::table('rsmst_rooms as a')
-                ->where(DB::raw("to_char(a.class_id)"), $kodekelasRs->class_id ?? '')
-                ->count();
-
-            $terpakai = DB::table('rsmst_rooms as a')
-                ->join('rstxn_rihdrs as b', 'a.room_id', '=', 'b.room_id')
-                ->where('b.ri_status', 'I')
-                ->where(DB::raw("to_char(a.class_id)"), $kodekelasRs->class_id ?? '')
-                ->count();
-
-            $tersedia = $kapasitas - $terpakai;
-
-            $updateKelas = [
-                'kodekelas'          => $kode['kodekelas'] ?? '1',
-                'koderuang'          => $kode['kodekelas'] ?? '1', // default kosong, bisa diisi nilai sesuai kebutuhan
-                'namaruang'          => $kode['namakelas'] ?? '', // asumsikan namaruang sama dengan namakelas jika tidak ada data lain
-                'kapasitas'          => $kapasitas,  // default 0; sesuaikan dengan kebutuhan
-                'tersedia'           => $tersedia,
-                'tersediapria'       => 0,
-                'tersediawanita'     => 0,
-                'tersediapriawanita' => $tersedia,
+        if ($roomClassData) {
+            // Daftar mapping kelas
+            $classMappingList = [
+                ["namakelas" => "VIP",       "kodekelas" => "VIP", "kodekelasRs" => "VIP"],
+                ["namakelas" => "KELAS I",   "kodekelas" => "KL1", "kodekelasRs" => "1"],
+                ["namakelas" => "KELAS II",  "kodekelas" => "KL2", "kodekelasRs" => "2"],
+                ["namakelas" => "KELAS III", "kodekelas" => "KL3", "kodekelasRs" => "3"],
+                ["namakelas" => "ICU",       "kodekelas" => "ICU", "kodekelasRs" => "ICU"],
+                ["namakelas" => "NICU",      "kodekelas" => "NIC", "kodekelasRs" => "NIC"],
+                ["namakelas" => "PICU",      "kodekelas" => "PIC", "kodekelasRs" => "PIC"],
             ];
-            $this->updateKetersediaanTempatTidur($updateKelas);
+
+            // Cari data kelas yang sesuai dari mapping list
+            $mappedClassData = collect($classMappingList)->firstWhere('kodekelasRs', $roomClassData->class_id);
+
+            if ($mappedClassData) {
+                // Hitung kapasitas ruangan
+                $kapasitas = DB::table('rsmst_rooms as a')
+                    ->where(DB::raw("to_char(a.class_id)"), $mappedClassData['kodekelasRs'] ?? '')
+                    ->count();
+
+                // Hitung ruangan yang terpakai
+                $terpakai = DB::table('rsmst_rooms as a')
+                    ->join('rstxn_rihdrs as b', 'a.room_id', '=', 'b.room_id')
+                    ->where('b.ri_status', 'I')
+                    ->where(DB::raw("to_char(a.class_id)"), $mappedClassData['kodekelasRs'] ?? '')
+                    ->count();
+
+                // Hitung ruangan yang tersedia
+                $tersedia = $kapasitas - $terpakai;
+
+                // Siapkan data untuk update ketersediaan tempat tidur
+                $bedAvailabilityUpdate = [
+                    'kodekelas'          => $mappedClassData['kodekelas'] ?? '1',
+                    'koderuang'          => $mappedClassData['kodekelas'] ?? '1',
+                    'namaruang'          => $mappedClassData['namakelas'] ?? '',
+                    'kapasitas'          => $kapasitas,
+                    'tersedia'           => $tersedia,
+                    'tersediapria'       => 0,
+                    'tersediawanita'     => 0,
+                    'tersediapriawanita' => $tersedia,
+                ];
+
+                // Panggil fungsi untuk update ketersediaan tempat tidur
+                $this->updateKetersediaanTempatTidur($bedAvailabilityUpdate);
+            }
         }
     }
 
