@@ -187,7 +187,7 @@
                                         <th scope="col" class="px-4 py-3 ">
                                             <x-sort-link :active=false wire:click.prevent="" role="button"
                                                 href="#">
-                                                Kode
+                                                Dokter
                                             </x-sort-link>
                                         </th>
 
@@ -219,12 +219,12 @@
 
                                                 <td
                                                     class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                    {{ $JasaDokter['JasaDokterId'] }}
+                                                    {{ $JasaDokter['DokterId'] ?? '-' }}/{{ $JasaDokter['DokterName'] ?? '-' }}
                                                 </td>
 
                                                 <td
                                                     class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                    {{ $JasaDokter['JasaDokterDesc'] }}
+                                                    {{ $JasaDokter['JasaDokterId'] }}/{{ $JasaDokter['JasaDokterDesc'] }}
                                                 </td>
 
 
