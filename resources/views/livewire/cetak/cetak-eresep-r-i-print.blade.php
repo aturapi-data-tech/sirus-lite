@@ -71,7 +71,7 @@
                             <td class="p-1 m-1">No. Resep / Tanggal</td>
                             <td class="p-1 m-1">:</td>
                             <td class="p-1 m-1 text-lg font-semibold">
-                                {{ isset($dataDaftarRi['eresepHdr'][$resepIndexRef]['rjNo']) ? $dataDaftarRi['eresepHdr'][$resepIndexRef]['rjNo'] : '-' }}
+                                {{ isset($dataDaftarRi['eresepHdr'][$resepIndexRef]['slsNo']) ? $dataDaftarRi['eresepHdr'][$resepIndexRef]['slsNo'] : '-' }}
                                 /
                                 {{ isset($dataDaftarRi['eresepHdr'][$resepIndexRef]['resepDate']) ? $dataDaftarRi['eresepHdr'][$resepIndexRef]['resepDate'] : '-' }}
                             </td>

@@ -183,33 +183,125 @@ class EresepRIHdr extends Component
     {
         // ttd Dokter
         foreach ($this->dataDaftarRi['eresepHdr'] as $index => $header) {
-            if (isset($header['resepNo'])) {
-                if ($header['resepNo'] == $this->formEntryEresepRIHdr['resepNo']) {
-                    $myUserCodeActive = auth()->user()->myuser_code;
-                    $myUserNameActive = auth()->user()->myuser_name;
-                    if (auth()->user()->hasRole('Dokter')) {
-                        $this->dataDaftarRi['eresepHdr'][$index]['tandaTanganDokter']['dokterPeresep'] = $myUserNameActive;
-                        $this->dataDaftarRi['eresepHdr'][$index]['tandaTanganDokter']['dokterPeresepCode'] = $myUserCodeActive;
-                        // Simpan perubahan
-                        $this->store();
-                        // Notifikasi sukses
-                        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("TTD Dokter berhasil diisi oleh " . $myUserNameActive);
-                    } else {
-                        // Notifikasi error jika peran tidak sesuai
-                        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Anda tidak dapat melakukan TTD karena User Role " . $myUserNameActive . ' bukan Dokter.');
+            if (isset($header['resepNo']) && $header['resepNo'] == $this->formEntryEresepRIHdr['resepNo']) {
+                $myUserCodeActive = auth()->user()->myuser_code;
+                $myUserNameActive = auth()->user()->myuser_name;
+
+                if (auth()->user()->hasRole('Dokter')) {
+                    // Set data tanda tangan dokter
+                    $this->dataDaftarRi['eresepHdr'][$index]['tandaTanganDokter'] = [
+                        'dokterPeresep'     => $myUserNameActive,
+                        'dokterPeresepCode' => $myUserCodeActive,
+                    ];
+
+                    // Ambil data header resep dan nilai-nilai yang diperlukan
+                    $eresepHdr         = $this->dataDaftarRi['eresepHdr'][$index];
+                    $resepDate         = $eresepHdr['resepDate'];
+                    $regNo             = $eresepHdr['regNo'];
+                    $riHdrNo           = $eresepHdr['riHdrNo'];
+                    $dokterPeresepCode = $eresepHdr['tandaTanganDokter']['dokterPeresepCode'];
+                    $dataObat          = $this->dataDaftarRi['eresepHdr'][$index]['eresep'];
+
+                    try {
+                        // Panggil method sendDataToApotek
+                        $this->sendDataToApotek($resepDate, $regNo, $riHdrNo, $dokterPeresepCode, $dataObat, $index);
+                    } catch (\Exception $e) {
+                        // Jika terjadi error, tampilkan pesan dan hentikan proses
+                        toastr()->closeOnHover(true)
+                            ->closeDuration(3)
+                            ->positionClass('toast-top-left')
+                            ->addError("Gagal mengirim data ke apotek: " . $e->getMessage());
                         return;
                     }
-                    break;
+
+                    // Jika sendDataToApotek berhasil, lanjutkan dengan menyimpan perubahan
+                    $this->store();
+
+                    // Notifikasi sukses
+                    toastr()->closeOnHover(true)
+                        ->closeDuration(3)
+                        ->positionClass('toast-top-left')
+                        ->addSuccess("TTD Dokter berhasil diisi oleh " . $myUserNameActive);
+                } else {
+                    // Notifikasi error jika peran tidak sesuai
+                    toastr()->closeOnHover(true)
+                        ->closeDuration(3)
+                        ->positionClass('toast-top-left')
+                        ->addError("Anda tidak dapat melakukan TTD karena User Role " . $myUserNameActive . ' bukan Dokter.');
+                    return;
                 }
+                break;
             }
         }
+    }
 
-        // Ambil data user yang sedang login
+    private function sendDataToApotek($resepDate, $regNo, $riHdrNo, $drId, $dataObat, $indexKe)
+    {
+        // Validasi: Pastikan $dataObat merupakan array dan tidak kosong
+        if (!is_array($dataObat) || empty($dataObat)) {
+            // Misalnya, kembalikan respons error atau cukup hentikan proses
+            // return response()->json(['message' => 'Data obat tidak tersedia atau format tidak valid'], 400);
+            return; // Hentikan proses jika data tidak valid
+        }
 
+        // 1. Ambil nomor transaksi header (sls_no)
+        $maxSlsNo = DB::table('imtxn_slshdrs')
+            ->select(DB::raw("nvl(max(sls_no)+1,1) as max_sls_no"))
+            ->first()
+            ->max_sls_no;
 
+        // 2. Format waktu resep dan cari shift yang sesuai
+        $formattedTime = Carbon::createFromFormat('d/m/Y H:i:s', $resepDate, env('APP_TIMEZONE'))
+            ->format('H:i:s');
+        $shiftRecord = DB::table('rstxn_shiftctls')
+            ->select('shift')
+            ->whereRaw("'{$formattedTime}' between shift_start and shift_end")
+            ->first();
+        $shift = $shiftRecord->shift ?? 3;
 
+        // 3. Insert header transaksi ke imtxn_slshdrs
+        DB::table('imtxn_slshdrs')->insert([
+            'sls_no'                => $maxSlsNo,
+            'sls_date'              => DB::raw("to_date('{$resepDate}','dd/mm/yyyy hh24:mi:ss')"),
+            'status'                => 'A',
+            'dr_id'                 => $drId,
+            'reg_no'                => $regNo,
+            'shift'                 => $shift,
+            'rihdr_no'              => $riHdrNo,
+            'emp_id'                => '1',
+            'acte_price'            => 3000,
+            'waktu_masuk_pelayanan' => DB::raw('sysdate'),
+        ]);
 
+        // 4. Loop untuk insert data detail obat ke imtxn_slsdtls
+        foreach ($dataObat as $eresepItem) {
+            // Ambil nomor detail transaksi berikutnya (sls_dtl)
+            $maxSlsDtl = DB::table('imtxn_slsdtls')
+                ->select(DB::raw("nvl(max(sls_dtl)+1,1) as max_sls_dtl"))
+                ->first()
+                ->max_sls_dtl;
 
+            // Ambil data produk untuk mendapatkan harga
+            $dataProduct = DB::table('immst_products')
+                ->select('sales_price')
+                ->where('product_id', $eresepItem['productId'])
+                ->first();
+
+            DB::table('imtxn_slsdtls')->insert([
+                'sls_dtl'         => $maxSlsDtl,
+                'qty'             => $eresepItem['qty'],
+                'exp_date'        => DB::raw("add_months(to_date('{$resepDate}','dd/mm/yyyy hh24:mi:ss'),12)"),
+                'sales_price'     => $dataProduct->sales_price ?? 0,
+                'product_id'      => $eresepItem['productId'],
+                'sls_no'          => $maxSlsNo,
+                'resep_carapakai' => $eresepItem['signaX'],
+                'resep_takar'     => 'Tablet',
+                'resep_kapsul'    => $eresepItem['signaHari'],
+                'resep_ket'       => $eresepItem['catatanKhusus'],
+                'etiket_status'   => 1,
+            ]);
+        }
+        $this->dataDaftarRi['eresepHdr'][$indexKe]['slsNo'] = $maxSlsNo;
     }
 
     // Memanggil ResepHdr ketika tombol di klik dan lakukan perubahan formEntryEresepRIHdr
