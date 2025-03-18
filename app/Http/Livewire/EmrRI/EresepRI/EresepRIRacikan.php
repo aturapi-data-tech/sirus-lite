@@ -224,7 +224,6 @@ class EresepRIRacikan extends Component
         $this->resepNoRef = $newResepNo;
         // setIndex Untuk membantu status record
         $this->resepIndexRef = $newResepIndex;
-        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError($newResepIndex . ' x  ' . $this->resepNoRef);
     }
 
     private function syncDataFormEntry(): void

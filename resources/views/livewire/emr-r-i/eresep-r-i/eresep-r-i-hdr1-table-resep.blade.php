@@ -70,6 +70,11 @@
                                                         {{ ')' }}
                                                     </span>
                                                 </div>
+
+                                                <div>
+                                                    <livewire:cetak.cetak-eresep-r-i :riHdrNoRef="$riHdrNoRef" :resepNoRef="$header['resepNo']"
+                                                        wire:key="cetak.cetak-eresep-r-i-{{ $riHdrNoRef }}-{{ $header['resepNo'] }}">
+                                                </div>
                                             </div>
                                         </div>
                                     </td>
