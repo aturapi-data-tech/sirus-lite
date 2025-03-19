@@ -31,6 +31,8 @@ use App\Http\Livewire\BookingRJ\BookingRJ;
 
 use App\Http\Livewire\EmrRJ\TelaahResepRJ\TelaahResepRJ;
 use App\Http\Livewire\EmrUGD\TelaahResepUGD\TelaahResepUGD;
+use App\Http\Livewire\EmrRI\TelaahResepRI\TelaahResepRI;
+
 
 use App\Http\Livewire\EmrUGD\EmrUGD;
 
@@ -113,6 +115,8 @@ Route::group(['middleware' => ['role:Admin|Mr|Perawat|Dokter|Apoteker|Tu']], fun
 
     Route::get('BookingRJ', BookingRJ::class)->middleware('auth')->name('BookingRJ');
     Route::get('TelaahResepRJ', TelaahResepRJ::class)->middleware('auth')->name('TelaahResepRJ');
+    Route::get('TelaahResepRI', TelaahResepRI::class)->middleware('auth')->name('TelaahResepRI');
+
 
     Route::get('EmrRJAdministrasi', AdministrasiRJ::class)->middleware('auth')->name('EmrRJAdministrasi');
 

@@ -28,7 +28,7 @@ trait EmrRITrait
                 $dataDaftarRi = json_decode($findData->datadaftarri_json, true);
             } else {
 
-                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data tidak dapat di proses json Ri Trait.");
+                // toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data tidak dapat di proses json Ri Trait.");
                 $dataDaftarRi = DB::table('rsview_rihdrs')
                     ->select(
                         DB::raw("to_char(entry_date,'dd/mm/yyyy hh24:mi:ss') AS entry_date"),

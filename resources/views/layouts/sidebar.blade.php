@@ -287,6 +287,15 @@
                                         {{ __('Resep UGD') }}
                                     </x-nav-link>
                                 </li>
+
+                                <li>
+                                    <x-nav-link class="pl-4" :href="route('TelaahResepRI')" :active="request()->routeIs('TelaahResepRI')">
+                                        <!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
+
+
+                                        {{ __('Resep RI') }}
+                                    </x-nav-link>
+                                </li>
                             </ul>
 
 

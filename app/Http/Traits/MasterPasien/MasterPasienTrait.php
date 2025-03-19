@@ -2,7 +2,6 @@
 
 namespace App\Http\Traits\MasterPasien;
 
-use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Spatie\ArrayToXml\ArrayToXml;
 
@@ -314,7 +313,7 @@ trait MasterPasienTrait
 
             return $dataPasien;
         } catch (Exception $e) {
-            dd($e->getMessage());
+            // dd($e->getMessage());
             return ["errorMessages" => $e->getMessage()];
         }
     }
