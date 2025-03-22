@@ -157,61 +157,82 @@
                                                 </td>
 
                                                 <td class="w-1/5 px-2 py-2 text-gray-900 group-hover:bg-gray-100">
-                                                    <div>
-                                                        <x-yellow-button
-                                                            wire:click.prevent="openModalLayanan('{{ $myQData->txn_no }}',
-                                                        '{{ $myQData->layanan_status }}',
-                                                        {{ $myQData->datadaftar_json }}
-                                                        )"
-                                                            type="button" wire:loading.remove>
-                                                            Resume Medis
-                                                        </x-yellow-button>
-                                                        <div wire:loading wire:target="openModalLayanan">
-                                                            <x-loading />
-                                                        </div>
-                                                    </div>
+                                                    <div class="grid grid-cols-1 gap-2">
 
-                                                    <div>
-                                                        <x-green-button
-                                                            wire:click.prevent="cetakRekamMedisRJGrid('{{ $myQData->txn_no }}',
+                                                        <div>
+                                                            <x-light-button
+                                                                wire:click.prevent="openModalLayanan('{{ $myQData->txn_no }}',
                                                         '{{ $myQData->layanan_status }}',
                                                         {{ $myQData->datadaftar_json }}
                                                         )"
-                                                            type="button" wire:loading.remove>
-                                                            Cetak Resume Medis
-                                                        </x-green-button>
-                                                        <div wire:loading wire:target="cetakRekamMedisRJGrid">
-                                                            <x-loading />
+                                                                type="button" wire:loading.remove>
+                                                                Resume Medis
+                                                            </x-light-button>
+                                                            <div wire:loading wire:target="openModalLayanan">
+                                                                <x-loading />
+                                                            </div>
                                                         </div>
-                                                    </div>
 
-                                                    <div>
-                                                        <x-green-button
-                                                            wire:click.prevent="cetakRekamMedisRJSuketIstirahatGrid('{{ $myQData->txn_no }}',
+                                                        <div>
+                                                            <x-green-button
+                                                                wire:click.prevent="cetakRekamMedisRJGrid('{{ $myQData->txn_no }}',
                                                         '{{ $myQData->layanan_status }}',
                                                         {{ $myQData->datadaftar_json }}
                                                         )"
-                                                            type="button" wire:loading.remove>
-                                                            Cetak Surat Keterangan Istirahat
-                                                        </x-green-button>
-                                                        <div wire:loading
-                                                            wire:target="cetakRekamMedisRJSuketIstirahatGrid">
-                                                            <x-loading />
+                                                                type="button" wire:loading.remove>
+                                                                Cetak Resume Medis
+                                                            </x-green-button>
+                                                            <div wire:loading wire:target="cetakRekamMedisRJGrid">
+                                                                <x-loading />
+                                                            </div>
                                                         </div>
-                                                    </div>
 
-                                                    <div>
-                                                        <x-green-button
-                                                            wire:click.prevent="cetakRekamMedisRJSuketSehatGrid('{{ $myQData->txn_no }}',
+                                                        @if (isset($datadaftar_json['poliId']) && $datadaftar_json['poliId'] == '7')
+                                                            <div>
+                                                                <x-yellow-button
+                                                                    wire:click.prevent="cetakRekamMedisOrthoRJGrid('{{ $myQData->txn_no }}',
                                                         '{{ $myQData->layanan_status }}',
                                                         {{ $myQData->datadaftar_json }}
                                                         )"
-                                                            type="button" wire:loading.remove>
-                                                            Cetak Surat Keterangan Sehat
-                                                        </x-green-button>
-                                                        <div wire:loading wire:target="cetakRekamMedisRJSuketSehatGrid">
-                                                            <x-loading />
+                                                                    type="button" wire:loading.remove>
+                                                                    Cetak Resume MedisOrtho
+                                                                </x-yellow-button>
+                                                                <div wire:loading
+                                                                    wire:target="cetakRekamMedisOrthoRJGrid">
+                                                                    <x-loading />
+                                                                </div>
+                                                            </div>
+                                                        @endif
+                                                        <div>
+                                                            <x-green-button
+                                                                wire:click.prevent="cetakRekamMedisRJSuketIstirahatGrid('{{ $myQData->txn_no }}',
+                                                        '{{ $myQData->layanan_status }}',
+                                                        {{ $myQData->datadaftar_json }}
+                                                        )"
+                                                                type="button" wire:loading.remove>
+                                                                Cetak Surat Keterangan Istirahat
+                                                            </x-green-button>
+                                                            <div wire:loading
+                                                                wire:target="cetakRekamMedisRJSuketIstirahatGrid">
+                                                                <x-loading />
+                                                            </div>
                                                         </div>
+
+                                                        <div>
+                                                            <x-green-button
+                                                                wire:click.prevent="cetakRekamMedisRJSuketSehatGrid('{{ $myQData->txn_no }}',
+                                                        '{{ $myQData->layanan_status }}',
+                                                        {{ $myQData->datadaftar_json }}
+                                                        )"
+                                                                type="button" wire:loading.remove>
+                                                                Cetak Surat Keterangan Sehat
+                                                            </x-green-button>
+                                                            <div wire:loading
+                                                                wire:target="cetakRekamMedisRJSuketSehatGrid">
+                                                                <x-loading />
+                                                            </div>
+                                                        </div>
+
                                                     </div>
 
                                                 </td>
