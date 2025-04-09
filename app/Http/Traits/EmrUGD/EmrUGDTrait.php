@@ -140,10 +140,10 @@ trait EmrUGDTrait
                     'dr_id',
                     'dr_name',
                     'klaim_id',
-                    'klaim_desc',
+                    // 'klaim_desc',
                     'rj_status',
-                    'kd_dr_bpjs',
-                    'kd_poli_bpjs',
+                    // 'kd_dr_bpjs',
+                    // 'kd_poli_bpjs',
                     'shift'
                 )
                 ->where('rj_no', '=', $rjno)
