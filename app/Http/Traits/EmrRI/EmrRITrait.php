@@ -116,8 +116,8 @@ trait EmrRITrait
                     'bangsal_name',
                     'klaim_id',
                     'klaim_desc',
-                    'entryDate',
-                    'exitDate',
+                    'entry_date',
+                    'exit_date',
                 )
                 ->where('rihdr_no', '=', $rino)
                 ->first();
@@ -129,8 +129,8 @@ trait EmrRITrait
             $dataDaftarRi['bedNo'] = $updatedDataDaftarRi->bed_no;
             $dataDaftarRi['klaimId'] = $updatedDataDaftarRi->klaim_id;
             $dataDaftarRi['klaimDesc'] = $updatedDataDaftarRi->klaim_desc;
-            $dataDaftarRi['entryDate'] = $dataDaftarRi->entry_date;
-            $dataDaftarRi['exitDate'] = $dataDaftarRi->exit_date ?? '';
+            $dataDaftarRi['entryDate'] = $updatedDataDaftarRi->entry_date;
+            $dataDaftarRi['exitDate'] = $updatedDataDaftarRi->exit_date ?? '';
 
 
             return $dataDaftarRi;
