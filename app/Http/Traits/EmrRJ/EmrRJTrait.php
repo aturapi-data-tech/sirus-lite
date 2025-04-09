@@ -139,7 +139,7 @@ trait EmrRJTrait
                     'dr_id',
                     'dr_name',
                     'klaim_id',
-                    'klaim_desc',
+                    // 'klaim_desc',
                     'rj_status',
                     'kd_dr_bpjs',
                     'kd_poli_bpjs',
