@@ -136,7 +136,7 @@ trait EmrUGDTrait
                 ->select(
                     DB::raw("to_char(rj_date, 'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
                     'poli_id',
-                    'poli_desc',
+                    // 'poli_desc',
                     'dr_id',
                     'dr_name',
                     'klaim_id',
