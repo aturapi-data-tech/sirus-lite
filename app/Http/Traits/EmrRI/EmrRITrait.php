@@ -106,6 +106,33 @@ trait EmrRITrait
                 ];
             }
 
+            // upate data array terkini
+            $updatedDataDaftarRi = DB::table('rsview_rihdrs')
+                ->select(
+                    'room_id',
+                    'room_name',
+                    'bed_no',
+                    'bangsal_id',
+                    'bangsal_name',
+                    'klaim_id',
+                    'klaim_desc',
+                    'entryDate',
+                    'exitDate',
+                )
+                ->where('rihdr_no', '=', $rino)
+                ->first();
+
+            $dataDaftarRi['bangsalId'] = $updatedDataDaftarRi->bangsal_id;
+            $dataDaftarRi['bangsalDesc'] = $updatedDataDaftarRi->bangsal_name;
+            $dataDaftarRi['roomId'] = $updatedDataDaftarRi->room_id;
+            $dataDaftarRi['roomDesc'] = $updatedDataDaftarRi->room_name;
+            $dataDaftarRi['bedNo'] = $updatedDataDaftarRi->bed_no;
+            $dataDaftarRi['klaimId'] = $updatedDataDaftarRi->klaim_id;
+            $dataDaftarRi['klaimDesc'] = $updatedDataDaftarRi->klaim_desc;
+            $dataDaftarRi['entryDate'] = $dataDaftarRi->entry_date;
+            $dataDaftarRi['exitDate'] = $dataDaftarRi->exit_date ?? '';
+
+
             return $dataDaftarRi;
         } catch (Exception $e) {
             // dd($e->getMessage());

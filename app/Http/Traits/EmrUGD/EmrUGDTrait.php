@@ -131,6 +131,36 @@ trait EmrUGDTrait
                 ];
             }
 
+            // Update data array terkini untuk RJ
+            $updatedDataDaftarUgd = DB::table('rsview_ugdkasir')
+                ->select(
+                    DB::raw("to_char(rj_date, 'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
+                    'poli_id',
+                    'poli_desc',
+                    'dr_id',
+                    'dr_name',
+                    'klaim_id',
+                    'klaim_desc',
+                    'rj_status',
+                    'kd_dr_bpjs',
+                    'kd_poli_bpjs',
+                    'shift'
+                )
+                ->where('rj_no', '=', $rjno)
+                ->first();
+
+            // Update field-field dataDaftarUgd dengan data terkini
+            $dataDaftarUgd['poliId']     = $updatedDataDaftarUgd->poli_id;
+            // $dataDaftarUgd['poliDesc']   = $updatedDataDaftarUgd->poli_desc;
+            $dataDaftarUgd['drId']       = $updatedDataDaftarUgd->dr_id;
+            $dataDaftarUgd['drDesc']     = $updatedDataDaftarUgd->dr_name;
+            $dataDaftarUgd['klaimId']    = $updatedDataDaftarUgd->klaim_id;
+            $dataDaftarUgd['rjDate']     = $updatedDataDaftarUgd->rj_date;
+            $dataDaftarUgd['rjStatus']   = $updatedDataDaftarUgd->rj_status;
+            // $dataDaftarUgd['kddrbpjs']   = $updatedDataDaftarUgd->kd_dr_bpjs;
+            // $dataDaftarUgd['kdpolibpjs'] = $updatedDataDaftarUgd->kd_poli_bpjs;
+            $dataDaftarUgd['shift']      = $updatedDataDaftarUgd->shift;
+
             return $dataDaftarUgd;
         } catch (Exception $e) {
             dd($e->getMessage());

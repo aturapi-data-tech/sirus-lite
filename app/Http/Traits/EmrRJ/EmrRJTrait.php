@@ -130,6 +130,36 @@ trait EmrRJTrait
                 ];
             }
 
+            // Update data array terkini untuk RJ
+            $updatedDataDaftarRJ = DB::table('rsview_rjkasir')
+                ->select(
+                    DB::raw("to_char(rj_date, 'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
+                    'poli_id',
+                    'poli_desc',
+                    'dr_id',
+                    'dr_name',
+                    'klaim_id',
+                    'klaim_desc',
+                    'rj_status',
+                    'kd_dr_bpjs',
+                    'kd_poli_bpjs',
+                    'shift'
+                )
+                ->where('rj_no', '=', $rjno)
+                ->first();
+
+            // Update field-field dataDaftarRJ dengan data terkini
+            $dataDaftarRJ['poliId']     = $updatedDataDaftarRJ->poli_id;
+            $dataDaftarRJ['poliDesc']   = $updatedDataDaftarRJ->poli_desc;
+            $dataDaftarRJ['drId']       = $updatedDataDaftarRJ->dr_id;
+            $dataDaftarRJ['drDesc']     = $updatedDataDaftarRJ->dr_name;
+            $dataDaftarRJ['klaimId']    = $updatedDataDaftarRJ->klaim_id;
+            $dataDaftarRJ['rjDate']     = $updatedDataDaftarRJ->rj_date;
+            $dataDaftarRJ['rjStatus']   = $updatedDataDaftarRJ->rj_status;
+            $dataDaftarRJ['kddrbpjs']   = $updatedDataDaftarRJ->kd_dr_bpjs;
+            $dataDaftarRJ['kdpolibpjs'] = $updatedDataDaftarRJ->kd_poli_bpjs;
+            $dataDaftarRJ['shift']      = $updatedDataDaftarRJ->shift;
+
 
             // dataPasienRJ
             $dataPasienRJ = DB::table('rsview_rjkasir')

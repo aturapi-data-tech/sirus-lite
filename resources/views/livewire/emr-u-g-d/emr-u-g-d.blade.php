@@ -145,11 +145,6 @@
                 @include('livewire.emr-u-g-d.create-general-consent-u-g-d-pasien')
             @endif
 
-
-            {{-- @if ($isOpenInap)
-                @include('livewire.emr-u-g-d.create-emr-u-g-d-inap')
-            @endif --}}
-
             {{-- @if ($isOpenScreening)
                 @include('livewire.emr-u-g-d.create-screening-u-g-d')
             @endif --}}
