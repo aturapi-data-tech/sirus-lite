@@ -13,118 +13,50 @@
 
             @if (!$collectingMyJasaMedis)
                 <div>
-                    <x-input-label for="dataJasaMedisLovSearch" :value="__('Jasa Medis')" :required="__(true)" />
-
-                    {{-- Lov dataJasaMedisLov --}}
-                    <div x-data="{ selecteddataJasaMedisLovIndex: @entangle('selecteddataJasaMedisLovIndex') }" @click.outside="$wire.dataJasaMedisLovSearch = ''">
-                        <x-text-input id="dataJasaMedisLovSearch" placeholder="Jasa Medis" class="mt-1 ml-2"
-                            :errorshas="__($errors->has('dataJasaMedisLovSearch'))" :disabled=$disabledPropertyRjStatus
-                            wire:model.debounce.500ms="dataJasaMedisLovSearch"
-                            x-on:click.outside="$wire.resetdataJasaMedisLov()"
-                            x-on:keyup.escape="$wire.resetdataJasaMedisLov()"
-                            x-on:keyup.down="$wire.selectNextdataJasaMedisLov()"
-                            x-on:keyup.up="$wire.selectPreviousdataJasaMedisLov()"
-                            x-on:keyup.enter="$wire.enterMydataJasaMedisLov(selecteddataJasaMedisLovIndex)"
-                            x-ref="dataJasaMedisLovSearchfocus" x-init="$refs.dataJasaMedisLovSearchfocus.focus()
-                            $watch('selecteddataJasaMedisLovIndex', (value, oldValue) => $refs.dataJasaMedisLovSearch.children[selecteddataJasaMedisLovIndex + 1].scrollIntoView({
-                                block: 'nearest'
-                            }))" />
-
-                        {{-- Lov --}}
-                        <div class="py-2 mt-1 overflow-y-auto bg-white border rounded-md shadow-lg max-h-64"
-                            x-show="$wire.dataJasaMedisLovSearch.length>1 && $wire.dataJasaMedisLov.length>0"
-                            x-transition x-ref="dataJasaMedisLovSearch">
-                            {{-- alphine --}}
-                            {{-- <template x-for="(dataJasaMedisLovx, index) in $wire.dataJasaMedisLov">
-                                        <button x-text="dataJasaMedisLovx.pact_desc"
-                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100"
-                                            :class="{
-                                                'bg-gray-100 outline-none': index === $wire
-                                                    .selecteddataJasaMedisLovIndex
-                                            }"
-                                            x-on:click.prevent="$wire.setMydataJasaMedisLov(index)"></button>
-                                    </template> --}}
-
-                            {{-- livewire --}}
-                            @foreach ($dataJasaMedisLov as $key => $lov)
-                                <li wire:key='dataJasaMedisLov{{ $lov['pact_desc'] }}'>
-                                    <x-dropdown-link wire:click="setMydataJasaMedisLov('{{ $key }}')"
-                                        class="text-base font-normal {{ $key === $selecteddataJasaMedisLovIndex ? 'bg-gray-100 outline-none' : '' }}">
-                                        <div>
-                                            {{ $lov['pact_desc'] . '/ ' . $lov['pact_price'] }}
-                                        </div>
-                                    </x-dropdown-link>
-                                </li>
-                            @endforeach
-
-                        </div>
-
-
-                        {{-- Start Lov exceptions --}}
-
-                        @if (strlen($dataJasaMedisLovSearch) > 0 && strlen($dataJasaMedisLovSearch) < 1 && count($dataJasaMedisLov) == 0)
-                            <div class="w-full p-2 text-sm text-center text-gray-500 dark:text-gray-400">
-                                {{ 'Masukkan minimal lebih dari 1  karakter' }}
-                            </div>
-                        @elseif(strlen($dataJasaMedisLovSearch) >= 1 && count($dataJasaMedisLov) == 0)
-                            <div class="w-full p-2 text-sm text-center text-gray-500 dark:text-gray-400">
-                                {{ 'Data Tidak ditemukan' }}
-                            </div>
-                        @endif
-                        {{-- End Lov exceptions --}}
-
-                        @error('dataJasaMedisLovSearch')
-                            <x-input-error :messages=$message />
-                        @enderror
-                    </div>
-                    {{-- Lov dataJasaMedisLov --}}
+                    @include('livewire.component.l-o-v.list-of-value-jasa-medis.list-of-value-jasa-medis')
                 </div>
-            @endif
-
-            @if ($collectingMyJasaMedis)
+            @else
                 {{-- collectingMyJasaMedis / obat --}}
                 <div class="grid grid-cols-12 gap-2 " x-data>
                     <div class="col-span-1">
-                        <x-input-label for="collectingMyJasaMedis.JasaMedisId" :value="__('Kode')" :required="__(true)" />
+                        <x-input-label for="formEntryJasaMedis.jasaMedisId" :value="__('Kode')" :required="__(true)" />
 
                         <div>
-                            <x-text-input id="collectingMyJasaMedis.JasaMedisId" placeholder="Kode" class="mt-1 ml-2"
-                                :errorshas="__($errors->has('collectingMyJasaMedis.JasaMedisId'))" :disabled=true
-                                wire:model.debounce.500ms="collectingMyJasaMedis.JasaMedisId" />
+                            <x-text-input id="formEntryJasaMedis.jasaMedisId" placeholder="Kode" class="mt-1 ml-2"
+                                :errorshas="__($errors->has('formEntryJasaMedis.jasaMedisId'))" :disabled=true wire:model="formEntryJasaMedis.jasaMedisId" />
 
-                            @error('collectingMyJasaMedis.JasaMedisId')
+                            @error('formEntryJasaMedis.jasaMedisId')
                                 <x-input-error :messages=$message />
                             @enderror
                         </div>
                     </div>
 
                     <div class="col-span-3">
-                        <x-input-label for="collectingMyJasaMedis.JasaMedisDesc" :value="__('Jasa Medis')" :required="__(true)" />
+                        <x-input-label for="formEntryJasaMedis.jasaMedisDesc" :value="__('Jasa Medis')" :required="__(true)" />
 
                         <div>
-                            <x-text-input id="collectingMyJasaMedis.JasaMedisDesc" placeholder="Jasa Medis"
-                                class="mt-1 ml-2" :errorshas="__($errors->has('collectingMyJasaMedis.JasaMedisDesc'))" :disabled=true
-                                wire:model.debounce.500ms="collectingMyJasaMedis.JasaMedisDesc" />
+                            <x-text-input id="formEntryJasaMedis.jasaMedisDesc" placeholder="Jasa Medis"
+                                class="mt-1 ml-2" :errorshas="__($errors->has('formEntryJasaMedis.jasaMedisDesc'))" :disabled=true
+                                wire:model="formEntryJasaMedis.jasaMedisDesc" />
 
-                            @error('collectingMyJasaMedis.JasaMedisDesc')
+                            @error('formEntryJasaMedis.jasaMedisDesc')
                                 <x-input-error :messages=$message />
                             @enderror
                         </div>
                     </div>
 
                     <div class="col-span-3">
-                        <x-input-label for="collectingMyJasaMedis.JasaMedisPrice" :value="__('Tarif')"
-                            :required="__(true)" />
+                        <x-input-label for="formEntryJasaMedis.jasaMedisPrice" :value="__('Tarif')" :required="__(true)" />
 
                         <div>
-                            <x-text-input id="collectingMyJasaMedis.JasaMedisPrice" placeholder="Tarif"
-                                class="mt-1 ml-2" :errorshas="__($errors->has('collectingMyJasaMedis.JasaMedisPrice'))" :disabled=$disabledPropertyRjStatus
-                                wire:model.debounce.500ms="collectingMyJasaMedis.JasaMedisPrice" x-init="$refs.collectingMyJasaMedisJasaMedisPrice.focus()"
-                                x-ref="collectingMyJasaMedisJasaMedisPrice"
+                            <x-text-input id="formEntryJasaMedis.jasaMedisPrice" placeholder="Tarif" class="mt-1 ml-2"
+                                :errorshas="__($errors->has('formEntryJasaMedis.jasaMedisPrice'))" :disabled=$disabledPropertyRjStatus
+                                wire:model="formEntryJasaMedis.jasaMedisPrice" x-init="$refs.formEntryJasaMedisJasaMedisPrice.focus()"
+                                x-ref="formEntryJasaMedisJasaMedisPrice"
                                 x-on:keyup.enter="$wire.insertJasaMedis()
-                                $refs.collectingMyJasaMedisJasaMedisPrice.focus()" />
+                                $refs.formEntryJasaMedisJasaMedisPrice.focus()" />
 
-                            @error('collectingMyJasaMedis.JasaMedisPrice')
+                            @error('formEntryJasaMedis.jasaMedisPrice')
                                 <x-input-error :messages=$message />
                             @enderror
                         </div>
@@ -135,8 +67,7 @@
                     <div class="col-span-1">
                         <x-input-label for="" :value="__('Hapus')" :required="__(true)" />
 
-                        <x-alternative-button class="inline-flex ml-2" wire:click.prevent="resetcollectingMyJasaMedis()"
-                            x-on:click="$refs.collectingMyJasaMedisJasaMedisDesc.focus()">
+                        <x-alternative-button class="inline-flex ml-2" wire:click.prevent="resetformEntryJasaMedis()">
                             <svg class="w-5 h-5 text-gray-800 dark:text-white" aria-hidden="true"
                                 xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 20">
                                 <path

@@ -12,15 +12,14 @@ use Illuminate\Support\Facades\Validator;
 
 use App\Http\Traits\customErrorMessagesTrait;
 use App\Http\Traits\EmrUGD\EmrUGDTrait;
+use App\Http\Traits\LOV\LOVJasaMedis\LOVJasaMedisTrait;
 
-// use Illuminate\Support\Str;
-use Spatie\ArrayToXml\ArrayToXml;
 use Exception;
 
 
 class JasaMedisUGD extends Component
 {
-    use WithPagination, EmrUGDTrait;
+    use WithPagination, EmrUGDTrait, LOVJasaMedisTrait;
 
 
     // listener from blade////////////////
@@ -42,22 +41,16 @@ class JasaMedisUGD extends Component
     public array $dataDaftarUgd = [];
 
     //////////////////////////////////////////////////////////////////////
+    // LOV Nested
+    public array $jasaMedis;
+    // LOV Nested
 
-
-    //  table LOV////////////////
-
-
-
-    public $dataJasaMedisLov = [];
-    public $dataJasaMedisLovStatus = 0;
-    public $dataJasaMedisLovSearch = '';
-    public $selecteddataJasaMedisLovIndex = 0;
-
-    public $collectingMyJasaMedis = [];
-
-
-
-
+    //////////////////////////////////////////////////////////////////////
+    public array $formEntryJasaMedis = [
+        'jasaMedisId' => '',
+        'jasaMedisPrice' => '', // Harga kunjungan minimal 0
+        'jasaMedisQty' => '',
+    ];
 
 
 
@@ -72,144 +65,9 @@ class JasaMedisUGD extends Component
 
 
 
-
-    /////////////////////////////////////////////////
-    // Lov dataJasaMedisLov //////////////////////
-    ////////////////////////////////////////////////
-    public function clickdataJasaMedisLov()
-    {
-        $this->dataJasaMedisLovStatus = true;
-        $this->dataJasaMedisLov = [];
-    }
-
-    public function updateddataJasaMedisLovsearch()
-    {
-
-        // Reset index of LoV
-        $this->reset(['selecteddataJasaMedisLovIndex', 'dataJasaMedisLov']);
-        // Variable Search
-        $search = $this->dataJasaMedisLovSearch;
-
-        // check LOV by dr_id rs id
-        $dataJasaMedisLovs = DB::table('rsmst_actparamedics  ')->select(
-            'pact_id',
-            'pact_desc',
-            'pact_price'
-        )
-            ->where('pact_id', $search)
-            ->where('active_status', '1')
-            ->first();
-
-        if ($dataJasaMedisLovs) {
-
-            // set JasaMedis sep
-            $this->addJasaMedis($dataJasaMedisLovs->pact_id, $dataJasaMedisLovs->pact_desc, $dataJasaMedisLovs->pact_price);
-            $this->resetdataJasaMedisLov();
-        } else {
-
-            // if there is no id found and check (min 3 char on search)
-            if (strlen($search) < 1) {
-                $this->dataJasaMedisLov = [];
-            } else {
-                $this->dataJasaMedisLov = json_decode(
-                    DB::table('rsmst_actparamedics ')->select(
-                        'pact_id',
-                        'pact_desc',
-                        'pact_price'
-                    )
-                        ->where('active_status', '1')
-                        ->where(DB::raw('upper(pact_desc)'), 'like', '%' . strtoupper($search) . '%')
-                        ->limit(10)
-                        ->orderBy('pact_id', 'ASC')
-                        ->orderBy('pact_desc', 'ASC')
-                        ->get(),
-                    true
-                );
-            }
-            $this->dataJasaMedisLovStatus = true;
-            // set doing nothing
-        }
-    }
-    // /////////////////////
-    // LOV selected start
-    public function setMydataJasaMedisLov($id)
-    {
-        $this->checkUgdStatus();
-        $dataJasaMedisLovs = DB::table('rsmst_actparamedics ')->select(
-            'pact_id',
-            'pact_desc',
-            'pact_price'
-        )
-            ->where('active_status', '1')
-            ->where('pact_id', $this->dataJasaMedisLov[$id]['pact_id'])
-            ->first();
-
-        // set dokter sep
-        $this->addJasaMedis($dataJasaMedisLovs->pact_id, $dataJasaMedisLovs->pact_desc, $dataJasaMedisLovs->pact_price);
-        $this->resetdataJasaMedisLov();
-    }
-
-    public function resetdataJasaMedisLov()
-    {
-        $this->reset(['dataJasaMedisLov', 'dataJasaMedisLovStatus', 'dataJasaMedisLovSearch', 'selecteddataJasaMedisLovIndex']);
-    }
-
-    public function selectNextdataJasaMedisLov()
-    {
-        if ($this->selecteddataJasaMedisLovIndex === "") {
-            $this->selecteddataJasaMedisLovIndex = 0;
-        } else {
-            $this->selecteddataJasaMedisLovIndex++;
-        }
-
-        if ($this->selecteddataJasaMedisLovIndex === count($this->dataJasaMedisLov)) {
-            $this->selecteddataJasaMedisLovIndex = 0;
-        }
-    }
-
-    public function selectPreviousdataJasaMedisLov()
-    {
-
-        if ($this->selecteddataJasaMedisLovIndex === "") {
-            $this->selecteddataJasaMedisLovIndex = count($this->dataJasaMedisLov) - 1;
-        } else {
-            $this->selecteddataJasaMedisLovIndex--;
-        }
-
-        if ($this->selecteddataJasaMedisLovIndex === -1) {
-            $this->selecteddataJasaMedisLovIndex = count($this->dataJasaMedisLov) - 1;
-        }
-    }
-
-    public function enterMydataJasaMedisLov($id)
-    {
-        $this->checkUgdStatus();
-        // jika JK belum siap maka toaster error
-        if (isset($this->dataJasaMedisLov[$id]['pact_id'])) {
-            $this->addJasaMedis($this->dataJasaMedisLov[$id]['pact_id'], $this->dataJasaMedisLov[$id]['pact_desc'], $this->dataJasaMedisLov[$id]['pact_price']);
-            $this->resetdataJasaMedisLov();
-        } else {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Jasa Medis belum tersedia.");
-        }
-    }
-
-
-    // LOV selected end
-    /////////////////////////////////////////////////
-    // Lov dataJasaMedisLov //////////////////////
-    ////////////////////////////////////////////////
-
-
-
-
-
-
-
     // insert and update record start////////////////
     public function store()
     {
-        // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
-        $this->setDataPrimer();
 
         // Logic update mode start //////////
         $this->updateDataRJ($this->dataDaftarUgd['rjNo']);
@@ -246,33 +104,24 @@ class JasaMedisUGD extends Component
         }
     }
 
-
-    private function setDataPrimer(): void {}
-
-
-
-    private function addJasaMedis($JasaMedisId, $JasaMedisDesc, $salesPrice): void
-    {
-
-        $this->collectingMyJasaMedis = [
-            'JasaMedisId' => $JasaMedisId,
-            'JasaMedisDesc' => $JasaMedisDesc,
-            'JasaMedisPrice' => $salesPrice,
-        ];
-    }
-
     public function insertJasaMedis(): void
     {
 
         // validate
         $this->checkUgdStatus();
         // customErrorMessages
-        $messages = customErrorMessagesTrait::messages();
+        $messages = [
+            'formEntryJasaMedis.jasaMedisId.required'  => 'ID Jasa Medis wajib diisi.',
+            'formEntryJasaMedis.jasaMedisId.exists'    => 'ID Jasa Medis tidak valid atau tidak ditemukan di data master.',
+            'formEntryJasaMedis.jasaMedisDesc.required' => 'Deskripsi Jasa Medis wajib diisi.',
+            'formEntryJasaMedis.jasaMedisPrice.required' => 'Harga Jasa Medis wajib diisi.',
+            'formEntryJasaMedis.jasaMedisPrice.numeric' => 'Harga Jasa Medis harus berupa angka.',
+        ];
         // require nik ketika pasien tidak dikenal
         $rules = [
-            "collectingMyJasaMedis.JasaMedisId" => 'bail|required|exists:rsmst_actparamedics ,pact_id',
-            "collectingMyJasaMedis.JasaMedisDesc" => 'bail|required|',
-            "collectingMyJasaMedis.JasaMedisPrice" => 'bail|required|numeric|',
+            "formEntryJasaMedis.jasaMedisId" => 'bail|required|exists:rsmst_actparamedics ,pact_id',
+            "formEntryJasaMedis.jasaMedisDesc" => 'bail|required|',
+            "formEntryJasaMedis.jasaMedisPrice" => 'bail|required|numeric|',
 
         ];
 
@@ -294,26 +143,27 @@ class JasaMedisUGD extends Component
                 ->insert([
                     'pact_dtl' => $lastInserted->pact_dtl_max,
                     'rj_no' => $this->rjNoRef,
-                    'pact_id' => $this->collectingMyJasaMedis['JasaMedisId'],
-                    'pact_price' => $this->collectingMyJasaMedis['JasaMedisPrice'],
+                    'pact_id' => $this->formEntryJasaMedis['jasaMedisId'],
+                    'pact_price' => $this->formEntryJasaMedis['jasaMedisPrice'],
                 ]);
 
 
             $this->dataDaftarUgd['JasaMedis'][] = [
-                'JasaMedisId' => $this->collectingMyJasaMedis['JasaMedisId'],
-                'JasaMedisDesc' => $this->collectingMyJasaMedis['JasaMedisDesc'],
-                'JasaMedisPrice' => $this->collectingMyJasaMedis['JasaMedisPrice'],
+                'JasaMedisId' => $this->formEntryJasaMedis['jasaMedisId'],
+                'JasaMedisDesc' => $this->formEntryJasaMedis['jasaMedisDesc'],
+                'JasaMedisPrice' => $this->formEntryJasaMedis['jasaMedisPrice'],
                 'rjpactDtl' => $lastInserted->pact_dtl_max,
                 'rjNo' => $this->rjNoRef,
                 'userLog' => auth()->user()->myuser_name,
                 'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
             ];
 
-            $this->paketLainLainJasaMedis($this->collectingMyJasaMedis['JasaMedisId'], $this->rjNoRef, $lastInserted->pact_dtl_max);
-            $this->paketObatJasaMedis($this->collectingMyJasaMedis['JasaMedisId'], $this->rjNoRef, $lastInserted->pact_dtl_max);
+            $this->paketLainLainJasaMedis($this->formEntryJasaMedis['jasaMedisId'], $this->rjNoRef, $lastInserted->pact_dtl_max);
+            $this->paketObatJasaMedis($this->formEntryJasaMedis['jasaMedisId'], $this->rjNoRef, $lastInserted->pact_dtl_max);
 
             $this->store();
-            $this->reset(['collectingMyJasaMedis']);
+            $this->resetformEntryJasaMedis();
+
 
 
             //
@@ -358,9 +208,13 @@ class JasaMedisUGD extends Component
 
     }
 
-    public function resetcollectingMyJasaMedis()
+    public function resetformEntryJasaMedis()
     {
-        $this->reset(['collectingMyJasaMedis']);
+        $this->reset([
+            'formEntryJasaMedis',
+            'collectingMyJasaMedis' //Reset LOV / render  / empty NestLov
+        ]);
+        $this->resetValidation();
     }
 
     // /////////////////////////////////////////////////////////////////
@@ -665,12 +519,48 @@ class JasaMedisUGD extends Component
     {
         $this->findData($this->rjNoRef);
     }
+    private function syncDataFormEntry(): void
+    {
+        // Synk Lov JasaMedis
+        $this->formEntryJasaMedis['jasaMedisId'] = $this->jasaMedis['JasaMedisId'] ?? '';
+        $this->formEntryJasaMedis['jasaMedisDesc'] = $this->jasaMedis['JasaMedisDesc'] ?? '';
+        // $this->formEntryJasaMedis['jasaMedisPrice'] = $this->jasaMedis['JasaMedisPrice'] ?? '';
 
+        // Jika 'jasaMedisPrice' belum tersedia atau kosong, tentukan harga berdasarkan status klaim
+        if (!isset($this->formEntryJasaMedis['jasaMedisPrice']) || empty($this->formEntryJasaMedis['jasaMedisPrice'])) {
+            // Ambil klaim_status dari rsmst_klaimtypes dengan default 'UMUM' jika NULL
+            $klaimStatus = DB::table('rsmst_klaimtypes')
+                ->where('klaim_id', $this->dataDaftarUgd['klaimId'] ?? '')
+                ->value('klaim_status') ?? 'UMUM';
 
+            // Berdasarkan status klaim, ambil harga yang sesuai dari tabel rsmst_actparamedics
+            if ($klaimStatus === 'BPJS') {
+                $JasaMedisPrice = DB::table('rsmst_actparamedics')
+                    ->where('pact_id', $this->jasaMedis['JasaMedisId'] ?? '')
+                    ->value('pact_price_bpjs');
+            } else {
+                $JasaMedisPrice = DB::table('rsmst_actparamedics')
+                    ->where('pact_id', $this->jasaMedis['JasaMedisId'] ?? '')
+                    ->value('pact_price');
+            }
+
+            // Set JasaMedisPrice jika ditemukan, jika tidak set ke 0
+            $this->formEntryJasaMedis['jasaMedisPrice'] = $JasaMedisPrice ?? 0;
+        }
+    }
+    private function syncLOV(): void
+    {
+        $this->jasaMedis = $this->collectingMyJasaMedis;
+    }
 
     // select data start////////////////
     public function render()
     {
+
+        // LOV
+        $this->syncLOV();
+        // FormEntry
+        $this->syncDataFormEntry();
 
         return view(
             'livewire.emr-u-g-d.administrasi-u-g-d.jasa-medis-u-g-d',
