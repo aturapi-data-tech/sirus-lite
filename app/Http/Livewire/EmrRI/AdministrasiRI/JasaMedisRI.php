@@ -331,15 +331,27 @@ class JasaMedisRI extends Component
 
             // Jika class_id ditemukan, ambil jasaMedis_price dari tabel rsmst_actpclasses
             if ($classId) {
-                $jasaMedisPrice = DB::table('rsmst_actpclasses')
-                    ->where('pact_id', $this->jasaMedis['JasaMedisId'] ?? '')
-                    ->where('class_id', $classId)
-                    ->value('actp_price');
+                // Ambil status klaim dari tabel rsmst_klaimtypes
+                // Pastikan bahwa data klaim pada rawat inap diakses dari variabel yang tepat, contohnya $this->dataDaftarRI
+                $klaimStatus = DB::table('rsmst_klaimtypes')
+                    ->where('klaim_id', $this->dataDaftarRI['klaimId'] ?? '')
+                    ->value('klaim_status') ?? 'UMUM';
 
-                // Set jasaMedisPrice jika ditemukan, jika tidak set ke 0
+                if ($klaimStatus === 'BPJS') {
+                    $jasaMedisPrice = DB::table('rsmst_actpclasses')
+                        ->where('pact_id', $this->jasaMedis['JasaMedisId'] ?? '')
+                        ->where('class_id', $classId)
+                        ->value('actp_price_bpjs');
+                } else {
+                    $jasaMedisPrice = DB::table('rsmst_actpclasses')
+                        ->where('pact_id', $this->jasaMedis['JasaMedisId'] ?? '')
+                        ->where('class_id', $classId)
+                        ->value('actp_price');
+                }
+                // Set harga jasa medis; jika tidak ditemukan nilai, maka set ke 0
                 $this->formEntryJasaMedis['jasaMedisPrice'] = $jasaMedisPrice ?? 0;
             } else {
-                // Jika class_id tidak ditemukan, set jasaMedisPrice ke 0
+                // Jika class_id tidak ditemukan, set harga jasa medis ke 0
                 $this->formEntryJasaMedis['jasaMedisPrice'] = 0;
             }
         }

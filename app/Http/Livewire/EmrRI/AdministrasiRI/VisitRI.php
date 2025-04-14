@@ -230,10 +230,24 @@ class VisitRI extends Component
 
             // Jika class_id ditemukan, ambil visit_price dari tabel rsmst_docvisits
             if ($classId) {
-                $visitPrice = DB::table('rsmst_docvisits')
-                    ->where('dr_id', $this->dokter['DokterId'] ?? '')
-                    ->where('class_id', $classId)
-                    ->value('visit_price');
+                // Ambil status klaim dari tabel rsmst_klaimtypes, default ke 'UMUM' bila tidak ditemukan
+                $klaimStatus = DB::table('rsmst_klaimtypes')
+                    ->where('klaim_id', $this->dataDaftarRI['klaimId'] ?? '')
+                    ->value('klaim_status') ?? 'UMUM';
+
+                if ($klaimStatus === 'BPJS') {
+                    // Ambil visit_price dari tabel rsmst_docvisits_bpjs
+                    $visitPrice = DB::table('rsmst_docvisits')
+                        ->where('dr_id', $this->dokter['DokterId'] ?? '')
+                        ->where('class_id', $classId)
+                        ->value('visit_price_bpjs');
+                } else {
+                    // Ambil visit_price dari tabel rsmst_docvisits
+                    $visitPrice = DB::table('rsmst_docvisits')
+                        ->where('dr_id', $this->dokter['DokterId'] ?? '')
+                        ->where('class_id', $classId)
+                        ->value('visit_price');
+                }
 
                 // Set visitPrice jika ditemukan, jika tidak set ke 0
                 $this->formEntryVisit['visitPrice'] = $visitPrice ?? 0;

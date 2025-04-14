@@ -250,10 +250,26 @@ class JasaDokterRI extends Component
 
             // Jika class_id ditemukan, ambil jasaDokter_price dari tabel rsmst_actdclasses
             if ($classId) {
-                $jasaDokterPrice = DB::table('rsmst_actdclasses')
-                    ->where('accdoc_id', $this->jasaDokter['JasaDokterId'] ?? '')
-                    ->where('class_id', $classId)
-                    ->value('actd_price');
+
+                // Ambil status klaim dari rsmst_klaimtypes (default ke 'UMUM' jika tidak ditemukan)
+                $klaimStatus = DB::table('rsmst_klaimtypes')
+                    ->where('klaim_id', $this->dataDaftarRI['klaimId'] ?? '')
+                    ->value('klaim_status') ?? 'UMUM';
+
+                if ($klaimStatus === 'BPJS') {
+
+                    $jasaDokterPrice = DB::table('rsmst_actdclasses')
+                        ->where('accdoc_id', $this->jasaDokter['JasaDokterId'] ?? '')
+                        ->where('class_id', $classId)
+                        ->value('actd_price_bpjs');
+                } else {
+
+                    $jasaDokterPrice = DB::table('rsmst_actdclasses')
+                        ->where('accdoc_id', $this->jasaDokter['JasaDokterId'] ?? '')
+                        ->where('class_id', $classId)
+                        ->value('actd_price');
+                }
+
 
                 // Set jasaDokterPrice jika ditemukan, jika tidak set ke 0
                 $this->formEntryJasaDokter['jasaDokterPrice'] = $jasaDokterPrice ?? 0;
