@@ -13,15 +13,15 @@ use Illuminate\Support\Facades\Validator;
 use App\Http\Traits\customErrorMessagesTrait;
 use App\Http\Traits\EmrRJ\EmrRJTrait;
 use App\Http\Traits\LOV\LOVDokter\LOVDokterTrait;
+use App\Http\Traits\LOV\LOVJasaDokter\LOVJasaDokterTrait;
 
-// use Illuminate\Support\Str;
-use Spatie\ArrayToXml\ArrayToXml;
+
 use Exception;
 
 
 class JasaDokterRJ extends Component
 {
-    use WithPagination, EmrRJTrait, LOVDokterTrait;
+    use WithPagination, EmrRJTrait, LOVDokterTrait, LOVJasaDokterTrait;
 
 
     // listener from blade////////////////
@@ -43,8 +43,9 @@ class JasaDokterRJ extends Component
     public array $dataDaftarPoliRJ = [];
 
     public array $formEntryJasaDokter = [
-        'drId' => '', // ID dokter harus ada di tabel rsmst_doctors
-        'drName' => '', // Harga kunjungan minimal 0
+        'drId' => '',
+        'jasaDokterId' => '',
+        'jasaDokterPrice' => '', // Harga kunjungan minimal 0
     ];
 
     //////////////////////////////////////////////////////////////////////
@@ -53,35 +54,7 @@ class JasaDokterRJ extends Component
     //  table LOV////////////////
     // LOV Nested
     public array $dokter;
-
-    private function syncDataFormEntry(): void
-    {
-        $this->formEntryJasaDokter['drId'] = $this->dokter['DokterId'] ?? '';
-        $this->formEntryJasaDokter['drName'] = $this->dokter['DokterDesc'] ?? '';
-    }
-    private function syncLOV(): void
-    {
-        $this->dokter = $this->collectingMyDokter;
-    }
-    public function resetDokter()
-    {
-        $this->reset([
-            'collectingMyDokter', //Reset LOV / render  / empty NestLov
-        ]);
-        $this->resetValidation();
-    }
-    // LOV Nested
-
-
-    public $dataJasaDokterLov = [];
-    public $dataJasaDokterLovStatus = 0;
-    public $dataJasaDokterLovSearch = '';
-    public $selecteddataJasaDokterLovIndex = 0;
-
-    public $collectingMyJasaDokter = [];
-
-
-
+    public array $jasaDokter;
 
 
 
@@ -96,145 +69,10 @@ class JasaDokterRJ extends Component
     }
 
 
-
-
-    /////////////////////////////////////////////////
-    // Lov dataJasaDokterLov //////////////////////
-    ////////////////////////////////////////////////
-    public function clickdataJasaDokterLov()
-    {
-        $this->dataJasaDokterLovStatus = true;
-        $this->dataJasaDokterLov = [];
-    }
-
-    public function updateddataJasaDokterLovsearch()
-    {
-
-        // Reset index of LoV
-        $this->reset(['selecteddataJasaDokterLovIndex', 'dataJasaDokterLov']);
-        // Variable Search
-        $search = $this->dataJasaDokterLovSearch;
-
-        // check LOV by dr_id rs id
-        $dataJasaDokterLovs = DB::table('rsmst_accdocs  ')->select(
-            'accdoc_id',
-            'accdoc_desc',
-            'accdoc_price'
-        )
-            ->where('accdoc_id', $search)
-            ->where('active_status', '1')
-            ->first();
-
-        if ($dataJasaDokterLovs) {
-
-            // set JasaDokter sep
-            $this->addJasaDokter($dataJasaDokterLovs->accdoc_id, $dataJasaDokterLovs->accdoc_desc, $dataJasaDokterLovs->accdoc_price);
-            $this->resetdataJasaDokterLov();
-        } else {
-
-            // if there is no id found and check (min 3 char on search)
-            if (strlen($search) < 1) {
-                $this->dataJasaDokterLov = [];
-            } else {
-                $this->dataJasaDokterLov = json_decode(
-                    DB::table('rsmst_accdocs ')->select(
-                        'accdoc_id',
-                        'accdoc_desc',
-                        'accdoc_price'
-                    )
-                        ->where('active_status', '1')
-                        ->where(DB::raw('upper(accdoc_desc)'), 'like', '%' . strtoupper($search) . '%')
-                        ->limit(10)
-                        ->orderBy('accdoc_id', 'ASC')
-                        ->orderBy('accdoc_desc', 'ASC')
-                        ->get(),
-                    true
-                );
-            }
-            $this->dataJasaDokterLovStatus = true;
-            // set doing nothing
-        }
-    }
-    // /////////////////////
-    // LOV selected start
-    public function setMydataJasaDokterLov($id)
-    {
-        $this->checkRjStatus();
-        $dataJasaDokterLovs = DB::table('rsmst_accdocs ')->select(
-            'accdoc_id',
-            'accdoc_desc',
-            'accdoc_price'
-        )
-            ->where('active_status', '1')
-            ->where('accdoc_id', $this->dataJasaDokterLov[$id]['accdoc_id'])
-            ->first();
-
-        // set dokter sep
-        $this->addJasaDokter($dataJasaDokterLovs->accdoc_id, $dataJasaDokterLovs->accdoc_desc, $dataJasaDokterLovs->accdoc_price);
-        $this->resetdataJasaDokterLov();
-    }
-
-    public function resetdataJasaDokterLov()
-    {
-        $this->reset(['dataJasaDokterLov', 'dataJasaDokterLovStatus', 'dataJasaDokterLovSearch', 'selecteddataJasaDokterLovIndex']);
-    }
-
-    public function selectNextdataJasaDokterLov()
-    {
-        if ($this->selecteddataJasaDokterLovIndex === "") {
-            $this->selecteddataJasaDokterLovIndex = 0;
-        } else {
-            $this->selecteddataJasaDokterLovIndex++;
-        }
-
-        if ($this->selecteddataJasaDokterLovIndex === count($this->dataJasaDokterLov)) {
-            $this->selecteddataJasaDokterLovIndex = 0;
-        }
-    }
-
-    public function selectPreviousdataJasaDokterLov()
-    {
-
-        if ($this->selecteddataJasaDokterLovIndex === "") {
-            $this->selecteddataJasaDokterLovIndex = count($this->dataJasaDokterLov) - 1;
-        } else {
-            $this->selecteddataJasaDokterLovIndex--;
-        }
-
-        if ($this->selecteddataJasaDokterLovIndex === -1) {
-            $this->selecteddataJasaDokterLovIndex = count($this->dataJasaDokterLov) - 1;
-        }
-    }
-
-    public function enterMydataJasaDokterLov($id)
-    {
-        $this->checkRjStatus();
-        // jika JK belum siap maka toaster error
-        if (isset($this->dataJasaDokterLov[$id]['accdoc_id'])) {
-            $this->addJasaDokter($this->dataJasaDokterLov[$id]['accdoc_id'], $this->dataJasaDokterLov[$id]['accdoc_desc'], $this->dataJasaDokterLov[$id]['accdoc_price']);
-            $this->resetdataJasaDokterLov();
-        } else {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Jasa Dokter belum tersedia.");
-        }
-    }
-
-
-    // LOV selected end
-    /////////////////////////////////////////////////
-    // Lov dataJasaDokterLov //////////////////////
-    ////////////////////////////////////////////////
-
-
-
-
-
-
-
     // insert and update record start////////////////
     public function store()
     {
-        // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
-        $this->setDataPrimer();
+
 
         // Logic update mode start //////////
         $this->updateDataRJ($this->dataDaftarPoliRJ['rjNo']);
@@ -276,36 +114,26 @@ class JasaDokterRJ extends Component
     }
 
 
-    private function setDataPrimer(): void {}
-
-
-
-    private function addJasaDokter($JasaDokterId, $JasaDokterDesc, $salesPrice): void
-    {
-
-        $this->collectingMyJasaDokter = [
-            'JasaDokterId' => $JasaDokterId,
-            'JasaDokterDesc' => $JasaDokterDesc,
-            'JasaDokterPrice' => $salesPrice,
-        ];
-    }
-
     public function insertJasaDokter(): void
     {
 
         // validate
         $this->checkRjStatus();
         // customErrorMessages
-        $messages = customErrorMessagesTrait::messages();
+        $messages = [
+            'formEntryJasaDokter.jasaDokterId.required'   => 'ID jasa dokter harus diisi.',
+            'formEntryJasaDokter.jasaDokterId.exists'     => 'ID jasa dokter tidak valid atau tidak ditemukan.',
+            'formEntryJasaDokter.jasaDokterPrice.required' => 'Harga jasa dokter harus diisi.',
+            'formEntryJasaDokter.jasaDokterPrice.numeric'  => 'Harga jasa dokter harus berupa angka.',
+            'formEntryJasaDokter.drId.exists'             => 'ID dokter tidak valid atau tidak ditemukan.',
+        ];
         // require nik ketika pasien tidak dikenal
         $rules = [
-            'collectingMyJasaDokter.JasaDokterId' => 'bail|required|exists:rsmst_accdocs ,accdoc_id',
-            'collectingMyJasaDokter.JasaDokterDesc' => 'bail|required|',
-            'collectingMyJasaDokter.JasaDokterPrice' => 'bail|required|numeric|',
+            'formEntryJasaDokter.jasaDokterId' => 'bail|required|exists:rsmst_accdocs ,accdoc_id',
+            'formEntryJasaDokter.jasaDokterPrice' => 'bail|required|numeric|',
             'formEntryJasaDokter.drId' => 'bail|nullable|exists:rsmst_doctors ,dr_id',
-            'formEntryJasaDokter.drName' => 'bail|nullable|',
-
         ];
+
 
         // Proses Validasi///////////////////////////////////////////
         $this->validate($rules, $messages);
@@ -326,28 +154,28 @@ class JasaDokterRJ extends Component
                     'dr_id' => $this->formEntryJasaDokter['drId'],
                     'rjhn_dtl' => $lastInserted->rjhn_dtl_max,
                     'rj_no' => $this->rjNoRef,
-                    'accdoc_id' => $this->collectingMyJasaDokter['JasaDokterId'],
-                    'accdoc_price' => $this->collectingMyJasaDokter['JasaDokterPrice'],
+                    'accdoc_id' => $this->formEntryJasaDokter['jasaDokterId'],
+                    'accdoc_price' => $this->formEntryJasaDokter['jasaDokterPrice'],
                 ]);
 
 
             $this->dataDaftarPoliRJ['JasaDokter'][] = [
                 'DokterId' => $this->formEntryJasaDokter['drId'],
                 'DokterName' => $this->formEntryJasaDokter['drName'],
-                'JasaDokterId' => $this->collectingMyJasaDokter['JasaDokterId'],
-                'JasaDokterDesc' => $this->collectingMyJasaDokter['JasaDokterDesc'],
-                'JasaDokterPrice' => $this->collectingMyJasaDokter['JasaDokterPrice'],
+                'JasaDokterId' => $this->formEntryJasaDokter['jasaDokterId'],
+                'JasaDokterDesc' => $this->formEntryJasaDokter['jasaDokterDesc'],
+                'JasaDokterPrice' => $this->formEntryJasaDokter['jasaDokterPrice'],
                 'rjaccdocDtl' => $lastInserted->rjhn_dtl_max,
                 'rjNo' => $this->rjNoRef,
                 'userLog' => auth()->user()->myuser_name,
                 'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
             ];
 
-            $this->paketLainLainJasaDokter($this->collectingMyJasaDokter['JasaDokterId'], $this->rjNoRef, $lastInserted->rjhn_dtl_max);
-            $this->paketObatJasaDokter($this->collectingMyJasaDokter['JasaDokterId'], $this->rjNoRef, $lastInserted->rjhn_dtl_max);
+            $this->paketLainLainJasaDokter($this->formEntryJasaDokter['jasaDokterId'], $this->rjNoRef, $lastInserted->rjhn_dtl_max);
+            $this->paketObatJasaDokter($this->formEntryJasaDokter['jasaDokterId'], $this->rjNoRef, $lastInserted->rjhn_dtl_max);
 
             $this->store();
-            $this->reset(['collectingMyJasaDokter', 'collectingMyDokter']);
+            $this->resetformEntryJasaDokter();
 
 
             //
@@ -356,6 +184,16 @@ class JasaDokterRJ extends Component
             dd($e->getMessage());
         }
         // goto start;
+    }
+
+    public function resetformEntryJasaDokter()
+    {
+        $this->reset([
+            'formEntryJasaDokter',
+            'collectingMyDokter',
+            'collectingMyJasaDokter'
+        ]);
+        $this->resetValidation();
     }
 
     public function removeJasaDokter($rjaccdocDtl)
@@ -392,10 +230,7 @@ class JasaDokterRJ extends Component
 
     }
 
-    public function resetcollectingMyJasaDokter()
-    {
-        $this->reset(['collectingMyJasaDokter', 'collectingMyDokter']);
-    }
+
 
     // Paket JasaDokter -> Lain lain
     private function paketLainLainJasaDokter($accdocId, $rjNo, $accdocDtl): void
@@ -701,7 +536,43 @@ class JasaDokterRJ extends Component
         $this->findData($this->rjNoRef);
     }
 
+    private function syncDataFormEntry(): void
+    {
+        $this->formEntryJasaDokter['drId'] = $this->dokter['DokterId'] ?? '';
+        $this->formEntryJasaDokter['drName'] = $this->dokter['DokterDesc'] ?? '';
 
+        $this->formEntryJasaDokter['jasaDokterId'] = $this->jasaDokter['JasaDokterId'] ?? '';
+        $this->formEntryJasaDokter['jasaDokterDesc'] = $this->jasaDokter['JasaDokterDesc'] ?? '';
+
+        // $this->formEntryJasaDokter['jasaDokterPrice'] = $this->jasaDokter['JasaDokterPrice'] ?? '';
+
+        // Jika 'jasaDokterPrice' belum tersedia atau kosong, tentukan harga berdasarkan status klaim
+        if (!isset($this->formEntryJasaDokter['jasaDokterPrice']) || empty($this->formEntryJasaDokter['jasaDokterPrice'])) {
+            // Ambil klaim_status dari rsmst_klaimtypes dengan default 'UMUM' jika NULL
+            $klaimStatus = DB::table('rsmst_klaimtypes')
+                ->where('klaim_id', $this->dataDaftarPoliRJ['klaimId'] ?? '')
+                ->value('klaim_status') ?? 'UMUM';
+
+            // Berdasarkan status klaim, ambil harga yang sesuai dari tabel rsmst_accdocs
+            if ($klaimStatus === 'BPJS') {
+                $JasaDokterPrice = DB::table('rsmst_accdocs')
+                    ->where('accdoc_id', $this->jasaDokter['JasaDokterId'] ?? '')
+                    ->value('accdoc_price_bpjs');
+            } else {
+                $JasaDokterPrice = DB::table('rsmst_accdocs')
+                    ->where('accdoc_id', $this->jasaDokter['JasaDokterId'] ?? '')
+                    ->value('accdoc_price');
+            }
+
+            // Set JasaDokterPrice jika ditemukan, jika tidak set ke 0
+            $this->formEntryJasaDokter['jasaDokterPrice'] = $JasaDokterPrice ?? 0;
+        }
+    }
+    private function syncLOV(): void
+    {
+        $this->dokter = $this->collectingMyDokter;
+        $this->jasaDokter = $this->collectingMyJasaDokter;
+    }
 
     // select data start////////////////
     public function render()
