@@ -514,8 +514,8 @@ class RekamMedis extends Component
                     'dataDaftarTxn' => $this->dataDaftarTxn,
 
                 ];
-                $pdfContent = PDF::loadView('livewire.emr.rekam-medis.cetak-rekam-medis-u-g-d', $data)->output();
-                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Cetak RM IGD');
+                $pdfContent = PDF::loadView('livewire.emr.rekam-medis.cetak-rekam-medis-u-g-d-suket-istirahat', $data)->output();
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Cetak Suket Istirahat IGD');
 
                 return response()->streamDownload(
                     fn() => print($pdfContent),
@@ -584,8 +584,8 @@ class RekamMedis extends Component
                     'dataDaftarTxn' => $this->dataDaftarTxn,
 
                 ];
-                $pdfContent = PDF::loadView('livewire.emr.rekam-medis.cetak-rekam-medis-u-g-d', $data)->output();
-                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Cetak RM IGD');
+                $pdfContent = PDF::loadView('livewire.emr.rekam-medis.cetak-rekam-medis-u-g-d-suket-sehat', $data)->output();
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Cetak Suket Sehat IGD');
 
                 return response()->streamDownload(
                     fn() => print($pdfContent),

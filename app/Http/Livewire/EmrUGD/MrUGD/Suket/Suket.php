@@ -1,19 +1,19 @@
 <?php
 
-namespace App\Http\Livewire\EmrRJ\MrRJ\Suket;
+namespace App\Http\Livewire\EmrUGD\MrUGD\Suket;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Http\Traits\EmrRJ\EmrRJTrait;
+use App\Http\Traits\EmrUGD\EmrUGDTrait;
 
 
 class Suket extends Component
 {
-    use WithPagination, EmrRJTrait;
+    use WithPagination, EmrUGDTrait;
 
     // listener from blade////////////////
     protected $listeners = [
-        'syncronizeAssessmentPerawatRJFindData' => 'mount'
+        'syncronizeAssessmentPerawatUGDFindData' => 'mount'
 
     ];
 
@@ -22,8 +22,8 @@ class Suket extends Component
     //////////////////////////////
     public $rjNoRef;
 
-    // dataDaftarPoliRJ RJ
-    public array $dataDaftarPoliRJ = [];
+    // dataDaftarUgd UGD
+    public array $dataDaftarUgd = [];
 
     // data SKDP / suket=>[]
     public array $suket =
@@ -44,9 +44,9 @@ class Suket extends Component
 
     protected $rules = [
 
-        // 'dataDaftarPoliRJ.suket.pengkajianMedis.waktuPemeriksaan' => 'required|date_format:d/m/Y H:i:s',
-        // 'dataDaftarPoliRJ.suket.pengkajianMedis.selesaiPemeriksaan' => 'required|date_format:d/m/Y H:i:s'
-        'dataDaftarPoliRJ.suket.suketIstirahat.suketIstirahatHari' => 'numeric'
+        // 'dataDaftarUgd.suket.pengkajianMedis.waktuPemeriksaan' => 'required|date_format:d/m/Y H:i:s',
+        // 'dataDaftarUgd.suket.pengkajianMedis.selesaiPemeriksaan' => 'required|date_format:d/m/Y H:i:s'
+        'dataDaftarUgd.suket.suketIstirahat.suketIstirahatHari' => 'numeric'
 
 
     ];
@@ -83,12 +83,12 @@ class Suket extends Component
 
 
     // ////////////////
-    // RJ Logic
+    // UGD Logic
     // ////////////////
 
 
-    // validate Data RJ//////////////////////////////////////////////////
-    private function validateDataRJ(): void
+    // validate Data UGD//////////////////////////////////////////////////
+    private function validateDataUGD(): void
     {
         // customErrorMessages
         // $messages = customErrorMessagesTrait::messages();
@@ -113,32 +113,32 @@ class Suket extends Component
     // insert and update record start////////////////
     public function store()
     {
-        // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
+        // set data UGDno / NoBooking / NoAntrian / klaimId / kunjunganId
         $this->setDataPrimer();
 
-        // Validate RJ
-        $this->validateDataRJ();
+        // Validate UGD
+        $this->validateDataUGD();
 
         // Logic update mode start //////////
-        $this->updateDataRJ($this->dataDaftarPoliRJ['rjNo']);
-        $this->emit('syncronizeAssessmentPerawatRJFindData');
+        $this->updateDataUGD($this->dataDaftarUgd['rjNo']);
+        $this->emit('syncronizeAssessmentPerawatUGDFindData');
     }
 
-    private function updateDataRJ($rjNo): void
+    private function updateDataUGD($rjNo): void
     {
-        // if ($rjNo !== $this->dataDaftarPoliRJ['rjNo']) {
-        //     dd('Data Json Tidak sesuai' . $rjNo . '  /  ' . $this->dataDaftarPoliRJ['rjNo']);
+        // if ($rjNo !== $this->dataDaftarUgd['rjNo']) {
+        //     dd('Data Json Tidak sesuai' . $rjNo . '  /  ' . $this->dataDaftarUgd['rjNo']);
         // }
 
         // // update table trnsaksi
         // DB::table('rstxn_rjhdrs')
         //     ->where('rj_no', $rjNo)
         //     ->update([
-        //         'dataDaftarPoliRJ_json' => json_encode($this->dataDaftarPoliRJ, true),
-        //         'dataDaftarPoliRJ_xml' => ArrayToXml::convert($this->dataDaftarPoliRJ),
+        //         'dataDaftarUgd_json' => json_encode($this->dataDaftarUgd, true),
+        //         'dataDaftarUgd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
 
         //     ]);
-        $this->updateJsonRJ($rjNo, $this->dataDaftarPoliRJ);
+        $this->updateJsonUGD($rjNo, $this->dataDaftarUgd);
 
         toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("suket berhasil disimpan.");
     }
@@ -149,16 +149,15 @@ class Suket extends Component
     {
 
 
-        $findDataRJ = $this->findDataRJ($rjno);
-        $this->dataDaftarPoliRJ  = $findDataRJ['dataDaftarRJ'];
+        $this->dataDaftarUgd = $this->findDataUGD($rjno);
 
         // jika suket tidak ditemukan tambah variable suket pda array
-        if (isset($this->dataDaftarPoliRJ['suket']) == false) {
-            $this->dataDaftarPoliRJ['suket'] = $this->suket;
+        if (isset($this->dataDaftarUgd['suket']) == false) {
+            $this->dataDaftarUgd['suket'] = $this->suket;
         }
     }
 
-    // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
+    // set data UGDno / NoBooking / NoAntrian / klaimId / kunjunganId
     private function setDataPrimer(): void {}
 
 
@@ -178,9 +177,9 @@ class Suket extends Component
     {
 
         return view(
-            'livewire.emr-r-j.mr-r-j.suket.suket',
+            'livewire.emr-u-g-d.mr-u-g-d.suket.suket',
             [
-                // 'RJpasiens' => $query->paginate($this->limitPerPage),
+                // 'UGDpasiens' => $query->paginate($this->limitPerPage),
                 'myTitle' => 'suket',
                 'mySnipt' => 'Rekam Medis Pasien',
                 'myProgram' => 'Pasien Rawat Jalan',

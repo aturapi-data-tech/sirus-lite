@@ -372,18 +372,6 @@ class EmrRJ extends Component
             'ermMenuId' => 'suket',
             'ermMenuName' => 'Surat Keterangan (Sehat/Istirahat)'
         ],
-        // [
-        //     'ermMenuId' => 'cppt',
-        //     'ermMenuName' => 'CPPT'
-        // ],
-        // [
-        //     'ermMenuId' => 'resumeMds',
-        //     'ermMenuName' => 'Resume Medis'
-        // ],
-        // [
-        //     'ermMenuId' => 'penerbitanSrt',
-        //     'ermMenuName' => 'Penerbitan Surat'
-        // ],
         [
             'ermMenuId' => 'rekamMedis',
             'ermMenuName' => 'Resume Medis'

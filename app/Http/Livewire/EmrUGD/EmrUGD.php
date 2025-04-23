@@ -375,18 +375,10 @@ class EmrUGD extends Component
             'ermMenuId' => 'administrasi',
             'ermMenuName' => 'Administrasi'
         ],
-        // [
-        //     'ermMenuId' => 'cppt',
-        //     'ermMenuName' => 'CPPT'
-        // ],
-        // [
-        //     'ermMenuId' => 'resumeMds',
-        //     'ermMenuName' => 'Resume Medis'
-        // ],
-        // [
-        //     'ermMenuId' => 'penerbitanSrt',
-        //     'ermMenuName' => 'Penerbitan Surat'
-        // ],
+        [
+            'ermMenuId' => 'suket',
+            'ermMenuName' => 'Surat Keterangan (Sehat/Istirahat)'
+        ],
         [
             'ermMenuId' => 'rekamMedis',
             'ermMenuName' => 'Rekam Medis'

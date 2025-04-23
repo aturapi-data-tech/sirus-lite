@@ -175,6 +175,16 @@
 
                     </div>
 
+                    <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50"
+                        :class="{
+                            'active': activeTab === 'suket'
+                        }"
+                        x-show.transition.in.opacity.duration.600="activeTab === 'suket'">
+
+                        <livewire:emr-u-g-d.mr-u-g-d.suket.suket :wire:key="'content-suketUgd'" :rjNoRef="$rjNoRef">
+
+                    </div>
+
 
                 </div>
 
