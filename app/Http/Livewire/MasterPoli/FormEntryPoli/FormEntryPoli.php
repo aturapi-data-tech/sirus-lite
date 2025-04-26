@@ -6,15 +6,16 @@ use Illuminate\Support\Facades\DB;
 use Exception;
 use App\Http\Traits\customErrorMessagesTrait;
 
-
-use App\Http\Livewire\SatuSehat\Location\Location;
-use App\Http\Traits\BPJS\SatuSehatTrait;
-
+use App\Http\Traits\SATUSEHAT\LocationTrait;
 
 use Livewire\Component;
 
 class FormEntryPoli extends Component
 {
+    use LocationTrait;
+
+
+
     // listener from blade////////////////
     protected $listeners = [];
 
@@ -149,36 +150,99 @@ class FormEntryPoli extends Component
         // $this->closeModal();
     }
 
-    public function UpdatelocationUuid($poliId, $poliDesc)
+
+    public function UpdatelocationUuid(string $poliId, string $poliDesc): void
     {
-        // get dulu jika ditemukan update DB
-        $getLocation = SatuSehatTrait::getLocation($poliDesc);
-        if (isset($getLocation->getOriginalContent()['response']['entry'][0]['resource']['id'])) {
-            $this->validateData();
-            $this->FormEntryPoli['poliUuid'] = $getLocation->getOriginalContent()['response']['entry'][0]['resource']['id'];
+        // 1. Inisialisasi koneksi ke SatuSehat dan cari lokasi berdasarkan nama
+        $this->initializeSatuSehat();
+        $locationEntries = collect(
+            $this->searchLocation(['name' => $poliDesc])['entry'] ?? []
+        );
+
+        // 2. Kalau tidak ada hasil, tampilkan warning toast
+        if ($locationEntries->isEmpty()) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addWarning('Tidak ada lokasi yang ditemukan');
+
+            $result = $this->createLocation([
+                'identifier' => $poliId,
+                'name'       => $poliDesc,
+                // … field lain jika perlu
+            ]);
+
+            // Pecah ke variabel yang jelas
+            $createdUuid  = $result['id']           ?? null;
+            $resourceType = $result['resourceType'] ?? null;
+            $status       = $result['status']       ?? null;
+
+            // Simpan UUID yang baru
+            $this->FormEntryPoli['poliUuid'] = $createdUuid;
             $this->store();
+
+            // Toast sukses
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addSuccess(
+                    "Lokasi baru “{$poliDesc}” berhasil dibuat " .
+                        "(UUID: {$createdUuid}, ResourceType: {$resourceType}, Status: {$status})"
+                );
+
             return;
         }
 
-        // jika tidak ditemukan maka POST Lokasi
-        $this->validateData();
+        // 3. Ambil UUID lokasi pertama dari hasil pencarian
+        $newLocationUuid = $locationEntries
+            ->pluck('resource.id')
+            ->first();
 
-        $location = new Location;
-        $location->addIdentifier($poliId); // unique string free text (increments / UUID / inisial)
-        $location->setName($poliDesc); // string free text
-        $location->addPhysicalType('ro'); // ro = ruangan, bu = bangunan, wi = sayap gedung, ve = kendaraan, ho = rumah, ca = kabined, rd = jalan, area = area. Default bila tidak dideklarasikan = ruangan
-
-        // dd($location->json());
-        $mylocation = SatuSehatTrait::postLocation($location->json());
-
-        if (isset($mylocation->getOriginalContent()['response']['id'])) {
-            $this->FormEntryPoli['poliUuid'] = $mylocation->getOriginalContent()['response']['id'];
+        // 4. Jika belum ada UUID tersimpan, simpan yang baru dan tampilkan success toast
+        if (empty($this->FormEntryPoli['poliUuid'])) {
+            $this->FormEntryPoli['poliUuid'] = $newLocationUuid;
             $this->store();
-        } else {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError($mylocation->getOriginalContent()['metadata']['message']);
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addSuccess("UUID di-set ke {$newLocationUuid}");
             return;
+        }
+
+        // 5. Ambil UUID yang sudah tersimpan dan bandingkan dengan yang baru
+        $currentLocationUuid = $this->FormEntryPoli['poliUuid'];
+        if ($currentLocationUuid === $newLocationUuid) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addInfo('UUID sudah cocok dengan hasil terbaru');
+            return;
+        }
+
+        // 6. Jika berbeda, cek apakah UUID lama masih ada dalam hasil pencarian
+        $isOldUuidStillPresent = $locationEntries
+            ->pluck('resource.id')
+            ->contains($currentLocationUuid);
+
+        if ($isOldUuidStillPresent) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addSuccess("UUID lama {$currentLocationUuid} masih ada di hasil pencarian");
+        } else {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addWarning("UUID lama {$currentLocationUuid} tidak ada di hasil baru");
         }
     }
+
 
     // validate Data RJ//////////////////////////////////////////////////
     private function validateData(): void

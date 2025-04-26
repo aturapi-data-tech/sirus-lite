@@ -4,18 +4,17 @@ namespace App\Http\Livewire\MasterDokter\FormEntryDokter;
 
 use Illuminate\Support\Facades\DB;
 use Exception;
-use Illuminate\Support\Facades\Validator;
 
 use App\Http\Traits\customErrorMessagesTrait;
 
-
-use App\Http\Traits\BPJS\SatuSehatTrait;
+use App\Http\Traits\SATUSEHAT\PractitionerTrait;
 
 
 use Livewire\Component;
 
 class FormEntryDokter extends Component
 {
+    use PractitionerTrait;
     // listener from blade////////////////
     protected $listeners = [];
 
@@ -147,47 +146,127 @@ class FormEntryDokter extends Component
         // $this->closeModal();
     }
 
-    public function UpdatePractitionerUuid(string $nik = '')
+    // public function UpdatePractitionerUuid(string $nik = '')
+    // {
+    //     // Proses Validasi///////////////////////////////////////////
+    //     $r = ['nik' => $nik];
+    //     $rules = ['nik' => 'bail|required|digits:16'];
+    //     $customErrorMessagesTrait = customErrorMessagesTrait::messages();
+    //     $attribute = ['nik' => 'Data NIK'];
+
+    //     $validator = Validator::make($r, $rules, $customErrorMessagesTrait, $attribute);
+
+    //     if ($validator->fails()) {
+    //         toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError($validator->messages()->all());
+    //         return;
+    //     }
+    //     // Proses Validasi///////////////////////////////////////////
+
+
+    //     // Proses Validasi///////////////////////////////////////////
+    //     try {
+
+    //         $PractitionerByNIK = SatuSehatTrait::PractitionerByNIK($nik);
+
+    //         // Jika uuid tidak ditemukan
+    //         if (!isset($PractitionerByNIK->getOriginalContent()['response']['entry'][0]['resource']['id'])) {
+    //             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('UUID tidak dapat ditemukan.' . $PractitionerByNIK->getOriginalContent()['metadata']['message']);
+    //             return;
+    //         }
+
+    //         $this->validateData();
+    //         $this->FormEntryDokter['dokterUuid'] = $PractitionerByNIK->getOriginalContent()['response']['entry'][0]['resource']['id'];
+    //         $this->store();
+    //         toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess($PractitionerByNIK->getOriginalContent()['response']['entry'][0]['resource']['id'] . ' / ' . $PractitionerByNIK->getOriginalContent()['response']['entry'][0]['resource']['name'][0]['text']);
+    //         return;
+
+    //         // dd($PractitionerByNIK->getOriginalContent());
+    //         // dd($PractitionerByNIK->getOriginalContent()['response']['entry'][0]['resource']['id']);
+    //         // dd($PractitionerByNIK->getOriginalContent()['response']['entry'][0]['resource']['name'][0]['text']);
+    //     } catch (\Illuminate\Validation\ValidationException $e) {
+    //         // dd($validator->fails());
+    //         toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Errors "' . $e->getMessage());
+    //         return;
+    //     }
+    // }
+
+    public function UpdatePractitionerUuid(string $nik = ''): void
     {
-        // Proses Validasi///////////////////////////////////////////
-        $r = ['nik' => $nik];
-        $rules = ['nik' => 'bail|required|digits:16'];
-        $customErrorMessagesTrait = customErrorMessagesTrait::messages();
-        $attribute = ['nik' => 'Data NIK'];
+        // 1. Inisialisasi koneksi dan cari Practitioner (dokter) berdasarkan NIK
+        $this->initializeSatuSehat();
+        $entries = collect(
+            $this->searchPractitioner(['nik' => $nik])['entry'] ?? []
+        );
+        // 2. Jika tidak ada, buat dokter baru (pakai data dari $this->FormEntryDokter)
+        if ($entries->isEmpty()) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addWarning("Tidak ada dokter ditemukan dengan NIK: {$nik}");
 
-        $validator = Validator::make($r, $rules, $customErrorMessagesTrait, $attribute);
 
-        if ($validator->fails()) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError($validator->messages()->all());
+            // off kan dulu (ada mekanisme sendiri di satu sehat belum kita pelajarii)
+            // $result     = $this->createPractitioner($this->FormEntryDokter);
+            // $createdUuid = $result['id'] ?? null;
+
+            // // Simpan UUID baru
+            // $this->FormEntryDokter['dokterUuid'] = $createdUuid;
+            // $this->store();
+
+            // toastr()
+            //     ->closeOnHover(true)
+            //     ->closeDuration(3)
+            //     ->positionClass('toast-top-left')
+            //     ->addSuccess("Dokter baru berhasil dibuat (UUID: {$createdUuid})");
+
             return;
         }
-        // Proses Validasi///////////////////////////////////////////
 
+        // 3. Ambil UUID dokter pertama dari hasil pencarian
+        $newUuid     = $entries->pluck('resource.id')->first();
+        $currentUuid = $this->FormEntryDokter['dokterUuid'] ?? null;
 
-        // Proses Validasi///////////////////////////////////////////
-        try {
-
-            $PractitionerByNIK = SatuSehatTrait::PractitionerByNIK($nik);
-
-            // Jika uuid tidak ditemukan
-            if (!isset($PractitionerByNIK->getOriginalContent()['response']['entry'][0]['resource']['id'])) {
-                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('UUID tidak dapat ditemukan.' . $PractitionerByNIK->getOriginalContent()['metadata']['message']);
-                return;
-            }
-
-            $this->validateData();
-            $this->FormEntryDokter['dokterUuid'] = $PractitionerByNIK->getOriginalContent()['response']['entry'][0]['resource']['id'];
+        // 4. Jika belum ada UUID tersimpan, set dan notify
+        if (empty($currentUuid)) {
+            $this->FormEntryDokter['dokterUuid'] = $newUuid;
             $this->store();
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess($PractitionerByNIK->getOriginalContent()['response']['entry'][0]['resource']['id'] . ' / ' . $PractitionerByNIK->getOriginalContent()['response']['entry'][0]['resource']['name'][0]['text']);
-            return;
 
-            // dd($PractitionerByNIK->getOriginalContent());
-            // dd($PractitionerByNIK->getOriginalContent()['response']['entry'][0]['resource']['id']);
-            // dd($PractitionerByNIK->getOriginalContent()['response']['entry'][0]['resource']['name'][0]['text']);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            // dd($validator->fails());
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Errors "' . $e->getMessage());
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addSuccess("dokterUuid di-set ke {$newUuid}");
             return;
+        }
+
+        // 5. Jika UUID sudah sama, beri info
+        if ($currentUuid === $newUuid) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addInfo("dokterUuid sudah sesuai dengan data terbaru");
+            return;
+        }
+
+        // 6. Jika berbeda, cek apakah UUID lama masih ada dalam hasil pencarian
+        $oldStillExists = $entries
+            ->pluck('resource.id')
+            ->contains($currentUuid);
+
+        if ($oldStillExists) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addSuccess("dokterUuid lama ({$currentUuid}) masih ditemukan");
+        } else {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addWarning("dokterUuid lama ({$currentUuid}) tidak ada di hasil terbaru");
         }
     }
 

@@ -10,15 +10,12 @@ use Carbon\Carbon;
 
 use App\Http\Traits\customErrorMessagesTrait;
 use App\Http\Traits\BPJS\VclaimTrait;
-use App\Http\Traits\BPJS\SatuSehatTrait;
+use App\Http\Traits\SATUSEHAT\PatientTrait;
 
-
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
 
 class MasterPasien extends Component
 {
-    use WithPagination, customErrorMessagesTrait, VclaimTrait;
+    use WithPagination, customErrorMessagesTrait, VclaimTrait, PatientTrait;
 
 
     //  table data//////////////// reser
@@ -402,10 +399,75 @@ class MasterPasien extends Component
         // resert validation
         $this->resetValidation();
         // resert input
-        $this->resetExcept([
-            'limitPerPage',
-            'search',
+        $this->reset([
+            // data
+            'dataPasien',
+            'dataPasienBPJS',
+            'dataPasienBPJSSearch',
 
+            // LOV jenis kelamin
+            'jenisKelaminLov',
+            'jenisKelaminLovStatus',
+            'jenisKelaminLovSearch',
+
+            // LOV agama
+            'agamaLov',
+            'agamaLovStatus',
+            'agamaLovSearch',
+
+            // LOV status perkawinan
+            'statusPerkawinanLov',
+            'statusPerkawinanLovStatus',
+            'statusPerkawinanLovSearch',
+
+            // LOV pendidikan
+            'pendidikanLov',
+            'pendidikanLovStatus',
+            'pendidikanLovSearch',
+
+            // LOV pekerjaan
+            'pekerjaanLov',
+            'pekerjaanLovStatus',
+            'pekerjaanLovSearch',
+
+            // LOV golongan darah
+            'golonganDarahLov',
+            'golonganDarahLovStatus',
+            'golonganDarahLovSearch',
+
+            // LOV status pasien
+            'statusLov',
+            'statusLovStatus',
+            'statusLovSearch',
+
+            // LOV hubungan dgn pasien
+            'hubunganDgnPasienLov',
+            'hubunganDgnPasienLovStatus',
+            'hubunganDgnPasienLovSearch',
+
+            // LOV desa identitas
+            'desaIdentitasLov',
+            'desaIdentitasLovStatus',
+            'desaIdentitasLovSearch',
+
+            // LOV kota identitas
+            'kotaIdentitasLov',
+            'kotaIdentitasLovStatus',
+            'kotaIdentitasLovSearch',
+
+            // LOV desa domisil
+            'desaDomisilLov',
+            'desaDomisilLovStatus',
+            'desaDomisilLovSearch',
+
+            // LOV kota domisil
+            'kotaDomisilLov',
+            'kotaDomisilLovStatus',
+            'kotaDomisilLovSearch',
+
+            // modal
+            'isOpen',
+            'isOpenMode',
         ]);
     }
 
@@ -1983,38 +2045,82 @@ class MasterPasien extends Component
     }
     // delete record end////////////////
 
-    public function UpdatepatientUuid(string $nik = '')
+    public function UpdatepatientUuid(string $nik = ''): void
     {
-
-        $messages = array(
-            'required' => 'Data NIK tidak boleh kosong.', // mencari referensi pada table tertentu
+        // 1. Inisialisasi koneksi dan cari Patient berdasarkan NIK
+        $this->initializeSatuSehat();
+        $entries = collect(
+            $this->searchPatient(['nik' => $nik])['entry'] ?? []
         );
+        // 2. Jika tidak ada, buat pasien baru (pakai data dari $this->dataPasien['pasien'])
+        if ($entries->isEmpty()) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addWarning("Tidak ada pasien ditemukan dengan NIK: {$nik}");
 
-        $rules = ['dataPasien.pasien.identitas.nik' => 'bail|required|digits:16'];
+            // off kan dulu (ada mekanisme sendiri di satu sehat belum kita pelajarii)
+            // $result = $this->createPatient($this->dataPasien['pasien']);
+            // $createdUuid = $result['id'] ?? null;
 
-        // Proses Validasi///////////////////////////////////////////
-        try {
-            $this->validate($rules, $messages);
+            // // Simpan UUID baru
+            // $this->dataPasien['pasien']['identitas']['patientUuid'] = $createdUuid;
+            // $this->store();
 
-            $PatientByNIK = SatuSehatTrait::PatientByNIK($nik);
+            // toastr()
+            //     ->closeOnHover(true)
+            //     ->closeDuration(3)
+            //     ->positionClass('toast-top-left')
+            //     ->addSuccess("Pasien baru berhasil dibuat (UUID: {$createdUuid})");
 
-            // Jika uuid tidak ditemukan
-            if (!isset($PatientByNIK->getOriginalContent()['response']['entry'][0]['resource']['id'])) {
-                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('UUID tidak dapat ditemukan.' . $PatientByNIK->getOriginalContent()['metadata']['message']);
-                return;
-            }
-
-            $this->dataPasien['pasien']['identitas']['patientUuid'] = $PatientByNIK->getOriginalContent()['response']['entry'][0]['resource']['id'];
-            $this->store();
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess($PatientByNIK->getOriginalContent()['response']['entry'][0]['resource']['id'] . ' / ' . $PatientByNIK->getOriginalContent()['response']['entry'][0]['resource']['name'][0]['text']);
-
-            // dd($PatientByNIK->getOriginalContent());
-            // dd($PatientByNIK->getOriginalContent()['response']['entry'][0]['resource']['id']);
-            // dd($PatientByNIK->getOriginalContent()['response']['entry'][0]['resource']['name'][0]['text']);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            // dd($validator->fails());
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Errors "' . $e->getMessage());
             return;
+        }
+
+        // 3. Ambil UUID Patient pertama dari hasil pencarian
+        $newUuid = $entries->pluck('resource.id')->first();
+        $currentUuid = $this->dataPasien['pasien']['identitas']['patientUuid'] ?? null;
+
+        // 4. Jika belum ada UUID tersimpan, set dan notify
+        if (empty($currentUuid)) {
+            $this->dataPasien['pasien']['identitas']['patientUuid'] = $newUuid;
+            $this->store();
+
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addSuccess("patientUuid di-set ke {$newUuid}");
+            return;
+        }
+
+        // 5. Jika UUID sudah sama, beri info
+        if ($currentUuid === $newUuid) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addInfo("patientUuid sudah sesuai dengan data terbaru");
+            return;
+        }
+
+        // 6. Jika berbeda, cek apakah UUID lama masih ada dalam hasil pencarian
+        $oldStillExists = $entries
+            ->pluck('resource.id')
+            ->contains($currentUuid);
+
+        if ($oldStillExists) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addSuccess("patientUuid lama ({$currentUuid}) masih ditemukan");
+        } else {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addWarning("patientUuid lama ({$currentUuid}) tidak ada di hasil terbaru");
         }
     }
 
