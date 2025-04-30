@@ -3,7 +3,7 @@
         {{ $EncounterID }}
     </div>
 
-    {{--
+
     <x-light-button wire:click.prevent="postEncounterRJ()" type="button" wire:loading.remove>
         Kirim Encounter
     </x-light-button>
@@ -46,7 +46,7 @@
     </x-light-button>
     <div wire:loading wire:target="getConditionRJ">
         <x-loading />
-    </div> --}}
+    </div>
 
 
     {{--
@@ -58,16 +58,7 @@
         <x-loading />
     </div>
 
-
-    <x-light-button wire:click.prevent="postAlergi()" type="button" wire:loading.remove>
-        Kirim Alergi
-    </x-light-button>
-    <div wire:loading wire:target="postAlergi">
-        <x-loading />
-    </div>
-
-
-    <x-light-button wire:click.prevent="postPenunjang()" type="button" wire:loading.remove>
+     <x-light-button wire:click.prevent="postPenunjang()" type="button" wire:loading.remove>
         Kirim Penunjang
     </x-light-button>
     <div wire:loading wire:target="postPenunjang">
