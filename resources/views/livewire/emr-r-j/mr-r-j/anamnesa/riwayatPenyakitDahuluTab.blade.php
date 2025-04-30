@@ -19,6 +19,41 @@
             @enderror
         </div>
 
+        @role(['Perawat', 'Mr', 'Admin'])
+            {{-- LOV Snomed --}}
+            <div class="">
+                @if (empty($dataDaftarPoliRJ['anamnesa']['riwayatPenyakitDahulu']['snomedCode']))
+                    @if (empty($dataSnomedLovSearch))
+                        <div>
+                            <x-input-label for="lovRJRiwayatPenyakitDahulu" :value="__('Cari Kode Riwayat Penyakit Dahulu')" :required="__(true)" />
+                            <x-text-input id="lovRJRiwayatPenyakitDahulu" placeholder="Cari Snomed" class="mt-1 ml-2"
+                                :errorshas="__($errors->has('lovRJRiwayatPenyakitDahulu'))" :disabled=false wire:model.debounce.500ms="lovRJRiwayatPenyakitDahulu" />
+                        </div>
+                    @else
+                        @if ($LOVParentStatus === 'lovRJRiwayatPenyakitDahulu')
+                            <div class="col-span-2">
+                                @include('livewire.component.l-o-v.list-of-value-snomed.list-of-value-snomed')
+                            </div>
+                        @endif
+                    @endif
+                @else
+                    <x-input-label for="dataDaftarPoliRJ.anamnesa.riwayatPenyakitDahulu.snomedDisplay" :value="__('Display Snomed Riwayat Penyakit Dahulu')"
+                        :required="__(true)" wire:click="resetLovRJRiwayatPenyakitDahulu()" />
+                    <div>
+                        <x-text-input id="dataDaftarPoliRJ.anamnesa.riwayatPenyakitDahulu.snomedDisplay"
+                            placeholder="Display Snomed" class="mt-1 ml-2" :errorshas="__(
+                                $errors->has('dataDaftarPoliRJ.anamnesa.riwayatPenyakitDahulu.snomedDisplay'),
+                            )"
+                            wire:model="dataDaftarPoliRJ.anamnesa.riwayatPenyakitDahulu.snomedDisplay" :disabled="true" />
+
+                    </div>
+                @endif
+                @error('dataDaftarPoliRJ.anamnesa.riwayatPenyakitDahulu.snomedCode')
+                    <x-input-error :messages=$message />
+                @enderror
+            </div>
+        @endrole
+
         <div>
             <x-input-label for="dataDaftarPoliRJ.anamnesa.alergi.alergi" :value="__('Alergi')" :required="__(false)"
                 class="pt-2 sm:text-xl" />
@@ -34,6 +69,12 @@
                 <x-input-error :messages=$message />
             @enderror
         </div>
+
+        @role(['Perawat', 'Mr', 'Admin'])
+            @include('livewire.emr-r-j.mr-r-j.anamnesa.form-entry-alergi-snomed')
+        @endrole
+
+        @include('livewire.emr-r-j.mr-r-j.anamnesa.rekonsiliasiObat')
 
 
         {{-- <div class="pt-2">

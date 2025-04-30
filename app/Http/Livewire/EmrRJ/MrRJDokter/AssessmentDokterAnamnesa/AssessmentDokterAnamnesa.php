@@ -10,16 +10,21 @@ use Carbon\Carbon;
 
 use Spatie\ArrayToXml\ArrayToXml;
 use App\Http\Traits\EmrRJ\EmrRJTrait;
+use App\Http\Traits\LOV\LOVSnomed\LOVSnomedTrait;
 
 
 class AssessmentDokterAnamnesa extends Component
 {
-    use WithPagination, EmrRJTrait;
+    use WithPagination, EmrRJTrait, LOVSnomedTrait;
 
     // listener from blade////////////////
     protected $listeners = [
         'storeAssessmentDokterRJ' => 'store',
-        'syncronizeAssessmentDokterRJFindData' => 'mount'
+        'syncronizeAssessmentDokterRJFindData' => 'mount',
+
+        'lovRJKeluhanUtama'           => 'setlovRJKeluhanUtama',
+        'lovRJRiwayatPenyakitDahulu'  => 'setlovRJRiwayatPenyakitDahulu',
+        'lovRJAlergiDahulu'           => 'setlovRJAlergiDahulu',
     ];
 
 
@@ -434,20 +439,149 @@ class AssessmentDokterAnamnesa extends Component
     {
         $this->validateOnly($propertyName);
         $this->store();
+
+        // LOV: cek apakah properti yang ter-`updated` adalah salah satu LOV key
+        $lovConfig = collect($this->LOVParent)->firstWhere('field', $propertyName);
+        $field = $lovConfig['field'] ?? null;
+        if ($field) {
+            $this->LOVParentStatus = $field;
+        }
     }
 
+    /////////////////////////////////////
+    // lov
+    public string $lovRJKeluhanUtama = '';
+    public string $lovRJRiwayatPenyakitDahulu = '';
+    public string $lovRJAlergiDahulu = '';
 
+    public function updatedLovRJKeluhanUtama(string $value): void
+    {
+        $this->dataSnomedLovSearch = $value;
+        $this->updateddataSnomedLovsearch();
+    }
+
+    public function updatedLovRJRiwayatPenyakitDahulu(string $value): void
+    {
+        $this->dataSnomedLovSearch = $value;
+        $this->updateddataSnomedLovsearch();
+    }
+
+    public function setlovRJKeluhanUtama($snomedCode, $snomedDisplay): void
+    {
+        // Synk Lov Snomed
+        $this->dataDaftarPoliRJ['anamnesa']['keluhanUtama']['snomedCode'] = $snomedCode ?? '';
+        $this->dataDaftarPoliRJ['anamnesa']['keluhanUtama']['snomedDisplay'] = $snomedDisplay ?? '';
+        $this->store();
+        $this->resetdataSnomedLov();
+    }
+
+    public function setlovRJRiwayatPenyakitDahulu($snomedCode, $snomedDisplay): void
+    {
+        // Synk Lov Snomed
+        $this->dataDaftarPoliRJ['anamnesa']['riwayatPenyakitDahulu']['snomedCode'] = $snomedCode ?? '';
+        $this->dataDaftarPoliRJ['anamnesa']['riwayatPenyakitDahulu']['snomedDisplay'] = $snomedDisplay ?? '';
+        $this->store();
+        $this->resetdataSnomedLov();
+    }
+
+    public function resetLovRJKeluhanUtama(): void
+    {
+        $this->dataDaftarPoliRJ['anamnesa']['keluhanUtama']['snomedCode'] = '';
+        $this->dataDaftarPoliRJ['anamnesa']['keluhanUtama']['snomedDisplay'] =  '';
+        $this->store();
+        $this->resetdataSnomedLov();
+        $this->resetAllLovs();
+    }
+    public function resetLovRJRiwayatPenyakitDahulu(): void
+    {
+        $this->dataDaftarPoliRJ['anamnesa']['riwayatPenyakitDahulu']['snomedCode'] = '';
+        $this->dataDaftarPoliRJ['anamnesa']['riwayatPenyakitDahulu']['snomedDisplay'] =  '';
+        $this->store();
+        $this->resetdataSnomedLov();
+        $this->resetAllLovs();
+    }
+
+    public function resetAllLovs(): void
+    {
+        $this->reset([
+            'lovRJKeluhanUtama',
+            'lovRJRiwayatPenyakitDahulu',
+            'lovRJAlergiDahulu',
+
+            'formEntryAlergiSnomed',
+
+        ]);
+        $this->resetdataSnomedLov();
+    }
+
+    /////////////////////////////////////
+    // lov
+
+    public array $formEntryAlergiSnomed = [
+        'snomedCode' => '',
+        'snomedDisplay' => '',
+    ];
+    public function addAlergiSnomed(): void
+    {
+        $rules = [
+            'formEntryAlergiSnomed.snomedCode'    => 'required|string|regex:/^\d+$/',
+            'formEntryAlergiSnomed.snomedDisplay' => 'required|string',
+        ];
+
+        $messages = [
+            'formEntryAlergiSnomed.snomedCode.required'    => 'Kode SNOMED untuk alergi wajib diisi.',
+            'formEntryAlergiSnomed.snomedCode.string'      => 'Kode SNOMED harus berupa teks.',
+            'formEntryAlergiSnomed.snomedCode.regex'       => 'Kode SNOMED hanya boleh berisi angka.',
+            'formEntryAlergiSnomed.snomedDisplay.required' => 'Deskripsi alergi (display) wajib diisi.',
+            'formEntryAlergiSnomed.snomedDisplay.string'   => 'Deskripsi alergi harus berupa teks.',
+        ];
+
+        // Proses validasi
+        try {
+            $this->validate($rules, $messages);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Periksa kembali input data. " . $e->getMessage());
+            $this->validate($rules, $messages);
+        }
+
+        // start:
+        try {
+            $this->dataDaftarPoliRJ['anamnesa']['alergi']['alergiSnomed'][] = [
+                'snomedCode' => $this->formEntryAlergiSnomed['snomedCode'],
+                'snomedDisplay' => $this->formEntryAlergiSnomed['snomedDisplay']
+            ];
+            $this->store();
+            $this->resetAllLovs();
+            //
+        } catch (\Exception $e) {
+            // display an error to user
+            dd($e->getMessage());
+        }
+        // goto start;
+    }
+
+    public function removeAlergiSnomed($index)
+    {
+        $newList = collect($this->dataDaftarPoliRJ['anamnesa']['alergi']['alergiSnomed'])
+            ->except($index)
+            ->values()
+            ->all();
+
+        // Simpan kembali ke model
+        $this->dataDaftarPoliRJ['anamnesa']['alergi']['alergiSnomed'] = $newList;
+
+        $this->store();
+    }
 
 
     // resert input private////////////////
-    private function resetInputFields(): void
-    {
-
-        // resert validation
-        $this->resetValidation();
-        // resert input kecuali
-        $this->reset(['']);
-    }
+    // private function resetInputFields(): void
+    // {
+    //     // resert validation
+    //     $this->resetValidation();
+    //     // resert input kecuali
+    //     $this->reset(['collectingMySnomed']);
+    // }
 
 
 

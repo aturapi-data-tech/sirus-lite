@@ -137,7 +137,6 @@ trait PatientTrait
             '&',
             PHP_QUERY_RFC3986
         );
-
         return $this->makeRequest('get', '/Patient?' . $queryString);
     }
 }

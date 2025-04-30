@@ -429,7 +429,7 @@
                                 <div class="grid grid-cols-4 gap-2">
                                     <div class="flex items-center col-span-3 mb-2">
                                         <x-text-input id="UUIDidentitas" placeholder="patientUuid" class="mt-1 ml-2"
-                                            :errorshas="__($errors->has('dataPasien.pasien.identitas.patientUuid'))" :disabled=true
+                                            :errorshas="__($errors->has('dataPasien.pasien.identitas.patientUuid'))" :disabled=false
                                             wire:model.debounce.500ms="dataPasien.pasien.identitas.patientUuid" />
                                     </div>
 

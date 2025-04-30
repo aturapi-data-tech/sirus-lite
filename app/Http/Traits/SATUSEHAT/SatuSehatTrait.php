@@ -58,8 +58,10 @@ trait SatuSehatTrait
      */
     protected function makeRequest($method, $endpoint, $data = [])
     {
+
         $token = $this->getAccessToken();
         $url = $this->baseUrl . $endpoint;
+
         // Base client: timeout, bearer token, common headers
         $client = Http::timeout(10)
             ->withToken($token)
@@ -80,7 +82,6 @@ trait SatuSehatTrait
         if ($response->successful()) {
             return $response->json();
         }
-
         throw new \Exception('API request failed: ' . $response->body());
     }
 }
