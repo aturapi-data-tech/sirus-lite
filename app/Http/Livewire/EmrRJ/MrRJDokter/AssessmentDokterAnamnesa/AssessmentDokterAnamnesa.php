@@ -23,8 +23,9 @@ class AssessmentDokterAnamnesa extends Component
         'syncronizeAssessmentDokterRJFindData' => 'mount',
 
         'lovRJKeluhanUtama'           => 'setlovRJKeluhanUtama',
+        'lovRJRiwayatPenyakitSekarangUmum'  => 'setlovRJRiwayatPenyakitSekarangUmum',
         'lovRJRiwayatPenyakitDahulu'  => 'setlovRJRiwayatPenyakitDahulu',
-        'lovRJAlergiDahulu'           => 'setlovRJAlergiDahulu',
+        'lovRJAlergi'                 => 'setlovRJAlergi',
     ];
 
 
@@ -451,8 +452,9 @@ class AssessmentDokterAnamnesa extends Component
     /////////////////////////////////////
     // lov
     public string $lovRJKeluhanUtama = '';
+    public string $lovRJRiwayatPenyakitSekarangUmum = '';
     public string $lovRJRiwayatPenyakitDahulu = '';
-    public string $lovRJAlergiDahulu = '';
+    public string $lovRJAlergi = '';
 
     public function updatedLovRJKeluhanUtama(string $value): void
     {
@@ -460,7 +462,19 @@ class AssessmentDokterAnamnesa extends Component
         $this->updateddataSnomedLovsearch();
     }
 
+    public function updatedLovRJRiwayatPenyakitSekarangUmum(string $value): void
+    {
+        $this->dataSnomedLovSearch = $value;
+        $this->updateddataSnomedLovsearch();
+    }
+
     public function updatedLovRJRiwayatPenyakitDahulu(string $value): void
+    {
+        $this->dataSnomedLovSearch = $value;
+        $this->updateddataSnomedLovsearch();
+    }
+
+    public function updatedLovRJAlergi(string $value): void
     {
         $this->dataSnomedLovSearch = $value;
         $this->updateddataSnomedLovsearch();
@@ -475,6 +489,14 @@ class AssessmentDokterAnamnesa extends Component
         $this->resetdataSnomedLov();
     }
 
+    public function setlovRJRiwayatPenyakitSekarangUmum($snomedCode, $snomedDisplay): void
+    {
+        // Synk Lov Snomed
+        $this->dataDaftarPoliRJ['anamnesa']['riwayatPenyakitSekarangUmum']['snomedCode'] = $snomedCode ?? '';
+        $this->dataDaftarPoliRJ['anamnesa']['riwayatPenyakitSekarangUmum']['snomedDisplay'] = $snomedDisplay ?? '';
+        $this->store();
+        $this->resetdataSnomedLov();
+    }
     public function setlovRJRiwayatPenyakitDahulu($snomedCode, $snomedDisplay): void
     {
         // Synk Lov Snomed
@@ -484,10 +506,28 @@ class AssessmentDokterAnamnesa extends Component
         $this->resetdataSnomedLov();
     }
 
+    public function setlovRJAlergi($snomedCode, $snomedDisplay): void
+    {
+        // Synk Lov Snomed
+        $this->formEntryAlergiSnomed['snomedCode'] = $snomedCode ?? '';
+        $this->formEntryAlergiSnomed['snomedDisplay'] = $snomedDisplay ?? '';
+        //jangan disimpan dulu simpan setelah addDataAlergi
+        $this->resetdataSnomedLov();
+    }
+
     public function resetLovRJKeluhanUtama(): void
     {
         $this->dataDaftarPoliRJ['anamnesa']['keluhanUtama']['snomedCode'] = '';
         $this->dataDaftarPoliRJ['anamnesa']['keluhanUtama']['snomedDisplay'] =  '';
+        $this->store();
+        $this->resetdataSnomedLov();
+        $this->resetAllLovs();
+    }
+
+    public function resetLovRJRiwayatPenyakitSekarangUmum(): void
+    {
+        $this->dataDaftarPoliRJ['anamnesa']['riwayatPenyakitSekarangUmum']['snomedCode'] = '';
+        $this->dataDaftarPoliRJ['anamnesa']['riwayatPenyakitSekarangUmum']['snomedDisplay'] =  '';
         $this->store();
         $this->resetdataSnomedLov();
         $this->resetAllLovs();
@@ -501,12 +541,22 @@ class AssessmentDokterAnamnesa extends Component
         $this->resetAllLovs();
     }
 
+    public function resetLovRJAlergi(): void
+    {
+        $this->formEntryAlergiSnomed['snomedCode'] =  '';
+        $this->formEntryAlergiSnomed['snomedDisplay'] = '';
+        //jangan disimpan dulu simpan setelah removeDataAlergi
+        $this->resetdataSnomedLov();
+        $this->resetAllLovs();
+    }
+
     public function resetAllLovs(): void
     {
         $this->reset([
             'lovRJKeluhanUtama',
+            'lovRJRiwayatPenyakitSekarangUmum',
             'lovRJRiwayatPenyakitDahulu',
-            'lovRJAlergiDahulu',
+            'lovRJAlergi',
 
             'formEntryAlergiSnomed',
 

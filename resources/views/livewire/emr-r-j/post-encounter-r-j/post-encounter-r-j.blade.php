@@ -26,6 +26,13 @@
         <x-loading />
     </div>
 
+    <x-light-button wire:click.prevent="postRiwayatPenyakitSekarangRJ()" type="button" wire:loading.remove>
+        Kirim Riwayat Penyakit Sekarang
+    </x-light-button>
+    <div wire:loading wire:target="postRiwayatPenyakitSekarangRJ">
+        <x-loading />
+    </div>
+
     <x-light-button wire:click.prevent="postRiwayatPenyakitDahuluRJ()" type="button" wire:loading.remove>
         Kirim Riwayat Penyakit Dahulu
     </x-light-button>

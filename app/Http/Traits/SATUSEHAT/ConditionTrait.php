@@ -112,26 +112,131 @@ trait ConditionTrait
     }
 
     /**
+     * Create a FHIR Condition resource for Riwayat Penyakit Sekarang current condition (chief complaint or active finding)
+     *
+     * @param array $data
+     *   - patientId (string)
+     *   - encounterId (string)
+     *   - snomed_code (string)
+     *   - snomed_display (string)
+     *   - complaint_text (string)
+     *   - recordedDate (ISO8601 string)
+     *   - onsetDate (ISO8601 string)
+     *   - note (string)
+     *
+     * @return array FHIR response JSON
+     *
+     * @throws \InvalidArgumentException
+     * @throws \Exception on HTTP error
+     */
+    public function createCurrentCondition(array $data): array
+    {
+        // SNOMED CT code mandatory
+        if (empty($data['snomed_code'])) {
+            throw new \InvalidArgumentException(
+                'SNOMED CT code untuk kondisi sekarang wajib diset.'
+            );
+        }
+        // Encounter reference mandatory
+        if (empty($data['encounterId'])) {
+            throw new \InvalidArgumentException(
+                'Encounter ID untuk kondisi sekarang wajib diset.'
+            );
+        }
+
+        // Build payload
+        $payload = [
+            'resourceType'       => 'Condition',
+            'clinicalStatus'     => [
+                'coding' => [[
+                    'system'  => 'http://terminology.hl7.org/CodeSystem/condition-clinical',
+                    'code'    => 'active',
+                    'display' => 'Active',
+                ]],
+            ],
+            'verificationStatus' => [
+                'coding' => [[
+                    'system'  => 'http://terminology.hl7.org/CodeSystem/condition-ver-status',
+                    'code'    => 'confirmed',
+                    'display' => 'Confirmed',
+                ]],
+            ],
+            'category'           => [[
+                'coding' => [[
+                    'system'  => 'http://terminology.hl7.org/CodeSystem/condition-category',
+                    'code'    => 'problem-list-item',
+                    'display' => 'Problem List Item',
+                ]],
+            ]],
+            'code'               => [
+                'coding' => [[
+                    'system'  => 'http://snomed.info/sct',
+                    'code'    => $data['snomed_code'],
+                    'display' => $data['snomed_display'] ?? '',
+                ]],
+                'text'   => $data['complaint_text'] ?? ($data['snomed_display'] ?? ''),
+            ],
+            'subject'            => [
+                'reference' => 'Patient/' . $data['patientId'],
+            ],
+            'encounter'          => [
+                'reference' => 'Encounter/' . $data['encounterId'],
+            ],
+            'recordedDate'       => $data['recordedDate'] ?? Carbon::now()->toIso8601String(),
+        ];
+
+        // Optional: onsetDateTime
+        if (!empty($data['onsetDate'])) {
+            $payload['onsetDateTime'] = $data['onsetDate'];
+        }
+
+        // Optional: note
+        if (!empty($data['note'])) {
+            $payload['note'] = [['text' => $data['note']]];
+        }
+
+        // Send request
+        return $this->makeRequest('post', 'Condition', $payload);
+    }
+
+
+    /**
      * Buat resource Condition untuk riwayat penyakit dahulu (past medical history)
      *
-     * @param  array  $data
-     * @return array  Response FHIR JSON
+     * @param array $data
+     *   - patientId (string)
+     *   - encounterId (string)
+     *   - snomed_code (string)
+     *   - snomed_display (string)
+     *   - history_text (string)
+     *   - recordedDate (ISO8601 string)
+     *   - onsetDate (ISO8601 string)
+     *   - abatementDate (ISO8601 string)
+     *   - note (string)
      *
-     * @throws \InvalidArgumentException Jika snomed_code tidak diset
-     * @throws \Exception Jika request FHIR gagal
+     * @return array FHIR response JSON
+     *
+     * @throws \InvalidArgumentException
+     * @throws \Exception on HTTP error
      */
     public function createPastMedicalHistory(array $data): array
     {
-        // Validasi wajib SNOMED CT
+        // SNOMED CT code mandatory
         if (empty($data['snomed_code'])) {
             throw new \InvalidArgumentException(
                 'SNOMED CT code untuk riwayat penyakit dahulu wajib diset.'
             );
         }
+        // Encounter reference mandatory
+        if (empty($data['encounterId'])) {
+            throw new \InvalidArgumentException(
+                'Encounter ID untuk riwayat penyakit dahulu wajib diset.'
+            );
+        }
 
+        // Build payload
         $payload = [
             'resourceType'       => 'Condition',
-            // Kondisi sudah 'resolved' / selesai
             'clinicalStatus'     => [
                 'coding' => [[
                     'system'  => 'http://terminology.hl7.org/CodeSystem/condition-clinical',
@@ -159,35 +264,33 @@ trait ConditionTrait
                     'code'    => $data['snomed_code'],
                     'display' => $data['snomed_display'] ?? '',
                 ]],
-                'text'   => $data['history_text']
-                    ?? ($data['snomed_display'] ?? ''),
+                'text'   => $data['history_text'] ?? ($data['snomed_display'] ?? ''),
             ],
             'subject'            => [
                 'reference' => 'Patient/' . $data['patientId'],
             ],
-            // Tanggal catat (waktu upload)
-            'recordedDate'       => $data['recordedDate']
-                ?? now()->toIso8601String(),
+            'encounter'          => [
+                'reference' => 'Encounter/' . $data['encounterId'],
+            ],
+            'recordedDate'       => $data['recordedDate'] ?? Carbon::now()->toIso8601String(),
         ];
 
-        // Optional: kapan mulai kondisi
+        // Optional: onsetDateTime
         if (!empty($data['onsetDate'])) {
             $payload['onsetDateTime'] = $data['onsetDate'];
         }
 
-        // Optional: kapan berakhir / sembuh
+        // Optional: abatementDateTime
         if (!empty($data['abatementDate'])) {
             $payload['abatementDateTime'] = $data['abatementDate'];
         }
 
-        // Optional: catatan tambahan
+        // Optional: note
         if (!empty($data['note'])) {
-            $payload['note'] = [[
-                'text' => $data['note'],
-            ]];
+            $payload['note'] = [['text' => $data['note']]];
         }
 
-        // Kirim POST ke endpoint FHIR Condition
+        // Send request
         return $this->makeRequest('post', 'Condition', $payload);
     }
 

@@ -414,6 +414,136 @@ class PostEncounterRJ extends Component
         }
     }
 
+    public function postRiwayatPenyakitSekarangRJ(): void
+    {
+        // 1. Ambil data pasien & encounter
+        $find             = $this->findDataRJ($this->rjNoRef);
+        $dataDaftarPoliRJ = $find['dataDaftarRJ'] ?? [];
+        $dataPasienRJ     = $find['dataPasienRJ']   ?? [];
+
+        $patientUuid      = $dataPasienRJ['patientUuid'] ?? null;
+        $encounterUuid    = $dataDaftarPoliRJ['satuSehatUuidRJ']['encounter']['uuid'] ?? null;
+        $currentCondUuid  = $dataDaftarPoliRJ['satuSehatUuidRJ']['currentCondition']['uuid'] ?? null;
+
+        // 2. Validasi prasyarat
+        if (empty($patientUuid)) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('UUID pasien tidak ditemukan, proses dibatalkan.');
+            return;
+        }
+        if (empty($encounterUuid)) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Encounter belum terkirim, proses kondisi sekarang dibatalkan.');
+            return;
+        }
+
+        if (!empty($currentCondUuid)) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addInfo("Kondisi sekarang telah dikirim (ID: {$currentCondUuid}).");
+            return;
+        }
+
+        // 3. Ambil input kondisi sekarang
+        $code    = $dataDaftarPoliRJ['anamnesa']['riwayatPenyakitSekarangUmum']['snomedCode'] ?? '';
+        $display = $dataDaftarPoliRJ['anamnesa']['riwayatPenyakitSekarangUmum']['snomedDisplay'] ?? '';
+        $text    = $dataDaftarPoliRJ['anamnesa']['riwayatPenyakitSekarangUmum']['riwayatPenyakitSekarangUmum'] ?? '';
+        // atau field kamu gunakan
+        if (empty($code)) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Data kondisi sekarang belum diisi.');
+            return;
+        }
+
+        // 4. Konversi tanggal onset (opsional)
+        try {
+            if (!empty($anam['onsetDate'])) {
+                $onsetDate = $dataDaftarPoliRJ['taskIdPelayanan']['taskId3'] ?? null;
+                $onsetIso = Carbon::createFromFormat('d/m/Y H:i:s', $onsetDate)
+                    ->toIso8601String();
+            }
+        } catch (\Throwable $e) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Format tanggal onset kondisi tidak valid.');
+            return;
+        }
+
+        // 5. Siapkan payload
+        $payload = [
+            'patientId'      => $patientUuid,
+            'encounterId'    => $encounterUuid,
+            'snomed_code'    => $code,
+            'snomed_display' => $display,
+            'complaint_text' => $text,
+            'recordedDate'   => now()->toIso8601String(),
+        ];
+        if (!empty($onsetIso)) {
+            $payload['onsetDate'] = $onsetIso;
+        }
+        if (!empty($note)) {
+            $payload['note'] = $note ?? '';
+        }
+
+        // 6. Validasi payload
+        $validator = Validator::make($payload, [
+            'patientId'      => 'required|string',
+            'encounterId'    => 'required|string',
+            'snomed_code'    => 'nullable|string',
+            'complaint_text' => 'nullable|string',
+        ], [
+            'patientId.required'      => 'UUID pasien wajib diisi.',
+            'encounterId.required'    => 'UUID encounter wajib diisi.',
+            'complaint_text.string'   => 'Deskripsi kondisi harus berupa teks.',
+        ]);
+        if ($validator->fails()) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Validasi gagal: ' . $validator->errors()->first());
+            return;
+            return;
+        }
+
+        // 7. Kirim ke SatuSehat
+        try {
+            $this->initializeSatuSehat();
+            $result           = $this->createCurrentCondition($payload);
+            $conditionId      = $result['id'] ?? '';
+
+            // 8. Simpan UUID ke JSON RJ
+            $dataDaftarPoliRJ['satuSehatUuidRJ']['currentCondition']['uuid'] = $conditionId;
+            $this->updateJsonRJ($this->rjNoRef, $dataDaftarPoliRJ);
+
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addSuccess("Kondisi sekarang berhasil dikirim (ID: {$conditionId}).");
+        } catch (\Exception $e) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Gagal mengirim kondisi sekarang: ' . $e->getMessage());
+        }
+    }
+
+
     public function postRiwayatPenyakitDahuluRJ()
     {
         // 1. Validasi & ambil data kunjungan & pasien
@@ -422,24 +552,22 @@ class PostEncounterRJ extends Component
         $dataPasienRJ   = $find['dataPasienRJ'] ?? [];
 
         $patientUuid  = $dataPasienRJ['patientUuid'] ?? null;
+        $encounterUuid = $dataDaftarPoliRJ['satuSehatUuidRJ']['encounter']['uuid'] ?? null;
         $historyData  = $dataDaftarPoliRJ['anamnesa']['riwayatPenyakitDahulu']['riwayatPenyakitDahulu'] ?? null;
         $pastHistUuid = $dataDaftarPoliRJ['satuSehatUuidRJ']['pastMedicalHistory']['uuid'] ?? null;
 
-        // $onsetDate       = $dataDaftarPoliRJ['taskIdPelayanan']['taskId3'] ?? null;
-        // 2. Cek prasyarat
+
+        // 2. Validasi prasyarat
         if (empty($patientUuid)) {
-            toastr()->closeOnHover(true)
-                ->closeDuration(3)
-                ->positionClass('toast-top-left')
-                ->addError('UUID pasien tidak ditemukan, proses dibatalkan.');
+            toastr()->addError('UUID pasien tidak ditemukan, proses dibatalkan.');
             return;
         }
-
+        if (empty($encounterUuid)) {
+            toastr()->addError('Encounter belum terkirim, proses dibatalkan.');
+            return;
+        }
         if (!empty($pastHistUuid)) {
-            toastr()->closeOnHover(true)
-                ->closeDuration(3)
-                ->positionClass('toast-top-left')
-                ->addInfo("Riwayat penyakit dahulu sudah dikirim (ID: {$pastHistUuid}).");
+            toastr()->addInfo("Riwayat penyakit dahulu sudah dikirim (ID: {$pastHistUuid}).");
             return;
         }
 
@@ -459,10 +587,11 @@ class PostEncounterRJ extends Component
         // 3. Konversi tanggal onset & abatement
         try {
             $onsetIso     = !empty($dataDaftarPoliRJ['taskIdPelayanan']['taskId3'])
-                ? Carbon::createFromFormat('d/m/Y', $dataDaftarPoliRJ['taskIdPelayanan']['taskId3'])->toIso8601String()
+                ? Carbon::createFromFormat('d/m/Y H:i:s', $dataDaftarPoliRJ['taskIdPelayanan']['taskId3'])->toIso8601String()
                 : null;
-            $abatementIso = !empty($dataDaftarPoliRJ['taskIdPelayanan']['taskId3'])
-                ? Carbon::createFromFormat('d/m/Y', $dataDaftarPoliRJ['taskIdPelayanan']['taskId3'])->toIso8601String()
+            //isi kosong jika sembuh isi dengan tanggal pasien sembuh
+            $abatementIso = !empty(null)
+                ? Carbon::createFromFormat('d/m/Y H:i:s', $dataDaftarPoliRJ['taskIdPelayanan']['taskId3'])->toIso8601String()
                 : null;
         } catch (\Throwable $e) {
             toastr()->closeOnHover(true)
@@ -475,6 +604,7 @@ class PostEncounterRJ extends Component
         // 4. Siapkan payload
         $payload = [
             'patientId'      => $patientUuid,
+            'encounterId'     => $encounterUuid,
             'snomed_code'    => $snomedCode,
             'snomed_display' => $snomedDisplay,
             'history_text'   => $historyText,
@@ -515,7 +645,7 @@ class PostEncounterRJ extends Component
 
             // 7. Simpan UUID ke JSON RJ
             $dataDaftarPoli['satuSehatUuidRJ']['pastMedicalHistory']['uuid'] = $historyId;
-            $this->updateJsonRJ($this->rjNoRef, $dataDaftarPoli);
+            $this->updateJsonRJ($this->rjNoRef, $dataDaftarPoliRJ);
 
             toastr()->closeOnHover(true)
                 ->closeDuration(3)

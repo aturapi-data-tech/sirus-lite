@@ -21,6 +21,11 @@ trait LOVSnomedTrait
             'valueSetId' => 'condition-code',
         ],
         [
+            'field'      => 'lovRJRiwayatPenyakitSekarangUmum',
+            // riwayat penyakit lama juga termasuk finding
+            'valueSetId' => 'condition-code',
+        ],
+        [
             'field'      => 'lovRJRiwayatPenyakitDahulu',
             // riwayat penyakit lama juga termasuk finding
             'valueSetId' => 'condition-code',

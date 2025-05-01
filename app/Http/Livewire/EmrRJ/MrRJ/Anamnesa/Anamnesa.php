@@ -21,6 +21,7 @@ class Anamnesa extends Component
         'syncronizeAssessmentPerawatRJFindData' => 'mount',
 
         'lovRJKeluhanUtama'           => 'setlovRJKeluhanUtama',
+        'lovRJRiwayatPenyakitSekarangUmum'  => 'setlovRJRiwayatPenyakitSekarangUmum',
         'lovRJRiwayatPenyakitDahulu'  => 'setlovRJRiwayatPenyakitDahulu',
         'lovRJAlergi'                 => 'setlovRJAlergi',
     ];
@@ -452,10 +453,17 @@ class Anamnesa extends Component
     /////////////////////////////////////
     // lov
     public string $lovRJKeluhanUtama = '';
+    public string $lovRJRiwayatPenyakitSekarangUmum = '';
     public string $lovRJRiwayatPenyakitDahulu = '';
     public string $lovRJAlergi = '';
 
     public function updatedLovRJKeluhanUtama(string $value): void
+    {
+        $this->dataSnomedLovSearch = $value;
+        $this->updateddataSnomedLovsearch();
+    }
+
+    public function updatedLovRJRiwayatPenyakitSekarangUmum(string $value): void
     {
         $this->dataSnomedLovSearch = $value;
         $this->updateddataSnomedLovsearch();
@@ -478,6 +486,15 @@ class Anamnesa extends Component
         // Synk Lov Snomed
         $this->dataDaftarPoliRJ['anamnesa']['keluhanUtama']['snomedCode'] = $snomedCode ?? '';
         $this->dataDaftarPoliRJ['anamnesa']['keluhanUtama']['snomedDisplay'] = $snomedDisplay ?? '';
+        $this->store();
+        $this->resetdataSnomedLov();
+    }
+
+    public function setlovRJRiwayatPenyakitSekarangUmum($snomedCode, $snomedDisplay): void
+    {
+        // Synk Lov Snomed
+        $this->dataDaftarPoliRJ['anamnesa']['riwayatPenyakitSekarangUmum']['snomedCode'] = $snomedCode ?? '';
+        $this->dataDaftarPoliRJ['anamnesa']['riwayatPenyakitSekarangUmum']['snomedDisplay'] = $snomedDisplay ?? '';
         $this->store();
         $this->resetdataSnomedLov();
     }
@@ -508,6 +525,16 @@ class Anamnesa extends Component
         $this->resetdataSnomedLov();
         $this->resetAllLovs();
     }
+
+    public function resetLovRJRiwayatPenyakitSekarangUmum(): void
+    {
+        $this->dataDaftarPoliRJ['anamnesa']['riwayatPenyakitSekarangUmum']['snomedCode'] = '';
+        $this->dataDaftarPoliRJ['anamnesa']['riwayatPenyakitSekarangUmum']['snomedDisplay'] =  '';
+        $this->store();
+        $this->resetdataSnomedLov();
+        $this->resetAllLovs();
+    }
+
     public function resetLovRJRiwayatPenyakitDahulu(): void
     {
         $this->dataDaftarPoliRJ['anamnesa']['riwayatPenyakitDahulu']['snomedCode'] = '';
@@ -530,6 +557,7 @@ class Anamnesa extends Component
     {
         $this->reset([
             'lovRJKeluhanUtama',
+            'lovRJRiwayatPenyakitSekarangUmum',
             'lovRJRiwayatPenyakitDahulu',
             'lovRJAlergi',
 
