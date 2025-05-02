@@ -1,4 +1,4 @@
-<div>
+<div class="grid grid-cols-5 gap-2">
     <div class="text-xs text-gray-700">
         {{ $EncounterID }}
     </div>
@@ -40,10 +40,17 @@
         <x-loading />
     </div>
 
-    <x-light-button wire:click.prevent="postAlergi()" type="button" wire:loading.remove>
+    <x-light-button wire:click.prevent="postAlergiRJ()" type="button" wire:loading.remove>
         Kirim Alergi
     </x-light-button>
-    <div wire:loading wire:target="postAlergi">
+    <div wire:loading wire:target="postAlergiRJ">
+        <x-loading />
+    </div>
+
+    <x-light-button wire:click.prevent="getAlergiRJ()" type="button" wire:loading.remove>
+        Get Alergi
+    </x-light-button>
+    <div wire:loading wire:target="getAlergiRJ">
         <x-loading />
     </div>
 

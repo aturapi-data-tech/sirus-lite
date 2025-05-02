@@ -7,28 +7,24 @@ use App\Http\Traits\MasterPasien\MasterPasienTrait;
 use App\Http\Traits\SATUSEHAT\EncounterTrait;
 use App\Http\Traits\SATUSEHAT\PatientTrait;
 use App\Http\Traits\SATUSEHAT\ConditionTrait;
-
+use App\Http\Traits\SATUSEHAT\AllergyIntoleranceTrait;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 
 use Illuminate\Support\Facades\DB;
 
-// use Illuminate\Support\Str;
-
-// use App\Http\Livewire\SatuSehat\Encounter\Encounter;
-// use App\Http\Livewire\SatuSehat\Condition\Condition;
-// use App\Http\Livewire\SatuSehat\Bundle\Bundle;
-
-// use App\Http\Traits\BPJS\SatuSehatTrait;
-// use App\Http\Traits\customErrorMessagesTrait;
-
 
 use Livewire\Component;
 
 class PostEncounterRJ extends Component
 {
-    use EmrRJTrait, MasterPasienTrait, EncounterTrait, PatientTrait, ConditionTrait;
+    use EmrRJTrait,
+        MasterPasienTrait,
+        EncounterTrait,
+        PatientTrait,
+        ConditionTrait,
+        AllergyIntoleranceTrait;
 
 
     public $rjNoRef;
@@ -559,15 +555,27 @@ class PostEncounterRJ extends Component
 
         // 2. Validasi prasyarat
         if (empty($patientUuid)) {
-            toastr()->addError('UUID pasien tidak ditemukan, proses dibatalkan.');
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('UUID pasien tidak ditemukan, proses dibatalkan.');
             return;
         }
         if (empty($encounterUuid)) {
-            toastr()->addError('Encounter belum terkirim, proses dibatalkan.');
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Encounter belum terkirim, proses dibatalkan.');
             return;
         }
         if (!empty($pastHistUuid)) {
-            toastr()->addInfo("Riwayat penyakit dahulu sudah dikirim (ID: {$pastHistUuid}).");
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addInfo("Riwayat penyakit dahulu sudah dikirim (ID: {$pastHistUuid}).");
             return;
         }
 
@@ -666,6 +674,146 @@ class PostEncounterRJ extends Component
         $existing = $this->searchConditionsByEncounter($encounterId);
         dd($existing);
     }
+
+
+
+
+
+
+
+
+    public function postAlergiRJ(): void
+    {
+        $find             = $this->findDataRJ($this->rjNoRef);
+        $dataDaftarPoliRJ = $find['dataDaftarRJ'] ?? [];
+        $dataPasienRJ = $find['dataPasienRJ'] ?? [];
+
+        $patientUuid   = $dataPasienRJ['patientUuid'] ?? null;
+        $encounterUuid = $dataDaftarPoliRJ['satuSehatUuidRJ']['encounter']['uuid'] ?? null;
+        $alergies      = $dataDaftarPoliRJ['anamnesa']['alergi']['alergiSnomed'] ?? [];
+        $sentRecords   = $dataDaftarPoliRJ['satuSehatUuidRJ']['allergyIntolerance'] ?? [];
+        $recorderUuid  = $dataPasienRJ['drUuid'] ?? null;
+        // 1) Cek Patient UUID
+        if (empty($patientUuid)) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('UUID pasien belum tersedia. Proses alergi dibatalkan.');
+            return;
+        }
+
+        // 2) Cek Encounter UUID
+        if (empty($encounterUuid)) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Encounter belum terkirim. Proses alergi dibatalkan.');
+            return;
+        }
+
+        // 3) Cek minimal satu alergi
+        if (empty($alergies)) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addWarning('Silakan pilih minimal satu alergi sebelum mengirim.');
+            return;
+        }
+
+        // 4) Cek Practitioner/Recorder UUID
+        if (empty($recorderUuid)) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('UUID practitioner belum tersedia. Proses alergi dibatalkan.');
+            return;
+        }
+
+        $this->initializeSatuSehat();
+
+        // Siapkan tempat simpan UUID alergi
+        $idAlergies = [];
+        foreach ($alergies as $i => $alergi) {
+
+            // Jika sudah pernah dikirim (berdasarkan snomedCode), skip
+            $sent = collect($sentRecords)
+                ->firstWhere('snomedCode', $alergi['snomedCode']);
+
+            if ($sent) {
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addInfo(
+                        "{$alergi['snomedDisplay']} telah dikirim sebelumnya (UUID: {$sent['uuid']})."
+                    );
+
+                continue;
+            }
+
+            $payload = [
+                'patientId'    => $patientUuid,
+                'encounterId'  => $encounterUuid,    // wajib
+                'recorderId'   => $recorderUuid,     // wajib (Practitioner/{id})
+                'code'         => $alergi['snomedCode'],
+                'display'      => $alergi['snomedDisplay'],
+                'category'     => 'food',       // atau 'food', 'environment'
+                'criticality'  => 'low',              // optional, sesuai trait default
+                'onset'        => now()->toIso8601String(),
+                'note'         => $alergi['note'] ?? '',
+            ];
+            try {
+                $res = $this->createAllergyIntolerance($payload);
+                $id  = $res['id'] ?? null;
+
+                if ($id) {
+                    $idAlergies[] = $id;
+                    // Simpan ke array satuSehatUuidRJ
+                    $dataDaftarPoliRJ['satuSehatUuidRJ']['allergyIntolerance'][] = [
+                        'uuid' => $id,
+                        'snomedCode' => $alergi['snomedCode'],
+                        'snomedDisplay' => $alergi['snomedDisplay'],
+
+                    ];
+                }
+            } catch (\Exception $e) {
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError("Gagal kirim alergi ke-" . ($i + 1) . ": " . $e->getMessage());
+            }
+        }
+        // 7. Persist JSON RJ sekali saja
+        $this->updateJsonRJ($this->rjNoRef, $dataDaftarPoliRJ);
+
+        // 8. Notifikasi sukses
+        if (!empty($idAlergies)) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addSuccess('Alergi terkirim (ID: ' . implode(', ', $idAlergies) . ').');
+        }
+    }
+
+    public function getAlergiRJ(): void
+    {
+        $find          = $this->findDataRJ($this->rjNoRef);
+        $dataPasienRJ = $find['dataPasienRJ'] ?? [];
+
+        $patientUuid   = $dataPasienRJ['patientUuid'] ?? null;
+        $alergiList = $this->fetchAllergyIntoleranceByPatient($patientUuid);
+
+        dd($alergiList);
+    }
+
+
+
 
     public function mount()
     {
