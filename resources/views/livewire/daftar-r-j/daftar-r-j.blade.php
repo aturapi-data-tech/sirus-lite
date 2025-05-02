@@ -539,13 +539,10 @@
 
                                                                     @role(['Admin', 'Mr', 'Perawat'])
                                                                         <div class="grid grid-cols-2 gap-1 mt-10 ml-2">
-                                                                            <livewire:emr-r-j.post-encounter-r-j.post-encounter-r-j
-                                                                                :rjNoRef="$RJp->rj_no"
-                                                                                :wire:key="'post-encounter-r-j-'.$RJp->rj_no">
 
-                                                                                <livewire:emr-r-j.post-satu-data-kesehatan-r-j.post-satu-data-kesehatan-r-j
-                                                                                    :rjNoRef="$RJp->rj_no"
-                                                                                    :wire:key="'post-satu-data-kesehatan-r-j-'.$RJp->rj_no">
+                                                                            <livewire:emr-r-j.post-satu-data-kesehatan-r-j.post-satu-data-kesehatan-r-j
+                                                                                :rjNoRef="$RJp->rj_no"
+                                                                                :wire:key="'post-satu-data-kesehatan-r-j-'.$RJp->rj_no">
                                                                         </div>
                                                                     @endrole
 
