@@ -47,6 +47,14 @@
         <x-loading />
     </div>
 
+    <x-light-button wire:click.prevent="postTtvRJ()" type="button" wire:loading.remove>
+        Kirim Ttv
+    </x-light-button>
+    <div wire:loading wire:target="postTtvRJ">
+        <x-loading />
+    </div>
+
+
     <x-light-button wire:click.prevent="getAlergiRJ()" type="button" wire:loading.remove>
         Get Alergi
     </x-light-button>
