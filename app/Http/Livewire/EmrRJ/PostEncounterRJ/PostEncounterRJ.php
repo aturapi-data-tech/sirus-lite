@@ -9,6 +9,7 @@ use App\Http\Traits\SATUSEHAT\PatientTrait;
 use App\Http\Traits\SATUSEHAT\ConditionTrait;
 use App\Http\Traits\SATUSEHAT\AllergyIntoleranceTrait;
 use App\Http\Traits\SATUSEHAT\ObservationTrait;
+use App\Http\Traits\SATUSEHAT\ProcedureTrait;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 
@@ -25,7 +26,8 @@ class PostEncounterRJ extends Component
         PatientTrait,
         ConditionTrait,
         AllergyIntoleranceTrait,
-        ObservationTrait;
+        ObservationTrait,
+        ProcedureTrait;
 
 
     public $rjNoRef;
@@ -822,12 +824,12 @@ class PostEncounterRJ extends Component
         $find = $this->findDataRJ($this->rjNoRef);
         $dataDaftarPoliRJ = $find['dataDaftarRJ'] ?? [];
         $dataPasienRJ = $find['dataPasienRJ'] ?? [];
-
         $patientUuid = $dataPasienRJ['patientUuid'] ?? null;
         $encounterUuid = $dataDaftarPoliRJ['satuSehatUuidRJ']['encounter']['uuid'] ?? null;
         $ttv = $dataDaftarPoliRJ['pemeriksaan']['tandaVital'] ?? [];
         $sentRecords = $dataDaftarPoliRJ['satuSehatUuidRJ']['vitalSigns'] ?? [];
         $performerId  = $dataPasienRJ['drUuid'] ?? null; //dokter / perawat yang melakukan ttv sementara pake dokter dulu
+
         // 2) Validasi prasyarat
         if (!$patientUuid) {
             toastr()
@@ -948,10 +950,7 @@ class PostEncounterRJ extends Component
 
         try {
             //Waktu yang dipakai waktu masuk poli
-            $effective = Carbon::createFromFormat(
-                'd/m/Y H:i:s',
-                $dataDaftarPoliRJ['taskIdPelayanan']['taskId4'] ?? now()->format('d/m/Y H:i:s')
-            )->toIso8601String();
+            $effective = Carbon::createFromFormat('d/m/Y H:i:s', $dataDaftarPoliRJ['taskIdPelayanan']['taskId4'])->toIso8601String();
         } catch (\Throwable $e) {
             toastr()
                 ->closeOnHover(true)
@@ -1040,6 +1039,426 @@ class PostEncounterRJ extends Component
     }
 
 
+
+    public function postAntropometriRJ()
+    {
+
+        // 1) Ambil data kunjungan & pasien
+        $find = $this->findDataRJ($this->rjNoRef);
+        $dataDaftarPoliRJ = $find['dataDaftarRJ'] ?? [];
+        $dataPasienRJ     = $find['dataPasienRJ'] ?? [];
+
+        $patientUuid   = $dataPasienRJ['patientUuid'] ?? null;
+        $encounterUuid = $dataDaftarPoliRJ['satuSehatUuidRJ']['encounter']['uuid'] ?? null;
+        $sentNutrition = $dataDaftarPoliRJ['satuSehatUuidRJ']['antropometri'] ?? [];
+        $performerId   = $dataPasienRJ['drUuid'] ?? null;
+        dd($sentNutrition);
+        // 2) Validasi prasyarat
+        if (! $patientUuid || ! $performerId || ! $encounterUuid) {
+            $msg = ! $patientUuid   ? 'UUID pasien belum tersedia.'
+                : (! $performerId  ? 'UUID performer belum tersedia.'
+                    : 'Encounter belum terkirim.');
+            toastr()->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("{$msg} Proses nutrisi dibatalkan.");
+            return;
+        }
+
+        $rawNutrisi = $dataDaftarPoliRJ['pemeriksaan']['nutrisi'] ?? [];
+        // 3) Kumpulkan input nutrisi dan cek minimal satu terisi
+        $nutrisi = [
+            'berat_badan'         => $rawNutrisi['bb']   ?? null, // bb = Berat Badan (kg)
+            'tinggi_badan'        => $rawNutrisi['tb']   ?? null, // tb = Tinggi Badan (cm)
+            'bmi'                 => $rawNutrisi['imt']  ?? null, // imt = Index Masa Tubuh
+            'lingkar_kepala'      => $rawNutrisi['lk']   ?? null, // lk = Lingkar Kepala (cm)
+            'lingkar_lengan_atas' => $rawNutrisi['lila'] ?? null, // lila = Lingkar Lengan Atas (cm)
+        ];
+
+        $hasAny = false;
+        $nutrisiKeys = [
+            'berat_badan',
+            'tinggi_badan',
+            'bmi',
+            'lingkar_kepala',
+            'lingkar_lengan_atas'
+        ];
+        foreach ($nutrisiKeys as $key) {
+            $value = $nutrisi[$key] ?? null;
+
+            if (! empty($value) && $value !== '0') {
+                $hasAny = true;
+                break;
+            }
+        }
+
+        if (!$hasAny) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addWarning('Isi minimal satu nilai nutrisi sebelum mengirim.');
+            return;
+        }
+
+        // 4) Definisi map nutrisi ke LOINC + unit
+        $nutrisiMap = [
+            [
+                'key'          => 'berat_badan',
+                'code'         => '29463-7',
+                'display'      => 'Body weight Measured',
+                'unitCode'     => 'kg',
+                'unitDisplay'  => 'kg',
+                'value'        => $rawNutrisi['bb'] ?? null,  // bb sesuai field JSON
+            ],
+            [
+                'key'          => 'tinggi_badan',
+                'code'         => '8302-2',
+                'display'      => 'Body height',
+                'unitCode'     => 'cm',
+                'unitDisplay'  => 'cm',
+                'value'        => $rawNutrisi['tb'] ?? null,
+            ],
+            [
+                'key'          => 'bmi',
+                'code'         => '39156-5',
+                'display'      => 'Body mass index',
+                'unitCode'     => 'kg/m2',
+                'unitDisplay'  => 'kg/m2',
+                'value'        => $rawNutrisi['imt'] ?? null,
+            ],
+            [
+                'key'          => 'lingkar_kepala',
+                'code'         => '8287-5',
+                'display'      => 'Head circumference',
+                'unitCode'     => 'cm',
+                'unitDisplay'  => 'cm',
+                'value'        => $rawNutrisi['lk'] ?? null,
+            ],
+            [
+                'key'          => 'lingkar_lengan_atas',
+                'code'         => '8289-1',
+                'display'      => 'Upper arm circumference',
+                'unitCode'     => 'cm',
+                'unitDisplay'  => 'cm',
+                'value'        => $rawNutrisi['lila'] ?? null,
+            ],
+        ];
+
+
+        // 5) Tentukan effectiveDate (mis. waktu masuk poli)
+        try {
+            $effective = Carbon::createFromFormat('d/m/Y H:i:s', $dataDaftarPoliRJ['taskIdPelayanan']['taskId4'])
+                ->toIso8601String();
+        } catch (\Throwable $e) {
+            toastr()->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addInfo('Waktu nutrisi tidak valid, gunakan waktu sekarang.');
+            return;
+        }
+
+        $this->initializeSatuSehat();
+
+        // 6) Loop kirim tiap observasi nutrisi
+        foreach ($nutrisiMap as $item) {
+            // skip null / zero
+            if (empty($item['value']) || $item['value'] === '0') {
+                continue;
+            }
+
+            // cast ke numeric
+            $numeric = is_numeric($item['value'])
+                ? (strpos($item['value'], '.') !== false ? (float)$item['value'] : (int)$item['value'])
+                : null;
+            if ($numeric === null) {
+                continue;
+            }
+
+            // cek sudah dikirim?
+            if (collect($sentNutrition)->firstWhere('code', $item['code'])) {
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addInfo("{$item['display']} sudah terkirim.");
+                continue;
+            }
+
+            // build payload per-observasi nutrisi
+            $payload = [
+                'patientId'     => $patientUuid,
+                'encounterId'   => $encounterUuid,
+                'performerId'   => $performerId,
+                'effectiveDate' => $effective,
+                'code' => [
+                    'system'  => 'http://loinc.org',
+                    'code'    => $item['code'],
+                    'display' => $item['display'],
+                ],
+                'valueQuantity' => [
+                    'value'  => $numeric,
+                    'unit'   => $item['unitDisplay'],
+                    'system' => 'http://unitsofmeasure.org',
+                    'code'   => $item['unitCode'],
+                ],
+            ];
+
+            try {
+                $res   = $this->createObservation($payload);
+                $obsId = $res['id'] ?? null;
+                if (! $obsId) {
+                    continue;
+                }
+
+                // simpan tiap UUID
+                $dataDaftarPoliRJ['satuSehatUuidRJ']['antropometri'][] = [
+                    'uuid'        => $obsId,
+                    'code'        => $item['code'],
+                    'unitCode'    => $item['unitCode'],
+                    'unitDisplay' => $item['unitDisplay'],
+                    'value'       => $numeric,
+                ];
+
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addSuccess("{$item['display']} terkirim (UUID: {$obsId}).");
+            } catch (\Exception $e) {
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError("Gagal kirim {$item['display']}: " . $e->getMessage());
+            }
+            // update JSON lokal setelah tiap kirim
+            $this->updateJsonRJ($this->rjNoRef, $dataDaftarPoliRJ);
+        }
+    }
+
+
+    public function getObservationRJ($encounterId)
+    {
+        // 1) Inisialisasi koneksi SatuSehat
+        $this->initializeSatuSehat();
+
+        // 2) Cari semua Observation untuk encounter tersebut
+        $existing = $this->searchObservationsByEncounter($encounterId);
+
+        // 3) Tampilkan hasil untuk debug
+        dd($existing);
+    }
+
+
+
+
+
+
+
+    public function postDiagnosaRJ()
+    {
+        // 1) Ambil data
+        $find             = $this->findDataRJ($this->rjNoRef);
+        $dataDaftarPoliRJ = $find['dataDaftarRJ'] ?? [];
+        $dataPasienRJ     = $find['dataPasienRJ'] ?? [];
+
+        $patientUuid   = $dataPasienRJ['patientUuid']       ?? null;
+        $encounterUuid = $dataDaftarPoliRJ['satuSehatUuidRJ']['encounter']['uuid'] ?? null;
+        $diagnoses     = $dataDaftarPoliRJ['diagnosis']     ?? [];
+        $sentDiag      = $dataDaftarPoliRJ['satuSehatUuidRJ']['diagnosis'] ?? [];
+
+        // 2) Validasi
+        if (! $patientUuid) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('UUID pasien belum tersedia. Proses diagnosa dibatalkan.');
+            return;
+        }
+
+        // Validasi UUID encounter
+        if (! $encounterUuid) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('UUID encounter belum tersedia. Proses diagnosa dibatalkan.');
+            return;
+        }
+
+        // Validasi ada data diagnosa
+        if (empty($diagnoses)) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addInfo('Tidak ada data diagnosa untuk dikirim.');
+            return;
+        }
+
+        $this->initializeSatuSehat();
+        // 3) Loop kirim setiap diagnosa
+        foreach ($diagnoses as $diag) {
+            $icd10      = $diag['icdX']        ?? null;
+            $desc       = $diag['diagDesc']    ?? '';
+            $textLocal  = $diag['kategoriDiagnosa'] ?? $desc;
+            // skip jika sudah pernah dikirim
+            $existing = collect($sentDiag)->firstWhere('icd10Code', $icd10);
+            if ($existing) {
+                $uuidSent = $existing['uuid'] ?? '';
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addInfo("Diagnosa {$desc} sudah terkirim (UUID: {$uuidSent}).");
+                continue;
+            }
+
+            // ambil Task ID 5 (format "d/m/Y H:i:s") lalu convert ke ISO8601
+            try {
+                $recorded = Carbon::createFromFormat('d/m/Y H:i:s', $dataDaftarPoliRJ['taskIdPelayanan']['taskId5'])->toIso8601String();
+            } catch (\Throwable $e) {
+                // fallback ke now() jika parsing gagal
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError('Format Task ID 5 tidak valid. Proses diagnosa dibatalkan.');
+                return;
+            }
+
+            // build payload
+            $payload = [
+                'patientId'      => $patientUuid,
+                'encounterId'    => $encounterUuid,
+                'icd10_code'     => $icd10,
+                'icd10_display'  => $desc,
+                'diagnosis_text' => $textLocal,
+                'recordedDate'   => $recorded,
+                // hanya tambahkan SNOMED kalau ada:
+                // 'snomed_code'    => $snomedCode,
+                // 'snomed_display' => $snomedDisplay,
+            ];
+            try {
+                $result = $this->createFinalDiagnosis($payload);
+                $condId = $result['id'] ?? null;
+                if ($condId) {
+                    // catat ke JSON lokal
+                    $dataDaftarPoliRJ['satuSehatUuidRJ']['diagnosis'][] = [
+                        'uuid' => $condId,
+                        'icd10Code' => $icd10,
+                    ];
+                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                        ->addSuccess("Diagnosa {$desc} terkirim (UUID: {$condId}).");
+                }
+            } catch (\Exception $e) {
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addError("Gagal kirim diagnosa {$desc}: " . $e->getMessage());
+            }
+        }
+        // simpan perubahan
+        $this->updateJsonRJ($this->rjNoRef, $dataDaftarPoliRJ);
+    }
+
+    public function postTindakanRJ()
+    {
+        // 1) Ambil data
+        $find             = $this->findDataRJ($this->rjNoRef);
+        $dataDaftarPoliRJ = $find['dataDaftarRJ'] ?? [];
+        $dataPasienRJ     = $find['dataPasienRJ'] ?? [];
+
+        $patientUuid   = $dataPasienRJ['patientUuid'] ?? null;
+        $encounterUuid = $dataDaftarPoliRJ['satuSehatUuidRJ']['encounter']['uuid'] ?? null;
+        $procedures    = $dataDaftarPoliRJ['procedure'] ?? [];
+        $sentProc      = $dataDaftarPoliRJ['satuSehatUuidRJ']['procedures'] ?? [];
+        // 2) Validasi UUID pasien
+        if (! $patientUuid) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('UUID pasien belum tersedia. Proses tindakan dibatalkan.');
+            return;
+        }
+
+        // Validasi UUID encounter
+        if (! $encounterUuid) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('UUID encounter belum tersedia. Proses tindakan dibatalkan.');
+            return;
+        }
+
+        // Validasi ada data tindakan
+        if (empty($procedures)) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addInfo('Tidak ada data tindakan untuk dikirim.');
+            return;
+        }
+
+        // Siapkan koneksi SatuSehat
+        $this->initializeSatuSehat();
+
+        // 3) Loop kirim tiap tindakan
+        foreach ($procedures as $proc) {
+            $code    = $proc['procedureId'] ?? null;
+            $display = $proc['procedureDesc'] ?? '';
+
+            // skip jika sudah dikirim
+            $existing = collect($sentProc)->firstWhere('icd9cmCode', $code);
+            if ($existing) {
+                $uuidSent = $existing['uuid'] ?? '';
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addInfo("Tindakan {$display} sudah terkirim (UUID: {$uuidSent}).");
+                continue;
+            }
+
+            // Ambil Task ID 5 sebagai performedDateTime
+            try {
+                $performedDateTime = Carbon::createFromFormat(
+                    'd/m/Y H:i:s',
+                    $dataDaftarPoliRJ['taskIdPelayanan']['taskId5']
+                )->toIso8601String();
+            } catch (\Throwable $e) {
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addError('Format Task ID 5 tidak valid. Proses tindakan dibatalkan.');
+                return;
+            }
+
+            // 4) Bangun payload sesuai createProcedure()
+            $procedureData = [
+                'patientId'        => $patientUuid,
+                'encounterId'      => $encounterUuid,
+                // Override default SNOMED, gunakan ICD-9-CM
+                'codeSystem'       => 'http://hl7.org/fhir/sid/icd-9-cm',
+                'code'             => $code,        // misal "003.0"
+                'display'          => $display,     // misal "Salmonella gastroenteritis"
+                'performedDateTime' => $performedDateTime,
+                'performerId'      => $dataPasienRJ['drUuid'] ?? null,
+                'performerRole'    => 'Practitioner',
+            ];
+
+
+            try {
+                $result = $this->createProcedure($procedureData);
+                $procId = $result['id'] ?? null;
+
+                if ($procId) {
+                    // catat UUID & icd9cmCode
+                    $dataDaftarPoliRJ['satuSehatUuidRJ']['procedures'][] = [
+                        'uuid'         => $procId,
+                        'icd9cmCode'  => $code,
+                    ];
+                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                        ->addSuccess("Tindakan {$display} terkirim (UUID: {$procId}).");
+                }
+            } catch (\Exception $e) {
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addError("Gagal kirim tindakan {$display}: " . $e->getMessage());
+            }
+
+            // simpan perubahan lokal
+            $this->updateJsonRJ($this->rjNoRef, $dataDaftarPoliRJ);
+        }
+    }
 
 
     public function mount()

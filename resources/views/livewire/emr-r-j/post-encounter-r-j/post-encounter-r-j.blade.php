@@ -1,4 +1,4 @@
-<div class="grid grid-cols-5 gap-2">
+<div class="grid grid-cols-4 gap-1">
     <div class="text-xs text-gray-700">
         {{ $EncounterID }}
     </div>
@@ -54,6 +54,33 @@
         <x-loading />
     </div>
 
+    <x-light-button wire:click.prevent="postAntropometriRJ()" type="button" wire:loading.remove>
+        Kirim Nutrisi
+    </x-light-button>
+    <div wire:loading wire:target="postAntropometriRJ">
+        <x-loading />
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     <x-light-button wire:click.prevent="getAlergiRJ()" type="button" wire:loading.remove>
         Get Alergi
@@ -70,6 +97,31 @@
         <x-loading />
     </div>
 
+    <x-light-button wire:click.prevent="getObservationRJ('{{ $EncounterID }}')" type="button" wire:loading.remove>
+        Get Observation
+    </x-light-button>
+    <div wire:loading wire:target="getObservationRJ">
+        <x-loading />
+    </div>
+
+
+    <!-- Tombol Kirim Diagnosa -->
+    <x-light-button wire:click.prevent="postDiagnosaRJ()" type="button" wire:loading.remove
+        wire:target="postDiagnosaRJ">
+        Kirim Diagnosa
+    </x-light-button>
+    <div wire:loading wire:target="postDiagnosaRJ">
+        <x-loading />
+    </div>
+
+    <!-- Tombol Kirim Tindakan -->
+    <x-light-button wire:click.prevent="postTindakanRJ()" type="button" wire:loading.remove
+        wire:target="postTindakanRJ">
+        Kirim Tindakan
+    </x-light-button>
+    <div wire:loading wire:target="postTindakanRJ">
+        <x-loading />
+    </div>
 
     {{--
 

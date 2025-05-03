@@ -96,4 +96,17 @@ trait ObservationTrait
             ]
         ];
     }
+
+    /**
+     * Cari semua Observation untuk sebuah encounter.
+     *
+     * @param string $encounterId
+     * @return array
+     * @throws \Exception on HTTP error
+     */
+    public function searchObservationsByEncounter(string $encounterId): array
+    {
+        // Inisialisasi request ke endpoint Observation dengan filter encounter
+        return $this->makeRequest('get', "/Observation?encounter={$encounterId}");
+    }
 }

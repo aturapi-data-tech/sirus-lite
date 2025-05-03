@@ -537,17 +537,57 @@
                                                                         @endrole
                                                                     </ul>
 
-                                                                    @role(['Admin', 'Mr', 'Perawat'])
-                                                                        <div class="grid grid-cols-2 gap-1 mt-10 ml-2">
 
-                                                                            <livewire:emr-r-j.post-satu-data-kesehatan-r-j.post-satu-data-kesehatan-r-j
-                                                                                :rjNoRef="$RJp->rj_no"
-                                                                                :wire:key="'post-satu-data-kesehatan-r-j-'.$RJp->rj_no">
-                                                                        </div>
-                                                                    @endrole
+
+
 
 
                                                                 </div>
+
+
+                                                                @role(['Admin', 'Mr', 'Perawat'])
+                                                                    <!-- Dropdown Action menu Flowbite-->
+                                                                    <div>
+                                                                        <x-light-button
+                                                                            id="dropdownButtonSendData{{ $RJp->rj_no }}"
+                                                                            class="inline-flex"
+                                                                            wire:click="$emit('pressDropdownButtonSendData','{{ $RJp->rj_no }}')">
+                                                                            <svg class="w-6 h-6 text-gray-800 dark:text-white"
+                                                                                aria-hidden="true"
+                                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                                width="24" height="24"
+                                                                                fill="none" viewBox="0 0 24 24">
+                                                                                <path stroke="currentColor"
+                                                                                    stroke-linecap="round"
+                                                                                    stroke-linejoin="round"
+                                                                                    stroke-width="2"
+                                                                                    d="M15 17h3a3 3 0 0 0 0-6h-.025a5.56 5.56 0 0 0 .025-.5A5.5 5.5 0 0 0 7.207 9.021C7.137 9.017 7.071 9 7 9a4 4 0 1 0 0 8h2.167M12 19v-9m0 0-2 2m2-2 2 2" />
+                                                                            </svg>
+
+                                                                        </x-light-button>
+
+                                                                        <!-- Dropdown Action Open menu -->
+                                                                        <div id="dropdownMenuSendData{{ $RJp->rj_no }}"
+                                                                            class="z-10 hidden w-auto bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700">
+
+                                                                            <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
+                                                                                aria-labelledby="dropdownButtonSendData{{ $RJp->rj_no }}">
+
+                                                                                <div class="grid grid-cols-1 gap-2">
+                                                                                    <livewire:emr-r-j.post-encounter-r-j.post-encounter-r-j
+                                                                                        :rjNoRef="$RJp->rj_no"
+                                                                                        :wire:key="'post-encounter-r-j-'.$RJp->rj_no">
+
+                                                                                        <livewire:emr-r-j.post-satu-data-kesehatan-r-j.post-satu-data-kesehatan-r-j
+                                                                                            :rjNoRef="$RJp->rj_no"
+                                                                                            :wire:key="'post-satu-data-kesehatan-r-j-'.$RJp->rj_no">
+                                                                                </div>
+
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                    <!-- End Dropdown Action Open menu -->
+                                                                @endrole
 
                                                             </div>
 
@@ -853,11 +893,50 @@
 
             // press_dropdownButton flowbite
             window.Livewire.on('pressDropdownButton', (key) => {
+                // set the dropdown menu element
+                const $targetEl = document.getElementById('dropdownMenu' + key);
+
+                // set the element that trigger the dropdown menu on click
+                const $triggerEl = document.getElementById('dropdownButton' + key);
+
+                // options with default values
+                const options = {
+                    placement: 'left',
+                    triggerType: 'click',
+                    offsetSkidding: 0,
+                    offsetDistance: 10,
+                    delay: 300,
+                    onHide: () => {
+                        console.log('dropdown has been hidden');
+
+                    },
+                    onShow: () => {
+                        console.log('dropdown has been shown');
+                    },
+                    onToggle: () => {
+                        console.log('dropdown has been toggled');
+                    }
+                };
+
+                /*
+                 * $targetEl: required
+                 * $triggerEl: required
+                 * options: optional
+                 */
+                const dropdown = new Dropdown($targetEl, $triggerEl, options);
+
+                dropdown.show();
+
+            });
+
+
+            // press_dropdownButtonSendData flowbite
+            window.Livewire.on('pressDropdownButtonSendData', (key) => {
                     // set the dropdown menu element
-                    const $targetEl = document.getElementById('dropdownMenu' + key);
+                    const $targetEl = document.getElementById('dropdownMenuSendData' + key);
 
                     // set the element that trigger the dropdown menu on click
-                    const $triggerEl = document.getElementById('dropdownButton' + key);
+                    const $triggerEl = document.getElementById('dropdownButtonSendData' + key);
 
                     // options with default values
                     const options = {

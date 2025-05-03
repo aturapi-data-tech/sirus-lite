@@ -418,57 +418,85 @@ trait ConditionTrait
 
     public function createFinalDiagnosis(array $data): array
     {
+        // Setup coding entries
+        $codings = [];
+        // ICD-10 must
+        $codings[] = [
+            'system'  => 'http://hl7.org/fhir/sid/icd-10',
+            'code'    => $data['icd10_code'],
+            'display' => $data['icd10_display'],
+        ];
+        // SNOMED if provided
+        if (!empty($data['snomed_code']) && !empty($data['snomed_display'])) {
+            $codings[] = [
+                'system'  => 'http://snomed.info/sct',
+                'code'    => $data['snomed_code'],
+                'display' => $data['snomed_display'],
+            ];
+        }
+
+        // ClinicalStatus
+        $clinical = $data['clinicalStatus'] ?? ['code' => 'active', 'display' => 'Active'];
+        // VerificationStatus
+        $verification = $data['verificationStatus'] ?? ['code' => 'confirmed', 'display' => 'Confirmed'];
+
+        // Build payload
         $payload = [
             'resourceType'       => 'Condition',
             'clinicalStatus'     => [
-                ['coding' => [
-                    [
-                        'system'  => 'http://terminology.hl7.org/CodeSystem/condition-clinical',
-                        'code'    => 'resolved',
-                        'display' => 'Resolved'
-                    ]
-                ]]
+                'coding' => [[
+                    'system'  => 'http://terminology.hl7.org/CodeSystem/condition-clinical',
+                    'code'    => $clinical['code'],
+                    'display' => $clinical['display'],
+                ]],
+                'text' => $clinical['display'],
             ],
             'verificationStatus' => [
-                ['coding' => [
-                    [
-                        'system'  => 'http://terminology.hl7.org/CodeSystem/condition-ver-status',
-                        'code'    => 'confirmed',
-                        'display' => 'Confirmed'
-                    ]
-                ]]
+                'coding' => [[
+                    'system'  => 'http://terminology.hl7.org/CodeSystem/condition-ver-status',
+                    'code'    => $verification['code'],
+                    'display' => $verification['display'],
+                ]],
+                'text' => $verification['display'],
             ],
-            'category'           => [
-                ['coding' => [
-                    [
-                        'system'  => 'http://terminology.hl7.org/CodeSystem/condition-category',
-                        'code'    => 'encounter-diagnosis',
-                        'display' => 'Encounter Diagnosis'
-                    ]
-                ]]
-            ],
+            'category'           => [[
+                'coding' => [[
+                    'system'  => 'http://terminology.hl7.org/CodeSystem/condition-category',
+                    'code'    => 'encounter-diagnosis',
+                    'display' => 'Encounter Diagnosis',
+                ]],
+            ]],
             'code'               => [
-                'coding' => [
-                    // ICD-10 first
-                    [
-                        'system'  => 'http://hl7.org/fhir/sid/icd-10',
-                        'code'    => $data['icd10_code'],
-                        'display' => $data['icd10_display']
-                    ],
-                    // ICD-9-CM second
-                    [
-                        'system'  => 'http://hl7.org/fhir/sid/icd-9-cm',
-                        'code'    => $data['icd9cm_code'],
-                        'display' => $data['icd9cm_display']
-                    ]
-                ],
-                'text'   => $data['diagnosis_text']
+                'coding' => $codings,
+                'text'   => $data['diagnosis_text'],
             ],
-            'subject'            => ['reference' => 'Patient/' . $data['patientId']],
-            'encounter'          => ['reference' => 'Encounter/' . $data['encounterId']],
-            'recordedDate'       => $data['recordedDate'] ?? Carbon::now()->toIso8601String(),
+            'subject'            => [
+                'reference' => 'Patient/' . $data['patientId'],
+                'display'   => $data['patientDisplay'] ?? null,
+            ],
+            'encounter'          => [
+                'reference' => 'Encounter/' . $data['encounterId'],
+            ],
         ];
 
-        return $this->makeRequest('post', 'Condition', $payload);
+        // OnsetDateTime if provided
+        if (!empty($data['onsetDateTime'])) {
+            $payload['onsetDateTime'] = $data['onsetDateTime'];
+        }
+        // RecordedDate if provided
+        if (!empty($data['recordedDate'])) {
+            $payload['recordedDate'] = $data['recordedDate'];
+        }
+
+        // Stage assessment if provided
+        if (!empty($data['stageAssessment'])) {
+            $payload['stage'] = [[
+                'assessment' => [[
+                    'reference' => 'ClinicalImpression/' . $data['stageAssessment'],
+                ]],
+            ]];
+        }
+
+        return $this->makeRequest('post', '/Condition', $payload);
     }
 }
