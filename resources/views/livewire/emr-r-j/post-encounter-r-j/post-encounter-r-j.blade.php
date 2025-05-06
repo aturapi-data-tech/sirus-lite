@@ -123,6 +123,13 @@
         <x-loading />
     </div>
 
+    <x-light-button wire:click.prevent="postResepRJ()" type="button" wire:loading.remove wire:target="postResepRJ">
+        Kirim Resep
+    </x-light-button>
+    <div wire:loading wire:target="postResepRJ">
+        <x-loading />
+    </div>
+
     {{--
 
     <x-light-button wire:click.prevent="postDiagnosis()" type="button" wire:loading.remove>

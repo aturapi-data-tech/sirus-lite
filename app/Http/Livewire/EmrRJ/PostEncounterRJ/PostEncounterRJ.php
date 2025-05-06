@@ -10,6 +10,8 @@ use App\Http\Traits\SATUSEHAT\ConditionTrait;
 use App\Http\Traits\SATUSEHAT\AllergyIntoleranceTrait;
 use App\Http\Traits\SATUSEHAT\ObservationTrait;
 use App\Http\Traits\SATUSEHAT\ProcedureTrait;
+use App\Http\Traits\SATUSEHAT\MedicationRequestTrait;
+
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 
@@ -27,7 +29,8 @@ class PostEncounterRJ extends Component
         ConditionTrait,
         AllergyIntoleranceTrait,
         ObservationTrait,
-        ProcedureTrait;
+        ProcedureTrait,
+        MedicationRequestTrait;
 
 
     public $rjNoRef;
@@ -1052,7 +1055,6 @@ class PostEncounterRJ extends Component
         $encounterUuid = $dataDaftarPoliRJ['satuSehatUuidRJ']['encounter']['uuid'] ?? null;
         $sentNutrition = $dataDaftarPoliRJ['satuSehatUuidRJ']['antropometri'] ?? [];
         $performerId   = $dataPasienRJ['drUuid'] ?? null;
-        dd($sentNutrition);
         // 2) Validasi prasyarat
         if (! $patientUuid || ! $performerId || ! $encounterUuid) {
             $msg = ! $patientUuid   ? 'UUID pasien belum tersedia.'
@@ -1086,7 +1088,7 @@ class PostEncounterRJ extends Component
         foreach ($nutrisiKeys as $key) {
             $value = $nutrisi[$key] ?? null;
 
-            if (! empty($value) && $value !== '0') {
+            if (!empty($value) && $value !== '0') {
                 $hasAny = true;
                 break;
             }
@@ -1459,6 +1461,496 @@ class PostEncounterRJ extends Component
             $this->updateJsonRJ($this->rjNoRef, $dataDaftarPoliRJ);
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // public function postResepRJ()
+    // {
+    //     // 1) Get data
+    //     $find             = $this->findDataRJ($this->rjNoRef);
+    //     $dataDaftarPoliRJ = $find['dataDaftarRJ'] ?? [];
+    //     $dataPasienRJ     = $find['dataPasienRJ'] ?? [];
+    //     $patientUuid   = $dataPasienRJ['patientUuid'] ?? null;
+    //     $encounterUuid = $dataDaftarPoliRJ['satuSehatUuidRJ']['encounter']['uuid'] ?? null;
+    //     $eresep        = $dataDaftarPoliRJ['eresep'] ?? [];
+    //     $sentRx        = $dataDaftarPoliRJ['satuSehatUuidRJ']['medicationRequests'] ?? [];
+    //     $requesterId   = $dataPasienRJ['drUuid'] ?? null;
+    //     $requesterName = $dataPasienRJ['drName'] ?? null;
+
+    //     // Get prescription time from Task ID 6
+    //     $authoredOnRaw = $dataDaftarPoliRJ['taskIdPelayanan']['taskId6'] ?? null;
+
+    //     // 1) Validasi Task ID 6 (waktu penulisan resep)
+    //     if (! $authoredOnRaw) {
+    //         toastr()->closeOnHover(true)
+    //             ->closeDuration(3)
+    //             ->positionClass('toast-top-left')
+    //             ->addError('Waktu penulisan resep (Task ID 6) belum tersedia. Proses resep dibatalkan.');
+    //         return;
+    //     }
+
+    //     // 2) Validasi UUID Dokter
+    //     if (! $requesterId) {
+    //         toastr()->closeOnHover(true)
+    //             ->closeDuration(3)
+    //             ->positionClass('toast-top-left')
+    //             ->addError('UUID dokter belum tersedia. Proses resep dibatalkan.');
+    //         return;
+    //     }
+
+    //     // 3) Validasi UUID Pasien
+    //     if (! $patientUuid) {
+    //         toastr()->closeOnHover(true)
+    //             ->closeDuration(3)
+    //             ->positionClass('toast-top-left')
+    //             ->addError('UUID pasien belum tersedia. Proses resep dibatalkan.');
+    //         return;
+    //     }
+
+    //     // 4) Validasi UUID Encounter
+    //     if (! $encounterUuid) {
+    //         toastr()->closeOnHover(true)
+    //             ->closeDuration(3)
+    //             ->positionClass('toast-top-left')
+    //             ->addError('UUID kunjungan belum tersedia. Proses resep dibatalkan.');
+    //         return;
+    //     }
+
+    //     // 5) Validasi ada data resep obat
+    //     if (empty($eresep)) {
+    //         toastr()->closeOnHover(true)
+    //             ->closeDuration(3)
+    //             ->positionClass('toast-top-left')
+    //             ->addInfo('Tidak ada data resep obat untuk dikirim.');
+    //         return;
+    //     }
+
+
+    //     // Parse date format to ISO8601
+    //     try {
+    //         $authoredOn = Carbon::createFromFormat(
+    //             'd/m/Y H:i:s',
+    //             $authoredOnRaw,
+    //             'Asia/Jakarta'
+    //         )->toIso8601String();
+    //     } catch (\Exception $e) {
+    //         toastr()->closeOnHover(true)->closeDuration(3)
+    //             ->positionClass('toast-top-left')
+    //             ->addError("Format Task ID 6 tidak valid ({$authoredOnRaw}). Proses resep dibatalkan.");
+    //         return;
+    //     }
+
+    //     $this->initializeSatuSehat();
+    //     $sentRx = collect($sentRx);
+
+    //     // Generate unique prescription ID
+    //     $prescriptionId = 'RESEP-RJ-' . $this->rjNoRef . '-' . now()->format('YmdHis');
+
+    //     // 3) Process each medication item
+    //     foreach ($eresep as $item) {
+    //         $localId   = $item['rjObatDtl'];
+    //         $code      = $item['productId'];
+    //         $display   = $item['productName'];
+    //         $signaX    = (int)$item['signaX'];
+    //         $signaHari = (int)$item['signaHari'];
+    //         $qtyTotal  = (float)$item['qty'];
+
+    //         // Skip if already sent
+    //         if ($sentRx->firstWhere('localId', $localId)) {
+    //             toastr()->addInfo("Obat {$display} sudah dikirim.");
+    //             continue;
+    //         }
+
+    //         // Get product mapping
+    //         $product = DB::table('immst_products')
+    //             ->select('product_id_satusehat', 'product_name_satusehat', 'uom_id')
+    //             ->where('product_id', $item['productId'])
+    //             ->first();
+
+    //         if (!$product || !$product->product_id_satusehat) {
+    //             toastr()->addError("Mapping SatuSehat untuk produk {$item['productId']} tidak ditemukan.");
+    //             continue;
+    //         }
+
+    //         $code    = $product->product_id_satusehat;
+    //         $display = $product->product_name_satusehat;
+
+    //         $formMapping = [
+    //             'tablet'           => ['code' => 'TAB',     'display' => 'Tablet'],
+    //             'capsule'          => ['code' => 'CAP',     'display' => 'Capsule'],
+    //             'pill'             => ['code' => 'PILL',    'display' => 'Pill'],
+    //             'oral_capsule'     => ['code' => 'ORCAP',   'display' => 'Oral Capsule'],
+    //             'caplet'           => ['code' => 'CAPLET',  'display' => 'Caplet'],
+    //             'chewable_tablet'  => ['code' => 'CHEWTAB', 'display' => 'Chewable Tablet'],
+    //         ];
+
+    //         $keyFormMapping = 'tablet';
+    //         // Ambil mapping, atau default ke tablet
+    //         $mappingSatuan = $formMapping[$keyFormMapping] ?? $formMapping['tablet'];
+
+    //         $dosageInstruction = [[
+    //             'text'               => "{$signaX}× sehari, selama {$signaHari} hari",
+    //             'patientInstruction' => "Diminum {$signaX} kali sehari",
+    //             'timing'             => [
+    //                 'repeat' => [
+    //                     'frequency'  => $signaX,
+    //                     'period'     => 1,
+    //                     'periodUnit' => 'd',
+    //                 ]
+    //             ],
+    //             'route'              => [
+    //                 'coding' => [[
+    //                     'code'    => 'O',
+    //                     'display' => 'Oral',
+    //                     'system' => "http://www.whocc.no/atc"
+    //                 ]]
+    //             ],
+    //             'doseAndRate'        => [[
+    //                 'doseQuantity' => [
+    //                     'value'  => 1,
+    //                     'unit'   => $mappingSatuan['display'],    // e.g. "Tablet"
+    //                     'system' => 'http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm',
+    //                     'code'   => $mappingSatuan['code'],       // e.g. "TAB"
+    //                 ]
+    //             ]]
+    //         ]];
+
+
+    //         // 2) Bangun dispenseRequest tanpa field non-FHIR (interval*) dan tanpa code/system
+    //         // Siapkan komponen‐komponen dispenseRequest
+    //         $dispenseInterval = [
+    //             'code'   => 'd',
+    //             'system' => 'http://unitsofmeasure.org',
+    //             'unit'   => 'days',
+    //             'value'  => 1,
+    //         ];
+
+    //         $quantity = [
+    //             'value'  => $qtyTotal,
+    //             'unit'   => $mappingSatuan['display'],   // e.g. "Tablet"
+    //             'system' => 'http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm',
+    //             'code'   => $mappingSatuan['code'],      // e.g. "TAB"
+    //         ];
+
+    //         $expectedSupplyDuration = [
+    //             'value'  => $signaHari,
+    //             'unit'   => 'days',
+    //             'system' => 'http://unitsofmeasure.org',
+    //             'code'   => 'd',
+    //         ];
+
+    //         $validityPeriod = [
+    //             'start' => $authoredOn,
+    //             'end'   => Carbon::parse($authoredOn)
+    //                 ->addDays($signaHari)
+    //                 ->toIso8601String(),
+    //         ];
+
+    //         $numberOfRepeatsAllowed = 0;
+
+    //         // Gabungkan ke dalam satu array dengan komentar penjelas
+
+
+    //         // 3) Siapkan identifier sesuai spec SatuSehat
+    //         $orgId = env('SATUSEHAT_ORGANIZATION_ID');
+    //         $identifier = [
+    //             // [
+    //             //     'system' => "http://sys-ids.kemkes.go.id/prescription/{$orgId}",
+    //             //     'use'    => 'official',
+    //             //     'value'  => $prescriptionId,                     // ID batch resep
+    //             // ],
+    //             [
+    //                 'system' => "http://sys-ids.kemkes.go.id/prescription-item/{$orgId}",
+    //                 'use'    => 'official',
+    //                 'value'  => "{$prescriptionId}-{$localId}",      // ID baris resep
+    //             ],
+    //         ];
+
+    //         // 4) Bangun payload lengkap
+
+    //         $dispenseRequest = [
+    //             'performer' => ['reference' => "Organization/{$orgId}"],
+    //             // Seberapa sering pasien boleh mengambil obat
+    //             'dispenseInterval'       => $dispenseInterval,
+
+    //             // Total kuantitas obat yang diberikan
+    //             'quantity'               => $quantity,
+
+    //             // Lama total pengobatan (supply duration)
+    //             'expectedSupplyDuration' => $expectedSupplyDuration,
+
+    //             // Berapa kali resep bisa di‐refill
+    //             'numberOfRepeatsAllowed' => $numberOfRepeatsAllowed,
+
+    //             // Periode validitas resep
+    //             'validityPeriod'         => $validityPeriod,
+    //         ];
+
+    //         $filter = urlencode("http://sys-ids.kemkes.go.id/kfa|{$code}");
+    //         dd($this->makeRequest('get', "Medication?code={$filter}"));
+
+    //         $dataReq = [
+    //             'identifier'        => $identifier,
+    //             'patientId'         => $patientUuid,
+    //             'encounterId'       => $encounterUuid,
+    //             'authoredOn'        => $authoredOn,
+    //             'requesterId'       => $requesterId,
+    //             'requesterName'     => $requesterName,     // <— make sure this is set
+    //             'medicationCodeableConcept' => [
+    //                 'system'  => 'http://sys-ids.kemkes.go.id/kfa',
+    //                 'code'    => $code,
+    //                 'display' => $display,
+    //             ],
+    //             'medicationReference'       => 'Medication/' . $code,
+    //             'category'                  => 'outpatient',
+    //             'dosageInstruction'         => $dosageInstruction,
+    //             'dispenseRequest'           => $dispenseRequest,
+    //             'note'                      => "Resep ditulis oleh {$requesterName}",
+    //         ];
+
+
+    //         // dd($requesterId);
+    //         // Send to SatuSehat
+    //         try {
+    //             $resp = $this->createMedicationRequest($dataReq);
+    //             $mrId = $resp['id'] ?? null;
+
+    //             if (!$mrId) {
+    //                 throw new \Exception('UUID tidak diterima dari SatuSehat');
+    //             }
+
+    //             // Save to local JSON
+    //             $dataDaftarPoliRJ['satuSehatUuidRJ']['medicationRequests'][] = [
+    //                 'uuid'    => $mrId,
+    //                 'localId' => $localId,
+    //             ];
+    //             $this->updateJsonRJ($this->rjNoRef, $dataDaftarPoliRJ);
+
+    //             toastr()->addSuccess("Obat {$display} terkirim (UUID: {$mrId}).");
+    //         } catch (\Exception $e) {
+    //             toastr()->addError("Gagal kirim {$display}: " . $e->getMessage());
+    //         }
+    //     }
+
+    //     // [Racikan code can be added here following similar pattern]
+    // }
+    public function postResepRJ()
+    {
+        // 1) Ambil data dasar
+        $find             = $this->findDataRJ($this->rjNoRef);
+        $dataDaftarPoliRJ = $find['dataDaftarRJ'] ?? [];
+        $dataPasienRJ     = $find['dataPasienRJ'] ?? [];
+        $patientUuid      = $dataPasienRJ['patientUuid'] ?? null;
+        $encounterUuid    = $dataDaftarPoliRJ['satuSehatUuidRJ']['encounter']['uuid'] ?? null;
+        $eresep           = $dataDaftarPoliRJ['eresep'] ?? [];
+        $sentRx           = collect($dataDaftarPoliRJ['satuSehatUuidRJ']['medicationRequests'] ?? []);
+
+        // UUID dokter & nama
+        $requesterId   = $dataPasienRJ['drUuid'] ?? null;
+        $requesterName = $dataPasienRJ['drName'] ?? null;
+
+        // Task ID 6 = waktu resep
+        $authoredOnRaw = $dataDaftarPoliRJ['taskIdPelayanan']['taskId6'] ?? null;
+
+        // Validasi prasyarat
+        if (! $authoredOnRaw || ! $requesterId || ! $patientUuid || ! $encounterUuid) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Data resep tidak lengkap. Proses dibatalkan.');
+            return;
+        }
+
+        try {
+            $authoredOn = Carbon::createFromFormat('d/m/Y H:i:s', $authoredOnRaw, 'Asia/Jakarta')->toIso8601String();
+        } catch (\Exception $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError("Format waktu resep tidak valid ({$authoredOnRaw}).");
+            return;
+        }
+
+        $this->initializeSatuSehat();
+        $orgId          = env('SATUSEHAT_ORGANIZATION_ID');
+        $prescriptionId = 'RESEP-RJ-' . $this->rjNoRef . '-' . now()->format('YmdHis');
+
+        // mapping bentuk sediaan
+        $formMapping = [
+            'tablet'          => ['code' => 'BS066', 'display' => 'Tablet'],
+            'capsule'         => ['code' => 'CA030', 'display' => 'Capsule'],
+            'kaplet'          => ['code' => 'KL030', 'display' => 'Kaplet Salut Selaput'],
+            'pill'            => ['code' => 'PL010', 'display' => 'Pil'],
+            'chewable_tablet' => ['code' => 'CHEWTAB', 'display' => 'Chewable Tablet'],
+            'syrup'           => ['code' => 'SY010', 'display' => 'Syrup'],
+            'suspension'      => ['code' => 'SS020', 'display' => 'Suspension'],
+            'injection'       => ['code' => 'IN010', 'display' => 'Injection'],
+            // dst.
+        ];
+        $dosageMapping = [
+            'tablet'          => ['code' => 'TAB',     'display' => 'Tablet'],
+            'capsule'         => ['code' => 'CAP',     'display' => 'Capsule'],
+            'pill'            => ['code' => 'PILL',    'display' => 'Pill'],
+            'oral_capsule'    => ['code' => 'ORCAP',   'display' => 'Oral Capsule'],
+            'caplet'          => ['code' => 'CAPLET',  'display' => 'Caplet'],
+            'chewable_tablet' => ['code' => 'CHEWTAB', 'display' => 'Chewable Tablet'],
+            'syrup'           => ['code' => 'SYRUP',   'display' => 'Syrup'],
+            'suspension'      => ['code' => 'SUSP',    'display' => 'Suspension'],
+            'injection'       => ['code' => 'INJ',     'display' => 'Injection'],
+        ];
+        foreach ($eresep as $item) {
+            $localId = $item['rjObatDtl'];
+            if ($sentRx->firstWhere('localId', $localId)) {
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addInfo("Obat {$item['productName']} sudah dikirim.");
+                continue;
+            }
+
+            // Data obat lokal
+            $product = DB::table('immst_products')
+                ->select('product_id_satusehat', 'product_name_satusehat')
+                ->where('product_id', $item['productId'])
+                ->first();
+            if (! $product) {
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addError("Mapping SatuSehat untuk produk {$item['productId']} tidak ditemukan.");
+                continue;
+            }
+
+            $code    = $product->product_id_satusehat;
+            $display = $product->product_name_satusehat;
+            $qty     = (float) $item['qty'];
+            $x       = (int) $item['signaX'];
+            $days    = (int) $item['signaHari'];
+
+            // bentuk sediaan default
+            $mappingDataForm = $formMapping['tablet'];
+
+            // build containedMedication
+            $medContainedId = "{$prescriptionId}-{$localId}";
+            $containedMed = [
+                'resourceType' => 'Medication',
+                'id'           => $medContainedId,
+                'meta'         => ['profile' => ['https://fhir.kemkes.go.id/r4/StructureDefinition/Medication']],
+                'identifier'   => [[
+                    'system' => "http://sys-ids.kemkes.go.id/medication/{$orgId}",
+                    'use'    => 'official',
+                    'value'  => $medContainedId,
+                ]],
+                'code'   => ['coding' => [[
+                    'system'  => 'http://sys-ids.kemkes.go.id/kfa',
+                    'code'    => $code,
+                    'display' => $display,
+                ]]],
+                'status' => 'active',
+                'form'   => ['coding' => [[
+                    'system'  => 'http://terminology.kemkes.go.id/CodeSystem/medication-form',
+                    'code'    => $mappingDataForm['code'],
+                    'display' => $mappingDataForm['display'],
+                ]]],
+                'extension' => [[
+                    'url' => 'https://fhir.kemkes.go.id/r4/StructureDefinition/MedicationType',
+                    'valueCodeableConcept' => ['coding' => [[
+                        'system'  => 'http://terminology.kemkes.go.id/CodeSystem/medication-type',
+                        'code'    => 'NC',
+                        'display' => 'Non-compound',
+                    ]]],
+                ]],
+            ];
+
+
+            // bentuk sediaan default
+            $mappingDataDosage = $dosageMapping['tablet'];
+            // dosageInstruction & dispenseRequest
+            $dosageInstruction = [[
+                'sequence'           => 1,
+                'patientInstruction' => "{$x}× sehari, selama {$days} hari",
+                'timing'             => ['repeat' => ['frequency' => $x, 'period' => 1, 'periodUnit' => 'd']],
+                'route'              => ['coding' => [['system' => 'http://www.whocc.no/atc', 'code' => 'O', 'display' => 'Oral']]],
+                'doseAndRate'        => [[
+                    'doseQuantity' => [
+                        'value'  => 1,
+                        'unit'   => $mappingDataDosage['display'],
+                        'system' => 'http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm',
+                        'code'   => $mappingDataDosage['code'],
+                    ],
+                ]],
+            ]];
+
+            $dispenseRequest = [
+                'performer' => ['reference' => "Organization/{$orgId}"],
+                'quantity'  => ['value' => $qty, 'unit' => $mappingDataDosage['display'], 'system' => 'http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm', 'code' => $mappingDataDosage['code']],
+                'expectedSupplyDuration' => ['value' => $days, 'unit' => 'days', 'system' => 'http://unitsofmeasure.org', 'code' => 'd'],
+                'validityPeriod' => ['start' => $authoredOn, 'end' => Carbon::parse($authoredOn)->addDays($days)->toIso8601String()],
+                'numberOfRepeatsAllowed' => 0,
+            ];
+
+            // susun request data
+            $dataReq = [
+                'registrationId'       => $prescriptionId,
+                'orgId'                => $orgId,
+                'patientId'            => $patientUuid,
+                'patientName'          => $dataPasienRJ['patientName'] ?? '',
+                'encounterId'          => $encounterUuid,
+                'authoredOn'           => $authoredOn,
+                'requesterId'          => $requesterId,
+                'requesterName'        => $requesterName,
+                'prescriptionId'       => $prescriptionId,
+                'medContainedId'       => $medContainedId,
+                'medicationCode'       => $code,
+                'medicationDisplay'    => $display,
+                'medicationTypeCode'   => 'NC',   //NC – Non-compound   CP – Compound
+                'medicationTypeDisplay' => 'Non-compound',
+                'medicationFormCode'   => $mappingDataForm['code'],
+                'medicationFormDisplay' => $mappingDataForm['display'],
+                'category'             => 'community',
+                'containedMedication'  => $containedMed,
+                'reasonReference'      => [[
+                    'reference' => 'Condition/' . $dataDaftarPoliRJ['satuSehatUuidRJ']['chiefComplaint']['uuid'] ?? '', //uuid keluhan utama
+                    'display' => $dataDaftarPoliRJ['anamnesa']['keluhanUtama']['snomedDisplay'] ?? ''
+                ]],
+                'dosageInstruction'    => $dosageInstruction,
+                'dispenseRequest'      => $dispenseRequest,
+                'note'                 => "Resep ditulis oleh {$requesterName}",
+            ];
+
+            // kirim
+            try {
+                $resp = $this->createMedicationRequest($dataReq);
+                $mrId = $resp['id'] ?? null;
+                if (!$mrId) throw new \Exception('UUID tidak diterima');
+
+                // simpan ke local
+                $dataDaftarPoliRJ['satuSehatUuidRJ']['medicationRequests'][] = ['uuid' => $mrId, 'localId' => $localId];
+                $this->updateJsonRJ($this->rjNoRef, $dataDaftarPoliRJ);
+
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addSuccess("Obat {$display} terkirim (UUID: {$mrId}).");
+            } catch (\Exception $e) {
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addError("Gagal kirim {$display}: {$e->getMessage()}");
+            }
+        }
+    }
+
+
+
+
+
+
+
+
+
+
 
 
     public function mount()
