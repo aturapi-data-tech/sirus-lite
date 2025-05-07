@@ -181,7 +181,7 @@ class VisitRI extends Component
         $riVisit = DB::table('rstxn_rivisits')
             ->join('rsmst_doctors', 'rstxn_rivisits.dr_id', '=', 'rsmst_doctors.dr_id')
             ->select(
-                'rstxn_rivisits.visit_date',
+                DB::raw("to_char(rstxn_rivisits.visit_date, 'dd/mm/yyyy hh24:mi:ss') AS visit_date"),
                 'rstxn_rivisits.dr_id',
                 'rsmst_doctors.dr_name',
                 'rstxn_rivisits.visit_price',

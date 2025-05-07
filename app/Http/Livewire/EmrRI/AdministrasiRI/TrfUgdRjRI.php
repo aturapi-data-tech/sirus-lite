@@ -43,7 +43,7 @@ class TrfUgdRjRI extends Component
     {
         $riTrfUgdRj = DB::table('rstxn_ritempadmins')
             ->select(
-                'tempadm_date',
+                DB::raw("to_char(tempadm_date, 'dd/mm/yyyy hh24:mi:ss') as tempadm_date"),
                 'rj_admin',
                 'poli_price',
                 'acte_price',

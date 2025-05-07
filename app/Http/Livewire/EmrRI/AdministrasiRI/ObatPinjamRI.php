@@ -182,7 +182,7 @@ class ObatPinjamRI extends Component
         $riObatPinjam = DB::table('rstxn_riobats')
             ->join('immst_products', 'immst_products.product_id', '=', 'rstxn_riobats.product_id')
             ->select(
-                'rstxn_riobats.riobat_date',
+                DB::raw("to_char(rstxn_riobats.riobat_date,     'dd/mm/yyyy hh24:mi:ss') as riobat_date"),
                 'rstxn_riobats.product_id as product_id',
                 'immst_products.product_name',
                 'rstxn_riobats.riobat_qty',

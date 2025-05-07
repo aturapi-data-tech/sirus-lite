@@ -43,7 +43,7 @@ class BonResepRI extends Component
     {
         $riBonResep = DB::table('rstxn_ribonobats')
             ->select(
-                'ribon_date',
+                DB::raw("to_char(rstxn_ribonobats.ribon_date, 'dd/mm/yyyy hh24:mi:ss') as ribon_date"),
                 'ribon_desc',
                 'ribon_price',
                 'rihdr_no',

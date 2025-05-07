@@ -43,7 +43,7 @@ class LaboratoriumRI extends Component
     {
         $riLaboratorium = DB::table('rstxn_rilabs')
             ->select(
-                'lab_date',
+                DB::raw("to_char(rstxn_rilabs.lab_date, 'dd/mm/yyyy hh24:mi:ss') as lab_date"),
                 'lab_desc',
                 'lab_price',
                 'lab_dtl',

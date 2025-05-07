@@ -30,8 +30,34 @@
                         </thead>
                         <tbody class="bg-white dark:bg-gray-800">
 
-                            @isset($dataBonResep['riBonResep'])
-                                @foreach ($dataBonResep['riBonResep'] as $key => $BonResep)
+                            @php
+                                use Carbon\Carbon;
+
+                                $sortedRiBonResep = collect($dataBonResep['riBonResep'] ?? [])
+                                    ->sortByDesc(function ($item) {
+                                        $date = $item['ribon_date'] ?? '';
+
+                                        // Jika kosong, kembalikan 0 agar muncul paling bawah
+                                        if (!$date) {
+                                            return 0;
+                                        }
+
+                                        try {
+                                            return Carbon::createFromFormat(
+                                                'd/m/Y H:i:s',
+                                                $date,
+                                                env('APP_TIMEZONE'),
+                                            )->timestamp;
+                                        } catch (\Exception $e) {
+                                            // Jika parsing gagal (format tidak sesuai atau ada trailing data), kembalikan 0
+                                            return 0;
+                                        }
+                                    })
+                                    ->values();
+                            @endphp
+
+                            @if ($sortedRiBonResep->isNotEmpty())
+                                @foreach ($sortedRiBonResep as $key => $BonResep)
                                     <tr class="border-b group dark:border-gray-700">
 
                                         <td
@@ -52,7 +78,7 @@
 
                                     </tr>
                                 @endforeach
-                            @endisset
+                            @endif
 
 
                         </tbody>

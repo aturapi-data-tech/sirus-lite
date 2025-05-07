@@ -30,8 +30,32 @@
                         </thead>
                         <tbody class="bg-white dark:bg-gray-800">
 
-                            @isset($dataRtnObat['riRtnObat'])
-                                @foreach ($dataRtnObat['riRtnObat'] as $key => $RtnObat)
+                            @php
+                                use Carbon\Carbon;
+
+                                $sortedRiRtnObat = collect($dataRtnObat['riRtnObat'] ?? [])
+                                    ->sortByDesc(function ($item) {
+                                        $date = $item['riobat_date'] ?? '';
+                                        // Jika kosong, jadikan paling bawah
+                                        if (!$date) {
+                                            return 0;
+                                        }
+                                        try {
+                                            return Carbon::createFromFormat(
+                                                'd/m/Y H:i:s',
+                                                $date,
+                                                env('APP_TIMEZONE'),
+                                            )->timestamp;
+                                        } catch (\Exception $e) {
+                                            // Jika parsing gagal, juga paling bawah
+                                            return 0;
+                                        }
+                                    })
+                                    ->values();
+                            @endphp
+
+                            @if ($sortedRiRtnObat->isNotEmpty())
+                                @foreach ($sortedRiRtnObat as $key => $RtnObat)
                                     <tr class="border-b group dark:border-gray-700">
 
                                         <td
@@ -44,18 +68,26 @@
                                             {{ $RtnObat['product_name'] }}
                                         </td>
 
-
+                                        @php
+                                            // Ambil qty & price, default 0 jika bukan angka
+                                            $qty = is_numeric($RtnObat['riobat_qty'] ?? null)
+                                                ? $RtnObat['riobat_qty']
+                                                : 0;
+                                            $price = is_numeric($RtnObat['riobat_price'] ?? null)
+                                                ? $RtnObat['riobat_price']
+                                                : 0;
+                                            $total = $qty * $price;
+                                        @endphp
                                         <td
                                             class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                            {{ number_format($RtnObat['riobat_qty']) }}*
-                                            {{ number_format($RtnObat['riobat_price']) }}=
-                                            {{ number_format($RtnObat['riobat_qty'] * $RtnObat['riobat_price']) }}
-
+                                            {{ number_format($qty) }} x;
+                                            {{ number_format($price) }} =;
+                                            {{ number_format($total) }}
                                         </td>
 
                                     </tr>
                                 @endforeach
-                            @endisset
+                            @endif
 
 
                         </tbody>

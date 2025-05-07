@@ -128,8 +128,34 @@
                         </thead>
                         <tbody class="bg-white dark:bg-gray-800">
 
-                            @isset($dataKonsul['riKonsul'])
-                                @foreach ($dataKonsul['riKonsul'] as $key => $Konsul)
+                            @php
+                                use Carbon\Carbon;
+
+                                $sortedRiKonsul = collect($dataKonsul['riKonsul'] ?? [])
+                                    ->sortByDesc(function ($item) {
+                                        $date = $item['konsul_date'] ?? '';
+
+                                        // Jika kosong, kembalikan 0 agar muncul paling bawah
+                                        if (!$date) {
+                                            return 0;
+                                        }
+
+                                        try {
+                                            return Carbon::createFromFormat(
+                                                'd/m/Y H:i:s',
+                                                $date,
+                                                env('APP_TIMEZONE'),
+                                            )->timestamp;
+                                        } catch (\Exception $e) {
+                                            // Jika parsing gagal, juga kembalikan 0
+                                            return 0;
+                                        }
+                                    })
+                                    ->values();
+                            @endphp
+
+                            @if ($sortedRiKonsul->isNotEmpty())
+                                @foreach ($sortedRiKonsul as $key => $Konsul)
                                     <tr class="border-b group dark:border-gray-700">
 
                                         <td
@@ -170,7 +196,7 @@
 
                                     </tr>
                                 @endforeach
-                            @endisset
+                            @endif
 
 
                         </tbody>

@@ -23,8 +23,34 @@
                         </thead>
                         <tbody class="bg-white dark:bg-gray-800">
 
-                            @isset($dataAdminLog['riAdminLog'])
-                                @foreach ($dataAdminLog['riAdminLog'] as $key => $AdminLog)
+                            @php
+                                use Carbon\Carbon;
+
+                                $sortedRiAdminLog = collect($dataAdminLog['riAdminLog'] ?? [])
+                                    ->sortByDesc(function ($item) {
+                                        $date = $item['userLogDate'] ?? '';
+
+                                        // Jika kosong, jadikan paling bawah
+                                        if (!$date) {
+                                            return 0;
+                                        }
+
+                                        try {
+                                            return Carbon::createFromFormat(
+                                                'd/m/Y H:i:s',
+                                                $date,
+                                                env('APP_TIMEZONE'),
+                                            )->timestamp;
+                                        } catch (\Exception $e) {
+                                            // Jika parsing gagal (format tidak sesuai), kembalikan 0
+                                            return 0;
+                                        }
+                                    })
+                                    ->values();
+                            @endphp
+
+                            @if ($sortedRiAdminLog->isNotEmpty())
+                                @foreach ($sortedRiAdminLog as $key => $AdminLog)
                                     <tr class="border-b group dark:border-gray-700">
 
                                         <td
@@ -39,11 +65,13 @@
                                         <td
                                             class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
                                             @if (str_contains(strtolower($AdminLog['userLogDesc']), 'remove'))
-                                                <span class="text-red-600">{{ 'User Log: ' . $AdminLog['userLog'] }}</span>
+                                                <span
+                                                    class="text-red-600">{{ 'User Log: ' . $AdminLog['userLog'] }}</span>
                                                 </br>
                                                 <span class="text-red-600">{{ $AdminLog['userLogDesc'] }}</span>
                                             @else
-                                                <span class="text-gray-700">{{ 'User Log: ' . $AdminLog['userLog'] }}</span>
+                                                <span
+                                                    class="text-gray-700">{{ 'User Log: ' . $AdminLog['userLog'] }}</span>
                                                 </br>
                                                 <span class="text-gray-700">{{ $AdminLog['userLogDesc'] }}</span>
                                             @endif
@@ -51,7 +79,7 @@
 
                                     </tr>
                                 @endforeach
-                            @endisset
+                            @endif
 
 
                         </tbody>

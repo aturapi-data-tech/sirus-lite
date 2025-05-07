@@ -181,7 +181,7 @@ class KonsulRI extends Component
         $riKonsul = DB::table('rstxn_rikonsuls')
             ->join('rsmst_doctors', 'rstxn_rikonsuls.dr_id', '=', 'rsmst_doctors.dr_id')
             ->select(
-                'rstxn_rikonsuls.konsul_date',
+                DB::raw("to_char(rstxn_rikonsuls.konsul_date, 'dd/mm/yyyy hh24:mi:ss') as konsul_date"),
                 'rstxn_rikonsuls.dr_id',
                 'rsmst_doctors.dr_name',
                 'rstxn_rikonsuls.konsul_price',

@@ -281,7 +281,7 @@ class JasaMedisRI extends Component
         $riJasaMedis = DB::table('rstxn_riactparams')
             ->join('rsmst_actparamedics', 'rsmst_actparamedics.pact_id', '=', 'rstxn_riactparams.pact_id')
             ->select(
-                'rstxn_riactparams.actp_date',
+                DB::raw("to_char(rstxn_riactparams.actp_date, 'dd/mm/yyyy hh24:mi:ss') as actp_date"),
                 'rstxn_riactparams.pact_id',
                 'rsmst_actparamedics.pact_desc',
                 'rstxn_riactparams.actp_price',

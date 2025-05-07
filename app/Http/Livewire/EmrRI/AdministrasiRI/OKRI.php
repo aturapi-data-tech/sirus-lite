@@ -42,7 +42,13 @@ class OKRI extends Component
     private function findData($riHdrNo): void
     {
         $riOk = DB::table('rstxn_rioks')
-            ->select('ok_date', 'ok_desc', 'ok_price', 'rihdr_no', 'ok_no')
+            ->select(
+                DB::raw("to_char(ok_date,        'dd/mm/yyyy hh24:mi:ss') as ok_date"),
+                'ok_desc',
+                'ok_price',
+                'rihdr_no',
+                'ok_no'
+            )
             ->where('rihdr_no', $riHdrNo)
             ->get();
         $this->dataOk['riOk'] = json_decode(json_encode($riOk, true), true);

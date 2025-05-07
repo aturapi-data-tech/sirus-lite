@@ -174,8 +174,34 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white dark:bg-gray-800">
-                            @isset($dataRoom['riRoom'])
-                                @foreach ($dataRoom['riRoom'] as $key => $Room)
+                            @php
+                                use Carbon\Carbon;
+
+                                $sortedRiRoom = collect($dataRoom['riRoom'] ?? [])
+                                    ->sortByDesc(function ($item) {
+                                        $date = $item['start_date'] ?? '';
+
+                                        // Jika kosong, anggap paling bawah
+                                        if (!$date) {
+                                            return 0;
+                                        }
+
+                                        try {
+                                            return Carbon::createFromFormat(
+                                                'd/m/Y H:i:s',
+                                                $date,
+                                                env('APP_TIMEZONE'),
+                                            )->timestamp;
+                                        } catch (\Exception $e) {
+                                            // Jika parsing gagal, juga jadikan paling bawah
+                                            return 0;
+                                        }
+                                    })
+                                    ->values();
+                            @endphp
+
+                            @if ($sortedRiRoom->isNotEmpty())
+                                @foreach ($sortedRiRoom as $key => $Room)
                                     <tr class="border-b group dark:border-gray-700">
                                         <td
                                             class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
@@ -188,19 +214,35 @@
                                             {{ $Room['bed_no'] }}
 
                                         </td>
+                                        @php
+                                            // Pastikan semua nilai numeric, default ke 0 jika bukan angka atau kosong
+                                            $roomPrice = is_numeric($Room['room_price'] ?? null)
+                                                ? $Room['room_price']
+                                                : 0;
+                                            $perawatanPrice = is_numeric($Room['perawatan_price'] ?? null)
+                                                ? $Room['perawatan_price']
+                                                : 0;
+                                            $commonService = is_numeric($Room['common_service'] ?? null)
+                                                ? $Room['common_service']
+                                                : 0;
+                                            $day = is_numeric($Room['day'] ?? null) ? $Room['day'] : 0;
+
+                                            // Hitung total
+                                            $totalRoom = $roomPrice * $day;
+                                            $totalPerawatan = $perawatanPrice * $day;
+                                            $totalCommon = $commonService * $day;
+                                        @endphp
+
                                         <td
                                             class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                            Kamar: {{ number_format($Room['room_price']) }} x
-                                            {{ number_format($Room['day']) }} =
-                                            {{ number_format($Room['room_price'] * $Room['day']) }}
+                                            Kamar: {{ number_format($roomPrice) }} x {{ number_format($day) }} =
+                                            {{ number_format($totalRoom) }}
                                             <br>
-                                            Perawatan: {{ number_format($Room['perawatan_price']) }} x
-                                            {{ number_format($Room['day']) }} =
-                                            {{ number_format($Room['perawatan_price'] * $Room['day']) }}
+                                            Perawatan: {{ number_format($perawatanPrice) }} x {{ number_format($day) }}
+                                            = {{ number_format($totalPerawatan) }}
                                             <br>
-                                            Umum: {{ number_format($Room['common_service']) }} x
-                                            {{ number_format($Room['day']) }} =
-                                            {{ number_format($Room['common_service'] * $Room['day']) }}
+                                            Umum: {{ number_format($commonService) }} x {{ number_format($day) }} =
+                                            {{ number_format($totalCommon) }}
                                         </td>
                                         <td
                                             class="px-4 py-3 font-normal text-center text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
@@ -216,7 +258,7 @@
                                         </td>
                                     </tr>
                                 @endforeach
-                            @endisset
+                            @endif
                         </tbody>
                     </table>
                 </div>

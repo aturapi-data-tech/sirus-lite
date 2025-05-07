@@ -30,8 +30,33 @@
                         </thead>
                         <tbody class="bg-white dark:bg-gray-800">
 
-                            @isset($dataTrfUgdRj['riTrfUgdRj'])
-                                @foreach ($dataTrfUgdRj['riTrfUgdRj'] as $key => $TrfUgdRj)
+                            @php
+                                use Carbon\Carbon;
+
+                                $sortedTrfUgdRj = collect($dataTrfUgdRj['riTrfUgdRj'] ?? [])
+                                    ->sortByDesc(function ($item) {
+                                        $date = $item['tempadm_date'] ?? '';
+                                        // Jika kosong, anggap paling bawah
+                                        if (!$date) {
+                                            return 0;
+                                        }
+                                        try {
+                                            // Parse dengan format d/m/Y H:i:s
+                                            return Carbon::createFromFormat(
+                                                'd/m/Y H:i:s',
+                                                $date,
+                                                env('APP_TIMEZONE'),
+                                            )->timestamp;
+                                        } catch (\Exception $e) {
+                                            // Jika parsing gagal, juga jadikan paling bawah
+                                            return 0;
+                                        }
+                                    })
+                                    ->values();
+                            @endphp
+
+                            @if ($sortedTrfUgdRj->isNotEmpty())
+                                @foreach ($sortedTrfUgdRj as $key => $TrfUgdRj)
                                     <tr class="border-b group dark:border-gray-700">
 
                                         <td
@@ -63,7 +88,7 @@
 
                                     </tr>
                                 @endforeach
-                            @endisset
+                            @endif
 
 
                         </tbody>

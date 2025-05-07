@@ -30,8 +30,34 @@
                         </thead>
                         <tbody class="bg-white dark:bg-gray-800">
 
-                            @isset($dataRadiologi['riRadiologi'])
-                                @foreach ($dataRadiologi['riRadiologi'] as $key => $Radiologi)
+                            @php
+                                use Carbon\Carbon;
+
+                                $sortedRiRadiologi = collect($dataRadiologi['riRadiologi'] ?? [])
+                                    ->sortByDesc(function ($item) {
+                                        $date = $item['rirad_date'] ?? '';
+
+                                        // Jika kosong, anggap paling bawah
+                                        if (!$date) {
+                                            return 0;
+                                        }
+
+                                        try {
+                                            return Carbon::createFromFormat(
+                                                'd/m/Y H:i:s',
+                                                $date,
+                                                env('APP_TIMEZONE'),
+                                            )->timestamp;
+                                        } catch (\Exception $e) {
+                                            // Jika parsing gagal, juga jadikan paling bawah
+                                            return 0;
+                                        }
+                                    })
+                                    ->values();
+                            @endphp
+
+                            @if ($sortedRiRadiologi->isNotEmpty())
+                                @foreach ($sortedRiRadiologi as $key => $Radiologi)
                                     <tr class="border-b group dark:border-gray-700">
 
                                         <td
@@ -52,7 +78,7 @@
 
                                     </tr>
                                 @endforeach
-                            @endisset
+                            @endif
 
 
                         </tbody>

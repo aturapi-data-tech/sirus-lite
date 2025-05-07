@@ -44,7 +44,7 @@ class RadiologiRI extends Component
         $riRadiologi = DB::table('rstxn_riradiologs')
             ->join('rsmst_radiologis', 'rstxn_riradiologs.rad_id', '=', 'rsmst_radiologis.rad_id')
             ->select(
-                'rstxn_riradiologs.rirad_date',
+                DB::raw("to_char(rstxn_riradiologs.rirad_date, 'dd/mm/yyyy hh24:mi:ss') as rirad_date"),
                 'rstxn_riradiologs.rad_id',
                 'rsmst_radiologis.rad_desc',
                 'rstxn_riradiologs.rirad_price',

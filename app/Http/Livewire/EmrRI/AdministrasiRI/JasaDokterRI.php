@@ -198,7 +198,7 @@ class JasaDokterRI extends Component
             ->join('rsmst_accdocs', 'rsmst_accdocs.accdoc_id', '=', 'rstxn_riactdocs.accdoc_id')
             ->join('rsmst_doctors', 'rsmst_doctors.dr_id', '=', 'rstxn_riactdocs.dr_id')
             ->select(
-                'rstxn_riactdocs.actd_date',
+                DB::raw("to_char(rstxn_riactdocs.actd_date, 'dd/mm/yyyy hh24:mi:ss') as actd_date"),
                 'rstxn_riactdocs.dr_id',
                 'rsmst_doctors.dr_name',
                 'rstxn_riactdocs.accdoc_id',

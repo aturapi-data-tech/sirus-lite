@@ -146,8 +146,34 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white dark:bg-gray-800">
-                            @isset($dataObatPinjam['riObatPinjam'])
-                                @foreach ($dataObatPinjam['riObatPinjam'] as $key => $Product)
+                            @php
+                                use Carbon\Carbon;
+
+                                $sortedRiObatPinjam = collect($dataObatPinjam['riObatPinjam'] ?? [])
+                                    ->sortByDesc(function ($item) {
+                                        $date = $item['riobat_date'] ?? '';
+
+                                        // Jika kosong, jadikan paling bawah
+                                        if (!$date) {
+                                            return 0;
+                                        }
+
+                                        try {
+                                            return Carbon::createFromFormat(
+                                                'd/m/Y H:i:s',
+                                                $date,
+                                                env('APP_TIMEZONE'),
+                                            )->timestamp;
+                                        } catch (\Exception $e) {
+                                            // Jika parsing gagal (format salah/trailling data), juga jadikan paling bawah
+                                            return 0;
+                                        }
+                                    })
+                                    ->values();
+                            @endphp
+
+                            @if ($sortedRiObatPinjam->isNotEmpty())
+                                @foreach ($sortedRiObatPinjam as $key => $Product)
                                     <tr class="border-b group dark:border-gray-700">
                                         <td
                                             class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
@@ -157,11 +183,21 @@
                                             class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
                                             {{ $Product['product_name'] }}
                                         </td>
+                                        @php
+                                            // Ambil qty & price, default 0 jika bukan angka
+                                            $qty = is_numeric($Product['riobat_qty'] ?? null)
+                                                ? $Product['riobat_qty']
+                                                : 0;
+                                            $price = is_numeric($Product['riobat_price'] ?? null)
+                                                ? $Product['riobat_price']
+                                                : 0;
+                                            $total = $qty * $price;
+                                        @endphp
                                         <td
                                             class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                            {{ number_format($Product['riobat_qty']) }} x
-                                            {{ number_format($Product['riobat_price']) }} =
-                                            {{ number_format($Product['riobat_qty'] * $Product['riobat_price']) }}
+                                            {{ number_format($qty) }} x
+                                            {{ number_format($price) }} =
+                                            {{ number_format($total) }}
                                         </td>
                                         <td
                                             class="px-4 py-3 font-normal text-center text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
@@ -177,7 +213,7 @@
                                         </td>
                                     </tr>
                                 @endforeach
-                            @endisset
+                            @endif
                         </tbody>
                     </table>
                 </div>

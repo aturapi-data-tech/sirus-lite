@@ -129,8 +129,30 @@
                         </thead>
                         <tbody class="bg-white dark:bg-gray-800">
 
-                            @isset($dataVisit['riVisit'])
-                                @foreach ($dataVisit['riVisit'] as $key => $Visit)
+                            @php
+                                use Carbon\Carbon;
+
+                                $sortedRiVisit = collect($dataVisit['riVisit'] ?? [])
+                                    ->sortByDesc(function ($item) {
+                                        $date = $item['visit_date'] ?? '';
+                                        if (!$date) {
+                                            return 0; // kosong, paling bawah
+                                        }
+                                        try {
+                                            return Carbon::createFromFormat(
+                                                'd/m/Y H:i:s',
+                                                $date,
+                                                env('APP_TIMEZONE'),
+                                            )->timestamp;
+                                        } catch (\Exception $e) {
+                                            return 0; // format salah, juga paling bawah
+                                        }
+                                    })
+                                    ->values();
+                            @endphp
+
+                            @if ($sortedRiVisit->isNotEmpty())
+                                @foreach ($sortedRiVisit as $key => $Visit)
                                     <tr class="border-b group dark:border-gray-700">
 
                                         <td
@@ -171,7 +193,7 @@
 
                                     </tr>
                                 @endforeach
-                            @endisset
+                            @endif
 
 
                         </tbody>

@@ -287,8 +287,8 @@ class RoomRI extends Component
         $riRoom =  DB::table('rsmst_trfrooms')
             ->join('rsmst_rooms', 'rsmst_trfrooms.room_id', '=', 'rsmst_rooms.room_id')
             ->select(
-                'start_date',
-                'end_date',
+                DB::raw("to_char(rsmst_trfrooms.start_date,  'dd/mm/yyyy hh24:mi:ss') as start_date"),
+                DB::raw("to_char(rsmst_trfrooms.end_date,    'dd/mm/yyyy hh24:mi:ss') as end_date"),
                 'rsmst_trfrooms.room_id',
                 'rsmst_rooms.room_name',
                 'rsmst_trfrooms.bed_no',

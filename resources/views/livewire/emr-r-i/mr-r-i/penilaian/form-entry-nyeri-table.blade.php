@@ -38,8 +38,27 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white">
-                        @isset($dataDaftarRi['penilaian']['nyeri'])
-                            @foreach ($dataDaftarRi['penilaian']['nyeri'] as $key => $assessment)
+                        @php
+                            use Carbon\Carbon;
+
+                            $sortedNyeri = collect($dataDaftarRi['penilaian']['nyeri'] ?? [])
+                                ->sortByDesc(function ($item) {
+                                    $tgl = $item['tglPenilaian'] ?? '';
+                                    if (!$tgl) {
+                                        return 0;
+                                    }
+                                    try {
+                                        return Carbon::createFromFormat('d/m/Y', $tgl, env('APP_TIMEZONE'))->timestamp;
+                                    } catch (\Exception $e) {
+                                        // Jika parsing gagal, jatuhkan ke urutan paling bawah
+                                        return 0;
+                                    }
+                                })
+                                ->values();
+                        @endphp
+
+                        @if ($sortedNyeri->isNotEmpty())
+                            @foreach ($sortedNyeri as $key => $assessment)
                                 <tr class="border-b group">
                                     <!-- Tanggal & Petugas Penilai -->
                                     <td
@@ -90,7 +109,8 @@
                                     <td
                                         class="px-2 py-2 font-normal text-gray-700 w-1/7 group-hover:bg-gray-50 whitespace-nowrap">
                                         <div>
-                                            <strong>Pencetus:</strong><br> {{ $assessment['nyeri']['pencetus'] ?? '-' }}
+                                            <strong>Pencetus:</strong><br>
+                                            {{ $assessment['nyeri']['pencetus'] ?? '-' }}
                                         </div>
                                         <div>
                                             <strong>Durasi:</strong><br> {{ $assessment['nyeri']['durasi'] ?? '-' }}
@@ -137,7 +157,8 @@
                                         <x-alternative-button class="inline-flex"
                                             wire:click.prevent="removeAssessmentNyeri('{{ $key }}')">
                                             <svg class="w-5 h-5 text-gray-800" aria-hidden="true"
-                                                xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 20">
+                                                xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                                                viewBox="0 0 18 20">
                                                 <path
                                                     d="M17 4h-4V2a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v2H1a1 1 0 0 0 0 2h1v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1a1 1 0 1 0 0-2ZM7 2h4v2H7V2Zm1 14a1 1 0 1 1-2 0V8a1 1 0 0 1 2 0v8Zm4 0a1 1 0 0 1-2 0V8a1 1 0 0 1 2 0v8Z" />
                                             </svg>
@@ -152,7 +173,7 @@
                                     Tidak ada data assessment nyeri.
                                 </td>
                             </tr>
-                        @endisset
+                        @endif
                     </tbody>
                 </table>
             </div>

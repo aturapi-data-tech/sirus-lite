@@ -179,7 +179,7 @@ class LainLainRI extends Component
         $riLain = DB::table('rstxn_riothers')
             ->join('rsmst_others', 'rstxn_riothers.other_id', '=', 'rsmst_others.other_id')
             ->select(
-                'rstxn_riothers.other_date',
+                DB::raw("to_char(rstxn_riothers.other_date, 'dd/mm/yyyy hh24:mi:ss') as other_date"),
                 'rstxn_riothers.other_id',
                 'rsmst_others.other_desc',
                 'rstxn_riothers.other_price',

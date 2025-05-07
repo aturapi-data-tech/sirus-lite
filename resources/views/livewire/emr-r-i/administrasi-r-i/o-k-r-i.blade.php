@@ -30,8 +30,34 @@
                         </thead>
                         <tbody class="bg-white dark:bg-gray-800">
 
-                            @isset($dataOk['riOk'])
-                                @foreach ($dataOk['riOk'] as $key => $Ok)
+                            @php
+                                use Carbon\Carbon;
+
+                                $sortedRiOk = collect($dataOk['riOk'] ?? [])
+                                    ->sortByDesc(function ($item) {
+                                        $date = $item['ok_date'] ?? '';
+
+                                        // Jika kosong, kembalikan 0 agar muncul paling bawah
+                                        if (!$date) {
+                                            return 0;
+                                        }
+
+                                        try {
+                                            return Carbon::createFromFormat(
+                                                'd/m/Y H:i:s',
+                                                $date,
+                                                env('APP_TIMEZONE'),
+                                            )->timestamp;
+                                        } catch (\Exception $e) {
+                                            // Jika parsing gagal, juga kembalikan 0
+                                            return 0;
+                                        }
+                                    })
+                                    ->values();
+                            @endphp
+
+                            @if ($sortedRiOk->isNotEmpty())
+                                @foreach ($sortedRiOk as $key => $Ok)
                                     <tr class="border-b group dark:border-gray-700">
 
                                         <td
@@ -52,7 +78,7 @@
 
                                     </tr>
                                 @endforeach
-                            @endisset
+                            @endif
 
 
                         </tbody>

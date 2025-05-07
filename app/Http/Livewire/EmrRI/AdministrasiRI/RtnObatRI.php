@@ -44,7 +44,7 @@ class RtnObatRI extends Component
         $riRtnObat = DB::table('rstxn_riobatrtns')
             ->join('immst_products', 'immst_products.product_id', '=', 'rstxn_riobatrtns.product_id')
             ->select(
-                'rstxn_riobatrtns.riobat_date',
+                DB::raw("to_char(rstxn_riobatrtns.riobat_date,  'dd/mm/yyyy hh24:mi:ss') as riobat_date"),
                 'rstxn_riobatrtns.product_id as product_id',
                 'immst_products.product_name',
                 'rstxn_riobatrtns.riobat_qty',

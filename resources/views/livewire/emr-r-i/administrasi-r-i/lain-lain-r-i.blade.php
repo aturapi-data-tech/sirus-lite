@@ -136,8 +136,34 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white dark:bg-gray-800">
-                            @isset($dataLain['riLain'])
-                                @foreach ($dataLain['riLain'] as $key => $Lain)
+                            @php
+                                use Carbon\Carbon;
+
+                                $sortedRiLain = collect($dataLain['riLain'] ?? [])
+                                    ->sortByDesc(function ($item) {
+                                        $date = $item['other_date'] ?? '';
+
+                                        // Jika kosong, kembalikan 0 agar muncul paling bawah
+                                        if (!$date) {
+                                            return 0;
+                                        }
+
+                                        try {
+                                            return Carbon::createFromFormat(
+                                                'd/m/Y H:i:s',
+                                                $date,
+                                                env('APP_TIMEZONE'),
+                                            )->timestamp;
+                                        } catch (\Exception $e) {
+                                            // Jika parsing gagal atau format tidak sesuai, juga kembalikan 0
+                                            return 0;
+                                        }
+                                    })
+                                    ->values();
+                            @endphp
+
+                            @if ($sortedRiLain->isNotEmpty())
+                                @foreach ($sortedRiLain as $key => $Lain)
                                     <tr class="border-b group dark:border-gray-700">
                                         <td
                                             class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
@@ -166,7 +192,7 @@
                                         </td>
                                     </tr>
                                 @endforeach
-                            @endisset
+                            @endif
                         </tbody>
                     </table>
                 </div>

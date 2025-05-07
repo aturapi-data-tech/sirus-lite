@@ -151,8 +151,34 @@
                         </thead>
                         <tbody class="bg-white dark:bg-gray-800">
 
-                            @isset($dataJasaMedis['riJasaMedis'])
-                                @foreach ($dataJasaMedis['riJasaMedis'] as $key => $JasaMedis)
+                            @php
+                                use Carbon\Carbon;
+
+                                $sortedRiJasaMedis = collect($dataJasaMedis['riJasaMedis'] ?? [])
+                                    ->sortByDesc(function ($item) {
+                                        $date = $item['actp_date'] ?? '';
+
+                                        // Jika kosong, kembalikan 0 agar muncul paling bawah
+                                        if (!$date) {
+                                            return 0;
+                                        }
+
+                                        try {
+                                            return Carbon::createFromFormat(
+                                                'd/m/Y H:i:s',
+                                                $date,
+                                                env('APP_TIMEZONE'),
+                                            )->timestamp;
+                                        } catch (\Exception $e) {
+                                            // Jika parsing gagal, juga kembalikan 0
+                                            return 0;
+                                        }
+                                    })
+                                    ->values();
+                            @endphp
+
+                            @if ($sortedRiJasaMedis->isNotEmpty())
+                                @foreach ($sortedRiJasaMedis as $key => $JasaMedis)
                                     <tr class="border-b group dark:border-gray-700">
 
                                         <td
@@ -164,13 +190,22 @@
                                             class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
                                             {{ $JasaMedis['pact_id'] }} {{ $JasaMedis['pact_desc'] }}
                                         </td>
-
+                                        @php
+                                            // Ambil data, default 0 jika bukan numeric
+                                            $qty = is_numeric($JasaMedis['actp_qty'] ?? null)
+                                                ? $JasaMedis['actp_qty']
+                                                : 0;
+                                            $price = is_numeric($JasaMedis['actp_price'] ?? null)
+                                                ? $JasaMedis['actp_price']
+                                                : 0;
+                                            $total = $qty * $price;
+                                        @endphp
 
                                         <td
                                             class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                            {{ number_format($JasaMedis['actp_qty']) }}x
-                                            {{ number_format($JasaMedis['actp_price']) }}=
-                                            {{ number_format($JasaMedis['actp_price'] * $JasaMedis['actp_qty']) }}
+                                            {{ number_format($qty) }}x
+                                            {{ number_format($price) }} =
+                                            {{ number_format($total) }}
 
                                         </td>
 
@@ -196,7 +231,7 @@
 
                                     </tr>
                                 @endforeach
-                            @endisset
+                            @endif
 
 
                         </tbody>

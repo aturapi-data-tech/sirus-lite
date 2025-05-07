@@ -171,8 +171,34 @@
                         </thead>
                         <tbody class="bg-white dark:bg-gray-800">
 
-                            @isset($dataJasaDokter['riJasaDokter'])
-                                @foreach ($dataJasaDokter['riJasaDokter'] as $key => $JasaDokter)
+                            @php
+                                use Carbon\Carbon;
+
+                                $sortedRiJasaDokter = collect($dataJasaDokter['riJasaDokter'] ?? [])
+                                    ->sortByDesc(function ($item) {
+                                        $date = $item['actd_date'] ?? '';
+
+                                        // Jika kosong, letakkan paling bawah
+                                        if (!$date) {
+                                            return 0;
+                                        }
+
+                                        try {
+                                            return Carbon::createFromFormat(
+                                                'd/m/Y H:i:s',
+                                                $date,
+                                                env('APP_TIMEZONE'),
+                                            )->timestamp;
+                                        } catch (\Exception $e) {
+                                            // Jika parsing gagal (format tak sesuai), juga letakkan paling bawah
+                                            return 0;
+                                        }
+                                    })
+                                    ->values();
+                            @endphp
+
+                            @if ($sortedRiJasaDokter->isNotEmpty())
+                                @foreach ($sortedRiJasaDokter as $key => $JasaDokter)
                                     <tr class="border-b group dark:border-gray-700">
 
                                         <td
@@ -187,12 +213,21 @@
                                             {{ $JasaDokter['accdoc_id'] }} {{ $JasaDokter['accdoc_desc'] }}
                                         </td>
 
-
+                                        @php
+                                            // Ambil qty & price, default 0 jika bukan angka
+                                            $qty = is_numeric($JasaDokter['actd_qty'] ?? null)
+                                                ? $JasaDokter['actd_qty']
+                                                : 0;
+                                            $price = is_numeric($JasaDokter['actd_price'] ?? null)
+                                                ? $JasaDokter['actd_price']
+                                                : 0;
+                                            $total = $qty * $price;
+                                        @endphp
                                         <td
                                             class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                            {{ number_format($JasaDokter['actd_qty']) }}x
-                                            {{ number_format($JasaDokter['actd_price']) }}=
-                                            {{ number_format($JasaDokter['actd_price'] * $JasaDokter['actd_qty']) }}
+                                            {{ number_format($qty) }}x
+                                            {{ number_format($price) }} =
+                                            {{ number_format($total) }}
 
                                         </td>
 
@@ -218,7 +253,7 @@
 
                                     </tr>
                                 @endforeach
-                            @endisset
+                            @endif
 
 
                         </tbody>

@@ -34,51 +34,65 @@
                     use Carbon\Carbon;
 
                     $sortedObatDanCairan = collect(
-                        $this->dataDaftarRi['observasi']['obatDanCairan']['pemberianObatDanCairan'] ?? [],
-                    )->sortByDesc(function ($item) {
-                        return Carbon::createFromFormat('d/m/Y H:i:s', $item['waktuPemberian'], env('APP_TIMEZONE'));
-                    });
+                        $dataDaftarRi['observasi']['obatDanCairan']['pemberianObatDanCairan'] ?? [],
+                    )
+                        ->sortByDesc(function ($item) {
+                            $waktu = $item['waktuPemberian'] ?? '';
 
+                            // Jika kosong, kembalikan 0 agar masuk urutan paling bawah
+                            if (!$waktu) {
+                                return 0;
+                            }
+
+                            try {
+                                return Carbon::createFromFormat('d/m/Y H:i:s', $waktu, env('APP_TIMEZONE'))->timestamp;
+                            } catch (\Exception $e) {
+                                // Jika parsing gagal, juga kembalikan 0
+                                return 0;
+                            }
+                        })
+                        ->values();
                 @endphp
 
-                @foreach ($sortedObatDanCairan ?? [] as $pemberianObatDanCairan)
-                    <tr class="border-b group dark:border-gray-700 ">
+                @if ($sortedObatDanCairan->isNotEmpty())
+                    @foreach ($sortedObatDanCairan as $pemberianObatDanCairan)
+                        <tr class="border-b group dark:border-gray-700 ">
 
-                        <td class="text-center group-hover:bg-gray-100 group-hover:text-primary">
-                            {{ $pemberianObatDanCairan['waktuPemberian'] }}
-                            <br>
-                            {{ $pemberianObatDanCairan['pemeriksa'] }}
-                        </td>
-                        <td class="text-center group-hover:bg-gray-100 group-hover:text-primary">
-                            {{ $pemberianObatDanCairan['namaObatAtauJenisCairan'] }}
-                        </td>
-                        <td class="text-center group-hover:bg-gray-100 group-hover:text-primary">
-                            {{ $pemberianObatDanCairan['jumlah'] }}
-                        </td>
-                        <td class="text-center group-hover:bg-gray-100 group-hover:text-primary">
-                            {{ $pemberianObatDanCairan['dosis'] }}
-                        </td>
-                        <td class="text-center group-hover:bg-gray-100 group-hover:text-primary">
-                            {{ $pemberianObatDanCairan['rute'] }}
-                        </td>
-                        <td class="text-center group-hover:bg-gray-100 group-hover:text-primary">
-                            {{ $pemberianObatDanCairan['keterangan'] }}
-
-                        </td>
-                        <td class="text-center group-hover:bg-gray-100 group-hover:text-primary">
-                            <x-alternative-button class="inline-flex"
-                                wire:click.prevent="removeObatDanCairan('{{ $pemberianObatDanCairan['waktuPemberian'] }}')">
-                                <svg class="w-5 h-5 text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                    fill="currentColor" viewBox="0 0 18 20">
-                                    <path
-                                        d="M17 4h-4V2a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v2H1a1 1 0 0 0 0 2h1v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1a1 1 0 1 0 0-2ZM7 2h4v2H7V2Zm1 14a1 1 0 1 1-2 0V8a1 1 0 0 1 2 0v8Zm4 0a1 1 0 0 1-2 0V8a1 1 0 0 1 2 0v8Z" />
-                                </svg>
+                            <td class="text-center group-hover:bg-gray-100 group-hover:text-primary">
                                 {{ $pemberianObatDanCairan['waktuPemberian'] }}
-                            </x-alternative-button>
-                        </td>
-                    </tr>
-                @endforeach
+                                <br>
+                                {{ $pemberianObatDanCairan['pemeriksa'] }}
+                            </td>
+                            <td class="text-center group-hover:bg-gray-100 group-hover:text-primary">
+                                {{ $pemberianObatDanCairan['namaObatAtauJenisCairan'] }}
+                            </td>
+                            <td class="text-center group-hover:bg-gray-100 group-hover:text-primary">
+                                {{ $pemberianObatDanCairan['jumlah'] }}
+                            </td>
+                            <td class="text-center group-hover:bg-gray-100 group-hover:text-primary">
+                                {{ $pemberianObatDanCairan['dosis'] }}
+                            </td>
+                            <td class="text-center group-hover:bg-gray-100 group-hover:text-primary">
+                                {{ $pemberianObatDanCairan['rute'] }}
+                            </td>
+                            <td class="text-center group-hover:bg-gray-100 group-hover:text-primary">
+                                {{ $pemberianObatDanCairan['keterangan'] }}
 
+                            </td>
+                            <td class="text-center group-hover:bg-gray-100 group-hover:text-primary">
+                                <x-alternative-button class="inline-flex"
+                                    wire:click.prevent="removeObatDanCairan('{{ $pemberianObatDanCairan['waktuPemberian'] }}')">
+                                    <svg class="w-5 h-5 text-gray-800" aria-hidden="true"
+                                        xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 20">
+                                        <path
+                                            d="M17 4h-4V2a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v2H1a1 1 0 0 0 0 2h1v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1a1 1 0 1 0 0-2ZM7 2h4v2H7V2Zm1 14a1 1 0 1 1-2 0V8a1 1 0 0 1 2 0v8Zm4 0a1 1 0 0 1-2 0V8a1 1 0 0 1 2 0v8Z" />
+                                    </svg>
+                                    {{ $pemberianObatDanCairan['waktuPemberian'] }}
+                                </x-alternative-button>
+                            </td>
+                        </tr>
+                    @endforeach
+                @endif
 
 
             </tbody>
