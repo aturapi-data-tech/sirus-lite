@@ -158,6 +158,14 @@
         <x-loading />
     </div>
 
+    <x-light-button wire:click.prevent="postSpecimenLaboratRJ()" type="button" wire:loading.remove
+        wire:target="postSpecimenLaboratRJ">
+        Kirim Speciment Laborat
+    </x-light-button>
+    <div wire:loading wire:target="postSpecimenLaboratRJ">
+        <x-loading />
+    </div>
+
 
 
     {{--

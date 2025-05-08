@@ -13,6 +13,7 @@ use App\Http\Traits\SATUSEHAT\ProcedureTrait;
 use App\Http\Traits\SATUSEHAT\MedicationRequestTrait;
 use App\Http\Traits\SATUSEHAT\MedicationDispenseTrait;
 use App\Http\Traits\SATUSEHAT\ServiceRequestTrait;
+use App\Http\Traits\SATUSEHAT\SpecimenTrait;
 
 
 
@@ -37,7 +38,8 @@ class PostEncounterRJ extends Component
         ProcedureTrait,
         MedicationRequestTrait,
         MedicationDispenseTrait,
-        ServiceRequestTrait;
+        ServiceRequestTrait,
+        SpecimenTrait;
 
 
     public $rjNoRef;
@@ -1704,21 +1706,21 @@ class PostEncounterRJ extends Component
         $dispenserName = $dataPasienRJ['drName'] ?? 'Apoteker';
 
         // Validasi prasyarat satu per satu
-        if (! $patientUuid) {
+        if (!$patientUuid) {
             toastr()->closeOnHover(true)
                 ->closeDuration(3)
                 ->positionClass('toast-top-left')
                 ->addError('UUID pasien belum tersedia. Proses dibatalkan.');
             return;
         }
-        if (! $encounterUuid) {
+        if (!$encounterUuid) {
             toastr()->closeOnHover(true)
                 ->closeDuration(3)
                 ->positionClass('toast-top-left')
                 ->addError('UUID encounter belum tersedia. Proses dibatalkan.');
             return;
         }
-        if (! $dispenserId) {
+        if (!$dispenserId) {
             toastr()->closeOnHover(true)
                 ->closeDuration(3)
                 ->positionClass('toast-top-left')
@@ -1771,7 +1773,7 @@ class PostEncounterRJ extends Component
 
             // Ambil waktu penyerahan dari Task ID
             $preperadOnRaw = $dataDaftarPoliRJ['taskIdPelayanan']['taskId6'] ?? null;
-            if (! $preperadOnRaw) {
+            if (!$preperadOnRaw) {
                 toastr()->closeOnHover(true)
                     ->closeDuration(3)
                     ->positionClass('toast-top-left')
@@ -1791,7 +1793,7 @@ class PostEncounterRJ extends Component
 
             // Ambil waktu penyerahan dari Task ID 7
             $handedOnRaw = $dataDaftarPoliRJ['taskIdPelayanan']['taskId7'] ?? null;
-            if (! $handedOnRaw) {
+            if (!$handedOnRaw) {
                 toastr()->closeOnHover(true)
                     ->closeDuration(3)
                     ->positionClass('toast-top-left')
@@ -1814,7 +1816,7 @@ class PostEncounterRJ extends Component
                 ->select('product_id_satusehat', 'product_name_satusehat')
                 ->where('product_id', $item['productId'])
                 ->first();
-            if (! $product) {
+            if (!$product) {
                 toastr()->closeOnHover(true)
                     ->closeDuration(3)
                     ->positionClass('toast-top-left')
@@ -1903,7 +1905,7 @@ class PostEncounterRJ extends Component
             try {
                 $resp      = $this->createMedicationDispense($dispenseData);
                 $dispUuid  = $resp['id'] ?? null;
-                if (! $dispUuid) {
+                if (!$dispUuid) {
                     throw new \Exception('UUID dispense tidak diterima');
                 }
                 // Simpan ke JSON RJ
@@ -1973,7 +1975,7 @@ class PostEncounterRJ extends Component
         $sentRecords = $dataDaftarPoliRJ['satuSehatUuidRJ']['serviceRequests'] ?? [];
 
         // Validasi prasyarat
-        if (! $patientUuid) {
+        if (!$patientUuid) {
             toastr()
                 ->closeOnHover(true)
                 ->closeDuration(3)
@@ -1982,7 +1984,7 @@ class PostEncounterRJ extends Component
             return;
         }
 
-        if (! $encounterUuid) {
+        if (!$encounterUuid) {
             toastr()
                 ->closeOnHover(true)
                 ->closeDuration(3)
@@ -1991,7 +1993,7 @@ class PostEncounterRJ extends Component
             return;
         }
 
-        if (! $requesterId) {
+        if (!$requesterId) {
             toastr()
                 ->closeOnHover(true)
                 ->closeDuration(3)
@@ -2106,7 +2108,7 @@ class PostEncounterRJ extends Component
 
                 $response = $this->postServiceRequest($srData);
                 $srUuid   = $response['id'] ?? null;
-                if (! $srUuid) {
+                if (!$srUuid) {
                     throw new \Exception('UUID ServiceRequest tidak diterima.');
                 }
 
@@ -2132,6 +2134,152 @@ class PostEncounterRJ extends Component
         }
     }
 
+
+    public function postSpecimenLaboratRJ()
+    {
+        // 1) Ambil data dasar
+        $find             = $this->findDataRJ($this->rjNoRef);
+        $dataDaftarPoliRJ = $find['dataDaftarRJ'] ?? [];
+        $dataPasienRJ     = $find['dataPasienRJ'] ?? [];
+        $patientUuid      = $dataPasienRJ['patientUuid'] ?? null;
+        $encounterUuid    = $dataDaftarPoliRJ['satuSehatUuidRJ']['encounter']['uuid'] ?? null;
+        $sentSR           = $dataDaftarPoliRJ['satuSehatUuidRJ']['serviceRequests'] ?? [];
+        $sentSpecimens    = $dataDaftarPoliRJ['satuSehatUuidRJ']['specimens'] ?? [];
+
+        // Validasi prasyarat
+        // Cek Patient UUID
+        if (!$patientUuid) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Patient UUID belum tersedia. Proses dibatalkan.');
+            return;
+        }
+
+        // Cek Encounter UUID
+        if (!$encounterUuid) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Encounter UUID belum tersedia. Proses dibatalkan.');
+            return;
+        }
+
+        // Inisialisasi client SatuSehat
+        $this->initializeSatuSehat();
+        $orgId = env('SATUSEHAT_ORGANIZATION_ID');
+
+        // Ambil daftar laboratorium
+        $pemeriksaanLab = DB::table('lbtxn_checkuphdrs as a')
+            ->join('lbtxn_checkupdtls as b', 'a.checkup_no', '=', 'b.checkup_no')
+            ->join('lbmst_clabitems as c', 'b.clabitem_id', '=', 'c.clabitem_id')
+            ->join('lbmst_clabs as d', 'c.clab_id', '=', 'd.clab_id')
+            ->where('a.status_rjri', 'RJ')
+            ->whereNotNull('c.price')
+            ->where('a.ref_no', $this->rjNoRef)
+            ->select([
+                'b.checkup_dtl',
+                'd.clab_id_satusehat_specimen',
+                'd.clab_desc_satusehat_specimen',
+                DB::raw("to_char(a.checkup_date, 'dd/mm/yyyy HH24:MI:SS') as checkup_date"),
+            ])
+            ->distinct()
+            ->get();
+
+        foreach ($pemeriksaanLab as $lab) {
+            $localId = $lab->checkup_dtl;
+
+            // Cek apakah Specimen sudah dikirim
+            $already = collect($sentSpecimens)
+                ->firstWhere('localId', $localId);
+
+            if ($already) {
+                toastr()->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addInfo("Specimen {$localId} sudah dikirim (UUID: {$already['uuid']}).");
+                continue;
+            }
+
+            // Cari ServiceRequest UUID untuk specimen ini
+            $sr = collect($sentSR)->firstWhere('localId', $localId);
+            if (!$sr) {
+                toastr()->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError("ServiceRequest untuk {$localId} belum ada. Kirim ServiceRequest dulu.");
+                continue;
+            }
+            $srRef = "ServiceRequest/{$sr['uuid']}";
+
+            // Konversi waktu
+            try {
+                $collectedIso = Carbon::createFromFormat('d/m/Y H:i:s', $lab->checkup_date, 'Asia/Jakarta')
+                    ->toIso8601String();
+            } catch (\Exception $e) {
+                toastr()->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError("Format waktu tidak valid: {$lab->checkup_date}");
+                continue;
+            }
+
+            // Bangun payload Specimen
+            $identifierValue = "SPEC-{$localId}-" . now('Asia/Jakarta')->format('YmdHis');
+            $specimenData = [
+                'identifier'   => [
+                    'system'   => "http://sys-ids.kemkes.go.id/specimen/{$orgId}",
+                    'value'    => $identifierValue,
+                    'assigner' => "Organization/{$orgId}",
+                ],
+                'status'       => 'available',
+                'subject'      => "Patient/{$patientUuid}",
+                'type'         => [
+                    'system'  => 'http://snomed.info/sct',
+                    'code'    => $lab->clab_id_satusehat_specimen,
+                    'display' => $lab->clab_desc_satusehat_specimen,
+                ],
+                'collection'   => [
+                    'collectedDateTime' => $collectedIso,
+                    'method'            => [
+                        'system'  => 'http://snomed.info/sct',
+                        'code'    => $lab->clab_id_satusehat_specimen,
+                        'display' => $lab->clab_desc_satusehat_specimen,
+                    ],
+                ],
+                'receivedTime' => $collectedIso,
+                'request'      => [$srRef],
+            ];
+
+            // Kirim Specimen
+            try {
+                $resp       = $this->postSpecimen($specimenData);
+                $specimenId = $resp['id'] ?? null;
+                if (!$specimenId) {
+                    throw new \Exception('UUID Specimen tidak diterima.');
+                }
+
+                toastr()->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addSuccess("Specimen {$localId} berhasil dikirim (UUID: {$specimenId}).");
+
+                // Simpan ke JSON RJ
+                $dataDaftarPoliRJ['satuSehatUuidRJ']['specimens'][] = [
+                    'uuid'    => $specimenId,
+                    'localId' => $localId,
+                ];
+                $this->updateJsonRJ($this->rjNoRef, $dataDaftarPoliRJ);
+            } catch (\Exception $e) {
+                toastr()->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError("Gagal kirim Specimen {$localId}: " . $e->getMessage());
+            }
+        }
+    }
 
 
 
