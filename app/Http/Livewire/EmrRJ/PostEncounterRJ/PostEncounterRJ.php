@@ -12,6 +12,9 @@ use App\Http\Traits\SATUSEHAT\ObservationTrait;
 use App\Http\Traits\SATUSEHAT\ProcedureTrait;
 use App\Http\Traits\SATUSEHAT\MedicationRequestTrait;
 use App\Http\Traits\SATUSEHAT\MedicationDispenseTrait;
+use App\Http\Traits\SATUSEHAT\ServiceRequestTrait;
+
+
 
 
 use Carbon\Carbon;
@@ -33,7 +36,8 @@ class PostEncounterRJ extends Component
         ObservationTrait,
         ProcedureTrait,
         MedicationRequestTrait,
-        MedicationDispenseTrait;
+        MedicationDispenseTrait,
+        ServiceRequestTrait;
 
 
     public $rjNoRef;
@@ -1927,6 +1931,206 @@ class PostEncounterRJ extends Component
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /**
+     * Kirim permintaan pemeriksaan laboratorium (hematologi) ke SatuSehat
+     */
+    public function postLaboratRJ()
+    {
+        // 1) Ambil data dasar
+        $find             = $this->findDataRJ($this->rjNoRef);
+        $dataDaftarPoliRJ = $find['dataDaftarRJ'] ?? [];
+        $dataPasienRJ  = $find['dataPasienRJ'] ?? [];
+        $patientUuid = $dataPasienRJ['patientUuid'] ?? null;
+        $encounterUuid = $dataDaftarPoliRJ['satuSehatUuidRJ']['encounter']['uuid'] ?? null;
+        $requesterId = $dataPasienRJ['drUuid'] ?? null;
+        $requesterName = $dataPasienRJ['drName'] ?? null;
+
+        $sentRecords = $dataDaftarPoliRJ['satuSehatUuidRJ']['serviceRequests'] ?? [];
+
+        // Validasi prasyarat
+        if (! $patientUuid) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Patient UUID belum tersedia. Proses dibatalkan.');
+            return;
+        }
+
+        if (! $encounterUuid) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Encounter UUID belum tersedia. Proses dibatalkan.');
+            return;
+        }
+
+        if (! $requesterId) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Requester ID belum tersedia. Proses dibatalkan.');
+            return;
+        }
+
+        // Inisialisasi client SatuSehat
+        $this->initializeSatuSehat();
+        $orgId = env('SATUSEHAT_ORGANIZATION_ID');
+
+        // Buat identifier unik untuk ServiceRequest
+
+        $pemeriksaanLab = DB::table('lbtxn_checkuphdrs as a')
+            ->join('lbtxn_checkupdtls as b', 'a.checkup_no', '=', 'b.checkup_no')
+            ->join('lbmst_clabitems as c', 'b.clabitem_id', '=', 'c.clabitem_id')
+            ->join('lbmst_clabs as d', 'c.clab_id', '=', 'd.clab_id')
+            ->where('a.status_rjri', 'RJ')
+            ->whereNotNull('c.price')
+            // ->where('b.checkup_status', '!=',  'B')
+            ->where('a.ref_no', $this->rjNoRef)
+            ->select([
+                DB::raw("to_char(a.checkup_date, 'dd/mm/yyyy hh24:mi:ss') as checkup_date"),
+                'c.clabitem_id',
+                'b.checkup_dtl',
+                'd.clab_id',
+                'd.clab_id_satusehat',
+                'd.clab_desc_satusehat',
+            ])
+            ->distinct()
+            ->get();
+
+        // Siapkan data ServiceRequest
+        foreach ($pemeriksaanLab as $lab) {
+            $localId = $lab->checkup_dtl;
+            $sent = collect($sentRecords)
+                ->firstWhere('localId', $localId);
+
+            if ($sent) {
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addInfo(
+                        "{$localId} telah dikirim sebelumnya (UUID: {$sent['uuid']})."
+                    );
+
+                continue;
+            }
+
+
+            $identifierValue = "LAB-{$localId}-" . now('Asia/Jakarta')->format('YmdHis');
+
+            $authoredOn = $lab->checkup_date ?? null;
+            if (empty($authoredOn)) {
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError('Waktu masuk ruang (laborat) tidak ditemukan, proses dibatalkan.');
+                return;
+            }
+
+            try {
+                $authoredOnIso = Carbon::createFromFormat('d/m/Y H:i:s', $authoredOn)
+                    ->toIso8601String();
+            } catch (\Exception $e) {
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError("Format waktu laborat tidak valid: “{$authoredOn}”. Proses dibatalkan.");
+                return;
+            }
+
+
+            $srData = [
+                'identifier'         => [
+                    'system' => "http://sys-ids.kemkes.go.id/servicerequest/{$orgId}",
+                    'value'  => $identifierValue,
+                ],
+                'status'             => 'active',
+                'intent'             => 'original-order',
+                'priority'           => 'routine',
+                'category'           => [
+                    'system'  => 'http://snomed.info/sct',
+                    'code'    => '108252007',
+                    'display' => 'Laboratory procedure',
+                ],
+                'code'               => [
+                    'system'  => 'http://loinc.org',
+                    'code'    => $lab->clab_id_satusehat,   // CBC panel
+                    'display' => $lab->clab_desc_satusehat,
+                ],
+                'subject'            => "Patient/{$patientUuid}",
+                'encounter'          => "Encounter/{$encounterUuid}",
+                'occurrenceDateTime' => $authoredOnIso,
+                'authoredOn'         => $authoredOnIso,
+                'requester'          => "Practitioner/{$requesterId}",
+                'requesterDisplay'   => $requesterName,
+
+                'performer'          => "Practitioner/{$requesterId}", //sementara pakai dokter. . .ini adalah petugas lab
+                'performerDisplay'   => $requesterName,
+                'reasonCode'         => [
+                    ['text' => $lab->clab_desc_satusehat]
+                ],
+            ];
+
+            // Kirim ServiceRequest via trait
+            try {
+
+                $response = $this->postServiceRequest($srData);
+                $srUuid   = $response['id'] ?? null;
+                if (! $srUuid) {
+                    throw new \Exception('UUID ServiceRequest tidak diterima.');
+                }
+
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addSuccess("Permintaan lab hematologi berhasil (UUID: {$srUuid})");
+
+                // Simpan hasil ke struktur JSON RJ jika perlu
+                $dataDaftarPoliRJ['satuSehatUuidRJ']['serviceRequests'][] = [
+                    'uuid'    => $srUuid,
+                    'localId' => $localId,
+                ];
+                $this->updateJsonRJ($this->rjNoRef, $dataDaftarPoliRJ);
+            } catch (\Exception $e) {
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError('Gagal mengirim permintaan lab: ' . $e->getMessage());
+            }
+        }
+    }
 
 
 
