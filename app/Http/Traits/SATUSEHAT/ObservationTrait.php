@@ -74,28 +74,10 @@ trait ObservationTrait
         elseif (!empty($data['components']) && is_array($data['components'])) {
             $payload['component'] = $data['components'];
         }
-
+        // dd($payload);
         return $this->makeRequest('post', '/Observation', $payload);
     }
 
-    protected function buildVitalSignComponent($loincCode, $display, $value, $unitCode, $unitDisplay)
-    {
-        return [
-            "code" => [
-                "coding" => [[
-                    "system" => "http://loinc.org",
-                    "code" => $loincCode,
-                    "display" => $display
-                ]]
-            ],
-            "valueQuantity" => [
-                "value" => $value,
-                "unit" => $unitDisplay,
-                "system" => "http://unitsofmeasure.org",
-                "code" => $unitCode
-            ]
-        ];
-    }
 
     /**
      * Cari semua Observation untuk sebuah encounter.

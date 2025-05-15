@@ -165,7 +165,7 @@
                                     @endphp
                                     <tr class="border-l-2 border-r-2 border-gray-900 {{ $propertyUpNormal }}">
                                         <td class="p-1 m-1 text-left">
-                                            {{ $dataDaftarTxn->clabitem_desc }}
+                                            {{ $dataDaftarTxn->clabitem_id }}/ {{ $dataDaftarTxn->clabitem_desc }}
                                         </td>
                                         <td class="p-1 m-1">
                                             {{ $dataDaftarTxn->lab_result_status }}

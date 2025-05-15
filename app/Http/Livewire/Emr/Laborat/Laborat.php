@@ -483,7 +483,6 @@ class Laborat extends Component
                 where a.clabitem_id=b.clabitem_id
                 and checkup_no=rsview_checkups.checkup_no
                 and a.price is not null) AS checkup_dtl_pasien
-
                 ")
 
             )

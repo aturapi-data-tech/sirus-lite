@@ -14,6 +14,8 @@ use App\Http\Traits\SATUSEHAT\MedicationRequestTrait;
 use App\Http\Traits\SATUSEHAT\MedicationDispenseTrait;
 use App\Http\Traits\SATUSEHAT\ServiceRequestTrait;
 use App\Http\Traits\SATUSEHAT\SpecimenTrait;
+use App\Http\Traits\SATUSEHAT\DiagnosticReportTrait;
+
 
 
 
@@ -39,7 +41,8 @@ class PostEncounterRJ extends Component
         MedicationRequestTrait,
         MedicationDispenseTrait,
         ServiceRequestTrait,
-        SpecimenTrait;
+        SpecimenTrait,
+        DiagnosticReportTrait;
 
 
     public $rjNoRef;
@@ -2021,15 +2024,28 @@ class PostEncounterRJ extends Component
                 'c.clabitem_id',
                 'b.checkup_dtl',
                 'd.clab_id',
-                'd.clab_id_satusehat',
-                'd.clab_desc_satusehat',
+                'c.clabitem_id_satusehat',
+                'c.clabitem_desc_satusehat',
             ])
             ->distinct()
             ->get();
-
         // Siapkan data ServiceRequest
         foreach ($pemeriksaanLab as $lab) {
             $localId = $lab->checkup_dtl;
+
+            if (
+                empty($lab->clabitem_id_satusehat) ||
+                empty($lab->clabitem_desc_satusehat)
+
+            ) {
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addWarning("Data mapping SATUSEHAT belum lengkap untuk item {$lab->checkup_dtl}, dilewati.");
+                continue;
+            }
+
             $sent = collect($sentRecords)
                 ->firstWhere('localId', $localId);
 
@@ -2086,8 +2102,8 @@ class PostEncounterRJ extends Component
                 ],
                 'code'               => [
                     'system'  => 'http://loinc.org',
-                    'code'    => $lab->clab_id_satusehat,   // CBC panel
-                    'display' => $lab->clab_desc_satusehat,
+                    'code'    => $lab->clabitem_id_satusehat,   // CBC panel
+                    'display' => $lab->clabitem_desc_satusehat,
                 ],
                 'subject'            => "Patient/{$patientUuid}",
                 'encounter'          => "Encounter/{$encounterUuid}",
@@ -2099,7 +2115,7 @@ class PostEncounterRJ extends Component
                 'performer'          => "Practitioner/{$requesterId}", //sementara pakai dokter. . .ini adalah petugas lab
                 'performerDisplay'   => $requesterName,
                 'reasonCode'         => [
-                    ['text' => $lab->clab_desc_satusehat]
+                    ['text' => $lab->clabitem_desc_satusehat]
                 ],
             ];
 
@@ -2190,6 +2206,19 @@ class PostEncounterRJ extends Component
 
         foreach ($pemeriksaanLab as $lab) {
             $localId = $lab->checkup_dtl;
+
+            if (
+                empty($lab->clab_id_satusehat_specimen) ||
+                empty($lab->clab_desc_satusehat_specimen)
+
+            ) {
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addWarning("Data mapping SATUSEHAT belum lengkap untuk item {$lab->checkup_dtl}, dilewati.");
+                continue;
+            }
 
             // Cek apakah Specimen sudah dikirim
             $already = collect($sentSpecimens)
@@ -2282,6 +2311,377 @@ class PostEncounterRJ extends Component
     }
 
 
+
+    public function postObservationLaboratRJ()
+    {
+        // 1) Ambil data kunjungan & pasien
+        $find = $this->findDataRJ($this->rjNoRef);
+        $dataDaftarPoliRJ = $find['dataDaftarRJ'] ?? [];
+        $dataPasienRJ = $find['dataPasienRJ'] ?? [];
+        $patientUuid = $dataPasienRJ['patientUuid'] ?? null;
+        $encounterUuid = $dataDaftarPoliRJ['satuSehatUuidRJ']['encounter']['uuid'] ?? null;
+        $sentRecords = $dataDaftarPoliRJ['satuSehatUuidRJ']['labObservations'] ?? [];
+        $performerId = $dataPasienRJ['drUuid'] ?? null; // Dokter yang melakukan pemeriksaan
+
+
+        // 2) Validasi prasyarat
+        if (!$patientUuid) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Patient UUID belum tersedia. Proses LabObservation dibatalkan.');
+            return;
+        }
+
+        if (!$performerId) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('UUID performer (dokter) belum tersedia. Proses LabObservation dibatalkan.');
+            return;
+        }
+
+        if (!$encounterUuid) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Encounter UUID belum tersedia. Proses LabObservation dibatalkan.');
+            return;
+        }
+
+        $this->initializeSatuSehat();
+        $orgId = env('SATUSEHAT_ORGANIZATION_ID');
+        // 3) Ambil data pemeriksaan laboratorium
+        $pemeriksaanLab = DB::table('lbtxn_checkuphdrs as a')
+            ->join('lbtxn_checkupdtls as b', 'a.checkup_no', '=', 'b.checkup_no')
+            ->join('lbmst_clabitems as c', 'b.clabitem_id', '=', 'c.clabitem_id')
+            ->join('lbmst_clabs as d', 'c.clab_id', '=', 'd.clab_id')
+            ->where('a.status_rjri', 'RJ')
+            ->whereNotNull('c.price')
+            ->where('a.ref_no', $this->rjNoRef)
+            ->select([
+                'b.checkup_dtl',
+                'd.clab_id_satusehat_specimen',
+                'd.clab_desc_satusehat_specimen',
+                'c.clabitem_id_satusehat',
+                'c.clabitem_desc_satusehat',
+                DB::raw("to_char(a.checkup_date, 'dd/mm/yyyy HH24:MI:SS') as checkup_date"),
+            ])
+            ->distinct()
+            ->get();
+
+
+        foreach ($pemeriksaanLab as $lab) {
+            $localId = $lab->checkup_dtl;
+
+            // Cek apakah data sudah dikirim sebelumnya
+            $alreadySent = collect($sentRecords)->firstWhere('localId', $localId);
+            if ($alreadySent) {
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addInfo("LabObservation {$localId} sudah terkirim (UUID: {$alreadySent['uuid']}).");
+                continue;
+            }
+
+            // 4) Ambil data lengkap hasil laboratorium
+            $dataDaftarTxn = DB::table('lbtxn_checkuphdrs as a')
+                ->join('lbtxn_checkupdtls as b', 'a.checkup_no', '=', 'b.checkup_no')
+                ->join('rsmst_pasiens as c', 'a.reg_no', '=', 'c.reg_no')
+                ->join('lbmst_clabitems as d', 'b.clabitem_id', '=', 'd.clabitem_id')
+                ->join('lbmst_clabs as e', 'd.clab_id', '=', 'e.clab_id')
+                ->join('rsmst_doctors as f', 'a.dr_id', '=', 'f.dr_id')
+                ->where('b.checkup_dtl', $localId)
+                ->whereRaw("NVL(d.hidden_status,'N') = 'N'")
+                ->select([
+                    'a.emp_id',
+                    'a.checkup_no',
+                    'a.checkup_date',
+                    'a.reg_no',
+                    'c.reg_name',
+                    'a.dr_id',
+                    'f.dr_name',
+                    'c.sex',
+                    'c.birth_date',
+                    'c.address',
+                    'e.app_seq',
+                    'e.clab_desc',
+                    'b.clabitem_id',
+                    DB::raw("'  ' || d.clabitem_desc AS clabitem_desc"),
+                    'a.checkup_kesimpulan',
+                    'd.normal_f',
+                    'd.normal_m',
+                    'b.lab_result',
+                    'd.item_seq',
+                    'd.unit_desc',
+                    'd.unit_convert',
+                    'd.item_code',
+                    'd.high_limit_m',
+                    'd.high_limit_f',
+                    'd.low_limit_m',
+                    'd.low_limit_f',
+                    'd.lowhigh_status',
+                    'b.lab_result_status',
+                    'a.waktu_selesai_pelayanan',
+                    DB::raw("to_char(a.checkup_date,'dd/mm/yyyy') AS checkup_date1x"),
+                ])
+                ->first();
+
+            if (empty($dataDaftarTxn) || empty($dataDaftarTxn->lab_result)) {
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addInfo("Data hasil laboratorium untuk {$localId} kosong. Dilewati.");
+                continue;
+            }
+
+            // Tentukan faktor konversi jika ada
+            $unitConvert = $dataDaftarTxn->lowhigh_status === 'Y'
+                ? ($dataDaftarTxn->unit_convert ?: 1)
+                : 1;
+
+            // Hitung nilai laboratorium
+            $rawValue = $dataDaftarTxn->lab_result * $unitConvert;
+            $value = (fmod($rawValue, 1) !== 0.0) ? $rawValue : number_format($rawValue);
+
+
+            try {
+                $effective = Carbon::createFromFormat('d/m/Y H:i:s', $lab->checkup_date, 'Asia/Jakarta')->toIso8601String();
+            } catch (\Exception $e) {
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addError("Format waktu tidak valid: {$lab->checkup_date}");
+                continue;
+            }
+
+            // payload per-komponen
+            $payload = [
+                'patientId'   => $patientUuid,
+                'encounterId' => $encounterUuid,
+                'performerId' => $performerId,
+                'effectiveDate' => $effective, // dari kode kamu sebelumnya
+                // bangun code + valueQuantity, bukan components array
+                'code' => [
+                    'system'  => 'http://loinc.org',
+                    'code'    => $lab->clabitem_id_satusehat,
+                    'display' => $lab->clabitem_desc_satusehat,
+                ],
+                // 'valueQuantity' => [
+                //     'value'  => $value,
+                //     'unit'   => $item['unitDisplay'],
+                //     'system' => 'http://unitsofmeasure.org',
+                //     'code'   => $item['unitCode'],
+                // ],
+            ];
+
+            // Kirimkan data Observation ke API
+            try {
+                $result = $this->createObservation($payload);
+                $observationId = $result['id'] ?? null;
+
+                if ($observationId) {
+                    toastr()
+                        ->closeOnHover(true)
+                        ->closeDuration(3)
+                        ->positionClass('toast-top-left')
+                        ->addSuccess("LabObservation untuk {$localId} berhasil dikirim (UUID: {$observationId}).");
+                    // Simpan ke JSON RJ
+                    $dataDaftarPoliRJ['satuSehatUuidRJ']['labObservations'][] = [
+                        'uuid'    => $observationId,
+                        'localId' => $localId,
+                        'checkupNo' => $dataDaftarTxn->checkup_no,
+                    ];
+                    $this->updateJsonRJ($this->rjNoRef, $dataDaftarPoliRJ);
+                }
+            } catch (\Exception $e) {
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError("Gagal kirim LabObservation untuk {$localId}: " . $e->getMessage());
+            }
+        }
+    }
+
+
+    public function postDiagnosticReportLaboratRJ()
+    {
+        // 1) Ambil data dasar
+        $find             = $this->findDataRJ($this->rjNoRef);
+        $dataDaftarPoliRJ = $find['dataDaftarRJ'] ?? [];
+        $dataPasienRJ     = $find['dataPasienRJ'] ?? [];
+        $patientUuid      = $dataPasienRJ['patientUuid'] ?? null;
+        $encounterUuid    = $dataDaftarPoliRJ['satuSehatUuidRJ']['encounter']['uuid'] ?? null;
+        $sentSR           = $dataDaftarPoliRJ['satuSehatUuidRJ']['serviceRequests'] ?? [];
+        $sentSpecimens    = $dataDaftarPoliRJ['satuSehatUuidRJ']['specimens'] ?? [];
+        $sentDiagnostics  = $dataDaftarPoliRJ['satuSehatUuidRJ']['diagnosticReports'] ?? [];
+        $sentLabObservations = $dataDaftarPoliRJ['satuSehatUuidRJ']['labObservations'] ?? [];
+
+
+        if (!$patientUuid) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Patient UUID belum tersedia. Proses dibatalkan.');
+            return;
+        }
+
+        if (!$encounterUuid) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Encounter UUID belum tersedia. Proses dibatalkan.');
+            return;
+        }
+
+        $this->initializeSatuSehat();
+        $orgId = env('SATUSEHAT_ORGANIZATION_ID');
+
+        $pemeriksaanLab = DB::table('lbtxn_checkuphdrs as a')
+            ->join('lbtxn_checkupdtls as b', 'a.checkup_no', '=', 'b.checkup_no')
+            ->join('lbmst_clabitems as c', 'b.clabitem_id', '=', 'c.clabitem_id')
+            ->join('lbmst_clabs as d', 'c.clab_id', '=', 'd.clab_id')
+            ->where('a.status_rjri', 'RJ')
+            ->whereNotNull('c.price')
+            ->where('a.ref_no', $this->rjNoRef)
+            ->select([
+                'a.checkup_no',
+                'b.checkup_dtl',
+                'd.clab_id_satusehat_specimen',
+                'd.clab_desc_satusehat_specimen',
+                'c.clabitem_id_satusehat',
+                'c.clabitem_desc_satusehat',
+
+                // 'c.result_id_satusehat',
+                // 'c.result_desc_satusehat',
+                DB::raw("to_char(a.checkup_date, 'dd/mm/yyyy HH24:MI:SS') as checkup_date"),
+            ])
+            ->distinct()
+            ->get();
+
+        foreach ($pemeriksaanLab as $lab) {
+            $localId = $lab->checkup_dtl;
+
+            if (
+                empty($lab->clab_id_satusehat_specimen) ||
+                empty($lab->clab_desc_satusehat_specimen) ||
+                empty($lab->clabitem_id_satusehat) ||
+                empty($lab->clabitem_desc_satusehat)
+            ) {
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addWarning("Data mapping SATUSEHAT belum lengkap untuk item {$lab->checkup_dtl}, dilewati.");
+                continue;
+            }
+
+            // 1) CEK APAKAH DIAGNOSTICREPORT SUDAH DIKIRIM
+            $alreadyDiag = collect($sentDiagnostics)->firstWhere('localId', $localId);
+            if ($alreadyDiag) {
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addInfo("DiagnosticReport {$localId} sudah dikirim (UUID: {$alreadyDiag['uuid']}).");
+                continue;
+            }
+
+            $sSpecimen = collect($sentSpecimens)->firstWhere('localId', $localId);
+            if (!$sSpecimen) {
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addInfo("Specimen {$localId} belum ada. Kirim Specimen dulu.");
+                continue;
+            }
+
+            $sr = collect($sentSR)->firstWhere('localId', $localId);
+            if (!$sr) {
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError("ServiceRequest untuk {$localId} belum ada. Kirim ServiceRequest dulu.");
+                continue;
+            }
+
+            try {
+                $collectedIso = Carbon::createFromFormat('d/m/Y H:i:s', $lab->checkup_date, 'Asia/Jakarta')->toIso8601String();
+            } catch (\Exception $e) {
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError("Format waktu tidak valid: {$lab->checkup_date}");
+                continue;
+            }
+
+            $slo = collect($sentLabObservations)
+                ->where('checkupNo', $lab->checkup_no)  // Menyaring berdasarkan checkupNo
+                ->pluck('uuid')  // Mengambil hanya nilai dari kolom 'uuid'
+                ->toArray();  // Mengubah hasilnya menjadi array
+
+            if (empty($slo)) {
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError("ServiceRequest untuk {$localId} belum ada. Kirim ServiceRequest dulu.");
+                continue;
+            }
+            try {
+                // === Kirim DiagnosticReport ===
+                $diagIdentifier = "DIAG-{$localId}-" . now('Asia/Jakarta')->format('YmdHis');
+                $diagnosticData = [
+                    'identifier'      => [[
+                        'system' => "http://sys-ids.kemkes.go.id/diagnostic/{$orgId}/lab",
+                        'use'    => 'official',
+                        'value'  => $diagIdentifier,
+                    ]],
+                    'status'          => 'final',
+                    'categoryCode'    => 'LAB',
+                    'categoryDisplay' => 'Laboratory',
+                    'codeSystem'      => 'http://loinc.org',
+                    'code'            => $lab->clabitem_id_satusehat,
+                    'display'         => $lab->clabitem_desc_satusehat,
+                    'patientId'       => $patientUuid,
+
+                    // tambahkan conclusionCode hardcode di sini () //program belum beres, nanti sesuaikan dengan hasil lab yang di setup (mbak anis)
+                    'conclusionCode'  => [[
+                        'coding' => [[
+                            'system'  => 'http://snomed.info/sct',
+                            'code'    => '443938003',
+                            'display' => 'Normal hematology report',
+                        ]]
+                    ]],
+
+                    'encounterId'     => $encounterUuid,
+                    'effectiveDate'   => $collectedIso,
+                    'issued'          => $collectedIso,
+                    'performer'       => ["Organization/{$orgId}"],
+                    'specimen'        => ["Specimen/{$sSpecimen['uuid']}"],
+                    'observationIds'  => $slo ?? [],
+                    'basedOn'         => [$sr['uuid']] ?? [],
+                ];
+
+                $responseDiag = $this->createDiagnosticReport($diagnosticData);
+                $diagId       = $responseDiag['id'] ?? null;
+                if ($diagId) {
+                    toastr()->addSuccess("DiagnosticReport untuk {$localId} berhasil dikirim (UUID: {$diagId}).");
+                    // Simpan ke JSON RJ
+                    $dataDaftarPoliRJ['satuSehatUuidRJ']['diagnosticReports'][] = [
+                        'uuid'    => $diagId,
+                        'localId' => $localId,
+                        'checkupNo' => $lab->checkup_no
+                    ];
+                    $this->updateJsonRJ($this->rjNoRef, $dataDaftarPoliRJ);
+                } else {
+                    throw new \Exception('UUID DiagnosticReport tidak diterima.');
+                }
+            } catch (\Exception $e) {
+                toastr()->addError("Gagal kirim Specimen / DiagnosticReport {$localId}: " . $e->getMessage());
+            }
+        }
+    }
 
 
     public function mount()
