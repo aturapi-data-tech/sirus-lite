@@ -88,6 +88,17 @@
                                                         </div>
                                                     </div>
 
+                                                    <div class="grid justify-center">
+                                                        <x-yellow-button
+                                                            wire:click.prevent="openModalLayananFoto('{{ $myQData->rad_upload_pdf_foto }}')"
+                                                            type="button" wire:loading.remove>
+                                                            Foto Radiologi
+                                                        </x-yellow-button>
+                                                        <div wire:loading wire:target="openModalLayananFoto">
+                                                            <x-loading />
+                                                        </div>
+                                                    </div>
+
 
 
                                                 </td>

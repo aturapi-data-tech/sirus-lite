@@ -38,6 +38,8 @@ class Radiologi extends Component
     public array $dataDaftarTxnHeader;
     public array $dataPasien;
     public string $rad_pdf_file = '';
+    public string $rad_pdf_file_foto = '';
+
 
 
 
@@ -64,6 +66,28 @@ class Radiologi extends Component
                 return response()->download(storage_path('/penunjang/rad/' . $rad_pdf_file));
                 $this->isOpenRekamMedisRadiologi = true;
                 $this->rad_pdf_file = $rad_pdf_file;
+            } catch (Exception $e) {
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('File tidak ditemukan');
+            }
+        } else {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Hasil Bacaan Radiologi masih dalam Proses');
+        }
+    }
+
+    public function openModalLayananFoto($rad_pdf_file_foto)
+    {
+        // if (Storage::exists('/penunjang/rad/' . $rad_pdf_file_foto)) {
+        //     $this->isOpenRekamMedisRadiologi = true;
+        //     $this->rad_pdf_file_foto = $rad_pdf_file_foto;
+        // } else {
+        //      toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError( 'Hasil Bacaan Radiologi masih dalam Proses');
+        // }
+        if ($rad_pdf_file_foto) {
+            try {
+
+                return response()->download(storage_path('/penunjang/rad/' . $rad_pdf_file_foto));
+                $this->isOpenRekamMedisRadiologi = true;
+                $this->rad_pdf_file_foto = $rad_pdf_file_foto;
             } catch (Exception $e) {
                 toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('File tidak ditemukan');
             }
@@ -417,6 +441,7 @@ class Radiologi extends Component
                 'birth_date',
                 'address',
                 'rad_upload_pdf',
+                'rad_upload_pdf_foto',
                 'rad_rjri',
                 'rad_id',
                 'rad_desc',
