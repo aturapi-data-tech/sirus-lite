@@ -201,7 +201,7 @@ class AdministrasiRJ extends Component
 
         // RS Admin
         $rsAdminDokter = DB::table('rsmst_doctors')
-            ->select('rs_admin', 'poli_price')
+            ->select('rs_admin', 'poli_price', 'poli_price_bpjs')
             ->where('dr_id', $dataRawatJalan['drId'])
             ->first();
 
@@ -219,11 +219,28 @@ class AdministrasiRJ extends Component
         }
 
         // PoliPrice
-        if (isset($dataRawatJalan['poliPrice'])) {
-            $dataRawatJalan['poliPrice'] = $rsAdmin->poli_price ? $rsAdmin->poli_price : 0;
+        $klaimStatus = DB::table('rsmst_klaimtypes')
+            ->where('klaim_id', $this->dataDaftarPoliRJ['klaimId'] ?? '')
+            ->value('klaim_status') ?? 'UMUM';
+
+        // 2) Tentukan kolom harga yang akan dipakai
+        if ($klaimStatus === 'BPJS') {
+            // Jika klaim BPJS, pakai harga BPJS
+            $dokterPoliPrice = $rsAdminDokter->poli_price_bpjs ?? 0;
         } else {
-            $dataRawatJalan['poliPrice'] = $rsAdminDokter->poli_price ? $rsAdminDokter->poli_price : 0;
-            // update table trnsaksi
+            // Jika klaim UMUM, pakai harga umum
+            $dokterPoliPrice = $rsAdminDokter->poli_price ?? 0;
+        }
+
+        // 3) Set dan simpan ke transaksi
+        if (isset($dataRawatJalan['poliPrice'])) {
+            // Harga dari admin (misal: registrasi, front office, dst)
+            $dataRawatJalan['poliPrice'] =  $rsAdmin->poli_price ? $rsAdmin->poli_price : 0;
+        } else {
+            // Harga dari dokter
+            $dataRawatJalan['poliPrice'] = $dokterPoliPrice;
+
+            // Simpan ke tabel transaksi
             DB::table('rstxn_rjhdrs')
                 ->where('rj_no', $rjNo)
                 ->update([

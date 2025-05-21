@@ -210,7 +210,7 @@ class AdministrasiUGD extends Component
 
         // RS Admin
         $rsAdminDokter = DB::table('rsmst_doctors')
-            ->select('rs_admin', 'poli_price')
+            ->select('rs_admin', 'ugd_price', 'ugd_price_bpjs')
             ->where('dr_id', $dataRawatJalan['drId'])
             ->first();
 
@@ -228,17 +228,33 @@ class AdministrasiUGD extends Component
         }
 
         // PoliPrice
+        // 1) Ambil klaim status (default 'UMUM' jika NULL)
+        $klaimStatus = DB::table('rsmst_klaimtypes')
+            ->where('klaim_id', $this->dataDaftarUGD['klaimId'] ?? '')
+            ->value('klaim_status') ?? 'UMUM';
+
+        // 2) Tentukan harga admin & dokter berdasarkan status klaim
+        if ($klaimStatus === 'BPJS') {
+            $dokterUgdPrice = $rsAdminDokter->ugd_price_bpjs ?? 0;
+        } else {
+            $dokterUgdPrice = $rsAdminDokter->ugd_price ?? 0;
+        }
+
+        // 3) Set poliPrice & simpan ke transaksi UGD
         if (isset($dataRawatJalan['poliPrice'])) {
+            // sudah ada → pakai harga admin/front-office
             $dataRawatJalan['poliPrice'] = $rsAdmin->poli_price ? $rsAdmin->poli_price : 0;
         } else {
-            $dataRawatJalan['poliPrice'] = $rsAdminDokter->poli_price ? $rsAdminDokter->poli_price : 0;
-            // update table trnsaksi
+            // belum ada → pakai harga dokter, lalu update ke tabel UGD
+            $dataRawatJalan['poliPrice'] = $dokterUgdPrice;
+
             DB::table('rstxn_ugdhdrs')
                 ->where('rj_no', $rjNo)
                 ->update([
                     'poli_price' => $dataRawatJalan['poliPrice'],
                 ]);
         }
+
 
         // Ketika Kronis
         if ($rsAdmin->klaim_id == 'KR') {
