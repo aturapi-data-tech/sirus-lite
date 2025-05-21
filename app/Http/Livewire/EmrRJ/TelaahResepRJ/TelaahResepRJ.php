@@ -580,7 +580,7 @@ class TelaahResepRJ extends Component
 
         // RS Admin
         $rsAdminDokter = DB::table('rsmst_doctors')
-            ->select('rs_admin', 'poli_price')
+            ->select('rs_admin', 'poli_price', 'poli_price_bpjs')
             ->where('dr_id', $dataRawatJalan['drId'])
             ->first();
 
@@ -598,17 +598,37 @@ class TelaahResepRJ extends Component
         }
 
         // PoliPrice
-        if (isset($dataRawatJalan['poliPrice'])) {
-            $dataRawatJalan['poliPrice'] = $rsAdmin->poli_price ? $rsAdmin->poli_price : 0;
+        // 1) Ambil klaim status (default 'UMUM' jika NULL)
+        $klaimStatus = DB::table('rsmst_klaimtypes')
+            ->where('klaim_id', $dataRawatJalan['klaimId'] ?? '')
+            ->value('klaim_status')
+            ?? 'UMUM';
+
+        // 2) Tentukan harga dokter berdasarkan status klaim
+        if ($klaimStatus === 'BPJS') {
+            // gunakan tarif BPJS untuk poli
+            $dokterPoliPrice = $rsAdminDokter->poli_price_bpjs ?? 0;
         } else {
-            $dataRawatJalan['poliPrice'] = $rsAdminDokter->poli_price ? $rsAdminDokter->poli_price : 0;
-            // update table trnsaksi
+            // gunakan tarif umum untuk poli
+            $dokterPoliPrice = $rsAdminDokter->poli_price ?? 0;
+        }
+
+        // 3) Set poliPrice & simpan ke transaksi Rawat Jalan
+        if (isset($dataRawatJalan['poliPrice'])) {
+            // sudah ada → pakai harga admin/front-office
+            $dataRawatJalan['poliPrice'] = $rsAdmin->poli_price ?? 0;
+        } else {
+            // belum ada → pakai tarif dokter sesuai klaim
+            $dataRawatJalan['poliPrice'] = $dokterPoliPrice;
+
+            // update kolom poli_price pada header transaksi RJ
             DB::table('rstxn_rjhdrs')
                 ->where('rj_no', $rjNo)
                 ->update([
                     'poli_price' => $dataRawatJalan['poliPrice'],
                 ]);
         }
+
 
         // Ketika Kronis
         if ($rsAdmin->klaim_id == 'KR') {

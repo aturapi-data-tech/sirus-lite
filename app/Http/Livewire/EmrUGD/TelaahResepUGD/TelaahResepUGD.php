@@ -567,7 +567,7 @@ class TelaahResepUGD extends Component
 
         // RS Admin
         $rsAdminDokter = DB::table('rsmst_doctors')
-            ->select('rs_admin', 'poli_price')
+            ->select('rs_admin', 'ugd_price', 'ugd_price_bpjs')
             ->where('dr_id', $dataUGD['drId'])
             ->first();
 
@@ -585,11 +585,27 @@ class TelaahResepUGD extends Component
         }
 
         // PoliPrice
-        if (isset($dataUGD['poliPrice'])) {
-            $dataUGD['poliPrice'] = $rsAdmin->poli_price ? $rsAdmin->poli_price : 0;
+        // 1) Ambil klaim status (default 'UMUM' jika NULL)
+        $klaimStatus = DB::table('rsmst_klaimtypes')
+            ->where('klaim_id', $dataUGD['klaimId'] ?? '')
+            ->value('klaim_status')
+            ?? 'UMUM';
+
+        // 2) Tentukan harga dokter berdasarkan status klaim
+        if ($klaimStatus === 'BPJS') {
+            $dokterUgdPrice = $rsAdminDokter->ugd_price_bpjs ?? 0;
         } else {
-            $dataUGD['poliPrice'] = $rsAdminDokter->poli_price ? $rsAdminDokter->poli_price : 0;
-            // update table trnsaksi
+            $dokterUgdPrice = $rsAdminDokter->ugd_price ?? 0;
+        }
+
+        // 3) Set poliPrice & simpan ke transaksi Rawat Jalan
+        if (isset($dataUGD['poliPrice'])) {
+            // sudah ada → pakai harga admin/front-office
+            $dataUGD['poliPrice'] = $rsAdmin->poli_price ?? 0;
+        } else {
+            // belum ada → pakai tarif dokter sesuai klaim
+            $dataUGD['poliPrice'] = $dokterUgdPrice;
+
             DB::table('rstxn_ugdhdrs')
                 ->where('rj_no', $rjNo)
                 ->update([
