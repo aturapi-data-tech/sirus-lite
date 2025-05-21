@@ -395,7 +395,7 @@ class RekamMedis extends Component
         }
     }
 
-    public function cetakRekamMedisOrthoRJGrid($txnNo = null, $layananStatus = null, $dataDaftarTxn = [])
+    public function cetakRekamMedisFisioRJGrid($txnNo = null, $layananStatus = null, $dataDaftarTxn = [])
     {
         $queryIdentitas = DB::table('rsmst_identitases')
             ->select(
@@ -422,7 +422,7 @@ class RekamMedis extends Component
                     'dataDaftarTxn' => $this->dataDaftarTxn,
 
                 ];
-                $pdfContent = PDF::loadView('livewire.emr.rekam-medis.cetak-rekam-medis-r-j-ortho', $data)->output();
+                $pdfContent = PDF::loadView('livewire.emr.rekam-medis.cetak-rekam-medis-r-j-fisio', $data)->output();
                 toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Cetak RM RJ');
 
 
