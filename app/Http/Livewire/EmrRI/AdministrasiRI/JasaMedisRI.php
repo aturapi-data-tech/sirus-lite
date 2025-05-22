@@ -331,10 +331,11 @@ class JasaMedisRI extends Component
 
             // Jika class_id ditemukan, ambil jasaMedis_price dari tabel rsmst_actpclasses
             if ($classId) {
+                $this->dataDaftarRi = $this->findDataRI($this->riHdrNoRef);
                 // Ambil status klaim dari tabel rsmst_klaimtypes
-                // Pastikan bahwa data klaim pada rawat inap diakses dari variabel yang tepat, contohnya $this->dataDaftarRI
+                // Pastikan bahwa data klaim pada rawat inap diakses dari variabel yang tepat, contohnya $this->dataDaftarRi
                 $klaimStatus = DB::table('rsmst_klaimtypes')
-                    ->where('klaim_id', $this->dataDaftarRI['klaimId'] ?? '')
+                    ->where('klaim_id', $this->dataDaftarRi['klaimId'] ?? '')
                     ->value('klaim_status') ?? 'UMUM';
 
                 if ($klaimStatus === 'BPJS') {
@@ -348,6 +349,8 @@ class JasaMedisRI extends Component
                         ->where('class_id', $classId)
                         ->value('actp_price');
                 }
+                $this->reset(['dataDaftarRi']);
+
                 // Set harga jasa medis; jika tidak ditemukan nilai, maka set ke 0
                 $this->formEntryJasaMedis['jasaMedisPrice'] = $jasaMedisPrice ?? 0;
             } else {

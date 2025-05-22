@@ -230,9 +230,10 @@ class VisitRI extends Component
 
             // Jika class_id ditemukan, ambil visit_price dari tabel rsmst_docvisits
             if ($classId) {
+                $this->dataDaftarRi = $this->findDataRI($this->riHdrNoRef);
                 // Ambil status klaim dari tabel rsmst_klaimtypes, default ke 'UMUM' bila tidak ditemukan
                 $klaimStatus = DB::table('rsmst_klaimtypes')
-                    ->where('klaim_id', $this->dataDaftarRI['klaimId'] ?? '')
+                    ->where('klaim_id', $this->dataDaftarRi['klaimId'] ?? '')
                     ->value('klaim_status') ?? 'UMUM';
 
                 if ($klaimStatus === 'BPJS') {
@@ -248,6 +249,7 @@ class VisitRI extends Component
                         ->where('class_id', $classId)
                         ->value('visit_price');
                 }
+                $this->reset(['dataDaftarRi']);
 
                 // Set visitPrice jika ditemukan, jika tidak set ke 0
                 $this->formEntryVisit['visitPrice'] = $visitPrice ?? 0;

@@ -228,8 +228,9 @@ class KonsulRI extends Component
 
             // Jika class_id ditemukan, ambil konsul_price dari tabel rsmst_docvisits
             if ($classId) {
+                $this->dataDaftarRi = $this->findDataRI($this->riHdrNoRef);
                 $klaimStatus = DB::table('rsmst_klaimtypes')
-                    ->where('klaim_id', $this->dataDaftarRI['klaimId'] ?? '')
+                    ->where('klaim_id', $this->dataDaftarRi['klaimId'] ?? '')
                     ->value('klaim_status') ?? 'UMUM';
 
                 if ($klaimStatus === 'BPJS') {
@@ -243,6 +244,8 @@ class KonsulRI extends Component
                         ->where('class_id', $classId)
                         ->value('konsul_price');
                 }
+                $this->reset(['dataDaftarRi']);
+
                 // Set konsulPrice jika ditemukan, jika tidak set ke 0
                 $this->formEntryKonsul['konsulPrice'] = $konsulPrice ?? 0;
             } else {
