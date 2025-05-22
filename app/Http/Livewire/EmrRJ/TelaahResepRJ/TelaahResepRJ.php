@@ -616,7 +616,7 @@ class TelaahResepRJ extends Component
         // 3) Set poliPrice & simpan ke transaksi Rawat Jalan
         if (isset($dataRawatJalan['poliPrice'])) {
             // sudah ada → pakai harga admin/front-office
-            $dataRawatJalan['poliPrice'] = $rsAdmin->poli_price ?? 0;
+            $dataRawatJalan['poliPrice'] = $rsAdmin->poli_price ? $rsAdmin->poli_price : 0;
         } else {
             // belum ada → pakai tarif dokter sesuai klaim
             $dataRawatJalan['poliPrice'] = $dokterPoliPrice;

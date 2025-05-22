@@ -601,7 +601,7 @@ class TelaahResepUGD extends Component
         // 3) Set poliPrice & simpan ke transaksi Rawat Jalan
         if (isset($dataUGD['poliPrice'])) {
             // sudah ada → pakai harga admin/front-office
-            $dataUGD['poliPrice'] = $rsAdmin->poli_price ?? 0;
+            $dataUGD['poliPrice'] = $rsAdmin->poli_price ? $rsAdmin->poli_price : 0;
         } else {
             // belum ada → pakai tarif dokter sesuai klaim
             $dataUGD['poliPrice'] = $dokterUgdPrice;
