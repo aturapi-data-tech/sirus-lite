@@ -588,8 +588,7 @@ class TelaahResepUGD extends Component
         // 1) Ambil klaim status (default 'UMUM' jika NULL)
         $klaimStatus = DB::table('rsmst_klaimtypes')
             ->where('klaim_id', $dataUGD['klaimId'] ?? '')
-            ->value('klaim_status')
-            ?? 'UMUM';
+            ->value('klaim_status') ?? 'UMUM';
 
         // 2) Tentukan harga dokter berdasarkan status klaim
         if ($klaimStatus === 'BPJS') {
