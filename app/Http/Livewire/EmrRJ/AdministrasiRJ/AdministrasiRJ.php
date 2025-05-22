@@ -124,7 +124,7 @@ class AdministrasiRJ extends Component
                 'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
             ];
 
-            // if ($rjNo !== $this->dataDaftarPoliRJ['rjNo']) {
+            // if ($rjNo !== $dataRawatJalan['rjNo']) {
             //     dd('Data Json Tidak sesuai' . $rjNo . '  /  ' . $dataDaftarPoliRJ['rjNo']);
             // }
 
@@ -147,8 +147,6 @@ class AdministrasiRJ extends Component
 
     private function findData($rjNo): array
     {
-        $dataRawatJalan = [];
-
         $findDataRJ = $this->findDataRJ($rjNo);
         $dataRawatJalan  = $findDataRJ['dataDaftarRJ'];
 
@@ -220,7 +218,7 @@ class AdministrasiRJ extends Component
 
         // PoliPrice
         $klaimStatus = DB::table('rsmst_klaimtypes')
-            ->where('klaim_id', $this->dataDaftarPoliRJ['klaimId'] ?? '')
+            ->where('klaim_id', $dataRawatJalan['klaimId'] ?? '')
             ->value('klaim_status') ?? 'UMUM';
 
         // 2) Tentukan kolom harga yang akan dipakai

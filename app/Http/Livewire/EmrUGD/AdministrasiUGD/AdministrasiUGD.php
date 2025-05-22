@@ -151,10 +151,8 @@ class AdministrasiUGD extends Component
 
     private function findData($rjNo): array
     {
-        $dataRawatJalan = [];
-
         $findDataUGD = $this->findDataUGD($rjNo);
-        $dataRawatJalan  = $findDataUGD;
+        $dataUGD  = $findDataUGD;
 
 
 
@@ -193,44 +191,44 @@ class AdministrasiUGD extends Component
                 ->select('par_value')
                 ->where('par_id', '1')
                 ->first();
-            if (isset($dataRawatJalan['rjAdmin'])) {
-                $dataRawatJalan['rjAdmin'] = $rsAdmin->rj_admin;
+            if (isset($dataUGD['rjAdmin'])) {
+                $dataUGD['rjAdmin'] = $rsAdmin->rj_admin;
             } else {
-                $dataRawatJalan['rjAdmin'] = $rsAdminParameter->par_value;
+                $dataUGD['rjAdmin'] = $rsAdminParameter->par_value;
                 // update table trnsaksi
                 DB::table('rstxn_ugdhdrs')
                     ->where('rj_no', $rjNo)
                     ->update([
-                        'rj_admin' => $dataRawatJalan['rjAdmin'],
+                        'rj_admin' => $dataUGD['rjAdmin'],
                     ]);
             }
         } else {
-            $dataRawatJalan['rjAdmin'] = 0;
+            $dataUGD['rjAdmin'] = 0;
         }
 
         // RS Admin
         $rsAdminDokter = DB::table('rsmst_doctors')
             ->select('rs_admin', 'ugd_price', 'ugd_price_bpjs')
-            ->where('dr_id', $dataRawatJalan['drId'])
+            ->where('dr_id', $dataUGD['drId'])
             ->first();
 
 
-        if (isset($dataRawatJalan['rsAdmin'])) {
-            $dataRawatJalan['rsAdmin'] = $rsAdmin->rs_admin ? $rsAdmin->rs_admin : 0;
+        if (isset($dataUGD['rsAdmin'])) {
+            $dataUGD['rsAdmin'] = $rsAdmin->rs_admin ? $rsAdmin->rs_admin : 0;
         } else {
-            $dataRawatJalan['rsAdmin'] = $rsAdminDokter->rs_admin ? $rsAdminDokter->rs_admin : 0;
+            $dataUGD['rsAdmin'] = $rsAdminDokter->rs_admin ? $rsAdminDokter->rs_admin : 0;
             // update table trnsaksi
             DB::table('rstxn_ugdhdrs')
                 ->where('rj_no', $rjNo)
                 ->update([
-                    'rs_admin' => $dataRawatJalan['rsAdmin'],
+                    'rs_admin' => $dataUGD['rsAdmin'],
                 ]);
         }
 
         // PoliPrice
         // 1) Ambil klaim status (default 'UMUM' jika NULL)
         $klaimStatus = DB::table('rsmst_klaimtypes')
-            ->where('klaim_id', $this->dataDaftarUGD['klaimId'] ?? '')
+            ->where('klaim_id', $dataUGD['klaimId'] ?? '')
             ->value('klaim_status') ?? 'UMUM';
 
         // 2) Tentukan harga admin & dokter berdasarkan status klaim
@@ -241,42 +239,42 @@ class AdministrasiUGD extends Component
         }
 
         // 3) Set poliPrice & simpan ke transaksi UGD
-        if (isset($dataRawatJalan['poliPrice'])) {
+        if (isset($dataUGD['poliPrice'])) {
             // sudah ada → pakai harga admin/front-office
-            $dataRawatJalan['poliPrice'] = $rsAdmin->poli_price ? $rsAdmin->poli_price : 0;
+            $dataUGD['poliPrice'] = $rsAdmin->poli_price ? $rsAdmin->poli_price : 0;
         } else {
             // belum ada → pakai harga dokter, lalu update ke tabel UGD
-            $dataRawatJalan['poliPrice'] = $dokterUgdPrice;
+            $dataUGD['poliPrice'] = $dokterUgdPrice;
 
             DB::table('rstxn_ugdhdrs')
                 ->where('rj_no', $rjNo)
                 ->update([
-                    'poli_price' => $dataRawatJalan['poliPrice'],
+                    'poli_price' => $dataUGD['poliPrice'],
                 ]);
         }
 
 
         // Ketika Kronis
         if ($rsAdmin->klaim_id == 'KR') {
-            $dataRawatJalan['rjAdmin'] = 0;
-            $dataRawatJalan['rsAdmin'] = 0;
-            $dataRawatJalan['poliPrice'] = 0;
+            $dataUGD['rjAdmin'] = 0;
+            $dataUGD['rsAdmin'] = 0;
+            $dataUGD['poliPrice'] = 0;
             // update table trnsaksi
             DB::table('rstxn_ugdhdrs')
                 ->where('rj_no', $rjNo)
                 ->update([
-                    'rj_admin' => $dataRawatJalan['rjAdmin'],
-                    'rs_admin' => $dataRawatJalan['rsAdmin'],
-                    'poli_price' => $dataRawatJalan['poliPrice'],
+                    'rj_admin' => $dataUGD['rjAdmin'],
+                    'rs_admin' => $dataUGD['rsAdmin'],
+                    'poli_price' => $dataUGD['poliPrice'],
                 ]);
         }
 
-        $dataRawatJalan['rjObat'] = json_decode(json_encode($rsObat, true), true);
-        $dataRawatJalan['rjLab'] = json_decode(json_encode($rsLab, true), true);
-        $dataRawatJalan['rjRad'] = json_decode(json_encode($rsRad, true), true);
-        $dataRawatJalan['rjtrfRj'] = json_decode(json_encode($rstrfRj, true), true);
+        $dataUGD['rjObat'] = json_decode(json_encode($rsObat, true), true);
+        $dataUGD['rjLab'] = json_decode(json_encode($rsLab, true), true);
+        $dataUGD['rjRad'] = json_decode(json_encode($rsRad, true), true);
+        $dataUGD['rjtrfRj'] = json_decode(json_encode($rstrfRj, true), true);
 
-        return ($dataRawatJalan);
+        return ($dataUGD);
     }
 
     // when new form instance

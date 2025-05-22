@@ -517,8 +517,8 @@ class TelaahResepUGD extends Component
     private function findData($rjNo): array
     {
 
-        $this->dataDaftarUgd = $this->findDataUGD($rjNo);
-        $dataUGD = $this->dataDaftarUgd;
+        $findDataUGD = $this->findDataUGD($rjNo);
+        $dataUGD = $findDataUGD;
 
 
         $rsAdmin = DB::table('rstxn_ugdhdrs')
