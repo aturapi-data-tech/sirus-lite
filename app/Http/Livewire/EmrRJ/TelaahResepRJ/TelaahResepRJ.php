@@ -1018,23 +1018,30 @@ class TelaahResepRJ extends Component
         ;
 
         // 1 urutkan berdasarkan json table
-        $myQueryPagination = $query->get()
+        $myQueryPagination = $query->get();
 
-            ->sortByDesc(
-                function ($mySortByJson) {
-                    $datadaftar_json = json_decode($mySortByJson->datadaftarpolirj_json, true);
-                    $myQueryAntrianFarmasi = isset($datadaftar_json['noAntrianApotek']['noAntrian']) ? $datadaftar_json['noAntrianApotek']['noAntrian'] : 0;
-                    $myQueryPagination = isset($datadaftar_json['eresep']) ? 1 : 0;
-                    $myQueryPagination1 = isset($datadaftar_json['AdministrasiRj']) ? 1 : 0;
-                    return ($myQueryAntrianFarmasi . $myQueryPagination . $myQueryPagination1 . $mySortByJson->rj_date1);
-                }
-            )->sortBy(
-                function ($mySortByJson) {
-                    $datadaftar_json = json_decode($mySortByJson->datadaftarpolirj_json, true);
-                    $myQueryAntrianFarmasi = isset($datadaftar_json['noAntrianApotek']['noAntrian']) ? $datadaftar_json['noAntrianApotek']['noAntrian'] : 9999;
-                    return ($myQueryAntrianFarmasi);
-                }
-            );
+        // Sort ketiga: datadaftarpolirj_json (desc)
+        $myQueryPagination = $myQueryPagination->sortByDesc(
+            function ($mySortByJson) {
+                $datadaftar_json = json_decode($mySortByJson->datadaftarpolirj_json, true);
+                $myQueryAntrianFarmasi = isset($datadaftar_json['noAntrianApotek']['noAntrian']) ? $datadaftar_json['noAntrianApotek']['noAntrian'] : 0;
+                $myQueryPagination = isset($datadaftar_json['eresep']) ? 1 : 0;
+                $myQueryPagination1 = isset($datadaftar_json['AdministrasiRj']) ? 1 : 0;
+                return ($myQueryAntrianFarmasi . $myQueryPagination . $myQueryPagination1 . $mySortByJson->rj_date1);
+            }
+        )->sortBy(
+            function ($mySortByJson) {
+                $datadaftar_json = json_decode($mySortByJson->datadaftarpolirj_json, true);
+                $myQueryAntrianFarmasi = isset($datadaftar_json['noAntrianApotek']['noAntrian']) ? $datadaftar_json['noAntrianApotek']['noAntrian'] : 9999;
+                return ($myQueryAntrianFarmasi);
+            }
+        )->sortBy(function ($mySortByJson) {
+            $datadaftar_json = json_decode($mySortByJson->datadaftarpolirj_json, true);
+            return $datadaftar_json['taskIdPelayanan']['taskId5'] ?? 0;
+        })->sortBy(function ($mySortByJson) {
+            $datadaftar_json = json_decode($mySortByJson->datadaftarpolirj_json, true);
+            return $datadaftar_json['taskIdPelayanan']['taskId6'] ?? 0;
+        });
 
 
         $myQueryPagination = $this->paginate($myQueryPagination, $this->limitPerPage);
