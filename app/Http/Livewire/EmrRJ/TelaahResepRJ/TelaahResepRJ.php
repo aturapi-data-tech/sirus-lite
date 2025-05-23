@@ -1037,11 +1037,6 @@ class TelaahResepRJ extends Component
                 $hasEresep             = isset($jsonData['eresep'])             ? 1 : 0;
                 $hasAdministrasiRj     = isset($jsonData['AdministrasiRj'])     ? 1 : 0;
 
-                // 4) Parse timestamp rjDateTime (fallback ke VERY LARGE agar muncul di akhir jika null)
-                $rjDateTime = isset($jsonData['rjDate'])
-                    ? strtotime(str_replace('/', '-', $jsonData['rjDate']))
-                    : PHP_INT_MAX;
-
                 // 4) Parse timestamp taskId5 (fallback ke VERY LARGE agar muncul di akhir jika null)
                 $task5Time = isset($jsonData['taskIdPelayanan']['taskId5'])
                     ? strtotime(str_replace('/', '-', $jsonData['taskIdPelayanan']['taskId5']))
@@ -1052,15 +1047,21 @@ class TelaahResepRJ extends Component
                     ? strtotime(str_replace('/', '-', $jsonData['taskIdPelayanan']['taskId6']))
                     : PHP_INT_MAX;
 
+                // 6) Parse timestamp rjDateTime (fallback ke VERY LARGE agar muncul di akhir jika null)
+                $rjDateTime = isset($jsonData['rjDate'])
+                    ? strtotime(str_replace('/', '-', $jsonData['rjDate']))
+                    : PHP_INT_MAX;
+
+
                 // Composite key untuk sortByDesc:
                 return [
                     $hasPharmacyQueue,                       // grup antrian
                     $hasPharmacyQueue ? $pharmacyQueueNumber : 0, // nilai antrian (DESC)
                     $hasPharmacyQueue ? 0 : $hasEresep, // transaksi selesai (DESC)
                     $hasPharmacyQueue ? 0 : $hasAdministrasiRj, // transaksi selesai (DESC)
-                    $hasPharmacyQueue ? 0 : -$rjDateTime,    // rjDateTime pertama (ascending)
                     $hasPharmacyQueue ? 0 : -$task5Time,    // taskId5 pertama (ascending)
                     $hasPharmacyQueue ? 0 : -$task6Time,    // taskId6 berikutnya (ascending)
+                    $hasPharmacyQueue ? 0 : -$rjDateTime,    // rjDateTime pertama (ascending)
                 ];
             }
         );
