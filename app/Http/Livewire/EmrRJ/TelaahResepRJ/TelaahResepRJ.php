@@ -1023,25 +1023,47 @@ class TelaahResepRJ extends Component
         // Sort ketiga: datadaftarpolirj_json (desc)
         $myQueryPagination = $myQueryPagination->sortByDesc(
             function ($mySortByJson) {
-                $datadaftar_json = json_decode($mySortByJson->datadaftarpolirj_json, true);
-                $myQueryAntrianFarmasi = isset($datadaftar_json['noAntrianApotek']['noAntrian']) ? $datadaftar_json['noAntrianApotek']['noAntrian'] : 0;
-                $myQueryPagination = isset($datadaftar_json['eresep']) ? 1 : 0;
-                $myQueryPagination1 = isset($datadaftar_json['AdministrasiRj']) ? 1 : 0;
-                return ($myQueryAntrianFarmasi . $myQueryPagination . $myQueryPagination1 . $mySortByJson->rj_date1);
+                // Decode JSON payload
+                $jsonData = json_decode($mySortByJson->datadaftarpolirj_json, true);
+
+                // 1) Ambil nomor antrian apotek (0 jika tidak ada)
+                $pharmacyQueueNumber = $jsonData['noAntrianApotek']['noAntrian'] ?? 0;
+
+                // 2) Flag untuk grouping: 1 = punya antrian, 0 = tidak
+                $hasPharmacyQueue = $pharmacyQueueNumber > 0 ? 1 : 0;
+
+                // 3) Flag transaksi selesai: 1 jika sudah ada eresep + administrasirj
+                // flag masing-masing
+                $hasEresep             = isset($jsonData['eresep'])             ? 1 : 0;
+                $hasAdministrasiRj     = isset($jsonData['AdministrasiRj'])     ? 1 : 0;
+
+                // 4) Parse timestamp rjDateTime (fallback ke VERY LARGE agar muncul di akhir jika null)
+                $rjDateTime = isset($jsonData['rjDate'])
+                    ? strtotime(str_replace('/', '-', $jsonData['rjDate']))
+                    : PHP_INT_MAX;
+
+                // 4) Parse timestamp taskId5 (fallback ke VERY LARGE agar muncul di akhir jika null)
+                $task5Time = isset($jsonData['taskIdPelayanan']['taskId5'])
+                    ? strtotime(str_replace('/', '-', $jsonData['taskIdPelayanan']['taskId5']))
+                    : PHP_INT_MAX;
+
+                // 5) Parse timestamp taskId6 (sama fallback)
+                $task6Time = isset($jsonData['taskIdPelayanan']['taskId6'])
+                    ? strtotime(str_replace('/', '-', $jsonData['taskIdPelayanan']['taskId6']))
+                    : PHP_INT_MAX;
+
+                // Composite key untuk sortByDesc:
+                return [
+                    $hasPharmacyQueue,                       // grup antrian
+                    $hasPharmacyQueue ? $pharmacyQueueNumber : 0, // nilai antrian (DESC)
+                    $hasPharmacyQueue ? 0 : $hasEresep, // transaksi selesai (DESC)
+                    $hasPharmacyQueue ? 0 : $hasAdministrasiRj, // transaksi selesai (DESC)
+                    $hasPharmacyQueue ? 0 : -$rjDateTime,    // rjDateTime pertama (ascending)
+                    $hasPharmacyQueue ? 0 : -$task5Time,    // taskId5 pertama (ascending)
+                    $hasPharmacyQueue ? 0 : -$task6Time,    // taskId6 berikutnya (ascending)
+                ];
             }
-        )->sortBy(
-            function ($mySortByJson) {
-                $datadaftar_json = json_decode($mySortByJson->datadaftarpolirj_json, true);
-                $myQueryAntrianFarmasi = isset($datadaftar_json['noAntrianApotek']['noAntrian']) ? $datadaftar_json['noAntrianApotek']['noAntrian'] : 9999;
-                return ($myQueryAntrianFarmasi);
-            }
-        )->sortBy(function ($mySortByJson) {
-            $datadaftar_json = json_decode($mySortByJson->datadaftarpolirj_json, true);
-            return $datadaftar_json['taskIdPelayanan']['taskId5'] ?? 0;
-        })->sortBy(function ($mySortByJson) {
-            $datadaftar_json = json_decode($mySortByJson->datadaftarpolirj_json, true);
-            return $datadaftar_json['taskIdPelayanan']['taskId6'] ?? 0;
-        });
+        );
 
 
         $myQueryPagination = $this->paginate($myQueryPagination, $this->limitPerPage);
