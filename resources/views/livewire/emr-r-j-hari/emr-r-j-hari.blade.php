@@ -344,6 +344,48 @@
 
                                 </div>
 
+                                @if (isset($datadaftar_json['poliId']) && $datadaftar_json['poliId'] == '12')
+                                    <div class="inline-flex">
+                                        @if (!$myQData->rjuploadbpjs_rm_count)
+                                            <x-primary-button
+                                                wire:click.prevent="uploadRekamMedisFisioRJGrid('{{ $myQData->rj_no }}')"
+                                                type="button" wire:loading.remove>
+                                                Upload Resume Medis Fisio
+                                            </x-primary-button>
+                                        @else
+                                            <x-light-button
+                                                wire:click.prevent="uploadRekamMedisFisioRJGrid('{{ $myQData->rj_no }}')"
+                                                type="button" wire:loading.remove>
+                                                Update Resume Medis Fisio
+                                            </x-light-button>
+                                        @endif
+                                        <div wire:loading wire:target="uploadRekamMedisFisioRJGrid">
+                                            <x-loading />
+                                        </div>
+
+                                    </div>
+
+                                    <div class="inline-flex">
+                                        @if (!$myQData->rjuploadbpjs_rm_count)
+                                            <x-primary-button
+                                                wire:click.prevent="uploadRekamMedisFisioLembarHasilRJGrid('{{ $myQData->rj_no }}')"
+                                                type="button" wire:loading.remove>
+                                                Upload Resume Medis FisioLembarHasil
+                                            </x-primary-button>
+                                        @else
+                                            <x-light-button
+                                                wire:click.prevent="uploadRekamMedisFisioLembarHasilRJGrid('{{ $myQData->rj_no }}')"
+                                                type="button" wire:loading.remove>
+                                                Update Resume Medis FisioLembarHasil
+                                            </x-light-button>
+                                        @endif
+                                        <div wire:loading wire:target="uploadRekamMedisFisioLembarHasilRJGrid">
+                                            <x-loading />
+                                        </div>
+
+                                    </div>
+                                @endif
+
                                 <div class="inline-flex">
                                     @if (!$myQData->rjuploadbpjs_sep_count)
                                         <x-primary-button

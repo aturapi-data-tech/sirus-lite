@@ -202,6 +202,135 @@ class EmrRJHari extends Component
     }
 
 
+    public function uploadRekamMedisFisioRJGrid($txnNo = null)
+    {
+        $queryIdentitas = DB::table('rsmst_identitases')
+            ->select(
+                'int_name',
+                'int_phone1',
+                'int_phone2',
+                'int_fax',
+                'int_address',
+                'int_city',
+            )
+            ->first();
+        $dataDaftarTxn = $this->findDataRJ($txnNo)['dataDaftarRJ'];
+        $dataPasien = $this->findDataMasterPasien($dataDaftarTxn['regNo']);
+        $data = [
+            'myQueryIdentitas' => $queryIdentitas,
+            'dataPasien' => $dataPasien,
+            'dataDaftarTxn' => $dataDaftarTxn,
+        ];
+
+        $pdfContent = PDF::loadView('livewire.emr.rekam-medis.cetak-rekam-medis-r-j-fisio', $data)->output();
+        $filename = Carbon::now(env('APP_TIMEZONE'))->format('dmYhis');
+        $filePath = 'bpjs/' . $filename . '.pdf'; // Adjust the path as needed
+
+
+        $cekFile = DB::table('rstxn_rjuploadbpjses')
+            ->where('rj_no', $txnNo)
+            ->where('seq_file', 5)
+            ->first();
+
+        if ($cekFile) {
+            Storage::disk('local')->delete('bpjs/' . $cekFile->uploadbpjs);
+            Storage::disk('local')->put($filePath, $pdfContent);
+            if (Storage::disk('local')->exists($filePath)) {
+                DB::table('rstxn_rjuploadbpjses')
+                    ->where('rj_no', $txnNo)
+                    ->where('uploadbpjs', $cekFile->uploadbpjs)
+                    ->where('seq_file', 5)
+                    ->update([
+                        'uploadbpjs' => $filename . '.pdf',
+                        'rj_no' => $txnNo,
+                        'jenis_file' => 'pdf'
+                    ]);
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Data berhasil diupdate " . $cekFile->uploadbpjs);
+            } else {
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data tidak berhasil diupdate " . $cekFile->uploadbpjs);
+            }
+        } else {
+            Storage::disk('local')->put($filePath, $pdfContent);
+            if (Storage::disk('local')->exists($filePath)) {
+                DB::table('rstxn_rjuploadbpjses')
+                    ->insert([
+                        'seq_file' => 5,
+                        'uploadbpjs' => $filename . '.pdf',
+                        'rj_no' => $txnNo,
+                        'jenis_file' => 'pdf'
+                    ]);
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Data berhasil diupload " . $filename . '.pdf');
+            } else {
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data tidak berhasil diupdate " . $filename . '.pdf');
+            }
+        }
+    }
+
+    public function uploadRekamMedisFisioLembarHasilRJGrid($txnNo = null)
+    {
+        $queryIdentitas = DB::table('rsmst_identitases')
+            ->select(
+                'int_name',
+                'int_phone1',
+                'int_phone2',
+                'int_fax',
+                'int_address',
+                'int_city',
+            )
+            ->first();
+        $dataDaftarTxn = $this->findDataRJ($txnNo)['dataDaftarRJ'];
+        $dataPasien = $this->findDataMasterPasien($dataDaftarTxn['regNo']);
+        $data = [
+            'myQueryIdentitas' => $queryIdentitas,
+            'dataPasien' => $dataPasien,
+            'dataDaftarTxn' => $dataDaftarTxn,
+        ];
+
+        $pdfContent = PDF::loadView('livewire.emr.rekam-medis.cetak-rekam-medis-r-j-fisio-lembar-hasil', $data)->output();
+        $filename = Carbon::now(env('APP_TIMEZONE'))->format('dmYhis');
+        $filePath = 'bpjs/' . $filename . '.pdf'; // Adjust the path as needed
+
+
+        $cekFile = DB::table('rstxn_rjuploadbpjses')
+            ->where('rj_no', $txnNo)
+            ->where('seq_file', 5)
+            ->first();
+
+        if ($cekFile) {
+            Storage::disk('local')->delete('bpjs/' . $cekFile->uploadbpjs);
+            Storage::disk('local')->put($filePath, $pdfContent);
+            if (Storage::disk('local')->exists($filePath)) {
+                DB::table('rstxn_rjuploadbpjses')
+                    ->where('rj_no', $txnNo)
+                    ->where('uploadbpjs', $cekFile->uploadbpjs)
+                    ->where('seq_file', 5)
+                    ->update([
+                        'uploadbpjs' => $filename . '.pdf',
+                        'rj_no' => $txnNo,
+                        'jenis_file' => 'pdf'
+                    ]);
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Data berhasil diupdate " . $cekFile->uploadbpjs);
+            } else {
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data tidak berhasil diupdate " . $cekFile->uploadbpjs);
+            }
+        } else {
+            Storage::disk('local')->put($filePath, $pdfContent);
+            if (Storage::disk('local')->exists($filePath)) {
+                DB::table('rstxn_rjuploadbpjses')
+                    ->insert([
+                        'seq_file' => 5,
+                        'uploadbpjs' => $filename . '.pdf',
+                        'rj_no' => $txnNo,
+                        'jenis_file' => 'pdf'
+                    ]);
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Data berhasil diupload " . $filename . '.pdf');
+            } else {
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data tidak berhasil diupdate " . $filename . '.pdf');
+            }
+        }
+    }
+
+
     public function uploadSepRJGrid($txnNo = null)
     {
         $dataDaftarTxn = $this->findDataRJ($txnNo)['dataDaftarRJ'];
