@@ -59,6 +59,10 @@ class EmrRJHari extends Component
                 'klaimStatusId' => 'BPJS',
                 'klaimStatusName' => 'BPJS'
             ],
+            [
+                'klaimStatusId' => 'KRONIS',
+                'klaimStatusName' => 'KRONIS'
+            ],
         ],
 
     ];
@@ -518,10 +522,12 @@ class EmrRJHari extends Component
                 DB::raw("(select count(*) from rstxn_rjuploadbpjses where rj_no = rsview_rjkasir.rj_no and seq_file=1) AS rjuploadbpjs_sep_count"),
                 DB::raw("(select count(*) from rstxn_rjuploadbpjses where rj_no = rsview_rjkasir.rj_no and seq_file=3) AS rjuploadbpjs_rm_count"),
                 DB::raw("(select count(*) from rstxn_rjuploadbpjses where rj_no = rsview_rjkasir.rj_no and seq_file=4) AS rjuploadbpjs_skdp_count"),
+                DB::raw("(select count(*) from rstxn_rjuploadbpjses where rj_no = rsview_rjkasir.rj_no and seq_file=5) AS rjuploadbpjs_lain_count"),
+
 
             )
             ->whereNotIn('rj_status', ['A', 'F'])
-            ->where('klaim_id', '!=', 'KR')
+            // ->where('klaim_id', '!=', 'KR')
             ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $myRefdate)
             ->whereIn('klaim_id', function ($query) use ($myRefklaimStatusId) {
                 $query->select('klaim_id')
