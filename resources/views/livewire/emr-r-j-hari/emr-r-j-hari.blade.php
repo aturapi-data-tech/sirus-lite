@@ -323,6 +323,37 @@
 
                             <td class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-primary">
 
+                                <!-- Dropdown Action menu Flowbite-->
+                                <div>
+                                    <x-light-button id="dropdownButtonSendData{{ $myQData->rj_no }}"
+                                        class="inline-flex"
+                                        wire:click="$emit('pressDropdownButtonSendData','{{ $myQData->rj_no }}')">
+                                        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
+                                            xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                            fill="none" viewBox="0 0 24 24">
+                                            <path stroke="currentColor" stroke-linecap="round"
+                                                stroke-linejoin="round" stroke-width="2"
+                                                d="M15 17h3a3 3 0 0 0 0-6h-.025a5.56 5.56 0 0 0 .025-.5A5.5 5.5 0 0 0 7.207 9.021C7.137 9.017 7.071 9 7 9a4 4 0 1 0 0 8h2.167M12 19v-9m0 0-2 2m2-2 2 2" />
+                                        </svg>
+
+                                    </x-light-button>
+
+                                    <!-- Dropdown Action Open menu -->
+                                    <div id="dropdownMenuSendData{{ $myQData->rj_no }}"
+                                        class="z-10 hidden w-auto bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700">
+
+                                        <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
+                                            aria-labelledby="dropdownButtonSendData{{ $myQData->rj_no }}">
+
+                                            <div class="grid grid-cols-1 gap-2">
+                                                <livewire:emr-r-j.post-inacbg-r-j.post-inacbg-r-j :rjNoRef="$myQData->rj_no"
+                                                    :wire:key="'post-inacbg-r-j-'.$myQData->rj_no">
+                                            </div>
+
+                                        </ul>
+                                    </div>
+                                </div>
+                                <!-- End Dropdown Action Open menu -->
 
                                 @if ($myTopBar['klaimStatusId'] === 'BPJS')
                                     <div class="inline-flex">
@@ -489,6 +520,8 @@
                                 @endif
 
 
+
+
                             </td>
                         </tr>
                     @endforeach
@@ -507,179 +540,22 @@
         </div>
 
         {{ $myQueryData->links() }}
-
-
-
-
-
-
-
-
     </div>
-
-
-
-    {{-- Canvas
-    Main BgColor /
-    Size H/W --}}
-
-    {{-- End Coding --}}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
 
     {{-- push start ///////////////////////////////// --}}
     @push('scripts')
-        {{-- script start --}}
-        <script src="{{ url('assets/js/jquery.min.js') }}"></script>
-        <script src="{{ url('assets/plugins/toastr/toastr.min.js') }}"></script>
-        <script src="{{ url('assets/flowbite/dist/datepicker.js') }}"></script>
-
-        {{-- script end --}}
-
-
-
-
-
-        {{-- Disabling enter key for form --}}
-        <script type="text/javascript">
-            $(document).on("keydown", "form", function(event) {
-                return event.key != "Enter";
-            });
-        </script>
-
-
-
-
-
         {{-- Global Livewire JavaScript Object start --}}
         <script type="text/javascript">
-            toastr.options = {
-                "closeButton": false,
-                "debug": false,
-                "newestOnTop": false,
-                "progressBar": false,
-                "positionClass": "toast-top-left",
-                "preventDuplicates": false,
-                "onclick": null,
-                "showDuration": "300",
-                "hideDuration": "1000",
-                "timeOut": "5000",
-                "extendedTimeOut": "1000",
-                "showEasing": "swing",
-                "hideEasing": "linear",
-                "showMethod": "fadeIn",
-                "hideMethod": "fadeOut"
-            }
-
-            window.livewire.on('toastr-success', message => toastr.success(message));
-            window.Livewire.on('toastr-info', (message) => {
-                toastr.info(message)
-            });
-            window.livewire.on('toastr-error', message => toastr.error(message));
-
-
-
-
-
-
-
-
-
-
-
-
-
-            // confirmation message remove record
-            window.livewire.on('confirm_remove_record', (key, name) => {
-
-                let cfn = confirm('Apakah anda ingin menghapus data ini ' + name + '?');
-
-                if (cfn) {
-                    window.livewire.emit('confirm_remove_record_RJp', key, name);
-                }
-            });
-
-
-            // confirmation message doble record
-            window.livewire.on('confirm_doble_record', (key, name) => {
-
-                let cfn = confirm('Pasien Sudah terdaftar, Apakah anda ingin tetap menyimpan data ini ' + name + '?');
-
-                if (cfn) {
-                    window.livewire.emit('confirm_doble_record_RJp', key, name);
-                }
-            });
-
-
-
-
-
-
-
-
-
-
-
-
-            // confirmation cari_Data_Pasien_Tidak_Ditemukan_Confirmation
-            window.livewire.on('cari_Data_Pasien_Tidak_Ditemukan_Confirmation', (msg) => {
-                let cfn = confirm('Data ' + msg +
-                    ' tidak ditemuka, apakah anda ingin menambahkan menjadi pasien baru ?');
-
-                if (cfn) {
-                    @this.set('callMasterPasien', true);
-                }
-            });
-
-
-
-
-            // confirmation rePush_Data_Antrian_Confirmation
-            window.livewire.on('rePush_Data_Antrian_Confirmation', () => {
-                let cfn = confirm('Apakah anda ingin mengulaingi Proses Kirim data Antrian ?');
-
-                if (cfn) {
-                    // emit ke controller
-                    window.livewire.emit('rePush_Data_Antrian');
-                }
-            });
-
-
-
-
-
-
-
-
-
-
-
-
-
-            // press_dropdownButton flowbite
-            window.Livewire.on('pressDropdownButton', (key) => {
+            // press_dropdownButtonSendData flowbite
+            window.Livewire.on('pressDropdownButtonSendData', (key) => {
                     // set the dropdown menu element
-                    const $targetEl = document.getElementById('dropdownMenu' + key);
+                    const $targetEl = document.getElementById('dropdownMenuSendData' + key);
 
                     // set the element that trigger the dropdown menu on click
-                    const $triggerEl = document.getElementById('dropdownButton' + key);
+                    const $triggerEl = document.getElementById('dropdownButtonSendData' + key);
 
                     // options with default values
                     const options = {
@@ -713,26 +589,6 @@
 
             );
         </script>
-        <script>
-            // $("#dateRjRef").change(function() {
-            //     const datepickerEl = document.getElementById('dateRjRef');
-            //     console.log(datepickerEl);
-            // });
-        </script>
-        {{-- Global Livewire JavaScript Object end --}}
-
-        {{-- Global Livewire JavaScript Object start --}}
-        <script type="text/javascript">
-            // confirmation message doble record
-            window.livewire.on('confirm_doble_recordUGD', (key, name) => {
-                console.log('x')
-                let cfn = confirm('Pasien Sudah terdaftar, Apakah anda ingin tetap menyimpan data ini ' + name + '?');
-
-                if (cfn) {
-                    window.livewire.emit('confirm_doble_record_UGDp', key, name);
-                }
-            });
-        </script>
     @endpush
 
 
@@ -740,19 +596,5 @@
 
 
 
-
-
-
-
-
-
-
-    @push('styles')
-        {{-- stylesheet start --}}
-        <link rel="stylesheet" href="{{ url('assets/plugins/toastr/toastr.min.css') }}">
-
-        {{-- stylesheet end --}}
-    @endpush
-    {{-- push end --}}
 
 </div>
