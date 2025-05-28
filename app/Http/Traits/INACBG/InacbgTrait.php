@@ -11,24 +11,10 @@ use Exception;
  */
 trait InacbgTrait
 {
-    // Web service endpoint (ws.php) dan opsi debug
-    protected $wsUrl;
-    protected $debugMode;
-
-    // Encryption key hex (256-bit) dari SIMRS
-    protected $encryptionKey;
-
-    // Kode rumah sakit (faskes code)
-    protected $hospitalCode;
-
-    // Consumer ID/Secret BPJS (bisa kosong jika belum tersedia)
-    protected $consumerId;
-    protected $consumerSecret;
-
     /**
      * Inisialisasi konfigurasi dari .env
      */
-    public function initializeInacbg()
+    public function initializeInacbg(): void
     {
         $this->wsUrl          = env('INACBG_WS_URL');
         $this->encryptionKey  = env('INACBG_KEY');
@@ -36,100 +22,96 @@ trait InacbgTrait
         $this->consumerId     = env('INACBG_CONSUMER_ID', '');
         $this->consumerSecret = env('INACBG_CONSUMER_SECRET', '');
         $this->debugMode      = env('INACBG_DEBUG', false);
+
+        // Validasi konfigurasi penting
+        if (empty($this->wsUrl)) {
+            throw new \RuntimeException('INA-CBG WS URL belum dikonfigurasi');
+        }
+        if (empty($this->encryptionKey)) {
+            throw new \RuntimeException('INA-CBG encryption key belum dikonfigurasi');
+        }
     }
 
-    /**
-     * mc_encrypt: AES-256-CBC + HMAC-SHA256 signature, lalu base64
-     * Sesuai dengan petunjuk teknik INA-CBG v5
-     */
-    protected function mcEncrypt(string $data): string
+    function mcEncrypt($data)
     {
         $key = hex2bin($this->encryptionKey);
-        if (mb_strlen($key, '8bit') !== 32) {
-            throw new Exception('Needs a 256-bit key!');
+        if (mb_strlen($key, "8bit") !== 32) {
+            throw new Exception("Needs a 256-bit key!");
         }
-        $ivSize = openssl_cipher_iv_length('aes-256-cbc');
-        $iv = random_bytes($ivSize);
-        $encrypted = openssl_encrypt($data, 'aes-256-cbc', $key, OPENSSL_RAW_DATA, $iv);
-        $signature = substr(hash_hmac('sha256', $encrypted, $key, true), 0, 10);
-        return base64_encode($signature . $iv . $encrypted);
+
+        $iv_size = openssl_cipher_iv_length("aes-256-cbc");
+        $iv = openssl_random_pseudo_bytes($iv_size);
+        $encrypted = openssl_encrypt($data, "aes-256-cbc", $key, OPENSSL_RAW_DATA, $iv);
+        $signature = mb_substr(hash_hmac("sha256", $encrypted, $key, true), 0, 10, "8bit");
+        $encoded = chunk_split(base64_encode($signature . $iv . $encrypted));
+        return $encoded;
     }
 
-    /**
-     * mc_decrypt: Proses kebalikan dari mcEncrypt
-     */
-    protected function mcDecrypt(string $encryptedData): string
+    function mcDecrypt($str)
     {
         $key = hex2bin($this->encryptionKey);
-        if (mb_strlen($key, '8bit') !== 32) {
-            throw new Exception('Needs a 256-bit key!');
+        if (mb_strlen($key, "8bit") !== 32) {
+            throw new Exception("Needs a 256-bit key!");
         }
-        $decoded = base64_decode($encryptedData);
-        $signature = mb_substr($decoded, 0, 10, '8bit');
-        $ivSize = openssl_cipher_iv_length('aes-256-cbc');
-        $iv = mb_substr($decoded, 10, $ivSize, '8bit');
-        $cipherText = mb_substr($decoded, 10 + $ivSize, null, '8bit');
-        $calcSignature = mb_substr(hash_hmac('sha256', $cipherText, $key, true), 0, 10, '8bit');
-        if (!hash_equals($signature, $calcSignature)) {
-            throw new Exception('Signature does not match');
+
+        $iv_size = openssl_cipher_iv_length("aes-256-cbc");
+        $decoded = base64_decode($str);
+        $signature = mb_substr($decoded, 0, 10, "8bit");
+        $iv = mb_substr($decoded, 10, $iv_size, "8bit");
+        $encrypted = mb_substr($decoded, $iv_size + 10, NULL, "8bit");
+        $calc_signature = mb_substr(hash_hmac("sha256", $encrypted, $key, true), 0, 10, "8bit");
+        if (!$this->mcCompare($signature, $calc_signature)) {
+            return "SIGNATURE_NOT_MATCH";
         }
-        return openssl_decrypt($cipherText, 'aes-256-cbc', $key, OPENSSL_RAW_DATA, $iv);
+
+        $decrypted = openssl_decrypt($encrypted, "aes-256-cbc", $key, OPENSSL_RAW_DATA, $iv);
+        return $decrypted;
     }
 
-    /**
-     * Kirim request ke Web Service INA-CBG
-     *
-     * @param string $method   Nama method (metadata.method)
-     * @param array  $metadata Metadata tambahan (misal nomor_rm)
-     * @param array  $data     Payload data sesuai method
-     * @return array           Response ter-dekripsi (atau mentah jika debug)
-     * @throws Exception       Jika gagal request atau dekripsi
-     */
+    function mcCompare($a, $b)
+    {
+        if (strlen($a) !== strlen($b)) {
+            return false;
+        }
+        $result = 0;
+        for ($i = 0; $i < strlen($a); $i++) {
+            $result |= ord($a[$i]) ^ ord($b[$i]);
+        }
+        return $result == 0;
+    }
+
+
     protected function callWs(string $method, array $metadata = [], array $data = []): array
     {
         $this->initializeInacbg();
 
-        // Susun request
+        // 1) Siapkan payload sama seperti sebelumnya
         $payload = [
             'metadata' => array_merge(
-                [
-                    'method'       => $method,
-                    'kode_rs'      => $this->hospitalCode,
-                    'consumer_id'  => $this->consumerId,
-                    'consumer_secret' => $this->consumerSecret
-                ],
+                ['method' => $method],
                 $metadata
             ),
-            'data' => $data
+            'data'     => $data,
         ];
-        $json = json_encode($payload);
+        $jsonEncrypted = $this->mcEncrypt(json_encode($payload, JSON_THROW_ON_ERROR));
 
-        // Tentukan endpoint (mode debug optional) dan body
-        $url = $this->wsUrl . ($this->debugMode ? '?mode=debug' : '');
-        if ($this->debugMode) {
-            $body = $json;
-        } else {
-            $body = $this->mcEncrypt($json);
-        }
+        // 2) Kirim request via Laravel HTTP Client
+        $response = Http::withHeaders([
+            'Content-Type' => 'application/x-www-form-urlencoded',
+        ])
+            ->timeout(30)  // atur timeout sesuai kebutuhan
+            // jika endpoint benar-benar mengharapkan body “mentah” berisi string terenkripsi:
+            ->withBody($jsonEncrypted, 'application/x-www-form-urlencoded')
+            ->post($this->wsUrl);
 
-        // Panggil Web Service
-        $response = Http::timeout(10)
-            ->withHeaders(['Content-Type' => 'application/x-www-form-urlencoded'])
-            ->post($url, ['rq' => $body]);
-
-        if ($response->successful()) {
-            $respBody = $response->body();
-            if (!$this->debugMode) {
-                $respBody = $this->mcDecrypt($respBody);
-            }
-            return json_decode($respBody, true) ?? [];
-        }
-
-        throw new Exception('INA-CBG WS request failed: ' . $response->body());
+        // 4) Buang baris pertama & terakhir, lalu decrypt
+        $first = strpos($response, "\n") + 1;
+        $last = strrpos($response, "\n") - 1;
+        $middle = substr($response, $first, strlen($response) - $first - $last);
+        $decrypted   = $this->mcDecrypt($middle);
+        // 5) Decode JSON hasil decrypt
+        return json_decode($decrypted, true) ?? [];
     }
-
-
-
 
     // ... (inialisasi, encrypt/decrypt, callWs)
 

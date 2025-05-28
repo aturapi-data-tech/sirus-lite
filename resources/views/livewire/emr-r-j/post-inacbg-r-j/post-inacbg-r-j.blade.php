@@ -22,5 +22,14 @@
     </div>
 
 
+    <x-light-button wire:click.prevent="getClaimDataToInaCbg()" type="button" wire:loading.remove>
+        Get Detail Klaim
+    </x-light-button>
+
+    <div wire:loading wire:target="getClaimDataToInaCbg">
+        <x-loading />
+    </div>
+
+
 
 </div>
