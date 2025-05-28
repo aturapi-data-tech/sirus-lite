@@ -219,7 +219,6 @@ class PostInacbgRJ extends Component
             ->where('txn_nominal', '>', 0)
             ->sum('txn_nominal');
         $tarif     = $totalNominal ?? 0;
-        $payor     =  'JKN';
         $jnsPelayanan     = $dataDaftarPoliRJ['sep']['reqSep']['request']['t_sep']['jnsPelayanan'] ?? '2';
         $klsRawatHak     = $dataDaftarPoliRJ['sep']['reqSep']['request']['t_sep']['klsRawat']['klsRawatHak'] ?? '3';
 
@@ -248,8 +247,9 @@ class PostInacbgRJ extends Component
                 //'no_kartu_lama'       => '0002271584439',  // jika ganti kartu
                 'diagnosa'              => $diagnosa,       // array ICD-10
                 'prosedur'              => $prosedur,       // array ICD-9CM/PCS
-                'payor_id'              => $payor,          // kode penjamin
                 'coder_nik'             => $coderNik,       // NIK coder (mandatory)
+                'payor_id'              => '3',
+                'payor_cd'              => 'JKN',
             ];
 
             $resp = $this->setClaimData($metadata, $data);
