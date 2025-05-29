@@ -321,8 +321,8 @@ class PostInacbgRJ extends Component
 
             $resp = $this->setClaimData($metadata, $data);
             $metaDataCode = $resp['metadata']['code'] ?? '';
-            dd($metaDataCode);
-            if (($metaDataCode) === '200') {
+
+            if ($metaDataCode == '200') {
                 dd($dataDaftarPoliRJ);
                 // tandai sudah selesai
                 // di tempat sebelum kamu set nomor_sep, atau di awal method:
