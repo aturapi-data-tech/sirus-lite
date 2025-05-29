@@ -324,10 +324,10 @@ class PostInacbgRJ extends Component
                 // tandai sudah selesai
                 // di tempat sebelum kamu set nomor_sep, atau di awal method:
 
+                dd($dataDaftarPoliRJ['inacbg']);
                 if (!isset($dataDaftarPoliRJ['inacbg']) || !is_array($dataDaftarPoliRJ['inacbg'])) {
                     $dataDaftarPoliRJ['inacbg'] = [];
                 }
-                dd($dataDaftarPoliRJ['inacbg']);
                 $dataDaftarPoliRJ['inacbg']['set_claim_data'] = true;
                 dd($dataDaftarPoliRJ['inacbg']);
                 $this->updateJsonRJ($this->rjNoRef, $dataDaftarPoliRJ);
