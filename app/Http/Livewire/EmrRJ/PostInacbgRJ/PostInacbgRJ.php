@@ -324,7 +324,7 @@ class PostInacbgRJ extends Component
                 // tandai sudah selesai
                 // di tempat sebelum kamu set nomor_sep, atau di awal method:
 
-                dd($dataDaftarPoliRJ['inacbg']);
+                dd($dataDaftarPoliRJ);
                 if (!isset($dataDaftarPoliRJ['inacbg']) || !is_array($dataDaftarPoliRJ['inacbg'])) {
                     $dataDaftarPoliRJ['inacbg'] = [];
                 }
