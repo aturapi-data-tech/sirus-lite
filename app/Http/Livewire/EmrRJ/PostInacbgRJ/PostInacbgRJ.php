@@ -129,6 +129,11 @@ class PostInacbgRJ extends Component
             }
 
             // 9. Jika benar-benar sukses
+            // di tempat sebelum kamu set nomor_sep, atau di awal method:
+            if (!isset($dataDaftarPoliRJ['inacbg']) || !is_array($dataDaftarPoliRJ['inacbg'])) {
+                $dataDaftarPoliRJ['inacbg'] = [];
+            }
+
             $dataDaftarPoliRJ['inacbg']['nomor_sep'] = $nomorSEP;
             $this->updateJsonRJ($this->rjNoRef, $dataDaftarPoliRJ);
 
@@ -161,13 +166,13 @@ class PostInacbgRJ extends Component
         $find = $this->findDataRJ($this->rjNoRef);
         $dataDaftarPoliRJ = $find['dataDaftarRJ'] ?? [];
 
-        // 2. Cek: apakah set_claim_data sudah pernah dijalankan
-        if (!empty($dataDaftarPoliRJ['inacbg']['setClaimDataDone'] ?? false)) {
+        // 2. Cek: apakah set_claim_data dikirim ulang
+        if (!empty($dataDaftarPoliRJ['inacbg']['set_claim_data'] ?? false)) {
             toastr()->closeOnHover(true)
                 ->closeDuration(3)
                 ->positionClass('toast-top-left')
-                ->addInfo("Detail klaim INA-CBG sudah pernah dikirim untuk SEP: {$dataDaftarPoliRJ['inacbg']['nomor_sep']}.");
-            return;
+                ->addInfo("Detail klaim INA-CBG dikirim ulang untuk SEP: {$dataDaftarPoliRJ['inacbg']['nomor_sep']}.");
+            // return;
         }
 
 
@@ -317,7 +322,13 @@ class PostInacbgRJ extends Component
             $resp = $this->setClaimData($metadata, $data);
             if (($resp['metadata']['code'] ?? '') === '200') {
                 // tandai sudah selesai
-                $dataDaftarPoliRJ['inacbg']['setClaimDataDone'] = true;
+                // di tempat sebelum kamu set nomor_sep, atau di awal method:
+
+                if (!isset($dataDaftarPoliRJ['inacbg']) || !is_array($dataDaftarPoliRJ['inacbg'])) {
+                    $dataDaftarPoliRJ['inacbg'] = [];
+                }
+
+                $dataDaftarPoliRJ['inacbg']['set_claim_data'] = true;
                 dd($dataDaftarPoliRJ);
                 $this->updateJsonRJ($this->rjNoRef, $dataDaftarPoliRJ);
 
