@@ -315,7 +315,7 @@ class PostInacbgRJ extends Component
 
 
             $resp = $this->setClaimData($metadata, $data);
-
+            dd($resp);
             if (($resp['metadata']['code'] ?? '') === '200') {
                 // tandai sudah selesai
                 $dataDaftarPoliRJ['inacbg']['set_claim_data_done'] = true;
