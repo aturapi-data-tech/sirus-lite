@@ -317,7 +317,7 @@ class PostInacbgRJ extends Component
             $resp = $this->setClaimData($metadata, $data);
             if (($resp['metadata']['code'] ?? '') === '200') {
                 // tandai sudah selesai
-                $dataDaftarPoliRJ['inacbg']['setClaimDataDone'] = 1;
+                $dataDaftarPoliRJ['inacbg']['setClaimDataDone'] = true;
                 dd($dataDaftarPoliRJ);
                 $this->updateJsonRJ($this->rjNoRef, $dataDaftarPoliRJ);
 
