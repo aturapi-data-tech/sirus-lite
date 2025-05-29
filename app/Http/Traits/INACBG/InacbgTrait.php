@@ -164,4 +164,20 @@ trait InacbgTrait
     {
         return $this->callWs('get_claim_status', $metadata, $data);
     }
+
+    public function claimPrint(array $metadata, array $data): array
+    {
+        return $this->callWs('claim_print', $metadata, $data);
+    }
+
+    public function deleteClaim(array $metadata, array $data): array
+    {
+        return $this->callWs('delete_claim', $metadata, $data);
+    }
+
+
+    public function reeditClaim(array $metadata, array $data): array
+    {
+        return $this->callWs('reedit_claim', $metadata, $data);
+    }
 }

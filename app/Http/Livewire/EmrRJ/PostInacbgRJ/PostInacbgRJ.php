@@ -342,51 +342,147 @@ class PostInacbgRJ extends Component
         }
     }
 
-
-    public function getClaimDataToInaCbg()
+    public function groupingStage1ToInaCbg()
     {
-        // 1. Ambil data kunjungan & pasien
-        $find = $this->findDataRJ($this->rjNoRef);
-        $dataDaftarPoliRJ = $find['dataDaftarRJ'] ?? [];
-        $nomorSEP   = $dataDaftarPoliRJ['sep']['resSep']['noSep'] ?? null;
-        // 2. Cek: apakah set_claim_data sudah pernah dijalankan
-        if (empty($nomorSEP)) {
+        $find     = $this->findDataRJ($this->rjNoRef);
+        $nomorSEP = $find['dataDaftarRJ']['inacbg']['nomor_sep'] ?? null;
+
+        if (!$nomorSEP) {
             toastr()->closeOnHover(true)
                 ->closeDuration(3)
                 ->positionClass('toast-top-left')
-                ->addInfo("Data klaim INA-CBG tidak ditemukan.");
+                ->addError('Nomor SEP belum tersedia. Jalankan setClaimData terlebih dahulu.');
             return;
         }
 
         try {
-            // Siapkan metadata (opsional — bisa kosong jika tidak ada override)
-            $metadata = [];
-
-            //  Siapkan payload data sesuai dokumentasi INA-CBG
-            $data = ['nomor_sep'   => $nomorSEP];
-            $resp = $this->getClaimData($metadata, $data);
-            dd($resp);
 
 
-            if (($resp['metadata']['code'] ?? '') === '200') {
-                // tandai sudah selesai
-                $dataDaftarPoliRJ['inacbg']['set_claim_data_done'] = true;
-                $this->updateJsonRJ($this->rjNoRef, $dataDaftarPoliRJ);
+            $metadata = ['nomor_sep' => $nomorSEP];
+            $data  = ['nomor_sep' => $nomorSEP];
+            $resp     = $this->grouperStage1($metadata, $data);
+
+            $code = $resp['metadata']['code'] ?? '';
+
+            if ($code == '200') {
+                $find['dataDaftarRJ']['inacbg']['stage1'] = $resp['response'] ?? [];
+                $this->updateJsonRJ($this->rjNoRef, $find['dataDaftarRJ']);
 
                 toastr()->closeOnHover(true)
                     ->closeDuration(3)
                     ->positionClass('toast-top-left')
-                    ->addSuccess('Detail klaim berhasil dikirim ke INA-CBG.');
-            } else {
-                throw new \Exception($resp['metadata']['message'] ?? 'Unknown error');
+                    ->addSuccess('Grouping INA-CBG Tahap 1 berhasil.');
+
+                return $resp['response'];
             }
+
+            toastr()->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError($resp['metadata']['message'] ?? 'Error pada Stage 1');
         } catch (\Exception $e) {
             toastr()->closeOnHover(true)
                 ->closeDuration(3)
                 ->positionClass('toast-top-left')
-                ->addError("Gagal kirim detail klaim: " . $e->getMessage());
+                ->addError('Gagal Grouping Stage 1: ' . $e->getMessage());
         }
     }
+
+    public function groupingStage2ToInaCbg()
+    {
+        $find     = $this->findDataRJ($this->rjNoRef);
+        $nomorSEP = $find['dataDaftarRJ']['inacbg']['nomor_sep'] ?? null;
+
+        if (!$nomorSEP) {
+            toastr()->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Nomor SEP belum tersedia. Jalankan Stage 1 terlebih dahulu.');
+            return;
+        }
+
+        // Ambil opsi special CMG dari hasil stage1
+        $options    = $dataDaftar['inacbg']['stage1']['special_cmg_option'] ?? [];
+        $specialCmg = collect($options)
+            ->pluck('code')
+            ->filter()
+            ->implode('#');
+
+
+        try {
+            $metadata = ['nomor_sep' => $nomorSEP, 'stage' => 2];
+            $data = ['nomor_sep' => $nomorSEP, 'special_cmg' => $specialCmg];
+            $resp = $this->grouperStage2($metadata, $data);
+
+            $code = $resp['metadata']['code'] ?? '';
+
+            if ($code == '200') {
+                $find['dataDaftarRJ']['inacbg']['stage2'] = $resp['response']['special_cmg'] ?? [];
+                $this->updateJsonRJ($this->rjNoRef, $find['dataDaftarRJ']);
+
+                toastr()->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addSuccess('Grouping INA-CBG Tahap 2 berhasil.');
+
+                return;
+            }
+
+            toastr()->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError($resp['metadata']['message'] ?? 'Error pada Stage 2');
+        } catch (\Exception $e) {
+            toastr()->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Gagal Grouping Stage 2: ' . $e->getMessage());
+        }
+    }
+
+    public function finalizeClaimToInaCbg()
+    {
+        $find     = $this->findDataRJ($this->rjNoRef);
+        $nomorSEP = $find['dataDaftarRJ']['inacbg']['nomor_sep'] ?? null;
+
+        if (!$nomorSEP) {
+            toastr()->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Nomor SEP belum tersedia. Jalankan proses sebelumnya.');
+            return;
+        }
+
+        try {
+            $metadata = ['nomor_sep' => $nomorSEP];
+            $data = ['nomor_sep' => $nomorSEP];
+            $resp = $this->claimFinal($metadata, $data);
+
+            $code = $resp['metadata']['code'] ?? '';
+            if ($code == '200') {
+                $find['dataDaftarRJ']['inacbg']['claim_final'] = true;
+                $this->updateJsonRJ($this->rjNoRef, $find['dataDaftarRJ']);
+
+                toastr()->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addSuccess('Klaim INA-CBG berhasil difinalisasi.');
+
+                return;
+            }
+
+            toastr()->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError($resp['metadata']['message'] ?? 'Error pada claim_final');
+        } catch (\Exception $e) {
+            toastr()->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Gagal finalisasi klaim: ' . $e->getMessage());
+        }
+    }
+
 
 
     public function render()
