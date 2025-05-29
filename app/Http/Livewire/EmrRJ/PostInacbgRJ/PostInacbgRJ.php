@@ -162,7 +162,7 @@ class PostInacbgRJ extends Component
         $dataDaftarPoliRJ = $find['dataDaftarRJ'] ?? [];
 
         // 2. Cek: apakah set_claim_data sudah pernah dijalankan
-        if (! empty($dataDaftarPoliRJ['inacbg']['set_claim_data_done'] ?? false)) {
+        if (!empty($dataDaftarPoliRJ['inacbg']['setClaimDataDone'] ?? false)) {
             toastr()->closeOnHover(true)
                 ->closeDuration(3)
                 ->positionClass('toast-top-left')
@@ -317,7 +317,7 @@ class PostInacbgRJ extends Component
             $resp = $this->setClaimData($metadata, $data);
             if (($resp['metadata']['code'] ?? '') === '200') {
                 // tandai sudah selesai
-                $dataDaftarPoliRJ['inacbg']['set_claim_data_done'] = 1;
+                $dataDaftarPoliRJ['inacbg']['setClaimDataDone'] = 1;
                 dd($dataDaftarPoliRJ);
                 $this->updateJsonRJ($this->rjNoRef, $dataDaftarPoliRJ);
 
