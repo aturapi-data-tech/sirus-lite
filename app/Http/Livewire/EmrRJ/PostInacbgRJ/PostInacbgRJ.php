@@ -130,9 +130,6 @@ class PostInacbgRJ extends Component
 
             // 9. Jika benar-benar sukses
             // di tempat sebelum kamu set nomor_sep, atau di awal method:
-            if (!isset($dataDaftarPoliRJ['inacbg']) || !is_array($dataDaftarPoliRJ['inacbg'])) {
-                $dataDaftarPoliRJ['inacbg'] = [];
-            }
 
             $dataDaftarPoliRJ['inacbg']['nomor_sep'] = $nomorSEP;
             $this->updateJsonRJ($this->rjNoRef, $dataDaftarPoliRJ);
@@ -323,15 +320,11 @@ class PostInacbgRJ extends Component
             $metaDataCode = $resp['metadata']['code'] ?? '';
 
             if ($metaDataCode == '200') {
-                dd($dataDaftarPoliRJ);
                 // tandai sudah selesai
                 // di tempat sebelum kamu set nomor_sep, atau di awal method:
 
-                if (!isset($dataDaftarPoliRJ['inacbg']) || !is_array($dataDaftarPoliRJ['inacbg'])) {
-                    $dataDaftarPoliRJ['inacbg'] = [];
-                }
+
                 $dataDaftarPoliRJ['inacbg']['set_claim_data'] = true;
-                dd($dataDaftarPoliRJ['inacbg']);
                 $this->updateJsonRJ($this->rjNoRef, $dataDaftarPoliRJ);
 
                 toastr()->closeOnHover(true)
