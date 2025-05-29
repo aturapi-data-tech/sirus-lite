@@ -327,9 +327,9 @@ class PostInacbgRJ extends Component
                 if (!isset($dataDaftarPoliRJ['inacbg']) || !is_array($dataDaftarPoliRJ['inacbg'])) {
                     $dataDaftarPoliRJ['inacbg'] = [];
                 }
-
+                dd($dataDaftarPoliRJ['inacbg']);
                 $dataDaftarPoliRJ['inacbg']['set_claim_data'] = true;
-                dd($dataDaftarPoliRJ);
+                dd($dataDaftarPoliRJ['inacbg']);
                 $this->updateJsonRJ($this->rjNoRef, $dataDaftarPoliRJ);
 
                 toastr()->closeOnHover(true)
