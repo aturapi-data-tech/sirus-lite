@@ -212,13 +212,6 @@ class PostInacbgRJ extends Component
             }
         }
 
-
-        // 5. Tarif, payor, coder
-        $totalNominal = DB::table('rsview_rjstrs')
-            ->where('rj_no', $this->rjNoRef)
-            ->where('txn_nominal', '>', 0)
-            ->sum('txn_nominal');
-        $tarif     = $totalNominal ?? 0;
         $jnsPelayanan     = $dataDaftarPoliRJ['sep']['reqSep']['request']['t_sep']['jnsPelayanan'] ?? '2';
         $klsRawatHak     = $dataDaftarPoliRJ['sep']['reqSep']['request']['t_sep']['klsRawat']['klsRawatHak'] ?? '3';
 
@@ -231,26 +224,95 @@ class PostInacbgRJ extends Component
                 'nomor_sep' => $nomorSEP,      // identifier klaim
             ];
 
+            // ambil dulu tarif masing‐masing dari variabel
+            // 1) Uang Periksa Poli (ADMIN UP)
+            $up = DB::table('rsview_rjstrs')
+                ->where('rj_no', $this->rjNoRef)
+                ->where('txn_id', 'ADMIN UP')
+                ->sum('txn_nominal');
+
+            // 2) Jasa Karyawan (JASA KARYAWAN)
+            $jk = DB::table('rsview_rjstrs')
+                ->where('rj_no', $this->rjNoRef)
+                ->where('txn_id', 'JASA KARYAWAN')
+                ->sum('txn_nominal');
+
+            // 3) Jasa Dokter (JASA DOKTER)
+            $jd = DB::table('rsview_rjstrs')
+                ->where('rj_no', $this->rjNoRef)
+                ->where('txn_id', 'JASA DOKTER')
+                ->sum('txn_nominal');
+
+            // 4) Jasa Medis (JASA MEDIS)
+            $jm = DB::table('rsview_rjstrs')
+                ->where('rj_no', $this->rjNoRef)
+                ->where('txn_id', 'JASA MEDIS')
+                ->sum('txn_nominal');
+
+            // 5) Admin & Lain-lain (ADMIN RAWAT JALAN + LAIN-LAIN)
+            // $rsAdmin + $adminOb
+            $rsAdmin = DB::table('rsview_rjstrs')
+                ->where('rj_no', $this->rjNoRef)
+                ->where('txn_id', 'ADMIN RAWAT JALAN')
+                ->sum('txn_nominal');
+
+            $lain = DB::table('rsview_rjstrs')
+                ->where('rj_no', $this->rjNoRef)
+                ->where('txn_id', 'LAIN-LAIN')
+                ->sum('txn_nominal');
+
+            // 6) Radiologi
+            $radiologi = DB::table('rsview_rjstrs')
+                ->where('rj_no', $this->rjNoRef)
+                ->where('txn_id', 'RADIOLOGI')
+                ->sum('txn_nominal');
+
+            // 7) Laboratorium
+            $laboratorium = DB::table('rsview_rjstrs')
+                ->where('rj_no', $this->rjNoRef)
+                ->where('txn_id', 'LABORAT')
+                ->sum('txn_nominal');
+
+            // 8) Obat
+            $obat = DB::table('rsview_rjstrs')
+                ->where('rj_no', $this->rjNoRef)
+                ->where('txn_id', 'OBAT')
+                ->sum('txn_nominal');
+
+            // 9) Obat Kronis
+            //    — jika di view belum ada kategori khusus, bisa 0 atau ambil logika terpisah
+            // $obatKronis = 0;
+
+            $tarifRs = [
+                'tenaga_ahli'        => (float) $jk + $up,
+                'keperawatan'        => (float) $jm + $jd,
+                'penunjang'          => (float) $rsAdmin + $lain,
+                'radiologi'          => (float) $radiologi,
+                'laboratorium'       => (float) $laboratorium,
+                'obat'               => (float) $obat,
+                // 'obat_kronis'        => (float) $obatKronis,
+            ];
+
             $data = [
                 'nomor_sep'             => $nomorSEP,      // identifier klaim
                 'tgl_masuk'             => $tglMasuk,       // 'YYYY-MM-DD HH:MM:SS'
                 'tgl_pulang'            => $tglPulang,      // 'YYYY-MM-DD HH:MM:SS'
                 'jenis_rawat'           => $jnsPelayanan,             // 1=inap,2=jalan,3=both
                 'kelas_rawat'           => $klsRawatHak,             // kelas tarif faskes
-                'cob_cd'                => '0',             // COB code
-                'add_payment_pct'       => 0,               // tambahan %
-                //'tarif_breakdown'     => [...],            // jika breakdown detail
-                'tarif_rs'              => (float) $tarif,  // total tarif RS
-                'upgrade_class_ind'     => 'N',             // naik kelas?
-                'upgrade_class_class'   => '2',             // kelas tujuan
-                'upgrade_class_los'     => 1,               // hari naik kelas
-                //'no_kartu_lama'       => '0002271584439',  // jika ganti kartu
+
+                'tarif_rs'              => $tarifRs,
+                // 'tarif_rs'              => (float) $tarif,  // total tarif RS
                 'diagnosa'              => $diagnosa,       // array ICD-10
                 'prosedur'              => $prosedur,       // array ICD-9CM/PCS
                 'coder_nik'             => $coderNik,       // NIK coder (mandatory)
                 'payor_id'              => '3',
                 'payor_cd'              => 'JKN',
+                // opsi:
+                'cob_cd'          => '0',
+                'add_payment_pct' => 0,
             ];
+
+
 
             $resp = $this->setClaimData($metadata, $data);
 
