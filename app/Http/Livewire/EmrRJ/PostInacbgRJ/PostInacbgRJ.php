@@ -161,14 +161,23 @@ class PostInacbgRJ extends Component
         // 1. Ambil data kunjungan & pasien
         $dataDaftarPoliRJ = $this->findDataRJ($this->rjNoRef);
         $dataDaftarPoliRJ = $dataDaftarPoliRJ['dataDaftarRJ'] ?? [];
-
+        $drName = $dataDaftarPoliRJ['drDesc'] ?? '';
         // 2. Cek: apakah set_claim_data dikirim ulang
+
         if (!empty($dataDaftarPoliRJ['inacbg']['set_claim_data'] ?? false)) {
             toastr()->closeOnHover(true)
                 ->closeDuration(3)
                 ->positionClass('toast-top-left')
                 ->addInfo("Detail klaim INA-CBG dikirim ulang untuk SEP: {$dataDaftarPoliRJ['inacbg']['nomor_sep']}.");
             // return;
+        }
+
+        if (!empty($drName ?? false)) {
+            toastr()->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addInfo("Nama Dokter belum tersedia.");
+            return;
         }
 
 
@@ -295,11 +304,13 @@ class PostInacbgRJ extends Component
                 'tgl_pulang'  => $tglPulang, // 'YYYY-MM-DD HH:MM:SS'
                 'jenis_rawat' => $jnsPelayanan,   // 1=inap,2=jalan,3=both
                 'kelas_rawat' => $klsRawatHak,   // kelas tarif faskes
-
+                'nama_dokter' => $drName,
                 'tarif_rs'    => $tarifRs,
                 // 'tarif_rs'    => (float) $tarif,  // total tarif RS
                 'diagnosa'    => $diagnosaString,  // array ICD-10
+                'diagnosa_inagrouper' => $diagnosaString,
                 'prosedur'    => $prosedurString,  // array ICD-9CM/PCS
+                'prosedur_inagrouper' => $prosedurString,
                 'coder_nik'   => $coderNik,  // NIK coder (mandatory)
                 'payor_id'    => '3',
                 'payor_cd'    => 'JKN',
