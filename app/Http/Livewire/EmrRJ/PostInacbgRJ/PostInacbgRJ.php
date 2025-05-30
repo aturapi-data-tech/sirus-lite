@@ -590,7 +590,7 @@ class PostInacbgRJ extends Component
             $code    = $resp['metadata']['code']    ?? null;
             $message = $resp['metadata']['message'] ?? 'Unknown error';
 
-            if ($code === '200') {
+            if ($code == '200') {
                 // 5. Tandai di JSON lokal
                 $dataDaftar['inacbg']['claim_edited'] = true;
                 $this->updateJsonRJ($this->rjNoRef, $dataDaftar);

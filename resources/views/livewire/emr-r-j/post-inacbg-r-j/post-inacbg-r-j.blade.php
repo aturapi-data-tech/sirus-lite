@@ -52,9 +52,9 @@
         <x-loading />
     </div>
 
-    <x-red-button wire:click.prevent="editClaimToInaCbg" type="button" wire:loading.remove>
+    <x-primary-button wire:click.prevent="editClaimToInaCbg" type="button" wire:loading.remove>
         6.Edit Ulang Klaim
-    </x-red-button>
+    </x-primary-button>
     <div wire:loading wire:target="editClaimToInaCbg">
         <x-loading />
     </div>
