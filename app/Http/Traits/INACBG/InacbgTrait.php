@@ -180,4 +180,12 @@ trait InacbgTrait
     {
         return $this->callWs('reedit_claim', $metadata, $data);
     }
+
+    /**
+     * generate_claim_number: Dapatkan nomor klaim unik
+     */
+    public function generateClaimNumber(array $metadata, array $data): array
+    {
+        return $this->callWs('generate_claim_number', $metadata, $data);
+    }
 }

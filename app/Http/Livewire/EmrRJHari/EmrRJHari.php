@@ -524,6 +524,15 @@ class EmrRJHari extends Component
                 DB::raw("(select count(*) from rstxn_rjuploadbpjses where rj_no = rsview_rjkasir.rj_no and seq_file=4) AS rjuploadbpjs_skdp_count"),
                 DB::raw("(select count(*) from rstxn_rjuploadbpjses where rj_no = rsview_rjkasir.rj_no and seq_file=5) AS rjuploadbpjs_lain_count"),
 
+                DB::raw("(select sum(txn_nominal) from rsview_rjstrs where rj_no = rsview_rjkasir.rj_no and txn_id = 'ADMIN UP') as admin_up"),
+                DB::raw("(select sum(txn_nominal) from rsview_rjstrs where rj_no = rsview_rjkasir.rj_no and txn_id = 'JASA KARYAWAN') as jasa_karyawan"),
+                DB::raw("(select sum(txn_nominal) from rsview_rjstrs where rj_no = rsview_rjkasir.rj_no and txn_id = 'JASA DOKTER') as jasa_dokter"),
+                DB::raw("(select sum(txn_nominal) from rsview_rjstrs where rj_no = rsview_rjkasir.rj_no and txn_id = 'JASA MEDIS')  as jasa_medis"),
+                DB::raw("(select sum(txn_nominal) from rsview_rjstrs where rj_no = rsview_rjkasir.rj_no and txn_id = 'ADMIN RAWAT JALAN') as admin_rawat_jalan"),
+                DB::raw("(select sum(txn_nominal) from rsview_rjstrs where rj_no = rsview_rjkasir.rj_no and txn_id = 'LAIN-LAIN') as lain_lain"),
+                DB::raw("(select sum(txn_nominal) from rsview_rjstrs where rj_no = rsview_rjkasir.rj_no and txn_id = 'RADIOLOGI')  as radiologi"),
+                DB::raw("(select sum(txn_nominal) from rsview_rjstrs where rj_no = rsview_rjkasir.rj_no and txn_id = 'LABORAT')  as laboratorium"),
+                DB::raw("(select sum(txn_nominal) from rsview_rjstrs where rj_no = rsview_rjkasir.rj_no and txn_id = 'OBAT') as obat"),
 
             )
             ->whereNotIn('rj_status', ['A', 'F'])

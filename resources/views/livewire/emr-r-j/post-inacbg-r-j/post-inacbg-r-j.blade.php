@@ -1,8 +1,7 @@
-<div class="grid grid-cols-3 gap-1">
+<div class="grid grid-cols-2 gap-1">
 
 
-
-    <x-light-button wire:click.prevent="groupingAllToInaCbg()" type="button" wire:loading.remove>
+    <x-light-button class="col-span-2" wire:click.prevent="groupingAllToInaCbg()" type="button" wire:loading.remove>
         Grouping All INA-CBG
     </x-light-button>
 
@@ -11,8 +10,7 @@
     </div>
 
 
-
-    <x-light-button wire:click.prevent="sendNewClaimToInaCbg()" type="button" wire:loading.remove>
+    {{-- <x-light-button wire:click.prevent="sendNewClaimToInaCbg()" type="button" wire:loading.remove>
         1.Kirim Klaim INA-CBG
     </x-light-button>
 
@@ -28,7 +26,6 @@
         <x-loading />
     </div>
 
-    {{-- Grouping Stage 1 --}}
     <x-light-button wire:click.prevent="groupingStage1ToInaCbg" type="button" wire:loading.remove>
         3.Grouping Stage 1
     </x-light-button>
@@ -36,7 +33,6 @@
         <x-loading />
     </div>
 
-    {{-- Grouping Stage 2 --}}
     <x-light-button wire:click.prevent="groupingStage2ToInaCbg" type="button" wire:loading.remove>
         4.Grouping Stage 2
     </x-light-button>
@@ -44,13 +40,12 @@
         <x-loading />
     </div>
 
-    {{-- Finalisasi Claim --}}
     <x-light-button wire:click.prevent="finalizeClaimToInaCbg" type="button" wire:loading.remove>
         5.Finalisasi Klaim
     </x-light-button>
     <div wire:loading wire:target="finalizeClaimToInaCbg">
         <x-loading />
-    </div>
+    </div> --}}
 
     <x-primary-button wire:click.prevent="editClaimToInaCbg" type="button" wire:loading.remove>
         6.Edit Ulang Klaim
@@ -76,13 +71,13 @@
     </div>
 
 
-    <x-light-button wire:click.prevent="getClaimDataToInaCbg()" type="button" wire:loading.remove>
+    {{-- <x-light-button wire:click.prevent="getClaimDataToInaCbg()" type="button" wire:loading.remove>
         Get Detail Klaim
     </x-light-button>
 
     <div wire:loading wire:target="getClaimDataToInaCbg">
         <x-loading />
-    </div>
+    </div> --}}
 
 
 

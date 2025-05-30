@@ -27,133 +27,149 @@ class PostInacbgRJ extends Component
 
     public function sendNewClaimToInaCbg()
     {
-        // 1. Validasi minimal
-        // $this->validate();
-
-        // 2. Ambil data kunjungan & pasien
+        // 1. Ambil data kunjungan & pasien
         $dataDaftarPoliRJ = $this->findDataRJ($this->rjNoRef);
         $dataDaftarPoliRJ = $dataDaftarPoliRJ['dataDaftarRJ'] ?? [];
-        $dataPasienRJ  = $dataDaftarPoliRJ['dataPasienRJ'] ?? [];
-        $dataPasien = $this->findDataMasterPasien($dataDaftarPoliRJ['regNo'] ?? '') ?? [];
+        $dataPasien = $this->findDataMasterPasien($dataDaftarPoliRJ['regNo'] ?? '')['pasien'] ?? [];
 
         // 2. Cek: apakah klaim sudah pernah dikirim?
-        if (!empty($dataDaftarPoliRJ['inacbg']['nomor_sep'] ?? null)) {
-            toastr()->closeOnHover(true)
-                ->closeDuration(3)
-                ->positionClass('toast-top-left')
-                ->addInfo("Klaim INA-CBG sudah pernah dikirim (SEP: {$dataDaftarPoliRJ['inacbg']['nomor_sep']}).");
-            // return;
-        }
+        // if (! empty($dataDaftarPoliRJ['inacbg']['nomor_sep'])) {
+        //     toastr()
+        //         ->closeOnHover(true)
+        //         ->closeDuration(3)
+        //         ->positionClass('toast-top-left')
+        //         ->addInfo("Klaim INA-CBG sudah pernah dikirim (SEP: {$dataDaftarPoliRJ['inacbg']['nomor_sep']}).");
+        //     // return;
+        // }
 
-        // 3. Ekstrak data peserta
-        $nomorKartu = $dataPasien['pasien']['identitas']['idbpjs'] ?? null;
+        // 3. Ekstrak data peserta & demografi
         $nomorSEP   = $dataDaftarPoliRJ['sep']['resSep']['noSep'] ?? null;
-        $nomorRM    = $dataDaftarPoliRJ['regNo'] ?? null;
-        $namaPasien = $dataPasien['pasien']['regName']   ?? null;
+        $nomorKartu = $dataPasien['identitas']['idbpjs'] ?? null;
+        $rawBirthDate     = $dataPasien['tglLahir']   ?? null;
+        $coderNik   = '123123123123';
 
-        // 4. Format tanggal lahir jadi “YYYY-MM-DD HH:MM:SS”
-        $rawDob = $dataPasien['pasien']['tglLahir'] ?? null;  // ex: “01/12/1966”
         try {
-            $tglLahir = Carbon::createFromFormat('d/m/Y', $rawDob)
+            $tglLahir = Carbon::createFromFormat('d/m/Y', $rawBirthDate)
                 ->format('Y-m-d 00:00:00');
         } catch (\Exception $e) {
-            $tglLahir = null;
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Format tanggal lahir tidak valid.');
+            return;
         }
-        // 5. Gender: 1=Laki, 2=Perempuan
-        $sex = strtolower($dataPasienRJ['jenisKelamin']['jenisKelaminDesc'] ?? '');
-        $gender = in_array($sex, ['l', 'laki', 'laki-laki']) ? '1' : '2';
 
+        $genderDesc = strtolower($dataDaftarPoliRJ['dataPasienRJ']['jenisKelamin']['jenisKelaminDesc'] ?? '');
+        $gender = in_array($genderDesc, ['l', 'laki', 'laki-laki']) ? '1' : '2';
 
-
-        // 6. Validasi input wajib
-        $validator = Validator::make(compact(
-            'nomorKartu',
-            'nomorSEP',
-            'nomorRM',
-            'namaPasien',
-            'tglLahir',
-            'gender'
-        ), [
-            'nomorKartu' => 'required',
+        // 4. Validasi input wajib
+        $validator = Validator::make(compact('nomorSEP', 'nomorKartu', 'tglLahir', 'gender'), [
             'nomorSEP'   => 'required',
-            'nomorRM'    => 'required',
-            'namaPasien' => 'required',
+            'nomorKartu' => 'required',
             'tglLahir'   => 'required',
             'gender' => 'required|in:1,2',
         ], [
-            'nomorKartu.required' => 'No. kartu peserta belum tersedia.',
             'nomorSEP.required'   => 'No. SEP belum tersedia.',
-            'nomorRM.required'    => 'No. RM belum tersedia.',
-            'namaPasien.required' => 'Nama pasien belum tersedia.',
+            'nomorKartu.required' => 'No. kartu peserta belum tersedia.',
             'tglLahir.required'   => 'Tanggal lahir tidak valid.',
             'gender.required' => 'Jenis kelamin tidak valid.',
         ]);
 
         if ($validator->fails()) {
-            toastr()->closeOnHover(true)
+            toastr()
+                ->closeOnHover(true)
                 ->closeDuration(3)
                 ->positionClass('toast-top-left')
                 ->addError($validator->errors()->first());
             return;
         }
 
-        // Siapkan metadata (opsional — bisa kosong jika tidak ada override)
+        // 5. Siapkan payload
         $metadata = [];
-
-        //  Siapkan payload data sesuai dokumentasi INA-CBG
         $data = [
-            'nomor_kartu' => $nomorKartu,   // ex: '0002271584439'
-            'nomor_sep'   => $nomorSEP, // ex: '0184R0060125V002743'
-            'nomor_rm'    => $nomorRM, // ex: '080310Z'
-            'nama_pasien' => $namaPasien,   // ex: 'KARJI'
-            'tgl_lahir'   => $tglLahir, // 'YYYY-MM-DD HH:MM:SS'
-            'gender' => $gender,  // '1' atau '2'
+            'nomor_sep'   => $nomorSEP,
+            'nomor_kartu' => $nomorKartu,
+            'nomor_rm' => $dataDaftarPoliRJ['regNo'] ?? null,
+            'nama_pasien' => $dataPasien['regName']   ?? null,
+            'tgl_lahir'   => $tglLahir,
+            'gender'  => $gender,
+            'coder_nik'   => $coderNik,
         ];
 
-        // 7. Kirim new_claim ke INA-CBG
+        // 6. Kirim new_claim dan tangani duplikasi
         try {
-            $resp = $this->newClaim($metadata, $data);
-
-            // 8. Periksa duplikasi dari response
-            // Misal: INA-CBG mengembalikan kode HTTP 400, atau metadata.code == '400', atau pesan berisi 'Duplikasi'
+            $resp   = $this->newClaim($metadata, $data);
             $statusCode = $resp['metadata']['code'] ?? null;
-            $message    = $resp['metadata']['message'] ?? '';
+            $message = $resp['metadata']['message'] ?? '';
 
-            if ($statusCode == 400 || Str::contains(strtolower($message), 'Duplikasi')) {
-                toastr()->closeOnHover(true)
+            if ($statusCode == 400) {
+                // retry dengan klaim baru
+                toastr()
+                    ->closeOnHover(true)
                     ->closeDuration(3)
                     ->positionClass('toast-top-left')
-                    ->addInfo("Klaim INA-CBG sudah pernah dikirim (SEP: {$nomorSEP}).");
-                // return;
+                    ->addError("Duplikasi klaim, generate nomor klaim baru… (SEP: {$nomorSEP})");
+                return;
+
+                $gen = $this->generateClaimNumber(
+                    ['method' => 'generate_claim_number', 'nomor_sep' => $nomorSEP],
+                    []
+                );
+                $newCode = (string)($gen['metadata']['code'] ?? '');
+                $newId   = ($gen['response']['claim_number'] ?? null);
+
+                if ($newCode != '200' || !$newId) {
+                    toastr()
+                        ->closeOnHover(true)
+                        ->closeDuration(3)
+                        ->positionClass('toast-top-left')
+                        ->addError("Gagal generate klaim baru: " . ($gen['metadata']['message'] ?? ''));
+                    return;
+                }
+                // simpan klaimId baru & retry
+                $dataDaftarPoliRJ['inacbg']['klaimId'] = $newId;
+                $this->updateJsonRJ($this->rjNoRef, $dataDaftarPoliRJ);
+                $resp   = $this->newClaim(
+                    ['method' => 'new_claim', 'nomor_sep' => $nomorSEP, 'nomor_klaim' => $newId],
+                    array_merge($data, ['nomor_klaim' => $newId])
+                );
+
+                // dd($resp);
+                $statusCode = $resp['metadata']['code'] ?? null;
+                $message = $resp['metadata']['message'] ?? '';
+                // $this->setClaimDataToInaCbg();
+                return;
             }
 
-            // 9. Jika benar-benar sukses
-            // di tempat sebelum kamu set nomor_sep, atau di awal method:
+            // 7. Final check
+            if ($statusCode == 200) {
+                $dataDaftarPoliRJ['inacbg']['nomor_sep'] = $nomorSEP;
+                $this->updateJsonRJ($this->rjNoRef, $dataDaftarPoliRJ);
 
-            $dataDaftarPoliRJ['inacbg']['nomor_sep'] = $nomorSEP;
-            $this->updateJsonRJ($this->rjNoRef, $dataDaftarPoliRJ);
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addSuccess("Klaim INA-CBG berhasil terkirim (SEP: {$nomorSEP}).");
+                return;
+            }
 
-            toastr()->closeOnHover(true)
+            // 8. Error selain duplikasi
+            toastr()
+                ->closeOnHover(true)
                 ->closeDuration(3)
                 ->positionClass('toast-top-left')
-                ->addSuccess("Klaim INA-CBG berhasil terkirim (SEP: {$nomorSEP}).");
+                ->addError("Gagal kirim klaim: {$message}");
         } catch (\Exception $e) {
-            // 10. Tangani error sewaktu request: bisa duplikasi juga
-            $errMsg = $e->getMessage();
-
-            if (Str::contains(strtolower($errMsg), 'Duplikasi') || Str::contains($errMsg, '400')) {
-                toastr()->closeOnHover(true)
-                    ->closeDuration(3)
-                    ->positionClass('toast-top-left')
-                    ->addInfo("Klaim INA-CBG sudah pernah dikirim (SEP: {$nomorSEP}).");
-            } else {
-                toastr()->closeOnHover(true)
-                    ->closeDuration(3)
-                    ->positionClass('toast-top-left')
-                    ->addError("Gagal kirim klaim INA-CBG: " . $errMsg);
-            }
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Error saat kirim klaim: " . $e->getMessage());
         }
     }
+
 
 
     public function setClaimDataToInaCbg()
@@ -192,7 +208,9 @@ class PostInacbgRJ extends Component
                 $dataDaftarPoliRJ['taskIdPelayanan']['taskId5']
             )->format('Y-m-d H:i:s');
         } catch (\Exception $e) {
-            toastr()->addError("Format waktu tidak valid: " . $e->getMessage());
+            toastr()->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')->addError("Format waktu tidak valid: " . $e->getMessage());
             return;
         }
 
@@ -202,7 +220,7 @@ class PostInacbgRJ extends Component
             ->sortBy(fn($item) => match ($item['kategoriDiagnosa'] ?? null) {
                 'Primary'   => 1,
                 'Secondary' => 2,
-                default     => 3,
+                default => 3,
             })
             ->pluck('icdX')
             ->filter()
@@ -284,7 +302,7 @@ class PostInacbgRJ extends Component
                 ->sum('txn_nominal');
 
             // 9) Obat Kronis
-            //    — jika di view belum ada kategori khusus, bisa 0 atau ambil logika terpisah
+            //— jika di view belum ada kategori khusus, bisa 0 atau ambil logika terpisah
             // $obatKronis = 0;
 
             $tarifRs = [
@@ -304,18 +322,19 @@ class PostInacbgRJ extends Component
                 'jenis_rawat' => $jnsPelayanan,   // 1=inap,2=jalan,3=both
                 'kelas_rawat' => $klsRawatHak,   // kelas tarif faskes
                 'nama_dokter' => $drName,
-                'tarif_rs'    => $tarifRs,
-                // 'tarif_rs'    => (float) $tarif,  // total tarif RS
-                'diagnosa'    => $diagnosaString,  // array ICD-10
+                'tarif_rs' => $tarifRs,
+                // 'tarif_rs'=> (float) $tarif,  // total tarif RS
+                'diagnosa' => $diagnosaString,  // array ICD-10
                 'diagnosa_inagrouper' => $diagnosaString,
-                'prosedur'    => $prosedurString,  // array ICD-9CM/PCS
+                'prosedur' => $prosedurString,  // array ICD-9CM/PCS
                 'prosedur_inagrouper' => $prosedurString,
                 'coder_nik'   => $coderNik,  // NIK coder (mandatory)
-                'payor_id'    => '3',
-                'payor_cd'    => 'JKN',
+                'payor_id' => '00003',
+                'payor_cd' => 'JKN',
                 // opsi:
                 'cob_cd' => '0',
                 'add_payment_pct' => 0,
+                'kode_tarif' => 'DS'
             ];
 
 
@@ -408,7 +427,7 @@ class PostInacbgRJ extends Component
         }
 
         // Ambil opsi special CMG dari hasil stage1
-        $options    = $dataDaftar['inacbg']['stage1']['special_cmg_option'] ?? [];
+        $options = $dataDaftarPoliRJ['inacbg']['stage1']['special_cmg_option'] ?? [];
         $specialCmg = collect($options)
             ->pluck('code')
             ->filter()
@@ -474,6 +493,8 @@ class PostInacbgRJ extends Component
                 $dataDaftarPoliRJ['inacbg']['claim_final'] = true;
                 $this->updateJsonRJ($this->rjNoRef, $dataDaftarPoliRJ);
 
+                $this->getClaimDataToInaCbg();
+
                 toastr()->closeOnHover(true)
                     ->closeDuration(3)
                     ->positionClass('toast-top-left')
@@ -523,9 +544,9 @@ class PostInacbgRJ extends Component
             ];
             $data = [
                 'nama_dokter' => '',
-                'diagnosa'    => '#',  // array ICD-10
+                'diagnosa' => '#',  // array ICD-10
                 'diagnosa_inagrouper' => '#',
-                'prosedur'    => '#',  // array ICD-9CM/PCS
+                'prosedur' => '#',  // array ICD-9CM/PCS
                 'prosedur_inagrouper' => '#',
                 'coder_nik'   => $coderNik,  // NIK coder (mandatory)
             ];
@@ -587,13 +608,13 @@ class PostInacbgRJ extends Component
             $resp = $this->reeditClaim($metadata, $data);
 
             // 4. Cek kode response
-            $code    = $resp['metadata']['code']    ?? null;
+            $code = $resp['metadata']['code'] ?? null;
             $message = $resp['metadata']['message'] ?? 'Unknown error';
 
             if ($code == '200') {
                 // 5. Tandai di JSON lokal
-                $dataDaftar['inacbg']['claim_edited'] = true;
-                $this->updateJsonRJ($this->rjNoRef, $dataDaftar);
+                $dataDaftarPoliRJ['inacbg']['claim_edited'] = true;
+                $this->updateJsonRJ($this->rjNoRef, $dataDaftarPoliRJ);
 
                 toastr()
                     ->closeOnHover(true)
@@ -643,7 +664,7 @@ class PostInacbgRJ extends Component
             $resp = $this->deleteClaim($metadata, $data);
 
             // 4. Cek kode response
-            $code    = $resp['metadata']['code']    ?? null;
+            $code = $resp['metadata']['code'] ?? null;
             $message = $resp['metadata']['message'] ?? 'Unknown error';
 
             if ($code == '200') {
@@ -683,6 +704,53 @@ class PostInacbgRJ extends Component
         $this->groupingStage2ToInaCbg();
         $this->finalizeClaimToInaCbg();
     }
+
+
+
+    public function getClaimDataToInaCbg()
+    {
+        // 1. Ambil data kunjungan & pasien
+        $find = $this->findDataRJ($this->rjNoRef);
+        $dataDaftarPoliRJ = $find['dataDaftarRJ'] ?? [];
+        $nomorSEP   = $dataDaftarPoliRJ['sep']['resSep']['noSep'] ?? null;
+        // 2. Cek: apakah set_claim_data sudah pernah dijalankan
+        if (empty($nomorSEP)) {
+            toastr()->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addInfo("Data klaim INA-CBG tidak ditemukan.");
+            return;
+        }
+
+        try {
+            // Siapkan metadata (opsional — bisa kosong jika tidak ada override)
+            $metadata = [];
+
+            //  Siapkan payload data sesuai dokumentasi INA-CBG
+            $data = ['nomor_sep'   => $nomorSEP];
+            $resp = $this->getClaimData($metadata, $data);
+
+
+            if (($resp['metadata']['code'] ?? '') == '200') {
+                // tandai sudah selesai
+                $dataDaftarPoliRJ['inacbg']['set_claim_data_done'] = $resp['response']['data'] ?? [];
+                $this->updateJsonRJ($this->rjNoRef, $dataDaftarPoliRJ);
+
+                toastr()->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addSuccess('Detail klaim berhasil dikirim ke INA-CBG.');
+            } else {
+                throw new \Exception($resp['metadata']['message'] ?? 'Unknown error');
+            }
+        } catch (\Exception $e) {
+            toastr()->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Gagal kirim detail klaim: " . $e->getMessage());
+        }
+    }
+
 
     public function render()
     {

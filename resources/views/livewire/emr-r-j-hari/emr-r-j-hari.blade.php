@@ -61,7 +61,7 @@
                                     <path clip-rule="evenodd" fill-rule="evenodd"
                                         d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
                                 </svg>
-                                <span>{{ $myTopBar['drName'] }}</span>
+                                <span class="font-semibold">{{ $myTopBar['drName'] }}</span>
                             </x-alternative-button>
                         </x-slot>
                         {{-- Open shiftcontent --}}
@@ -88,7 +88,7 @@
                                     <path clip-rule="evenodd" fill-rule="evenodd"
                                         d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
                                 </svg>
-                                <span>{{ $myTopBar['klaimStatusName'] }}</span>
+                                <span class="font-semibold">{{ $myTopBar['klaimStatusName'] }}</span>
                             </x-alternative-button>
                         </x-slot>
                         {{-- Open shiftcontent --}}
@@ -157,6 +157,9 @@
                         </th>
                         <th scope="col" class="w-1/5 px-4 py-3 ">
                             Status Layanan
+                        </th>
+                        <th scope="col" class="w-1/5 px-4 py-3 ">
+                            Ina-CBG
                         </th>
                         <th scope="col" class="w-1/5 px-4 py-3 ">
                             Action
@@ -269,55 +272,244 @@
                             </td>
 
                             <td class="px-4 py-3 group-hover:bg-gray-100">
-                                <div class="">
+                                <div class="space-y-1 text-xs">
+                                    {{-- Tanggal --}}
                                     <div class="font-semibold text-primary">
                                         {{ $myQData->rj_date }}
                                     </div>
-                                    <div class="flex italic font-semibold text-gray-900">
-                                        <x-badge :badgecolor="__($badgecolorStatus)">
-                                            {{ isset($myQData->rj_status)
-                                                ? ($myQData->rj_status === 'A'
-                                                    ? 'Pelayanan'
-                                                    : ($myQData->rj_status === 'L'
-                                                        ? 'Selesai Pelayanan'
-                                                        : ($myQData->rj_status === 'I'
-                                                            ? 'Transfer Inap'
-                                                            : ($myQData->rj_status === 'F'
-                                                                ? 'Batal Transaksi'
-                                                                : ''))))
-                                                : '' }}
+
+                                    {{-- Status & EMR --}}
+                                    <div class="flex items-center space-x-1 italic font-semibold text-gray-900">
+                                        <x-badge class="px-1 py-0.5 text-xs" :badgecolor="__($badgecolorStatus)">
+                                            {{ $myQData->rj_status === 'A'
+                                                ? 'Pelayanan'
+                                                : ($myQData->rj_status === 'L'
+                                                    ? 'Selesai'
+                                                    : ($myQData->rj_status === 'I'
+                                                        ? 'Transfer Inap'
+                                                        : ($myQData->rj_status === 'F'
+                                                            ? 'Batal'
+                                                            : ''))) }}
                                         </x-badge>
-                                        <x-badge :badgecolor="__($badgecolorEmr)">
-                                            Emr: {{ $prosentaseEMR . '%' }}
+                                        <x-badge class="px-1 py-0.5 text-xs" :badgecolor="__($badgecolorEmr)">
+                                            EMR {{ $prosentaseEMR }}%
                                         </x-badge>
                                     </div>
+
+                                    {{-- No. Booking --}}
+                                    <div class="text-gray-700">
+                                        {{ $myQData->nobooking }}
+                                    </div>
+
+                                    {{-- Diagnosis & Procedure --}}
                                     <div class="font-normal text-gray-900">
-                                        {{ '' . $myQData->nobooking }}
+                                        <span class="font-semibold">
+                                            Diagnosa:
+                                        </span>
+                                        <br>
+                                        {{ !empty($datadaftar_json['diagnosis']) && is_array($datadaftar_json['diagnosis'])
+                                            ? implode('# ', array_column($datadaftar_json['diagnosis'], 'icdX'))
+                                            : '-' }}
+                                        <br>
+                                        <span class="pl-2">
+                                            FreeText: {{ $datadaftar_json['diagnosisFreeText'] ?: '-' }}
+                                        </span>
+                                        <br>
+                                        <span class="font-semibold">
+                                            Procedure:
+                                        </span>
+                                        <br>
+                                        {{ !empty($datadaftar_json['procedure']) && is_array($datadaftar_json['procedure'])
+                                            ? implode('# ', array_column($datadaftar_json['procedure'], 'procedureId'))
+                                            : '-' }}
+                                        <br>
+                                        <span class="pl-2">
+                                            FreeText: {{ $datadaftar_json['procedureFreeText'] ?: '-' }}
+                                        </span>
                                     </div>
 
-                                    <div class="mt-1 font-normal">
-                                        Tindak Lanjut :
-                                        {{ isset($datadaftar_json['perencanaan']['tindakLanjut']['tindakLanjut'])
-                                            ? ($datadaftar_json['perencanaan']['tindakLanjut']['tindakLanjut']
-                                                ? $datadaftar_json['perencanaan']['tindakLanjut']['tindakLanjut']
-                                                : '-')
-                                            : '-' }}
-                                        </br>
-                                        Tanggal :
-                                        {{ isset($datadaftar_json['kontrol']['tglKontrol'])
-                                            ? ($datadaftar_json['kontrol']['tglKontrol']
-                                                ? $datadaftar_json['kontrol']['tglKontrol']
-                                                : '-')
-                                            : '-' }}
-                                        </br>
-                                        {{ isset($datadaftar_json['kontrol']['noSKDPBPJS'])
-                                            ? ($datadaftar_json['kontrol']['noSKDPBPJS']
-                                                ? $datadaftar_json['kontrol']['noSKDPBPJS']
-                                                : '-')
-                                            : '-' }}
-                                    </div>
 
+                                    <table class="table mb-3 text-xs table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Jenis Layanan</th>
+                                                <th class="text-right">Tarif (Rp)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @php
+                                                $tarif_rs = [
+                                                    'admin_up' => $myQData->admin_up,
+                                                    'jasa_karyawan' => $myQData->jasa_karyawan,
+                                                    'jasa_dokter' => $myQData->jasa_dokter,
+                                                    'jasa_medis' => $myQData->jasa_medis,
+                                                    'admin_rawat_jalan' => $myQData->admin_rawat_jalan,
+                                                    'lain_lain' => $myQData->lain_lain,
+                                                    'radiologi' => $myQData->radiologi,
+                                                    'laboratorium' => $myQData->laboratorium,
+                                                    'obat' => $myQData->obat,
+                                                ];
+                                                $total_all = array_sum($tarif_rs);
+                                            @endphp
+
+                                            @foreach ($tarif_rs as $key => $nominal)
+                                                @if ((float) $nominal > 0)
+                                                    <tr>
+                                                        <td>{{ ucwords(str_replace('_', ' ', $key)) }}</td>
+                                                        <td class="text-right">
+                                                            {{ number_format($nominal, 0, ',', '.') }}
+                                                        </td>
+                                                    </tr>
+                                                @endif
+                                            @endforeach
+                                            <tr class="font-semibold">
+                                                <td>Total</td>
+                                                <td class="text-right">
+                                                    {{ number_format($total_all, 0, ',', '.') }}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
+
+                            </td>
+
+                            <td class="px-4 py-3 group-hover:bg-gray-100">
+                                {{-- Cek dulu apakah set_claim_data_done ada --}}
+                                @if (isset($datadaftar_json['inacbg']['set_claim_data_done']) &&
+                                        is_array($datadaftar_json['inacbg']['set_claim_data_done']))
+                                    @php
+                                        $data = $datadaftar_json['inacbg']['set_claim_data_done'];
+                                    @endphp
+
+                                    <div class="mb-4 text-xs card">
+                                        <div class="card-header">
+                                            <h5>Detail Klaim INA-CBG</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            {{-- Diagnosa & Procedure --}}
+                                            <div class="mb-3 row">
+                                                <div class="col-sm-6">
+                                                    <span class="font-semibold">Diagnosa:</span>
+                                                    <p>{{ $data['diagnosa'] ?? '-' }}</p>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <span class="font-semibold">Procedure:</span>
+                                                    <p>{{ $data['procedure'] ?? '-' }}</p>
+                                                </div>
+                                            </div>
+                                            {{-- Grouper CBG --}}
+                                            <div class="mb-3 row">
+                                                <div class="col-sm-3">
+                                                    <span class="font-semibold">CBG Code:</span>
+                                                    <p>{{ $data['grouper']['response']['cbg']['code'] ?? '-' }}</p>
+                                                </div>
+                                                <div class="col-sm-5">
+                                                    <span class="font-semibold">Description:</span>
+                                                    <p>{{ $data['grouper']['response']['cbg']['description'] ?? '-' }}
+                                                    </p>
+                                                </div>
+                                                <div class="col-sm-2">
+                                                    <span class="font-semibold">Base Tarif:</span>
+                                                    <p>Rp
+                                                        {{ number_format($data['grouper']['response']['cbg']['base_tariff'] ?? 0, 0, ',', '.') }}
+                                                    </p>
+                                                </div>
+                                                <div class="col-sm-2">
+                                                    <span class="font-semibold">Kelas:</span>
+                                                    <p>{{ $data['grouper']['response']['kelas'] ?? '-' }}</p>
+                                                </div>
+                                            </div>
+
+                                            {{-- Response Inagrouper --}}
+                                            @if (isset($data['grouper']['response']['response_inagrouper']) &&
+                                                    is_array($data['grouper']['response']['response_inagrouper']))
+                                                <div class="mb-3">
+                                                    <h6>Detail DRG (Inagrouper)</h6>
+                                                    <ul class="list-unstyled">
+                                                        <li><span class="font-semibold">MDC Number:</span>
+                                                            {{ $data['grouper']['response']['response_inagrouper']['mdc_number'] }}
+                                                        </li>
+                                                        <li><span class="font-semibold">MDC Description:</span>
+                                                            {{ $data['grouper']['response']['response_inagrouper']['mdc_description'] }}
+                                                        </li>
+                                                        <li><span class="font-semibold">DRG Code:</span>
+                                                            {{ $data['grouper']['response']['response_inagrouper']['drg_code'] }}
+                                                        </li>
+                                                        <li><span class="font-semibold">DRG Description:</span>
+                                                            {{ $data['grouper']['response']['response_inagrouper']['drg_description'] }}
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            @endif
+
+                                            {{-- Tarif RS --}}
+                                            @if (isset($data['tarif_rs']) && is_array($data['tarif_rs']))
+                                                @php
+                                                    // Hitung total semua tarif
+                                                    $total_all = array_sum($data['tarif_rs']);
+                                                @endphp
+
+                                                <table class="table mb-3 table-sm table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Jenis Layanan</th>
+                                                            <th class="text-right">Tarif (Rp)</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach ($data['tarif_rs'] as $layanan => $nominal)
+                                                            @if ((float) $nominal > 0)
+                                                                <tr>
+                                                                    <td>{{ ucwords(str_replace('_', ' ', $layanan)) }}
+                                                                    </td>
+                                                                    <td class="text-right">
+                                                                        {{ number_format($nominal, 0, ',', '.') }}
+                                                                    </td>
+                                                                </tr>
+                                                            @endif
+                                                        @endforeach
+
+                                                        {{-- Baris Total --}}
+                                                        <tr class="font-semibold">
+                                                            <td>Total</td>
+                                                            <td class="text-right">
+                                                                {{ number_format($total_all, 0, ',', '.') }}
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            @endif
+
+                                            {{-- Status Pengiriman --}}
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <span class="font-semibold">Status Kemenkes:</span>
+                                                    <p>
+                                                        {{ ucfirst($data['kemenkes_dc_status_cd'] ?? '-') }}
+                                                        @if (!empty($data['kemenkes_dc_sent_dttm']) && $data['kemenkes_dc_sent_dttm'] !== '-')
+                                                            ({{ $data['kemenkes_dc_sent_dttm'] }})
+                                                        @endif
+                                                    </p>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <span class="font-semibold">Status BPJS:</span>
+                                                    <p>
+                                                        {{ ucfirst($data['klaim_status_cd'] ?? '-') }}
+                                                        @if (!empty($data['bpjs_dc_sent_dttm']) && $data['bpjs_dc_sent_dttm'] !== '-')
+                                                            ({{ $data['bpjs_dc_sent_dttm'] }})
+                                                        @endif
+                                                        @if (!empty($data['bpjs_klaim_status_nm']) && $data['bpjs_klaim_status_nm'] !== '-')
+                                                            — {{ $data['bpjs_klaim_status_nm'] }}
+                                                        @endif
+                                                    </p>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+
                             </td>
 
 
