@@ -31,9 +31,9 @@ class PostInacbgRJ extends Component
         // $this->validate();
 
         // 2. Ambil data kunjungan & pasien
-        $find = $this->findDataRJ($this->rjNoRef);
-        $dataDaftarPoliRJ = $find['dataDaftarRJ'] ?? [];
-        $dataPasienRJ  = $find['dataPasienRJ'] ?? [];
+        $dataDaftarPoliRJ = $this->findDataRJ($this->rjNoRef);
+        $dataDaftarPoliRJ = $dataDaftarPoliRJ['dataDaftarRJ'] ?? [];
+        $dataPasienRJ  = $dataDaftarPoliRJ['dataPasienRJ'] ?? [];
         $dataPasien = $this->findDataMasterPasien($dataDaftarPoliRJ['regNo'] ?? '') ?? [];
 
         // 2. Cek: apakah klaim sudah pernah dikirim?
@@ -46,14 +46,14 @@ class PostInacbgRJ extends Component
         }
 
         // 3. Ekstrak data peserta
-        $nomorKartu = $dataDaftarPoliRJ['sep']['reqSep']['request']['t_sep']['noKartu'] ?? null;
+        $nomorKartu = $dataPasien['pasien']['identitas']['idbpjs'] ?? null;
         $nomorSEP   = $dataDaftarPoliRJ['sep']['resSep']['noSep'] ?? null;
         $nomorRM    = $dataDaftarPoliRJ['regNo'] ?? null;
         $namaPasien = $dataPasienRJ['regName']   ?? null;
 
 
         // 4. Format tanggal lahir jadi “YYYY-MM-DD HH:MM:SS”
-        $rawDob = $dataPasien['pasien']['tglLahir'] ?? null;            // ex: “01/12/1966”
+        $rawDob = $dataPasien['pasien']['tglLahir'] ?? null;  // ex: “01/12/1966”
         try {
             $tglLahir = Carbon::createFromFormat('d/m/Y', $rawDob)
                 ->format('Y-m-d 00:00:00');
@@ -80,14 +80,14 @@ class PostInacbgRJ extends Component
             'nomorRM'    => 'required',
             'namaPasien' => 'required',
             'tglLahir'   => 'required',
-            'gender'     => 'required|in:1,2',
+            'gender' => 'required|in:1,2',
         ], [
             'nomorKartu.required' => 'No. kartu peserta belum tersedia.',
             'nomorSEP.required'   => 'No. SEP belum tersedia.',
             'nomorRM.required'    => 'No. RM belum tersedia.',
             'namaPasien.required' => 'Nama pasien belum tersedia.',
             'tglLahir.required'   => 'Tanggal lahir tidak valid.',
-            'gender.required'     => 'Jenis kelamin tidak valid.',
+            'gender.required' => 'Jenis kelamin tidak valid.',
         ]);
 
         if ($validator->fails()) {
@@ -104,11 +104,11 @@ class PostInacbgRJ extends Component
         //  Siapkan payload data sesuai dokumentasi INA-CBG
         $data = [
             'nomor_kartu' => $nomorKartu,   // ex: '0002271584439'
-            'nomor_sep'   => $nomorSEP,     // ex: '0184R0060125V002743'
-            'nomor_rm'    => $nomorRM,      // ex: '080310Z'
+            'nomor_sep'   => $nomorSEP, // ex: '0184R0060125V002743'
+            'nomor_rm'    => $nomorRM, // ex: '080310Z'
             'nama_pasien' => $namaPasien,   // ex: 'KARJI'
-            'tgl_lahir'   => $tglLahir,     // 'YYYY-MM-DD HH:MM:SS'
-            'gender'      => $gender,       // '1' atau '2'
+            'tgl_lahir'   => $tglLahir, // 'YYYY-MM-DD HH:MM:SS'
+            'gender' => $gender,  // '1' atau '2'
         ];
         // dd($data);
         // 7. Kirim new_claim ke INA-CBG
@@ -160,8 +160,8 @@ class PostInacbgRJ extends Component
     public function setClaimDataToInaCbg()
     {
         // 1. Ambil data kunjungan & pasien
-        $find = $this->findDataRJ($this->rjNoRef);
-        $dataDaftarPoliRJ = $find['dataDaftarRJ'] ?? [];
+        $dataDaftarPoliRJ = $this->findDataRJ($this->rjNoRef);
+        $dataDaftarPoliRJ = $dataDaftarPoliRJ['dataDaftarRJ'] ?? [];
 
         // 2. Cek: apakah set_claim_data dikirim ulang
         if (!empty($dataDaftarPoliRJ['inacbg']['set_claim_data'] ?? false)) {
@@ -197,7 +197,7 @@ class PostInacbgRJ extends Component
                 $diagnosa[] = [
                     'code'   => $diag['icdX'] ?? null,
                     'system' => 'ICD-10',
-                    'display' => $diag['diagDesc'] ?? null,      // opsional, kalau butuh deskripsi
+                    'display' => $diag['diagDesc'] ?? null, // opsional, kalau butuh deskripsi
                 ];
             }
         }
@@ -208,14 +208,14 @@ class PostInacbgRJ extends Component
             foreach ($dataDaftarPoliRJ['procedure'] as $proc) {
                 $prosedur[] = [
                     'code'   => $proc['procedureId'] ?? null,
-                    'system' => 'ICD-9-CM',                       // sesuaikan sistem kode prosedur-mu
+                    'system' => 'ICD-9-CM',   // sesuaikan sistem kode prosedur-mu
                     'display' => $proc['procedureDesc'] ?? null,   // opsional
                 ];
             }
         }
 
-        $jnsPelayanan     = $dataDaftarPoliRJ['sep']['reqSep']['request']['t_sep']['jnsPelayanan'] ?? '2';
-        $klsRawatHak     = $dataDaftarPoliRJ['sep']['reqSep']['request']['t_sep']['klsRawat']['klsRawatHak'] ?? '3';
+        $jnsPelayanan = $dataDaftarPoliRJ['sep']['reqSep']['request']['t_sep']['jnsPelayanan'] ?? '2';
+        $klsRawatHak = $dataDaftarPoliRJ['sep']['reqSep']['request']['t_sep']['klsRawat']['klsRawatHak'] ?? '3';
 
 
         $coderNik  = '123123123123';
@@ -223,7 +223,7 @@ class PostInacbgRJ extends Component
         try {
             $metadata = [
                 'method' => 'set_claim_data',
-                'nomor_sep' => $nomorSEP,      // identifier klaim
+                'nomor_sep' => $nomorSEP, // identifier klaim
             ];
 
             // ambil dulu tarif masing‐masing dari variabel
@@ -286,31 +286,31 @@ class PostInacbgRJ extends Component
             // $obatKronis = 0;
 
             $tarifRs = [
-                'tenaga_ahli'        => (float) $jk + $up,
-                'keperawatan'        => (float) $jm + $jd,
-                'penunjang'          => (float) $rsAdmin + $lain,
-                'radiologi'          => (float) $radiologi,
-                'laboratorium'       => (float) $laboratorium,
-                'obat'               => (float) $obat,
-                // 'obat_kronis'        => (float) $obatKronis,
+                'tenaga_ahli'   => (float) $jk + $up,
+                'keperawatan'   => (float) $jm + $jd,
+                'penunjang' => (float) $rsAdmin + $lain,
+                'radiologi' => (float) $radiologi,
+                'laboratorium'  => (float) $laboratorium,
+                'obat' => (float) $obat,
+                // 'obat_kronis'   => (float) $obatKronis,
             ];
 
             $data = [
-                'nomor_sep'             => $nomorSEP,      // identifier klaim
-                'tgl_masuk'             => $tglMasuk,       // 'YYYY-MM-DD HH:MM:SS'
-                'tgl_pulang'            => $tglPulang,      // 'YYYY-MM-DD HH:MM:SS'
-                'jenis_rawat'           => $jnsPelayanan,             // 1=inap,2=jalan,3=both
-                'kelas_rawat'           => $klsRawatHak,             // kelas tarif faskes
+                'nomor_sep'   => $nomorSEP, // identifier klaim
+                'tgl_masuk'   => $tglMasuk,  // 'YYYY-MM-DD HH:MM:SS'
+                'tgl_pulang'  => $tglPulang, // 'YYYY-MM-DD HH:MM:SS'
+                'jenis_rawat' => $jnsPelayanan,   // 1=inap,2=jalan,3=both
+                'kelas_rawat' => $klsRawatHak,   // kelas tarif faskes
 
-                'tarif_rs'              => $tarifRs,
-                // 'tarif_rs'              => (float) $tarif,  // total tarif RS
-                'diagnosa'              => $diagnosa,       // array ICD-10
-                'prosedur'              => $prosedur,       // array ICD-9CM/PCS
-                'coder_nik'             => $coderNik,       // NIK coder (mandatory)
-                'payor_id'              => '3',
-                'payor_cd'              => 'JKN',
+                'tarif_rs'    => $tarifRs,
+                // 'tarif_rs'    => (float) $tarif,  // total tarif RS
+                'diagnosa'    => $diagnosa,  // array ICD-10
+                'prosedur'    => $prosedur,  // array ICD-9CM/PCS
+                'coder_nik'   => $coderNik,  // NIK coder (mandatory)
+                'payor_id'    => '3',
+                'payor_cd'    => 'JKN',
                 // opsi:
-                'cob_cd'          => '0',
+                'cob_cd' => '0',
                 'add_payment_pct' => 0,
             ];
 
@@ -344,8 +344,9 @@ class PostInacbgRJ extends Component
 
     public function groupingStage1ToInaCbg()
     {
-        $find     = $this->findDataRJ($this->rjNoRef);
-        $nomorSEP = $find['dataDaftarRJ']['inacbg']['nomor_sep'] ?? null;
+        $dataDaftarPoliRJ = $this->findDataRJ($this->rjNoRef);
+        $dataDaftarPoliRJ = $dataDaftarPoliRJ['dataDaftarRJ'] ?? [];
+        $nomorSEP = $dataDaftarPoliRJ['sep']['resSep']['noSep'] ?? null;
 
         if (!$nomorSEP) {
             toastr()->closeOnHover(true)
@@ -360,13 +361,13 @@ class PostInacbgRJ extends Component
 
             $metadata = ['nomor_sep' => $nomorSEP];
             $data  = ['nomor_sep' => $nomorSEP];
-            $resp     = $this->grouperStage1($metadata, $data);
+            $resp = $this->grouperStage1($metadata, $data);
 
             $code = $resp['metadata']['code'] ?? '';
 
             if ($code == '200') {
-                $find['dataDaftarRJ']['inacbg']['stage1'] = $resp['response'] ?? [];
-                $this->updateJsonRJ($this->rjNoRef, $find['dataDaftarRJ']);
+                $dataDaftarPoliRJ['inacbg']['stage1'] = $resp['response'] ?? [];
+                $this->updateJsonRJ($this->rjNoRef, $dataDaftarPoliRJ);
 
                 toastr()->closeOnHover(true)
                     ->closeDuration(3)
@@ -390,8 +391,9 @@ class PostInacbgRJ extends Component
 
     public function groupingStage2ToInaCbg()
     {
-        $find     = $this->findDataRJ($this->rjNoRef);
-        $nomorSEP = $find['dataDaftarRJ']['inacbg']['nomor_sep'] ?? null;
+        $dataDaftarPoliRJ = $this->findDataRJ($this->rjNoRef);
+        $dataDaftarPoliRJ = $dataDaftarPoliRJ['dataDaftarRJ'] ?? [];
+        $nomorSEP = $dataDaftarPoliRJ['sep']['resSep']['noSep'] ?? null;
 
         if (!$nomorSEP) {
             toastr()->closeOnHover(true)
@@ -417,8 +419,8 @@ class PostInacbgRJ extends Component
             $code = $resp['metadata']['code'] ?? '';
 
             if ($code == '200') {
-                $find['dataDaftarRJ']['inacbg']['stage2'] = $resp['response']['special_cmg'] ?? [];
-                $this->updateJsonRJ($this->rjNoRef, $find['dataDaftarRJ']);
+                $dataDaftarPoliRJ['inacbg']['stage2'] = $resp['response']['special_cmg'] ?? [];
+                $this->updateJsonRJ($this->rjNoRef, $dataDaftarPoliRJ);
 
                 toastr()->closeOnHover(true)
                     ->closeDuration(3)
@@ -442,8 +444,9 @@ class PostInacbgRJ extends Component
 
     public function finalizeClaimToInaCbg()
     {
-        $find     = $this->findDataRJ($this->rjNoRef);
-        $nomorSEP = $find['dataDaftarRJ']['inacbg']['nomor_sep'] ?? null;
+        $dataDaftarPoliRJ = $this->findDataRJ($this->rjNoRef);
+        $dataDaftarPoliRJ = $dataDaftarPoliRJ['dataDaftarRJ'] ?? [];
+        $nomorSEP = $dataDaftarPoliRJ['sep']['resSep']['noSep']  ?? null;
 
         if (!$nomorSEP) {
             toastr()->closeOnHover(true)
@@ -460,8 +463,8 @@ class PostInacbgRJ extends Component
 
             $code = $resp['metadata']['code'] ?? '';
             if ($code == '200') {
-                $find['dataDaftarRJ']['inacbg']['claim_final'] = true;
-                $this->updateJsonRJ($this->rjNoRef, $find['dataDaftarRJ']);
+                $dataDaftarPoliRJ['inacbg']['claim_final'] = true;
+                $this->updateJsonRJ($this->rjNoRef, $dataDaftarPoliRJ);
 
                 toastr()->closeOnHover(true)
                     ->closeDuration(3)
