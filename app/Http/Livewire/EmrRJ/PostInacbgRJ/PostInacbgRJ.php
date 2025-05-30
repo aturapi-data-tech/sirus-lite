@@ -558,6 +558,67 @@ class PostInacbgRJ extends Component
         }
     }
 
+    public function editClaimToInaCbg()
+    {
+        $dataDaftarPoliRJ = $this->findDataRJ($this->rjNoRef);
+        $dataDaftarPoliRJ = $dataDaftarPoliRJ['dataDaftarRJ'] ?? [];
+        $nomorSEP = $dataDaftarPoliRJ['sep']['resSep']['noSep']  ?? null;
+        $coderNik  = '123123123123';
+
+        if (!$nomorSEP) {
+            toastr()->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Nomor SEP belum tersedia. Jalankan proses sebelumnya.');
+            return;
+        }
+
+        try {
+            // 2. Siapkan metadata & data payload
+            $metadata = [
+                'nomor_sep' => $nomorSEP,
+            ];
+            $data = [
+                'nomor_sep' => $nomorSEP,
+                'coder_nik' => $coderNik,
+            ];
+
+            // 3. Panggil WS reedit_claim
+            $resp = $this->reeditClaim($metadata, $data);
+
+            // 4. Cek kode response
+            $code    = $resp['metadata']['code']    ?? null;
+            $message = $resp['metadata']['message'] ?? 'Unknown error';
+
+            if ($code === '200') {
+                // 5. Tandai di JSON lokal
+                $dataDaftar['inacbg']['claim_edited'] = true;
+                $this->updateJsonRJ($this->rjNoRef, $dataDaftar);
+
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addSuccess('Edit klaim INA-CBG berhasil.');
+                return;
+            }
+
+            // 6. Gagal dengan kode lain
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Gagal edit klaim: {$message}");
+        } catch (\Exception $e) {
+            // 7. Tangani exception
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Error saat edit klaim: ' . $e->getMessage());
+        }
+    }
+
     public function deleteClaimToInaCbg()
     {
         $dataDaftarPoliRJ = $this->findDataRJ($this->rjNoRef);

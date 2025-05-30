@@ -52,10 +52,16 @@
         <x-loading />
     </div>
 
+    <x-red-button wire:click.prevent="editClaimToInaCbg" type="button" wire:loading.remove>
+        6.Edit Ulang Klaim
+    </x-red-button>
+    <div wire:loading wire:target="editClaimToInaCbg">
+        <x-loading />
+    </div>
 
 
     <x-yellow-button wire:click.prevent="deleteDiagnosisAndProcedureDataToInaCbg" type="button" wire:loading.remove>
-        6.Hapus Diagnosa Dan Prosedur Klaim
+        7.Hapus Diagnosa Dan Prosedur Klaim
     </x-yellow-button>
     <div wire:loading wire:target="deleteDiagnosisAndProcedureDataToInaCbg">
         <x-loading />
@@ -63,7 +69,7 @@
 
 
     <x-red-button wire:click.prevent="deleteClaimToInaCbg" type="button" wire:loading.remove>
-        7.Hapus Klaim
+        8.Hapus Klaim
     </x-red-button>
     <div wire:loading wire:target="deleteClaimToInaCbg">
         <x-loading />
