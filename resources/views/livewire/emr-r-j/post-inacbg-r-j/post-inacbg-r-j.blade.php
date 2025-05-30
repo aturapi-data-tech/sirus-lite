@@ -2,19 +2,26 @@
 
 
 
+    <x-light-button wire:click.prevent="groupingAllToInaCbg()" type="button" wire:loading.remove>
+        Grouping All INA-CBG
+    </x-light-button>
+
+    <div wire:loading wire:target="groupingAllToInaCbg">
+        <x-loading />
+    </div>
+
+
+
     <x-light-button wire:click.prevent="sendNewClaimToInaCbg()" type="button" wire:loading.remove>
-        Kirim Klaim INA-CBG
+        1.Kirim Klaim INA-CBG
     </x-light-button>
 
     <div wire:loading wire:target="sendNewClaimToInaCbg">
         <x-loading />
     </div>
 
-
-
-
     <x-light-button wire:click.prevent="setClaimDataToInaCbg()" type="button" wire:loading.remove>
-        Kirim Detail Klaim
+        2.Kirim Detail Klaim
     </x-light-button>
 
     <div wire:loading wire:target="setClaimDataToInaCbg">
@@ -23,7 +30,7 @@
 
     {{-- Grouping Stage 1 --}}
     <x-light-button wire:click.prevent="groupingStage1ToInaCbg" type="button" wire:loading.remove>
-        Grouping Stage 1
+        3.Grouping Stage 1
     </x-light-button>
     <div wire:loading wire:target="groupingStage1ToInaCbg">
         <x-loading />
@@ -31,7 +38,7 @@
 
     {{-- Grouping Stage 2 --}}
     <x-light-button wire:click.prevent="groupingStage2ToInaCbg" type="button" wire:loading.remove>
-        Grouping Stage 2
+        4.Grouping Stage 2
     </x-light-button>
     <div wire:loading wire:target="groupingStage2ToInaCbg">
         <x-loading />
@@ -39,7 +46,7 @@
 
     {{-- Finalisasi Claim --}}
     <x-light-button wire:click.prevent="finalizeClaimToInaCbg" type="button" wire:loading.remove>
-        Finalisasi Klaim
+        5.Finalisasi Klaim
     </x-light-button>
     <div wire:loading wire:target="finalizeClaimToInaCbg">
         <x-loading />

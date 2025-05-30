@@ -49,8 +49,7 @@ class PostInacbgRJ extends Component
         $nomorKartu = $dataPasien['pasien']['identitas']['idbpjs'] ?? null;
         $nomorSEP   = $dataDaftarPoliRJ['sep']['resSep']['noSep'] ?? null;
         $nomorRM    = $dataDaftarPoliRJ['regNo'] ?? null;
-        $namaPasien = $dataPasienRJ['regName']   ?? null;
-
+        $namaPasien = $dataPasien['pasien']['regName']   ?? null;
 
         // 4. Format tanggal lahir jadi “YYYY-MM-DD HH:MM:SS”
         $rawDob = $dataPasien['pasien']['tglLahir'] ?? null;  // ex: “01/12/1966”
@@ -110,7 +109,7 @@ class PostInacbgRJ extends Component
             'tgl_lahir'   => $tglLahir, // 'YYYY-MM-DD HH:MM:SS'
             'gender' => $gender,  // '1' atau '2'
         ];
-        // dd($data);
+
         // 7. Kirim new_claim ke INA-CBG
         try {
             $resp = $this->newClaim($metadata, $data);
@@ -189,30 +188,25 @@ class PostInacbgRJ extends Component
             return;
         }
 
-        // 4. Susun diagnosa & prosedur sesuai format
-        // 1. Siapkan $diagnosa dari array diagnosis
-        $diagnosa = [];
-        if (!empty($dataDaftarPoliRJ['diagnosis'])) {
-            foreach ($dataDaftarPoliRJ['diagnosis'] as $diag) {
-                $diagnosa[] = [
-                    'code'   => $diag['icdX'] ?? null,
-                    'system' => 'ICD-10',
-                    'display' => $diag['diagDesc'] ?? null, // opsional, kalau butuh deskripsi
-                ];
-            }
-        }
 
-        // 2. Siapkan $prosedur dari array procedure
-        $prosedur = [];
-        if (!empty($dataDaftarPoliRJ['procedure'])) {
-            foreach ($dataDaftarPoliRJ['procedure'] as $proc) {
-                $prosedur[] = [
-                    'code'   => $proc['procedureId'] ?? null,
-                    'system' => 'ICD-9-CM',   // sesuaikan sistem kode prosedur-mu
-                    'display' => $proc['procedureDesc'] ?? null,   // opsional
-                ];
-            }
-        }
+        // 4. Susun diagnosa & prosedur sesuai format
+        $diagnosaString = collect($dataDaftarPoliRJ['diagnosis'] ?? [])
+            ->sortBy(fn($item) => match ($item['kategoriDiagnosa'] ?? null) {
+                'Primary'   => 1,
+                'Secondary' => 2,
+                default     => 3,
+            })
+            ->pluck('icdX')
+            ->filter()
+            ->implode('#')
+            ?: '#';
+
+
+        $prosedurString = collect($dataDaftarPoliRJ['prosedur'] ?? [])
+            ->pluck('procedureId')
+            ->filter()
+            ->implode('#')
+            ?: '#';
 
         $jnsPelayanan = $dataDaftarPoliRJ['sep']['reqSep']['request']['t_sep']['jnsPelayanan'] ?? '2';
         $klsRawatHak = $dataDaftarPoliRJ['sep']['reqSep']['request']['t_sep']['klsRawat']['klsRawatHak'] ?? '3';
@@ -304,8 +298,8 @@ class PostInacbgRJ extends Component
 
                 'tarif_rs'    => $tarifRs,
                 // 'tarif_rs'    => (float) $tarif,  // total tarif RS
-                'diagnosa'    => $diagnosa,  // array ICD-10
-                'prosedur'    => $prosedur,  // array ICD-9CM/PCS
+                'diagnosa'    => $diagnosaString,  // array ICD-10
+                'prosedur'    => $prosedurString,  // array ICD-9CM/PCS
                 'coder_nik'   => $coderNik,  // NIK coder (mandatory)
                 'payor_id'    => '3',
                 'payor_cd'    => 'JKN',
@@ -313,7 +307,7 @@ class PostInacbgRJ extends Component
                 'cob_cd' => '0',
                 'add_payment_pct' => 0,
             ];
-
+            // dd($data);
 
 
             $resp = $this->setClaimData($metadata, $data);
@@ -447,6 +441,7 @@ class PostInacbgRJ extends Component
         $dataDaftarPoliRJ = $this->findDataRJ($this->rjNoRef);
         $dataDaftarPoliRJ = $dataDaftarPoliRJ['dataDaftarRJ'] ?? [];
         $nomorSEP = $dataDaftarPoliRJ['sep']['resSep']['noSep']  ?? null;
+        $coderNik  = '123123123123';
 
         if (!$nomorSEP) {
             toastr()->closeOnHover(true)
@@ -458,7 +453,10 @@ class PostInacbgRJ extends Component
 
         try {
             $metadata = ['nomor_sep' => $nomorSEP];
-            $data = ['nomor_sep' => $nomorSEP];
+            $data = [
+                'nomor_sep' => $nomorSEP,
+                'coder_nik'   => $coderNik,  // NIK coder (mandatory)
+            ];
             $resp = $this->claimFinal($metadata, $data);
 
             $code = $resp['metadata']['code'] ?? '';
@@ -487,6 +485,14 @@ class PostInacbgRJ extends Component
     }
 
 
+    public function groupingAllToInaCbg()
+    {
+        $this->sendNewClaimToInaCbg();
+        $this->setClaimDataToInaCbg();
+        $this->groupingStage1ToInaCbg();
+        $this->groupingStage2ToInaCbg();
+        $this->finalizeClaimToInaCbg();
+    }
 
     public function render()
     {
