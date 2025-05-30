@@ -163,7 +163,6 @@ class PostInacbgRJ extends Component
         $dataDaftarPoliRJ = $dataDaftarPoliRJ['dataDaftarRJ'] ?? [];
         $drName = $dataDaftarPoliRJ['drDesc'] ?? '';
         // 2. Cek: apakah set_claim_data dikirim ulang
-
         if (!empty($dataDaftarPoliRJ['inacbg']['set_claim_data'] ?? false)) {
             toastr()->closeOnHover(true)
                 ->closeDuration(3)
@@ -172,7 +171,7 @@ class PostInacbgRJ extends Component
             // return;
         }
 
-        if (!empty($drName ?? false)) {
+        if (empty($drName)) {
             toastr()->closeOnHover(true)
                 ->closeDuration(3)
                 ->positionClass('toast-top-left')
