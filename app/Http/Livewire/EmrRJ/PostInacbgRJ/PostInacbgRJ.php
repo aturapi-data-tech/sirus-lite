@@ -495,6 +495,125 @@ class PostInacbgRJ extends Component
     }
 
 
+    public function deleteDiagnosisAndProcedureDataToInaCbg()
+    {
+        // 1. Ambil data kunjungan & pasien
+        $dataDaftarPoliRJ = $this->findDataRJ($this->rjNoRef);
+        $dataDaftarPoliRJ = $dataDaftarPoliRJ['dataDaftarRJ'] ?? [];
+        $drName = $dataDaftarPoliRJ['drDesc'] ?? '';
+        // 2. Cek: apakah set_claim_data dikirim ulang
+        if (!empty($dataDaftarPoliRJ['inacbg']['set_claim_data'] ?? false)) {
+            toastr()->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addInfo("Detail klaim INA-CBG dikirim ulang untuk SEP: {$dataDaftarPoliRJ['inacbg']['nomor_sep']}.");
+            // return;
+        }
+
+
+        // 3. Ekstrak SEP dan waktu masuk/pulang
+        $nomorSEP   = $dataDaftarPoliRJ['sep']['resSep']['noSep'] ?? null;
+
+        $coderNik  = '123123123123';
+        // 6. Panggil wrapper di trait
+        try {
+            $metadata = [
+                'method' => 'set_claim_data',
+                'nomor_sep' => $nomorSEP, // identifier klaim
+            ];
+            $data = [
+                'nama_dokter' => '',
+                'diagnosa'    => '#',  // array ICD-10
+                'diagnosa_inagrouper' => '#',
+                'prosedur'    => '#',  // array ICD-9CM/PCS
+                'prosedur_inagrouper' => '#',
+                'coder_nik'   => $coderNik,  // NIK coder (mandatory)
+            ];
+
+
+            $resp = $this->setClaimData($metadata, $data);
+            $metaDataCode = $resp['metadata']['code'] ?? '';
+            // dd($resp);
+
+            if ($metaDataCode == '200') {
+                // tandai sudah selesai
+                // di tempat sebelum kamu set nomor_sep, atau di awal method:
+
+
+                $dataDaftarPoliRJ['inacbg']['set_claim_data'] = true;
+                $this->updateJsonRJ($this->rjNoRef, $dataDaftarPoliRJ);
+
+                toastr()->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addSuccess('Detail klaim berhasil dikirim ke INA-CBG.');
+            } else {
+                throw new \Exception($resp['metadata']['message'] ?? 'Unknown error');
+            }
+        } catch (\Exception $e) {
+            toastr()->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Gagal kirim detail klaim: " . $e->getMessage());
+        }
+    }
+
+    public function deleteClaimToInaCbg()
+    {
+        $dataDaftarPoliRJ = $this->findDataRJ($this->rjNoRef);
+        $dataDaftarPoliRJ = $dataDaftarPoliRJ['dataDaftarRJ'] ?? [];
+        $nomorSEP = $dataDaftarPoliRJ['sep']['resSep']['noSep']  ?? null;
+        $coderNik  = '123123123123';
+
+        if (!$nomorSEP) {
+            toastr()->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Nomor SEP belum tersedia. Jalankan proses sebelumnya.');
+            return;
+        }
+
+        try {
+            $metadata = ['nomor_sep' => $nomorSEP];
+            $data = [
+                'nomor_sep' => $nomorSEP,
+                'coder_nik'   => $coderNik,  // NIK coder (mandatory)
+            ];
+            $resp = $this->deleteClaim($metadata, $data);
+
+            // 4. Cek kode response
+            $code    = $resp['metadata']['code']    ?? null;
+            $message = $resp['metadata']['message'] ?? 'Unknown error';
+
+            if ($code == '200') {
+                $dataDaftarPoliRJ['inacbg']['claim_deleted'] = true;
+                $this->updateJsonRJ($this->rjNoRef, $dataDaftarPoliRJ);
+
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addSuccess('Delete klaim INA-CBG berhasil.');
+
+                return;
+            }
+
+            // Jika bukan 200, tampilkan pesan dari server
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Gagal delete klaim: {$message}");
+        } catch (\Exception $e) {
+            // Tangani exception unexpected
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Error saat menghapus klaim: ' . $e->getMessage());
+        }
+    }
+
     public function groupingAllToInaCbg()
     {
         $this->sendNewClaimToInaCbg();
