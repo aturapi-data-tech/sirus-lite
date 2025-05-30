@@ -42,7 +42,7 @@ class PostInacbgRJ extends Component
                 ->closeDuration(3)
                 ->positionClass('toast-top-left')
                 ->addInfo("Klaim INA-CBG sudah pernah dikirim (SEP: {$dataDaftarPoliRJ['inacbg']['nomor_sep']}).");
-            return;
+            // return;
         }
 
         // 3. Ekstrak data peserta
@@ -307,11 +307,11 @@ class PostInacbgRJ extends Component
                 'cob_cd' => '0',
                 'add_payment_pct' => 0,
             ];
-            // dd($data);
 
 
             $resp = $this->setClaimData($metadata, $data);
             $metaDataCode = $resp['metadata']['code'] ?? '';
+            // dd($resp);
 
             if ($metaDataCode == '200') {
                 // tandai sudah selesai
