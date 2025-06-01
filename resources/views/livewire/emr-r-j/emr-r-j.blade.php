@@ -135,7 +135,7 @@
 
 
 
-            <div class="flex justify-end w-1/2">
+            <div class="flex justify-end w-1/3">
 
                 {{-- @role(['Admin', 'Mr', 'Perawat'])
                     <livewire:emr-r-j.post-encounter-r-j.post-encounter-r-j-all :rjDateRef="$myTopBar['refDate']"
