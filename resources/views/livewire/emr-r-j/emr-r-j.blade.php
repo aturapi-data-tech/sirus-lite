@@ -399,31 +399,32 @@
                                         @endisset
                                     @endif
 
-                                    {{-- Diagnosis & Procedure --}}
-                                    <div class="text-xs font-normal text-gray-900">
-                                        <span class="font-semibold">
-                                            Diagnosa:
-                                        </span>
-                                        <br>
-                                        {{ !empty($datadaftar_json['diagnosis']) && is_array($datadaftar_json['diagnosis'])
-                                            ? implode('# ', array_column($datadaftar_json['diagnosis'], 'icdX'))
-                                            : '-' }}
-                                        <span class="pl-2">
-                                            / {{ $datadaftar_json['diagnosisFreeText'] ?? '-' }}
-                                        </span>
-                                        <br>
-                                        <span class="font-semibold">
-                                            Procedure:
-                                        </span>
-                                        <br>
-                                        {{ !empty($datadaftar_json['procedure']) && is_array($datadaftar_json['procedure'])
-                                            ? implode('# ', array_column($datadaftar_json['procedure'], 'procedureId'))
-                                            : '-' }}
-                                        <span class="pl-2">
-                                            / {{ $datadaftar_json['procedureFreeText'] ?? '-' }}
-                                        </span>
-                                    </div>
-
+                                    @role(['Mr', 'Admin', 'Perawat'])
+                                        {{-- Diagnosis & Procedure --}}
+                                        <div class="text-xs font-normal text-gray-900">
+                                            <span class="">
+                                                Diagnosa:
+                                            </span>
+                                            <br>
+                                            {{ !empty($datadaftar_json['diagnosis']) && is_array($datadaftar_json['diagnosis'])
+                                                ? implode('# ', array_column($datadaftar_json['diagnosis'], 'icdX'))
+                                                : '-' }}
+                                            <span class="pl-2">
+                                                / {{ $datadaftar_json['diagnosisFreeText'] ?? '-' }}
+                                            </span>
+                                            <br>
+                                            <span class="">
+                                                Procedure:
+                                            </span>
+                                            <br>
+                                            {{ !empty($datadaftar_json['procedure']) && is_array($datadaftar_json['procedure'])
+                                                ? implode('# ', array_column($datadaftar_json['procedure'], 'procedureId'))
+                                                : '-' }}
+                                            <span class="pl-2">
+                                                / {{ $datadaftar_json['procedureFreeText'] ?? '-' }}
+                                            </span>
+                                        </div>
+                                    @endrole
 
                                 </div>
                             </td>
