@@ -410,7 +410,7 @@
                                             : '-' }}
                                         <br>
                                         <span class="pl-2">
-                                            FreeText: {{ $datadaftar_json['diagnosisFreeText'] ?: '-' }}
+                                            FreeText: {{ $datadaftar_json['diagnosisFreeText'] ?? '-' }}
                                         </span>
                                         <br>
                                         <span class="font-semibold">
@@ -422,7 +422,7 @@
                                             : '-' }}
                                         <br>
                                         <span class="pl-2">
-                                            FreeText: {{ $datadaftar_json['procedureFreeText'] ?: '-' }}
+                                            FreeText: {{ $datadaftar_json['procedureFreeText'] ?? '-' }}
                                         </span>
                                     </div>
 
