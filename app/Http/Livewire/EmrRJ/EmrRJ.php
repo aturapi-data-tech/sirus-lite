@@ -187,7 +187,7 @@ class EmrRJ extends Component
         if ($klaimId  === 'JM') {
             $sep = $this->dataDaftarPoliRJ['sep']['noSep'] ?? '';
             $nomorKartu = $this->dataDaftarPoliRJ['sep']['reqSep']['request']['t_sep']['noKartu'] ?? '';
-            $this->myiCare($nomorKartu, $sep);
+            // $this->myiCare($nomorKartu, $sep);
         }
         //iCare
 
@@ -570,43 +570,43 @@ class EmrRJ extends Component
         $this->settermyTopBarShiftandmyTopBarrefDate();
     }
 
-    //Otomatis Buka Icare
-    public bool $isOpenRekamMedisicare;
-    public string $icareUrlResponse;
-    private function myiCare($nomorKartu, $sep)
-    {
-        if (!$sep) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Belum Terbit SEP.");
-            return;
-        }
+    // //Otomatis Buka Icare
+    // public bool $isOpenRekamMedisicare;
+    // public string $icareUrlResponse;
+    // private function myiCare($nomorKartu, $sep)
+    // {
+    //     if (!$sep) {
+    //         toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Belum Terbit SEP.");
+    //         return;
+    //     }
 
-        $kodeDokter = DB::table('rsmst_doctors')
-            ->select('kd_dr_bpjs')
-            ->where('rsmst_doctors.dr_id', $this->dataDaftarPoliRJ['drId'])
-            ->first();
+    //     $kodeDokter = DB::table('rsmst_doctors')
+    //         ->select('kd_dr_bpjs')
+    //         ->where('rsmst_doctors.dr_id', $this->dataDaftarPoliRJ['drId'])
+    //         ->first();
 
 
-        if (!$kodeDokter || $kodeDokter->kd_dr_bpjs == null) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Dokter tidak memiliki hak akses untuk I-Care.");
-            return;
-        }
+    //     if (!$kodeDokter || $kodeDokter->kd_dr_bpjs == null) {
+    //         toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Dokter tidak memiliki hak akses untuk I-Care.");
+    //         return;
+    //     }
 
-        // trait
-        $HttpGetBpjs  = $this->icare($nomorKartu, $kodeDokter->kd_dr_bpjs)->getOriginalContent();
-        // $HttpGetBpjs =  iCareTrait::icare($nomorKartu, $kodeDokter)->getOriginalContent();
-        // set http response to public
-        $HttpGetBpjsStatus = $HttpGetBpjs['metadata']['code']; //status 200 201 400 ..
-        $HttpGetBpjsJson = $HttpGetBpjs; //Return Response
-        if ($HttpGetBpjsStatus == 200) {
-            $this->icareUrlResponse = $HttpGetBpjsJson['response']['url'];
-            // offkan modalIcare hanya untuk penilaian BPJS
-            // $this->openModalicare();
-            // return redirect()->to($HttpGetBpjsJson['response']['url']);
-        } else {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError(json_encode($HttpGetBpjsJson['metadata']['message'], true));
-            return;
-        }
-    }
+    //     // trait
+    //     $HttpGetBpjs  = $this->icare($nomorKartu, $kodeDokter->kd_dr_bpjs)->getOriginalContent();
+    //     // $HttpGetBpjs =  iCareTrait::icare($nomorKartu, $kodeDokter)->getOriginalContent();
+    //     // set http response to public
+    //     $HttpGetBpjsStatus = $HttpGetBpjs['metadata']['code']; //status 200 201 400 ..
+    //     $HttpGetBpjsJson = $HttpGetBpjs; //Return Response
+    //     if ($HttpGetBpjsStatus == 200) {
+    //         $this->icareUrlResponse = $HttpGetBpjsJson['response']['url'];
+    //         // offkan modalIcare hanya untuk penilaian BPJS
+    //         // $this->openModalicare();
+    //         // return redirect()->to($HttpGetBpjsJson['response']['url']);
+    //     } else {
+    //         toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError(json_encode($HttpGetBpjsJson['metadata']['message'], true));
+    //         return;
+    //     }
+    // }
 
 
     // select data start////////////////
