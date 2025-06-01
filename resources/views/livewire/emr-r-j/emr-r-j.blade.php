@@ -137,34 +137,34 @@
 
             <div class="flex justify-end w-1/2">
 
-                @role(['Admin', 'Mr', 'Perawat'])
+                {{-- @role(['Admin', 'Mr', 'Perawat'])
                     <livewire:emr-r-j.post-encounter-r-j.post-encounter-r-j-all :rjDateRef="$myTopBar['refDate']"
                         :wire:key="'post-encounter-r-j-all-'.$myTopBar['refDate']">
-                    @endrole
+                    @endrole --}}
 
 
-                    <x-dropdown align="right" :width="__('20')">
-                        <x-slot name="trigger">
-                            {{-- Button myLimitPerPage --}}
-                            <x-alternative-button class="inline-flex">
-                                <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
-                                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                    <path clip-rule="evenodd" fill-rule="evenodd"
-                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-                                </svg>
-                                Tampil ({{ $limitPerPage }})
-                            </x-alternative-button>
-                        </x-slot>
-                        {{-- Open myLimitPerPagecontent --}}
-                        <x-slot name="content">
+                <x-dropdown align="right" :width="__('20')">
+                    <x-slot name="trigger">
+                        {{-- Button myLimitPerPage --}}
+                        <x-alternative-button class="inline-flex">
+                            <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
+                                xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path clip-rule="evenodd" fill-rule="evenodd"
+                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                            </svg>
+                            Tampil ({{ $limitPerPage }})
+                        </x-alternative-button>
+                    </x-slot>
+                    {{-- Open myLimitPerPagecontent --}}
+                    <x-slot name="content">
 
-                            @foreach ($myLimitPerPages as $myLimitPerPage)
-                                <x-dropdown-link wire:click="$set('limitPerPage', '{{ $myLimitPerPage }}')">
-                                    {{ __($myLimitPerPage) }}
-                                </x-dropdown-link>
-                            @endforeach
-                        </x-slot>
-                    </x-dropdown>
+                        @foreach ($myLimitPerPages as $myLimitPerPage)
+                            <x-dropdown-link wire:click="$set('limitPerPage', '{{ $myLimitPerPage }}')">
+                                {{ __($myLimitPerPage) }}
+                            </x-dropdown-link>
+                        @endforeach
+                    </x-slot>
+                </x-dropdown>
             </div>
 
 
