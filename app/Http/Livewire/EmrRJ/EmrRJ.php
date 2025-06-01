@@ -63,7 +63,27 @@ class EmrRJ extends Component
                 'drId' => 'All',
                 'drName' => 'All'
             ]
-        ]
+        ],
+        'klaimStatusId' => 'All',
+        'klaimStatusName' => 'All',
+        'klaimStatusOptions' => [
+            [
+                'klaimStatusId' => 'All',
+                'klaimStatusName' => 'All'
+            ],
+            [
+                'klaimStatusId' => 'UMUM',
+                'klaimStatusName' => 'UMUM'
+            ],
+            [
+                'klaimStatusId' => 'BPJS',
+                'klaimStatusName' => 'BPJS'
+            ],
+            [
+                'klaimStatusId' => 'KRONIS',
+                'klaimStatusName' => 'KRONIS'
+            ],
+        ],
     ];
 
     public string $refFilter = '';
@@ -106,6 +126,14 @@ class EmrRJ extends Component
              shift_start and shift_end")
             ->first();
         $this->myTopBar['refShiftId'] = isset($findShift->shift) && $findShift->shift ? $findShift->shift : 3;
+    }
+
+    public function settermyTopBarklaimStatusOptions($klaimStatusId, $klaimStatusName): void
+    {
+
+        $this->myTopBar['klaimStatusId'] = $klaimStatusId;
+        $this->myTopBar['klaimStatusName'] = $klaimStatusName;
+        $this->resetPage();
     }
 
 
@@ -620,6 +648,7 @@ class EmrRJ extends Component
         // $myRefshift = $this->myTopBar['refShiftId'];
         $myRefstatusId = $this->myTopBar['refStatusId'];
         $myRefdrId = $this->myTopBar['drId'];
+        $myRefklaimStatusId = $this->myTopBar['klaimStatusId'];
 
 
 
@@ -660,6 +689,14 @@ class EmrRJ extends Component
             // ->where('shift', '=', $myRefshift)
             ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $myRefdate);
 
+
+        if ($myRefklaimStatusId != 'All') {
+            $query->whereIn('klaim_id', function ($query) use ($myRefklaimStatusId) {
+                $query->select('klaim_id')
+                    ->from('rsmst_klaimtypes')
+                    ->where('klaim_status', '=', $myRefklaimStatusId);
+            });
+        }
         // Jika where dokter tidak kosong
         if ($myRefdrId != 'All') {
             $query->where('dr_id', $myRefdrId);
