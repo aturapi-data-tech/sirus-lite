@@ -399,6 +399,33 @@
                                         @endisset
                                     @endif
 
+                                    {{-- Diagnosis & Procedure --}}
+                                    <div class="font-normal text-gray-900">
+                                        <span class="font-semibold">
+                                            Diagnosa:
+                                        </span>
+                                        <br>
+                                        {{ !empty($datadaftar_json['diagnosis']) && is_array($datadaftar_json['diagnosis'])
+                                            ? implode('# ', array_column($datadaftar_json['diagnosis'], 'icdX'))
+                                            : '-' }}
+                                        <br>
+                                        <span class="pl-2">
+                                            FreeText: {{ $datadaftar_json['diagnosisFreeText'] ?: '-' }}
+                                        </span>
+                                        <br>
+                                        <span class="font-semibold">
+                                            Procedure:
+                                        </span>
+                                        <br>
+                                        {{ !empty($datadaftar_json['procedure']) && is_array($datadaftar_json['procedure'])
+                                            ? implode('# ', array_column($datadaftar_json['procedure'], 'procedureId'))
+                                            : '-' }}
+                                        <br>
+                                        <span class="pl-2">
+                                            FreeText: {{ $datadaftar_json['procedureFreeText'] ?: '-' }}
+                                        </span>
+                                    </div>
+
 
                                 </div>
                             </td>
