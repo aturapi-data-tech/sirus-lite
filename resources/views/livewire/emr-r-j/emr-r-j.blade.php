@@ -400,7 +400,7 @@
                                     @endif
 
                                     {{-- Diagnosis & Procedure --}}
-                                    <div class="font-normal text-gray-900">
+                                    <div class="text-xs font-normal text-gray-900">
                                         <span class="font-semibold">
                                             Diagnosa:
                                         </span>
