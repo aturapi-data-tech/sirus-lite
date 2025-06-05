@@ -159,7 +159,7 @@
 
         {{-- Status apakah sudah ter-mount atau belum --}}
         <div class="flex items-center space-x-2">
-            {{ $isMounted . 'xxxxxxx' }}
+            {{ $isMounted ? 'Ter-mount' : 'Belum ter-mount' }}
             @if ($isMounted)
                 <span class="inline-block w-3 h-3 bg-green-500 rounded-full"></span>
                 <span class="font-medium text-green-700">Status: Ter-mount</span>

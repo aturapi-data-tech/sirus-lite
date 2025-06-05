@@ -197,7 +197,7 @@ class Permissions extends Component
         $cmd = [
             '/usr/bin/mountpoint',
             '-q',
-            $this->mountPoint
+            '/home/orad/Desktop/sirus-lite/storage/penunjang/rad'
         ];
 
         $process = new Process($cmd);
