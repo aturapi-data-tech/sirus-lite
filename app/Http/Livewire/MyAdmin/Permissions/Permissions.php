@@ -128,21 +128,15 @@ class Permissions extends Component
     public $statusMessage = '';
     // Boolean: apakah folder sudah ter-mount?
     public $isMounted = false;
-    // Method untuk melakukan mount
     public function mountShare()
     {
-        // Pastikan folder mount point sudah ada sebelum mengeksekusi
-        // $this->mountPoint = '/home/orad/Desktop/sirus-lite/storage/penunjang/rad';
-
         $cmd = [
             'sudo',
-            'mount',
+            '/usr/bin/mount',
             '-t',
             'cifs',
             $this->shareServer,
             $this->mountPoint,
-            // Jika butuh kredensial (username/password):
-            // '-o', 'username=nama_user,password=secret,vers=3.0'
         ];
 
         $process = new Process($cmd);
@@ -156,22 +150,21 @@ class Permissions extends Component
 
             $this->statusMessage = "✓ Mount berhasil di: {$this->mountPoint}";
         } catch (ProcessFailedException $e) {
-            // Tampilkan error output (lebih detail)
             $errorOutput = $process->getErrorOutput();
             $this->statusMessage = "✗ Mount gagal: " . trim($errorOutput);
         }
+
+        // Setelah selesai, cek status mount kembali
+        $this->checkMounted();
     }
 
-    // Method untuk melakukan unmount
     public function unmountShare()
     {
         $cmd = [
             'sudo',
-            'umount',
-            '-t',
-            'cifs', // opsional, tetap mengikutkan -t cifs
-            $this->shareServer,
+            '/usr/bin/umount',
             $this->mountPoint,
+
         ];
 
         $process = new Process($cmd);
@@ -188,7 +181,11 @@ class Permissions extends Component
             $errorOutput = $process->getErrorOutput();
             $this->statusMessage = "✗ Unmount gagal: " . trim($errorOutput);
         }
+
+        // Cek status lagi setelah unmount
+        $this->checkMounted();
     }
+
 
     /**
      * Method untuk mengecek status mount.
@@ -198,7 +195,7 @@ class Permissions extends Component
     public function checkMounted()
     {
         $cmd = [
-            'mountpoint',
+            '/usr/bin/mountpoint',
             '-q',
             $this->mountPoint
         ];
