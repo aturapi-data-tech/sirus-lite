@@ -4,13 +4,14 @@ namespace App\Http\Livewire\MyAdmin\Permissions;
 
 use Illuminate\Support\Facades\DB;
 
-use Spatie\Permission\Models\Role;
+// use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
-use Spatie\Permission\PermissionRegistrar;
+// use Spatie\Permission\PermissionRegistrar;
+// use Illuminate\Support\Facades\Auth;
+// use App\Models\User;
 
-use Illuminate\Support\Facades\Auth;
-
-use App\Models\User;
+use Symfony\Component\Process\Process;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 
 use Livewire\WithPagination;
 
@@ -53,7 +54,7 @@ class Permissions extends Component
     public bool $isOpen = false;
     public string $isOpenMode = 'insert';
     public bool $forceInsertRecord = false;
-    // 
+    //
     private function openModal(): void
     {
         $this->isOpen = true;
@@ -102,6 +103,114 @@ class Permissions extends Component
 
     public function mount()
     {
+        $this->checkMounted();
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public $shareServer = '//172.8.8.12/rad_path/';
+    public $mountPoint  = '/home/orad/Desktop/sirus-lite/storage/penunjang/rad';
+    // Pesan status yang akan ditampilkan di view
+    public $statusMessage = '';
+    // Boolean: apakah folder sudah ter-mount?
+    public $isMounted = false;
+    // Method untuk melakukan mount
+    public function mountShare()
+    {
+        // Pastikan folder mount point sudah ada sebelum mengeksekusi
+        // $this->mountPoint = '/home/orad/Desktop/sirus-lite/storage/penunjang/rad';
+
+        $cmd = [
+            'sudo',
+            'mount',
+            '-t',
+            'cifs',
+            $this->shareServer,
+            $this->mountPoint,
+            // Jika butuh kredensial (username/password):
+            // '-o', 'username=nama_user,password=secret,vers=3.0'
+        ];
+
+        $process = new Process($cmd);
+
+        try {
+            $process->run();
+
+            if (! $process->isSuccessful()) {
+                throw new ProcessFailedException($process);
+            }
+
+            $this->statusMessage = "✓ Mount berhasil di: {$this->mountPoint}";
+        } catch (ProcessFailedException $e) {
+            // Tampilkan error output (lebih detail)
+            $errorOutput = $process->getErrorOutput();
+            $this->statusMessage = "✗ Mount gagal: " . trim($errorOutput);
+        }
+    }
+
+    // Method untuk melakukan unmount
+    public function unmountShare()
+    {
+        $cmd = [
+            'sudo',
+            'umount',
+            '-t',
+            'cifs', // opsional, tetap mengikutkan -t cifs
+            $this->shareServer,
+            $this->mountPoint,
+        ];
+
+        $process = new Process($cmd);
+
+        try {
+            $process->run();
+
+            if (! $process->isSuccessful()) {
+                throw new ProcessFailedException($process);
+            }
+
+            $this->statusMessage = "✓ Unmount berhasil dari: {$this->mountPoint}";
+        } catch (ProcessFailedException $e) {
+            $errorOutput = $process->getErrorOutput();
+            $this->statusMessage = "✗ Unmount gagal: " . trim($errorOutput);
+        }
+    }
+
+    /**
+     * Method untuk mengecek status mount.
+     * Menggunakan perintah 'mountpoint -q'.
+     * Jika exitCode = 0 → sudah ter-mount; jika != 0 → belum ter-mount.
+     */
+    public function checkMounted()
+    {
+        $cmd = [
+            'mountpoint',
+            '-q',
+            $this->mountPoint
+        ];
+
+        $process = new Process($cmd);
+        $process->run();
+
+        if ($process->getExitCode() === 0) {
+            $this->isMounted = true;
+        } else {
+            $this->isMounted = false;
+        }
     }
 
     public function render()
