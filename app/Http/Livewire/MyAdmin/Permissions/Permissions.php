@@ -127,7 +127,7 @@ class Permissions extends Component
     // Pesan status yang akan ditampilkan di view
     public $statusMessage = '';
     // Boolean: apakah folder sudah ter-mount?
-    public $isMounted = false;
+    public $isMounted = 1;
     public function mountShare()
     {
         $cmd = [
@@ -203,10 +203,15 @@ class Permissions extends Component
         $process = new Process($cmd);
         $process->run();
 
+        toastr()->closeOnHover(true)
+            ->closeDuration(3)
+            ->positionClass('toast-top-left')
+            ->addError($process->getExitCode());
+
         if ($process->getExitCode() === 0) {
-            $this->isMounted = true;
+            $this->isMounted = 1;
         } else {
-            $this->isMounted = false;
+            $this->isMounted = 0;
         }
     }
 
