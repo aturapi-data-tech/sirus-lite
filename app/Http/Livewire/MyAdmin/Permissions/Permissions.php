@@ -195,6 +195,7 @@ class Permissions extends Component
     public function checkMounted()
     {
         $cmd = [
+            'sudo',
             '/usr/bin/mountpoint',
             '-q',
             $this->mountPoint
@@ -202,11 +203,6 @@ class Permissions extends Component
 
         $process = new Process($cmd);
         $process->run();
-
-        toastr()->closeOnHover(true)
-            ->closeDuration(3)
-            ->positionClass('toast-top-left')
-            ->addError($process->getExitCode());
 
         if ($process->getExitCode() === 0) {
             $this->isMounted = 1;
