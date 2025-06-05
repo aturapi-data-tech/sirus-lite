@@ -123,7 +123,7 @@ class Permissions extends Component
 
 
     public $shareServer = '//172.8.8.12/rad_path/';
-    public $mountPoint  = '/home/orad/Desktop/sirus-lite/storage/penunjang/rad';
+    public $mountPoint  = '/opt/lampp/htdocs/sirus-lite/storage/penunjang/rad';
     // Pesan status yang akan ditampilkan di view
     public $statusMessage = '';
     // Boolean: apakah folder sudah ter-mount?
@@ -197,7 +197,7 @@ class Permissions extends Component
         $cmd = [
             '/usr/bin/mountpoint',
             '-q',
-            '/home/orad/Desktop/sirus-lite/storage/penunjang/rad'
+            $this->mountPoint
         ];
 
         $process = new Process($cmd);
