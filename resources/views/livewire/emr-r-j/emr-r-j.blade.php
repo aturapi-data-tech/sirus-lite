@@ -703,9 +703,10 @@
 
 
 
-
-
-
+        @role(['Admin', 'Mr', 'Perawat'])
+            <livewire:my-admin.mounting-control.mounting-control
+                :wire:key="'livewire.my-admin.mounting-control.mounting-control'">
+            @endrole
 
     </div>
 
