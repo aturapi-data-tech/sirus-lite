@@ -202,7 +202,6 @@ class Permissions extends Component
 
         $process = new Process($cmd);
         $process->run();
-        dd($process->getExitCode());
 
         if ($process->getExitCode() === 0) {
             $this->isMounted = true;
