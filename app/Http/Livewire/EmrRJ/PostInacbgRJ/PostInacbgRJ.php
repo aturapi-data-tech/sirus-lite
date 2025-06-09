@@ -228,7 +228,7 @@ class PostInacbgRJ extends Component
             ?: '#';
 
 
-        $prosedurString = collect($dataDaftarPoliRJ['prosedur'] ?? [])
+        $prosedurString = collect($dataDaftarPoliRJ['procedure'] ?? [])
             ->pluck('procedureId')
             ->filter()
             ->implode('#')
