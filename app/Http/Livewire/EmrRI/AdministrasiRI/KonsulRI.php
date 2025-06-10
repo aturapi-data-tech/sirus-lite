@@ -206,7 +206,7 @@ class KonsulRI extends Component
                 'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
             ];
         $this->updateJsonRI($riHdrNo, $this->dataDaftarRi);
-        $this->reset(['dataDaftarRi']);
+        // $this->reset(['dataDaftarRi']);
     }
     private function syncDataFormEntry(): void
     {
@@ -244,7 +244,7 @@ class KonsulRI extends Component
                         ->where('class_id', $classId)
                         ->value('konsul_price');
                 }
-                $this->reset(['dataDaftarRi']);
+                // $this->reset(['dataDaftarRi']);
 
                 // Set konsulPrice jika ditemukan, jika tidak set ke 0
                 $this->formEntryKonsul['konsulPrice'] = $konsulPrice ?? 0;
