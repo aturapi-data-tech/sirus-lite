@@ -183,7 +183,7 @@ class PostInacbgRJ extends Component
             toastr()->closeOnHover(true)
                 ->closeDuration(3)
                 ->positionClass('toast-top-left')
-                ->addInfo("Detail klaim INA-CBG dikirim ulang untuk SEP: {$dataDaftarPoliRJ['inacbg']['nomor_sep']}.");
+                ->addInfo("Detail klaim INA-CBG dikirim ulang untuk SEP: {$dataDaftarPoliRJ['sep']['resSep']['noSep']}.");
             // return;
         }
 
@@ -527,7 +527,7 @@ class PostInacbgRJ extends Component
             toastr()->closeOnHover(true)
                 ->closeDuration(3)
                 ->positionClass('toast-top-left')
-                ->addInfo("Detail klaim INA-CBG dikirim ulang untuk SEP: {$dataDaftarPoliRJ['inacbg']['nomor_sep']}.");
+                ->addInfo("Detail klaim INA-CBG dikirim ulang untuk SEP: {$dataDaftarPoliRJ['sep']['resSep']['noSep']}.");
             // return;
         }
 
