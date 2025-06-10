@@ -215,7 +215,7 @@ class PostInacbgRJ extends Component
         }
 
 
-        // 4. Susun diagnosa & prosedur sesuai format
+        // 4. Susun diagnosa & procedure sesuai format
         $diagnosaString = collect($dataDaftarPoliRJ['diagnosis'] ?? [])
             ->sortBy(fn($item) => match ($item['kategoriDiagnosa'] ?? null) {
                 'Primary'   => 1,
@@ -228,7 +228,7 @@ class PostInacbgRJ extends Component
             ?: '#';
 
 
-        $prosedurString = collect($dataDaftarPoliRJ['procedure'] ?? [])
+        $procedureString = collect($dataDaftarPoliRJ['procedure'] ?? [])
             ->pluck('procedureId')
             ->filter()
             ->implode('#')
@@ -326,8 +326,8 @@ class PostInacbgRJ extends Component
                 // 'tarif_rs'=> (float) $tarif,  // total tarif RS
                 'diagnosa' => $diagnosaString,  // array ICD-10
                 'diagnosa_inagrouper' => $diagnosaString,
-                'prosedur' => $prosedurString,  // array ICD-9CM/PCS
-                'prosedur_inagrouper' => $prosedurString,
+                'procedure' => $procedureString,  // array ICD-9CM/PCS
+                'procedure_inagrouper' => $procedureString,
                 'coder_nik'   => $coderNik,  // NIK coder (mandatory)
                 'payor_id' => '00003',
                 'payor_cd' => 'JKN',
@@ -546,8 +546,8 @@ class PostInacbgRJ extends Component
                 'nama_dokter' => '',
                 'diagnosa' => '#',  // array ICD-10
                 'diagnosa_inagrouper' => '#',
-                'prosedur' => '#',  // array ICD-9CM/PCS
-                'prosedur_inagrouper' => '#',
+                'procedure' => '#',  // array ICD-9CM/PCS
+                'procedure_inagrouper' => '#',
                 'coder_nik'   => $coderNik,  // NIK coder (mandatory)
             ];
 
