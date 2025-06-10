@@ -337,7 +337,6 @@ class PostInacbgRJ extends Component
                 'kode_tarif' => 'DS'
             ];
 
-
             $resp = $this->setClaimData($metadata, $data);
             $metaDataCode = $resp['metadata']['code'] ?? '';
             // dd($resp);
