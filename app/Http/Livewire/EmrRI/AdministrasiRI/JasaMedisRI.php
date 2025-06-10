@@ -306,7 +306,7 @@ class JasaMedisRI extends Component
                 'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
             ];
         $this->updateJsonRI($riHdrNo, $this->dataDaftarRi);
-        $this->reset(['dataDaftarRi']);
+        // $this->reset(['dataDaftarRi']);
     }
 
     private function syncDataFormEntry(): void
@@ -349,7 +349,7 @@ class JasaMedisRI extends Component
                         ->where('class_id', $classId)
                         ->value('actp_price');
                 }
-                $this->reset(['dataDaftarRi']);
+                // $this->reset(['dataDaftarRi']);
 
                 // Set harga jasa medis; jika tidak ditemukan nilai, maka set ke 0
                 $this->formEntryJasaMedis['jasaMedisPrice'] = $jasaMedisPrice ?? 0;

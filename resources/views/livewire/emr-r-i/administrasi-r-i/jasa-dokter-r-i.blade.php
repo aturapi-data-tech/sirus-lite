@@ -199,11 +199,43 @@
 
                             @if ($sortedRiJasaDokter->isNotEmpty())
                                 @foreach ($sortedRiJasaDokter as $key => $JasaDokter)
+                                    @php
+
+                                        $adminLogs = $dataDaftarRi['AdministrasiRI']['userLogs'] ?? [];
+                                        // bungkus array jadi Collection
+                                        $adminLogsColl = collect($adminLogs);
+
+                                        // filter userLogDesc yang diawali "JasaDokter"
+                                        // dan mengandung "Txn No:{$JasaDokter['actd_no']}"
+                                        $filteredLogs = $adminLogsColl
+                                            ->filter(function ($log) use ($JasaDokter) {
+                                                return Str::startsWith($log['userLogDesc'], 'JasaDokter') &&
+                                                    Str::contains(
+                                                        $log['userLogDesc'],
+                                                        'Txn No:' . $JasaDokter['actd_no'],
+                                                    );
+                                            })
+                                            ->values();
+                                    @endphp
                                     <tr class="border-b group dark:border-gray-700">
 
                                         <td
                                             class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
                                             {{ $JasaDokter['actd_date'] }}
+
+                                            @if ($filteredLogs->isNotEmpty())
+                                                @foreach ($filteredLogs as $log)
+                                                    <br>
+                                                    <span class="text-xs italic text-gray-600">
+                                                        {{ 'Log ' }}{{ $log['userLogDate'] }} --
+                                                        {{ $log['userLog'] }}</span>
+                                                @endforeach
+                                            @else
+                                                <br>
+                                                <span class="text-xs italic">
+                                                    — no matching log —
+                                                </span>
+                                            @endif
                                         </td>
 
                                         <td

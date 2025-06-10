@@ -203,11 +203,12 @@ class LainLainRI extends Component
                 'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
             ];
         $this->updateJsonRI($riHlainNo, $this->dataDaftarRi);
-        $this->reset(['dataDaftarRi']);
+        // $this->reset(['dataDaftarRi']);
     }
 
     private function syncDataFormEntry(): void
     {
+
         // Synk Lov Lain
         $this->formEntryLain['lainId'] = $this->lain['LainId'] ?? '';
         $this->formEntryLain['lainDesc'] = $this->lain['LainDesc'] ?? '';
@@ -215,6 +216,8 @@ class LainLainRI extends Component
 
         //price
         if (!isset($this->formEntryLain['lainPrice']) || empty($this->formEntryLain['lainPrice'])) {
+
+            $this->dataDaftarRi = $this->findDataRI($this->riHdrNoRef);
 
             // Jika class_id ditemukan, ambil lain_price dari tabel rsmst_others
             $lainPrice = DB::table('rsmst_others')

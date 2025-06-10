@@ -317,7 +317,7 @@ class RoomRI extends Component
                 'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
             ];
         $this->updateJsonRI($riHdrNo, $this->dataDaftarRi);
-        $this->reset(['dataDaftarRi']);
+        // $this->reset(['dataDaftarRi']);
     }
 
     private function syncDataFormEntry(): void
@@ -343,6 +343,8 @@ class RoomRI extends Component
             !isset($this->formEntryRoom['perawatanPrice']) || empty($this->formEntryRoom['perawatanPrice']) ||
             !isset($this->formEntryRoom['commonService']) || empty($this->formEntryRoom['commonService'])
         ) {
+            $this->dataDaftarRi = $this->findDataRI($this->riHdrNoRef);
+
             // Ambil semua harga terkait dari tabel rsmst_rooms dalam satu query
             $prices = DB::table('rsmst_rooms')
                 ->where('room_id', $this->room['RoomId'] ?? '')

@@ -225,7 +225,7 @@ class JasaDokterRI extends Component
                 'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
             ];
         $this->updateJsonRI($riHdrNo, $this->dataDaftarRi);
-        $this->reset(['dataDaftarRi']);
+        // $this->reset(['dataDaftarRi']);
     }
 
     private function syncDataFormEntry(): void
@@ -269,7 +269,7 @@ class JasaDokterRI extends Component
                         ->where('class_id', $classId)
                         ->value('actd_price');
                 }
-                $this->reset(['dataDaftarRi']);
+                // $this->reset(['dataDaftarRi']);
 
                 // Set jasaDokterPrice jika ditemukan, jika tidak set ke 0
                 $this->formEntryJasaDokter['jasaDokterPrice'] = $jasaDokterPrice ?? 0;
