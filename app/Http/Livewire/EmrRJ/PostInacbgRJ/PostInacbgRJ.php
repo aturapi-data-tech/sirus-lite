@@ -726,8 +726,7 @@ class PostInacbgRJ extends Component
                     ->addError($printResp['metadata']['message'] ?? 'Gagal cetak klaim');
                 return;
             }
-
-            $base64 = $printResp['response']['pdf'] ?? null;
+            $base64 = $printResp['data'] ?? null;
             if (! $base64) {
                 toastr()->closeOnHover(true)
                     ->closeDuration(3)
