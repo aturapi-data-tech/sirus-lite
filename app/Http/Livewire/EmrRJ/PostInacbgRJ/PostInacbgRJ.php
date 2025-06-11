@@ -23,7 +23,8 @@ class PostInacbgRJ extends Component
 
 
     public $rjNoRef;
-    public $pdfUrl;
+    public $groupingCount;
+
 
 
     public function sendNewClaimToInaCbg()

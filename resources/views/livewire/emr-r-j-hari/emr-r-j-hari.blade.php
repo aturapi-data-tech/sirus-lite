@@ -539,7 +539,7 @@
 
                                             <div class="grid grid-cols-1 gap-2">
                                                 <livewire:emr-r-j.post-inacbg-r-j.post-inacbg-r-j :rjNoRef="$myQData->rj_no"
-                                                    :wire:key="'post-inacbg-r-j-'.$myQData->rj_no">
+                                                    :groupingCount="$myQData->rjuploadbpjs_grouping_count ?? 0" :wire:key="'post-inacbg-r-j-'.$myQData->rj_no">
                                             </div>
 
                                         </ul>

@@ -46,10 +46,15 @@
     <div wire:loading wire:target="finalizeClaimToInaCbg">
         <x-loading />
     </div> --}}
-
-    <x-light-button class="col-span-2" wire:click.prevent="printClaimToInaCbg()" type="button" wire:loading.remove>
-        Generate PDF Klaim
-    </x-light-button>
+    @if (!$groupingCount)
+        <x-primary-button class="col-span-2" wire:click.prevent="printClaimToInaCbg()" type="button" wire:loading.remove>
+            Upload PDF Klaim
+        </x-primary-button>
+    @else
+        <x-light-button class="col-span-2" wire:click.prevent="printClaimToInaCbg()" type="button" wire:loading.remove>
+            Upload PDF Klaim
+        </x-light-button>
+    @endif
 
     <div wire:loading wire:target="printClaimToInaCbg">
         <x-loading />
