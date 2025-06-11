@@ -324,60 +324,50 @@
                                                                 {{ ' (' . $eresep['catatanKhusus'] . ')' }}
                                                             @endif --}}
 
-                                                            <div class="flex items-baseline space-x-2">
-
-                                                                <div class="basis-[20%]">
-
-                                                                    <div>
-                                                                        <x-text-input placeholder="Signa1"
-                                                                            class="mt-1 ml-2"
-                                                                            :disabled=$disabledPropertyRjStatus
-                                                                            wire:model="dataDaftarPoliRJ.eresep.{{ $key }}.signaX"
-                                                                            x-ref="dataDaftarPoliRJeresep{{ $key }}signaX"
-                                                                            x-on:keyup.enter="$refs.dataDaftarPoliRJeresep{{ $key }}signaHari.focus()" />
-
-
-                                                                    </div>
+                                                            <div class="grid items-baseline gap-x-2"
+                                                                style="grid-template-columns:20% 4% 20% 56%;">
+                                                                {{-- Signa 1 --}}
+                                                                <div>
+                                                                    <x-text-input placeholder="Signa1" class="w-full mt-1"
+                                                                        :disabled="$disabledPropertyRjStatus"
+                                                                        wire:model="dataDaftarPoliRJ.eresep.{{ $key }}.signaX"
+                                                                        x-ref="dataDaftarPoliRJeresep{{ $key }}signaX"
+                                                                        x-on:keyup.enter="$refs.dataDaftarPoliRJeresep{{ $key }}signaHari.focus()" />
                                                                 </div>
 
-                                                                <div class="basis-[4%]">
-
-                                                                    <div>
-                                                                        <span class="text-sm">{{ 'dd' }}</span>
-                                                                    </div>
+                                                                {{-- “dd” label --}}
+                                                                <div class="flex justify-center">
+                                                                    <span class="self-center text-sm">dd</span>
                                                                 </div>
 
-                                                                <div class="basis-[20%]">
-
-                                                                    <div>
-                                                                        <x-text-input placeholder="Signa2"
-                                                                            class="mt-1 ml-2"
-                                                                            :disabled=$disabledPropertyRjStatus
-                                                                            wire:model="dataDaftarPoliRJ.eresep.{{ $key }}.signaHari"
-                                                                            x-ref="dataDaftarPoliRJeresep{{ $key }}signaHari"
-                                                                            x-on:keyup.enter="$refs.dataDaftarPoliRJeresep{{ $key }}catatanKhusus.focus()" />
-
-
-                                                                    </div>
+                                                                {{-- Signa 2 --}}
+                                                                <div>
+                                                                    <x-text-input placeholder="Signa2" class="w-full mt-1"
+                                                                        :disabled="$disabledPropertyRjStatus"
+                                                                        wire:model="dataDaftarPoliRJ.eresep.{{ $key }}.signaHari"
+                                                                        x-ref="dataDaftarPoliRJeresep{{ $key }}signaHari"
+                                                                        x-on:keyup.enter="$refs.dataDaftarPoliRJeresep{{ $key }}catatanKhusus.focus()" />
                                                                 </div>
 
-                                                                <div class="basis-3/6">
-
-                                                                    <div>
-                                                                        <x-text-input placeholder="Catatan Khusus"
-                                                                            class="mt-1 ml-2"
-                                                                            :disabled=$disabledPropertyRjStatus
-                                                                            wire:model="dataDaftarPoliRJ.eresep.{{ $key }}.catatanKhusus"
-                                                                            x-on:keyup.enter="$wire.updateProduct('{{ $dataDaftarPoliRJ['eresep'][$key]['rjObatDtl'] ? $dataDaftarPoliRJ['eresep'][$key]['rjObatDtl'] : null }}', '{{ $dataDaftarPoliRJ['eresep'][$key]['qty'] ? $dataDaftarPoliRJ['eresep'][$key]['qty'] : null }}','{{ $dataDaftarPoliRJ['eresep'][$key]['signaX'] ? $dataDaftarPoliRJ['eresep'][$key]['signaX'] : null }}', '{{ $dataDaftarPoliRJ['eresep'][$key]['signaHari'] ? $dataDaftarPoliRJ['eresep'][$key]['signaHari'] : null }}', '{{ $dataDaftarPoliRJ['eresep'][$key]['catatanKhusus'] ? $dataDaftarPoliRJ['eresep'][$key]['catatanKhusus'] : null }}')
-                                                                        $refs.dataDaftarPoliRJeresep{{ $key }}qty.focus()"
-                                                                            x-ref="dataDaftarPoliRJeresep{{ $key }}catatanKhusus" />
-
-
-                                                                    </div>
+                                                                {{-- Catatan Khusus --}}
+                                                                <div>
+                                                                    <x-text-input placeholder="Catatan Khusus"
+                                                                        class="w-full mt-1" :disabled="$disabledPropertyRjStatus"
+                                                                        wire:model="dataDaftarPoliRJ.eresep.{{ $key }}.catatanKhusus"
+                                                                        x-ref="dataDaftarPoliRJeresep{{ $key }}catatanKhusus"
+                                                                        x-on:keyup.enter="
+                                                                  $wire.updateProduct(
+                                                                    '{{ $dataDaftarPoliRJ['eresep'][$key]['rjObatDtl'] ?? null }}',
+                                                                    '{{ $dataDaftarPoliRJ['eresep'][$key]['qty'] ?? null }}',
+                                                                    '{{ $dataDaftarPoliRJ['eresep'][$key]['signaX'] ?? null }}',
+                                                                    '{{ $dataDaftarPoliRJ['eresep'][$key]['signaHari'] ?? null }}',
+                                                                    '{{ $dataDaftarPoliRJ['eresep'][$key]['catatanKhusus'] ?? null }}'
+                                                                  );
+                                                                  $refs.dataDaftarPoliRJeresep{{ $key }}qty.focus()
+                                                                " />
                                                                 </div>
-
-
                                                             </div>
+
                                                         </td>
 
                                                         <td
