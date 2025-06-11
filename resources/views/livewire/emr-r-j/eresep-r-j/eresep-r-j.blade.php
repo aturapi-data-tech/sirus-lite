@@ -324,10 +324,9 @@
                                                                 {{ ' (' . $eresep['catatanKhusus'] . ')' }}
                                                             @endif --}}
 
-                                                            <div class="grid items-baseline gap-x-2"
-                                                                style="grid-template-columns:20% 4% 20% 56%;">
-                                                                {{-- Signa 1 --}}
-                                                                <div>
+                                                            <div class="flex items-baseline space-x-2">
+                                                                {{-- Signa1 = 20% --}}
+                                                                <div class="basis-1/5">
                                                                     <x-text-input placeholder="Signa1" class="w-full mt-1"
                                                                         :disabled="$disabledPropertyRjStatus"
                                                                         wire:model="dataDaftarPoliRJ.eresep.{{ $key }}.signaX"
@@ -335,13 +334,13 @@
                                                                         x-on:keyup.enter="$refs.dataDaftarPoliRJeresep{{ $key }}signaHari.focus()" />
                                                                 </div>
 
-                                                                {{-- “dd” label --}}
-                                                                <div class="flex justify-center">
-                                                                    <span class="self-center text-sm">dd</span>
+                                                                {{-- “dd” label (auto-width) --}}
+                                                                <div class="flex-none">
+                                                                    <span class="text-sm">dd</span>
                                                                 </div>
 
-                                                                {{-- Signa 2 --}}
-                                                                <div>
+                                                                {{-- Signa2 = 20% --}}
+                                                                <div class="basis-1/5">
                                                                     <x-text-input placeholder="Signa2" class="w-full mt-1"
                                                                         :disabled="$disabledPropertyRjStatus"
                                                                         wire:model="dataDaftarPoliRJ.eresep.{{ $key }}.signaHari"
@@ -349,24 +348,25 @@
                                                                         x-on:keyup.enter="$refs.dataDaftarPoliRJeresep{{ $key }}catatanKhusus.focus()" />
                                                                 </div>
 
-                                                                {{-- Catatan Khusus --}}
-                                                                <div>
+                                                                {{-- Catatan Khusus = remaining space --}}
+                                                                <div class="flex-1">
                                                                     <x-text-input placeholder="Catatan Khusus"
                                                                         class="w-full mt-1" :disabled="$disabledPropertyRjStatus"
                                                                         wire:model="dataDaftarPoliRJ.eresep.{{ $key }}.catatanKhusus"
                                                                         x-ref="dataDaftarPoliRJeresep{{ $key }}catatanKhusus"
                                                                         x-on:keyup.enter="
-                                                                  $wire.updateProduct(
-                                                                    '{{ $dataDaftarPoliRJ['eresep'][$key]['rjObatDtl'] ?? null }}',
-                                                                    '{{ $dataDaftarPoliRJ['eresep'][$key]['qty'] ?? null }}',
-                                                                    '{{ $dataDaftarPoliRJ['eresep'][$key]['signaX'] ?? null }}',
-                                                                    '{{ $dataDaftarPoliRJ['eresep'][$key]['signaHari'] ?? null }}',
-                                                                    '{{ $dataDaftarPoliRJ['eresep'][$key]['catatanKhusus'] ?? null }}'
-                                                                  );
-                                                                  $refs.dataDaftarPoliRJeresep{{ $key }}qty.focus()
-                                                                " />
+                                                                      $wire.updateProduct(
+                                                                        '{{ $dataDaftarPoliRJ['eresep'][$key]['rjObatDtl'] ?? null }}',
+                                                                        '{{ $dataDaftarPoliRJ['eresep'][$key]['qty'] ?? null }}',
+                                                                        '{{ $dataDaftarPoliRJ['eresep'][$key]['signaX'] ?? null }}',
+                                                                        '{{ $dataDaftarPoliRJ['eresep'][$key]['signaHari'] ?? null }}',
+                                                                        '{{ $dataDaftarPoliRJ['eresep'][$key]['catatanKhusus'] ?? null }}'
+                                                                      );
+                                                                      $refs.dataDaftarPoliRJeresep{{ $key }}qty.focus()
+                                                                    " />
                                                                 </div>
                                                             </div>
+
 
                                                         </td>
 
