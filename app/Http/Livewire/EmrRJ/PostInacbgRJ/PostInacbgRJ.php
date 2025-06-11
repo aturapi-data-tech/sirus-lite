@@ -753,7 +753,7 @@ class PostInacbgRJ extends Component
                     DB::table('rstxn_rjuploadbpjses')
                         ->where('rj_no', $this->rjNoRef)
                         ->where('uploadbpjs', $cekFile->uploadbpjs)
-                        ->where('seq_file', 5)
+                        ->where('seq_file', 2)
                         ->update([
                             'uploadbpjs' => $filename . '.pdf',
                             'rj_no' => $this->rjNoRef,
@@ -768,7 +768,7 @@ class PostInacbgRJ extends Component
                 if (Storage::disk('local')->exists($filePath)) {
                     DB::table('rstxn_rjuploadbpjses')
                         ->insert([
-                            'seq_file' => 5,
+                            'seq_file' => 2,
                             'uploadbpjs' => $filename . '.pdf',
                             'rj_no' => $this->rjNoRef,
                             'jenis_file' => 'pdf'
