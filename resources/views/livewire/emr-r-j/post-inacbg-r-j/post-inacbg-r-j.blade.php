@@ -47,6 +47,14 @@
         <x-loading />
     </div> --}}
 
+    <x-light-button class="col-span-2" wire:click.prevent="printClaimToInaCbg()" type="button" wire:loading.remove>
+        Generate PDF Klaim
+    </x-light-button>
+
+    <div wire:loading wire:target="printClaimToInaCbg">
+        <x-loading />
+    </div>
+
     <x-primary-button wire:click.prevent="editClaimToInaCbg" type="button" wire:loading.remove>
         6.Edit Ulang Klaim
     </x-primary-button>

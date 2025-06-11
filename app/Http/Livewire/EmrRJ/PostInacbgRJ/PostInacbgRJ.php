@@ -8,8 +8,9 @@ use App\Http\Traits\INACBG\InacbgTrait;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
+// use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 
 use Livewire\Component;
@@ -22,7 +23,7 @@ class PostInacbgRJ extends Component
 
 
     public $rjNoRef;
-
+    public $pdfUrl;
 
 
     public function sendNewClaimToInaCbg()
@@ -692,6 +693,121 @@ class PostInacbgRJ extends Component
                 ->closeDuration(3)
                 ->positionClass('toast-top-left')
                 ->addError('Error saat menghapus klaim: ' . $e->getMessage());
+        }
+    }
+
+
+    /**
+     * Cetak klaim via WS claim_print
+     */
+    public function printClaimToInaCbg()
+    {
+        $daftar = $this->findDataRJ($this->rjNoRef)['dataDaftarRJ'] ?? [];
+        $sep    = $daftar['sep']['resSep']['noSep'] ?? null;
+
+        if (! $sep) {
+            toastr()->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Nomor SEP belum tersedia.');
+            return;
+        }
+
+        try {
+            $printResp = $this->claimPrint(
+                ['method' => 'claim_print', 'nomor_sep' => $sep],
+                ['nomor_sep' => $sep]
+            );
+
+            if (($printResp['metadata']['code'] ?? '') != '200') {
+                toastr()->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError($printResp['metadata']['message'] ?? 'Gagal cetak klaim');
+                return;
+            }
+
+            $base64 = $printResp['response']['pdf'] ?? null;
+            if (! $base64) {
+                toastr()->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addError('Data PDF tidak ditemukan.');
+                return;
+            }
+
+            $pdfContent = base64_decode($base64);
+
+            $filename = Carbon::now(env('APP_TIMEZONE'))->format('dmYhis');
+            $filePath = 'bpjs/' . $filename . '.pdf'; // Adjust the path as needed
+
+
+            $cekFile = DB::table('rstxn_rjuploadbpjses')
+                ->where('rj_no', $this->rjNoRef)
+                ->where('seq_file', 2)
+                ->first();
+
+            if ($cekFile) {
+                Storage::disk('local')->delete('bpjs/' . $cekFile->uploadbpjs);
+                Storage::disk('local')->put($filePath, $pdfContent);
+                if (Storage::disk('local')->exists($filePath)) {
+                    DB::table('rstxn_rjuploadbpjses')
+                        ->where('rj_no', $this->rjNoRef)
+                        ->where('uploadbpjs', $cekFile->uploadbpjs)
+                        ->where('seq_file', 5)
+                        ->update([
+                            'uploadbpjs' => $filename . '.pdf',
+                            'rj_no' => $this->rjNoRef,
+                            'jenis_file' => 'pdf'
+                        ]);
+                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Data berhasil diupdate " . $cekFile->uploadbpjs);
+                } else {
+                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data tidak berhasil diupdate " . $cekFile->uploadbpjs);
+                }
+            } else {
+                Storage::disk('local')->put($filePath, $pdfContent);
+                if (Storage::disk('local')->exists($filePath)) {
+                    DB::table('rstxn_rjuploadbpjses')
+                        ->insert([
+                            'seq_file' => 5,
+                            'uploadbpjs' => $filename . '.pdf',
+                            'rj_no' => $this->rjNoRef,
+                            'jenis_file' => 'pdf'
+                        ]);
+                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Data berhasil diupload " . $filename . '.pdf');
+                } else {
+                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data tidak berhasil diupdate " . $filename . '.pdf');
+                }
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            toastr()->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addSuccess('Klaim berhasil dicetak via WS.');
+        } catch (\Exception $e) {
+            toastr()->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Error saat cetak klaim: ' . $e->getMessage());
         }
     }
 
