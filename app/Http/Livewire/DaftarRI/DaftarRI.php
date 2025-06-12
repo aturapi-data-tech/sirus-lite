@@ -16,9 +16,9 @@ class DaftarRI extends Component
 
 
     // primitive Variable
-    public string $myTitle = 'Rekam Medis RI';
-    public string $mySnipt = 'Rekam Medis Pasien';
-    public string $myProgram = 'Pasien RI';
+    public string $myTitle = 'Daftar Rawat Inap';
+    public string $mySnipt = 'Daftar Pasien';
+    public string $myProgram = 'Pasien Rawat Inap';
 
     public array $myLimitPerPages = [5, 10, 15, 20, 100];
     // limit record per page -resetExcept////////////////
@@ -130,6 +130,7 @@ class DaftarRI extends Component
         $this->isOpenMode = 'update';
         $this->riHdrNoRef = $riHdrNo;
         $this->regNoRef = $regNoRef;
+        $this->emit('listenerRegNo', $this->regNoRef);
     }
 
 
