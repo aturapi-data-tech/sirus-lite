@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\EmrRI;
+namespace App\Http\Livewire\DaftarRI;
 
 use Illuminate\Support\Facades\DB;
 
@@ -9,9 +9,10 @@ use Livewire\WithPagination;
 use App\Http\Traits\LOV\LOVDokter\LOVDokterTrait;
 
 
-class EmrRI extends Component
+class DaftarRI extends Component
 {
     use WithPagination, LOVDokterTrait;
+
 
 
     // primitive Variable
@@ -114,23 +115,6 @@ class EmrRI extends Component
     public bool $isOpen = false;
     public string $isOpenMode = 'insert';
 
-    public bool $isOpenDokter = false;
-    public string $isOpenModeDokter = 'insert';
-
-    public bool $isOpenInap = false;
-    public string $isOpenModeInap = 'insert';
-
-    public bool $isOpenGeneralConsentPasienRI = false;
-    public string $isOpenModeGeneralConsentPasienRI = 'insert';
-
-    public bool $isOpenEdukasiPasienRI = false;
-    public string $isOpenModeEdukasiPasienRI = 'insert';
-
-    public bool $isOpenScreening = false;
-    public string $isOpenModeScreening = 'insert';
-
-    public bool $forceInsertRecord = false;
-
     public int $riHdrNoRef;
     public string $regNoRef;
 
@@ -148,45 +132,9 @@ class EmrRI extends Component
         $this->regNoRef = $regNoRef;
     }
 
-    private function openModalEditDokter($riHdrNo, $regNoRef): void
-    {
-        $this->isOpenDokter = true;
-        $this->isOpenModeDokter = 'update';
-        $this->riHdrNoRef = $riHdrNo;
-        $this->regNoRef = $regNoRef;
-    }
 
-    private function openModalEditGeneralConsentPasienRI($riHdrNo, $regNoRef): void
-    {
-        $this->isOpenGeneralConsentPasienRI = true;
-        $this->isOpenModeGeneralConsentPasienRI = 'update';
-        $this->riHdrNoRef = $riHdrNo;
-        $this->regNoRef = $regNoRef;
-    }
 
-    private function openModalEditEdukasiPasienRI($riHdrNo, $regNoRef): void
-    {
-        $this->isOpenEdukasiPasienRI = true;
-        $this->isOpenModeEdukasiPasienRI = 'update';
-        $this->riHdrNoRef = $riHdrNo;
-        $this->regNoRef = $regNoRef;
-    }
 
-    private function openModalEditInap($riHdrNo, $regNoRef): void
-    {
-        $this->isOpenInap = true;
-        $this->isOpenModeInap = 'update';
-        $this->riHdrNoRef = $riHdrNo;
-        $this->regNoRef = $regNoRef;
-    }
-
-    private function openModalEditScreening($riHdrNo, $regNoRef): void
-    {
-        $this->isOpenScreening = true;
-        $this->isOpenModeScreening = 'update';
-        $this->riHdrNoRef = $riHdrNo;
-        $this->regNoRef = $regNoRef;
-    }
 
     private function openModalTampil(): void
     {
@@ -201,40 +149,6 @@ class EmrRI extends Component
         $this->resetInputFields();
     }
 
-    public function closeModalDokter(): void
-    {
-        $this->isOpenDokter = false;
-        $this->isOpenModeDokter = 'insert';
-        $this->resetInputFields();
-    }
-
-    public function closeModalGeneralConsentPasienRI(): void
-    {
-        $this->isOpenGeneralConsentPasienRI = false;
-        $this->isOpenModeGeneralConsentPasienRI = 'insert';
-        $this->resetInputFields();
-    }
-
-    public function closeModalEdukasiPasienRI(): void
-    {
-        $this->isOpenEdukasiPasienRI = false;
-        $this->isOpenModeEdukasiPasienRI = 'insert';
-        $this->resetInputFields();
-    }
-
-    public function closeModalInap(): void
-    {
-        $this->isOpenInap = false;
-        $this->isOpenModeInap = 'insert';
-        $this->resetInputFields();
-    }
-
-    public function closeModalScreening(): void
-    {
-        $this->isOpenScreening = false;
-        $this->isOpenModeScreening = 'insert';
-        $this->resetInputFields();
-    }
     // open and close modal end////////////////
 
 
@@ -255,36 +169,6 @@ class EmrRI extends Component
         // $this->findData($id);
     }
 
-    public function editDokter($riHdrNo, $regNoRef)
-    {
-        $this->openModalEditDokter($riHdrNo, $regNoRef);
-        // $this->findData($id);
-    }
-
-    public function editGeneralConsentPasienRI($riHdrNo, $regNoRef)
-    {
-        $this->openModalEditGeneralConsentPasienRI($riHdrNo, $regNoRef);
-        // $this->findData($id);
-    }
-
-    public function editEdukasiPasienRI($riHdrNo, $regNoRef)
-    {
-        $this->openModalEditEdukasiPasienRI($riHdrNo, $regNoRef);
-        // $this->findData($id);
-    }
-
-    // is going to edit data/////////////////
-    public function editInap($riHdrNo, $regNoRef)
-    {
-        $this->openModalEditInap($riHdrNo, $regNoRef);
-        // $this->findData($id);
-    }
-
-    public function editScreening($riHdrNo, $regNoRef)
-    {
-        $this->openModalEditScreening($riHdrNo, $regNoRef);
-        // $this->findData($id);
-    }
 
     ////////////////////////////////////////////////
     ///////////begin////////////////////////////////
@@ -306,110 +190,6 @@ class EmrRI extends Component
         toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Fitur dalam masa pengembangan');
     }
 
-
-    public string $activeTab = "rekamMedis";
-    public string $activeTabDokter = "pengkajianDokter";
-    public string $activeTabGeneralConsentPasienRI = "generalConsentPasienRI";
-    public string $activeTabEdukasiPasienRI = "edukasiPasienRI";
-
-
-
-
-    public array $EmrMenu = [
-        [
-            'ermMenuId' => 'pengkajianAwalPasienRawatInap',
-            'ermMenuName' => 'Pengkajian Pasien Rawat Inap'
-        ],
-        [
-            'ermMenuId' => 'pengkajianDokter',
-            'ermMenuName' => 'Pengkajian Dokter'
-        ],
-        [
-            'ermMenuId' => 'pemeriksaan',
-            'ermMenuName' => 'Pemeriksaan'
-        ],
-        [
-            'ermMenuId' => 'penilaian',
-            'ermMenuName' => 'Penilaian'
-        ],
-        [
-            'ermMenuId' => 'observasi',
-            'ermMenuName' => 'Observasi'
-        ],
-        [
-            'ermMenuId' => 'asuhanKeperawatan',
-            'ermMenuName' => 'Asuhan Keperawatan'
-        ],
-        [
-            'ermMenuId' => 'cppt',
-            'ermMenuName' => 'CPPT'
-        ],
-        [
-            'ermMenuId' => 'diagnosis',
-            'ermMenuName' => 'Diagnosis (ICD)'
-        ],
-
-        [
-            'ermMenuId' => 'perencanaan',
-            'ermMenuName' => 'Perencanaan'
-        ],
-        [
-            'ermMenuId' => 'administrasi',
-            'ermMenuName' => 'Administrasi'
-        ],
-
-        [
-            'ermMenuId' => 'rekamMedis',
-            'ermMenuName' => 'Rekam Medis'
-        ],
-
-    ];
-
-    public array $EmrMenuDokter = [
-        [
-            'ermMenuId' => 'pengkajianDokter',
-            'ermMenuName' => 'Pengkajian Dokter'
-        ],
-        [
-            'ermMenuId' => 'observasi',
-            'ermMenuName' => 'Observasi'
-        ],
-        [
-            'ermMenuId' => 'cppt',
-            'ermMenuName' => 'CPPT'
-        ],
-        [
-            'ermMenuId' => 'pemeriksaanPenunjang',
-            'ermMenuName' => 'Pemeriksaan Penunjang'
-        ],
-        [
-            'ermMenuId' => 'pelayananPenunjang',
-            'ermMenuName' => 'Pelayanan Penunjang'
-        ],
-        [
-            'ermMenuId' => 'rekamMedis',
-            'ermMenuName' => 'Resume Medis'
-        ],
-
-    ];
-
-    public array $EmrMenuGeneralConsentPasienRI = [
-        [
-            'ermMenuId' => 'generalConsentPasienRI',
-            'ermMenuName' => 'General Consent Pasien RI'
-        ],
-        [
-            'ermMenuId' => 'informConsentPasienRI',
-            'ermMenuName' => 'Inform Consent Pasien RI'
-        ]
-    ];
-
-    public array $EmrMenuEdukasiPasienRI = [
-        [
-            'ermMenuId' => 'edukasiPasienRI',
-            'ermMenuName' => 'Form Edukasi Pasien RI'
-        ]
-    ];
 
 
     // when new form instance
@@ -511,7 +291,7 @@ class EmrRI extends Component
 
 
         return view(
-            'livewire.emr-r-i.emr-r-i',
+            'livewire.daftar-r-i.daftar-r-i',
             ['myQueryData' => $query->paginate($this->limitPerPage)]
         );
     }

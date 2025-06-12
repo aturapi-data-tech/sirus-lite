@@ -14,6 +14,7 @@ use App\Http\Livewire\MasterKamarAplicares\MasterKamarAplicares;
 use App\Http\Livewire\PendaftaranMandiriPasienPoli\PendaftaranMandiriPasienPoli;
 use App\Http\Livewire\DaftarRJ\DaftarRJ;
 use App\Http\Livewire\DaftarUGD\DaftarUGD;
+use App\Http\Livewire\DaftarRI\DaftarRI;
 
 use App\Http\Livewire\RJskdp\RJskdp;
 use App\Http\Livewire\RIskdp\RIskdp;
@@ -139,6 +140,7 @@ Route::group(['middleware' => ['role:Admin|Mr|Perawat|Dokter|Apoteker|Tu']], fun
 
 
     // RI
+    Route::get('daftarRI', DaftarRI::class)->middleware('auth')->name('daftarRI');
     Route::get('EmrRI', EmrRI::class)->middleware('auth')->name('EmrRI');
 
     //Laporan
