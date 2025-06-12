@@ -664,6 +664,137 @@ trait VclaimTrait
             return self::sendError($e->getMessage(), $validator->errors(), 408, $url, null);
         }
     }
+
+
+
+    public static function spri_insert($kontrol)
+    {
+
+        // customErrorMessages
+        // $messages = customErrorMessagesTrait::messages();
+        $messages = [];
+        // Masukkan Nilai dari parameter
+        $r = [
+            "request" => [
+                "noKartu" => $kontrol['noKartu'],
+                "tglRencanaKontrol" => Carbon::createFromFormat('d/m/Y', $kontrol['tglKontrol'], env('APP_TIMEZONE'))->format('Y-m-d'),
+                "poliKontrol" => $kontrol['poliKontrolBPJS'],
+                "kodeDokter" => $kontrol['drKontrolBPJS'],
+                "user" =>  'Sirus',
+            ]
+        ];
+        // lakukan validasis
+        $validator = Validator::make($r, [
+            "request.noKartu" => "required",
+            "request.tglRencanaKontrol" => "required|date",
+            "request.kodeDokter" => "required",
+            "request.poliKontrol" => "required",
+            "request.user" => "required",
+        ], $messages);
+
+        if ($validator->fails()) {
+            return self::sendError($validator->errors()->first(), $validator->errors(), 201, null, null);
+        }
+
+
+
+        // handler when time out and off line mode
+        try {
+
+            $url = env('VCLAIM_URL') . "RencanaKontrol/InsertSPRI";
+            $signature = self::signature();
+            $signature['Content-Type'] = 'application/x-www-form-urlencoded';
+            $data = $r;
+
+            $response = Http::timeout(10)
+                ->withHeaders($signature)
+                ->post($url, $data);
+
+
+            // dd($response->transferStats->getTransferTime()); Get Transfertime request
+            // semua response error atau sukses dari BPJS di handle pada logic response_decrypt
+            return self::response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
+            /////////////////////////////////////////////////////////////////////////////
+        } catch (Exception $e) {
+            return self::sendError($e->getMessage(), $validator->errors(), 408, $url, null);
+        }
+    }
+
+    public static function spri_update($kontrol)
+    {
+
+        // customErrorMessages
+        // $messages = customErrorMessagesTrait::messages();
+        $messages = [];
+        // Masukkan Nilai dari parameter
+        $r = [
+            "request" => [
+                "request.noSPRI" => $kontrol['noSPRIBPJS'],
+                "noKartu" => $kontrol['noKartu'],
+                "tglRencanaKontrol" => Carbon::createFromFormat('d/m/Y', $kontrol['tglKontrol'], env('APP_TIMEZONE'))->format('Y-m-d'),
+                "poliKontrol" => $kontrol['poliKontrolBPJS'],
+                "kodeDokter" => $kontrol['drKontrolBPJS'],
+                "user" =>  'Sirus',
+            ]
+        ];
+
+        // lakukan validasis
+        $validator = Validator::make($r, [
+            "request.noSPRI" => "required",
+            "request.noKartu" => "required",
+            "request.tglRencanaKontrol" => "required|date",
+            "request.kodeDokter" => "required",
+            "request.poliKontrol" => "required",
+            "request.user" => "required",
+        ], $messages);
+
+        if ($validator->fails()) {
+            return self::sendError($validator->errors()->first(), $validator->errors(), 201, null, null);
+        }
+
+
+
+        // handler when time out and off line mode
+        try {
+            $url = env('VCLAIM_URL') . "RencanaKontrol/UpdateSPRI";
+            $signature = self::signature();
+            $signature['Content-Type'] = 'application/x-www-form-urlencoded';
+            $data = $r;
+
+            $response = Http::timeout(10)
+                ->withHeaders($signature)
+                ->post($url, $data);
+
+
+            // dd($response->transferStats->getTransferTime()); Get Transfertime request
+            // semua response error atau sukses dari BPJS di handle pada logic response_decrypt
+            return self::response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
+            /////////////////////////////////////////////////////////////////////////////
+        } catch (Exception $e) {
+            return self::sendError($e->getMessage(), $validator->errors(), 408, $url, null);
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     public static function suratkontrol_delete(Request $request)
     {
         $validator = Validator::make(request()->all(), [

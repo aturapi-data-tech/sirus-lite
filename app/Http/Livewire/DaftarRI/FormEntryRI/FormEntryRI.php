@@ -15,7 +15,6 @@ class FormEntryRI extends Component
 
 
     public bool $isOpen = false;
-    public string $isOpenMode = 'insert';
     public int $riHdrNo;
 
     public  $dataPasien = [];
@@ -25,11 +24,18 @@ class FormEntryRI extends Component
 
 
     //////////////////////////////////////////////////////////////////////
+    private function openModal(): void
+    {
+        $this->isOpen = true;
+    }
+    public function create()
+    {
+        $this->openModal();
+    }
 
     public function closeModal(): void
     {
         $this->isOpen = false;
-        $this->isOpenMode = 'insert';
     }
 
 
@@ -45,7 +51,6 @@ class FormEntryRI extends Component
 
         if ($this->riHdrNo) {
             $this->findData($this->riHdrNo);
-            $this->isOpenMode = 'update';
         }
     }
 

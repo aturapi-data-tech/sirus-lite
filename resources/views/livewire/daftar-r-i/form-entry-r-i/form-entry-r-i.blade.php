@@ -68,22 +68,24 @@
                             wire:loading.attr="disabled" />
                     </div>
 
-                    @if (empty($dataDaftarRi['sep']['noSep']))
-                        <div class="flex justify-between">
-                            <x-green-button :disabled="$disabledPropertyRiStatus" wire:click.prevent="clickrujukanPeserta()"
-                                type="button">
-                                Ambil Nomor SPRI
-                            </x-green-button>
-                            <div wire:loading wire:target="clickrujukanPeserta">
-                                <x-loading />
-                            </div>
+                    {{-- @if (empty($dataDaftarRi['sep']['noSep'])) --}}
+                    <div class="flex justify-between">
+                        <x-green-button :disabled="$disabledPropertyRiStatus" wire:click.prevent="create()" type="button">
+                            Ambil Nomor SPRI
+                        </x-green-button>
+                        <div wire:loading wire:target="create">
+                            <x-loading />
                         </div>
+                    </div>
 
-                        <p class="mt-1 text-xs text-gray-500">
-                            Diisi dengan: Nomor SPRI (Surat Perintah Rawat Inap) dari dokter yang mencetak di aplikasi
-                            P-Care atau Edklaim.
-                        </p>
+                    <p class="mt-1 text-xs text-gray-500">
+                        Diisi dengan: Nomor SPRI (Surat Perintah Rawat Inap) dari dokter yang mencetak di aplikasi
+                        P-Care atau Edklaim.
+                    </p>
+                    @if ($isOpen)
+                        @include('livewire.daftar-r-i.form-entry-r-i.create')
                     @endif
+                    {{-- @endif --}}
 
                 </div>
             </div>
