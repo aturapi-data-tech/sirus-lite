@@ -382,12 +382,12 @@ class SpriRI extends Component
 
                     // 2 cek proses pada getHttp
                     if ($HttpGetBpjs['metadata']['code'] == 200) {
-                        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('KONTROL Post Inap' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+                        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('SPRI Inap' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
                         $this->dataDaftarRi['spri']['noSPRIBPJS'] = $HttpGetBpjs['response']['noSPRI']; //status 200 201 400 ..
 
-                        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('KONTROL Post Inap' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+                        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('SPRI Inap' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
                     } else {
-                        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('KONTROL Post Inap' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+                        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('SPRI Inap' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
                     }
                 }
             } else {
@@ -395,12 +395,12 @@ class SpriRI extends Component
                 $HttpGetBpjs =  VclaimTrait::spri_update($this->dataDaftarRi['spri'])->getOriginalContent();
 
                 if ($HttpGetBpjs['metadata']['code'] == 200) {
-                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('UPDATEKONTROL ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('UPDATESPRI ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
                     // $this->dataDaftarRi['spri']['noSPRIBPJS'] = $HttpGetBpjs['metadata']['response']['noSPRI']; //status 200 201 400 ..
 
-                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('UPDATEKONTROL ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('UPDATESPRI ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
                 } else {
-                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('UPDATEKONTROL ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('UPDATESPRI ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
                 }
             }
         }
