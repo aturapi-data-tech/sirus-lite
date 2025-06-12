@@ -46,46 +46,53 @@
                             @enderror
                         </div>
 
-                        <div>
-                            <x-input-label for="dataDaftarRi.spri.noSPRIBPJS" :value="__('No SPRI BPJS ')" :required="__(false)" />
+                        <div class="grid grid-cols-4 gap-1">
+                            <div class="col-span-2">
+                                <x-input-label for="dataDaftarRi.spri.noSPRIBPJS" :value="__('No SPRI BPJS ')"
+                                    :required="__(false)" />
 
-                            <div class="flex items-center mb-2">
-                                <x-text-input id="dataDaftarRi.spri.noSPRIBPJS" placeholder="No SPRI BPJS "
-                                    class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarRi.spri.noSPRIBPJS'))" :disabled=true
-                                    wire:model.debounce.500ms="dataDaftarRi.spri.noSPRIBPJS" />
+                                <div class="flex items-center mb-2">
+                                    <x-text-input id="dataDaftarRi.spri.noSPRIBPJS" placeholder="No SPRI BPJS "
+                                        class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarRi.spri.noSPRIBPJS'))" :disabled=true
+                                        wire:model.debounce.500ms="dataDaftarRi.spri.noSPRIBPJS" />
 
+                                </div>
+                                @error('dataDaftarRi.spri.noSPRIBPJS')
+                                    <x-input-error :messages=$message />
+                                @enderror
                             </div>
-                            @error('dataDaftarRi.spri.noSPRIBPJS')
-                                <x-input-error :messages=$message />
-                            @enderror
-                        </div>
 
-                        <div>
-                            <x-input-label for="dataDaftarRi.spri.noAntrian" :value="__('No Antrian')" :required="__(false)" />
 
-                            <div class="flex items-center mb-2">
-                                <x-text-input id="dataDaftarRi.spri.noAntrian" placeholder="No Antrian"
-                                    class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarRi.spri.noAntrian'))" :disabled=$disabledPropertyRiStatus
-                                    wire:model.debounce.500ms="dataDaftarRi.spri.noAntrian" />
+                            <div>
+                                <x-input-label for="dataDaftarRi.spri.noAntrian" :value="__('No Antrian')"
+                                    :required="__(false)" />
 
+                                <div class="flex items-center mb-2">
+                                    <x-text-input id="dataDaftarRi.spri.noAntrian" placeholder="No Antrian"
+                                        class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarRi.spri.noAntrian'))" :disabled=$disabledPropertyRiStatus
+                                        wire:model.debounce.500ms="dataDaftarRi.spri.noAntrian" />
+
+                                </div>
+                                @error('dataDaftarRi.spri.noAntrian')
+                                    <x-input-error :messages=$message />
+                                @enderror
                             </div>
-                            @error('dataDaftarRi.spri.noAntrian')
-                                <x-input-error :messages=$message />
-                            @enderror
-                        </div>
 
-                        <div>
-                            <x-input-label for="dataDaftarRi.spri.tglKontrol" :value="__('Tgl Kontrol')" :required="__(true)" />
+                            <div>
+                                <x-input-label for="dataDaftarRi.spri.tglKontrol" :value="__('Tgl Kontrol')"
+                                    :required="__(true)" />
 
-                            <div class="flex items-center mb-2">
-                                <x-text-input id="dataDaftarRi.spri.tglKontrol" placeholder="Tgl Kontrol [dd/mm/yyyy]"
-                                    class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarRi.spri.tglKontrol'))" :disabled=$disabledPropertyRiStatus
-                                    wire:model.debounce.500ms="dataDaftarRi.spri.tglKontrol" />
+                                <div class="flex items-center mb-2">
+                                    <x-text-input id="dataDaftarRi.spri.tglKontrol"
+                                        placeholder="Tgl Kontrol [dd/mm/yyyy]" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarRi.spri.tglKontrol'))"
+                                        :disabled=$disabledPropertyRiStatus
+                                        wire:model.debounce.500ms="dataDaftarRi.spri.tglKontrol" />
 
+                                </div>
+                                @error('dataDaftarRi.spri.tglKontrol')
+                                    <x-input-error :messages=$message />
+                                @enderror
                             </div>
-                            @error('dataDaftarRi.spri.tglKontrol')
-                                <x-input-error :messages=$message />
-                            @enderror
                         </div>
 
                         <div>

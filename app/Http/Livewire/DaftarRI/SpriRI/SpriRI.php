@@ -20,7 +20,7 @@ class SpriRI extends Component
     use WithPagination, EmrRITrait;
     // listener from blade////////////////
     protected $listeners = [
-        'syncronizeAssessmentPerawatRJFindData' => 'mount'
+        'syncronizeAssessmentPerawatRIFindData' => 'mount'
 
     ];
 
@@ -268,7 +268,7 @@ class SpriRI extends Component
         $this->setDataPrimer();
 
         //  off sementara
-        $this->pushSuratKontrolBPJS();
+        $this->pushSuratSpriBPJS();
 
         // Validate RJ
         $this->validateDataRJ();
@@ -361,7 +361,7 @@ class SpriRI extends Component
     // ////////////////
 
 
-    private function pushSuratKontrolBPJS(): void
+    private function pushSuratSpriBPJS(): void
     {
 
 

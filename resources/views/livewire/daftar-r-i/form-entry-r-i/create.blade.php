@@ -51,6 +51,9 @@
                     <livewire:daftar-r-i.spri-r-i.spri-r-i :riHdrNoRef="$dataDaftarRi['riHdrNo']"
                         :wire:key="$dataDaftarRi['riHdrNo'].'form-spri-r-i'">
 
+                        <livewire:daftar-r-i.sep-r-i.sep-r-i :riHdrNoRef="$dataDaftarRi['riHdrNo']"
+                            :wire:key="$dataDaftarRi['riHdrNo'].'form-sep-r-i'">
+
                 </div>
             </div>
 
