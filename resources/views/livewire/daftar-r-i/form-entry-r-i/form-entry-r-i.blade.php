@@ -1,9 +1,6 @@
 @php
-    $disabledProperty = true;
-    $disabledPropertyRiStatus = $statusRiRef['statusId'] !== 'I' ? true : false;
-
+    $disabledPropertyRiStatus = false;
 @endphp
-
 <div>
     {{-- Stop trying to control. --}}
     {{-- @if ($formRujukanRefBPJSStatus)
@@ -14,7 +11,7 @@
     <div id="TransaksiRawatInap" class="px-4">
         <x-border-form :title="'Pendaftaran RI'" :align="'start'" :bgcolor="'bg-white'" class="mr-0">
 
-            <div class="grid grid-cols-2 gap-2">
+            <div class="grid grid-cols-3 gap-2">
                 <div>
                     {{-- Tanggal Masuk --}}
                     <x-input-label :value="'Tanggal Masuk'" />
@@ -22,34 +19,72 @@
                         {{ $dataDaftarRi['entryDate'] ?? '-' }}
                     </div>
                 </div>
-                <div>
+                {{-- <div>
                     <x-input-label :value="'Tanggal Keluar'" />
                     <div class="px-3 py-2 mt-1 ml-2 text-sm text-gray-800 bg-gray-100 border rounded">
                         {{ $dataDaftarRi['exitDate'] ?? '-' }}
+                    </div>
+                </div> --}}
+
+                <div>
+                    {{-- Status Umur di Bawah 14 Tahun --}}
+                    <x-input-label :value="'Status Umur < 14 Tahun'" />
+                    <div class="px-3 py-2 mt-1 ml-2 text-sm text-gray-800 bg-gray-100 border rounded">
+                        {{ ($dataDaftarRi['k14th']['status'] ?? '-') === 'Y' ? 'Ya (di bawah 14 tahun)' : 'Tidak' }}
+                    </div>
+                </div>
+
+                <div>
+                    {{-- Kasus Polisi --}}
+                    <x-input-label :value="'Kasus Polisi'" />
+                    <div class="px-3 py-2 mt-1 ml-2 text-sm text-gray-800 bg-gray-100 border rounded">
+                        {{ ($dataDaftarRi['kPolisi']['status'] ?? '-') === 'Y' ? 'Ya (kasus polisi)' : 'Tidak' }}
                     </div>
                 </div>
             </div>
 
             {{-- Pasien --}}
-            <x-input-label :value="'Nomor Registrasi Pasien'" />
+            {{-- <x-input-label :value="'Nomor Registrasi Pasien'" />
             <div class="px-3 py-2 mt-1 ml-2 text-sm text-gray-800 bg-gray-100 border rounded">
                 {{ $dataDaftarRi['regNo'] ?? '-' }}
-            </div>
+            </div> --}}
 
             <div class="grid grid-cols-2 gap-2">
                 <div>
                     {{-- Jenis Klaim --}}
                     <x-input-label :value="'Jenis Klaim'" />
                     <div class="px-3 py-2 mt-1 ml-2 text-sm text-gray-800 bg-gray-100 border rounded">
-                        {{ $JenisKlaim['JenisKlaimId'] ?? '-' }} - {{ $JenisKlaim['JenisKlaimDesc'] ?? '-' }}
+                        {{ $dataDaftarRi['klaimId'] ?? '-' }} - {{ $dataDaftarRi['klaimDesc'] ?? '-' }}
                     </div>
                 </div>
                 <div>
                     {{-- No Referensi --}}
-                    <x-input-label :value="'No Referensi'" />
-                    <div class="px-3 py-2 mt-1 ml-2 text-sm text-gray-800 bg-gray-100 border rounded">
-                        {{ $dataDaftarRi['noReferensi'] ?? '-' }}
+                    {{-- Nomor SPRI --}}
+                    <x-input-label :value="'Nomor SPRI'" :required="true" />
+
+                    <div class="flex items-center mb-2">
+                        <x-text-input placeholder="Nomor SPRI (SKDP Dokter)" class="mt-1 ml-2" :errorshas="$errors->has('dataDaftarRi.noReferensi')"
+                            :disabled="$disabledPropertyRiStatus || filled($dataDaftarRi['sep']['noSep'] ?? null)" wire:model.debounce.500ms="dataDaftarRi.noReferensi"
+                            wire:loading.attr="disabled" />
                     </div>
+
+                    @if (empty($dataDaftarRi['sep']['noSep']))
+                        <div class="flex justify-between">
+                            <x-green-button :disabled="$disabledPropertyRiStatus" wire:click.prevent="clickrujukanPeserta()"
+                                type="button">
+                                Ambil Nomor SPRI
+                            </x-green-button>
+                            <div wire:loading wire:target="clickrujukanPeserta">
+                                <x-loading />
+                            </div>
+                        </div>
+
+                        <p class="mt-1 text-xs text-gray-500">
+                            Diisi dengan: Nomor SPRI (Surat Perintah Rawat Inap) dari dokter yang mencetak di aplikasi
+                            P-Care atau Edklaim.
+                        </p>
+                    @endif
+
                 </div>
             </div>
 
@@ -65,7 +100,7 @@
                 {{ $dataDaftarRi['entryId'] ?? '-' }} - {{ $dataDaftarRi['entryDesc'] ?? '-' }}
             </div>
 
-            <div class="grid grid-cols-3 gap-2">
+            <div class="grid grid-cols-2 gap-2">
                 <div>
                     {{-- Bangsal --}}
                     <x-input-label :value="'Bangsal'" />
@@ -81,12 +116,13 @@
                         {{ $dataDaftarRi['roomId'] ?? '-' }} - {{ $dataDaftarRi['roomDesc'] ?? '-' }}
                     </div>
                 </div>
-                <div>
-                    {{-- Nomor Bed --}}
-                    <x-input-label :value="'Nomor Bed'" />
-                    <div class="px-3 py-2 mt-1 ml-2 text-sm text-gray-800 bg-gray-100 border rounded">
-                        {{ $dataDaftarRi['bedNo'] ?? '-' }}
-                    </div>
+            </div>
+
+            <div>
+                {{-- Nomor Bed --}}
+                <x-input-label :value="'Nomor Bed'" />
+                <div class="px-3 py-2 mt-1 ml-2 text-sm text-gray-800 bg-gray-100 border rounded">
+                    {{ $dataDaftarRi['bedNo'] ?? '-' }}
                 </div>
             </div>
 
