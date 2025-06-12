@@ -169,6 +169,9 @@ class SepRI extends Component
                     'vno_sep' => $this->dataDaftarRi['sep']['noSep'] ?? '',
                 ]);
 
+            $this->updateDataRi($this->riHdrNoRef);
+
+
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('SEP ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
         } else {
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('SEP ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
@@ -227,7 +230,7 @@ class SepRI extends Component
         } else {
             $this->pushUpdateSEP($this->dataDaftarRi['sep']['reqSep'] ?? []);
         }
-        $this->updateDataRi($this->dataDaftarRi['riHdrNo']);
+
         // Logic update mode start //////////
 
         $this->emit('syncronizeAssessmentPerawatRIFindData');
