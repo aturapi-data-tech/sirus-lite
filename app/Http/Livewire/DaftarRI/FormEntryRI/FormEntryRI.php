@@ -37,7 +37,7 @@ class FormEntryRI extends Component
     {
         $this->isOpen = false;
     }
-
+    public function cetakSEP(): void {}
 
 
 

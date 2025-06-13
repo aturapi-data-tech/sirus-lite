@@ -142,7 +142,9 @@
                 <livewire:cetak.cetak-etiket :regNo="$dataPasienRegNo" :wire:key="$dataPasienRegNo" />
                 <x-yellow-button wire:click.prevent="cetakSEP()" type="button" wire:loading.remove>Cetak
                     SEP</x-yellow-button>
-                <div wire:loading wire:target="cetakSEP"><x-loading /></div>
+                <div wire:loading wire:target="cetakSEP">
+                    <x-loading />
+                </div>
             </div>
 
         </x-border-form>
