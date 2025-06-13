@@ -217,7 +217,7 @@ class SpriRI extends Component
 
 
     // validate Data RJ//////////////////////////////////////////////////
-    private function validateDataRJ(): void
+    private function validateDataSPRI(): void
     {
         // customErrorMessages
         $messages = customErrorMessagesTrait::messages();
@@ -267,14 +267,10 @@ class SpriRI extends Component
         // set data RiHdrNo / NoBooking / NoAntrian / klaimId / kunjunganId
         $this->setDataPrimer();
 
-        //  off sementara
+        $this->validateDataSPRI();
+
         $this->pushSuratSpriBPJS();
 
-        // Validate RJ
-        $this->validateDataRJ();
-
-        // Logic update mode start //////////
-        $this->updateDataRI($this->dataDaftarRi['riHdrNo']);
         $this->emit('syncronizeAssessmentPerawatRJFindData');
     }
 
@@ -384,6 +380,8 @@ class SpriRI extends Component
                     if ($HttpGetBpjs['metadata']['code'] == 200) {
                         toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('SPRI Inap' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
                         $this->dataDaftarRi['spri']['noSPRIBPJS'] = $HttpGetBpjs['response']['noSPRI']; //status 200 201 400 ..
+                        // Logic update mode start //////////
+                        $this->updateDataRI($this->dataDaftarRi['riHdrNo']);
 
                         toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('SPRI Inap' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
                     } else {
@@ -397,7 +395,8 @@ class SpriRI extends Component
                 if ($HttpGetBpjs['metadata']['code'] == 200) {
                     toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('UPDATESPRI ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
                     // $this->dataDaftarRi['spri']['noSPRIBPJS'] = $HttpGetBpjs['metadata']['response']['noSPRI']; //status 200 201 400 ..
-
+                    // Logic update mode start //////////
+                    $this->updateDataRI($this->dataDaftarRi['riHdrNo']);
                     toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('UPDATESPRI ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
                 } else {
                     toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('UPDATESPRI ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
