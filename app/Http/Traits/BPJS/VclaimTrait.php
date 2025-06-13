@@ -776,6 +776,32 @@ trait VclaimTrait
     }
 
 
+    public static function suratkontrol_nomor($noSPRI)
+    {
+        $messages = customErrorMessagesTrait::messages();
+        $r = ['noSuratKontrol' => $noSPRI];
+        $validator = Validator::make($r, ["noSuratKontrol" => "required"], $messages);
+
+        if ($validator->fails()) {
+            return self::sendError($validator->errors()->first(), $validator->errors(), 201, null, null);
+        }
+
+        try {
+
+            $url = env('VCLAIM_URL') . "RencanaKontrol/noSuratKontrol/" . $noSPRI;
+
+            $signature = self::signature();
+            $response = Http::timeout(10)
+                ->withHeaders($signature)
+                ->get($url);
+
+            return self::response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
+            /////////////////////////////////////////////////////////////////////////////
+        } catch (Exception $e) {
+            return self::sendError($e->getMessage(), $validator->errors(), 408, $url, null);
+        }
+    }
+
 
 
 
@@ -818,19 +844,7 @@ trait VclaimTrait
         $response = Http::withHeaders($signature)->delete($url, $data);
         return self::response_decrypt($response, $signature, null, null);
     }
-    public static function suratkontrol_nomor(Request $request)
-    {
-        $validator = Validator::make(request()->all(), [
-            "noSuratKontrol" => "required",
-        ]);
-        if ($validator->fails()) {
-            return self::sendError($validator->errors()->first(), null, 201, null, null);
-        }
-        $url = env('VCLAIM_URL') . "RencanaKontrol/noSuratKontrol/" . $request->noSuratKontrol;
-        $signature = self::signature();
-        $response = Http::withHeaders($signature)->get($url);
-        return self::response_decrypt($response, $signature, null, null);
-    }
+
     public static function suratkontrol_peserta(Request $request)
     {
         $validator = Validator::make(request()->all(), [
@@ -1040,8 +1054,8 @@ trait VclaimTrait
             "ppkRujukan" => $SEPJsonReq['request']['t_sep']['rujukan']['ppkRujukan'],
             "catatan" => $SEPJsonReq['request']['t_sep']['catatan'],
             "diagAwal" => $SEPJsonReq['request']['t_sep']['diagAwal'],
-            "tujuan" => $SEPJsonReq['request']['t_sep']['poli']['tujuan'],
-            "eksekutif" => $SEPJsonReq['request']['t_sep']['poli']['eksekutif'],
+            "tujuan" => $SEPJsonReq['request']['t_sep']['poli']['tujuan'] ?? '',
+            "eksekutif" => $SEPJsonReq['request']['t_sep']['poli']['eksekutif'] ?? '',
             "tujuanKunj" => $SEPJsonReq['request']['t_sep']['tujuanKunj'],
             // "flagProcedure" => $SEPJsonReq['request']['t_sep']['flagProcedure'],
             // "kdPenunjang" => $SEPJsonReq['request']['t_sep']['kdPenunjang'],

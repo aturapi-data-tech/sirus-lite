@@ -9,6 +9,7 @@ use Livewire\WithPagination;
 use Carbon\Carbon;
 
 use App\Http\Traits\BPJS\VclaimTrait;
+use App\Http\Traits\MasterPasien\MasterPasienTrait;
 
 use App\Http\Traits\EmrRI\EmrRITrait;
 
@@ -16,7 +17,7 @@ use App\Http\Traits\EmrRI\EmrRITrait;
 
 class SepRI extends Component
 {
-    use WithPagination, EmrRITrait;
+    use WithPagination, EmrRITrait, MasterPasienTrait;
     // listener from blade////////////////
     protected $listeners = [
         'syncronizeAssessmentPerawatRIFindData' => 'mount'
@@ -35,37 +36,37 @@ class SepRI extends Component
 
 
 
-    private function rujukanPesertaFKTL($idBpjs): array
+    private function rujukanPesertaSPRI($noSPRI): array
     {
-        $HttpGetBpjs =  VclaimTrait::rujukan_rs_peserta($idBpjs)->getOriginalContent();
-
+        $HttpGetBpjs =  VclaimTrait::suratkontrol_nomor($noSPRI)->getOriginalContent();
         if ($HttpGetBpjs['metadata']['code'] == 200) {
-            $dataRefBPJSLov = json_decode(json_encode($HttpGetBpjs['response']['rujukan'], true), true);
+            $dataRefRujukanSPRIBPJS = json_decode(json_encode($HttpGetBpjs['response'], true), true);
         } else {
-            $dataRefBPJSLov = [];
+            $dataRefRujukanSPRIBPJS = [];
         }
 
-        return $dataRefBPJSLov;
+        return $dataRefRujukanSPRIBPJS;
     }
+
+    private function pesertaNomorKartu($idBpjs, $tanggal): array
+    {
+        $HttpGetBpjs =  VclaimTrait::peserta_nomorkartu($idBpjs, $tanggal)->getOriginalContent();
+        // metadata d kecil
+        if ($HttpGetBpjs['metadata']['code'] == 200) {
+            $dataRefPeserta = json_decode(json_encode($HttpGetBpjs['response'], true), true);
+        } else {
+            $dataRefPeserta = [];
+        }
+        return $dataRefPeserta;
+    }
+
 
     public function setSEPJsonReqRI($riHdrNo): void
     {
         try {
-            // 1. Ambil data pasien
-            $findData = DB::table('rsview_rihdrs')
-                ->join('rsmst_pasiens', 'rsview_rihdrs.reg_no', '=', 'rsmst_pasiens.reg_no')
-                ->select('rsmst_pasiens.nokartu_bpjs')
-                ->where('rsview_rihdrs.rihdr_no', $riHdrNo)
-                ->first();
 
-            if (!$findData || empty($findData->nokartu_bpjs)) {
-                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-                    ->addError("Data BPJS pasien tidak ditemukan untuk RI No: {$riHdrNo}");
-                return;
-            }
-
-            $idBpjs = $findData->nokartu_bpjs;
             $noSPRI = $this->dataDaftarRi['spri']['noSPRIBPJS'] ?? null;
+            $noKartu = $this->dataDaftarRi['spri']['noKartu'] ?? null;
 
             if (empty($noSPRI)) {
                 toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
@@ -74,72 +75,61 @@ class SepRI extends Component
             }
 
             // 2. Ambil data rujukan peserta
-            $allRujukan = $this->rujukanPesertaFKTL($idBpjs);
-            $dataRefBPJSLov = collect($allRujukan)->where('noKunjungan', $noSPRI)->first();
+            $dataRefRujukanSPRIBPJS = $this->rujukanPesertaSPRI($noSPRI);
 
-            if (!$dataRefBPJSLov) {
+            if (!$dataRefRujukanSPRIBPJS) {
                 toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
                     ->addError("Data rujukan peserta berdasarkan nomor SPRI {$noSPRI} tidak ditemukan.");
                 return;
             }
 
-            $kodeDPJP = $this->dataDaftarRi['spri']['drKontrolBPJS'] ?? '';
+            $tanggal = Carbon::now(env('APP_TIMEZONE'))->format('Y-m-d');
+            $dataRefPesertaBPJS = $this->pesertaNomorKartu($noKartu, $tanggal);
+
+            if (!$dataRefPesertaBPJS) {
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addError("Data peserta berdasarkan nomor kartu {$noKartu} tidak ditemukan.");
+                return;
+            }
+
+            $dataPasien = $this->findDataMasterPasien($this->dataDaftarRi['regNo'] ?? '');
+
             // 4. Susun payload reqSep
             $this->dataDaftarRi['sep']['reqSep'] = [
                 "request" => [
                     "t_sep" => [
-                        "noKartu" => $dataRefBPJSLov['peserta']['noKartu'] ?? '',
-                        "tglSep" => Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarRi['entryDate'], env('APP_TIMEZONE'))->format('Y-m-d'),
+                        "noKartu" => $noKartu ?? '',
+                        "tglSep" => Carbon::parse($this->dataDaftarRi['entryDate'])->format('Y-m-d'),
                         "ppkPelayanan" => "0184R006",
                         "jnsPelayanan" => "1",
                         "klsRawat" => [
-                            "klsRawatHak" => $dataRefBPJSLov['peserta']['hakKelas']['kode'] ?? '',
+                            "klsRawatHak" => $dataRefPesertaBPJS['response']['peserta']['hakKelas']['kode'] ?? '',
                             "klsRawatNaik" => "",
                             "pembiayaan" => "",
                             "penanggungJawab" => ""
                         ],
-                        "noMR" => $dataRefBPJSLov['peserta']['mr']['noMR'] ?? '',
+                        "noMR" => $dataPasien['pasien']['regNo'] ?? '', // fungsi ambil dari master pasien
                         "rujukan" => [
                             "asalRujukan" => "2",
-                            "tglRujukan" => $dataRefBPJSLov['tglKunjungan'] ?? '',
-                            "noRujukan" => $dataRefBPJSLov['noKunjungan'] ?? '',
-                            "ppkRujukan" => $dataRefBPJSLov['provPerujuk']['kode'] ?? ''
+                            "tglRujukan" => $dataRefRujukanSPRIBPJS['tglRencanaKontrol'] ?? '',
+                            "noRujukan" => $dataRefRujukanSPRIBPJS['noSuratKontrol'] ?? '',
+                            "ppkRujukan" => "0184R006"
                         ],
                         "catatan" => "-",
-                        "diagAwal" => $dataRefBPJSLov['diagnosa']['kode'] ?? '',
-                        "cob" => [
-                            "cob" => "0"
-                        ],
-                        "katarak" => [
-                            "katarak" => "0"
-                        ],
-                        "jaminan" => [
-                            "lakaLantas" => "0",
-                            "noLP" => "",
-                            "penjamin" => [
-                                "tglKejadian" => "",
-                                "keterangan" => "",
-                                "suplesi" => [
-                                    "suplesi" => "0",
-                                    "noSepSuplesi" => "",
-                                    "lokasiLaka" => [
-                                        "kdPropinsi" => "",
-                                        "kdKabupaten" => "",
-                                        "kdKecamatan" => ""
-                                    ]
-                                ]
-                            ]
-                        ],
+                        "diagAwal" => "-",
+                        "cob" => ["cob" => "0"],
+                        "katarak" => ["katarak" => "0"],
+                        "jaminan" => [ /* sama seperti punyamu */],
                         "tujuanKunj" => "0",
                         "flagProcedure" => "",
                         "kdPenunjang" => "",
                         "assesmentPel" => "",
                         "skdp" => [
-                            "noSurat" => $noSPRI,
-                            "kodeDPJP" => $kodeDPJP
+                            "noSurat" => $dataRefRujukanSPRIBPJS['noSuratKontrol'],
+                            "kodeDPJP" => $dataRefRujukanSPRIBPJS['kodeDokter']
                         ],
-                        "dpjpLayan" => "",
-                        "noTelp" => $dataRefBPJSLov['peserta']['mr']['noTelepon'] ?? '',
+                        "dpjpLayan" => $dataRefRujukanSPRIBPJS['kodeDokter'],
+                        "noTelp" => $dataPasien['pasien']['kontak']['nomerTelponSelulerPasien'] ?? '',
                         "user" => "sirus App"
                     ]
                 ]
@@ -226,6 +216,11 @@ class SepRI extends Component
     {
         // lakukan jika noSep masih kosong
         if (empty($this->dataDaftarRi['sep']['noSep'])) {
+
+            if (empty($this->dataDaftarRi['sep']['reqSep'])) {
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Form SEP Masih Kosong');
+                return;
+            }
             $this->pushInsertSEP($this->dataDaftarRi['sep']['reqSep'] ?? []);
         } else {
             $this->pushUpdateSEP($this->dataDaftarRi['sep']['reqSep'] ?? []);
