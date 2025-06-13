@@ -12,12 +12,13 @@
                     <x-border-form :title="__($myTitle)" :align="__('start')" :bgcolor="__('bg-white')" class="mr-0">
 
                         {{-- No Kartu & No MR --}}
-                        <div class='grid items-center grid-cols-2 gap-4 mb-2'>
+                        <div class='grid items-center grid-cols-3 gap-4 mb-2'>
                             <x-input-label for="dataDaftarRi.sep.reqSep.noKartu" :value="__('No Kartu BPJS')" :required="true" />
                             <x-input-label for="dataDaftarRi.sep.reqSep.noMR" :value="__('No Rekam Medis')" :required="true" />
+                            <x-input-label for="dataDaftarRi.sep.noSep" :value="'Nomor SEP'" :required="true" />
                         </div>
 
-                        <div class="grid items-center grid-cols-2 gap-2 mb-2">
+                        <div class="grid items-center grid-cols-3 gap-2 mb-2">
                             <x-text-input id="dataDaftarRi.sep.reqSep.noKartu" placeholder="No Kartu BPJS"
                                 class="mt-1 ml-2" :errorshas="$errors->has('dataDaftarRi.sep.reqSep.noKartu')" :disabled="$disabledPropertyRiStatus"
                                 wire:model.debounce.500ms="dataDaftarRi.sep.reqSep.noKartu" />
@@ -25,6 +26,10 @@
                             <x-text-input id="dataDaftarRi.sep.reqSep.noMR" placeholder="No Rekam Medis"
                                 class="mt-1 ml-2" :errorshas="$errors->has('dataDaftarRi.sep.reqSep.noMR')" :disabled="$disabledPropertyRiStatus"
                                 wire:model.debounce.500ms="dataDaftarRi.sep.reqSep.noMR" />
+
+                            <x-text-input id="dataDaftarRi.sep.noSep" placeholder="Nomor SEP" class="mt-1 ml-2"
+                                :errorshas="$errors->has('dataDaftarRi.sep.noSep')" :disabled="true"
+                                wire:model.debounce.500ms="dataDaftarRi.sep.noSep" />
                         </div>
 
                         {{-- Tanggal SEP & Tanggal Rujukan --}}
@@ -112,13 +117,15 @@
 
             <div class="sticky bottom-0 flex justify-between px-4 py-3 bg-gray-50 sm:px-6">
                 <div>
-                    <div wire:loading wire:target="setSEPJsonReqRI">
-                        <x-loading />
-                    </div>
-                    <x-yellow-button :disabled="$disabledPropertyRiStatus" wire:click.prevent="setSEPJsonReqRI('{{ $riHdrNoRef }}')"
-                        type="button" wire:loading.remove>
-                        setSEP RI
-                    </x-yellow-button>
+                    @if (empty($dataDaftarRi['sep']['noSep']))
+                        <div wire:loading wire:target="setSEPJsonReqRI()">
+                            <x-loading />
+                        </div>
+                        <x-yellow-button :disabled="$disabledPropertyRiStatus" wire:click.prevent="setSEPJsonReqRI('{{ $riHdrNoRef }}')"
+                            type="button" wire:loading.remove>
+                            setSEP RI
+                        </x-yellow-button>
+                    @endif
                 </div>
                 <div>
                     <div wire:loading wire:target="store">
