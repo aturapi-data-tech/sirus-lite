@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\DaftarRI\FormEntryRI;
 
 use App\Http\Traits\EmrRI\EmrRITrait;
+use Illuminate\Support\Facades\DB;
 
 use Livewire\Component;
 
@@ -30,6 +31,18 @@ class FormEntryRI extends Component
     }
     public function create()
     {
+        $klaimStatus = DB::table('rsmst_klaimtypes')
+            ->where('klaim_id', $this->dataDaftarRi['klaimId'] ?? '')
+            ->value('klaim_status') ?? 'UMUM';
+
+        if ($klaimStatus !== 'BPJS') {
+            toastr()->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addWarning('Form hanya dapat dibuka jika jenis klaim adalah Jaminan (JM).');
+            return;
+        }
+
         $this->openModal();
     }
 
