@@ -19,8 +19,8 @@ class EmrRJHari extends Component
     use WithPagination, EmrRJTrait, MasterPasienTrait;
     public $file;
     // primitive Variable
-    public string $myTitle = 'Upload FIle Rekam Medis Harian';
-    public string $mySnipt = 'Rekam Medis Pasien';
+    public string $myTitle = 'Upload FIle Rawat Jalan Harian';
+    public string $mySnipt = 'Rawat Jalan Pasien';
     public string $myProgram = 'Pasien Rawat Jalan Harian';
 
     public array $myLimitPerPages = [100, 200, 300, 400, 500];
@@ -553,6 +553,7 @@ class EmrRJHari extends Component
         $query->where(function ($q) use ($mySearch) {
             $q->Where(DB::raw('upper(reg_name)'), 'like', '%' . strtoupper($mySearch) . '%')
                 ->orWhere(DB::raw('upper(reg_no)'), 'like', '%' . strtoupper($mySearch) . '%')
+                ->orWhere(DB::raw('upper(vno_sep)'), 'like', '%' . strtoupper($mySearch) . '%')
                 ->orWhere(DB::raw('upper(dr_name)'), 'like', '%' . strtoupper($mySearch) . '%');
         })
             ->orderBy('rj_date1',  'desc')

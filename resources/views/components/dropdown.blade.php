@@ -26,6 +26,7 @@
             '48' => 'w-48',
             '64' => 'w-64',
             '96' => 'w-96',
+            '500' => 'w-[500px]',
         ][$width] ?? 'w-48'; // Default ke w-48 jika width tidak valid
 
 @endphp
