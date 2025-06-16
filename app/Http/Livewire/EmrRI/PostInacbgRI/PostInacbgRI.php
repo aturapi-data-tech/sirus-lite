@@ -178,7 +178,7 @@ class PostInacbgRI extends Component
         // 1. Ambil data kunjungan & pasien
         $dataDaftarRi = $this->findDataRI($this->riHdrNoRef) ?? [];
 
-        $drName = collect($this->dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokter'])
+        $drName = collect($dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokter'])
             ->firstWhere('levelDokter', 'Utama')['drName'] ?? '-';
 
         // 2. Cek: apakah set_claim_data dikirim ulang
