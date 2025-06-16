@@ -341,9 +341,9 @@ class PostInacbgRI extends Component
                 ->first();
 
 
-            $roomPriceTotal      = $rsRoom->total_room_price ?? 0;
-            $perawatanPriceTotal = $rsRoom->total_perawatan_price ?? 0;
-            $commonServiceTotal  = $rsRoom->total_common_service ?? 0;
+            $roomPriceTotal      = $roomSummary->total_room_price ?? 0;
+            $perawatanPriceTotal = $roomSummary->total_perawatan_price ?? 0;
+            $commonServiceTotal  = $roomSummary->total_common_service ?? 0;
 
             // 9) Obat Kronis
             //— jika di view belum ada kategori khusus, bisa 0 atau ambil logika terpisah

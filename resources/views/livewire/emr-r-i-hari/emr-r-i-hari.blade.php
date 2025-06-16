@@ -83,6 +83,33 @@
                     @enderror
                 </div>
 
+                {{-- Status Klaim --}}
+                <div class="ml-4">
+                    <x-dropdown align="right" :width="__('80')" :contentclasses="__('overflow-auto max-h-[150px] py-1 bg-white dark:bg-gray-700')">
+                        <x-slot name="trigger">
+                            {{-- Button Status Klaim --}}
+                            <x-alternative-button class="inline-flex whitespace-nowrap">
+                                <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
+                                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                    <path clip-rule="evenodd" fill-rule="evenodd"
+                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                                </svg>
+                                <span class="font-semibold">{{ $myTopBar['klaimStatusName'] }}</span>
+                            </x-alternative-button>
+                        </x-slot>
+                        {{-- Open shiftcontent --}}
+                        <x-slot name="content">
+
+                            @foreach ($myTopBar['klaimStatusOptions'] as $dr)
+                                <x-dropdown-link
+                                    wire:click="settermyTopBarklaimStatusOptions('{{ $dr['klaimStatusId'] }}','{{ addslashes($dr['klaimStatusName']) }}')">
+                                    {{ __($dr['klaimStatusName']) }}
+                                </x-dropdown-link>
+                            @endforeach
+                        </x-slot>
+                    </x-dropdown>
+                </div>
+
 
             </div>
 
@@ -114,31 +141,6 @@
             </div>
 
 
-            @if ($isOpen)
-                @include('livewire.emr-r-i.create-emr-r-i')
-            @endif
-
-            @if ($isOpenDokter)
-                @include('livewire.emr-r-i.create-emr-r-i-dokter')
-            @endif
-
-            @if ($isOpenGeneralConsentPasienRI)
-                @include('livewire.emr-r-i.create-general-consent-r-i-pasien')
-            @endif
-
-            @if ($isOpenEdukasiPasienRI)
-                @include('livewire.emr-r-i.create-edukasi-r-i-pasien')
-            @endif
-
-
-            {{-- @if ($isOpenInap)
-                @include('livewire.emr-r-i.create-emr-r-i-inap')
-            @endif --}}
-
-            {{-- @if ($isOpenScreening)
-                @include('livewire.emr-r-i.create-screening-r-i')
-            @endif --}}
-
         </div>
         {{-- Top Bar --}}
 
@@ -152,13 +154,13 @@
             <table class="w-full text-sm text-left text-gray-700 table-auto">
                 <thead class="sticky top-0 text-xs text-gray-900 uppercase bg-gray-100 ">
                     <tr>
-                        <th scope="col" class="w-1/5 px-4 py-3 ">
+                        <th scope="col" class="w-2/6 px-4 py-3 ">
                             Pasien
                         </th>
-                        <th scope="col" class="w-3/5 px-4 py-3 ">
+                        <th scope="col" class="w-3/6 px-4 py-3 ">
                             Inap
                         </th>
-                        <th scope="col" class="w-1/5 px-4 py-3 ">
+                        <th scope="col" class="w-1/6 px-4 py-3 ">
                             Status Layanan
                         </th>
                         <th scope="col" class="w-32 px-4 py-3 ">
@@ -269,6 +271,10 @@
                                         </div>
                                     @endif
 
+                                    <div class="p-2 m-2 bg-gray-200 rounded-lg">
+                                        @include('livewire.emr-r-i-hari.emr-r-i-hari-inacbg-rs-table')
+                                    </div>
+
                                 </div>
                             </td>
 
@@ -276,7 +282,7 @@
                             <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap ">
                                 <div class="grid grid-cols-4 gap-2">
                                     <div class="col-span-3">
-                                        @include('livewire.emr-r-i.emr-r-i-leveling-dokter-table')
+                                        @include('livewire.emr-r-i-hari.emr-r-i-hari-leveling-dokter-table')
                                     </div>
                                     <div class="col-span-1">
                                         <div class="font-semibold text-gray-900">
@@ -366,39 +372,40 @@
                             </td>
 
                             <td class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-primary">
+                                @if ($myTopBar['klaimStatusId'] === 'BPJS')
+                                    <div class="flex justify-end w-1/2 pt-8">
+                                        <x-dropdown align="right" width="500"
+                                            contentclasses="overflow-auto max-h-[500px] py-1 bg-white dark:bg-gray-700">
+                                            <x-slot name="trigger">
+                                                {{-- Button myLimitPerPage --}}
+                                                <x-alternative-button class="inline-flex">
+                                                    <svg class="w-6 h-6 text-gray-800 dark:text-white"
+                                                        aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                                        width="24" height="24" fill="none"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke="currentColor" stroke-linecap="round"
+                                                            stroke-linejoin="round" stroke-width="2"
+                                                            d="M15 17h3a3 3 0 0 0 0-6h-.025a5.56 5.56 0 0 0 .025-.5A5.5 5.5 0 0 0 7.207 9.021C7.137 9.017 7.071 9 7 9a4 4 0 1 0 0 8h2.167M12 19v-9m0 0-2 2m2-2 2 2" />
+                                                    </svg>
+                                                </x-alternative-button>
+                                            </x-slot>
+                                            {{-- Open myLimitPerPagecontent --}}
+                                            <x-slot name="content">
 
-                                <div class="flex justify-end w-1/2 pt-8">
-                                    <x-dropdown align="right" width="500"
-                                        contentclasses="overflow-auto max-h-[500px] py-1 bg-white dark:bg-gray-700">
-                                        <x-slot name="trigger">
-                                            {{-- Button myLimitPerPage --}}
-                                            <x-alternative-button class="inline-flex">
-                                                <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
-                                                    xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                    fill="none" viewBox="0 0 24 24">
-                                                    <path stroke="currentColor" stroke-linecap="round"
-                                                        stroke-linejoin="round" stroke-width="2"
-                                                        d="M15 17h3a3 3 0 0 0 0-6h-.025a5.56 5.56 0 0 0 .025-.5A5.5 5.5 0 0 0 7.207 9.021C7.137 9.017 7.071 9 7 9a4 4 0 1 0 0 8h2.167M12 19v-9m0 0-2 2m2-2 2 2" />
-                                                </svg>
-                                            </x-alternative-button>
-                                        </x-slot>
-                                        {{-- Open myLimitPerPagecontent --}}
-                                        <x-slot name="content">
-
-                                            {{-- <li>
+                                                {{-- <li>
                                                 <x-dropdown-link> --}}
-                                            <div class="grid grid-cols-1 gap-2 p-2">
-                                                <livewire:emr-r-i.post-inacbg-r-i.post-inacbg-r-i :riHdrNoRef="$myQData->rihdr_no"
-                                                    :groupingCount="$myQData->riuploadbpjs_grouping_count ?? 0"
-                                                    :wire:key="'post-inacbg-r-i-'.$myQData->rihdr_no">
-                                            </div>
-                                            {{-- </x-dropdown-link>
+                                                <div class="grid grid-cols-1 gap-2 p-2">
+                                                    <livewire:emr-r-i.post-inacbg-r-i.post-inacbg-r-i :riHdrNoRef="$myQData->rihdr_no"
+                                                        :groupingCount="$myQData->riuploadbpjs_grouping_count ?? 0"
+                                                        :wire:key="'post-inacbg-r-i-'.$myQData->rihdr_no">
+                                                </div>
+                                                {{-- </x-dropdown-link>
                                             </li> --}}
 
-                                        </x-slot>
-                                    </x-dropdown>
-                                </div>
-
+                                            </x-slot>
+                                        </x-dropdown>
+                                    </div>
+                                @endif
                             </td>
                         </tr>
                     @endforeach

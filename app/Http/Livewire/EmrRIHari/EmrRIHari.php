@@ -62,7 +62,24 @@ class EmrRIHari extends Component
         ],
         'drId' => '',
         'drName' => '',
-        'drOptions' => []
+        'drOptions' => [],
+
+        'klaimStatusId' => 'BPJS',
+        'klaimStatusName' => 'BPJS',
+        'klaimStatusOptions' => [
+            [
+                'klaimStatusId' => 'UMUM',
+                'klaimStatusName' => 'UMUM'
+            ],
+            [
+                'klaimStatusId' => 'BPJS',
+                'klaimStatusName' => 'BPJS'
+            ],
+            [
+                'klaimStatusId' => 'KRONIS',
+                'klaimStatusName' => 'KRONIS'
+            ],
+        ],
     ];
 
     public string $refFilter = '';
@@ -109,308 +126,25 @@ class EmrRIHari extends Component
 
 
 
-    // open and close modal start////////////////
     //  modal status////////////////
-    public bool $isOpen = false;
-    public string $isOpenMode = 'insert';
-
-    public bool $isOpenDokter = false;
-    public string $isOpenModeDokter = 'insert';
-
-    public bool $isOpenInap = false;
-    public string $isOpenModeInap = 'insert';
-
-    public bool $isOpenGeneralConsentPasienRI = false;
-    public string $isOpenModeGeneralConsentPasienRI = 'insert';
-
-    public bool $isOpenEdukasiPasienRI = false;
-    public string $isOpenModeEdukasiPasienRI = 'insert';
-
-    public bool $isOpenScreening = false;
-    public string $isOpenModeScreening = 'insert';
-
-    public bool $forceInsertRecord = false;
 
     public int $riHdrNoRef;
     public string $regNoRef;
-
-    //
-    private function openModal(): void
-    {
-        $this->isOpen = true;
-        $this->isOpenMode = 'insert';
-    }
-    private function openModalEdit($riHdrNo, $regNoRef): void
-    {
-        $this->isOpen = true;
-        $this->isOpenMode = 'update';
-        $this->riHdrNoRef = $riHdrNo;
-        $this->regNoRef = $regNoRef;
-    }
-
-    private function openModalEditDokter($riHdrNo, $regNoRef): void
-    {
-        $this->isOpenDokter = true;
-        $this->isOpenModeDokter = 'update';
-        $this->riHdrNoRef = $riHdrNo;
-        $this->regNoRef = $regNoRef;
-    }
-
-    private function openModalEditGeneralConsentPasienRI($riHdrNo, $regNoRef): void
-    {
-        $this->isOpenGeneralConsentPasienRI = true;
-        $this->isOpenModeGeneralConsentPasienRI = 'update';
-        $this->riHdrNoRef = $riHdrNo;
-        $this->regNoRef = $regNoRef;
-    }
-
-    private function openModalEditEdukasiPasienRI($riHdrNo, $regNoRef): void
-    {
-        $this->isOpenEdukasiPasienRI = true;
-        $this->isOpenModeEdukasiPasienRI = 'update';
-        $this->riHdrNoRef = $riHdrNo;
-        $this->regNoRef = $regNoRef;
-    }
-
-    private function openModalEditInap($riHdrNo, $regNoRef): void
-    {
-        $this->isOpenInap = true;
-        $this->isOpenModeInap = 'update';
-        $this->riHdrNoRef = $riHdrNo;
-        $this->regNoRef = $regNoRef;
-    }
-
-    private function openModalEditScreening($riHdrNo, $regNoRef): void
-    {
-        $this->isOpenScreening = true;
-        $this->isOpenModeScreening = 'update';
-        $this->riHdrNoRef = $riHdrNo;
-        $this->regNoRef = $regNoRef;
-    }
-
-    private function openModalTampil(): void
-    {
-        $this->isOpen = true;
-        $this->isOpenMode = 'tampil';
-    }
-
-    public function closeModal(): void
-    {
-        $this->isOpen = false;
-        $this->isOpenMode = 'insert';
-        $this->resetInputFields();
-    }
-
-    public function closeModalDokter(): void
-    {
-        $this->isOpenDokter = false;
-        $this->isOpenModeDokter = 'insert';
-        $this->resetInputFields();
-    }
-
-    public function closeModalGeneralConsentPasienRI(): void
-    {
-        $this->isOpenGeneralConsentPasienRI = false;
-        $this->isOpenModeGeneralConsentPasienRI = 'insert';
-        $this->resetInputFields();
-    }
-
-    public function closeModalEdukasiPasienRI(): void
-    {
-        $this->isOpenEdukasiPasienRI = false;
-        $this->isOpenModeEdukasiPasienRI = 'insert';
-        $this->resetInputFields();
-    }
-
-    public function closeModalInap(): void
-    {
-        $this->isOpenInap = false;
-        $this->isOpenModeInap = 'insert';
-        $this->resetInputFields();
-    }
-
-    public function closeModalScreening(): void
-    {
-        $this->isOpenScreening = false;
-        $this->isOpenModeScreening = 'insert';
-        $this->resetInputFields();
-    }
-    // open and close modal end////////////////
-
-
-    // resert input private////////////////
-    private function resetInputFields(): void
-    {
-        // resert validation
-        $this->resetValidation();
-        // resert input
-
-    }
-    // resert input private////////////////
-
-    // is going to edit data/////////////////
-    public function edit($riHdrNo, $regNoRef)
-    {
-        $this->openModalEdit($riHdrNo, $regNoRef);
-        // $this->findData($id);
-    }
-
-    public function editDokter($riHdrNo, $regNoRef)
-    {
-        $this->openModalEditDokter($riHdrNo, $regNoRef);
-        // $this->findData($id);
-    }
-
-    public function editGeneralConsentPasienRI($riHdrNo, $regNoRef)
-    {
-        $this->openModalEditGeneralConsentPasienRI($riHdrNo, $regNoRef);
-        // $this->findData($id);
-    }
-
-    public function editEdukasiPasienRI($riHdrNo, $regNoRef)
-    {
-        $this->openModalEditEdukasiPasienRI($riHdrNo, $regNoRef);
-        // $this->findData($id);
-    }
-
-    // is going to edit data/////////////////
-    public function editInap($riHdrNo, $regNoRef)
-    {
-        $this->openModalEditInap($riHdrNo, $regNoRef);
-        // $this->findData($id);
-    }
-
-    public function editScreening($riHdrNo, $regNoRef)
-    {
-        $this->openModalEditScreening($riHdrNo, $regNoRef);
-        // $this->findData($id);
-    }
 
     ////////////////////////////////////////////////
     ///////////begin////////////////////////////////
     ////////////////////////////////////////////////
 
     // is going to insert data////////////////
-    public function create()
+
+
+    public function settermyTopBarklaimStatusOptions($klaimStatusId, $klaimStatusName): void
     {
-        $this->openModal();
+
+        $this->myTopBar['klaimStatusId'] = $klaimStatusId;
+        $this->myTopBar['klaimStatusName'] = $klaimStatusName;
+        $this->resetPage();
     }
-
-    public function tampil()
-    {
-        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Fitur dalam masa pengembangan');
-    }
-
-    public function delete()
-    {
-        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Fitur dalam masa pengembangan');
-    }
-
-
-    public string $activeTab = "rekamMedis";
-    public string $activeTabDokter = "pengkajianDokter";
-    public string $activeTabGeneralConsentPasienRI = "generalConsentPasienRI";
-    public string $activeTabEdukasiPasienRI = "edukasiPasienRI";
-
-
-
-
-    public array $EmrMenu = [
-        [
-            'ermMenuId' => 'pengkajianAwalPasienRawatInap',
-            'ermMenuName' => 'Pengkajian Pasien Rawat Inap'
-        ],
-        [
-            'ermMenuId' => 'pengkajianDokter',
-            'ermMenuName' => 'Pengkajian Dokter'
-        ],
-        [
-            'ermMenuId' => 'pemeriksaan',
-            'ermMenuName' => 'Pemeriksaan'
-        ],
-        [
-            'ermMenuId' => 'penilaian',
-            'ermMenuName' => 'Penilaian'
-        ],
-        [
-            'ermMenuId' => 'observasi',
-            'ermMenuName' => 'Observasi'
-        ],
-        [
-            'ermMenuId' => 'asuhanKeperawatan',
-            'ermMenuName' => 'Asuhan Keperawatan'
-        ],
-        [
-            'ermMenuId' => 'cppt',
-            'ermMenuName' => 'CPPT'
-        ],
-        [
-            'ermMenuId' => 'diagnosis',
-            'ermMenuName' => 'Diagnosis (ICD)'
-        ],
-
-        [
-            'ermMenuId' => 'perencanaan',
-            'ermMenuName' => 'Perencanaan'
-        ],
-        [
-            'ermMenuId' => 'administrasi',
-            'ermMenuName' => 'Administrasi'
-        ],
-
-        [
-            'ermMenuId' => 'rekamMedis',
-            'ermMenuName' => 'Rekam Medis'
-        ],
-
-    ];
-
-    public array $EmrMenuDokter = [
-        [
-            'ermMenuId' => 'pengkajianDokter',
-            'ermMenuName' => 'Pengkajian Dokter'
-        ],
-        [
-            'ermMenuId' => 'observasi',
-            'ermMenuName' => 'Observasi'
-        ],
-        [
-            'ermMenuId' => 'cppt',
-            'ermMenuName' => 'CPPT'
-        ],
-        [
-            'ermMenuId' => 'pemeriksaanPenunjang',
-            'ermMenuName' => 'Pemeriksaan Penunjang'
-        ],
-        [
-            'ermMenuId' => 'pelayananPenunjang',
-            'ermMenuName' => 'Pelayanan Penunjang'
-        ],
-        [
-            'ermMenuId' => 'rekamMedis',
-            'ermMenuName' => 'Resume Medis'
-        ],
-
-    ];
-
-    public array $EmrMenuGeneralConsentPasienRI = [
-        [
-            'ermMenuId' => 'generalConsentPasienRI',
-            'ermMenuName' => 'General Consent Pasien RI'
-        ],
-        [
-            'ermMenuId' => 'informConsentPasienRI',
-            'ermMenuName' => 'Inform Consent Pasien RI'
-        ]
-    ];
-
-    public array $EmrMenuEdukasiPasienRI = [
-        [
-            'ermMenuId' => 'edukasiPasienRI',
-            'ermMenuName' => 'Form Edukasi Pasien RI'
-        ]
-    ];
-
 
     // when new form instance
     public function mount() {}
@@ -430,6 +164,8 @@ class EmrRIHari extends Component
         $myRefstatusId = $this->myTopBar['refStatusId'];
         $myRefroomId = $this->myTopBar['roomId'];
         $myRefdrId = $this->myTopBar['drId'];
+        $myRefklaimStatusId = $this->myTopBar['klaimStatusId'];
+
 
 
 
@@ -469,8 +205,38 @@ class EmrRIHari extends Component
                 'bed_no',
                 'totinacbg_temp',
                 'totalri_temp',
+
+                DB::raw("(SELECT SUM(NVL(actd_price, 0) * NVL(actd_qty, 0)) FROM rstxn_riactdocs WHERE rihdr_no = rsview_rihdrs.rihdr_no) as jasa_dokter"),
+                DB::raw("(SELECT SUM(NVL(actp_price, 0) * NVL(actp_qty, 0)) FROM rstxn_riactparams WHERE rihdr_no = rsview_rihdrs.rihdr_no) as jasa_medis"),
+                DB::raw("(SELECT SUM(NVL(konsul_price, 0)) FROM rstxn_rikonsuls WHERE rihdr_no = rsview_rihdrs.rihdr_no) as konsultasi"),
+                DB::raw("(SELECT SUM(NVL(visit_price, 0)) FROM rstxn_rivisits WHERE rihdr_no = rsview_rihdrs.rihdr_no) as visit"),
+                'admin_age',
+                'admin_status',
+                DB::raw("(SELECT SUM(NVL(ribon_price, 0)) FROM rstxn_ribonobats WHERE rihdr_no = rsview_rihdrs.rihdr_no) as bon_resep"),
+                DB::raw("(SELECT SUM(NVL(riobat_qty, 0) * NVL(riobat_price, 0)) FROM rstxn_riobats WHERE rihdr_no = rsview_rihdrs.rihdr_no) as obat_pinjam"),
+                DB::raw("(SELECT SUM(NVL(riobat_qty, 0) * NVL(riobat_price, 0)) FROM rstxn_riobatrtns WHERE rihdr_no = rsview_rihdrs.rihdr_no) as return_obat"),
+                DB::raw("(SELECT SUM(NVL(rirad_price, 0)) FROM rstxn_riradiologs WHERE rihdr_no = rsview_rihdrs.rihdr_no) as radiologi"),
+                DB::raw("(SELECT SUM(NVL(lab_price, 0)) FROM rstxn_rilabs WHERE rihdr_no = rsview_rihdrs.rihdr_no) as laboratorium"),
+                DB::raw("(SELECT SUM(NVL(ok_price, 0)) FROM rstxn_rioks WHERE rihdr_no = rsview_rihdrs.rihdr_no) as operasi"),
+                DB::raw("(SELECT SUM(NVL(other_price, 0)) FROM rstxn_riothers WHERE rihdr_no = rsview_rihdrs.rihdr_no) as lain_lain"),
+                DB::raw("(SELECT SUM(
+                        NVL(rj_admin, 0) + NVL(poli_price, 0) + NVL(acte_price, 0) +
+                        NVL(actp_price, 0) + NVL(actd_price, 0) + NVL(obat, 0) +
+                        NVL(lab, 0) + NVL(rad, 0) + NVL(other, 0) + NVL(rs_admin, 0)
+                    )
+                    FROM rstxn_ritempadmins WHERE rihdr_no = rsview_rihdrs.rihdr_no) as rawat_jalan"),
+
+                DB::raw("(SELECT SUM(NVL(room_price, 0) * ROUND(NVL(day, NVL(end_date, SYSDATE+1) - NVL(start_date, SYSDATE)))) FROM rsmst_trfrooms WHERE rihdr_no = rsview_rihdrs.rihdr_no) as total_room_price"),
+                DB::raw("(SELECT SUM(NVL(perawatan_price, 0) * ROUND(NVL(day, NVL(end_date, SYSDATE+1) - NVL(start_date, SYSDATE)))) FROM rsmst_trfrooms WHERE rihdr_no = rsview_rihdrs.rihdr_no) as total_perawatan_price"),
+                DB::raw("(SELECT SUM(NVL(common_service, 0) * ROUND(NVL(day, NVL(end_date, SYSDATE+1) - NVL(start_date, SYSDATE)))) FROM rsmst_trfrooms WHERE rihdr_no = rsview_rihdrs.rihdr_no) as total_common_service"),
             )
-            ->where(DB::raw("nvl(ri_status,'I')"), '=', $myRefstatusId);
+            ->where(DB::raw("nvl(ri_status,'I')"), '=', $myRefstatusId)
+            ->whereIn('klaim_id', function ($query) use ($myRefklaimStatusId) {
+                $query->select('klaim_id')
+                    ->from('rsmst_klaimtypes')
+                    ->where('klaim_status', '=', $myRefklaimStatusId);
+            });
+
 
         // Jika where dokter tidak kosong
         if ($myRefroomId != 'All') {
@@ -503,7 +269,6 @@ class EmrRIHari extends Component
         })
             ->orderBy('entry_date1',  'desc')
             ->orderBy('dr_name',  'desc');
-
         ////////////////////////////////////////////////
         // end Query
         ///////////////////////////////////////////////

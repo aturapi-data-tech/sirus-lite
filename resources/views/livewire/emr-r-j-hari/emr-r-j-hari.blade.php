@@ -515,39 +515,42 @@
 
                             <td class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-primary">
 
-                                <!-- Dropdown Action menu Flowbite-->
-                                <div>
-                                    <x-light-button id="dropdownButtonSendData{{ $myQData->rj_no }}"
-                                        class="inline-flex"
-                                        wire:click="$emit('pressDropdownButtonSendData','{{ $myQData->rj_no }}')">
-                                        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
-                                            xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            fill="none" viewBox="0 0 24 24">
-                                            <path stroke="currentColor" stroke-linecap="round"
-                                                stroke-linejoin="round" stroke-width="2"
-                                                d="M15 17h3a3 3 0 0 0 0-6h-.025a5.56 5.56 0 0 0 .025-.5A5.5 5.5 0 0 0 7.207 9.021C7.137 9.017 7.071 9 7 9a4 4 0 1 0 0 8h2.167M12 19v-9m0 0-2 2m2-2 2 2" />
-                                        </svg>
 
-                                    </x-light-button>
-
-                                    <!-- Dropdown Action Open menu -->
-                                    <div id="dropdownMenuSendData{{ $myQData->rj_no }}"
-                                        class="z-10 hidden w-auto bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700">
-
-                                        <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
-                                            aria-labelledby="dropdownButtonSendData{{ $myQData->rj_no }}">
-
-                                            <div class="grid grid-cols-1 gap-2">
-                                                <livewire:emr-r-j.post-inacbg-r-j.post-inacbg-r-j :rjNoRef="$myQData->rj_no"
-                                                    :groupingCount="$myQData->rjuploadbpjs_grouping_count ?? 0" :wire:key="'post-inacbg-r-j-'.$myQData->rj_no">
-                                            </div>
-
-                                        </ul>
-                                    </div>
-                                </div>
-                                <!-- End Dropdown Action Open menu -->
 
                                 @if ($myTopBar['klaimStatusId'] === 'BPJS')
+                                    <!-- Dropdown Action menu Flowbite-->
+                                    <div>
+                                        <x-light-button id="dropdownButtonSendData{{ $myQData->rj_no }}"
+                                            class="inline-flex"
+                                            wire:click="$emit('pressDropdownButtonSendData','{{ $myQData->rj_no }}')">
+                                            <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
+                                                xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                fill="none" viewBox="0 0 24 24">
+                                                <path stroke="currentColor" stroke-linecap="round"
+                                                    stroke-linejoin="round" stroke-width="2"
+                                                    d="M15 17h3a3 3 0 0 0 0-6h-.025a5.56 5.56 0 0 0 .025-.5A5.5 5.5 0 0 0 7.207 9.021C7.137 9.017 7.071 9 7 9a4 4 0 1 0 0 8h2.167M12 19v-9m0 0-2 2m2-2 2 2" />
+                                            </svg>
+
+                                        </x-light-button>
+
+                                        <!-- Dropdown Action Open menu -->
+                                        <div id="dropdownMenuSendData{{ $myQData->rj_no }}"
+                                            class="z-10 hidden w-auto bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700">
+
+                                            <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
+                                                aria-labelledby="dropdownButtonSendData{{ $myQData->rj_no }}">
+
+                                                <div class="grid grid-cols-1 gap-2">
+                                                    <livewire:emr-r-j.post-inacbg-r-j.post-inacbg-r-j :rjNoRef="$myQData->rj_no"
+                                                        :groupingCount="$myQData->rjuploadbpjs_grouping_count ?? 0"
+                                                        :wire:key="'post-inacbg-r-j-'.$myQData->rj_no">
+                                                </div>
+
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <!-- End Dropdown Action Open menu -->
+
                                     <div class="inline-flex">
                                         @if (!$myQData->rjuploadbpjs_rm_count)
                                             <x-primary-button
