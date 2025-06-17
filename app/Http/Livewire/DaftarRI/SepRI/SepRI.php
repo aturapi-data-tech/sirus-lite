@@ -174,7 +174,7 @@ class SepRI extends Component
 
     private function pushUpdateSEP($SEPJsonReq)
     {
-        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('SEP xxxx');
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('SEP Update dlm proses pengembangan xxxx');
 
         //ketika Push Tambah Antrean Berhasil buat SEP
         //////////////////////////////////////////////
@@ -236,7 +236,7 @@ class SepRI extends Component
         $this->dataDaftarRi = $this->findDataRI($riHdrNo);
         // dd($this->dataDaftarRi);
         // jika reqSep tidak ditemukan tambah variable reqSep pda array
-        if (empty($this->dataDaftarRi['sep']['reqSep'])) {
+        if (empty($this->dataDaftarRi['sep']['noSep']) && empty($this->dataDaftarRi['sep']['reqSep'])) {
             $this->setSEPJsonReqRI($riHdrNo);
         }
     }
