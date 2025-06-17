@@ -131,6 +131,8 @@ trait EmrRITrait
             $dataDaftarRi['klaimDesc'] = $updatedDataDaftarRi->klaim_desc;
             $dataDaftarRi['entryDate'] = $updatedDataDaftarRi->entry_date;
             $dataDaftarRi['exitDate'] = $updatedDataDaftarRi->exit_date ?? '';
+            $dataDaftarRi['sep']['noSep'] = $dataDaftarRi->vno_sep ?? '';
+
 
 
             return $dataDaftarRi;
