@@ -357,7 +357,7 @@ class PostInacbgRI extends Component
                 'prosedur_bedah'     => (string) $totalOperasi,                 // ganti operasi
                 'konsultasi'         => (string) $totalKonsul,                  // pisahkan
                 'tenaga_ahli'        => (string) ($totalVisit + $totalJasaDokter),
-                'keperawatan'        => (string) ($totalJasaMedis + $roomPriceTotal + $perawatanPriceTotal),
+                'keperawatan'        => (string) ($totalJasaMedis + $perawatanPriceTotal),
                 'penunjang'          => (string) ($adminAge + $adminStatus + $commonServiceTotal),
                 'radiologi'          => (string) $totalRadiologi,
                 'laboratorium'       => (string) $totalLaboratorium,
