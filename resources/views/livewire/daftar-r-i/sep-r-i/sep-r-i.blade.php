@@ -3,7 +3,7 @@
     <div class="w-full mb-1">
 
         @php
-            $disabledPropertyRiStatus = false;
+            $disabledPropertyRiStatus = !empty($dataDaftarRi['sep']['noSep']);
         @endphp
 
         <form class="scroll-smooth hover:scroll-auto">
@@ -25,49 +25,56 @@
                         </div>
                         <div class="grid items-center grid-cols-2 gap-2 mb-2">
                             <x-text-input id="noKartu" placeholder="No Kartu BPJS" class="mt-1 ml-2"
-                                wire:model.debounce.500ms="dataDaftarRi.sep.reqSep.request.t_sep.noKartu" />
+                                wire:model.debounce.500ms="dataDaftarRi.sep.reqSep.request.t_sep.noKartu"
+                                :disabled="true" />
                             <x-text-input id="noMR" placeholder="No Rekam Medis" class="mt-1 ml-2"
-                                wire:model.debounce.500ms="dataDaftarRi.sep.reqSep.request.t_sep.noMR" />
+                                wire:model.debounce.500ms="dataDaftarRi.sep.reqSep.request.t_sep.noMR"
+                                :disabled="true" />
                         </div>
 
                         {{-- Tanggal SEP --}}
                         <div class="mb-2">
-                            <x-input-label for="tglSep" :value="'Tanggal SEP'" :required="true" />
+                            <x-input-label for="tglSep" :value="'Tanggal SEP'" :required="false" />
                             <x-text-input id="tglSep" placeholder="YYYY-MM-DD" class="mt-1 ml-2"
-                                wire:model.debounce.500ms="dataDaftarRi.sep.reqSep.request.t_sep.tglSep" />
+                                wire:model.debounce.500ms="dataDaftarRi.sep.reqSep.request.t_sep.tglSep"
+                                :disabled="true" />
                         </div>
 
                         {{-- Kelas Rawat Hak --}}
                         <div class="mb-2">
                             <x-input-label for="klsRawatHak" :value="'Kelas Rawat (Hak)'" :required="true" />
                             <x-text-input id="klsRawatHak" placeholder="Isi 1 / 2 / 3" class="mt-1 ml-2"
-                                wire:model="dataDaftarRi.sep.reqSep.request.t_sep.klsRawat.klsRawatHak" />
+                                wire:model="dataDaftarRi.sep.reqSep.request.t_sep.klsRawat.klsRawatHak"
+                                :disabled="true" />
                         </div>
 
                         {{-- Rujukan --}}
                         <div class="grid grid-cols-2 gap-2 mb-2">
                             <div>
-                                <x-input-label :value="'Tanggal Rujukan'" :required="true" />
+                                <x-input-label :value="'Tanggal Rujukan'" :required="false" />
                                 <x-text-input placeholder="YYYY-MM-DD" class="mt-1 ml-2"
-                                    wire:model="dataDaftarRi.sep.reqSep.request.t_sep.rujukan.tglRujukan" />
+                                    wire:model="dataDaftarRi.sep.reqSep.request.t_sep.rujukan.tglRujukan"
+                                    :disabled="true" />
                             </div>
                             <div>
                                 <x-input-label :value="'No Rujukan'" :required="true" />
                                 <x-text-input placeholder="No Rujukan" class="mt-1 ml-2"
-                                    wire:model="dataDaftarRi.sep.reqSep.request.t_sep.rujukan.noRujukan" />
+                                    wire:model="dataDaftarRi.sep.reqSep.request.t_sep.rujukan.noRujukan"
+                                    :disabled="true" />
                             </div>
                         </div>
                         <div class="mb-2">
                             <x-input-label :value="'PPK Rujukan'" :required="true" />
                             <x-text-input placeholder="Kode PPK" class="mt-1 ml-2"
-                                wire:model="dataDaftarRi.sep.reqSep.request.t_sep.rujukan.ppkRujukan" />
+                                wire:model="dataDaftarRi.sep.reqSep.request.t_sep.rujukan.ppkRujukan"
+                                :disabled="true" />
                         </div>
 
                         {{-- Diagnosa Awal --}}
                         <div class="mb-2">
                             <x-input-label :value="'Diagnosa Awal (ICD10)'" :required="true" />
                             <x-text-input placeholder="Kode ICD10" class="mt-1 ml-2"
-                                wire:model="dataDaftarRi.sep.reqSep.request.t_sep.diagAwal" />
+                                wire:model="dataDaftarRi.sep.reqSep.request.t_sep.diagAwal" :disabled="false" />
                         </div>
 
                         {{-- SKDP --}}
@@ -75,23 +82,26 @@
                             <div>
                                 <x-input-label :value="'No SKDP'" :required="true" />
                                 <x-text-input placeholder="Nomor SKDP" class="mt-1 ml-2"
-                                    wire:model="dataDaftarRi.sep.reqSep.request.t_sep.skdp.noSurat" />
+                                    wire:model="dataDaftarRi.sep.reqSep.request.t_sep.skdp.noSurat"
+                                    :disabled="true" />
                             </div>
                             <div>
                                 <x-input-label :value="'Kode DPJP'" :required="true" />
                                 <x-text-input placeholder="Kode DPJP" class="mt-1 ml-2"
-                                    wire:model="dataDaftarRi.sep.reqSep.request.t_sep.skdp.kodeDPJP" />
+                                    wire:model="dataDaftarRi.sep.reqSep.request.t_sep.skdp.kodeDPJP"
+                                    :disabled="true" />
                             </div>
                         </div>
 
                         {{-- No Telp --}}
                         <div class="mb-4">
-                            <x-input-label :value="'No Telepon'" :required="true" />
+                            <x-input-label :value="'No Telepon'" :required="false" />
                             <x-text-input placeholder="08xxxxxxxxxx" class="mt-1 ml-2"
-                                wire:model="dataDaftarRi.sep.reqSep.request.t_sep.noTelp" />
+                                wire:model="dataDaftarRi.sep.reqSep.request.t_sep.noTelp" :disabled="true" />
                         </div>
 
                     </x-border-form>
+
                 </div>
             </div>
 
@@ -111,9 +121,17 @@
                     <div wire:loading wire:target="store">
                         <x-loading />
                     </div>
-                    <x-green-button :disabled="$disabledPropertyRiStatus" wire:click.prevent="store()" type="button" wire:loading.remove>
-                        Buat SEP Rawat Inap
-                    </x-green-button>
+                    @if (!empty($dataDaftarRi['sep']['noSep']))
+                        <x-yellow-button :disabled="$disabledPropertyRiStatus" wire:click.prevent="store()" type="button"
+                            wire:loading.remove>
+                            Update SEP Rawat Inap
+                        </x-yellow-button>
+                    @else
+                        <x-green-button :disabled="$disabledPropertyRiStatus" wire:click.prevent="store()" type="button"
+                            wire:loading.remove>
+                            Buat SEP Rawat Inap
+                        </x-green-button>
+                    @endif
                 </div>
             </div>
         </form>
