@@ -116,8 +116,8 @@ trait EmrRITrait
                     'bangsal_name',
                     'klaim_id',
                     'klaim_desc',
-                    'entry_date',
-                    'exit_date',
+                    DB::raw("to_char(entry_date,'dd/mm/yyyy hh24:mi:ss') AS entry_date"),
+                    DB::raw("to_char(exit_date,'dd/mm/yyyy hh24:mi:ss') AS exit_date"),
                     'vno_sep'
                 )
                 ->where('rihdr_no', '=', $rino)

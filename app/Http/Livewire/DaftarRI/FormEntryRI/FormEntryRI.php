@@ -57,6 +57,7 @@ class FormEntryRI extends Component
     private function findData($riHdrNo): void
     {
         $this->dataDaftarRi = $this->findDataRI($riHdrNo);
+        dd($this->dataDaftarRi);
         $this->emit('listenerRegNo', $this->dataDaftarRi['regNo']);
     }
     public function mount()
