@@ -351,55 +351,26 @@ class PostInacbgRI extends Component
             // 9) Obat Kronis
             //— jika di view belum ada kategori khusus, bisa 0 atau ambil logika terpisah
             // $obatKronis = 0;
-
             $tarifRs = [
-                // 1. Dokter & ahli: visit + konsultasi
-                'tenaga_ahli' => (float) $totalVisit + $totalKonsul + $totalJasaDokter,
-
-                // 2. Keperawatan & tindakan: tindakan paramedis + kamar + perawatan
-                'keperawatan' => (float) $totalJasaMedis + $roomPriceTotal + $perawatanPriceTotal,
-
-                // 3. Penunjang non-medis: admin, status, common service
-                'penunjang' => (float) $adminAge + $adminStatus + $commonServiceTotal,
-
-                // 4. Radiologi
-                'radiologi' => (float) $totalRadiologi,
-
-                // 5. Laboratorium
-                'laboratorium' => (float) $totalLaboratorium,
-
-                // 6. Pelayanan darah
-                'pelayanan_darah' => 0,
-
-                // 7. Rehabilitasi
-                'rehabilitasi' => 0,
-
-                // 8. Kamar (opsional, sudah di atas)
-                'kamar' => (float) $roomPriceTotal,
-
-                // 9. Obat
-                'obat' => (float) $totalBonResep + $totalObatPinjam - $totalReturnObat,
-
-                // 10. Obat kronis
-                'obat_kronis' => 0,
-
-                // 11. BMHP
-                'bmhp' => 0,
-
-                // 12. Alat kesehatan
-                'alat_kesehatan' => 0,
-
-                // 13. Sewa alat
-                'sewa_alat' => 0,
-
-                // 14. Operasi
-                'operasi' => (float) $totalOperasi,
-
-                // 15. Akomodasi
-                'akomodasi' => 0,
-
-                // 16. Lain-lain: UGD/rawat jalan + other
-                'lain_lain' => (float) $totalRjTemp + $totalOther,
+                // 0. Siapkan variabel dulu — sesuaikan logika hitung Anda
+                'prosedur_non_bedah' => '0',        // baru
+                'prosedur_bedah'     => (string) $totalOperasi,                 // ganti operasi
+                'konsultasi'         => (string) $totalKonsul,                  // pisahkan
+                'tenaga_ahli'        => (string) ($totalVisit + $totalJasaDokter),
+                'keperawatan'        => (string) ($totalJasaMedis + $roomPriceTotal + $perawatanPriceTotal),
+                'penunjang'          => (string) ($adminAge + $adminStatus + $commonServiceTotal),
+                'radiologi'          => (string) $totalRadiologi,
+                'laboratorium'       => (string) $totalLaboratorium,
+                'pelayanan_darah'    => '0',
+                'rehabilitasi'       => '0',
+                'kamar'              => (string) $roomPriceTotal,               // gabungan akomodasi
+                'rawat_intensif'     => '0',                     // baru
+                'obat'               => (string) ($totalBonResep + $totalObatPinjam - $totalReturnObat),
+                'obat_kemoterapi'    => '0',                                    // isi bila ada
+                'obat_kronis'        => '0',
+                'alkes'              => '0',                                    // rename dari alat_kesehatan
+                'bmhp'               => '0',
+                'sewa_alat'          => (string)$totalOther + $totalRjTemp,
             ];
 
             $data = [
