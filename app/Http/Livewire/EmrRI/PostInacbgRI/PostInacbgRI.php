@@ -202,14 +202,17 @@ class PostInacbgRI extends Component
         // 3. Ekstrak SEP dan waktu masuk/pulang
         $nomorSEP   = $dataDaftarRi['sep']['noSep'] ?? null;
         try {
-            $tglMasuk  = Carbon::createFromFormat(
-                'd/m/Y H:i:s',
-                $dataDaftarRi['entryDate']
-            )->format('Y-m-d H:i:s');
-            $tglPulang = Carbon::createFromFormat(
-                'd/m/Y H:i:s',
-                $dataDaftarRi['exitDate']
-            )->format('Y-m-d H:i:s');
+            // 1) Tanggal Masuk
+            $tglMasuk = empty($dataDaftarRi['entryDate'])
+                ? Carbon::now()->format('Y-m-d H:i:s')
+                : Carbon::createFromFormat('d/m/Y H:i:s', $dataDaftarRi['entryDate'])
+                ->format('Y-m-d H:i:s');
+
+            // 2) Tanggal Pulang
+            $tglPulang = empty($dataDaftarRi['exitDate'])
+                ? Carbon::now()->format('Y-m-d H:i:s')
+                : Carbon::createFromFormat('d/m/Y H:i:s', $dataDaftarRi['exitDate'])
+                ->format('Y-m-d H:i:s');
         } catch (\Exception $e) {
             toastr()->closeOnHover(true)
                 ->closeDuration(3)
