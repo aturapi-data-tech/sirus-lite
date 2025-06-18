@@ -2,10 +2,6 @@
 
     <div class="w-full mb-1">
 
-        @php
-            $disabledPropertyRiStatus = !empty($dataDaftarRi['sep']['noSep']);
-        @endphp
-
         <form class="scroll-smooth hover:scroll-auto">
             <div class="grid grid-cols-1">
                 <div id="TransaksiRawatInap" class="px-4">
@@ -111,7 +107,7 @@
                         <div wire:loading wire:target="setSEPJsonReqRI()">
                             <x-loading />
                         </div>
-                        <x-yellow-button :disabled="$disabledPropertyRiStatus" wire:click.prevent="setSEPJsonReqRI('{{ $riHdrNoRef }}')"
+                        <x-yellow-button :disabled="false" wire:click.prevent="setSEPJsonReqRI('{{ $riHdrNoRef }}')"
                             type="button" wire:loading.remove>
                             setSEP RI
                         </x-yellow-button>
