@@ -118,10 +118,10 @@ trait EmrRITrait
                     'klaim_desc',
                     'entry_date',
                     'exit_date',
+                    'vno_sep'
                 )
                 ->where('rihdr_no', '=', $rino)
                 ->first();
-
             $dataDaftarRi['bangsalId'] = $updatedDataDaftarRi->bangsal_id;
             $dataDaftarRi['bangsalDesc'] = $updatedDataDaftarRi->bangsal_name;
             $dataDaftarRi['roomId'] = $updatedDataDaftarRi->room_id;
@@ -131,7 +131,7 @@ trait EmrRITrait
             $dataDaftarRi['klaimDesc'] = $updatedDataDaftarRi->klaim_desc;
             $dataDaftarRi['entryDate'] = $updatedDataDaftarRi->entry_date;
             $dataDaftarRi['exitDate'] = $updatedDataDaftarRi->exit_date ?? '';
-            $dataDaftarRi['sep']['noSep'] = $dataDaftarRi->vno_sep ?? '';
+            $dataDaftarRi['sep']['noSep'] = $updatedDataDaftarRi->vno_sep ?? '';
 
 
 

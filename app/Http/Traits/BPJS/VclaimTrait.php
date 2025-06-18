@@ -1080,15 +1080,15 @@ trait VclaimTrait
             // "ppkRujukan" => "required",
             "catatan" => "required",
             "diagAwal" => "required",
-            "tujuan" => "required",
-            "eksekutif" => "required",
+            // "tujuan" => "required",
+            // "eksekutif" => "required",
             "tujuanKunj" => "required",
             // "flagProcedure" => "required",
             // "kdPenunjang" => "required",
             // "assesmentPel" => "required",
             // "noSurat" => "required",
             // "kodeDPJP" => "required",
-            "dpjpLayan" => "required",
+            // "dpjpLayan" => "required",
             "noTelp" => "required",
             "user" => "required",
         ], $messages);
@@ -1106,12 +1106,9 @@ trait VclaimTrait
             $signature = self::signature();
             $signature['Content-Type'] = 'application/x-www-form-urlencoded';
             $data = $SEPJsonReq;
-
             $response = Http::timeout(10)
                 ->withHeaders($signature)
                 ->post($url, $data);
-
-
             // dd($response->transferStats->getTransferTime()); Get Transfertime request
             // semua response error atau sukses dari BPJS di handle pada logic response_decrypt
             return self::response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());

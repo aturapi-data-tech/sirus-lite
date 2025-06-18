@@ -93,7 +93,6 @@ class SepRI extends Component
             }
 
             $dataPasien = $this->findDataMasterPasien($this->dataDaftarRi['regNo'] ?? '');
-
             // 4. Susun payload reqSep
             $this->dataDaftarRi['sep']['reqSep'] = [
                 "request" => [
@@ -103,7 +102,7 @@ class SepRI extends Component
                         "ppkPelayanan" => "0184R006",
                         "jnsPelayanan" => "1",
                         "klsRawat" => [
-                            "klsRawatHak" => $dataRefPesertaBPJS['response']['peserta']['hakKelas']['kode'] ?? '',
+                            "klsRawatHak" => $dataRefPesertaBPJS['peserta']['hakKelas']['kode'] ?? '',
                             "klsRawatNaik" => "",
                             "pembiayaan" => "",
                             "penanggungJawab" => ""
@@ -116,10 +115,30 @@ class SepRI extends Component
                             "ppkRujukan" => "0184R006"
                         ],
                         "catatan" => "-",
-                        "diagAwal" => "-",
+                        "diagAwal" => "",
+                        "poli" => [
+                            "tujuan" => "",
+                            "eksekutif" => "0"
+                        ],
                         "cob" => ["cob" => "0"],
                         "katarak" => ["katarak" => "0"],
-                        "jaminan" => [ /* sama seperti punyamu */],
+                        "jaminan" => [
+                            "lakaLantas" => "0",
+                            "noLP" => "",
+                            "penjamin" => [
+                                "tglKejadian" => "",
+                                "keterangan" => "",
+                                "suplesi" => [
+                                    "suplesi" => "0",
+                                    "noSepSuplesi" => "",
+                                    "lokasiLaka" => [
+                                        "kdPropinsi" => "",
+                                        "kdKabupaten" => "",
+                                        "kdKecamatan" => ""
+                                    ]
+                                ]
+                            ]
+                        ],
                         "tujuanKunj" => "0",
                         "flagProcedure" => "",
                         "kdPenunjang" => "",
@@ -128,7 +147,7 @@ class SepRI extends Component
                             "noSurat" => $dataRefRujukanSPRIBPJS['noSuratKontrol'],
                             "kodeDPJP" => $dataRefRujukanSPRIBPJS['kodeDokter']
                         ],
-                        "dpjpLayan" => $dataRefRujukanSPRIBPJS['kodeDokter'],
+                        "dpjpLayan" => "",
                         "noTelp" => $dataPasien['pasien']['kontak']['nomerTelponSelulerPasien'] ?? '',
                         "user" => "sirus App"
                     ]
