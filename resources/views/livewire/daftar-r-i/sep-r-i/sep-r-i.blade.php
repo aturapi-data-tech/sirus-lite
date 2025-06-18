@@ -122,12 +122,12 @@
                         <x-loading />
                     </div>
                     @if (!empty($dataDaftarRi['sep']['noSep']))
-                        <x-yellow-button :disabled="$disabledPropertyRiStatus" wire:click.prevent="store()" type="button"
+                        <x-yellow-button :disabled="false" wire:click.prevent="store()" type="button"
                             wire:loading.remove>
                             Update SEP Rawat Inap
                         </x-yellow-button>
                     @else
-                        <x-green-button :disabled="$disabledPropertyRiStatus" wire:click.prevent="store()" type="button"
+                        <x-green-button :disabled="false" wire:click.prevent="store()" type="button"
                             wire:loading.remove>
                             Buat SEP Rawat Inap
                         </x-green-button>
