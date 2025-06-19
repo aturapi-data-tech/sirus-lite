@@ -98,7 +98,7 @@ class SepRI extends Component
                 "request" => [
                     "t_sep" => [
                         "noKartu" => $noKartu ?? '',
-                        "tglSep" => Carbon::parse($this->dataDaftarRi['entryDate'])->format('Y-m-d'),
+                        "tglSep" => Carbon::createFromFormat('d/m/Y H:i:s', $this->dataDaftarRi['entryDate'], env('APP_TIMEZONE'))->format('Y-m-d'),
                         "ppkPelayanan" => "0184R006",
                         "jnsPelayanan" => "1",
                         "klsRawat" => [
