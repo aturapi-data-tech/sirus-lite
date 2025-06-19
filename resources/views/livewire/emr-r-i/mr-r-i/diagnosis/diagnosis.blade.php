@@ -96,7 +96,7 @@
                                                             class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
 
                                                             <x-alternative-button class="inline-flex"
-                                                                wire:click.prevent="removeDiagnosaICD10('{{ isset($diag['rjDtlDtl']) ? $diag['rjDtlDtl'] : 0 }}')">
+                                                                wire:click.prevent="removeDiagnosaICD10('{{ isset($diag['riDtlDtl']) ? $diag['riDtlDtl'] : 0 }}')">
                                                                 <svg class="w-5 h-5 text-gray-800 dark:text-white"
                                                                     aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                                                     fill="currentColor" viewBox="0 0 18 20">
