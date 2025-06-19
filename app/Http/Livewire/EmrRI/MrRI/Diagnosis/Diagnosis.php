@@ -246,11 +246,11 @@ class Diagnosis extends Component
                 ]);
 
             // update status diagnosa rstxn_rihdrs
-            DB::table('rstxn_rihdrs')
-                ->where('rihdr_no',  $this->riHdrNoRef)
-                ->update([
-                    'ri_diagnosa' => 'D',
-                ]);
+            // DB::table('rstxn_rihdrs')
+            //     ->where('rihdr_no',  $this->riHdrNoRef)
+            //     ->update([
+            //         'ri_diagnosa' => 'D',
+            //     ]);
 
             $checkDiagnosaCount = collect($this->dataDaftarRi['diagnosis'])->count();
             $kategoriDiagnosa = $checkDiagnosaCount ? 'Secondary' : 'Primary';
