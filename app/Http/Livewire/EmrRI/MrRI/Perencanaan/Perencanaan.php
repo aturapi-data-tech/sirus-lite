@@ -420,7 +420,7 @@ class Perencanaan extends Component
             toastr()->closeOnHover(true)
                 ->closeDuration(3)
                 ->positionClass('toast-top-left')
-                ->addError('Pembuatan SEP bukan melalui siRUS Tgl SEP belum tersedia, tidak dapat update tanggal pulang.');
+                ->addError('Pembuatan SEP bukan melalui siRUS, Tgl SEP belum tersedia, tidak dapat update tanggal pulang.');
 
             return; // hentikan proses jika tgl sep belum tersedia
         }
