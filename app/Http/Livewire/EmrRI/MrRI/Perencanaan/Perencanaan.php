@@ -8,7 +8,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 
 use Carbon\Carbon;
-
+use App\Http\Traits\BPJS\VclaimTrait;
 use App\Http\Traits\EmrRI\EmrRITrait;
 
 
@@ -33,8 +33,16 @@ class Perencanaan extends Component
     public array $perencanaan = [
         "tindakLanjut" => [
             "tindakLanjut" => "",
-            "tindakLanjutKode" => "",
+            "tindakLanjutKode"      => "", // Kode SNOMED CT, seperti "419099009"
             "keteranganTindakLanjut" => "",
+
+            "noSep"             => "",
+            "statusPulang"      => "", // 1,3,4,5
+            "noSuratMeninggal"  => "",
+            "tglMeninggal"      => "",
+            "tglPulang"         => "",
+            "noLPManual"        => "",
+            "user"              => "",
         ],
 
         "dischargePlanning" => [
@@ -95,12 +103,36 @@ class Perencanaan extends Component
     //////////////////////////////////////////////////////////////////////
     // Opsi-opsi untuk tindak lanjut
     public array $tindakLanjutOptions = [
-        ["tindakLanjut" => "Pulang Sehat", "tindakLanjutKode" => "371827001"],
-        ["tindakLanjut" => "Pulang dengan Permintaan Sendiri", "tindakLanjutKode" => "266707007"],
-        ["tindakLanjut" => "Pulang Pindah / Rujuk", "tindakLanjutKode" => "306206005"],
-        ["tindakLanjut" => "Pulang Tanpa Perbaikan", "tindakLanjutKode" => "371828006"],
-        ["tindakLanjut" => "Meninggal", "tindakLanjutKode" => "419099009"],
-        ["tindakLanjut" => "Lain-lain", "tindakLanjutKode" => "74964007"],
+        [
+            "tindakLanjut"         => "Pulang Sehat",
+            "tindakLanjutKode"     => "371827001",
+            "tindakLanjutKodeBpjs" => 1,
+        ],
+        [
+            "tindakLanjut"         => "Pulang dengan Permintaan Sendiri",
+            "tindakLanjutKode"     => "266707007",
+            "tindakLanjutKodeBpjs" => 3,
+        ],
+        [
+            "tindakLanjut"         => "Pulang Pindah / Rujuk",
+            "tindakLanjutKode"     => "306206005",
+            "tindakLanjutKodeBpjs" => 5, // tidak ada padanan di BPJS SEP
+        ],
+        [
+            "tindakLanjut"         => "Pulang Tanpa Perbaikan",
+            "tindakLanjutKode"     => "371828006",
+            "tindakLanjutKodeBpjs" => 5, // tidak ada padanan di BPJS SEP
+        ],
+        [
+            "tindakLanjut"         => "Meninggal",
+            "tindakLanjutKode"     => "419099009",
+            "tindakLanjutKodeBpjs" => 4,
+        ],
+        [
+            "tindakLanjut"         => "Lain-lain",
+            "tindakLanjutKode"     => "74964007",
+            "tindakLanjutKodeBpjs" => 5,
+        ],
     ];
 
     // Opsi-opsi untuk pelayanan berkelanjutan
@@ -276,10 +308,30 @@ class Perencanaan extends Component
     ////////////////////////////////////////////////
     ///////////begin////////////////////////////////
     ////////////////////////////////////////////////
-    public function updated($propertyName)
+    public function updated($propertyName, $value)
     {
         $this->validateOnly($propertyName);
+        // Jalankan hanya jika radio SNOMED berubah
+        if ($propertyName === 'dataDaftarRi.perencanaan.tindakLanjut.tindakLanjut') {
+            $this->syncTindakLanjut($value);
+        }
         $this->store();
+    }
+
+    private function syncTindakLanjut(string $kodeSnomed): void
+    {
+        // Cari opsi yang cocok
+        $selected = collect($this->tindakLanjutOptions)
+            ->firstWhere('tindakLanjutKode', $kodeSnomed);
+
+        // Jika ditemukan, set kedua field sekaligus
+        if ($selected) {
+            $this->dataDaftarRi['perencanaan']['tindakLanjut']['tindakLanjutKode']
+                = $selected['tindakLanjutKode'];
+
+            $this->dataDaftarRi['perencanaan']['tindakLanjut']['statusPulang']
+                = $selected['tindakLanjutKodeBpjs'];
+        }
     }
 
 
@@ -302,6 +354,121 @@ class Perencanaan extends Component
         $this->emit('syncronizeAssessmentPerawatRIFindData');
     }
 
+    // Set tanggal meninggal (format dd/mm/yyyy)
+    public function setTglMeninggal($date)
+    {
+        $this->dataDaftarRi['perencanaan']['tindakLanjut']['tglMeninggal'] = $date;
+    }
+
+    // Set tanggal pulang (format dd/mm/yyyy)
+    public function setTglPulang($date)
+    {
+        $this->dataDaftarRi['perencanaan']['tindakLanjut']['tglPulang'] = $date;
+    }
+
+    public function updateTglPulangBPJS(): void
+    {
+
+        $tindak = $this->dataDaftarRi['perencanaan']['tindakLanjut'];
+
+        /* ============================================================
+     * 0. Cek status klaim & ketersediaan SEP
+     * ========================================================== */
+        $klaimStatus = DB::table('rsmst_klaimtypes')
+            ->where('klaim_id', $this->dataDaftarRi['klaimId'] ?? '')
+            ->value('klaim_status') ?? 'UMUM';
+        $noSep = $tindak['noSep'] ?? '';
+        $tglSepRaw = $this->dataDaftarRi['sep']['reqSep']['request']['t_sep']['tglSep'] ?? null;
+
+        // --- Bukan klaim BPJS --------------------------------------
+        if ($klaimStatus !== 'BPJS') {
+            toastr()->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Gagal: Klaim ini bukan BPJS, tidak dapat mengirim update tanggal pulang.');
+            return;
+        }
+        // --- No SEP belum tersedia ---------------------------------
+        if (empty($noSep)) {
+            toastr()->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Gagal: Nomor SEP belum tersedia, tidak dapat update tanggal pulang.');
+            return;
+        }
+
+        // ───── Konversi format tanggal ─────
+        try {
+            $tglPulang = $tindak['tglPulang']
+                ? Carbon::createFromFormat('d/m/Y', $tindak['tglPulang'])->format('Y-m-d')
+                : null;
+
+            $tglMeninggal = $tindak['tglMeninggal']
+                ? Carbon::createFromFormat('d/m/Y', $tindak['tglMeninggal'])->format('Y-m-d')
+                : null;
+        } catch (\Exception $e) {
+            // Kirim toast error & hentikan proses
+            toastr()->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Format tanggal tidak valid: ' . $e->getMessage());
+
+            return; // keluar dari fungsi pushUpdateTglPulangBPJS()
+        }
+
+        if (empty(($tglSepRaw))) {
+            toastr()->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Pembuatan SEP bukan melalui siRUS Tgl SEP belum tersedia, tidak dapat update tanggal pulang.');
+
+            return; // hentikan proses jika tgl sep belum tersedia
+        }
+
+        $SEPJsonReq = [
+            'request' => [
+                't_sep' => [
+                    'noSep'            => $tindak['noSep'],
+                    'statusPulang'     => $tindak['statusPulang'],
+                    'noSuratMeninggal' => $tindak['noSuratMeninggal'],
+                    'tglMeninggal'     => $tglMeninggal,
+                    'tglPulang'        => $tglPulang,
+                    'noLPManual'       => $tindak['noLPManual'],
+                    'user'             => 'siRUS',
+                    // field bantu lain jika perlu (isKLL, tglSEP, dst.)
+
+                    // ---------- field bantu (hanya dipakai di sisi aplikasi) ----------
+                    'isKLL'            => $tindak['isKLL'] ?? 0,    // 0/1
+                    'tglSep'           => $tglSepRaw, // YYYY-mm-dd
+                    'isAlreadyReferred' => false // true/false
+                ],
+            ],
+        ];
+
+        /* ------------------------------------------------------------
+     * 2. Panggil Trait  ➜  sep_updtglplg()
+     * ---------------------------------------------------------- */
+        $HttpGetBpjs = VclaimTrait::sep_updtglplg($SEPJsonReq)->getOriginalContent();
+
+        /* ------------------------------------------------------------
+     * 3. Tangani respon & beri notifikasi
+     * ---------------------------------------------------------- */
+        if ($HttpGetBpjs['metadata']['code'] == 200) {
+            // Update entri lokal jika perlu
+            toastr()->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addSuccess('Update Tgl Pulang: ' .
+                    $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+        } else {
+            toastr()->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Update Tgl Pulang: ' .
+                    $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+        }
+    }
+
     private function updateDataRi($riHdrNo): void
     {
 
@@ -320,6 +487,17 @@ class Perencanaan extends Component
         // jika perencanaan tidak ditemukan tambah variable perencanaan pda array
         if (isset($this->dataDaftarRi['perencanaan']) == false) {
             $this->dataDaftarRi['perencanaan'] = $this->perencanaan;
+        }
+
+        /* --------------------------------------------------------
+     *  Auto-set noSep jika klaimId = 'JM'
+     * ------------------------------------------------------ */
+        $klaimStatus = DB::table('rsmst_klaimtypes')
+            ->where('klaim_id', $this->dataDaftarRi['klaimId'] ?? '')
+            ->value('klaim_status') ?? 'UMUM';
+        if ($klaimStatus === 'BPJS' && empty($this->dataDaftarRi['perencanaan']['tindakLanjut']['noSep'])) {
+            $this->dataDaftarRi['perencanaan']['tindakLanjut']['noSep'] =
+                $this->dataDaftarRi['sep']['noSep'] ?? '';
         }
     }
 

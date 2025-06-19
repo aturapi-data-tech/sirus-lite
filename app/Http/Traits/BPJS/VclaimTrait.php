@@ -1182,4 +1182,112 @@ trait VclaimTrait
             return self::sendError($e->getMessage(), $validator->errors(), 408, $url, null);
         }
     }
+
+
+    public static function sep_updtglplg($SEPJsonReq)
+    {
+
+
+        /**
+         * 2. Lengkapi data bantu yang dipakai validasi lintas-field.
+         *    Contoh: baca tgl SEP & info lain dari DB SEP (table sep_master).
+         */
+        $tglSep = $SEPJsonReq['request']['t_sep']['tglSep'];                         // yyyy-MM-dd (string)
+        $today  = now('Asia/Jakarta')->toDateString();     // “hari ini” versi WIB
+
+        $isKLL              = (int) $SEPJsonReq['request']['t_sep']['isKLL'] == 1; // atau field Anda sendiri
+        $isAlreadyReferred  = (bool) $SEPJsonReq['request']['t_sep']['statusPulang']; //true/false   // contoh: sudah “Dirujuk”
+        $tglSep             = $SEPJsonReq['request']['t_sep']['tglSep'] ?? null;
+
+
+        // customErrorMessages
+        $messages = [
+            // Umum
+            'noSep.required'             => 'Nomor SEP wajib diisi.',
+            'statusPulang.required'      => 'Status pulang wajib diisi.',
+            'statusPulang.integer'       => 'Status pulang harus berupa angka.',
+            'statusPulang.in'            => 'Status pulang tidak valid (hanya 1, 3, 4, atau 5).',
+
+            // Tanggal Pulang
+            'tglPulang.required'         => 'Tanggal pulang wajib diisi.',
+            'tglPulang.date_format'      => 'Format tanggal pulang harus YYYY-MM-DD.',
+            'tglPulang.before_or_equal' => 'Tanggal pulang tidak boleh melebihi hari ini.',
+            'tglPulang.after_or_equal'  => 'Tanggal pulang tidak boleh sebelum tanggal SEP.',
+
+            // Meninggal
+            'noSuratMeninggal.required_if' => 'Nomor surat meninggal wajib diisi jika pasien meninggal.',
+            'noSuratMeninggal.min'         => 'Nomor surat meninggal minimal 5 karakter.',
+            'tglMeninggal.required_if'     => 'Tanggal meninggal wajib diisi jika pasien meninggal.',
+            'tglMeninggal.date_format'     => 'Format tanggal meninggal harus YYYY-MM-DD.',
+
+            // KLL
+            'noLPManual.required_if'    => 'Nomor laporan polisi wajib diisi untuk kasus KLL.',
+            'noLPManual.min'            => 'Nomor laporan polisi minimal 5 karakter.',
+        ];
+        // Masukkan Nilai dari parameter
+
+
+        $r = [
+            'noSep'            => $SEPJsonReq['request']['t_sep']['noSep'],
+            'statusPulang'     => $SEPJsonReq['request']['t_sep']['statusPulang']         ?? null,
+            'tglPulang'        => $SEPJsonReq['request']['t_sep']['tglPulang']            ?? null,
+            'noSuratMeninggal' => $SEPJsonReq['request']['t_sep']['noSuratMeninggal']     ?? null,
+            'tglMeninggal'     => $SEPJsonReq['request']['t_sep']['tglMeninggal']         ?? null,
+            'noLPManual'       => $SEPJsonReq['request']['t_sep']['noLPManual']           ?? null,
+
+            // field bantu – tidak ikut dikirim ke BPJS, hanya untuk closure
+            'tglSep'           => $tglSep,
+            'isKLL'            => $isKLL,
+            'isAlreadyReferred' => $isAlreadyReferred,
+        ];
+
+        $rules = [
+            'noSep'        => 'required',
+            'statusPulang' => 'required|integer|in:1,3,4,5',
+
+            // tglPulang: pakai rule string bawaan + 1 closure singkat
+            'tglPulang' => [
+                "required",
+                "date_format:Y-m-d",
+                "before_or_equal:$today",        // ≤ hari ini
+                "after_or_equal:$tglSep",        // ≥ tgl SEP
+                fn($attr, $value, $fail) => $isAlreadyReferred
+                    && $fail('tanggal pulang tidak bisa diupdate'),
+            ],
+
+            // cara pulang meninggal
+            'noSuratMeninggal' => 'required_if:statusPulang,4|min:5',
+            'tglMeninggal'     => 'required_if:statusPulang,4|date_format:Y-m-d',
+
+            // SEP KLL
+            'noLPManual' => 'required_if:isKLL,1|min:5',
+        ];
+
+        // lakukan validasis
+        $validator = Validator::make($r, $rules, $messages);
+
+        if ($validator->fails()) {
+            return self::sendError($validator->errors()->first(), $validator->errors(), 201, null, null);
+        }
+
+
+
+        // handler when time out and off line mode
+        try {
+
+            $url = env('VCLAIM_URL') . "SEP/2.0/updtglplg";
+            $signature = self::signature();
+            $signature['Content-Type'] = 'application/x-www-form-urlencoded';
+            $data = $SEPJsonReq;
+            $response = Http::timeout(10)
+                ->withHeaders($signature)
+                ->put($url, $data);
+            // dd($response->transferStats->getTransferTime()); Get Transfertime request
+            // semua response error atau sukses dari BPJS di handle pada logic response_decrypt
+            return self::response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
+            /////////////////////////////////////////////////////////////////////////////
+        } catch (Exception $e) {
+            return self::sendError($e->getMessage(), $validator->errors(), 408, $url, null);
+        }
+    }
 }
