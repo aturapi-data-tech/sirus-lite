@@ -191,33 +191,89 @@ class SepRI extends Component
         //////////////////////////////////////////////
     }
 
-    private function pushUpdateSEP($SEPJsonReq)
+    private function pushUpdateSEP(array $SEPJsonReqUpdate): void
     {
-        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('SEP Update dlm proses pengembangan xxxx');
 
-        //ketika Push Tambah Antrean Berhasil buat SEP
-        //////////////////////////////////////////////
-        // $HttpGetBpjs =  VclaimTrait::sep_insert($SEPJsonReq)->getOriginalContent();
-        // if ($HttpGetBpjs['metadata']['code'] == 200) {
-        //     // dd($HttpGetBpjs);
-        //     $this->dataDaftarRi['sep']['resSep'] = $HttpGetBpjs['response']['sep'];
-        //     $this->dataDaftarRi['sep']['noSep'] = $HttpGetBpjs['response']['sep']['noSep'];
+        $req = $SEPJsonReqUpdate ?? [];
+        /* 1. Panggil endpoint UPDATE */
 
-        //     // update table trnsaksi
-        //     DB::table('rstxn_rihdrs')
-        //         ->where('rihdr_no', $this->riHdrNoRef)
-        //         ->update([
-        //             'vno_sep' => $this->dataDaftarRi['sep']['noSep'] ?? '',
-        //         ]);
+        $SEPJsonReq = [
+            'request' => [
+                't_sep' => [
+                    'noSep'     => $req['t_sep']['noSep'] ?? '',
+                    'klsRawat'  => [
+                        'klsRawatHak' => $req['t_sep']['klsRawat']['klsRawatHak'] ?? '',
+                        'klsRawatNaik' => $req['t_sep']['klsRawat']['klsRawatNaik'] ?? '',
+                        'pembiayaan' => $req['t_sep']['klsRawat']['pembiayaan'] ?? '',
+                        'penanggungJawab' => $req['t_sep']['klsRawat']['penanggungJawab'] ?? '',
+                    ],
+                    'noMR'      => $req['t_sep']['noMR'] ?? '',
+                    'catatan'   => $req['t_sep']['catatan'] ?? '',
+                    'diagAwal'  => $req['t_sep']['diagAwal'] ?? '',
+                    'poli'      => [
+                        'tujuan'    => $req['t_sep']['poli']['tujuan'] ?? '',
+                        'eksekutif' => $req['t_sep']['poli']['eksekutif'] ?? '0',
+                    ],
+                    'cob'       => [
+                        'cob' => $req['t_sep']['cob']['cob'] ?? '0',
+                    ],
+                    'katarak'   => [
+                        'katarak' => $req['t_sep']['katarak']['katarak'] ?? '0',
+                    ],
+                    'jaminan' => [
+                        'lakaLantas' => $req['t_sep']['jaminan']['lakaLantas'] ?? '0',
+                        'penjamin' => [
+                            'tglKejadian' => $req['t_sep']['jaminan']['penjamin']['tglKejadian'] ?? '',
+                            'keterangan' => $req['t_sep']['jaminan']['penjamin']['keterangan'] ?? '',
+                            'suplesi' => [
+                                'suplesi' => $req['t_sep']['jaminan']['penjamin']['suplesi']['suplesi'] ?? '0',
+                                'noSepSuplesi' => $req['t_sep']['jaminan']['penjamin']['suplesi']['noSepSuplesi'] ?? '',
+                                'lokasiLaka' => [
+                                    'kdPropinsi' => $req['t_sep']['jaminan']['penjamin']['suplesi']['lokasiLaka']['kdPropinsi'] ?? '',
+                                    'kdKabupaten' => $req['t_sep']['jaminan']['penjamin']['suplesi']['lokasiLaka']['kdKabupaten'] ?? '',
+                                    'kdKecamatan' => $req['t_sep']['jaminan']['penjamin']['suplesi']['lokasiLaka']['kdKecamatan'] ?? '',
+                                ]
+                            ]
+                        ]
+                    ],
+                    'dpjpLayan' => $req['t_sep']['dpjpLayan'] ?? '',
+                    'noTelp'    => $req['t_sep']['noTelp'] ?? '',
+                    'user'      => 'siRUS',
+                ]
+            ]
+        ];
 
-        //     toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('SEP ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
-        // } else {
-        //     toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('SEP ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
-        // }
+        $res = VclaimTrait::sep_update($SEPJsonReq)->getOriginalContent();   // ← ganti sep_insert
 
-        // response sep value
-        //ketika Push Tambah Antrean Berhasil buat SEP
-        //////////////////////////////////////////////
+        /* 2. Tangani respons */
+        if (($res['metadata']['code'] ?? 500) == 200) {
+
+            // // --- simpan respons SEP terbaru ke state -------------
+            // $this->dataDaftarRi['sep']['resSep'] = $res['response']['sep'] ?? [];
+            // $this->dataDaftarRi['sep']['noSep']  = $res['response']['sep']['noSep'] ?? '';
+
+            // // --- contoh: update kolom lain jika ada perubahan ----
+            // DB::table('rstxn_rihdrs')
+            //     ->where('rihdr_no', $this->riHdrNoRef)
+            //     ->update([
+            //         'vno_sep'     => $this->dataDaftarRi['sep']['noSep'],
+            //         'vsep_update' => now(),          // timestamp audit
+            //     ]);
+
+            toastr()
+                ->closeOnHover(true)->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addSuccess('Update SEP berhasil: '
+                    . $res['metadata']['code'] . ' '
+                    . $res['metadata']['message']);
+        } else {
+            toastr()
+                ->closeOnHover(true)->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Update SEP gagal: '
+                    . ($res['metadata']['code'] ?? '??') . ' '
+                    . ($res['metadata']['message'] ?? 'Tidak ada pesan'));
+        }
     }
 
 

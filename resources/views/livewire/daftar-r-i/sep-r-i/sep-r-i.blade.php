@@ -96,6 +96,14 @@
                                 wire:model="dataDaftarRi.sep.reqSep.request.t_sep.noTelp" :disabled="true" />
                         </div>
 
+                        <div>
+                            <x-input-label for="dataDaftarRi.sep.reqSep.request.t_sep.catatan" :value="__('Keterangan')"
+                                :required="__(false)" />
+                            <x-text-input id="dataDaftarRi.sep.reqSep.request.t_sep.catatan" placeholder="Keterangan"
+                                class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarRi.sep.reqSep.request.t_sep.catatan'))"
+                                wire:model="dataDaftarRi.sep.reqSep.request.t_sep.catatan" :disabled="false" />
+                        </div>
+
                     </x-border-form>
 
                 </div>

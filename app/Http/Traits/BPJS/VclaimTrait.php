@@ -1118,6 +1118,82 @@ trait VclaimTrait
         }
     }
 
+    public static function sep_update($SEPJsonReq)
+    {
+        /* ------------------------------------------------------------------
+     * 1. Siapkan data yang ingin divalidasi.
+     *    – Update SEP WAJIB menyertakan nomor SEP (`noSep`).
+     *    – Beberapa field pada proses insert tidak wajib/diabaikan
+     *      ketika update (mis. `ppkPelayanan`, `asalRujukan`, dll.),
+     *      tapi tetap kita sertakan bila Anda ingin mengubahnya.
+     * -----------------------------------------------------------------*/
+        $r = [
+            "noSep"        => $SEPJsonReq['request']['t_sep']['noSep']       ?? '',
+            "noKartu"      => $SEPJsonReq['request']['t_sep']['noKartu']     ?? '',
+            "tglSep"       => $SEPJsonReq['request']['t_sep']['tglSep']      ?? '',
+            "ppkPelayanan" => $SEPJsonReq['request']['t_sep']['ppkPelayanan'] ?? '',
+            "jnsPelayanan" => $SEPJsonReq['request']['t_sep']['jnsPelayanan'] ?? '',
+            "klsRawatHak"  => $SEPJsonReq['request']['t_sep']['klsRawat']['klsRawatHak'] ?? '',
+            "diagAwal"     => $SEPJsonReq['request']['t_sep']['diagAwal']    ?? '',
+            "tujuanKunj"   => $SEPJsonReq['request']['t_sep']['tujuanKunj']  ?? '',
+            "dpjpLayan"    => $SEPJsonReq['request']['t_sep']['dpjpLayan']   ?? '',
+            "catatan"      => $SEPJsonReq['request']['t_sep']['catatan']     ?? '',
+            "noTelp"       => $SEPJsonReq['request']['t_sep']['noTelp']      ?? '',
+            "user"         => $SEPJsonReq['request']['t_sep']['user']        ?? '',
+        ];
+
+        /* ------------------------------------------------------------------
+     * 2. Validasi minimal – hanya field yang memang diwajibkan
+     *    oleh spesifikasi *update* VClaim.
+     * -----------------------------------------------------------------*/
+        $validator = Validator::make($r, [
+            "noSep"      => "required",
+            "noKartu"    => "required",
+            "tglSep"     => "required|date_format:Y-m-d",
+            "jnsPelayanan" => "required|in:1,2",          // 1=RJ, 2=RI
+            "diagAwal"   => "required",
+            "tujuanKunj" => "required",
+            "user"       => "required",
+        ]);
+
+        if ($validator->fails()) {
+            return self::sendError(
+                $validator->errors()->first(),
+                $validator->errors(),
+                201,
+                null,
+                null
+            );
+        }
+
+        /* ------------------------------------------------------------------
+     * 3. Panggil endpoint UPDATE.
+     *    – Metode HTTP: PUT
+     *    – Endpoint   : SEP/2.0/update
+     * -----------------------------------------------------------------*/
+        try {
+            $url        = env('VCLAIM_URL') . "SEP/2.0/update";
+            $signature  = self::signature();
+            $signature['Content-Type'] = 'application/x-www-form-urlencoded';
+            $data = $SEPJsonReq;
+            $response = Http::timeout(10)
+                ->withHeaders($signature)
+                ->put($url, $data);
+
+            // Semua respons (sukses/gagal) di-decrypt & diproses di helper
+            return self::response_decrypt(
+                $response,
+                $signature,
+                $url,
+                $response->transferStats->getTransferTime()
+            );
+        } catch (\Throwable $e) {
+            // Catatan: $validator->errors() kosong di sini; bisa diganti []
+            return self::sendError($e->getMessage(), [], 408, $url ?? null, null);
+        }
+    }
+
+
     public static function sep_delete(Request $request)
     {
         $validator = Validator::make(request()->all(), [
