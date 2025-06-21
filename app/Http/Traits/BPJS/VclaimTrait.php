@@ -729,7 +729,7 @@ trait VclaimTrait
         // Masukkan Nilai dari parameter
         $r = [
             "request" => [
-                "request.noSPRI" => $kontrol['noSPRIBPJS'],
+                "noSPRI" => $kontrol['noSPRIBPJS'],
                 "noKartu" => $kontrol['noKartu'],
                 "tglRencanaKontrol" => Carbon::createFromFormat('d/m/Y', $kontrol['tglKontrol'], env('APP_TIMEZONE'))->format('Y-m-d'),
                 "poliKontrol" => $kontrol['poliKontrolBPJS'],
