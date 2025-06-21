@@ -140,9 +140,9 @@
                     $dataPasienRegNo = $dataPasien['pasien']['regNo'] ?? '110750Z';
                 @endphp
                 <livewire:cetak.cetak-etiket :regNo="$dataPasienRegNo" :wire:key="$dataPasienRegNo" />
-                <x-yellow-button wire:click.prevent="cetakSEP()" type="button" wire:loading.remove>Cetak
+                <x-yellow-button wire:click.prevent="cetakSEPRI()" type="button" wire:loading.remove>Cetak
                     SEP</x-yellow-button>
-                <div wire:loading wire:target="cetakSEP">
+                <div wire:loading wire:target="cetakSEPRI">
                     <x-loading />
                 </div>
             </div>
