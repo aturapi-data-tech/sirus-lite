@@ -119,7 +119,7 @@ class FormEntryRI extends Component
         ];
 
         $pdfContent = PDF::loadView(
-            'livewire.daftar-r-i.cetak-sep-ri',   // view Blade khusus SEP RI
+            'livewire.daftar-r-i.cetak-sep',   // view Blade khusus SEP RI
             $data
         )->output();
 
