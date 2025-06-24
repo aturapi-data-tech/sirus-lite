@@ -444,12 +444,10 @@ class Perencanaan extends Component
                 ],
             ],
         ];
-
         /* ------------------------------------------------------------
      * 2. Panggil Trait  ➜  sep_updtglplg()
      * ---------------------------------------------------------- */
         $HttpGetBpjs = VclaimTrait::sep_updtglplg($SEPJsonReq)->getOriginalContent();
-
         /* ------------------------------------------------------------
      * 3. Tangani respon & beri notifikasi
      * ---------------------------------------------------------- */

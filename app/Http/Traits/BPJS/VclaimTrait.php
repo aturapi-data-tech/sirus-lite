@@ -1263,7 +1263,6 @@ trait VclaimTrait
     public static function sep_updtglplg($SEPJsonReq)
     {
 
-
         /**
          * 2. Lengkapi data bantu yang dipakai validasi lintas-field.
          *    Contoh: baca tgl SEP & info lain dari DB SEP (table sep_master).
@@ -1326,14 +1325,14 @@ trait VclaimTrait
                 "required",
                 "date_format:Y-m-d",
                 "before_or_equal:$today",        // ≤ hari ini
-                "after_or_equal:$tglSep",        // ≥ tgl SEP
-                fn($attr, $value, $fail) => $isAlreadyReferred
-                    && $fail('tanggal pulang tidak bisa diupdate'),
+                // "after_or_equal:$tglSep",        // ≥ tgl SEP
+                // fn($attr, $value, $fail) => $isAlreadyReferred
+                //     && $fail('tanggal pulang tidak bisa diupdate'),
             ],
 
             // cara pulang meninggal
             'noSuratMeninggal' => 'required_if:statusPulang,4|min:5',
-            'tglMeninggal'     => 'required_if:statusPulang,4|date_format:Y-m-d',
+            'tglMeninggal'     => 'required_if:statusPulang,4|nullable|date_format:Y-m-d',
 
             // SEP KLL
             'noLPManual' => 'required_if:isKLL,1|min:5',
@@ -1347,7 +1346,6 @@ trait VclaimTrait
         }
 
 
-
         // handler when time out and off line mode
         try {
 
@@ -1358,6 +1356,7 @@ trait VclaimTrait
             $response = Http::timeout(10)
                 ->withHeaders($signature)
                 ->put($url, $data);
+            dd($response);
             // dd($response->transferStats->getTransferTime()); Get Transfertime request
             // semua response error atau sukses dari BPJS di handle pada logic response_decrypt
             return self::response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
