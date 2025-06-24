@@ -51,6 +51,9 @@ use App\Http\Livewire\Laporan\LaporanRJ;
 use App\Http\Livewire\Laporan\LaporanUGD;
 
 
+use App\Http\Livewire\GroupingBPJS\GroupingBPJS;
+
+
 
 
 /*
@@ -151,6 +154,11 @@ Route::group(['middleware' => ['role:Admin|Mr|Perawat|Dokter|Apoteker|Tu']], fun
     Route::get('LaporanRI', LaporanRI::class)->middleware('auth')->name('LaporanRI');
     Route::get('LaporanRJ', LaporanRJ::class)->middleware('auth')->name('LaporanRJ');
     Route::get('LaporanUGD', LaporanUGD::class)->middleware('auth')->name('LaporanUGD');
+
+
+
+    //Grouping
+    Route::get('GroupingBPJS', GroupingBPJS::class)->middleware('auth')->name('GroupingBPJS');
 });
 
 

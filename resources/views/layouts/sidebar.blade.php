@@ -376,6 +376,16 @@
                                         {{ __('Upload Rawat Jalan Bulanan') }}
                                     </x-nav-link>
                                 </li>
+
+
+                                <li>
+                                    <x-nav-link class="pl-4" :href="route('GroupingBPJS')" :active="request()->routeIs('GroupingBPJS')">
+                                        <!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
+
+
+                                        {{ __('Grouping BPJS') }}
+                                    </x-nav-link>
+                                </li>
                             </ul>
 
 
