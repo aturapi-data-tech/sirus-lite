@@ -1356,7 +1356,6 @@ trait VclaimTrait
             $response = Http::timeout(10)
                 ->withHeaders($signature)
                 ->put($url, $data);
-            dd($response);
             // dd($response->transferStats->getTransferTime()); Get Transfertime request
             // semua response error atau sukses dari BPJS di handle pada logic response_decrypt
             return self::response_decrypt($response, $signature, $url, $response->transferStats->getTransferTime());
