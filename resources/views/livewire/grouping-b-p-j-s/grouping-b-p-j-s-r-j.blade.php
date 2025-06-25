@@ -186,7 +186,10 @@
                 <tbody class="bg-white">
                     @foreach ($myQueryData as $index => $myQData)
                         @php
-                            $datadaftar_json = json_decode($myQData->datadaftarpolirj_json, true);
+                            $datadaftar_json = json_decode($row->datadaftarpolirj_json ?? '[]', true);
+                            if (json_last_error() !== JSON_ERROR_NONE) {
+                                $datadaftar_json = [];
+                            }
                             $tarif_rs = [
                                 'admin_up' => $myQData->admin_up,
                                 'jasa_karyawan' => $myQData->jasa_karyawan,
