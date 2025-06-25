@@ -51,7 +51,9 @@ use App\Http\Livewire\Laporan\LaporanRJ;
 use App\Http\Livewire\Laporan\LaporanUGD;
 
 
-use App\Http\Livewire\GroupingBPJS\GroupingBPJS;
+use App\Http\Livewire\GroupingBPJS\GroupingBPJSRJ;
+use App\Http\Livewire\GroupingBPJS\GroupingBPJSRI;
+
 
 
 
@@ -158,7 +160,8 @@ Route::group(['middleware' => ['role:Admin|Mr|Perawat|Dokter|Apoteker|Tu']], fun
 
 
     //Grouping
-    Route::get('GroupingBPJS', GroupingBPJS::class)->middleware('auth')->name('GroupingBPJS');
+    Route::get('GroupingBPJSRJ', GroupingBPJSRJ::class)->middleware('auth')->name('GroupingBPJSRJ');
+    Route::get('GroupingBPJSRI', GroupingBPJSRI::class)->middleware('auth')->name('GroupingBPJSRI');
 });
 
 

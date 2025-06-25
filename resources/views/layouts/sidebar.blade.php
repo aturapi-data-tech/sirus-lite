@@ -379,11 +379,20 @@
 
 
                                 <li>
-                                    <x-nav-link class="pl-4" :href="route('GroupingBPJS')" :active="request()->routeIs('GroupingBPJS')">
+                                    <x-nav-link class="pl-4" :href="route('GroupingBPJSRJ')" :active="request()->routeIs('GroupingBPJSRJ')">
                                         <!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
 
 
-                                        {{ __('Grouping BPJS') }}
+                                        {{ __('Grouping BPJS Rawat Jalan') }}
+                                    </x-nav-link>
+                                </li>
+
+                                <li>
+                                    <x-nav-link class="pl-4" :href="route('GroupingBPJSRI')" :active="request()->routeIs('GroupingBPJSRI')">
+                                        <!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
+
+
+                                        {{ __('Grouping BPJS Rawat Inap') }}
                                     </x-nav-link>
                                 </li>
                             </ul>
