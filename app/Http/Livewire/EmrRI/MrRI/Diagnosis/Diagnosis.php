@@ -343,7 +343,7 @@ class Diagnosis extends Component
             'proc_desc',
 
         )
-            ->where('proc_id', $search, 'xxx')
+            ->where('proc_id', $search . 'xxx')
             // ->where('active_status', '1')
             ->first();
 

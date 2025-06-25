@@ -104,7 +104,7 @@ class Diagnosis extends Component
             'diag_desc',
             'icdx'
         )
-            ->where('icdx', $search)
+            ->where('icdx', $search . 'xxx')
             // ->where('active_status', '1')
             ->first();
 
@@ -345,7 +345,7 @@ class Diagnosis extends Component
             'proc_desc',
 
         )
-            ->where('proc_id', $search)
+            ->where('proc_id', $search . 'xxx')
             // ->where('active_status', '1')
             ->first();
 
