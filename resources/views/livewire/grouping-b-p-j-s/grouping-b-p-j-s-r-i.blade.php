@@ -114,52 +114,55 @@
         {{-- Ringkasan biaya singkat --}}
         <div class="text-[13px] leading-5 bg-gray-50 rounded p-3 mb-3">
 
-            {{-- <span class="font-semibold">Admin RJ:</span>
-            {{ number_format($myQueryDataSum['admin_rawat_jalan'], 0, ',', '.') }} &nbsp;|&nbsp;
+            <div class="text-[13px] leading-5 bg-gray-50 rounded p-3 mb-3">
 
-            <span class="font-semibold">Admin UP:</span>
-            {{ number_format($myQueryDataSum['admin_up'], 0, ',', '.') }} &nbsp;|&nbsp;
+                <div class="grid grid-cols-5 gap-2">
+                    <!-- Card 1 -->
+                    <div class="p-4 bg-white border rounded-lg shadow">
+                        <div class="mb-1 text-xs text-gray-500">Jumlah Klaim (Total Data)</div>
+                        <div class="text-lg font-semibold text-gray-700">
+                            {{ number_format($myQueryDataSum['jml_all'], 0, ',', '.') }}
+                        </div>
+                    </div>
 
-            <span class="font-semibold">Jasa Dokter:</span>
-            {{ number_format($myQueryDataSum['jasa_dokter'], 0, ',', '.') }} &nbsp;|&nbsp;
+                    <!-- Card 2 -->
+                    <div class="p-4 bg-white border rounded-lg shadow">
+                        <div class="mb-1 text-xs text-gray-500">Total Biaya Klaim</div>
+                        <div class="text-lg font-semibold text-gray-700">
+                            Rp {{ number_format($myQueryDataSum['total_all'], 0, ',', '.') }}
+                        </div>
+                    </div>
 
-            <span class="font-semibold">Jasa Medis:</span>
-            {{ number_format($myQueryDataSum['jasa_medis'], 0, ',', '.') }} &nbsp;|&nbsp;
+                    <!-- Card 3 -->
+                    <div class="p-4 bg-white border rounded-lg shadow">
+                        <div class="mb-1 text-xs text-gray-500">Jumlah Klaim ke BPJS</div>
+                        <div class="text-lg font-semibold text-gray-700">
+                            {{ number_format($myQueryDataSum['jml_disetujui_bpjs'], 0, ',', '.') }}
+                        </div>
+                    </div>
 
-            <span class="font-semibold">Jasa Karyawan:</span>
-            {{ number_format($myQueryDataSum['jasa_karyawan'], 0, ',', '.') }} &nbsp;|&nbsp;
+                    <!-- Card 4 -->
+                    <div class="p-4 bg-white border rounded-lg shadow">
+                        <div class="mb-1 text-xs text-gray-500">Total Disetujui BPJS</div>
+                        <div class="text-lg font-semibold text-gray-700">
+                            Rp {{ number_format($myQueryDataSum['disetujui_bpjs'], 0, ',', '.') }}
+                        </div>
+                    </div>
 
-            <span class="font-semibold">Obat:</span>
-            {{ number_format($myQueryDataSum['obat'], 0, ',', '.') }} &nbsp;|&nbsp;
+                    <!-- Card 5 -->
+                    <div class="p-4 bg-white border rounded-lg shadow">
+                        <div class="mb-1 text-xs text-gray-500">Persentase Disetujui</div>
+                        <div class="text-lg font-semibold text-gray-700">
+                            {{ $myQueryDataSum['jml_all'] > 0
+                                ? number_format(($myQueryDataSum['jml_disetujui_bpjs'] / $myQueryDataSum['jml_all']) * 100, 2, ',', '.') . '%'
+                                : '0%' }}
+                        </div>
+                    </div>
+                </div>
 
-            <span class="font-semibold">Radiologi:</span>
-            {{ number_format($myQueryDataSum['radiologi'], 0, ',', '.') }} &nbsp;|&nbsp;
+            </div>
 
-            <span class="font-semibold">Laborat:</span>
-            {{ number_format($myQueryDataSum['laboratorium'], 0, ',', '.') }} &nbsp;|&nbsp;
-
-            <span class="font-semibold">Lain-lain:</span>
-            {{ number_format($myQueryDataSum['lain_lain'], 0, ',', '.') }} &nbsp;|&nbsp;
-
-            <br> --}}
-            <span class="font-bold text-primary">Jml Klaim:</span>
-            <span class="font-bold text-primary">{{ number_format($myQueryDataSum['jml_all'], 0, ',', '.') }}
-            </span>
-            &nbsp;|&nbsp;
-            <span class="font-bold text-primary">TOTAL:</span>
-            <span class="font-bold text-primary">{{ number_format($myQueryDataSum['total_all'], 0, ',', '.') }}
-            </span>
-
-            &nbsp;|&nbsp;
-            <span class="font-bold text-primary">Jml Klaim BPJS:</span>
-            <span class="font-bold text-primary">{{ number_format($myQueryDataSum['jml_disetujui_bpjs'], 0, ',', '.') }}
-            </span>
-            &nbsp;|&nbsp;
-            <span class="font-bold text-primary">Disetujui BPJS:</span>
-            <span class="font-bold text-primary">{{ number_format($myQueryDataSum['disetujui_bpjs'], 0, ',', '.') }}
-            </span>
         </div>
-
         {{-- Top Bar --}}
 
 
@@ -174,7 +177,7 @@
                     <tr>
                         <th scope="col" class="w-[5%] px-4 py-3">No</th>
                         <th scope="col" class="w-[25%] px-4 py-3">No SEP / Pasien RS&Klaim</th>
-                        <th scope="col" class="w-[20%] px-4 py-3">Tgl Rajal</th>
+                        <th scope="col" class="w-[20%] px-4 py-3">Tgl Masuk /Keluar</th>
                         <th scope="col" class="w-[10%] px-4 py-3">Riil RS</th>
                         <th scope="col" class="w-[10%] px-4 py-3">Tgl Verifikasi</th>
                         <th scope="col" class="w-[10%] px-4 py-3">Riil RS Inacbg</th>
@@ -186,20 +189,40 @@
                 <tbody class="bg-white">
                     @foreach ($myQueryData as $index => $myQData)
                         @php
-                            $datadaftar_json = json_decode($myQData->datadaftarpolirj_json, true);
-                            if (json_last_error() !== JSON_ERROR_NONE) {
-                                $datadaftar_json = [];
-                            }
+                            $datadaftar_json = json_decode($myQData->datadaftarri_json, true);
                             $tarif_rs = [
-                                'admin_up' => $myQData->admin_up,
-                                'jasa_karyawan' => $myQData->jasa_karyawan,
-                                'jasa_dokter' => $myQData->jasa_dokter,
-                                'jasa_medis' => $myQData->jasa_medis,
-                                'admin_rawat_jalan' => $myQData->admin_rawat_jalan,
-                                'lain_lain' => $myQData->lain_lain,
+                                /* ▶ Tenaga Medis & Tindakan */
+                                'jasa_dokter' => $myQData->jasa_dokter, // tindakan dokter
+                                'jasa_medis' => $myQData->jasa_medis, // tindakan paramedis / alat medis
+                                'konsultasi' => $myQData->konsultasi, // rstxn_rikonsuls
+                                'visit' => $myQData->visit, // rstxn_rivisits
+                                'operasi' => $myQData->operasi, // rstxn_rioks (OK)
+
+                                /* ▶ Administrasi */
+                                'admin_age' => $myQData->admin_age, // usia administrasi (if numeric)
+                                'admin_status' => $myQData->admin_status, // status admin (if numeric)
+
+                                /* ▶ Obat & Resep */
+                                'bon_resep' => $myQData->bon_resep, // biaya racikan / bon resep
+                                'obat_pinjam' => $myQData->obat_pinjam, // riobats
+                                'return_obat' => $myQData->return_obat, // riobatrtns
+                                'obat' =>
+                                    ($myQData->obat_pinjam ?? 0) -
+                                    ($myQData->return_obat ?? 0) +
+                                    ($myQData->bon_resep ?? 0),
+
+                                /* ▶ Penunjang */
                                 'radiologi' => $myQData->radiologi,
                                 'laboratorium' => $myQData->laboratorium,
-                                'obat' => $myQData->obat,
+
+                                /* ▶ Akomodasi Kamar Rawat Inap */
+                                'total_room_price' => $myQData->total_room_price,
+                                'total_perawatan_price' => $myQData->total_perawatan_price,
+                                'total_common_service' => $myQData->total_common_service,
+
+                                /* ▶ Lain-lain & Transisi */
+                                'lain_lain' => $myQData->lain_lain,
+                                'rawat_jalan' => $myQData->rawat_jalan, // biaya RJ yang masih dibukukan di RI
                             ];
                             $total_all = array_sum($tarif_rs);
 
@@ -219,15 +242,6 @@
                                     {{ $myQData->reg_no }} | {{ $myQData->reg_name }}
                                 </div>
 
-                                {{-- Dokter --}}
-                                <div class="text-sm text-gray-600">
-                                    Dokter: {{ $myQData->dr_name ?? '-' }}
-                                </div>
-
-                                {{-- Poli --}}
-                                <div class="text-sm text-gray-600">
-                                    Poli: {{ $myQData->poli_desc ?? '-' }}
-                                </div>
 
                                 {{-- Klaim BPJS --}}
                                 <x-badge :badgecolor="'green'" class="mt-1">
@@ -235,7 +249,14 @@
                                 </x-badge>
                             </td>
 
-                            <td class="px-4 py-3">{{ $myQData->rj_date }}</td>
+                            <td class="px-4 py-3">
+                                <span class="text-xs text-gray-500">Masuk:</span> <br>
+                                {{ $myQData->entry_date }} <br>
+
+                                <span class="text-xs text-gray-500">Keluar:</span> <br>
+                                {{ $myQData->exit_date }}
+                            </td>
+
                             <!-- Riil RS -->
                             <td class="px-4 py-3 text-right"> {{ number_format($total_all, 0, ',', '.') }}</td>
                             {{-- Persentase Selisih --}}

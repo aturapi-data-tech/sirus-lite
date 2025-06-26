@@ -4,7 +4,7 @@ namespace App\Http\Livewire\GroupingBPJS;
 
 
 use Illuminate\Support\Facades\DB;
-use App\Http\Traits\EmrRJ\EmrRJTrait;
+use App\Http\Traits\EmrRI\EmrRITrait;
 
 use Livewire\Component;
 
@@ -18,7 +18,7 @@ use Spatie\PdfToText\Pdf;
 
 class GroupingBPJSRI extends Component
 {
-    use WithPagination, WithFileUploads, EmrRJTrait;
+    use WithPagination, WithFileUploads, EmrRITrait;
 
     // primitive Variable
     public string $myTitle = 'FIle Grouping BPJS Rawat Inap';
@@ -92,29 +92,27 @@ class GroupingBPJSRI extends Component
         $text = str_replace("\xC2\xA0", ' ', $text);
         $text = preg_replace('/[ ]{2,}/', ' ', $text);
         $lines = array_values(array_filter(array_map('trim', explode("\n", $text))));
-
         // Hapus baris header
         $filtered = array_filter($lines, function ($line) {
             $line = trim(str_replace("\f", '', $line));
-            return !preg_match('/^(Hal\.\d+\/\d+|RINCIAN DATA HASIL VERIFIKASI|Nama RS|Tingkat Pelayanan|Bulan Pelayanan|^: .+|: RJTL|No$|No\.SEP|Tgl\. Verifikasi|Biaya$|Riil RS|Diajukan|Disetujui)$/i', $line);
+            return !preg_match('/^(Hal\.\d+\/\d+|RINCIAN DATA HASIL VERIFIKASI|Nama RS|Tingkat Pelayanan|Bulan Pelayanan|^: .+|: RITL|No$|No\.SEP|Tgl\. Verifikasi|Biaya$|Riil RS|Diajukan|Disetujui)$/i', $line);
         });
 
         $lines = array_values(array_filter($filtered)); // Reset index
         $data = [];
         $chunks = array_chunk($lines, 6); // tiap data pasien: 6 baris
-
         $myRefdate = $this->myTopBar['refDate'];
 
-        $dataRjLookup = DB::table('rsview_rjkasir')
-            ->select('vno_sep', 'rj_no')
-            ->where(DB::raw("nvl(rj_status,'A')"), '=', 'L')
+        $dataRjLookup = DB::table('rsview_rihdrs')
+            ->select('vno_sep', 'rihdr_no')
+            ->where(DB::raw("nvl(ri_status,'I')"), '=', 'P')
             ->whereIn('klaim_id', function ($klaimData) {
                 $klaimData->select('klaim_id')
                     ->from('rsmst_klaimtypes')
                     ->where('klaim_status', 'BPJS');
             })
-            ->where(DB::raw("to_char(rj_date,'mm/yyyy')"), '=', $myRefdate)
-            ->pluck('rj_no', 'vno_sep') // hasil: ['0184R006xxxx' => 'RJ2025xxxx']
+            ->where(DB::raw("to_char(exit_date,'mm/yyyy')"), '=', $myRefdate)
+            ->pluck('rihdr_no', 'vno_sep') // hasil: ['0184R006xxxx' => 'RI2025xxxx']
             ->toArray();
 
         foreach ($chunks as $index => $chunk) {
@@ -132,15 +130,15 @@ class GroupingBPJSRI extends Component
                 ];
 
                 if (!empty($dataRjLookup[$no_sep])) {
-                    $rj_no = $dataRjLookup[$no_sep];
+                    $rihdr_no = $dataRjLookup[$no_sep];
 
-                    $findDataRJ = $this->findDataRJ($rj_no);
+                    $findDataRI = $this->findDataRI($rihdr_no);
 
-                    $dataDaftarPoliRJ = $findDataRJ['dataDaftarRJ'];
+                    $dataDaftarRI = $findDataRI;
 
-                    $dataDaftarPoliRJ['umbalBpjs'] = $umbal;
+                    $dataDaftarRI['umbalBpjs'] = $umbal;
 
-                    $this->updateJsonRJ($rj_no, $dataDaftarPoliRJ);
+                    $this->updateJsonRI($rihdr_no, $dataDaftarRI);
                 } else {
                     $this->dataUmbalBPJSTidakAdaDiRS[] = $umbal;
                 }
@@ -176,36 +174,50 @@ class GroupingBPJSRI extends Component
         //////////////////////////////////////////
         // Query Khusus BPJS///////////////////////////////
         //////////////////////////////////////////
-        $query = DB::table('rsview_rjkasir')
+        $query = DB::table('rsview_rihdrs')
             ->select(
-                DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
-                DB::raw("to_char(rj_date,'yyyymmddhh24miss') AS rj_date1"),
+                DB::raw("to_char(entry_date,'dd/mm/yyyy hh24:mi:ss') AS entry_date"),
+                DB::raw("to_char(entry_date,'yyyymmddhh24miss') AS entry_date1"),
+                DB::raw("to_char(exit_date,'dd/mm/yyyy hh24:mi:ss') AS exit_date"),
+                DB::raw("to_char(exit_date,'yyyymmddhh24miss') AS exit_date1"),
                 'vno_sep',
-                'rj_no',
+                'rihdr_no',
                 'reg_no',
                 'reg_name',
-                'poli_id',
-                'poli_desc',
-                'dr_id',
-                'dr_name',
-                'datadaftarpolirj_json',
-                DB::raw("(select sum(txn_nominal) from rsview_rjstrs where rj_no = rsview_rjkasir.rj_no and txn_id = 'ADMIN UP') as admin_up"),
-                DB::raw("(select sum(txn_nominal) from rsview_rjstrs where rj_no = rsview_rjkasir.rj_no and txn_id = 'JASA KARYAWAN') as jasa_karyawan"),
-                DB::raw("(select sum(txn_nominal) from rsview_rjstrs where rj_no = rsview_rjkasir.rj_no and txn_id = 'JASA DOKTER') as jasa_dokter"),
-                DB::raw("(select sum(txn_nominal) from rsview_rjstrs where rj_no = rsview_rjkasir.rj_no and txn_id = 'JASA MEDIS')  as jasa_medis"),
-                DB::raw("(select sum(txn_nominal) from rsview_rjstrs where rj_no = rsview_rjkasir.rj_no and txn_id = 'ADMIN RAWAT JALAN') as admin_rawat_jalan"),
-                DB::raw("(select sum(txn_nominal) from rsview_rjstrs where rj_no = rsview_rjkasir.rj_no and txn_id = 'LAIN-LAIN') as lain_lain"),
-                DB::raw("(select sum(txn_nominal) from rsview_rjstrs where rj_no = rsview_rjkasir.rj_no and txn_id = 'RADIOLOGI')  as radiologi"),
-                DB::raw("(select sum(txn_nominal) from rsview_rjstrs where rj_no = rsview_rjkasir.rj_no and txn_id = 'LABORAT')  as laboratorium"),
-                DB::raw("(select sum(txn_nominal) from rsview_rjstrs where rj_no = rsview_rjkasir.rj_no and txn_id = 'OBAT') as obat"),
+                'datadaftarri_json',
+
+
+                DB::raw("(SELECT SUM(NVL(actd_price, 0) * NVL(actd_qty, 0)) FROM rstxn_riactdocs WHERE rihdr_no = rsview_rihdrs.rihdr_no) as jasa_dokter"),
+                DB::raw("(SELECT SUM(NVL(actp_price, 0) * NVL(actp_qty, 0)) FROM rstxn_riactparams WHERE rihdr_no = rsview_rihdrs.rihdr_no) as jasa_medis"),
+                DB::raw("(SELECT SUM(NVL(konsul_price, 0)) FROM rstxn_rikonsuls WHERE rihdr_no = rsview_rihdrs.rihdr_no) as konsultasi"),
+                DB::raw("(SELECT SUM(NVL(visit_price, 0)) FROM rstxn_rivisits WHERE rihdr_no = rsview_rihdrs.rihdr_no) as visit"),
+                'admin_age',
+                'admin_status',
+                DB::raw("(SELECT SUM(NVL(ribon_price, 0)) FROM rstxn_ribonobats WHERE rihdr_no = rsview_rihdrs.rihdr_no) as bon_resep"),
+                DB::raw("(SELECT SUM(NVL(riobat_qty, 0) * NVL(riobat_price, 0)) FROM rstxn_riobats WHERE rihdr_no = rsview_rihdrs.rihdr_no) as obat_pinjam"),
+                DB::raw("(SELECT SUM(NVL(riobat_qty, 0) * NVL(riobat_price, 0)) FROM rstxn_riobatrtns WHERE rihdr_no = rsview_rihdrs.rihdr_no) as return_obat"),
+                DB::raw("(SELECT SUM(NVL(rirad_price, 0)) FROM rstxn_riradiologs WHERE rihdr_no = rsview_rihdrs.rihdr_no) as radiologi"),
+                DB::raw("(SELECT SUM(NVL(lab_price, 0)) FROM rstxn_rilabs WHERE rihdr_no = rsview_rihdrs.rihdr_no) as laboratorium"),
+                DB::raw("(SELECT SUM(NVL(ok_price, 0)) FROM rstxn_rioks WHERE rihdr_no = rsview_rihdrs.rihdr_no) as operasi"),
+                DB::raw("(SELECT SUM(NVL(other_price, 0)) FROM rstxn_riothers WHERE rihdr_no = rsview_rihdrs.rihdr_no) as lain_lain"),
+                DB::raw("(SELECT SUM(
+                        NVL(rj_admin, 0) + NVL(poli_price, 0) + NVL(acte_price, 0) +
+                        NVL(actp_price, 0) + NVL(actd_price, 0) + NVL(obat, 0) +
+                        NVL(lab, 0) + NVL(rad, 0) + NVL(other, 0) + NVL(rs_admin, 0)
+                    )
+                    FROM rstxn_ritempadmins WHERE rihdr_no = rsview_rihdrs.rihdr_no) as rawat_jalan"),
+
+                DB::raw("(SELECT SUM(NVL(room_price, 0) * ROUND(NVL(day, NVL(end_date, SYSDATE+1) - NVL(start_date, SYSDATE)))) FROM rsmst_trfrooms WHERE rihdr_no = rsview_rihdrs.rihdr_no) as total_room_price"),
+                DB::raw("(SELECT SUM(NVL(perawatan_price, 0) * ROUND(NVL(day, NVL(end_date, SYSDATE+1) - NVL(start_date, SYSDATE)))) FROM rsmst_trfrooms WHERE rihdr_no = rsview_rihdrs.rihdr_no) as total_perawatan_price"),
+                DB::raw("(SELECT SUM(NVL(common_service, 0) * ROUND(NVL(day, NVL(end_date, SYSDATE+1) - NVL(start_date, SYSDATE)))) FROM rsmst_trfrooms WHERE rihdr_no = rsview_rihdrs.rihdr_no) as total_common_service"),
             )
-            ->where(DB::raw("nvl(rj_status,'A')"), '=', 'L')
+            ->where(DB::raw("nvl(ri_status,'I')"), '=', 'P')
             ->whereIn('klaim_id', function ($klaimData) {
                 $klaimData->select('klaim_id')
                     ->from('rsmst_klaimtypes')
                     ->where('klaim_status', 'BPJS');
             })
-            ->where(DB::raw("to_char(rj_date,'mm/yyyy')"), '=', $myRefdate);
+            ->where(DB::raw("to_char(exit_date,'mm/yyyy')"), '=', $myRefdate);
 
         $query->where(function ($q) use ($mySearch) {
             $q->Where(DB::raw('upper(reg_name)'), 'like', '%' . strtoupper($mySearch) . '%')
@@ -213,20 +225,27 @@ class GroupingBPJSRI extends Component
                 ->orWhere(DB::raw('upper(vno_sep)'), 'like', '%' . strtoupper($mySearch) . '%')
                 ->orWhere(DB::raw('upper(dr_name)'), 'like', '%' . strtoupper($mySearch) . '%');
         })
-            ->orderBy('rj_date1',  'desc');
+            ->orderBy('exit_date1',  'desc');
 
         $detail = $query->get();
         $myQueryDataSum = [
-            'admin_up'         => $detail->sum('admin_up'),
-            'jasa_karyawan'    => $detail->sum('jasa_karyawan'),
-            'jasa_dokter'      => $detail->sum('jasa_dokter'),
-            'jasa_medis'       => $detail->sum('jasa_medis'),
-            'admin_rawat_jalan' => $detail->sum('admin_rawat_jalan'),
-            'lain_lain'        => $detail->sum('lain_lain'),
-            'radiologi'        => $detail->sum('radiologi'),
-            'laboratorium'     => $detail->sum('laboratorium'),
-            'obat'             => $detail->sum('obat'),
-
+            'jasa_dokter'           => $detail->sum('jasa_dokter'),
+            'jasa_medis'            => $detail->sum('jasa_medis'),
+            'konsultasi'            => $detail->sum('konsultasi'),
+            'visit'                 => $detail->sum('visit'),
+            'admin_age'             => $detail->sum('admin_age'),
+            'admin_status'          => $detail->sum('admin_status'),
+            'bon_resep'             => $detail->sum('bon_resep'),
+            'obat_pinjam'           => $detail->sum('obat_pinjam'),
+            'return_obat'           => $detail->sum('return_obat'),
+            'radiologi'             => $detail->sum('radiologi'),
+            'laboratorium'          => $detail->sum('laboratorium'),
+            'operasi'               => $detail->sum('operasi'),
+            'lain_lain'             => $detail->sum('lain_lain'),
+            'rawat_jalan'           => $detail->sum('rawat_jalan'),
+            'total_room_price'      => $detail->sum('total_room_price'),
+            'total_perawatan_price' => $detail->sum('total_perawatan_price'),
+            'total_common_service'  => $detail->sum('total_common_service'),
         ];
         // sumall
         $myQueryDataSum['total_all'] = array_sum($myQueryDataSum);
@@ -237,7 +256,7 @@ class GroupingBPJSRI extends Component
         $jumlahDisetujui = 0;
         $jmlKlaimDisetujui = 0;
         foreach ($detail as $row) {
-            $json = json_decode($row->datadaftarpolirj_json, true);
+            $json = json_decode($row->datadaftarri_json, true);
             if (!empty($json['umbalBpjs']['disetujui'])) {
                 $jumlahDisetujui += (int) $json['umbalBpjs']['disetujui'];
                 $jmlKlaimDisetujui++;

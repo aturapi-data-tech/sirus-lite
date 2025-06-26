@@ -114,52 +114,51 @@
         {{-- Ringkasan biaya singkat --}}
         <div class="text-[13px] leading-5 bg-gray-50 rounded p-3 mb-3">
 
-            {{-- <span class="font-semibold">Admin RJ:</span>
-            {{ number_format($myQueryDataSum['admin_rawat_jalan'], 0, ',', '.') }} &nbsp;|&nbsp;
+            <div class="grid grid-cols-5 gap-2">
+                <!-- Card 1 -->
+                <div class="p-4 bg-white border rounded-lg shadow">
+                    <div class="mb-1 text-xs text-gray-500">Jumlah Klaim (Total Data)</div>
+                    <div class="text-lg font-semibold text-gray-700">
+                        {{ number_format($myQueryDataSum['jml_all'], 0, ',', '.') }}
+                    </div>
+                </div>
 
-            <span class="font-semibold">Admin UP:</span>
-            {{ number_format($myQueryDataSum['admin_up'], 0, ',', '.') }} &nbsp;|&nbsp;
+                <!-- Card 2 -->
+                <div class="p-4 bg-white border rounded-lg shadow">
+                    <div class="mb-1 text-xs text-gray-500">Total Biaya Klaim</div>
+                    <div class="text-lg font-semibold text-gray-700">
+                        Rp {{ number_format($myQueryDataSum['total_all'], 0, ',', '.') }}
+                    </div>
+                </div>
 
-            <span class="font-semibold">Jasa Dokter:</span>
-            {{ number_format($myQueryDataSum['jasa_dokter'], 0, ',', '.') }} &nbsp;|&nbsp;
+                <!-- Card 3 -->
+                <div class="p-4 bg-white border rounded-lg shadow">
+                    <div class="mb-1 text-xs text-gray-500">Jumlah Klaim ke BPJS</div>
+                    <div class="text-lg font-semibold text-gray-700">
+                        {{ number_format($myQueryDataSum['jml_disetujui_bpjs'], 0, ',', '.') }}
+                    </div>
+                </div>
 
-            <span class="font-semibold">Jasa Medis:</span>
-            {{ number_format($myQueryDataSum['jasa_medis'], 0, ',', '.') }} &nbsp;|&nbsp;
+                <!-- Card 4 -->
+                <div class="p-4 bg-white border rounded-lg shadow">
+                    <div class="mb-1 text-xs text-gray-500">Total Disetujui BPJS</div>
+                    <div class="text-lg font-semibold text-gray-700">
+                        Rp {{ number_format($myQueryDataSum['disetujui_bpjs'], 0, ',', '.') }}
+                    </div>
+                </div>
 
-            <span class="font-semibold">Jasa Karyawan:</span>
-            {{ number_format($myQueryDataSum['jasa_karyawan'], 0, ',', '.') }} &nbsp;|&nbsp;
+                <!-- Card 5 -->
+                <div class="p-4 bg-white border rounded-lg shadow">
+                    <div class="mb-1 text-xs text-gray-500">Persentase Disetujui</div>
+                    <div class="text-lg font-semibold text-gray-700">
+                        {{ $myQueryDataSum['jml_all'] > 0
+                            ? number_format(($myQueryDataSum['jml_disetujui_bpjs'] / $myQueryDataSum['jml_all']) * 100, 2, ',', '.') . '%'
+                            : '0%' }}
+                    </div>
+                </div>
+            </div>
 
-            <span class="font-semibold">Obat:</span>
-            {{ number_format($myQueryDataSum['obat'], 0, ',', '.') }} &nbsp;|&nbsp;
-
-            <span class="font-semibold">Radiologi:</span>
-            {{ number_format($myQueryDataSum['radiologi'], 0, ',', '.') }} &nbsp;|&nbsp;
-
-            <span class="font-semibold">Laborat:</span>
-            {{ number_format($myQueryDataSum['laboratorium'], 0, ',', '.') }} &nbsp;|&nbsp;
-
-            <span class="font-semibold">Lain-lain:</span>
-            {{ number_format($myQueryDataSum['lain_lain'], 0, ',', '.') }} &nbsp;|&nbsp;
-
-            <br> --}}
-            <span class="font-bold text-primary">Jml Klaim:</span>
-            <span class="font-bold text-primary">{{ number_format($myQueryDataSum['jml_all'], 0, ',', '.') }}
-            </span>
-            &nbsp;|&nbsp;
-            <span class="font-bold text-primary">TOTAL:</span>
-            <span class="font-bold text-primary">{{ number_format($myQueryDataSum['total_all'], 0, ',', '.') }}
-            </span>
-
-            &nbsp;|&nbsp;
-            <span class="font-bold text-primary">Jml Klaim BPJS:</span>
-            <span class="font-bold text-primary">{{ number_format($myQueryDataSum['jml_disetujui_bpjs'], 0, ',', '.') }}
-            </span>
-            &nbsp;|&nbsp;
-            <span class="font-bold text-primary">Disetujui BPJS:</span>
-            <span class="font-bold text-primary">{{ number_format($myQueryDataSum['disetujui_bpjs'], 0, ',', '.') }}
-            </span>
         </div>
-
         {{-- Top Bar --}}
 
 
@@ -186,10 +185,7 @@
                 <tbody class="bg-white">
                     @foreach ($myQueryData as $index => $myQData)
                         @php
-                            $datadaftar_json = json_decode($row->datadaftarpolirj_json ?? '[]', true);
-                            if (json_last_error() !== JSON_ERROR_NONE) {
-                                $datadaftar_json = [];
-                            }
+                            $datadaftar_json = json_decode($myQData->datadaftarpolirj_json, true);
                             $tarif_rs = [
                                 'admin_up' => $myQData->admin_up,
                                 'jasa_karyawan' => $myQData->jasa_karyawan,
