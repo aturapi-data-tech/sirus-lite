@@ -25,9 +25,9 @@ class GroupingBPJSRI extends Component
     public string $mySnipt = 'Grouping BPJS Rawat Inap';
     public string $myProgram = 'Grouping BPJS Rawat Inap';
 
-    public array $myLimitPerPages = [50, 100, 150, 200, 1000];
+    public array $myLimitPerPages = [10, 50, 100, 150, 200, 1000];
     // limit record per page -resetExcept////////////////
-    public int $limitPerPage = 50;
+    public int $limitPerPage = 10;
 
 
 
