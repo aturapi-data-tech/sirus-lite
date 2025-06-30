@@ -68,7 +68,7 @@
 
                         {{-- Tombol Proses --}}
                         <x-green-button type="submit" wire:loading.attr="disabled" wire:loading.remove
-                            wire:target="file,readPdfUmbalBPJS">
+                            wire:target="readPdfUmbalBPJS">
                             Proses PDF
                         </x-green-button>
                         {{-- Spinner saat proses --}}
