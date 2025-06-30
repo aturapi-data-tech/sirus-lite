@@ -86,7 +86,7 @@ class GroupingBPJSRJ extends Component
         ]);
 
         $path = $this->file->getRealPath();
-        $text = Pdf::getText($path, '/usr/bin/pdftotext');
+        $text = Pdf::getText($path, '/usr/local/bin/pdftotext-wrapper');
 
         // Normalisasi teks
         $text = str_replace("\xC2\xA0", ' ', $text);
