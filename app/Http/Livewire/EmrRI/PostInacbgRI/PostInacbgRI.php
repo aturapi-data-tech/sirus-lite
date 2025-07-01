@@ -354,24 +354,25 @@ class PostInacbgRI extends Component
             $tarifRs = [
                 // 0. Siapkan variabel dulu — sesuaikan logika hitung Anda
                 'prosedur_non_bedah' => '0',        // baru
-                'prosedur_bedah'     => (string) $totalOperasi,                 // ganti operasi
-                'konsultasi'         => (string) $totalKonsul,                  // pisahkan
-                'tenaga_ahli'        => (string) ($totalVisit + $totalJasaDokter),
-                'keperawatan'        => (string) ($totalJasaMedis + $perawatanPriceTotal),
-                'penunjang'          => (string) ($adminAge + $adminStatus + $commonServiceTotal),
-                'radiologi'          => (string) $totalRadiologi,
-                'laboratorium'       => (string) $totalLaboratorium,
+                'prosedur_bedah'     => (string) ($totalOperasi ?? 0),
+                'konsultasi'         => (string) ($totalKonsul ?? 0),
+                'tenaga_ahli'        => (string) ((float) ($totalVisit ?? 0) + (float) ($totalJasaDokter ?? 0)),
+                'keperawatan'        => (string) ((float) ($totalJasaMedis ?? 0) + (float) ($perawatanPriceTotal ?? 0)),
+                'penunjang'          => (string) ((float) ($adminAge ?? 0) + (float) ($adminStatus ?? 0) + (float) ($commonServiceTotal ?? 0)),
+                'radiologi'          => (string) ($totalRadiologi ?? 0),
+                'laboratorium'       => (string) ($totalLaboratorium ?? 0),
                 'pelayanan_darah'    => '0',
                 'rehabilitasi'       => '0',
-                'kamar'              => (string) $roomPriceTotal,               // gabungan akomodasi
-                'rawat_intensif'     => '0',                     // baru
-                'obat'               => (string) ($totalBonResep + $totalObatPinjam - $totalReturnObat),
-                'obat_kemoterapi'    => '0',                                    // isi bila ada
+                'kamar'              => (string) ($roomPriceTotal ?? 0),
+                'rawat_intensif'     => '0',
+                'obat'               => (string) ((float) ($totalBonResep ?? 0) + (float) ($totalObatPinjam ?? 0) - (float) ($totalReturnObat ?? 0)),
+                'obat_kemoterapi'    => '0',
                 'obat_kronis'        => '0',
-                'alkes'              => '0',                                    // rename dari alat_kesehatan
+                'alkes'              => '0',
                 'bmhp'               => '0',
-                'sewa_alat'          => (string)$totalOther + $totalRjTemp,
+                'sewa_alat'          => (string) ((float) ($totalOther ?? 0) + (float) ($totalRjTemp ?? 0)),
             ];
+
 
             $data = [
                 'nomor_sep'   => $nomorSEP, // identifier klaim

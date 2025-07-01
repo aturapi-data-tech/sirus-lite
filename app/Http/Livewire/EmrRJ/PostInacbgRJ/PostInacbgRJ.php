@@ -308,13 +308,13 @@ class PostInacbgRJ extends Component
             // $obatKronis = 0;
 
             $tarifRs = [
-                'tenaga_ahli'   => (float) $jk + $up,
-                'keperawatan'   => (float) $jm + $jd,
-                'penunjang' => (float) $rsAdmin + $lain,
-                'radiologi' => (float) $radiologi,
-                'laboratorium'  => (float) $laboratorium,
-                'obat' => (float) $obat,
-                // 'obat_kronis'   => (float) $obatKronis,
+                'tenaga_ahli'   => (float) ($jk ?? 0) + (float) ($up ?? 0),
+                'keperawatan'   => (float) ($jm ?? 0) + (float) ($jd ?? 0),
+                'penunjang'     => (float) ($rsAdmin ?? 0) + (float) ($lain ?? 0),
+                'radiologi'     => (float) ($radiologi ?? 0),
+                'laboratorium'  => (float) ($laboratorium ?? 0),
+                'obat'          => (float) ($obat ?? 0),
+                // 'obat_kronis'   => (float) ($obatKronis ?? 0),
             ];
 
             $data = [
