@@ -259,7 +259,7 @@
 
                             <!-- Riil RS -->
                             <td class="px-4 py-3 text-right">
-                                <div class="mt-1 text-xs text-gray-700 text-left space-y-0.5">
+                                {{-- <div class="mt-1 text-xs text-gray-700 text-left space-y-0.5">
                                     @foreach ($tarif_rs as $label => $nilai)
                                         @if ($nilai > 0)
                                             <div class="flex justify-between">
@@ -269,7 +269,7 @@
                                             </div>
                                         @endif
                                     @endforeach
-                                </div>
+                                </div> --}}
                                 {{ number_format($total_all, 0, ',', '.') }}
                             </td>
                             {{-- Persentase Selisih --}}

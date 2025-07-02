@@ -245,7 +245,31 @@
                                 <x-input-error :messages=$message />
                             @enderror
                         </div>
+                        <div>
+                            <div class="flex items-center ml-2 space-x-4">
+                                <!-- Radio button for Non-Katarak -->
+                                <label class="inline-flex items-center">
+                                    <input type="radio" class="form-radio text-primary"
+                                        wire:model="SEPJsonReq.request.t_sep.katarak.katarak" value="0"
+                                        @if ($disabledProperty) disabled @endif>
+                                    <span class="ml-2">Non-Katarak</span>
+                                </label>
+
+                                <!-- Radio button for Katarak -->
+                                <label class="inline-flex items-center">
+                                    <input type="radio" class="form-radio text-primary"
+                                        wire:model="SEPJsonReq.request.t_sep.katarak.katarak" value="1"
+                                        @if ($disabledProperty) disabled @endif>
+                                    <span class="ml-2">Katarak</span>
+                                </label>
+                            </div>
+
+                            @error('SEPJsonReq.request.t_sep.katarak.katarak')
+                                <x-input-error :messages="$message" class="ml-2" />
+                            @enderror
+                        </div>
                     </div>
+
 
                     <div>
                         <div class="flex">

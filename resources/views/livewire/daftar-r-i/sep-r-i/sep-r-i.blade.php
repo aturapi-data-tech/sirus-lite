@@ -44,6 +44,18 @@
                                 :disabled="true" />
                         </div>
 
+                        <div>
+                            <x-input-label :value="'Katarak'" :required="false" />
+                            <div class="grid grid-cols-4 gap-2">
+                                {{-- Katarak: Ya --}}
+                                <x-radio-button label="Ya" value="1"
+                                    wire:model="dataDaftarRi.sep.reqSep.request.t_sep.katarak.katarak" />
+                                {{-- Katarak: Tidak --}}
+                                <x-radio-button label="Tidak" value="0"
+                                    wire:model="dataDaftarRi.sep.reqSep.request.t_sep.katarak.katarak" />
+                            </div>
+                        </div>
+
                         {{-- Rujukan --}}
                         <div class="grid grid-cols-2 gap-2 mb-2">
                             <div>
