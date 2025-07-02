@@ -203,9 +203,9 @@
                                 'admin_status' => $myQData->admin_status, // status admin (if numeric)
 
                                 /* ▶ Obat & Resep */
-                                'bon_resep' => $myQData->bon_resep, // biaya racikan / bon resep
-                                'obat_pinjam' => $myQData->obat_pinjam, // riobats
-                                'return_obat' => $myQData->return_obat, // riobatrtns
+                                //'bon_resep' => $myQData->bon_resep, // biaya racikan / bon resep
+                                //'obat_pinjam' => $myQData->obat_pinjam, // riobats
+                                //'return_obat' => $myQData->return_obat, // riobatrtns
                                 'obat' =>
                                     ($myQData->obat_pinjam ?? 0) -
                                     ($myQData->return_obat ?? 0) +
@@ -258,7 +258,20 @@
                             </td>
 
                             <!-- Riil RS -->
-                            <td class="px-4 py-3 text-right"> {{ number_format($total_all, 0, ',', '.') }}</td>
+                            <td class="px-4 py-3 text-right">
+                                <div class="mt-1 text-xs text-gray-700 text-left space-y-0.5">
+                                    @foreach ($tarif_rs as $label => $nilai)
+                                        @if ($nilai > 0)
+                                            <div class="flex justify-between">
+                                                <span class="capitalize">{{ str_replace('_', ' ', $label) }}</span>
+                                                <span
+                                                    class="text-right">{{ number_format($nilai, 0, ',', '.') }}</span>
+                                            </div>
+                                        @endif
+                                    @endforeach
+                                </div>
+                                {{ number_format($total_all, 0, ',', '.') }}
+                            </td>
                             {{-- Persentase Selisih --}}
                             @php
                                 $riil_rs = (int) ($umbal['riil_rs'] ?? 0);
