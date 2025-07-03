@@ -148,9 +148,7 @@
         <div>
 
             @php
-                $tingkatKegawatan = $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['tingkatKegawatan']
-                    ? $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['tingkatKegawatan']
-                    : 'P0';
+                $tingkatKegawatan = $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['tingkatKegawatan'] ?? 'P0';
 
                 $tingkatKegawatanBgColor = match ($tingkatKegawatan) {
                     'P1' => 'red',
