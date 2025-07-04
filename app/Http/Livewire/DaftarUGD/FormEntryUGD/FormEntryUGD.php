@@ -1676,8 +1676,57 @@ class FormEntryUGD extends Component
         //////////////////////////////////////////////
     }
 
-    private function pushUpdateSEP($SEPJsonReq)
+    private function pushUpdateSEP($SEPJsonReqUpdate)
     {
+        $req = $SEPJsonReqUpdate ?? [];
+        /* 1. Panggil endpoint UPDATE */
+
+        $SEPJsonReq = [
+            'request' => [
+                't_sep' => [
+                    'noSep'     => $req['t_sep']['noSep'] ?? '',
+                    'klsRawat'  => [
+                        'klsRawatHak' => $req['t_sep']['klsRawat']['klsRawatHak'] ?? '',
+                        'klsRawatNaik' => $req['t_sep']['klsRawat']['klsRawatNaik'] ?? '',
+                        'pembiayaan' => $req['t_sep']['klsRawat']['pembiayaan'] ?? '',
+                        'penanggungJawab' => $req['t_sep']['klsRawat']['penanggungJawab'] ?? '',
+                    ],
+                    'noMR'      => $req['t_sep']['noMR'] ?? '',
+                    'catatan'   => $req['t_sep']['catatan'] ?? '',
+                    'diagAwal'  => $req['t_sep']['diagAwal'] ?? '',
+                    'poli'      => [
+                        'tujuan'    => $req['t_sep']['poli']['tujuan'] ?? '',
+                        'eksekutif' => $req['t_sep']['poli']['eksekutif'] ?? '0',
+                    ],
+                    'cob'       => [
+                        'cob' => $req['t_sep']['cob']['cob'] ?? '0',
+                    ],
+                    'katarak'   => [
+                        'katarak' => $req['t_sep']['katarak']['katarak'] ?? '0',
+                    ],
+                    'jaminan' => [
+                        'lakaLantas' => $req['t_sep']['jaminan']['lakaLantas'] ?? '0',
+                        'penjamin' => [
+                            'tglKejadian' => $req['t_sep']['jaminan']['penjamin']['tglKejadian'] ?? '',
+                            'keterangan' => $req['t_sep']['jaminan']['penjamin']['keterangan'] ?? '',
+                            'suplesi' => [
+                                'suplesi' => $req['t_sep']['jaminan']['penjamin']['suplesi']['suplesi'] ?? '0',
+                                'noSepSuplesi' => $req['t_sep']['jaminan']['penjamin']['suplesi']['noSepSuplesi'] ?? '',
+                                'lokasiLaka' => [
+                                    'kdPropinsi' => $req['t_sep']['jaminan']['penjamin']['suplesi']['lokasiLaka']['kdPropinsi'] ?? '',
+                                    'kdKabupaten' => $req['t_sep']['jaminan']['penjamin']['suplesi']['lokasiLaka']['kdKabupaten'] ?? '',
+                                    'kdKecamatan' => $req['t_sep']['jaminan']['penjamin']['suplesi']['lokasiLaka']['kdKecamatan'] ?? '',
+                                ]
+                            ]
+                        ]
+                    ],
+                    'dpjpLayan' => $req['t_sep']['dpjpLayan'] ?? '',
+                    'noTelp'    => $req['t_sep']['noTelp'] ?? '',
+                    'user'      => 'siRUS',
+                ]
+            ]
+        ];
+
         // if sep kosong
         if ($this->dataDaftarUgd['sep']['noSep']) {
             //ketika Push Tambah Antrean Berhasil buat SEP
