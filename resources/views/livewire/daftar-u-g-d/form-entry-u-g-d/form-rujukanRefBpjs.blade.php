@@ -316,7 +316,8 @@
                             <div class="col-span-3">
                                 <x-dropdown align="right" width="80">
                                     <x-slot name="trigger">
-                                        <x-alternative-button class="flex items-center justify-between w-full">
+                                        <x-alternative-button wire:click.prevent=""
+                                            class="flex items-center justify-between w-full">
                                             <span>
                                                 {{ isset($SEPJsonReq['request']['t_sep']['tujuanKunj']) ? $SEPJsonReq['request']['t_sep']['tujuanKunj'] : 'Data tidak dapat di proses' }}
                                                 {{ isset($SEPJsonReq['request']['t_sep']['tujuanKunjDesc']) ? $SEPJsonReq['request']['t_sep']['tujuanKunjDesc'] : 'Data tidak dapat diproses' }}
@@ -350,7 +351,8 @@
                                 <div class="col-span-3">
                                     <x-dropdown align="right" width="80">
                                         <x-slot name="trigger">
-                                            <x-alternative-button class="flex items-center justify-between w-full">
+                                            <x-alternative-button wire:click.prevent=""
+                                                class="flex items-center justify-between w-full">
                                                 <span>
                                                     {{ isset($SEPJsonReq['request']['t_sep']['flagProcedure']) ? $SEPJsonReq['request']['t_sep']['flagProcedure'] : 'Data tidak dapat di proses' }}
                                                     {{ isset($SEPJsonReq['request']['t_sep']['flagProcedureDesc']) ? $SEPJsonReq['request']['t_sep']['flagProcedureDesc'] : 'Data tidak dapat di proses' }}
@@ -384,7 +386,8 @@
                                 <div class="col-span-3">
                                     <x-dropdown align="right" width="80">
                                         <x-slot name="trigger">
-                                            <x-alternative-button class="flex items-center justify-between w-full">
+                                            <x-alternative-button wire:click.prevent=""
+                                                class="flex items-center justify-between w-full">
                                                 <span>
                                                     {{ isset($SEPJsonReq['request']['t_sep']['kdPenunjang']) ? $SEPJsonReq['request']['t_sep']['kdPenunjang'] : 'Data tidak dapat diproses' }}
                                                     {{ isset($SEPJsonReq['request']['t_sep']['kdPenunjangDesc']) ? $SEPJsonReq['request']['t_sep']['kdPenunjangDesc'] : 'Data tidak dapat di proses' }}
@@ -420,7 +423,8 @@
                                 <div class="col-span-3">
                                     <x-dropdown align="right" width="80">
                                         <x-slot name="trigger">
-                                            <x-alternative-button class="flex items-center justify-between w-full">
+                                            <x-alternative-button wire:click.prevent=""
+                                                class="flex items-center justify-between w-full">
                                                 <span>
                                                     {{ isset($SEPJsonReq['request']['t_sep']['assesmentPel']) ? $SEPJsonReq['request']['t_sep']['assesmentPel'] : 'Data tidak dapat di proses' }}
                                                     {{ isset($SEPJsonReq['request']['t_sep']['assesmentPelDesc']) ? $SEPJsonReq['request']['t_sep']['assesmentPelDesc'] : 'Data tidak dapat di proses' }}
