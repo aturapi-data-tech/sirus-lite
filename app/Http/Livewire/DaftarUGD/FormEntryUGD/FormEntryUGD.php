@@ -767,8 +767,10 @@ class FormEntryUGD extends Component
         // Validate RJ
         $this->validateDataRJ();
 
-        if ($this->JenisKlaim['JenisKlaimId'] == 'JM') {
-            $this->pushInsertSEP($this->SEPJsonReq);
+        if ($this->JenisKlaim['JenisKlaimId'] == 'JM' && empty($this->dataDaftarUgd['sep']['noSep'])) {
+            $this->pushInsertSEP($this->dataDaftarUgd['sep']['reqSep']);
+        } else {
+            $this->pushUpdateSEP($this->dataDaftarUgd['sep']['reqSep']);
         }
 
 
@@ -1667,6 +1669,28 @@ class FormEntryUGD extends Component
                 toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('SEP ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
             } else {
                 toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('SEP ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+            }
+        }
+        // response sep value
+        //ketika Push Tambah Antrean Berhasil buat SEP
+        //////////////////////////////////////////////
+    }
+
+    private function pushUpdateSEP($SEPJsonReq)
+    {
+        // if sep kosong
+        if ($this->dataDaftarUgd['sep']['noSep']) {
+            //ketika Push Tambah Antrean Berhasil buat SEP
+            //////////////////////////////////////////////
+            $HttpGetBpjs =  VclaimTrait::sep_update($SEPJsonReq)->getOriginalContent();
+            if ($HttpGetBpjs['metadata']['code'] == 200) {
+                // dd($HttpGetBpjs);
+                $this->dataDaftarUgd['sep']['resSep'] = $HttpGetBpjs['response']['sep'];
+                $this->dataDaftarUgd['sep']['noSep'] = $HttpGetBpjs['response']['sep']['noSep'];
+
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('SEPUPDATE ' .  $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
+            } else {
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('SEPUPDATE ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
             }
         }
         // response sep value
