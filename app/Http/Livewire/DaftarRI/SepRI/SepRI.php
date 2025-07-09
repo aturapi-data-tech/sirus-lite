@@ -276,6 +276,52 @@ class SepRI extends Component
         }
     }
 
+    public function deleteSep(string $noSep): void
+    {
+        // 1. Panggil trait sep_delete dengan try/catch untuk menghindari exception
+        try {
+            $response = VclaimTrait::sep_delete($noSep)
+                ->getOriginalContent();
+        } catch (\Throwable $e) {
+            toastr()
+                ->closeOnHover(true)->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError('Delete SEP gagal: ' . $e->getMessage());
+            return;
+        }
+
+        // 2. Ambil kode & pesan dengan helper data_get agar lebih aman
+        $code    = data_get($response, 'metadata.code');
+        $message = data_get($response, 'metadata.message', 'Tidak ada pesan');
+
+        if ($code === 200) {
+            // 3a. Clear state SEP (resSep, noSep, reqSep)
+            $this->dataDaftarRi['sep']['resSep']  = [];
+            $this->dataDaftarRi['sep']['noSep']   = '';
+            unset($this->dataDaftarRi['sep']['reqSep']);
+
+            // 3b. Update kolom vno_sep jadi kosong
+            DB::table('rstxn_rihdrs')
+                ->where('rihdr_no', $this->riHdrNoRef)
+                ->update(['vno_sep' => '']);
+
+            // 3c. Refresh data RI
+            $this->updateDataRi($this->riHdrNoRef);
+
+            // 3d. Tampilkan notifikasi sukses
+            toastr()
+                ->closeOnHover(true)->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addSuccess("Delete SEP berhasil: {$code} {$message}");
+        } else {
+            // 4. Tampilkan notifikasi gagal
+            toastr()
+                ->closeOnHover(true)->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Delete SEP gagal: {$code} {$message}");
+        }
+    }
+
 
     private function updateDataRi($riHdrNo): void
     {

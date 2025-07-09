@@ -1194,28 +1194,77 @@ trait VclaimTrait
     }
 
 
-    public static function sep_delete(Request $request)
+    public static function sep_delete(string $noSep)
     {
-        $validator = Validator::make(request()->all(), [
-            "noSep" => "required",
-        ]);
-        if ($validator->fails()) {
-            return self::sendError($validator->errors()->first(), null, 201, null, null);
-        }
-        $url = env('VCLAIM_URL') . "SEP/2.0/delete";
-        $signature = self::signature();
-        $signature['Content-Type'] = 'application/x-www-form-urlencoded';
-        $data = [
-            "request" => [
-                "t_sep" => [
-                    "noSep" => $request->noSep,
-                    "user" => 'RSUD Waled',
-                ]
-            ]
+        /* ------------------------------------------------------------------
+         * 1. Siapkan data yang ingin divalidasi.
+         * -----------------------------------------------------------------*/
+        $r = [
+            'noSep' => $noSep,
+            // ganti sesuai nama user/aplikasi Anda, bisa juga config('app.name') atau env('APP_NAME')
+            'user'  => 'siRUS',
         ];
-        $response = Http::withHeaders($signature)->delete($url, $data);
-        return self::response_decrypt($response, $signature, null, null);
+
+        /* ------------------------------------------------------------------
+         * 2. Validasi minimal – hanya field yang diwajibkan oleh DELETE VClaim.
+         * -----------------------------------------------------------------*/
+        $validator = Validator::make($r, [
+            'noSep' => 'required',
+            'user'  => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return self::sendError(
+                $validator->errors()->first(),
+                $validator->errors(),
+                201,
+                null,
+                null
+            );
+        }
+
+        /* ------------------------------------------------------------------
+         * 3. Panggil endpoint DELETE.
+         *    – Metode HTTP: DELETE
+         *    – Endpoint   : SEP/2.0/delete
+         * -----------------------------------------------------------------*/
+        try {
+            $url       = env('VCLAIM_URL') . 'SEP/2.0/delete';
+            $signature = self::signature();
+            $signature['Content-Type'] = 'application/x-www-form-urlencoded';
+
+            $payload = [
+                'request' => [
+                    't_sep' => [
+                        'noSep' => $r['noSep'],
+                        'user'  => $r['user'],
+                    ],
+                ],
+            ];
+
+            $response = Http::timeout(10)
+                ->withHeaders($signature)
+                ->delete($url, $payload);
+
+            return self::response_decrypt(
+                $response,
+                $signature,
+                $url,
+                $response->transferStats->getTransferTime()
+            );
+        } catch (\Throwable $e) {
+            return self::sendError(
+                $e->getMessage(),
+                [],
+                408,
+                $url ?? null,
+                null
+            );
+        }
     }
+
+
+
     public static function sep_nomor($noSep)
     {
 

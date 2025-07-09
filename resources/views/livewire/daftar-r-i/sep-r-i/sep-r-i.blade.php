@@ -120,15 +120,24 @@
                         </x-yellow-button>
                     @endif
                 </div>
-                <div>
-                    <div wire:loading wire:target="store">
+                <div class="flex items-center space-x-2">
+                    {{-- Loading untuk store & deleteSep --}}
+                    <div wire:loading wire:target="store, deleteSep">
                         <x-loading />
                     </div>
+
                     @if (!empty($dataDaftarRi['sep']['noSep']))
                         <x-yellow-button :disabled="false" wire:click.prevent="store()" type="button"
                             wire:loading.remove>
                             Update SEP Rawat Inap
                         </x-yellow-button>
+
+                        {{-- Tombol Hapus --}}
+                        <x-red-button :disabled="false" class="ml-2"
+                            wire:click.prevent="deleteSep('{{ $dataDaftarRi['sep']['noSep'] ?? '' }}')" type="button"
+                            wire:loading.remove>
+                            Hapus SEP
+                        </x-red-button>
                     @else
                         <x-green-button :disabled="false" wire:click.prevent="store()" type="button"
                             wire:loading.remove>
