@@ -226,9 +226,60 @@ class EmrRIHari extends Component
                     )
                     FROM rstxn_ritempadmins WHERE rihdr_no = rsview_rihdrs.rihdr_no) as rawat_jalan"),
 
-                DB::raw("(SELECT SUM(NVL(room_price, 0) * ROUND(NVL(day, NVL(end_date, SYSDATE+1) - NVL(start_date, SYSDATE)))) FROM rsmst_trfrooms WHERE rihdr_no = rsview_rihdrs.rihdr_no) as total_room_price"),
-                DB::raw("(SELECT SUM(NVL(perawatan_price, 0) * ROUND(NVL(day, NVL(end_date, SYSDATE+1) - NVL(start_date, SYSDATE)))) FROM rsmst_trfrooms WHERE rihdr_no = rsview_rihdrs.rihdr_no) as total_perawatan_price"),
-                DB::raw("(SELECT SUM(NVL(common_service, 0) * ROUND(NVL(day, NVL(end_date, SYSDATE+1) - NVL(start_date, SYSDATE)))) FROM rsmst_trfrooms WHERE rihdr_no = rsview_rihdrs.rihdr_no) as total_common_service"),
+                DB::raw("(
+                        SELECT SUM(
+                          NVL(room_price,0)
+                          * NVL(
+                              day,
+                              CEIL(
+                                DECODE(
+                                  NVL(end_date, SYSDATE) - NVL(start_date, SYSDATE),
+                                  0, 1,
+                                  NVL(end_date, SYSDATE) - NVL(start_date, SYSDATE)
+                                )
+                              )
+                            )
+                        )
+                        FROM rsmst_trfrooms
+                        WHERE rihdr_no = rsview_rihdrs.rihdr_no
+                    ) AS total_room_price"),
+
+                DB::raw("(
+                        SELECT SUM(
+                          NVL(perawatan_price,0)
+                          * NVL(
+                              day,
+                              CEIL(
+                                DECODE(
+                                  NVL(end_date, SYSDATE) - NVL(start_date, SYSDATE),
+                                  0, 1,
+                                  NVL(end_date, SYSDATE) - NVL(start_date, SYSDATE)
+                                )
+                              )
+                            )
+                        )
+                        FROM rsmst_trfrooms
+                        WHERE rihdr_no = rsview_rihdrs.rihdr_no
+                    ) AS total_perawatan_price"),
+
+                DB::raw("(
+                        SELECT SUM(
+                          NVL(common_service,0)
+                          * NVL(
+                              day,
+                              CEIL(
+                                DECODE(
+                                  NVL(end_date, SYSDATE) - NVL(start_date, SYSDATE),
+                                  0, 1,
+                                  NVL(end_date, SYSDATE) - NVL(start_date, SYSDATE)
+                                )
+                              )
+                            )
+                        )
+                        FROM rsmst_trfrooms
+                        WHERE rihdr_no = rsview_rihdrs.rihdr_no
+                    ) AS total_common_service"),
+
             )
             ->where(DB::raw("nvl(ri_status,'I')"), '=', $myRefstatusId)
             ->whereIn('klaim_id', function ($query) use ($myRefklaimStatusId) {
