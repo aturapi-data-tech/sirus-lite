@@ -114,6 +114,7 @@ class FormEntryRI extends Component
         $data = [
             'data'    => $this->dataDaftarRi['sep']['resSep'],
             'reqData' => $this->dataDaftarRi['sep']['reqSep'],
+            'reqDataSpri' => $this->dataDaftarRi['spri'],
             // opsional: kirim nomor cetakan ke-n
             'cetakKe' => ($this->dataDaftarRi['sep']['resSep']['cetakKe'] ?? 1) + 1,
         ];

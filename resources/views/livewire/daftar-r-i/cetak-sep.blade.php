@@ -71,11 +71,13 @@
                     </tr>
                     <tr>
                         <td>Dokter</td>
-                        <td>: {{ $reqData['request']['t_sep']['dpjpLayanNama'] ?? '-' }}</td>
+                        <td>: {{ $reqDataSpri['drKontrolDesc'] ?? '-' }}</td>
                     </tr>
                     <tr>
                         <td>Faskes Perujuk</td>
-                        <td>: {{ $reqData['request']['t_sep']['rujukan']['ppkRujukanNama'] ?? '-' }}</td>
+                        <td>:
+                            {{ $reqData['request']['t_sep']['rujukan']['ppkRujukanNama'] ?? 'MADINAH (JST)' }}
+                        </td>
                     </tr>
                     <tr>
                         <td>Diagnosa Awal</td>
