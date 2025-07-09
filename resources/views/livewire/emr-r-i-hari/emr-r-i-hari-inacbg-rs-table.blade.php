@@ -36,23 +36,36 @@
             <tbody>
                 @php
                     $tarif_rs = [
-                        'jasa_dokter' => $myQData->jasa_dokter ?? 0,
-                        'jasa_medis' => $myQData->jasa_medis ?? 0,
-                        'konsultasi' => $myQData->konsultasi ?? 0,
-                        'visit' => $myQData->visit ?? 0,
-                        'admin_age' => $myQData->admin_age ?? 0,
-                        'admin_status' => $myQData->admin_status ?? 0,
-                        'bon_resep' => $myQData->bon_resep ?? 0,
-                        'obat_pinjam' => $myQData->obat_pinjam ?? 0,
-                        'return_obat' => $myQData->return_obat ?? 0,
-                        'radiologi' => $myQData->radiologi ?? 0,
-                        'laboratorium' => $myQData->laboratorium ?? 0,
-                        'operasi' => $myQData->operasi ?? 0,
-                        'lain_lain' => $myQData->lain_lain ?? 0,
-                        'rawat_jalan' => $myQData->rawat_jalan ?? 0,
-                        'total_room_price' => $myQData->total_room_price ?? 0,
-                        'total_perawatan_price' => $myQData->total_perawatan_price ?? 0,
-                        'total_common_service' => $myQData->total_common_service ?? 0,
+                        /* ▶ Tenaga Medis & Tindakan */
+                        'jasa_dokter' => $myQData->jasa_dokter, // tindakan dokter
+                        'jasa_medis' => $myQData->jasa_medis, // tindakan paramedis / alat medis
+                        'konsultasi' => $myQData->konsultasi, // rstxn_rikonsuls
+                        'visit' => $myQData->visit, // rstxn_rivisits
+                        'operasi' => $myQData->operasi, // rstxn_rioks (OK)
+
+                        /* ▶ Administrasi */
+                        'admin_age' => $myQData->admin_age, // usia administrasi (if numeric)
+                        'admin_status' => $myQData->admin_status, // status admin (if numeric)
+
+                        /* ▶ Obat & Resep */
+                        //'bon_resep' => $myQData->bon_resep, // biaya racikan / bon resep
+                        //'obat_pinjam' => $myQData->obat_pinjam, // riobats
+                        //'return_obat' => $myQData->return_obat, // riobatrtns
+                        'obat' =>
+                            ($myQData->obat_pinjam ?? 0) - ($myQData->return_obat ?? 0) + ($myQData->bon_resep ?? 0),
+
+                        /* ▶ Penunjang */
+                        'radiologi' => $myQData->radiologi,
+                        'laboratorium' => $myQData->laboratorium,
+
+                        /* ▶ Akomodasi Kamar Rawat Inap */
+                        'total_room_price' => $myQData->total_room_price,
+                        'total_perawatan_price' => $myQData->total_perawatan_price,
+                        'total_common_service' => $myQData->total_common_service,
+
+                        /* ▶ Lain-lain & Transisi */
+                        'lain_lain' => $myQData->lain_lain,
+                        'rawat_jalan' => $myQData->rawat_jalan, // biaya RJ yang masih dibukukan di RI
                     ];
 
                     $total_all = array_sum($tarif_rs);
