@@ -21,13 +21,13 @@ class DisplayPasien extends Component
     public bool $forceInsertRecord = false;
 
 
-    public array $myQData = [];
+    public  $myQData = '{}';
     public  array $dataPasien = [];
 
 
     private function findData($riHdrNo): void
     {
-        $this->myQData = $this->findDataRI($riHdrNo);
+        $this->myQData = json_encode($this->findDataRI($riHdrNo), true);
         $this->dataPasien = $this->findDataMasterPasien($this->myQData['regNo'] ?? '');
     }
 
