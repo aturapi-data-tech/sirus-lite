@@ -1,230 +1,226 @@
 <div class="grid grid-cols-2 gap-2">
-    <div>
-        {{-- RS --}}
-        <div class="font-normal text-left text-gray-900">
-            <span class="font-semibold">
-                Diagnosa:
-            </span>
-            <br>
-            {{ !empty($datadaftar_json['diagnosis']) && is_array($datadaftar_json['diagnosis'])
-                ? implode('# ', array_column($datadaftar_json['diagnosis'], 'icdX'))
-                : '-' }}
-            <br>
-            <span class="pl-2">
-                FreeText: {{ $datadaftar_json['diagnosisFreeText'] ?? '-' }}
-            </span>
-            <br>
-            <span class="font-semibold">
-                Procedure:
-            </span>
-            <br>
-            {{ !empty($datadaftar_json['procedure']) && is_array($datadaftar_json['procedure'])
-                ? implode('# ', array_column($datadaftar_json['procedure'], 'procedureId'))
-                : '-' }}
-            <br>
-            <span class="pl-2">
-                FreeText: {{ $datadaftar_json['procedureFreeText'] ?? '-' }}
-            </span>
+    @php
+        $datadaftar_json = json_decode($myQData->datadaftarri_json, true) ?? [];
+    @endphp
+    {{-- LEFT: Diagnosa & Tarif RS --}}
+    <div class="p-2 space-y-2 overflow-x-auto bg-white rounded-lg shadow">
+        {{-- Section title --}}
+        <h5 class="text-sm font-semibold text-gray-700">Detail RS</h5>
+
+        {{-- Diagnosa & Procedure --}}
+        <div class="space-y-2 text-xs text-gray-700">
+            <section class="space-y-1">
+                <span class="font-semibold text-gray-700">Diagnosa:</span>
+                <p class="ml-2 break-words whitespace-normal">
+                    {{ !empty($datadaftar_json['diagnosis']) && is_array($datadaftar_json['diagnosis'])
+                        ? implode('# ', array_column($datadaftar_json['diagnosis'], 'icdX'))
+                        : '-' }}
+                </p>
+                <p class="ml-2 text-gray-700 break-words whitespace-normal">
+                    {{ $datadaftar_json['diagnosisFreeText'] ?? '-' }}
+                </p>
+            </section>
+
+            <section class="space-y-1">
+                <span class="font-semibold text-gray-700">Procedure:</span>
+                <p class="ml-2 break-words whitespace-normal">
+                    {{ !empty($datadaftar_json['procedure']) && is_array($datadaftar_json['procedure'])
+                        ? implode('# ', array_column($datadaftar_json['procedure'], 'procedureId'))
+                        : '-' }}
+                </p>
+                <p class="ml-2 text-gray-700 break-words whitespace-normal">
+                    {{ $datadaftar_json['procedureFreeText'] ?? '-' }}
+                </p>
+            </section>
         </div>
-        <table class="table mb-3 text-xs table-sm table-bordered bg-red">
-            <thead>
-                <tr>
-                    <th>Jenis Layanan</th>
-                    <th class="text-right">Tarif (Rp)</th>
-                </tr>
-            </thead>
-            <tbody>
-                @php
-                    $tarif_rs = [
-                        /* ▶ Tenaga Medis & Tindakan */
-                        'jasa_dokter' => $myQData->jasa_dokter, // tindakan dokter
-                        'jasa_medis' => $myQData->jasa_medis, // tindakan paramedis / alat medis
-                        'konsultasi' => $myQData->konsultasi, // rstxn_rikonsuls
-                        'visit' => $myQData->visit, // rstxn_rivisits
-                        'operasi' => $myQData->operasi, // rstxn_rioks (OK)
 
-                        /* ▶ Administrasi */
-                        'admin_age' => $myQData->admin_age, // usia administrasi (if numeric)
-                        'admin_status' => $myQData->admin_status, // status admin (if numeric)
+        {{-- Tarif RS Table --}}
+        @php
+            $tarif_rs = [
+                'Dokter' => $myQData->jasa_dokter,
+                'Medis' => $myQData->jasa_medis,
+                'Konsul' => $myQData->konsultasi,
+                'Visit' => $myQData->visit,
+                'Operasi' => $myQData->operasi,
+                'Adm Umur' => $myQData->admin_age,
+                'Adm Sts' => $myQData->admin_status,
+                'Obat' => ($myQData->obat_pinjam ?? 0) - ($myQData->return_obat ?? 0) + ($myQData->bon_resep ?? 0),
+                'Rad' => $myQData->radiologi,
+                'Lab' => $myQData->laboratorium,
+                'Kamar' => $myQData->total_room_price,
+                'Rawat' => $myQData->total_perawatan_price,
+                'Umum' => $myQData->total_common_service,
+                'Lain' => $myQData->lain_lain,
+                'TrfRJ' => $myQData->rawat_jalan,
+            ];
 
-                        /* ▶ Obat & Resep */
-                        //'bon_resep' => $myQData->bon_resep, // biaya racikan / bon resep
-                        //'obat_pinjam' => $myQData->obat_pinjam, // riobats
-                        //'return_obat' => $myQData->return_obat, // riobatrtns
-                        'obat' =>
-                            ($myQData->obat_pinjam ?? 0) - ($myQData->return_obat ?? 0) + ($myQData->bon_resep ?? 0),
+            $total_all = array_sum($tarif_rs);
+        @endphp
 
-                        /* ▶ Penunjang */
-                        'radiologi' => $myQData->radiologi,
-                        'laboratorium' => $myQData->laboratorium,
-
-                        /* ▶ Akomodasi Kamar Rawat Inap */
-                        'total_room_price' => $myQData->total_room_price,
-                        'total_perawatan_price' => $myQData->total_perawatan_price,
-                        'total_common_service' => $myQData->total_common_service,
-
-                        /* ▶ Lain-lain & Transisi */
-                        'lain_lain' => $myQData->lain_lain,
-                        'rawat_jalan' => $myQData->rawat_jalan, // biaya RJ yang masih dibukukan di RI
-                    ];
-
-                    $total_all = array_sum($tarif_rs);
-                @endphp
-
-                @foreach ($tarif_rs as $key => $nominal)
-                    @if ((float) $nominal > 0)
-                        <tr>
-                            <td>{{ ucwords(str_replace('_', ' ', $key)) }}</td>
-                            <td class="text-right">
-                                {{ number_format($nominal, 0, ',', '.') }}
-                            </td>
-                        </tr>
-                    @endif
-                @endforeach
-                <tr class="font-semibold">
-                    <td>Total</td>
-                    <td class="text-right">
-                        {{ number_format($total_all, 0, ',', '.') }}
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="relative overflow-x-auto">
+            <table class="min-w-full text-xs text-left border border-gray-200 rounded-lg table-auto">
+                <thead class="text-gray-700 bg-gray-50">
+                    <tr>
+                        <th class="px-2 py-1 font-semibold">Jenis Layanan</th>
+                        <th class="px-2 py-1 font-semibold text-right">Tarif (Rp)</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    @foreach ($tarif_rs as $layanan => $nominal)
+                        @if ((float) $nominal > 0)
+                            <tr>
+                                <td class="px-2 py-1 text-gray-700">{{ $layanan }}</td>
+                                <td class="px-2 py-1 text-right text-gray-700">
+                                    {{ number_format($nominal, 0, ',', '.') }}
+                                </td>
+                            </tr>
+                        @endif
+                    @endforeach
+                    <tr class="font-semibold text-gray-700 bg-gray-100">
+                        <td class="px-2 py-1">Total</td>
+                        <td class="px-2 py-1 text-right">
+                            {{ number_format($total_all, 0, ',', '.') }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    {{-- INACBGCek dulu apakah set_claim_data_done ada --}}
-    <div>
-        @if (isset($datadaftar_json['inacbg']['set_claim_data_done']) &&
-                is_array($datadaftar_json['inacbg']['set_claim_data_done']))
-            @php
-                $data = $datadaftar_json['inacbg']['set_claim_data_done'];
-            @endphp
 
-            <div class="mb-4 text-xs card">
-                <div class="card-header">
-                    <h5>Detail Klaim INA-CBG</h5>
+    {{-- RIGHT: Detail Klaim INA-CBG --}}
+    @if (
+        !empty($datadaftar_json['inacbg']['set_claim_data_done']) &&
+            is_array($datadaftar_json['inacbg']['set_claim_data_done']))
+        @php
+            $data = $datadaftar_json['inacbg']['set_claim_data_done'];
+        @endphp
+        <div class="p-2 space-y-2 overflow-x-auto bg-white rounded-lg shadow">
+            {{-- Section title --}}
+            <h5 class="text-sm font-semibold text-gray-700">Detail Klaim INA-CBG</h5>
+
+            {{-- Diagnosa & Procedure --}}
+            <div class="space-y-2 text-xs text-gray-700">
+                <div>
+                    <span class="font-semibold text-gray-700">Diagnosa:</span>
+                    <p class="ml-2 break-words whitespace-normal">{{ $data['diagnosa'] ?? '-' }}</p>
+                    @if (!empty($data['diagnosisFreeText']))
+                        <p class="ml-4 text-gray-600">{{ $data['diagnosisFreeText'] }}</p>
+                    @endif
                 </div>
-                <div class="card-body">
-                    {{-- Diagnosa & Procedure --}}
-                    <div class="mb-3 row">
-                        <div class="col-sm-6">
-                            <span class="font-semibold">Diagnosa:</span>
-                            <p>{{ $data['diagnosa'] ?? '-' }}</p>
-                        </div>
-                        <div class="col-sm-6">
-                            <span class="font-semibold">Procedure:</span>
-                            <p>{{ $data['procedure'] ?? '-' }}</p>
-                        </div>
-                    </div>
-                    {{-- Grouper CBG --}}
-                    <div class="mb-3 row">
-                        <div class="col-sm-3">
-                            <span class="font-semibold">CBG Code:</span>
-                            <p>{{ $data['grouper']['response']['cbg']['code'] ?? '-' }}</p>
-                        </div>
-                        <div class="col-sm-5">
-                            <span class="font-semibold">Description:</span>
-                            <p>{{ $data['grouper']['response']['cbg']['description'] ?? '-' }}
-                            </p>
-                        </div>
-                        <div class="col-sm-2">
-                            <span class="font-semibold">Base Tarif:</span>
-                            <p>Rp
-                                {{ number_format($data['grouper']['response']['cbg']['base_tariff'] ?? 0, 0, ',', '.') }}
-                            </p>
-                        </div>
-                        <div class="col-sm-2">
-                            <span class="font-semibold">Kelas:</span>
-                            <p>{{ $data['grouper']['response']['kelas'] ?? '-' }}</p>
-                        </div>
-                    </div>
 
-                    {{-- Response Inagrouper --}}
-                    @if (isset($data['grouper']['response']['response_inagrouper']) &&
-                            is_array($data['grouper']['response']['response_inagrouper']))
-                        <div class="mb-3">
-                            <h6>Detail DRG (Inagrouper)</h6>
-                            <ul class="list-unstyled">
-                                <li><span class="font-semibold">MDC Number:</span>
-                                    {{ $data['grouper']['response']['response_inagrouper']['mdc_number'] }}
-                                </li>
-                                <li><span class="font-semibold">MDC Description:</span>
-                                    {{ $data['grouper']['response']['response_inagrouper']['mdc_description'] }}
-                                </li>
-                                <li><span class="font-semibold">DRG Code:</span>
-                                    {{ $data['grouper']['response']['response_inagrouper']['drg_code'] }}
-                                </li>
-                                <li><span class="font-semibold">DRG Description:</span>
-                                    {{ $data['grouper']['response']['response_inagrouper']['drg_description'] }}
-                                </li>
-                            </ul>
-                        </div>
+                <div>
+                    <span class="font-semibold text-gray-700">Procedure:</span>
+                    <p class="ml-2 break-words whitespace-normal">{{ $data['procedure'] ?? '-' }}</p>
+                    @if (!empty($data['procedureFreeText']))
+                        <p class="ml-4 text-gray-600">{{ $data['procedureFreeText'] }}</p>
                     @endif
+                </div>
 
-                    {{-- Tarif RS --}}
-                    @if (isset($data['tarif_rs']) && is_array($data['tarif_rs']))
-                        @php
-                            // Hitung total semua tarif
-                            $total_all = array_sum($data['tarif_rs']);
-                        @endphp
+                <div>
+                    <span class="font-semibold text-gray-700">Description:</span>
+                    <p class="ml-2 break-words whitespace-normal">
+                        {{ $data['grouper']['response']['cbg']['description'] ?? '-' }}</p>
+                </div>
+                <div>
+                    <span class="font-semibold text-gray-700">Base Tarif:</span>
+                    <p class="ml-2 text-gray-700">Rp
+                        {{ number_format($data['grouper']['response']['cbg']['base_tariff'] ?? 0, 0, ',', '.') }}
+                    </p>
+                </div>
+            </div>
 
-                        <table class="table mb-3 table-sm table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Jenis Layanan</th>
-                                    <th class="text-right">Tarif (Rp)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($data['tarif_rs'] as $layanan => $nominal)
-                                    @if ((float) $nominal > 0)
-                                        <tr>
-                                            <td>{{ ucwords(str_replace('_', ' ', $layanan)) }}
-                                            </td>
-                                            <td class="text-right">
-                                                {{ number_format($nominal, 0, ',', '.') }}
-                                            </td>
-                                        </tr>
-                                    @endif
-                                @endforeach
+            {{-- Detail DRG --}}
+            @if (!empty($data['grouper']['response']['response_inagrouper']))
+                <div class="text-xs text-gray-700">
+                    <span class="font-semibold text-gray-700">Detail DRG:</span>
+                    <ul class="ml-4 space-y-1 list-disc list-inside">
+                        @foreach ([
+        'mdc_number' => 'MDC Number',
+        'mdc_description' => 'MDC Description',
+        'drg_code' => 'DRG Code',
+        'drg_description' => 'DRG Description',
+    ] as $key => $label)
+                            <li>
+                                <span class="font-medium">{{ $label }}:</span>
+                                <span
+                                    class="text-gray-700">{{ $data['grouper']['response']['response_inagrouper'][$key] ?? '-' }}</span>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
-                                {{-- Baris Total --}}
-                                <tr class="font-semibold">
-                                    <td>Total</td>
-                                    <td class="text-right">
-                                        {{ number_format($total_all, 0, ',', '.') }}
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    @endif
-
-                    {{-- Status Pengiriman --}}
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <span class="font-semibold">Status Kemenkes:</span>
-                            <p>
-                                {{ ucfirst($data['kemenkes_dc_status_cd'] ?? '-') }}
-                                @if (!empty($data['kemenkes_dc_sent_dttm']) && $data['kemenkes_dc_sent_dttm'] !== '-')
-                                    ({{ $data['kemenkes_dc_sent_dttm'] }})
+            {{-- Tarif CBG-RS --}}
+            @if (!empty($data['tarif_rs']))
+                @php($total_all_cb = array_sum($data['tarif_rs']))
+                <div class="relative overflow-x-auto">
+                    <table class="min-w-full text-xs text-left border border-gray-200 rounded-lg table-auto">
+                        <thead class="text-gray-700 bg-gray-50">
+                            <tr>
+                                <th class="px-2 py-1 font-semibold">Jenis Layanan</th>
+                                <th class="px-2 py-1 font-semibold text-right">Tarif (Rp)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            @foreach ($data['tarif_rs'] as $layanan => $nominal)
+                                @if ((float) $nominal > 0)
+                                    <tr>
+                                        <td class="px-2 py-1 text-gray-700">
+                                            {{ ucwords(str_replace('_', ' ', $layanan)) }}</td>
+                                        <td class="px-2 py-1 text-right text-gray-700">
+                                            {{ number_format($nominal, 0, ',', '.') }}</td>
+                                    </tr>
                                 @endif
-                            </p>
-                        </div>
-                        <div class="col-sm-6">
-                            <span class="font-semibold">Status BPJS:</span>
-                            <p>
-                                {{ ucfirst($data['klaim_status_cd'] ?? '-') }}
-                                @if (!empty($data['bpjs_dc_sent_dttm']) && $data['bpjs_dc_sent_dttm'] !== '-')
-                                    ({{ $data['bpjs_dc_sent_dttm'] }})
-                                @endif
-                                @if (!empty($data['bpjs_klaim_status_nm']) && $data['bpjs_klaim_status_nm'] !== '-')
-                                    — {{ $data['bpjs_klaim_status_nm'] }}
-                                @endif
-                            </p>
-                        </div>
+                            @endforeach
+                            <tr class="font-semibold text-gray-700 bg-gray-100">
+                                <td class="px-2 py-1">Total</td>
+                                <td class="px-2 py-1 text-right">{{ number_format($total_all_cb, 0, ',', '.') }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            @endif
 
+            {{-- Grouper CBG --}}
+            <div class="space-y-2 text-xs text-gray-700">
+                <span class="font-semibold text-gray-700">Grouper CBG</span>
+                <div class="space-y-1">
+                    <div>
+                        <span class="font-medium">CBG Code:</span>
+                        <p class="ml-2 break-words whitespace-normal">
+                            {{ $data['grouper']['response']['cbg']['code'] ?? '-' }}</p>
+                    </div>
+
+                    <div>
+                        <span class="font-medium">Kelas:</span>
+                        <p class="ml-2 text-gray-700">{{ $data['grouper']['response']['kelas'] ?? '-' }}</p>
                     </div>
                 </div>
             </div>
-        @endif
-    </div>
+
+            {{-- Status Pengiriman --}}
+            <div class="space-y-2 text-xs text-gray-700">
+                <div>
+                    <span class="font-semibold text-gray-700">Status Kemenkes:</span>
+                    <p class="ml-2">{{ ucfirst($data['kemenkes_dc_status_cd'] ?? '-') }}
+                        @if (!empty($data['kemenkes_dc_sent_dttm']) && $data['kemenkes_dc_sent_dttm'] !== '-')
+                            ({{ $data['kemenkes_dc_sent_dttm'] }})
+                        @endif
+                    </p>
+                </div>
+                <div>
+                    <span class="font-semibold text-gray-700">Status BPJS:</span>
+                    <p class="ml-2">{{ ucfirst($data['klaim_status_cd'] ?? '-') }}
+                        @if (!empty($data['bpjs_dc_sent_dttm']) && $data['bpjs_dc_sent_dttm'] !== '-')
+                            ({{ $data['bpjs_dc_sent_dttm'] }})
+                        @endif
+                        @if (!empty($data['bpjs_klaim_status_nm']) && $data['bpjs_klaim_status_nm'] !== '-')
+                            — {{ $data['bpjs_klaim_status_nm'] }}
+                        @endif
+                    </p>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>

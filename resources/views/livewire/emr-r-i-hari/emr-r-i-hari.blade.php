@@ -154,13 +154,10 @@
             <table class="w-full text-sm text-left text-gray-700 table-auto">
                 <thead class="sticky top-0 text-xs text-gray-900 uppercase bg-gray-100 ">
                     <tr>
-                        <th scope="col" class="w-2/6 px-4 py-3 ">
+                        <th scope="col" class="w-1/3 px-4 py-3 ">
                             Pasien
                         </th>
-                        <th scope="col" class="w-3/6 px-4 py-3 ">
-                            Inap
-                        </th>
-                        <th scope="col" class="w-1/6 px-4 py-3 ">
+                        <th scope="col" class="w-2/3 px-4 py-3 ">
                             Status Layanan
                         </th>
                         <th scope="col" class="w-32 px-4 py-3 ">
@@ -173,205 +170,187 @@
 
                     @foreach ($myQueryData as $myQData)
                         @php
-                            $datadaftar_json = json_decode($myQData->datadaftarri_json, true);
-                            $anamnesa = isset($datadaftar_json['anamnesa']) ? 1 : 0;
-                            $pemeriksaan = isset($datadaftar_json['pemeriksaan']) ? 1 : 0;
-                            $penilaian = isset($datadaftar_json['penilaian']) ? 1 : 0;
-                            $procedure = isset($datadaftar_json['procedure']) ? 1 : 0;
-                            $diagnosis = isset($datadaftar_json['diagnosis']) ? 1 : 0;
-                            $perencanaan = isset($datadaftar_json['perencanaan']) ? 1 : 0;
-                            $prosentaseEMR =
-                                (($anamnesa + $pemeriksaan + $penilaian + $procedure + $diagnosis + $perencanaan) / 6) *
-                                100;
+                            $datadaftar_json = json_decode($myQData->datadaftarri_json, true) ?? [];
 
-                            $bgSelesaiPemeriksaan = isset(
-                                $datadaftar_json['perencanaan']['pengkajianMedis']['drPemeriksa'],
-                            )
-                                ? ($datadaftar_json['perencanaan']['pengkajianMedis']['drPemeriksa']
-                                    ? 'bg-green-100'
-                                    : '')
-                                : '';
+                            // Cek klaim BPJS
+                            $klaim = DB::table('rsmst_klaimtypes')
+                                ->where('klaim_id', $myQData->klaim_id)
+                                ->select('klaim_status', 'klaim_desc')
+                                ->first();
+                            // Boolean BPJS
+                            $isBpjs = optional($klaim)->klaim_status === 'BPJS';
 
-                            $badgecolorEmr = $prosentaseEMR >= 80 ? 'green' : 'red';
+                            // Deskripsi klaim (fallback jika null)
+                            $klaimDesc = $klaim->klaim_desc ?? 'Asuransi Lain';
 
-                            $badgecolorStatus = isset($myQData->ri_status)
-                                ? ($myQData->ri_status === 'A'
-                                    ? 'red'
-                                    : ($myQData->ri_status === 'L'
-                                        ? 'green'
-                                        : ($myQData->ri_status === 'I'
-                                            ? 'green'
-                                            : ($myQData->ri_status === 'F'
-                                                ? 'yellow'
-                                                : 'default'))))
-                                : '';
+                            $badgecolorKlaim = match (true) {
+                                $myQData->klaim_id === 'UM' => 'green', // Umum
+                                $isBpjs => 'yellow', // BPJS
+                                $myQData->klaim_id === 'KR' => 'red', // Kronis
+                                default => 'slate', // Asuransi Lain
+                            };
 
-                            $badgecolorKlaim =
-                                $myQData->klaim_id == 'UM'
-                                    ? 'green'
-                                    : ($myQData->klaim_id == 'JM'
-                                        ? 'default'
-                                        : ($myQData->klaim_id == 'KR'
-                                            ? 'yellow'
-                                            : 'red'));
+                            // Hitung total RS & INA
 
-                            $badgecolorAdministrasiRj = isset($datadaftar_json['AdministrasiRj']) ? 'green' : 'red';
+                            $totalrs = $myQData->totalri_temp ?? 1;
+
+                            $totalinacbgRs = $myQData->totinacbg_temp ?: $myQData->totalri_temp;
+
+                            $totalinacbgSirus = data_get(
+                                $datadaftar_json,
+                                'inacbg.set_claim_data_done.grouper.response.cbg.base_tariff',
+                                $myQData->totalri_temp,
+                            );
+
+                            $persentasiRs = $totalinacbgRs ? round(($totalrs / $totalinacbgRs) * 100) : 0;
+                            $persentasiSirus = $totalinacbgSirus ? round(($totalrs / $totalinacbgSirus) * 100) : 0;
+
+                            // Warna badge berdasarkan persentase
+                            $badgeColorPersentasiRs =
+                                $persentasiRs < 50 ? 'green' : ($persentasiRs < 80 ? 'yellow' : 'red');
+
+                            $badgeColorPersentasiSirus =
+                                $persentasiSirus < 50 ? 'green' : ($persentasiSirus < 80 ? 'yellow' : 'red');
                         @endphp
 
 
-                        <tr class="border-b group {{ $bgSelesaiPemeriksaan }}">
+                        <tr class="border-b group">
 
 
                             <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap ">
-                                <div class="">
-                                    {{-- <div class="font-normal text-gray-700">
-                                        {{ 'No. Antrian ' }} <span
-                                            class="text-5xl font-semibold text-gray-700">{{ $myQData->no_antrian }}</span>
-                                    </div> --}}
-                                    <div class="font-semibold text-primary">
-                                        {{ $myQData->reg_no }}
-                                    </div>
-                                    <div class="font-semibold text-gray-900">
-                                        {{ $myQData->reg_name . ' / (' . $myQData->sex . ')' . ' / ' . $myQData->thn }}
-                                    </div>
-                                    <div class="font-normal text-gray-900">
-                                        {{ $myQData->address }}
-                                    </div>
-
-                                    @if ($myQData->klaim_id == 'JM')
-                                        <div>
-                                            @php
-                                                $totalrs = $myQData->totalri_temp ?? 1;
-                                                $totalinacbg = empty($myQData->totinacbg_temp)
-                                                    ? $myQData->totalri_temp
-                                                    : $myQData->totinacbg_temp;
-                                                $persentasiTotalRsInacbg = round(($totalrs / $totalinacbg) * 100);
-
-                                                // Menentukan warna berdasarkan persentase
-                                                $badgecolorKlaim =
-                                                    $persentasiTotalRsInacbg < 50
-                                                        ? 'green'
-                                                        : ($persentasiTotalRsInacbg < 80
-                                                            ? 'yellow'
-                                                            : 'red');
-
-                                                // Menentukan label klaim
-                                                $klaimLabel = match ($myQData->klaim_id) {
-                                                    'UM' => 'UMUM',
-                                                    'JM' => 'BPJS',
-                                                    'KR' => 'Kronis',
-                                                    default => 'Asuransi Lain',
-                                                };
-                                            @endphp
-
-                                            <x-badge :badgecolor="__($badgecolorKlaim)">
-                                                RS {{ $totalrs }} | INA {{ $totalinacbg }} |
-                                                %{{ $persentasiTotalRsInacbg }} - {{ $klaimLabel }}
-                                            </x-badge>
+                                <div class="p-2 space-y-2 bg-white rounded-lg shadow">
+                                    {{-- Header: Registrasi & Pasien --}}
+                                    <div class="space-y-1">
+                                        <div class="text-lg font-semibold text-primary">
+                                            {{ $myQData->reg_no }}
                                         </div>
-                                    @endif
+                                        <div class="font-semibold text-gray-900">
+                                            {{ $myQData->reg_name }} / ({{ $myQData->sex }}) / {{ $myQData->thn }}
+                                        </div>
+                                        <div class="text-sm text-gray-700">
+                                            {{ $myQData->address }}
+                                        </div>
+                                    </div>
 
+                                    {{-- Badges: Klaim, SEP, Laborat, Radiologi --}}
+                                    <div class="grid grid-cols-2 gap-2">
+                                        @if ($isBpjs)
+                                            <span @class([
+                                                'inline-flex items-center px-2 py-0.5 text-xs font-medium rounded',
+                                                'bg-green-100 text-green-800' => $badgeColorPersentasiRs === 'green',
+                                                'bg-yellow-100 text-yellow-800' => $badgeColorPersentasiRs === 'yellow',
+                                                'bg-red-100 text-red-800' => $badgeColorPersentasiRs === 'red',
+                                            ])>
+                                                RS {{ number_format($totalrs, 0, ',', '.') }} |
+                                                INA {{ number_format($totalinacbgRs, 0, ',', '.') }} |
+                                                {{ $persentasiRs }}%
+                                            </span>
+
+                                            <span @class([
+                                                'inline-flex items-center px-2 py-0.5 text-xs font-medium rounded',
+                                                'bg-green-100 text-green-800' => $badgeColorPersentasiSirus === 'green',
+                                                'bg-yellow-100 text-yellow-800' => $badgeColorPersentasiSirus === 'yellow',
+                                                'bg-red-100 text-red-800' => $badgeColorPersentasiSirus === 'red',
+                                            ])>
+                                                RS {{ number_format($totalrs, 0, ',', '.') }} |
+                                                INA {{ number_format($totalinacbgSirus, 0, ',', '.') }} |
+                                                {{ $persentasiRs }}%
+                                            </span>
+                                        @endif
+                                    </div>
+
+                                    {{-- inacbg --}}
                                     <div class="p-2 m-2 bg-gray-200 rounded-lg">
                                         @include('livewire.emr-r-i-hari.emr-r-i-hari-inacbg-rs-table')
                                     </div>
 
                                 </div>
+
                             </td>
 
 
-                            <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap ">
+                            <td class="px-4 py-3 align-top group-hover:bg-gray-100 whitespace-nowrap ">
                                 <div class="grid grid-cols-4 gap-2">
                                     <div class="col-span-3">
-                                        @include('livewire.emr-r-i-hari.emr-r-i-hari-leveling-dokter-table')
-                                    </div>
-                                    <div class="col-span-1">
-                                        <div class="font-semibold text-gray-900">
-                                            <x-badge :badgecolor="__($badgecolorKlaim)">
-                                                {{ $myQData->klaim_id == 'UM'
-                                                    ? 'UMUM'
-                                                    : ($myQData->klaim_id == 'JM'
-                                                        ? 'BPJS'
-                                                        : ($myQData->klaim_id == 'KR'
-                                                            ? 'Kronis'
-                                                            : 'Asuransi Lain')) }}
-                                            </x-badge>
 
+                                        @include('livewire.emr-r-i.emr-r-i-leveling-dokter-table')
+
+                                        <div class="grid grid-cols-1 gap-2 mt-2">
+                                            {{-- Tanggal Masuk --}}
+                                            <div class="grid grid-cols-2 gap-2 text-xs text-gray-700">
+                                                <div class="flex items-center">
+                                                    <span class="mr-1 font-semibold">Tgl Masuk:</span>
+                                                    <span>{{ $myQData->entry_date ?? '-' }}</span>
+                                                </div>
+
+                                                <div class="flex items-center">
+                                                    <span class="mr-1 font-semibold">Tgl Pulang:</span>
+                                                    <span>{{ $myQData->exit_date ?? '-' }}</span>
+                                                </div>
+                                            </div>
+
+                                            <div class="grid gap-2 text-xs text-gray-700">
+
+                                                {{-- Bangsal, Kamar & Bed --}}
+                                                <div class="space-y-0.5">
+                                                    <div class="font-medium">{{ $myQData->bangsal_name }}</div>
+                                                    <div class="text-gray-600">
+                                                        {{ $myQData->room_name }} &middot; Bed:
+                                                        {{ $myQData->bed_no }}
+                                                    </div>
+                                                </div>
+
+                                                {{-- Badges: Klaim / SEP / Laborat / Radiologi --}}
+                                                <div class="flex flex-wrap items-center gap-2 pt-1">
+                                                    {{-- Klaim --}}
+                                                    @if (optional($klaim)->klaim_status === 'BPJS')
+                                                        <span
+                                                            class="inline-flex items-center px-2 py-0.5 rounded bg-yellow-100 text-yellow-800 text-xs font-medium">
+                                                            {{ $klaim->klaim_status }} – {{ $klaimDesc }}
+                                                        </span>
+                                                    @else
+                                                        <span
+                                                            class="inline-flex items-center px-2 py-0.5 rounded bg-gray-100 text-gray-800 text-xs font-medium">
+                                                            {{ $klaimDesc }}
+                                                        </span>
+                                                    @endif
+
+                                                    {{-- Nomor SEP --}}
+                                                    @if ($myQData->vno_sep)
+                                                        <span
+                                                            class="inline-flex items-center px-2 py-0.5 rounded bg-blue-50 text-blue-800 text-xs">
+                                                            SEP: {{ $myQData->vno_sep }}
+                                                        </span>
+                                                    @endif
+
+                                                    {{-- Laborat --}}
+                                                    @if ($myQData->lab_status)
+                                                        <span
+                                                            class="inline-flex items-center px-2 py-0.5 rounded bg-blue-100 text-blue-800 text-xs font-medium">
+                                                            Laborat
+                                                        </span>
+                                                    @endif
+
+                                                    {{-- Radiologi --}}
+                                                    @if ($myQData->rad_status)
+                                                        <span
+                                                            class="inline-flex items-center px-2 py-0.5 rounded bg-blue-100 text-blue-800 text-xs font-medium">
+                                                            Radiologi
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                            </div>
                                         </div>
-
-                                        <div class="font-normal">
-                                            {{ $myQData->vno_sep }}
-                                        </div>
-
-                                        <div class="flex my-2 space-x-2">
-                                            @if ($myQData->lab_status)
-                                                <x-badge :badgecolor="__('default')">
-                                                    {{ 'Laborat' }}
-                                                </x-badge>
-                                            @endif
-
-                                            @if ($myQData->rad_status)
-                                                <x-badge :badgecolor="__('default')">
-                                                    {{ 'Radiologi' }}
-                                                </x-badge>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-
-                            <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap ">
-                                <div class="">
-                                    <div class="text-sm font-semibold text-primary">
-                                        {{ 'Tgl Masuk :' . $myQData->entry_date }}
                                     </div>
 
-
-                                    <div class="flex italic font-semibold text-gray-900">
-                                        <x-badge :badgecolor="__($badgecolorStatus)">
-                                            @php
-                                                switch ($myQData->ri_status) {
-                                                    case 'I':
-                                                        $riStatus = 'Inap';
-                                                        break;
-
-                                                    case 'P':
-                                                        $riStatus = 'Pulang';
-                                                        break;
-
-                                                    default:
-                                                        $riStatus = 'Inap';
-                                                        break;
-                                                }
-                                            @endphp
-                                            {{ $riStatus }}
-                                        </x-badge>
-                                        <x-badge :badgecolor="__($badgecolorEmr)">
-                                            Emr: {{ $prosentaseEMR . '%' }}
-                                        </x-badge>
-                                    </div>
-
-                                    <div class="font-normal text-gray-700">
-                                        <x-badge :badgecolor="__($badgecolorAdministrasiRj)">
-                                            Administrasi :
-                                            @isset($datadaftar_json['AdministrasiRj'])
-                                                {{ $datadaftar_json['AdministrasiRj']['userLog'] }}
-                                            @else
-                                                {{ '---' }}
-                                            @endisset
-                                        </x-badge>
-                                    </div>
-                                    <div>
-                                        <span class="text-sm font-semibold">{{ $myQData->bangsal_name }}</span>
-                                        </br>
-                                        <span class="text-sm">{{ $myQData->room_name }}</span>
-                                        <span class="text-sm">{{ 'Bed :' . $myQData->bed_no }}</span>
-
-                                    </div>
 
                                 </div>
                             </td>
 
-                            <td class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-primary">
+
+
+                            <td class="px-4 py-3 align-top group-hover:bg-gray-100 group-hover:text-primary">
+
                                 @if ($myTopBar['klaimStatusId'] === 'BPJS')
                                     <div class="flex justify-end w-1/2 pt-8">
                                         <x-dropdown align="right" width="500"
@@ -391,21 +370,16 @@
                                             </x-slot>
                                             {{-- Open myLimitPerPagecontent --}}
                                             <x-slot name="content">
-
-                                                {{-- <li>
-                                                <x-dropdown-link> --}}
                                                 <div class="grid grid-cols-1 gap-2 p-2">
                                                     <livewire:emr-r-i.post-inacbg-r-i.post-inacbg-r-i :riHdrNoRef="$myQData->rihdr_no"
                                                         :groupingCount="$myQData->riuploadbpjs_grouping_count ?? 0"
                                                         :wire:key="'post-inacbg-r-i-'.$myQData->rihdr_no">
                                                 </div>
-                                                {{-- </x-dropdown-link>
-                                            </li> --}}
-
                                             </x-slot>
                                         </x-dropdown>
                                     </div>
                                 @endif
+
                             </td>
                         </tr>
                     @endforeach
