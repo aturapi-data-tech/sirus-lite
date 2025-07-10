@@ -44,6 +44,8 @@ use App\Http\Livewire\SetupHfisBpjs\SetupHfisBpjs;
 
 use App\Http\Livewire\EmrRI\EmrRI;
 use App\Http\Livewire\EmrRIHari\EmrRIHari;
+use App\Http\Livewire\EmrRIHariPulang\EmrRIHariPulang;
+
 
 
 use App\Http\Livewire\Laporan\LaporanRI;
@@ -150,6 +152,8 @@ Route::group(['middleware' => ['role:Admin|Mr|Perawat|Dokter|Apoteker|Tu']], fun
     Route::get('daftarRI', DaftarRI::class)->middleware('auth')->name('daftarRI');
     Route::get('EmrRI', EmrRI::class)->middleware('auth')->name('EmrRI');
     Route::get('EmrRIHari', EmrRIHari::class)->middleware('auth')->name('EmrRIHari');
+    Route::get('EmrRIHariPulang', EmrRIHariPulang::class)->middleware('auth')->name('EmrRIHariPulang');
+
 
 
     //Laporan

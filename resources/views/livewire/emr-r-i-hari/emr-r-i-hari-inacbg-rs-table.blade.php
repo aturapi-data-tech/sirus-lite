@@ -37,21 +37,21 @@
         {{-- Tarif RS Table --}}
         @php
             $tarif_rs = [
-                'Dokter' => $myQData->jasa_dokter,
-                'Medis' => $myQData->jasa_medis,
-                'Konsul' => $myQData->konsultasi,
-                'Visit' => $myQData->visit,
-                'Operasi' => $myQData->operasi,
-                'Adm Umur' => $myQData->admin_age,
-                'Adm Sts' => $myQData->admin_status,
+                'Dokter' => $myQData->jasa_dokter ?? 0,
+                'Medis' => $myQData->jasa_medis ?? 0,
+                'Konsul' => $myQData->konsultasi ?? 0,
+                'Visit' => $myQData->visit ?? 0,
+                'Operasi' => $myQData->operasi ?? 0,
+                'Adm Umur' => $myQData->admin_age ?? 0,
+                'Adm Sts' => $myQData->admin_status ?? 0,
                 'Obat' => ($myQData->obat_pinjam ?? 0) - ($myQData->return_obat ?? 0) + ($myQData->bon_resep ?? 0),
-                'Rad' => $myQData->radiologi,
-                'Lab' => $myQData->laboratorium,
-                'Kamar' => $myQData->total_room_price,
-                'Rawat' => $myQData->total_perawatan_price,
-                'Umum' => $myQData->total_common_service,
-                'Lain' => $myQData->lain_lain,
-                'TrfRJ' => $myQData->rawat_jalan,
+                'Rad' => $myQData->radiologi ?? 0,
+                'Lab' => $myQData->laboratorium ?? 0,
+                'Kamar' => $myQData->total_room_price ?? 0,
+                'Rawat' => $myQData->total_perawatan_price ?? 0,
+                'Umum' => $myQData->total_common_service ?? 0,
+                'Lain' => $myQData->lain_lain ?? 0,
+                'TrfRJ' => $myQData->rawat_jalan ?? 0,
             ];
 
             $total_all = array_sum($tarif_rs);

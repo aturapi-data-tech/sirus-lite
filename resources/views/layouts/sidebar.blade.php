@@ -369,6 +369,15 @@
                                 </li>
 
                                 <li>
+                                    <x-nav-link class="pl-4" :href="route('EmrRIHariPulang')" :active="request()->routeIs('EmrRIHariPulang')">
+                                        <!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
+
+
+                                        {{ __('Upload Rawat Inap Harian Pulang') }}
+                                    </x-nav-link>
+                                </li>
+
+                                <li>
                                     <x-nav-link class="pl-4" :href="route('EmrRJBulan')" :active="request()->routeIs('EmrRJBulan')">
                                         <!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
 
