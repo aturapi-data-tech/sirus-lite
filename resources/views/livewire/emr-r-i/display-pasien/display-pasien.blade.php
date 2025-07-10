@@ -24,7 +24,7 @@
                 </div>
 
                 <div class="">
-                    @include('livewire.emr-r-i.emr-r-i-leveling-dokter-table')
+                    @include('livewire.emr-r-i.display-pasien.emr-r-i-leveling-dokter-table-display-pasien')
                 </div>
 
                 <div class="px-2 text-sm text-gray-900">
