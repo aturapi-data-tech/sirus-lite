@@ -226,7 +226,11 @@
 
                                 @role(['Dokter', 'Perawat', 'Mr', 'Admin', 'Tu'])
                                     <x-nav-link class="pl-4" :href="route('EmrRI')" :active="request()->routeIs('EmrRI')">
-                                        {{ __('Rekam Medis RI') }}
+                                        {{ __('Rekam Medis Rawat Inap  (Status Inap)') }}
+                                    </x-nav-link>
+
+                                    <x-nav-link class="pl-4" :href="route('EmrRIPulang')" :active="request()->routeIs('EmrRIPulang')">
+                                        {{ __('Rekam Medis Rawat Inap (Status Pulang)') }}
                                     </x-nav-link>
 
                                     <x-nav-link class="pl-4" :href="route('MasterKamarAplicares')" :active="request()->routeIs('MasterKamarAplicares')">
@@ -355,7 +359,7 @@
                                         <!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
 
 
-                                        {{ __('Upload Rawat Jalan Harian') }}
+                                        {{ __('Upload Rawat Jalan') }}
                                     </x-nav-link>
                                 </li>
 
@@ -364,7 +368,7 @@
                                         <!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
 
 
-                                        {{ __('Upload Rawat Inap Harian') }}
+                                        {{ __('Upload Pasien Rawat Inap (Sedang Dirawat)') }}
                                     </x-nav-link>
                                 </li>
 
@@ -373,7 +377,7 @@
                                         <!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
 
 
-                                        {{ __('Upload Rawat Inap Harian Pulang') }}
+                                        {{ __('Upload Pasien Rawat Inap (Sudah Pulang)') }}
                                     </x-nav-link>
                                 </li>
 
@@ -392,7 +396,7 @@
                                         <!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
 
 
-                                        {{ __('Grouping BPJS Rawat Jalan') }}
+                                        {{ __('Umbal BPJS Rawat Jalan') }}
                                     </x-nav-link>
                                 </li>
 
@@ -401,7 +405,7 @@
                                         <!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
 
 
-                                        {{ __('Grouping BPJS Rawat Inap') }}
+                                        {{ __('Umbal BPJS Rawat Inap') }}
                                     </x-nav-link>
                                 </li>
                             </ul>
