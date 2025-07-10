@@ -26,7 +26,7 @@
                 <div class="">
                     @include('livewire.emr-r-i.display-pasien.emr-r-i-leveling-dokter-table-display-pasien')
                 </div>
-
+                @dd($myQData);
                 <div class="px-2 text-sm text-gray-900">
                     <p class="text-right">{{ $myQData['bangsalDesc'] ?? '-' }}</p>
                     <p class="font-semibold text-right">
