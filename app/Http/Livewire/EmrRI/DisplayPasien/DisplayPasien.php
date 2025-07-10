@@ -27,13 +27,9 @@ class DisplayPasien extends Component
 
     private function findData($riHdrNo): void
     {
-        $this->myQData = json_encode($this->findDataRI($riHdrNo), true);
-        $regNo = data_get(
-            json_decode($this->myQData, true),
-            'regNo',
-            '',
-        );
-        $this->dataPasien = $this->findDataMasterPasien($regNo ?? '');
+        $this->myQData = $this->findDataRI($riHdrNo);
+
+        $this->dataPasien = $this->findDataMasterPasien($this->myQData['regNo'] ?? '');
     }
 
     public function mount()
