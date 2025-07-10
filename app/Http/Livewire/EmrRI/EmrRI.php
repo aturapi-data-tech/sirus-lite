@@ -15,9 +15,9 @@ class EmrRI extends Component
 
 
     // primitive Variable
-    public string $myTitle = 'Rekam Medis RI';
+    public string $myTitle = 'Rekam Medis Rawat Inap - Status Inap';
     public string $mySnipt = 'Rekam Medis Pasien';
-    public string $myProgram = 'Pasien RI';
+    public string $myProgram = 'Pasien Rawat Inap';
 
     public array $myLimitPerPages = [5, 10, 15, 20, 100];
     // limit record per page -resetExcept////////////////

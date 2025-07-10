@@ -15,9 +15,9 @@ class EmrRIHari extends Component
 
 
     // primitive Variable
-    public string $myTitle = 'Upload FIle Rawat Inap Harian';
+    public string $myTitle = 'Upload FIle Rawat Inap - Status Inap';
     public string $mySnipt = 'Rekam Rawat Inap Pasien';
-    public string $myProgram = 'Pasien Rawat Inap Harian';
+    public string $myProgram = 'Pasien Rawat Inap - Status Inap';
 
     public array $myLimitPerPages = [5, 10, 15, 20, 100];
     // limit record per page -resetExcept////////////////

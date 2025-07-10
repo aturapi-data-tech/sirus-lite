@@ -14,9 +14,9 @@ class EmrRIHariPulang extends Component
 
 
     // primitive Variable
-    public string $myTitle = 'Upload FIle Rawat Inap Harian Pulang';
+    public string $myTitle = 'Upload FIle Rawat Inap - Status Pulang';
     public string $mySnipt = 'Rekam Rawat Inap Pasien';
-    public string $myProgram = 'Pasien Rawat Inap Harian Pulang';
+    public string $myProgram = 'Pasien Rawat Inap - Status Pulang';
 
     public array $myLimitPerPages = [5, 10, 15, 20, 100];
     // limit record per page -resetExcept////////////////

@@ -368,7 +368,7 @@
                                         <!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
 
 
-                                        {{ __('Upload Pasien Rawat Inap (Sedang Dirawat)') }}
+                                        {{ __('Upload Pasien Rawat Inap (Status Inap)') }}
                                     </x-nav-link>
                                 </li>
 
@@ -377,7 +377,7 @@
                                         <!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
 
 
-                                        {{ __('Upload Pasien Rawat Inap (Sudah Pulang)') }}
+                                        {{ __('Upload Pasien Rawat Inap (Status Pulang)') }}
                                     </x-nav-link>
                                 </li>
 
