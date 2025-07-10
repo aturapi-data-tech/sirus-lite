@@ -6,8 +6,8 @@
 
             @php
                 $pasieenTitle = 'Pasien RegNo : ' . $dataPasien['pasien']['regNo'];
-                $datadaftar_json = $dataDaftarRi;
-                $klaimId = isset($dataDaftarRi['klaimId']) ? $dataDaftarRi['klaimId'] : '-';
+                $datadaftar_json = $myQData;
+                $klaimId = isset($myQData['klaimId']) ? $myQData['klaimId'] : '-';
             @endphp
 
             <div class="grid grid-cols-3 pl-3 bg-gray-100 rounded-lg">
@@ -28,9 +28,9 @@
                 </div>
 
                 <div class="px-2 text-sm text-gray-900">
-                    <p class="text-right">{{ $dataDaftarRi['bangsalDesc'] ?? '-' }}</p>
+                    <p class="text-right">{{ $myQData['bangsalDesc'] ?? '-' }}</p>
                     <p class="font-semibold text-right">
-                        {{ $dataDaftarRi['roomDesc'] ?? '-' }} / Bed : {{ $dataDaftarRi['bedNo'] ?? '-' }}
+                        {{ $myQData['roomDesc'] ?? '-' }} / Bed : {{ $myQData['bedNo'] ?? '-' }}
                     </p>
                     <p class="text-right">
                         Jenis Klaim:
@@ -38,7 +38,7 @@
                         {{ $klaimId }}
                     </p>
                     <p class="text-right">
-                        Tgl Masuk: {{ $dataDaftarRi['entryDate'] }}
+                        Tgl Masuk: {{ $myQData['entryDate'] }}
                     </p>
                 </div>
 
