@@ -21,14 +21,14 @@ class DisplayPasien extends Component
     public bool $forceInsertRecord = false;
 
 
-    public array $dataDaftarRi = [];
+    public array $myQData = [];
     public  array $dataPasien = [];
 
 
     private function findData($riHdrNo): void
     {
-        $this->dataDaftarRi = $this->findDataRI($riHdrNo);
-        $this->dataPasien = $this->findDataMasterPasien($this->dataDaftarRi['regNo'] ?? '');
+        $this->myQData = $this->findDataRI($riHdrNo);
+        $this->dataPasien = $this->findDataMasterPasien($this->myQData['regNo'] ?? '');
     }
 
     public function mount()
