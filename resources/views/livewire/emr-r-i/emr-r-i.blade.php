@@ -190,14 +190,14 @@
 
                             // Hitung total RS & INA
 
-                            $totalrs = $myQData->totalri_temp ?? 1;
+                            $totalrs = $myQData->totalri_temp ?? 0;
 
-                            $totalinacbgRs = $myQData->totinacbg_temp ?: $myQData->totalri_temp;
+                            $totalinacbgRs = $myQData->totinacbg_temp ?: $totalrs;
 
                             $totalinacbgSirus = data_get(
                                 $datadaftar_json,
                                 'inacbg.set_claim_data_done.grouper.response.cbg.base_tariff',
-                                $myQData->totalri_temp,
+                                $totalrs,
                             );
 
                             $persentasiRs = $totalinacbgRs ? round(($totalrs / $totalinacbgRs) * 100) : 0;
