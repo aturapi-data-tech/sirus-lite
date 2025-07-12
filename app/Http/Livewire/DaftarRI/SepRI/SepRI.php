@@ -294,7 +294,7 @@ class SepRI extends Component
         $code    = data_get($response, 'metadata.code');
         $message = data_get($response, 'metadata.message', 'Tidak ada pesan');
 
-        if ($code === 200) {
+        if ($code == 200 || $code == 201) {
             // 3a. Clear state SEP (resSep, noSep, reqSep)
             $this->dataDaftarRi['sep']['resSep']  = [];
             $this->dataDaftarRi['sep']['noSep']   = '';
