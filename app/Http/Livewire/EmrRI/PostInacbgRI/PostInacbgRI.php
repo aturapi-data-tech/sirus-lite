@@ -243,11 +243,7 @@ class PostInacbgRI extends Component
         $jnsPelayanan = $dataDaftarRi['sep']['reqSep']['request']['t_sep']['jnsPelayanan'] ?? '2';
         $klsRawatHak = $dataDaftarRi['sep']['reqSep']['request']['t_sep']['klsRawat']['klsRawatHak'] ?? '3';
 
-        $statusPulang = data_get(
-            $this->dataDaftarRi,
-            'perencanaan.tindakLanjut.statusPulang',
-            0
-        );
+        $statusPulang =  $dataDaftarRi['perencanaan']['tindakLanjut']['statusPulang'] ?? 0;
         // pastikan dalam 1..5
         $statusPulang = in_array($statusPulang, [1, 2, 3, 4, 5])
             ? $statusPulang
