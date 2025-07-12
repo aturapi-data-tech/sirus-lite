@@ -35,27 +35,6 @@
         </div>
 
         {{-- Tarif RS Table --}}
-        @php
-            $tarif_rs = [
-                'Dokter' => $myQData->jasa_dokter ?? 0,
-                'Medis' => $myQData->jasa_medis ?? 0,
-                'Konsul' => $myQData->konsultasi ?? 0,
-                'Visit' => $myQData->visit ?? 0,
-                'Operasi' => $myQData->operasi ?? 0,
-                'Adm Umur' => $myQData->admin_age ?? 0,
-                'Adm Sts' => $myQData->admin_status ?? 0,
-                'Obat' => ($myQData->obat_pinjam ?? 0) - ($myQData->return_obat ?? 0) + ($myQData->bon_resep ?? 0),
-                'Rad' => $myQData->radiologi ?? 0,
-                'Lab' => $myQData->laboratorium ?? 0,
-                'Kamar' => $myQData->total_room_price ?? 0,
-                'Rawat' => $myQData->total_perawatan_price ?? 0,
-                'Umum' => $myQData->total_common_service ?? 0,
-                'Lain' => $myQData->lain_lain ?? 0,
-                'TrfRJ' => $myQData->rawat_jalan ?? 0,
-            ];
-
-            $total_all = array_sum($tarif_rs);
-        @endphp
 
         <div class="relative overflow-x-auto">
             <table class="min-w-full text-xs text-left border border-gray-200 rounded-lg table-auto">
@@ -66,7 +45,7 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
-                    @foreach ($tarif_rs as $layanan => $nominal)
+                    @foreach ($myQData->tarif_rs as $layanan => $nominal)
                         @if ((float) $nominal > 0)
                             <tr>
                                 <td class="px-2 py-1 text-gray-700">{{ $layanan }}</td>
@@ -79,7 +58,7 @@
                     <tr class="font-semibold text-gray-700 bg-gray-100">
                         <td class="px-2 py-1">Total</td>
                         <td class="px-2 py-1 text-right">
-                            {{ number_format($total_all, 0, ',', '.') }}
+                            {{ number_format($myQData->tarif_total, 0, ',', '.') }}
                         </td>
                     </tr>
                 </tbody>

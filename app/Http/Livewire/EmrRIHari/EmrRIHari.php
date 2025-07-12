@@ -146,6 +146,254 @@ class EmrRIHari extends Component
         $this->resetPage();
     }
 
+    private function buatTarifRawatInap(object $row): array
+    {
+        return [
+            'Dokter'   => $row->jasa_dokter            ?? 0,
+            'Medis'    => $row->jasa_medis             ?? 0,
+            'Konsul'   => $row->konsultasi             ?? 0,
+            'Visit'    => $row->visit                  ?? 0,
+            'Operasi'  => $row->operasi                ?? 0,
+            'Adm Umur' => $row->admin_age              ?? 0,
+            'Adm Sts'  => $row->admin_status           ?? 0,
+            'Obat'     => (
+                ($row->obat_pinjam    ?? 0)
+                - ($row->return_obat    ?? 0)
+                + ($row->bon_resep      ?? 0)
+            ),
+            'Rad'      => $row->radiologi              ?? 0,
+            'Lab'      => $row->laboratorium           ?? 0,
+            'Kamar'    => $row->total_room_price       ?? 0,
+            'Rawat'    => $row->total_perawatan_price  ?? 0,
+            'Umum'     => $row->total_common_service   ?? 0,
+            'Lain'     => $row->lain_lain              ?? 0,
+            'TrfRJ'    => $row->rawat_jalan            ?? 0,
+        ];
+    }
+
+    /**
+     * Ambil semua metrics sekali untuk semua rihdr_no di current page,
+     * lalu transform Collection-nya dengan men‐attach metrics + tarif_total.
+     */
+    private function perhitunganTarifRawatInap(\Illuminate\Pagination\LengthAwarePaginator $paginator)
+    {
+        // get raw collection & IDs
+        $collection = $paginator->getCollection();
+        $ids        = $collection->pluck('rihdr_no')->all();
+
+        // 1) Ambil totinacbg_temp & totalri_temp langsung dari VIEW
+        $totInacbgTemp = DB::table('rsview_rihdrs')
+            ->whereIn('rihdr_no', $ids)
+            ->pluck('totinacbg_temp', 'rihdr_no');
+
+        $totalriTemp = DB::table('rsview_rihdrs')
+            ->whereIn('rihdr_no', $ids)
+            ->pluck('totalri_temp', 'rihdr_no');
+
+        // 2) Batch‐fetch tiap komponen tarif
+        $jasaDokter = DB::table('rstxn_riactdocs')
+            ->select('rihdr_no', DB::raw('SUM(actd_price * actd_qty) AS total'))
+            ->whereIn('rihdr_no', $ids)
+            ->groupBy('rihdr_no')
+            ->pluck('total', 'rihdr_no');
+
+        $jasaMedis = DB::table('rstxn_riactparams')
+            ->select('rihdr_no', DB::raw('SUM(actp_price * actp_qty) AS total'))
+            ->whereIn('rihdr_no', $ids)
+            ->groupBy('rihdr_no')
+            ->pluck('total', 'rihdr_no');
+
+        $konsultasi = DB::table('rstxn_rikonsuls')
+            ->select('rihdr_no', DB::raw('SUM(konsul_price) AS total'))
+            ->whereIn('rihdr_no', $ids)
+            ->groupBy('rihdr_no')
+            ->pluck('total', 'rihdr_no');
+
+        $visit = DB::table('rstxn_rivisits')
+            ->select('rihdr_no', DB::raw('SUM(visit_price) AS total'))
+            ->whereIn('rihdr_no', $ids)
+            ->groupBy('rihdr_no')
+            ->pluck('total', 'rihdr_no');
+
+        $bonResep = DB::table('rstxn_ribonobats')
+            ->select('rihdr_no', DB::raw('SUM(ribon_price) AS total'))
+            ->whereIn('rihdr_no', $ids)
+            ->groupBy('rihdr_no')
+            ->pluck('total', 'rihdr_no');
+
+        $obatPinjam = DB::table('rstxn_riobats')
+            ->select('rihdr_no', DB::raw('SUM(riobat_qty * riobat_price) AS total'))
+            ->whereIn('rihdr_no', $ids)
+            ->groupBy('rihdr_no')
+            ->pluck('total', 'rihdr_no');
+
+        $returnObat = DB::table('rstxn_riobatrtns')
+            ->select('rihdr_no', DB::raw('SUM(riobat_qty * riobat_price) AS total'))
+            ->whereIn('rihdr_no', $ids)
+            ->groupBy('rihdr_no')
+            ->pluck('total', 'rihdr_no');
+
+        $radiologi = DB::table('rstxn_riradiologs')
+            ->select('rihdr_no', DB::raw('SUM(rirad_price) AS total'))
+            ->whereIn('rihdr_no', $ids)
+            ->groupBy('rihdr_no')
+            ->pluck('total', 'rihdr_no');
+
+        $laboratorium = DB::table('rstxn_rilabs')
+            ->select('rihdr_no', DB::raw('SUM(lab_price) AS total'))
+            ->whereIn('rihdr_no', $ids)
+            ->groupBy('rihdr_no')
+            ->pluck('total', 'rihdr_no');
+
+        $operasi = DB::table('rstxn_rioks')
+            ->select('rihdr_no', DB::raw('SUM(ok_price) AS total'))
+            ->whereIn('rihdr_no', $ids)
+            ->groupBy('rihdr_no')
+            ->pluck('total', 'rihdr_no');
+
+        $adminStatus = DB::table('rstxn_rihdrs')
+            ->select('rihdr_no', DB::raw('SUM(NVL(admin_status, 0)) AS total'))
+            ->whereIn('rihdr_no', $ids)
+            ->groupBy('rihdr_no')
+            ->pluck('total', 'rihdr_no');
+
+        $adminAge = DB::table('rstxn_rihdrs')
+            ->select('rihdr_no', DB::raw('SUM(NVL(admin_age, 0)) AS total'))
+            ->whereIn('rihdr_no', $ids)
+            ->groupBy('rihdr_no')
+            ->pluck('total', 'rihdr_no');
+
+        $lainLain = DB::table('rstxn_riothers')
+            ->select('rihdr_no', DB::raw('SUM(other_price) AS total'))
+            ->whereIn('rihdr_no', $ids)
+            ->groupBy('rihdr_no')
+            ->pluck('total', 'rihdr_no');
+
+        $rawatJalan = DB::table('rstxn_ritempadmins')
+            ->select('rihdr_no', DB::raw('SUM(
+                rj_admin + poli_price + acte_price +
+                actp_price + actd_price + obat +
+                rad + lab + other + rs_admin
+            ) AS total'))
+            ->whereIn('rihdr_no', $ids)
+            ->groupBy('rihdr_no')
+            ->pluck('total', 'rihdr_no');
+
+        // 3) Tarif kamar / perawatan / common service dengan CEIL-DECODE model
+        $roomPrice = DB::table('rsmst_trfrooms')
+            ->select('rihdr_no', DB::raw("
+            SUM(
+                NVL(room_price,0)
+                * NVL(
+                    day,
+                    CEIL(
+                    DECODE(
+                        NVL(end_date,SYSDATE) - NVL(start_date,SYSDATE),
+                        0,1,
+                        NVL(end_date,SYSDATE)-NVL(start_date,SYSDATE)
+                    )
+                    )
+                )
+            ) AS total
+            "))
+            ->whereIn('rihdr_no', $ids)
+            ->groupBy('rihdr_no')
+            ->pluck('total', 'rihdr_no');
+
+        $perawatanPrice = DB::table('rsmst_trfrooms')
+            ->select('rihdr_no', DB::raw("
+            SUM(
+                NVL(perawatan_price,0)
+                * NVL(
+                    day,
+                    CEIL(
+                    DECODE(
+                        NVL(end_date,SYSDATE) - NVL(start_date,SYSDATE),
+                        0,1,
+                        NVL(end_date,SYSDATE)-NVL(start_date,SYSDATE)
+                    )
+                    )
+                )
+            ) AS total
+            "))
+            ->whereIn('rihdr_no', $ids)
+            ->groupBy('rihdr_no')
+            ->pluck('total', 'rihdr_no');
+
+        $commonService = DB::table('rsmst_trfrooms')
+            ->select('rihdr_no', DB::raw("
+            SUM(
+                NVL(common_service,0)
+                * NVL(
+                    day,
+                    CEIL(
+                    DECODE(
+                        NVL(end_date,SYSDATE) - NVL(start_date,SYSDATE),
+                        0,1,
+                        NVL(end_date,SYSDATE)-NVL(start_date,SYSDATE)
+                    )
+                    )
+                )
+            ) AS total
+            "))
+            ->whereIn('rihdr_no', $ids)
+            ->groupBy('rihdr_no')
+            ->pluck('total', 'rihdr_no');
+
+        $new = $collection->map(function ($row) use (
+            $totInacbgTemp,
+            $totalriTemp,
+            $jasaDokter,
+            $jasaMedis,
+            $konsultasi,
+            $visit,
+            $bonResep,
+            $obatPinjam,
+            $returnObat,
+            $radiologi,
+            $laboratorium,
+            $operasi,
+            $adminStatus,
+            $adminAge,
+            $lainLain,
+            $rawatJalan,
+            $roomPrice,
+            $perawatanPrice,
+            $commonService,
+        ) {
+            $key = $row->rihdr_no;
+            $row->totinacbg_temp         = $totInacbgTemp[$key]      ?? 0;
+            $row->totalri_temp           = $totalriTemp[$key]        ?? 0;
+            $row->jasa_dokter            = $jasaDokter[$key]         ?? 0;
+            $row->jasa_medis             = $jasaMedis[$key]          ?? 0;
+            $row->konsultasi             = $konsultasi[$key]         ?? 0;
+            $row->visit                  = $visit[$key]              ?? 0;
+            $row->bon_resep              = $bonResep[$key]           ?? 0;
+            $row->obat_pinjam            = $obatPinjam[$key]         ?? 0;
+            $row->return_obat            = $returnObat[$key]         ?? 0;
+            $row->radiologi              = $radiologi[$key]          ?? 0;
+            $row->laboratorium           = $laboratorium[$key]       ?? 0;
+            $row->operasi                = $operasi[$key]            ?? 0;
+            $row->admin_status           = $adminStatus[$key]        ?? 0;
+            $row->admin_age              = $adminAge[$key]           ?? 0;
+            $row->lain_lain              = $lainLain[$key]           ?? 0;
+            $row->rawat_jalan            = $rawatJalan[$key]         ?? 0;
+            $row->total_room_price       = $roomPrice[$key]          ?? 0;
+            $row->total_perawatan_price  = $perawatanPrice[$key]     ?? 0;
+            $row->total_common_service   = $commonService[$key]      ?? 0;
+
+            // dan terakhir bangun tarif_rs / tarif_total seperti biasa
+            $row->tarif_rs    = $this->buatTarifRawatInap($row);
+            $row->tarif_total = array_sum($row->tarif_rs);
+
+            return $row;
+        });
+
+        $paginator->setCollection($new);
+
+        return $paginator;
+    }
+
     // when new form instance
     public function mount() {}
 
@@ -203,82 +451,6 @@ class EmrRIHari extends Component
                 'bangsal_id',
                 'bangsal_name',
                 'bed_no',
-                'totinacbg_temp',
-                'totalri_temp',
-
-                DB::raw("(SELECT SUM(NVL(actd_price, 0) * NVL(actd_qty, 0)) FROM rstxn_riactdocs WHERE rihdr_no = rsview_rihdrs.rihdr_no) as jasa_dokter"),
-                DB::raw("(SELECT SUM(NVL(actp_price, 0) * NVL(actp_qty, 0)) FROM rstxn_riactparams WHERE rihdr_no = rsview_rihdrs.rihdr_no) as jasa_medis"),
-                DB::raw("(SELECT SUM(NVL(konsul_price, 0)) FROM rstxn_rikonsuls WHERE rihdr_no = rsview_rihdrs.rihdr_no) as konsultasi"),
-                DB::raw("(SELECT SUM(NVL(visit_price, 0)) FROM rstxn_rivisits WHERE rihdr_no = rsview_rihdrs.rihdr_no) as visit"),
-                'admin_age',
-                'admin_status',
-                DB::raw("(SELECT SUM(NVL(ribon_price, 0)) FROM rstxn_ribonobats WHERE rihdr_no = rsview_rihdrs.rihdr_no) as bon_resep"),
-                DB::raw("(SELECT SUM(NVL(riobat_qty, 0) * NVL(riobat_price, 0)) FROM rstxn_riobats WHERE rihdr_no = rsview_rihdrs.rihdr_no) as obat_pinjam"),
-                DB::raw("(SELECT SUM(NVL(riobat_qty, 0) * NVL(riobat_price, 0)) FROM rstxn_riobatrtns WHERE rihdr_no = rsview_rihdrs.rihdr_no) as return_obat"),
-                DB::raw("(SELECT SUM(NVL(rirad_price, 0)) FROM rstxn_riradiologs WHERE rihdr_no = rsview_rihdrs.rihdr_no) as radiologi"),
-                DB::raw("(SELECT SUM(NVL(lab_price, 0)) FROM rstxn_rilabs WHERE rihdr_no = rsview_rihdrs.rihdr_no) as laboratorium"),
-                DB::raw("(SELECT SUM(NVL(ok_price, 0)) FROM rstxn_rioks WHERE rihdr_no = rsview_rihdrs.rihdr_no) as operasi"),
-                DB::raw("(SELECT SUM(NVL(other_price, 0)) FROM rstxn_riothers WHERE rihdr_no = rsview_rihdrs.rihdr_no) as lain_lain"),
-                DB::raw("(SELECT SUM(
-                        NVL(rj_admin, 0) + NVL(poli_price, 0) + NVL(acte_price, 0) +
-                        NVL(actp_price, 0) + NVL(actd_price, 0) + NVL(obat, 0) +
-                        NVL(lab, 0) + NVL(rad, 0) + NVL(other, 0) + NVL(rs_admin, 0)
-                    )
-                    FROM rstxn_ritempadmins WHERE rihdr_no = rsview_rihdrs.rihdr_no) as rawat_jalan"),
-
-                DB::raw("(
-                        SELECT SUM(
-                          NVL(room_price,0)
-                          * NVL(
-                              day,
-                              CEIL(
-                                DECODE(
-                                  NVL(end_date, SYSDATE) - NVL(start_date, SYSDATE),
-                                  0, 1,
-                                  NVL(end_date, SYSDATE) - NVL(start_date, SYSDATE)
-                                )
-                              )
-                            )
-                        )
-                        FROM rsmst_trfrooms
-                        WHERE rihdr_no = rsview_rihdrs.rihdr_no
-                    ) AS total_room_price"),
-
-                DB::raw("(
-                        SELECT SUM(
-                          NVL(perawatan_price,0)
-                          * NVL(
-                              day,
-                              CEIL(
-                                DECODE(
-                                  NVL(end_date, SYSDATE) - NVL(start_date, SYSDATE),
-                                  0, 1,
-                                  NVL(end_date, SYSDATE) - NVL(start_date, SYSDATE)
-                                )
-                              )
-                            )
-                        )
-                        FROM rsmst_trfrooms
-                        WHERE rihdr_no = rsview_rihdrs.rihdr_no
-                    ) AS total_perawatan_price"),
-
-                DB::raw("(
-                        SELECT SUM(
-                          NVL(common_service,0)
-                          * NVL(
-                              day,
-                              CEIL(
-                                DECODE(
-                                  NVL(end_date, SYSDATE) - NVL(start_date, SYSDATE),
-                                  0, 1,
-                                  NVL(end_date, SYSDATE) - NVL(start_date, SYSDATE)
-                                )
-                              )
-                            )
-                        )
-                        FROM rsmst_trfrooms
-                        WHERE rihdr_no = rsview_rihdrs.rihdr_no
-                    ) AS total_common_service"),
 
             )
             ->where(DB::raw("nvl(ri_status,'I')"), '=', $myRefstatusId)
@@ -312,23 +484,25 @@ class EmrRIHari extends Component
             $query->whereIn('rihdr_no', $filterDataDokter);
         }
 
-        $query->where(function ($q) use ($mySearch) {
+        $query = $query->where(function ($q) use ($mySearch) {
             $q->Where(DB::raw('upper(reg_name)'), 'like', '%' . strtoupper($mySearch) . '%')
                 ->orWhere(DB::raw('upper(reg_no)'), 'like', '%' . strtoupper($mySearch) . '%')
                 ->orWhere(DB::raw('upper(vno_sep)'), 'like', '%' . strtoupper($mySearch) . '%')
                 ->orWhere(DB::raw('upper(dr_name)'), 'like', '%' . strtoupper($mySearch) . '%');
         })
             ->orderBy('entry_date1',  'desc')
-            ->orderBy('dr_name',  'desc');
+            ->orderBy('dr_name',  'desc')
+            ->paginate($this->limitPerPage);
         ////////////////////////////////////////////////
         // end Query
         ///////////////////////////////////////////////
+        $query = $this->perhitunganTarifRawatInap($query);
 
 
 
         return view(
             'livewire.emr-r-i-hari.emr-r-i-hari',
-            ['myQueryData' => $query->paginate($this->limitPerPage)]
+            ['myQueryData' => $query]
         );
     }
     // select data end////////////////

@@ -142,6 +142,28 @@
                                 default => 'slate', // Asuransi Lain
                             };
 
+                            // Hitung total RS & INA
+
+                            $totalrs = $myQData->totalri_temp ?? 0;
+
+                            $totalinacbgRs = $myQData->totinacbg_temp ?: $totalrs;
+
+                            $totalinacbgSirus = data_get(
+                                $datadaftar_json,
+                                'inacbg.set_claim_data_done.grouper.response.cbg.base_tariff',
+                                $totalrs,
+                            );
+
+                            $persentasiRs = $totalinacbgRs ? round(($totalrs / $totalinacbgRs) * 100) : 0;
+                            $persentasiSirus = $totalinacbgSirus ? round(($totalrs / $totalinacbgSirus) * 100) : 0;
+
+                            // Warna badge berdasarkan persentase
+                            $badgeColorPersentasiRs =
+                                $persentasiRs < 50 ? 'green' : ($persentasiRs < 80 ? 'yellow' : 'red');
+
+                            $badgeColorPersentasiSirus =
+                                $persentasiSirus < 50 ? 'green' : ($persentasiSirus < 80 ? 'yellow' : 'red');
+
                         @endphp
 
 
@@ -163,7 +185,32 @@
                                         </div>
                                     </div>
 
+                                    {{-- Badges: Klaim, SEP, Laborat, Radiologi --}}
+                                    <div class="grid grid-cols-2 gap-2">
+                                        @if ($isBpjs)
+                                            <span @class([
+                                                'inline-flex items-center px-2 py-0.5 text-xs font-medium rounded',
+                                                'bg-green-100 text-green-800' => $badgeColorPersentasiRs === 'green',
+                                                'bg-yellow-100 text-yellow-800' => $badgeColorPersentasiRs === 'yellow',
+                                                'bg-red-100 text-red-800' => $badgeColorPersentasiRs === 'red',
+                                            ])>
+                                                RS {{ number_format($totalrs, 0, ',', '.') }} |
+                                                INA {{ number_format($totalinacbgRs, 0, ',', '.') }} |
+                                                {{ $persentasiRs }}%
+                                            </span>
 
+                                            <span @class([
+                                                'inline-flex items-center px-2 py-0.5 text-xs font-medium rounded',
+                                                'bg-green-100 text-green-800' => $badgeColorPersentasiSirus === 'green',
+                                                'bg-yellow-100 text-yellow-800' => $badgeColorPersentasiSirus === 'yellow',
+                                                'bg-red-100 text-red-800' => $badgeColorPersentasiSirus === 'red',
+                                            ])>
+                                                SIRUS {{ number_format($totalrs, 0, ',', '.') }} |
+                                                INA {{ number_format($totalinacbgSirus, 0, ',', '.') }} |
+                                                {{ $persentasiRs }}%
+                                            </span>
+                                        @endif
+                                    </div>
 
                                     {{-- Diagnosa & Procedure --}}
                                     <div class="text-xs text-gray-700 rounded-lg bg-gray-50">

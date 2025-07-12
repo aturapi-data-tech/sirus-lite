@@ -346,6 +346,43 @@ class EmrRIPulang extends Component
         ]
     ];
 
+    /**
+     * Ambil semua metrics sekali untuk semua rihdr_no di current page,
+     * lalu transform Collection-nya dengan men‐attach metrics + tarif_total.
+     */
+    private function perhitunganTarifRawatInap(\Illuminate\Pagination\LengthAwarePaginator $paginator)
+    {
+        // get raw collection & IDs
+        $collection = $paginator->getCollection();
+        $ids        = $collection->pluck('rihdr_no')->all();
+
+        // 1) Ambil totinacbg_temp & totalri_temp langsung dari VIEW
+        $totInacbgTemp = DB::table('rsview_rihdrs')
+            ->whereIn('rihdr_no', $ids)
+            ->pluck('totinacbg_temp', 'rihdr_no');
+
+        $totalriTemp = DB::table('rsview_rihdrs')
+            ->whereIn('rihdr_no', $ids)
+            ->pluck('totalri_temp', 'rihdr_no');
+
+
+        $new = $collection->map(function ($row) use (
+            $totInacbgTemp,
+            $totalriTemp,
+
+        ) {
+            $key = $row->rihdr_no;
+            $row->totinacbg_temp         = $totInacbgTemp[$key]      ?? 0;
+            $row->totalri_temp           = $totalriTemp[$key]        ?? 0;
+
+
+            return $row;
+        });
+
+        $paginator->setCollection($new);
+
+        return $paginator;
+    }
 
     // when new form instance
     public function mount() {}
@@ -410,6 +447,7 @@ class EmrRIPulang extends Component
         // end Query
         ///////////////////////////////////////////////
 
+        $query = $this->perhitunganTarifRawatInap($query);
 
 
         return view(
