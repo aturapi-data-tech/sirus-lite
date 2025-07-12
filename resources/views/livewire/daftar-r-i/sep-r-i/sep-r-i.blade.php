@@ -87,6 +87,13 @@
                                     wire:model="dataDaftarRi.sep.reqSep.request.t_sep.diagAwal" />
                             </div>
 
+                            <div>
+                                <x-input-label :value="'Kode DPJP'" :required="true" />
+                                <x-text-input placeholder="Kode DPJP" class="w-full mt-1"
+                                    wire:model="dataDaftarRi.sep.reqSep.request.t_sep.skdp.kodeDPJP"
+                                    :disabled="true" />
+                            </div>
+
                             {{-- No Telepon --}}
                             <div>
                                 <x-input-label :value="'No Telepon'" />

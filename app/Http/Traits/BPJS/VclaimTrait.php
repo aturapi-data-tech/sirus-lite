@@ -1101,7 +1101,6 @@ trait VclaimTrait
 
         // handler when time out and off line mode
         try {
-
             $url = env('VCLAIM_URL') . "SEP/2.0/insert";
             $signature = self::signature();
             $signature['Content-Type'] = 'application/x-www-form-urlencoded';
