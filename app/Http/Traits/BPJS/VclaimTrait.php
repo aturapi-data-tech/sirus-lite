@@ -763,7 +763,7 @@ trait VclaimTrait
 
             $response = Http::timeout(10)
                 ->withHeaders($signature)
-                ->post($url, $data);
+                ->put($url, $r);
 
 
             // dd($response->transferStats->getTransferTime()); Get Transfertime request
