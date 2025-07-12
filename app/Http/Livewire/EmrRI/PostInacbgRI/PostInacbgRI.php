@@ -243,6 +243,16 @@ class PostInacbgRI extends Component
         $jnsPelayanan = $dataDaftarRi['sep']['reqSep']['request']['t_sep']['jnsPelayanan'] ?? '2';
         $klsRawatHak = $dataDaftarRi['sep']['reqSep']['request']['t_sep']['klsRawat']['klsRawatHak'] ?? '3';
 
+        $statusPulang = data_get(
+            $this->dataDaftarRi,
+            'perencanaan.tindakLanjut.statusPulang',
+            0
+        );
+        // pastikan dalam 1..5
+        $statusPulang = in_array($statusPulang, [1, 2, 3, 4, 5])
+            ? $statusPulang
+            : 5; // fallback ke “Lain-lain”
+
 
         $coderNik  = '123123123123';
         // 6. Panggil wrapper di trait
@@ -393,7 +403,11 @@ class PostInacbgRI extends Component
                 // opsi:
                 'cob_cd' => '0',
                 'add_payment_pct' => 0,
-                'kode_tarif' => 'DS'
+                'kode_tarif' => 'DS',
+                // **baru**: discharge_status
+                // 1=Atas persetujuan dokter, 2=Dirujuk, 3=Atas permintaan sendiri,
+                // 4=Meninggal, 5=Lain-lain
+                'discharge_status'        => $statusPulang,
             ];
 
             $resp = $this->setClaimData($metadata, $data);
