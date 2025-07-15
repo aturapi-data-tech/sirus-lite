@@ -342,6 +342,29 @@
                                     <x-badge :badgecolor="__($badgecolorEresep)">
                                         E-Resep: {{ $prosentaseEMR . '%' }}
                                     </x-badge>
+
+                                    @php
+                                        // Ambil statusResep, default: kosong
+                                        $statusResep = $datadaftar_json['statusResep']['status'] ?? 'DITUNGGU';
+                                        // Map status ke warna badge
+                                        $badgeColors = [
+                                            'DITUNGGU' => 'green',
+                                            'DITINGGAL' => 'yellow',
+                                        ];
+                                        $badgeColorStatusResep = $badgeColors[$statusResep] ?? 'gray';
+                                        // Label yang ingin ditampilkan
+                                        $labelStatusResep =
+                                            $statusResep === 'DITUNGGU'
+                                                ? 'Ditunggu'
+                                                : ($statusResep === 'DITINGGAL'
+                                                    ? 'Ditinggal'
+                                                    : '');
+                                    @endphp
+
+                                    {{-- Badge Status Resep (hanya tampil kalau sudah diset) --}}
+                                    <x-badge :badgecolor="__($badgeColorStatusResep)">
+                                        {{ $labelStatusResep }}
+                                    </x-badge>
                                 </div>
 
 

@@ -243,7 +243,23 @@
         <div class="sticky bottom-0 flex justify-between px-4 py-3 bg-gray-50 sm:px-6">
 
             <div class="">
-                {{-- null --}}
+                <div class="grid grid-cols-2 gap-1 p-2">
+                    {{-- 1. Radio button Status --}}
+                    <div>
+                        <x-input-label value="Status Pengambilan Obat" />
+                        <div class="grid w-full grid-cols-2 gap-2 mt-1">
+                            <x-radio-button label="Ditunggu" value="DITUNGGU" wire:model="statusResep.status" />
+                            <x-radio-button label="Ditinggal" value="DITINGGAL" wire:model="statusResep.status" />
+                        </div>
+                    </div>
+
+                    {{-- 2. Keterangan (hanya sebagai teks input biasa) --}}
+                    <div>
+                        <x-input-label for="keteranganResep" :value="'Keterangan Pasien'" />
+                        <x-text-input id="keteranganResep" placeholder="Masukkan catatan pasien…" class="w-full mt-1"
+                            wire:model="statusResep.keterangan" />
+                    </div>
+                </div>
             </div>
             <div>
                 <div wire:loading wire:target="">

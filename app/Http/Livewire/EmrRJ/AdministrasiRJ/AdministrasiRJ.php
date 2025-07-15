@@ -24,6 +24,11 @@ class AdministrasiRJ extends Component
     // dataDaftarPoliRJ RJ
     public $rjNoRef;
 
+    public $statusResep = [
+        'status'     => 'DITUNGGU',    // 'DITUNGGU' atau 'DITINGGAL'
+        'keterangan' => '',      // catatan pasien
+    ];
+
     public int $sumRsAdmin;
     public int $sumRjAdmin;
     public int $sumPoliPrice;
@@ -145,6 +150,79 @@ class AdministrasiRJ extends Component
         }
     }
 
+
+
+    public function setObatDitungguAtauDitinggal(string $rjNo, string $status, string $keterangan)
+    {
+
+        $allowed = ['DITUNGGU', 'DITINGGAL'];
+        if (! in_array($status, $allowed)) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Status tidak valid. Pilih antara DITUNGGU atau DITINGGAL.");
+            return;
+        }
+
+        // 1. Ambil data JSON existing
+        $dataDaftarPoliRJ = $this->findData($rjNo);
+        // 2. Cek apakah statusResep sudah pernah diset
+        // 3a. Buat struktur statusResep baru
+        $dataDaftarPoliRJ['statusResep'] = [
+            'status'      => $status,
+            'keterangan'  => $keterangan,
+            'userLog'     => auth()->user()->myuser_name,
+            'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'),
+        ];
+
+        // 3b. Simpan kembali ke DB (JSON + XML bila perlu)
+        $this->updateJsonRJ($rjNo, $dataDaftarPoliRJ);
+
+        // 3c. Notifikasi sukses
+        toastr()
+            ->closeOnHover(true)
+            ->closeDuration(3)
+            ->positionClass('toast-top-left')
+            ->addSuccess("Status resep “{$status}” berhasil disimpan.");
+
+        // 3d. (Opsional) emit event jika perlu refresh di UI lain
+        $this->emit('syncronizeAssessmentDokterRJFindData');
+        $this->emit('syncronizeAssessmentPerawatRJFindData');
+    }
+
+
+    /**
+     * Dipanggil otomatis saat statusResep.status berubah.
+     */
+    public function updatedStatusResepStatus($value)
+    {
+        $this->autoSaveStatusResep();
+    }
+
+    /**
+     * Dipanggil otomatis saat statusResep.keterangan berubah.
+     */
+    public function updatedStatusResepKeterangan($value)
+    {
+        $this->autoSaveStatusResep();
+    }
+
+    /**
+     * Helper untuk validasi & simpan statusResep tanpa tombol.
+     */
+    protected function autoSaveStatusResep()
+    {
+        // Panggil method penyimpanan
+        $this->setObatDitungguAtauDitinggal(
+            $this->rjNoRef,
+            $this->statusResep['status'],
+            $this->statusResep['keterangan']
+        );
+    }
+
+
+
     private function findData($rjNo): array
     {
         $findDataRJ = $this->findDataRJ($rjNo);
@@ -264,6 +342,20 @@ class AdministrasiRJ extends Component
         $dataRawatJalan['rjObat'] = json_decode(json_encode($rsObat, true), true);
         $dataRawatJalan['rjLab'] = json_decode(json_encode($rsLab, true), true);
         $dataRawatJalan['rjRad'] = json_decode(json_encode($rsRad, true), true);
+
+
+        // ─────────────── Inisialisasi statusResep ───────────────
+        // Jika JSON sudah punya statusResep, pakai itu;
+        // kalau belum, buat default, lalu set properti Livewire.
+        if (isset($dataRawatJalan['statusResep'])) {
+            $this->statusResep = $dataRawatJalan['statusResep'];
+        } else {
+            $dataRawatJalan['statusResep'] = [
+                'status'     => null,
+                'keterangan' => '',
+            ];
+            $this->statusResep = $dataRawatJalan['statusResep'];
+        }
 
         return ($dataRawatJalan);
     }
