@@ -85,7 +85,7 @@
 
                                 @php
                                     // Ambil statusResep, default: kosong
-                                    $statusResep = $datadaftar_json['statusResep']['status'] ?? 'DITUNGGU';
+                                    $statusResep = $dataDaftarPoliRJ['statusResep']['status'] ?? 'DITUNGGU';
 
                                     $labelStatusResep =
                                         $statusResep === 'DITUNGGU'
