@@ -82,6 +82,21 @@
                                 @else
                                     {{-- NonPRB --}}
                                 @endisset
+
+                                @php
+                                    // Ambil statusResep, default: kosong
+                                    $statusResep = $datadaftar_json['statusResep']['status'] ?? 'DITUNGGU';
+
+                                    $labelStatusResep =
+                                        $statusResep === 'DITUNGGU'
+                                            ? 'Ditunggu'
+                                            : ($statusResep === 'DITINGGAL'
+                                                ? 'Ditinggal'
+                                                : '');
+                                @endphp
+                                @if ($labelStatusResep == 'Ditinggal')
+                                    <span style="color: red;"> {{ $labelStatusResep }}</span>
+                                @endif
                             </td>
                         </tr>
 
