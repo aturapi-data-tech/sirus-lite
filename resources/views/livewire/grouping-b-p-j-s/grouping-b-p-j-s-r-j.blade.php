@@ -64,6 +64,10 @@
 
                     </div>
 
+                    <div wire:loading wire:target="myTopBar.refDate">
+                        <x-loading />
+                    </div>
+
                     <div>
 
                         {{-- Tombol Proses --}}
@@ -119,7 +123,7 @@
                 <div class="p-4 bg-white border rounded-lg shadow">
                     <div class="mb-1 text-xs text-gray-500">Jumlah Klaim (Total Data)</div>
                     <div class="text-lg font-semibold text-gray-700">
-                        {{ number_format($myQueryDataSum['jml_all'], 0, ',', '.') }}
+                        {{ number_format($myQueryDataSum['jml_all'] ?? 0, 0, ',', '.') }}
                     </div>
                 </div>
 
@@ -127,7 +131,7 @@
                 <div class="p-4 bg-white border rounded-lg shadow">
                     <div class="mb-1 text-xs text-gray-500">Total Biaya Klaim</div>
                     <div class="text-lg font-semibold text-gray-700">
-                        Rp {{ number_format($myQueryDataSum['total_all'], 0, ',', '.') }}
+                        Rp {{ number_format($myQueryDataSum['total_all'] ?? 0, 0, ',', '.') }}
                     </div>
                 </div>
 
@@ -135,7 +139,7 @@
                 <div class="p-4 bg-white border rounded-lg shadow">
                     <div class="mb-1 text-xs text-gray-500">Jumlah Klaim ke BPJS</div>
                     <div class="text-lg font-semibold text-gray-700">
-                        {{ number_format($myQueryDataSum['jml_disetujui_bpjs'], 0, ',', '.') }}
+                        {{ number_format($myQueryDataSum['jml_disetujui_bpjs'] ?? 0, 0, ',', '.') }}
                     </div>
                 </div>
 
@@ -143,7 +147,7 @@
                 <div class="p-4 bg-white border rounded-lg shadow">
                     <div class="mb-1 text-xs text-gray-500">Total Disetujui BPJS</div>
                     <div class="text-lg font-semibold text-gray-700">
-                        Rp {{ number_format($myQueryDataSum['disetujui_bpjs'], 0, ',', '.') }}
+                        Rp {{ number_format($myQueryDataSum['disetujui_bpjs'] ?? 0, 0, ',', '.') }}
                     </div>
                 </div>
 
@@ -151,7 +155,7 @@
                 <div class="p-4 bg-white border rounded-lg shadow">
                     <div class="mb-1 text-xs text-gray-500">Persentase Disetujui</div>
                     <div class="text-lg font-semibold text-gray-700">
-                        {{ $myQueryDataSum['jml_all'] > 0
+                        {{ $myQueryDataSum['jml_all'] ?? 0 > 0
                             ? number_format(($myQueryDataSum['jml_disetujui_bpjs'] / $myQueryDataSum['jml_all']) * 100, 2, ',', '.') . '%'
                             : '0%' }}
                     </div>
@@ -184,25 +188,22 @@
 
                 <tbody class="bg-white">
                     @foreach ($myQueryData as $index => $myQData)
-                        @php
-                            $datadaftar_json = json_decode($myQData->datadaftarpolirj_json, true);
-                            $tarif_rs = [
-                                'admin_up' => $myQData->admin_up,
-                                'jasa_karyawan' => $myQData->jasa_karyawan,
-                                'jasa_dokter' => $myQData->jasa_dokter,
-                                'jasa_medis' => $myQData->jasa_medis,
-                                'admin_rawat_jalan' => $myQData->admin_rawat_jalan,
-                                'lain_lain' => $myQData->lain_lain,
-                                'radiologi' => $myQData->radiologi,
-                                'laboratorium' => $myQData->laboratorium,
-                                'obat' => $myQData->obat,
-                            ];
-                            $total_all = array_sum($tarif_rs);
-
-                            $umbal = $datadaftar_json['umbalBpjs'] ?? [];
-                        @endphp
+                        @if (strtoupper($myQData->poli_desc) === 'UGD')
+                            @php
+                                $datadaftar_json = json_decode($myQData->datadaftarugd_json, true);
+                                $umbal = $datadaftar_json['umbalBpjs'] ?? [];
+                            @endphp
+                        @else
+                            @php
+                                $datadaftar_json = json_decode($myQData->datadaftarpolirj_json, true);
+                                $umbal = $datadaftar_json['umbalBpjs'] ?? [];
+                            @endphp
+                        @endif
                         <tr class="border-b">
-                            <td class="px-4 py-3">{{ $index + 1 }}</td>
+                            <td class="px-4 py-3">
+                                {{ $index + 1 }}
+
+                            </td>
 
                             <td class="px-4 py-3">
                                 {{-- No SEP --}}
@@ -231,9 +232,14 @@
                                 </x-badge>
                             </td>
 
-                            <td class="px-4 py-3">{{ $myQData->rj_date }}</td>
+                            <td class="px-4 py-3">
+                                {{ $myQData->rj_date }}
+
+                            </td>
                             <!-- Riil RS -->
-                            <td class="px-4 py-3 text-right"> {{ number_format($total_all, 0, ',', '.') }}</td>
+                            <td class="px-4 py-3 text-right">
+                                {{ number_format($myQData->tarif_total, 0, ',', '.') }}
+                            </td>
                             {{-- Persentase Selisih --}}
                             @php
                                 $riil_rs = (int) ($umbal['riil_rs'] ?? 0);
@@ -302,9 +308,15 @@
                     <tbody class="bg-white">
                         @foreach ($dataUmbalBPJSTidakAdaDiRS as $index => $umbal)
                             <tr class="border-b">
-                                <td class="px-4 py-2">{{ $index + 1 }}</td>
-                                <td class="px-4 py-2">{{ $umbal['no_sep'] }}</td>
-                                <td class="px-4 py-2">{{ $umbal['tgl_verif'] }}</td>
+                                <td class="px-4 py-2">{{ $index + 1 }}
+
+                                </td>
+                                <td class="px-4 py-2">{{ $umbal['no_sep'] }}
+
+                                </td>
+                                <td class="px-4 py-2">{{ $umbal['tgl_verif'] }}
+
+                                </td>
                                 <td class="px-4 py-2 text-right">{{ number_format($umbal['riil_rs'], 0, ',', '.') }}
                                 </td>
                                 <td class="px-4 py-2 text-right">{{ number_format($umbal['diajukan'], 0, ',', '.') }}
@@ -356,7 +368,9 @@
                 @foreach ($myQDatas as $myQData)
                     <tr>
                         @foreach ($myQData as $cell)
-                            <td class="px-4 py-2 border">{{ $cell }}</td>
+                            <td class="px-4 py-2 border">{{ $cell }}
+
+                            </td>
                         @endforeach
                     </tr>
                 @endforeach
