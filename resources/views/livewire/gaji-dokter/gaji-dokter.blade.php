@@ -106,72 +106,87 @@
 
                 <tbody class="bg-white">
                     @php
-                        $currentDoctor = null;
-                        $currentDocName = '';
-                        $subtotalDoctor = 0;
-                        $grandTotal = 0;
+                        $bgColors = [
+                            'bg-red-100',
+                            'bg-yellow-100',
+                            'bg-green-100',
+                            'bg-blue-100',
+                            'bg-indigo-100',
+                            'bg-purple-100',
+                            'bg-pink-100',
+                        ];
+                        $colorsAvailable = $bgColors;
+                        $overallTotal = 0;
                     @endphp
 
-                    @foreach ($myQueryData as $row)
-                        {{-- Ketika dokter berubah, cetak subtotal dokter sebelumnya --}}
-                        @if ($currentDoctor !== null && $currentDoctor !== $row->dr_id)
-                            <tr class="font-semibold bg-gray-200">
-                                <td colspan="3" class="px-4 py-3 text-right">
-                                    Subtotal Dokter {{ $currentDocName }}
+                    {{-- Group by doctor --}}
+                    @foreach ($myQueryData->groupBy('dr_id') as $drId => $doctorRows)
+                        @php
+                            $drName = $doctorRows->first()->dr_name;
+                            $doctorTotal = $doctorRows->sum('doc_nominal');
+                            $overallTotal += $doctorTotal;
+
+                            // zero-based index of this foreach
+                            $idx = $loop->index;
+                            // pick color by cycling through $bgColors
+                            $bgColorDokter = $bgColors[$idx % count($bgColors)];
+                        @endphp
+
+                        {{-- Doctor header --}}
+                        <tr class="font-bold {{ $bgColorDokter }}">
+                            <td colspan="4" class="px-4 py-2">
+                                Dokter: {{ $drId }} - {{ $drName }}
+                            </td>
+                        </tr>
+
+                        {{-- Within each doctor, group by klaim status --}}
+                        @foreach ($doctorRows->groupBy('klaim_status') as $klaimStatus => $klaimStatusRows)
+                            @php
+                                $klaimStatusTotal = $klaimStatusRows->sum('doc_nominal');
+                            @endphp
+                            {{-- Detail rows --}}
+                            @foreach ($klaimStatusRows as $row)
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-4 py-1 whitespace-nowrap"></td>
+                                    <td class="px-4 py-1 whitespace-nowrap">{{ $klaimStatus }}</td>
+                                    <td class="px-4 py-1 whitespace-nowrap">{{ $row->desc_doc }}</td>
+                                    <td class="px-4 py-1 text-right whitespace-nowrap">
+                                        {{ number_format($row->doc_nominal, 0, ',', '.') }}
+                                    </td>
+                                </tr>
+                            @endforeach
+
+                            {{-- Status subtotal --}}
+                            <tr class="font-semibold bg-gray-50">
+                                <td class="px-4 py-2"></td>
+                                <td class="px-4 py-2"></td>
+                                <td class="px-4 py-2 text-right" colspan="1">
+                                    Subtotal {{ $klaimStatus }}
                                 </td>
-                                <td class="px-4 py-3 text-right">
-                                    {{ number_format($subtotalDoctor, 0, ',', '.') }}
+                                <td class="px-4 py-2 text-right">
+                                    {{ number_format($klaimStatusTotal, 0, ',', '.') }}
                                 </td>
                             </tr>
-                            @php
-                                $subtotalDoctor = 0;
-                            @endphp
-                        @endif
+                        @endforeach
 
-                        {{-- Baris data --}}
-                        <tr class="hover:bg-gray-100">
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                {{ $row->dr_id }} – {{ $row->dr_name }}
+                        {{-- Doctor subtotal --}}
+                        <tr class="font-semibold {{ $bgColorDokter }}">
+                            <td colspan="3" class="px-4 py-2 text-right">
+                                Subtotal Dokter {{ $drName }}
                             </td>
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                {{ $row->klaim_status }}
-                            </td>
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                {{ $row->desc_doc }}
-                            </td>
-                            <td class="px-4 py-3 text-right whitespace-nowrap">
-                                {{ number_format($row->doc_nominal, 0, ',', '.') }}
+                            <td class="px-4 py-2 text-right">
+                                {{ number_format($doctorTotal, 0, ',', '.') }}
                             </td>
                         </tr>
-
-                        @php
-                            // Update tracking
-                            $currentDoctor = $row->dr_id;
-                            $currentDocName = $row->dr_name;
-                            $subtotalDoctor += $row->doc_nominal;
-                            $grandTotal += $row->doc_nominal;
-                        @endphp
                     @endforeach
 
-                    {{-- Subtotal untuk dokter terakhir --}}
-                    @if ($currentDoctor !== null)
-                        <tr class="font-semibold bg-gray-200">
-                            <td colspan="3" class="px-4 py-3 text-right">
-                                Subtotal Dokter {{ $currentDocName }}
-                            </td>
-                            <td class="px-4 py-3 text-right">
-                                {{ number_format($subtotalDoctor, 0, ',', '.') }}
-                            </td>
-                        </tr>
-                    @endif
-
                     {{-- Grand total --}}
-                    <tr class="font-semibold bg-gray-100">
-                        <td colspan="3" class="px-4 py-3 text-right">
-                            Total Semua Dokter
+                    <tr class="font-bold bg-gray-300">
+                        <td colspan="3" class="px-4 py-2 text-right">
+                            Total Semua Dokter & Klaim
                         </td>
-                        <td class="px-4 py-3 text-right">
-                            {{ number_format($grandTotal, 0, ',', '.') }}
+                        <td class="px-4 py-2 text-right">
+                            {{ number_format($overallTotal, 0, ',', '.') }}
                         </td>
                     </tr>
                 </tbody>
