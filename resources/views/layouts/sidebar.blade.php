@@ -414,7 +414,7 @@
                         </li>
                     @endrole
 
-                    @role(['Perawat', 'Mr', 'Admin'])
+                    @role(['Admin', 'Tu'])
                         <li class="border border-gray-300 rounded-lg ">
 
                             <button type="button"
@@ -476,6 +476,14 @@
 
 
                                         {{ __('Laporan RI') }}
+                                    </x-nav-link>
+                                </li>
+
+                                <li>
+                                    <x-nav-link class="pl-4" :href="route('GajiDokter')" :active="request()->routeIs('GajiDokter')">
+                                        <!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
+
+                                        {{ __('Pendapatan Jasa Dokter') }}
                                     </x-nav-link>
                                 </li>
                             </ul>

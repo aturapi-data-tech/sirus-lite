@@ -59,6 +59,8 @@ use App\Http\Livewire\GroupingBPJS\GroupingBPJSRJ;
 use App\Http\Livewire\GroupingBPJS\GroupingBPJSRI;
 
 
+use App\Http\Livewire\GajiDokter\GajiDokter;
+
 
 
 
@@ -170,6 +172,10 @@ Route::group(['middleware' => ['role:Admin|Mr|Perawat|Dokter|Apoteker|Tu']], fun
     //Grouping
     Route::get('GroupingBPJSRJ', GroupingBPJSRJ::class)->middleware('auth')->name('GroupingBPJSRJ');
     Route::get('GroupingBPJSRI', GroupingBPJSRI::class)->middleware('auth')->name('GroupingBPJSRI');
+
+
+    //Gaji Dokter
+    Route::get('GajiDokter', GajiDokter::class)->middleware('auth')->name('GajiDokter');
 });
 
 
