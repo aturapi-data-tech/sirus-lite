@@ -106,15 +106,7 @@
 
                 <tbody class="bg-white">
                     @php
-                        $bgColors = [
-                            'bg-red-100',
-                            'bg-yellow-100',
-                            'bg-green-100',
-                            'bg-blue-100',
-                            'bg-indigo-100',
-                            'bg-purple-100',
-                            'bg-pink-100',
-                        ];
+                        $bgColors = ['text-primary'];
                         $colorsAvailable = $bgColors;
                         $overallTotal = 0;
                     @endphp
@@ -129,11 +121,11 @@
                             // zero-based index of this foreach
                             $idx = $loop->index;
                             // pick color by cycling through $bgColors
-                            $bgColorDokter = $bgColors[$idx % count($bgColors)];
+                            $txColorDokter = $bgColors[$idx % count($bgColors)];
                         @endphp
 
                         {{-- Doctor header --}}
-                        <tr class="font-bold {{ $bgColorDokter }}">
+                        <tr class="font-bold {{ $txColorDokter }}">
                             <td colspan="4" class="px-4 py-2">
                                 Dokter: {{ $drId }} - {{ $drName }}
                             </td>
@@ -160,7 +152,7 @@
                             <tr class="font-semibold bg-gray-50">
                                 <td class="px-4 py-2"></td>
                                 <td class="px-4 py-2"></td>
-                                <td class="px-4 py-2 text-right" colspan="1">
+                                <td class="px-4 py-2 text-xs text-right" colspan="1">
                                     Subtotal {{ $klaimStatus }}
                                 </td>
                                 <td class="px-4 py-2 text-right">
@@ -170,7 +162,7 @@
                         @endforeach
 
                         {{-- Doctor subtotal --}}
-                        <tr class="font-semibold {{ $bgColorDokter }}">
+                        <tr class="font-semibold bg-gray-100 {{ $txColorDokter }}">
                             <td colspan="3" class="px-4 py-2 text-right">
                                 Subtotal Dokter {{ $drName }}
                             </td>
