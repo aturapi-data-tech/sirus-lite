@@ -79,10 +79,6 @@ class GajiDokter extends Component
         $this->myTopBar['refBulan'] = Carbon::now()->format('m/Y');
     }
 
-    private function perhitunganTarifDisetujui(object $row)
-    {
-        dd($row);
-    }
 
     // select data start////////////////
     public function render()
@@ -159,6 +155,7 @@ class GajiDokter extends Component
                 ->get();
 
             $disetujuiBpjs = 0;
+            $notApprovedRihdr = [];
             foreach ($txnNoList as $txn) {
                 if ($txn->klaim_status === 'BPJS') {
                     // Pilih sumber JSON berdasarkan group_doc
@@ -169,79 +166,90 @@ class GajiDokter extends Component
                         case 'OPERATOR':
                         case 'ANASTESI':
                             $datadaftar = DB::table('rstxn_oks as a')
+                                ->select('b.datadaftarri_json', 'vno_sep')
                                 ->join('rstxn_rihdrs as b', 'a.rihdr_no', '=', 'b.rihdr_no')
                                 ->where('a.ok_reg', $txn->txn_no)
-                                ->value('b.datadaftarri_json');
+                                ->first();
                             break;
 
                         // Rawat Inap
                         case 'VISIT':
                             $datadaftar = DB::table('rstxn_rivisits as v')
+                                ->select('ri.datadaftarri_json', 'vno_sep')
                                 ->join('rstxn_rihdrs as ri', 'v.rihdr_no', '=', 'ri.rihdr_no')
                                 ->where('v.visit_no', $txn->txn_no)
-                                ->value('ri.datadaftarri_json');
+                                ->first();
                             break;
                         case 'KONSUL':
                             $datadaftar = DB::table('rstxn_rikonsuls as k')
+                                ->select('ri.datadaftarri_json', 'vno_sep')
                                 ->join('rstxn_rihdrs as ri', 'k.rihdr_no', '=', 'ri.rihdr_no')
                                 ->where('k.konsul_no', $txn->txn_no)
-                                ->value('ri.datadaftarri_json');
+                                ->first();
                             break;
                         case 'JD RI':
                             $datadaftar = DB::table('rstxn_riactdocs as a')
+                                ->select('ri.datadaftarri_json', 'vno_sep')
                                 ->join('rstxn_rihdrs as ri', 'a.rihdr_no', '=', 'ri.rihdr_no')
                                 ->where('a.actd_no', $txn->txn_no)
-                                ->value('ri.datadaftarri_json');
+                                ->first();
                             break;
 
                         // UGD
                         case 'UP UGD':
                             $datadaftar = DB::table('rstxn_ugdhdrs as u')
+                                ->select('u.datadaftarugd_json', 'vno_sep')
                                 ->where('u.rj_no', $txn->txn_no)
-                                ->value('u.datadaftarugd_json');
+                                ->first();
                             break;
                         case 'JD UGD':
                             $datadaftar = DB::table('rstxn_ugdaccdocs as a')
+                                ->select('u.datadaftarugd_json', 'vno_sep')
                                 ->join('rstxn_ugdhdrs as u', 'a.rj_no', '=', 'u.rj_no')
                                 ->where('a.rjhn_dtl', $txn->txn_no)
-                                ->value('u.datadaftarugd_json');
+                                ->first();
                             break;
 
                         // UGD Transfer (UGDTRF) → pakai rihdr_no
                         case 'UP UGDTRF':
                         case 'JD UGDTRF':
                             $datadaftar = DB::table('rstxn_rihdrs as ri')
+                                ->select('ri.datadaftarri_json', 'vno_sep')
                                 ->where('ri.rihdr_no', $txn->txn_no)
-                                ->value('ri.datadaftarri_json');
+                                ->first();
                             break;
 
                         // Rawat Jalan
                         case 'UP RJ':
                             $datadaftar = DB::table('rstxn_rjhdrs as rj')
+                                ->select('rj.datadaftarpolirj_json', 'vno_sep')
                                 ->where('rj.rj_no', $txn->txn_no)
-                                ->value('rj.datadaftarpolirj_json');
+                                ->first();
                             break;
                         case 'JD RJ':
                             $datadaftar = DB::table('rstxn_rjaccdocs as a')
+                                ->select('rj.datadaftarpolirj_json', 'vno_sep')
                                 ->join('rstxn_rjhdrs as rj', 'a.rj_no', '=', 'rj.rj_no')
                                 ->where('a.rjhn_dtl', $txn->txn_no)
-                                ->value('rj.datadaftarpolirj_json');
+                                ->first();
                             break;
 
                         // RJ Transfer (RJTRF) → pakai rihdr_no
                         case 'UP RJTRF':
                         case 'JD RJTRF':
                             $datadaftar = DB::table('rstxn_rihdrs as ri')
+                                ->select('ri.datadaftarri_json', 'vno_sep')
                                 ->where('ri.rihdr_no', $txn->txn_no)
-                                ->value('ri.datadaftarri_json');
+                                ->first();
                             break;
 
                         // Klinik (RJK)
                         case 'UP KLINIK':
                         case 'JD KLINIK':
                             $datadaftar = DB::table('rstxn_rjhdrks as rjk')
+                                ->select('rjk.datadaftarpolirj_json', 'vno_sep')
                                 ->where('rjk.rj_no', $txn->txn_no)
-                                ->value('rjk.datadaftarpolirj_json');
+                                ->first();
                             break;
 
                         default:
@@ -251,26 +259,54 @@ class GajiDokter extends Component
                     }
 
                     // Decode JSON
-                    $json = json_decode($datadaftar, true);
+                    $jsonString = $datadaftar->datadaftarri_json
+                        ?? $datadaftar->datadaftarpolirj_json
+                        ?? $datadaftar->datadaftarugd_json
+                        ?? '{}';
 
-                    if (!empty($json['umbalBpjs']['disetujui'])) {
+                    // Decode JSON ke array
+                    $json = json_decode($jsonString, true);
+
+                    //Kumpulkan semua SEP
+                    $vno_sep = $datadaftar->vno_sep ?? null;
+                    if (!empty($vno_sep)) {
+                        $allSepPerDokter[]     = $vno_sep;
+                    }
+
+                    $approved = (isset($json['umbalBpjs']['disetujui']));
+
+                    if ($approved) {
                         $disetujuiBpjs += (int) $txn->doc_nominal;
+                    } else {
+                        $notApprovedRihdr[] = [
+                            'txn_no'   => $txn->txn_no,
+                            'desc_doc' => $txn->desc_doc,
+                            'doc_nominal' => $txn->doc_nominal,
+
+                        ];
+                        $debugJson[] = [
+                            'txn_no'   => $txn->txn_no,
+                            'desc_doc' => $txn->desc_doc,
+                            'doc_nominal' => $txn->doc_nominal,
+                            'json'     => $json,  // simpan JSON mentah untuk debug
+                        ];
                     }
                 } elseif ($txn->klaim_status === 'UMUM') {
-                    // Jika klaim UMUM, langsung tambah nominal tanpa cek JSON
                     $disetujuiBpjs += (int) $txn->doc_nominal;
                 }
             }
 
-            // Tambahkan ke total per desc_doc
+
             if (!isset($disetujuiPerDesc[$row->desc_doc])) {
                 $disetujuiPerDesc[$row->desc_doc] = 0;
             }
             $disetujuiPerDesc[$row->desc_doc] += $disetujuiBpjs;
 
-            // Simpan pada row juga
             $row->disetujui = $disetujuiBpjs;
+            $row->tidak_disetujui = $notApprovedRihdr;
+            $row->debug_json = $debugJson;
         }
+        $allSepPerDokter     = array_values(array_unique($allSepPerDokter ?? []));
 
 
 
@@ -283,7 +319,10 @@ class GajiDokter extends Component
         return view(
             'livewire.gaji-dokter.gaji-dokter',
             // ['myQueryData' => $query->paginate($this->limitPerPage)]
-            ['myQueryData' => $query]
+            [
+                'myQueryData' => $query,
+                'allSepPerDokter' => $allSepPerDokter
+            ]
 
         );
     }

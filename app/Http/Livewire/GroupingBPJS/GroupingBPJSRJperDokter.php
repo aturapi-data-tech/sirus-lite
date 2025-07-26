@@ -34,28 +34,19 @@ class GroupingBPJSRJperDokter extends Component
     ];
 
     // my Top Bar
-    public string $refDate;
-    public string $refDokterId;
+    public array $allSepPerDokter = [];
 
-
-    public string $refFilter = '';
     public array $myQueryDataSum = [];
 
     // search logic -resetExcept////////////////
     protected $queryRJString = [
-        'refFilter' => ['except' => '', 'as' => 'cariData'],
         'page' => ['except' => 1, 'as' => 'p'],
     ];
 
-    // reset page when myTopBar Change
-    public function updatedReffilter()
-    {
-        $this->resetPage();
-    }
 
     public function updatedMyTopBarRefDate()
     {
-        $this->hitungTotallAll($this->refDate);
+        $this->hitungTotallAll($this->allSepPerDokter);
     }
 
 
@@ -307,7 +298,7 @@ class GroupingBPJSRJperDokter extends Component
         return $new;
     }
 
-    public function hitungTotallAll()
+    public function hitungTotallAll($myrefAllSepPerDokter)
     {
 
         //////////////////////////////////////////
@@ -327,14 +318,7 @@ class GroupingBPJSRJperDokter extends Component
                 'dr_name',
 
             )
-            ->where(DB::raw("to_char(rj_date,'mm/yyyy')"), '=', $this->refDate)
-            ->where(DB::raw("nvl(rj_status,'A')"), '=', 'L')
-            ->where('dr_id', $this->refDokterId)
-            ->whereIn('klaim_id', function ($klaimData) {
-                $klaimData->select('klaim_id')
-                    ->from('rsmst_klaimtypes')
-                    ->where('klaim_status', 'BPJS');
-            });
+            ->whereIn('vno_sep', $myrefAllSepPerDokter);
 
         $queryUGD = DB::table('rsview_ugdkasir')
             ->select(
@@ -350,16 +334,7 @@ class GroupingBPJSRJperDokter extends Component
                 'dr_name',
 
             )
-            ->where(DB::raw("to_char(rj_date,'mm/yyyy')"), '=', $this->refDate)
-            ->where(DB::raw("nvl(rj_status,'A')"), '=', 'L')
-            ->where('dr_id', $this->refDokterId)
-            ->whereIn('klaim_id', function ($klaimData) {
-                $klaimData->select('klaim_id')
-                    ->from('rsmst_klaimtypes')
-                    ->where('klaim_status', 'BPJS');
-            });
-
-
+            ->whereIn('vno_sep', $myrefAllSepPerDokter);
 
         $qUnionRJUGD = $queryRJ->unionAll($queryUGD);
 
@@ -410,7 +385,7 @@ class GroupingBPJSRJperDokter extends Component
 
     public function mount()
     {
-        $this->hitungTotallAll();
+        $this->hitungTotallAll($this->allSepPerDokter);
     }
 
 
@@ -419,9 +394,8 @@ class GroupingBPJSRJperDokter extends Component
     // select data start////////////////
     public function render()
     {
-        $mySearch = $this->refFilter;
-        $myRefdate = $this->refDate;
-        $myrefDokterId = $this->refDokterId;
+
+        $myrefAllSepPerDokter = $this->allSepPerDokter;
 
         //////////////////////////////////////////
         // Query Khusus BPJS///////////////////////////////
@@ -440,21 +414,7 @@ class GroupingBPJSRJperDokter extends Component
                 'dr_name',
 
             )
-            ->where(DB::raw("to_char(rj_date,'mm/yyyy')"), '=', $myRefdate)
-            ->where(DB::raw("nvl(rj_status,'A')"), '=', 'L')
-            ->where('dr_id', $myrefDokterId)
-            ->whereIn('klaim_id', function ($klaimData) {
-                $klaimData->select('klaim_id')
-                    ->from('rsmst_klaimtypes')
-                    ->where('klaim_status', 'BPJS');
-            });
-
-        $queryRJ->where(function ($q) use ($mySearch) {
-            $q->Where(DB::raw('upper(reg_name)'), 'like', '%' . strtoupper($mySearch) . '%')
-                ->orWhere(DB::raw('upper(reg_no)'), 'like', '%' . strtoupper($mySearch) . '%')
-                ->orWhere(DB::raw('upper(vno_sep)'), 'like', '%' . strtoupper($mySearch) . '%')
-                ->orWhere(DB::raw('upper(dr_name)'), 'like', '%' . strtoupper($mySearch) . '%');
-        });
+            ->whereIn('vno_sep', $myrefAllSepPerDokter);
 
 
 
@@ -472,21 +432,7 @@ class GroupingBPJSRJperDokter extends Component
                 'dr_name',
 
             )
-            ->where(DB::raw("to_char(rj_date,'mm/yyyy')"), '=', $myRefdate)
-            ->where(DB::raw("nvl(rj_status,'A')"), '=', 'L')
-            ->where('dr_id', $myrefDokterId)
-            ->whereIn('klaim_id', function ($klaimData) {
-                $klaimData->select('klaim_id')
-                    ->from('rsmst_klaimtypes')
-                    ->where('klaim_status', 'BPJS');
-            });
-
-        $queryUGD->where(function ($q) use ($mySearch) {
-            $q->Where(DB::raw('upper(reg_name)'), 'like', '%' . strtoupper($mySearch) . '%')
-                ->orWhere(DB::raw('upper(reg_no)'), 'like', '%' . strtoupper($mySearch) . '%')
-                ->orWhere(DB::raw('upper(vno_sep)'), 'like', '%' . strtoupper($mySearch) . '%')
-                ->orWhere(DB::raw('upper(dr_name)'), 'like', '%' . strtoupper($mySearch) . '%');
-        });
+            ->whereIn('vno_sep', $myrefAllSepPerDokter);
 
 
         $qUnionRJUGD = $queryRJ->unionAll($queryUGD);

@@ -149,6 +149,16 @@
                                     </td>
                                     <td class="px-4 py-1 text-right whitespace-nowrap">
                                         {{ number_format($row->disetujui, 0, ',', '.') }}
+                                        <br>
+                                        @forelse($row->tidak_disetujui as $tidakDisetujuiu)
+                                            <div class="text-xs text-gray-500">
+                                                ({{ number_format($tidakDisetujuiu['doc_nominal'], 0, ',', '.') }} /
+                                                Txn No:
+                                                {{ $tidakDisetujuiu['txn_no'] }})
+                                            </div>
+                                        @empty
+                                            <em class="text-xs text-gray-500">Semua OK</em>
+                                        @endforelse
                                     </td>
                                 </tr>
                             @endforeach
@@ -215,11 +225,13 @@
         <div class="grid grid-cols-2 gap-2">
             <div>
                 <livewire:grouping-b-p-j-s.grouping-b-p-j-s-r-iper-dokter :refDate="$myTopBar['refBulan']" :refDokterId="$myTopBar['drId']"
+                    :allSepPerDokter=$allSepPerDokter
                     :wire:key="$myTopBar['refBulan'].$myTopBar['drId'].'grouping-b-p-j-s-r-iper-dokter'">
             </div>
 
             <div>
                 <livewire:grouping-b-p-j-s.grouping-b-p-j-s-r-jper-dokter :refDate="$myTopBar['refBulan']" :refDokterId="$myTopBar['drId']"
+                    :allSepPerDokter=$allSepPerDokter
                     :wire:key="$myTopBar['refBulan'].$myTopBar['drId'].'grouping-b-p-j-s-r-jper-dokter'">
             </div>
         </div>

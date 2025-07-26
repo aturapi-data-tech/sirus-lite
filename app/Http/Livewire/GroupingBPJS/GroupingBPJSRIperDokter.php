@@ -28,22 +28,12 @@ class GroupingBPJSRIperDokter extends Component
     public int $limitPerPage = 10;
 
     // my Top Bar
-    public string $refDate;
-    public string $refDokterId;
 
-
-    public string $refFilter = '';
+    public array $allSepPerDokter = [];
     // search logic -resetExcept////////////////
     protected $queryString = [
-        'refFilter' => ['except' => '', 'as' => 'cariData'],
         'page' => ['except' => 1, 'as' => 'p'],
     ];
-
-    // reset page when myTopBar Change
-    public function updatedReffilter()
-    {
-        $this->resetPage();
-    }
 
 
     ////////////////////////////////////////////////
@@ -55,9 +45,7 @@ class GroupingBPJSRIperDokter extends Component
     // select data start////////////////
     public function render()
     {
-        $mySearch = $this->refFilter;
-        $myRefdate = $this->refDate;
-        $myrefDokterId = $this->refDokterId;
+        $myrefAllSepPerDokter = $this->allSepPerDokter;
 
 
         //////////////////////////////////////////
@@ -151,35 +139,8 @@ class GroupingBPJSRIperDokter extends Component
                     ) AS total_common_service"),
 
             )
-            ->where(DB::raw("to_char(exit_date,'mm/yyyy')"), '=', $myRefdate)
-            ->where(DB::raw("nvl(ri_status,'I')"), '=', 'P')
-            ->whereIn('klaim_id', function ($klaimData) {
-                $klaimData->select('klaim_id')
-                    ->from('rsmst_klaimtypes')
-                    ->where('klaim_status', 'BPJS');
-            });
 
-        $filterDataDokter = $query
-            ->get()
-            ->filter(function ($item) use ($myrefDokterId) {
-                $datadaftarri_json = json_decode($item->datadaftarri_json, true) ?? [];
-                if (!empty($datadaftarri_json['pengkajianAwalPasienRawatInap']['levelingDokter'])) {
-                    foreach ($datadaftarri_json['pengkajianAwalPasienRawatInap']['levelingDokter'] as $levelingDokterOnMyChildren) {
-                        $levelingDokterOnMyChildrenValue = $levelingDokterOnMyChildren['drId'] ?? '';
-                        if ($levelingDokterOnMyChildrenValue === $myrefDokterId && !empty($levelingDokterOnMyChildrenValue)) {
-                            return $item;
-                        };
-                    }
-                }
-            })->pluck('rihdr_no')->toArray();
-        $query->whereIn('rihdr_no', $filterDataDokter);
-
-        $query->where(function ($q) use ($mySearch) {
-            $q->Where(DB::raw('upper(reg_name)'), 'like', '%' . strtoupper($mySearch) . '%')
-                ->orWhere(DB::raw('upper(reg_no)'), 'like', '%' . strtoupper($mySearch) . '%')
-                ->orWhere(DB::raw('upper(vno_sep)'), 'like', '%' . strtoupper($mySearch) . '%')
-                ->orWhere(DB::raw('upper(dr_name)'), 'like', '%' . strtoupper($mySearch) . '%');
-        })
+            ->whereIn('vno_sep', $myrefAllSepPerDokter)
             ->orderBy('exit_date1',  'desc');
 
         $detail = $query->get();
