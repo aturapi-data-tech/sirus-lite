@@ -224,14 +224,12 @@
 
         <div class="grid grid-cols-2 gap-2">
             <div>
-                <livewire:grouping-b-p-j-s.grouping-b-p-j-s-r-iper-dokter :refDate="$myTopBar['refBulan']" :refDokterId="$myTopBar['drId']"
-                    :allSepPerDokter=$allSepPerDokter
+                <livewire:grouping-b-p-j-s.grouping-b-p-j-s-r-iper-dokter :allSepPerDokter=$allSepPerDokter
                     :wire:key="$myTopBar['refBulan'].$myTopBar['drId'].'grouping-b-p-j-s-r-iper-dokter'">
             </div>
 
             <div>
-                <livewire:grouping-b-p-j-s.grouping-b-p-j-s-r-jper-dokter :refDate="$myTopBar['refBulan']" :refDokterId="$myTopBar['drId']"
-                    :allSepPerDokter=$allSepPerDokter
+                <livewire:grouping-b-p-j-s.grouping-b-p-j-s-r-jper-dokter :allSepPerDokter=$allSepPerDokter
                     :wire:key="$myTopBar['refBulan'].$myTopBar['drId'].'grouping-b-p-j-s-r-jper-dokter'">
             </div>
         </div>
