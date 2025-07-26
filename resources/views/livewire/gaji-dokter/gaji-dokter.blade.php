@@ -151,13 +151,13 @@
                                         {{ number_format($row->disetujui, 0, ',', '.') }}
                                         <br>
                                         @forelse($row->tidak_disetujui as $tidakDisetujuiu)
-                                            <div class="text-xs text-gray-500">
+                                            <div class="text-xs text-red-500">
                                                 ({{ number_format($tidakDisetujuiu['doc_nominal'], 0, ',', '.') }} /
-                                                Txn No:
-                                                {{ $tidakDisetujuiu['txn_no'] }})
+                                                sep:
+                                                {{ $tidakDisetujuiu['vno_sep'] }})
                                             </div>
                                         @empty
-                                            <em class="text-xs text-gray-500">Semua OK</em>
+                                            <em class="text-xs text-red-500">Semua OK</em>
                                         @endforelse
                                     </td>
                                 </tr>

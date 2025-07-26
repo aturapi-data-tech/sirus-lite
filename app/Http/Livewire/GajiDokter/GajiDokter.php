@@ -281,6 +281,7 @@ class GajiDokter extends Component
                         $notApprovedRihdr[] = [
                             'txn_no'   => $txn->txn_no,
                             'desc_doc' => $txn->desc_doc,
+                            'vno_sep' => $vno_sep ?? '',
                             'doc_nominal' => $txn->doc_nominal,
 
                         ];
@@ -288,6 +289,7 @@ class GajiDokter extends Component
                             'txn_no'   => $txn->txn_no,
                             'desc_doc' => $txn->desc_doc,
                             'doc_nominal' => $txn->doc_nominal,
+                            'vno_sep' => $vno_sep ?? '',
                             'json'     => $json,  // simpan JSON mentah untuk debug
                         ];
                     }
