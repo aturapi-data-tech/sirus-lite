@@ -1,9 +1,5 @@
 <div>
 
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-
     {{-- Start Coding  --}}
 
     {{-- Canvas
@@ -100,7 +96,9 @@
                         <th class="w-1/5 px-4 py-3 text-left">Dokter</th>
                         <th class="w-1/5 px-4 py-3 text-left">Klaim</th>
                         <th class="w-1/5 px-4 py-3 text-left">Description</th>
-                        <th class="w-1/5 px-4 py-3 text-right">Nominal</th>
+                        <th class="w-1/5 px-4 py-3 text-right">Jasa Dokter</th>
+                        <th class="w-1/5 px-4 py-3 text-right">Disetujui</th>
+
                     </tr>
                 </thead>
 
@@ -108,15 +106,18 @@
                     @php
                         $bgColors = ['text-primary'];
                         $colorsAvailable = $bgColors;
-                        $overallTotal = 0;
+                        $overallTotalNominal = 0;
+                        $overallTotalDisetujui = 0;
                     @endphp
 
                     {{-- Group by doctor --}}
                     @foreach ($myQueryData->groupBy('dr_id') as $drId => $doctorRows)
                         @php
                             $drName = $doctorRows->first()->dr_name;
-                            $doctorTotal = $doctorRows->sum('doc_nominal');
-                            $overallTotal += $doctorTotal;
+                            $doctorTotalNominal = $doctorRows->sum('doc_nominal');
+                            $doctorTotalDisetujui = $doctorRows->sum('disetujui');
+                            $overallTotalNominal += $doctorTotalNominal;
+                            $overallTotalDisetujui += $doctorTotalDisetujui;
 
                             // zero-based index of this foreach
                             $idx = $loop->index;
@@ -126,7 +127,7 @@
 
                         {{-- Doctor header --}}
                         <tr class="font-bold {{ $txColorDokter }}">
-                            <td colspan="4" class="px-4 py-2">
+                            <td colspan="3" class="px-4 py-2">
                                 Dokter: {{ $drId }} - {{ $drName }}
                             </td>
                         </tr>
@@ -134,7 +135,8 @@
                         {{-- Within each doctor, group by klaim status --}}
                         @foreach ($doctorRows->groupBy('klaim_status') as $klaimStatus => $klaimStatusRows)
                             @php
-                                $klaimStatusTotal = $klaimStatusRows->sum('doc_nominal');
+                                $klaimStatusTotalNominal = $klaimStatusRows->sum('doc_nominal');
+                                $klaimStatusTotalDisetujui = $klaimStatusRows->sum('disetujui');
                             @endphp
                             {{-- Detail rows --}}
                             @foreach ($klaimStatusRows as $row)
@@ -144,6 +146,9 @@
                                     <td class="px-4 py-1 whitespace-nowrap">{{ $row->desc_doc }}</td>
                                     <td class="px-4 py-1 text-right whitespace-nowrap">
                                         {{ number_format($row->doc_nominal, 0, ',', '.') }}
+                                    </td>
+                                    <td class="px-4 py-1 text-right whitespace-nowrap">
+                                        {{ number_format($row->disetujui, 0, ',', '.') }}
                                     </td>
                                 </tr>
                             @endforeach
@@ -156,7 +161,10 @@
                                     Subtotal {{ $klaimStatus }}
                                 </td>
                                 <td class="px-4 py-2 text-right">
-                                    {{ number_format($klaimStatusTotal, 0, ',', '.') }}
+                                    {{ number_format($klaimStatusTotalNominal, 0, ',', '.') }}
+                                </td>
+                                <td class="px-4 py-2 text-right">
+                                    {{ number_format($klaimStatusTotalDisetujui, 0, ',', '.') }}
                                 </td>
                             </tr>
                         @endforeach
@@ -167,7 +175,10 @@
                                 Subtotal Dokter {{ $drName }}
                             </td>
                             <td class="px-4 py-2 text-right">
-                                {{ number_format($doctorTotal, 0, ',', '.') }}
+                                {{ number_format($doctorTotalNominal, 0, ',', '.') }}
+                            </td>
+                            <td class="px-4 py-2 text-right">
+                                {{ number_format($doctorTotalDisetujui, 0, ',', '.') }}
                             </td>
                         </tr>
                     @endforeach
@@ -178,7 +189,10 @@
                             Total Semua Dokter & Klaim
                         </td>
                         <td class="px-4 py-2 text-right">
-                            {{ number_format($overallTotal, 0, ',', '.') }}
+                            {{ number_format($overallTotalNominal, 0, ',', '.') }}
+                        </td>
+                        <td class="px-4 py-2 text-right">
+                            {{ number_format($overallTotalDisetujui, 0, ',', '.') }}
                         </td>
                     </tr>
                 </tbody>
@@ -198,7 +212,17 @@
         {{-- {{ $myQueryData->links() }} --}}
 
 
+        <div class="grid grid-cols-2 gap-2">
+            <div>
+                <livewire:grouping-b-p-j-s.grouping-b-p-j-s-r-iper-dokter :refDate="$myTopBar['refBulan']" :refDokterId="$myTopBar['drId']"
+                    :wire:key="$myTopBar['refBulan'].$myTopBar['drId'].'grouping-b-p-j-s-r-iper-dokter'">
+            </div>
 
+            <div>
+                <livewire:grouping-b-p-j-s.grouping-b-p-j-s-r-jper-dokter :refDate="$myTopBar['refBulan']" :refDokterId="$myTopBar['drId']"
+                    :wire:key="$myTopBar['refBulan'].$myTopBar['drId'].'grouping-b-p-j-s-r-jper-dokter'">
+            </div>
+        </div>
 
 
 
@@ -215,150 +239,5 @@
     {{-- End Coding --}}
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    {{-- push start ///////////////////////////////// --}}
-    @push('scripts')
-        {{-- script start --}}
-        <script src="{{ url('assets/js/jquery.min.js') }}"></script>
-        <script src="{{ url('assets/plugins/toastr/toastr.min.js') }}"></script>
-        <script src="{{ url('assets/flowbite/dist/datepicker.js') }}"></script>
-
-        {{-- script end --}}
-
-        {{-- Global Livewire JavaScript Object start --}}
-        <script type="text/javascript">
-            toastr.options = {
-                "closeButton": false,
-                "debug": false,
-                "newestOnTop": false,
-                "progressBar": false,
-                "positionClass": "toast-top-left",
-                "preventDuplicates": false,
-                "onclick": null,
-                "showDuration": "300",
-                "hideDuration": "1000",
-                "timeOut": "5000",
-                "extendedTimeOut": "1000",
-                "showEasing": "swing",
-                "hideEasing": "linear",
-                "showMethod": "fadeIn",
-                "hideMethod": "fadeOut"
-            }
-
-            window.livewire.on('toastr-success', message => toastr.success(message));
-            window.Livewire.on('toastr-info', (message) => {
-                toastr.info(message)
-            });
-            window.livewire.on('toastr-error', message => toastr.error(message));
-
-
-
-
-            // press_dropdownButton flowbite
-            window.Livewire.on('pressDropdownButtonUgd', (key) => {
-                    // set the dropdown menu element
-                    const $targetEl = document.getElementById('dropdownMenu' + key);
-
-                    // set the element that trigger the dropdown menu on click
-                    const $triggerEl = document.getElementById('dropdownButton' + key);
-
-                    // options with default values
-                    const options = {
-                        placement: 'left',
-                        triggerType: 'click',
-                        offsetSkidding: 0,
-                        offsetDistance: 10,
-                        delay: 300,
-                        onHide: () => {
-                            console.log('dropdown has been hidden');
-
-                        },
-                        onShow: () => {
-                            console.log('dropdown has been shown');
-                        },
-                        onToggle: () => {
-                            console.log('dropdown has been toggled');
-                        }
-                    };
-
-                    /*
-                     * $targetEl: required
-                     * $triggerEl: required
-                     * options: optional
-                     */
-                    const dropdown = new Dropdown($targetEl, $triggerEl, options);
-
-                    dropdown.show();
-
-                }
-
-            );
-        </script>
-
-        <script src="assets/js/signature_pad.umd.min.js"></script>
-        <script>
-            document.addEventListener('alpine:init', () => {
-                Alpine.data('signaturePad', (value) => ({
-                    signaturePadInstance: null,
-                    value: value,
-                    init() {
-
-                        this.signaturePadInstance = new SignaturePad(this.$refs.signature_canvas, {
-                                minWidth: 2,
-                                maxWidth: 2,
-                                penColor: "rgb(11, 73, 182)"
-                            }
-
-                        );
-                        this.signaturePadInstance.addEventListener("endStroke", () => {
-                            // this.value = this.signaturePadInstance.toDataURL('image/png');signaturePad.toSVG()
-                            // https://github.com/aturapi-data-tech/signature_pad
-                            // https://gist.github.com/jonneroelofs/a4a372fe4b55c5f9c0679d432f2c0231
-                            this.value = this.signaturePadInstance.toSVG();
-
-                            // console.log(this.signaturePadInstance)
-                        });
-                    },
-                }))
-            })
-        </script>
-    @endpush
-
-
-
-
-
-
-
-
-
-
-
-
-
-    @push('styles')
-        {{-- stylesheet start --}}
-        <link rel="stylesheet" href="{{ url('assets/plugins/toastr/toastr.min.css') }}">
-
-        {{-- stylesheet end --}}
-    @endpush
-    {{-- push end --}}
 
 </div>
