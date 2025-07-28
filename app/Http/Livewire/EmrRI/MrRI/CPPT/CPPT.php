@@ -171,6 +171,23 @@ class CPPT extends Component
 
 
 
+    public bool $isOpenEresepRI = false;
+    public string $isOpenModeEresepRI = 'insert';
+
+    public function openModalEresepRI(): void
+    {
+        $this->isOpenEresepRI = true;
+        $this->isOpenModeEresepRI = 'insert';
+    }
+
+    public function closeModalEresepRI(): void
+    {
+        $this->isOpenEresepRI = false;
+        $this->isOpenModeEresepRI = 'insert';
+    }
+
+
+
     // ////////////////
     // RJ Logic
     // ////////////////

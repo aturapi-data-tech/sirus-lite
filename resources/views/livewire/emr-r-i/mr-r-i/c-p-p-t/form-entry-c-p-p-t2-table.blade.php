@@ -63,7 +63,7 @@
                                 <tr class="border-b group">
                                     <!-- Tanggal & Petugas -->
                                     <td
-                                        class="px-2 py-2 font-normal text-gray-700 w-1/7 group-hover:bg-gray-50 whitespace-nowrap">
+                                        class="px-2 py-2 font-normal text-gray-700 whitespace-normal align-top w-1/7 group-hover:bg-gray-50">
                                         <div>
                                             <strong>Tanggal:</strong> {{ $cppt['tglCPPT'] ?? '-' }}
                                         </div>
@@ -80,7 +80,7 @@
 
                                     <!-- SOAP -->
                                     <td
-                                        class="px-2 py-2 font-normal text-gray-700 w-1/7 group-hover:bg-gray-50 whitespace-nowrap">
+                                        class="px-2 py-2 font-normal text-gray-700 whitespace-normal align-top w-1/7 group-hover:bg-gray-50">
                                         <div>
                                             <strong>S:</strong> {{ $cppt['soap']['subjective'] ?? '-' }}<br>
                                             <strong>O:</strong> {{ $cppt['soap']['objective'] ?? '-' }}<br>
@@ -91,7 +91,7 @@
 
                                     <!-- Instruksi -->
                                     <td
-                                        class="px-2 py-2 font-normal text-gray-700 w-1/7 group-hover:bg-gray-50 whitespace-nowrap">
+                                        class="px-2 py-2 font-normal text-gray-700 whitespace-normal align-top w-1/7 group-hover:bg-gray-50">
                                         <div>
                                             {{ $cppt['instruction'] ?? '-' }}
                                         </div>
@@ -99,7 +99,7 @@
 
                                     <!-- Review -->
                                     <td
-                                        class="px-2 py-2 font-normal text-gray-700 w-1/7 group-hover:bg-gray-50 whitespace-nowrap">
+                                        class="px-2 py-2 font-normal text-gray-700 whitespace-normal align-top w-1/7 group-hover:bg-gray-50">
                                         <div>
                                             {{ $cppt['review'] ?? '-' }}
                                         </div>
@@ -107,7 +107,7 @@
 
                                     <!-- Action -->
                                     <td
-                                        class="px-2 py-2 font-normal text-gray-700 w-1/7 group-hover:bg-gray-50 whitespace-nowrap">
+                                        class="px-2 py-2 font-normal text-gray-700 whitespace-normal align-top w-1/7 group-hover:bg-gray-50">
                                         <x-alternative-button class="inline-flex"
                                             wire:click.prevent="removeCPPT('{{ $key }}')">
                                             <svg class="w-5 h-5 text-gray-800" aria-hidden="true"

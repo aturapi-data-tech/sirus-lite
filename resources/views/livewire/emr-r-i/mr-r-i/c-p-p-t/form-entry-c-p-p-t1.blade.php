@@ -39,7 +39,25 @@
             @error('formEntryCPPT.soap.plan')
                 <x-input-error :messages="__($message)" />
             @enderror
+
+            @role(['Dokter', 'Admin'])
+                <div class="grid grid-cols-1 gap-2 mt-2">
+                    <x-yellow-button :disabled="false" wire:click="openModalEresepRI" type="button" wire:loading.remove>
+                        E-resep
+                    </x-yellow-button>
+
+                    <div wire:loading wire:target="openModalEresepRI">
+                        <x-loading />
+                    </div>
+
+                    @if ($isOpenEresepRI)
+                        @include('livewire.emr-r-i.create-emr-r-i-racikan-nonracikan')
+                    @endif
+                </div>
+            @endrole
         </div>
+
+
     </div>
 
     <!-- Instruksi dan Review -->
