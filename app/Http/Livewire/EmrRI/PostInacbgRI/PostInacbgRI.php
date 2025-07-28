@@ -178,8 +178,10 @@ class PostInacbgRI extends Component
         // 1. Ambil data kunjungan & pasien
         $dataDaftarRi = $this->findDataRI($this->riHdrNoRef) ?? [];
 
-        $drName = collect($dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokter'] ?? [])
-            ->firstWhere('levelDokter', 'Utama')['drName'] ?? '-';
+        $drName = optional(
+            collect($dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokter'] ?? [])
+                ->firstWhere('levelDokter', 'Utama')
+        )->drName ?? '-';
 
         // 2. Cek: apakah set_claim_data dikirim ulang
         if (!empty($dataDaftarRi['inacbg']['set_claim_data'] ?? false)) {
@@ -190,7 +192,7 @@ class PostInacbgRI extends Component
             // return;
         }
 
-        if (empty($drName)) {
+        if ($drName === '-') {
             toastr()->closeOnHover(true)
                 ->closeDuration(3)
                 ->positionClass('toast-top-left')
