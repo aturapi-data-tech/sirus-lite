@@ -102,14 +102,60 @@ class GroupingBPJSRJ extends Component
         $lines = array_values(array_filter(array_map('trim', explode("\n", $text))));
 
         // Hapus baris header
-        $filtered = array_filter($lines, function ($line) {
+        $blacklistExact = [
+            'RINCIAN DATA HASIL VERIFIKASI',
+            'Nama RS',
+            'Tingkat Pelayanan',
+            'Bulan Pelayanan',
+            'Tgl. Verifikasi',
+            'Riil RS',
+            'RESUME',
+            'Menyetujui',
+            'Mengetahui',
+            'Direktur RS',
+            'BPJS KESEHATAN',
+        ];
+        $filtered = array_filter($lines, function ($line) use ($blacklistExact) {
             $line = trim(str_replace("\f", '', $line));
-            return !preg_match('/^(Hal\.\d+\/\d+|RINCIAN DATA HASIL VERIFIKASI|Nama RS|Tingkat Pelayanan|Bulan Pelayanan|^: .+|: RJTL|No$|No\.SEP|Tgl\. Verifikasi|Biaya$|Riil RS|Diajukan|Disetujui)$/i', $line);
+            // Buang jika cocok persis
+            if (in_array($line, $blacklistExact, true)) return false;
+
+            // Buang jika cocok regex (format)
+            return !preg_match('/^(
+                Hal\.\d+\/\d+ |        # Halaman
+                :.* |                  # Baris yang diawali :
+                RJTL |                 # Baris RJTL
+                No$ |                  # Baris No saja
+                No\.SEP |              # Baris No.SEP
+                Tgl\. Verifikasi |     # Baris Tgl. Verifikasi
+                Biaya$ |               # Baris Biaya
+                Diajukan |             # Baris Diajukan
+                Disetujui |            # Baris Disetujui
+                TOTAL.* |              # TOTAL Bea
+                Total Bea\.Diajukan.* |
+                Total Bea\.Disetujui.* |
+                dr\.\s?[A-Za-z\s\.]+ | # Nama dokter
+                0184R006\s*-\s*.*      # Baris nama faskes
+            )$/ix', $line);
         });
 
         $lines = array_values(array_filter($filtered)); // Reset index
+        $linesCleaned = [];
 
-        $chunks = array_chunk($lines, 6); // tiap data pasien: 6 baris
+        foreach ($filtered as $line) {
+            $line = preg_replace('/\s+/u', ' ', trim($line)); // Normalisasi whitespace
+            $parts = explode(' ', $line);
+
+            if (count($parts) === 2 && is_numeric($parts[0]) && str_starts_with($parts[1], '0184R006')) {
+                $linesCleaned[] = $parts[0]; // nomor urut
+                $linesCleaned[] = $parts[1]; // kode SEP
+            } else {
+                $linesCleaned[] = $line; // fallback
+            }
+        }
+        $lines = array_values($linesCleaned);
+        $chunks = array_chunk($lines, 6);
+
 
         $myRefdate = $this->myTopBar['refDate'];
 
