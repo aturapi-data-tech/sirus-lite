@@ -572,7 +572,9 @@ class GroupingBPJSRJ extends Component
 
         $jml_klaim               = 0;    // total baris klaim (UGD + RJ)
         $total_klaim             = 0;    // akumulasi tarif_total
-        $this->klaimTidakDisetujui = [];
+
+
+        $this->klaimTidakDisetujui = []; //reset klaimTidakDisetujui;
         foreach ($queryRJUGDGridAll as $row) {
             // setiap baris dihitung sebagai 1 klaim
             $jml_klaim++;
