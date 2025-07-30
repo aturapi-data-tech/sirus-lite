@@ -34,24 +34,7 @@ class GroupingBPJSRJ extends Component
 
 
     // my Top Bar
-    public array $myTopBar = [
-        'refDate' => '',
-        'statusKlaimId' => 'All',
-        'statusKlaimOptions' => [
-            [
-                'statusKlaimId' => 'All',
-                'statusKlaimDesc' => 'All'
-            ],
-            [
-                'statusKlaimId' => 'Disetujui',
-                'statusKlaimDesc' => 'Disetujui'
-            ],
-            [
-                'statusKlaimId' => 'Tidak Disetujui',
-                'statusKlaimDesc' => 'Tidak Disetujui'
-            ]
-        ]
-    ];
+    public array $myTopBar = ['refDate' => ''];
     public array $myQueryDataSum = [];
     public array $klaimTidakDisetujui = [];
 
@@ -598,6 +581,7 @@ class GroupingBPJSRJ extends Component
                         'dr_id'       => $row->dr_id,
                         'dr_name'     => $row->dr_name,
                         'tarif_total' => $row->tarif_total,
+                        'rj_date'     => $row->rj_date ?? '-',
                         'status'      => 'Tidak Disetujui',
                     ];
                 }
@@ -618,6 +602,7 @@ class GroupingBPJSRJ extends Component
                         'dr_id'       => $row->dr_id,
                         'dr_name'     => $row->dr_name,
                         'tarif_total' => $row->tarif_total,
+                        'rj_date'     => $row->rj_date ?? '-',
                         'status'      => 'Tidak Disetujui',
                     ];
                 }

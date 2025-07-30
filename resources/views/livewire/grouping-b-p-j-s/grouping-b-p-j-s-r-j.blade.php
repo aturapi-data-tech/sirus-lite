@@ -89,14 +89,6 @@
 
 
 
-
-            <div class="grid grid-cols-3 gap-2">
-                @foreach ($myTopBar['statusKlaimOptions'] as $status)
-                    <x-radio-button :label="__($status['statusKlaimDesc'])" value="{{ $status['statusKlaimId'] }}"
-                        wire:model="myTopBar.statusKlaimId" />
-                @endforeach
-            </div>
-
             <div class="flex justify-end w-1/2">
                 <x-dropdown align="right" :width="__('20')">
                     <x-slot name="trigger">
@@ -349,6 +341,7 @@
                         <tr>
                             <th class="px-4 py-2">No</th>
                             <th class="px-4 py-2">No SEP</th>
+                            <th class="px-4 py-2">Tgl Rajal</th>
                             <th class="px-4 py-2">No RM / Nama Pasien</th>
                             <th class="px-4 py-2">Dokter</th>
                             <th class="px-4 py-2">Poli</th>
@@ -361,6 +354,7 @@
                             <tr class="border-b">
                                 <td class="px-4 py-2">{{ $index + 1 }}</td>
                                 <td class="px-4 py-2">{{ $klaim['vno_sep'] ?? '-' }}</td>
+                                <td class="px-4 py-2">{{ $klaim['rj_no'] ?? '-' }}</td>
                                 <td class="px-4 py-2">{{ $klaim['reg_no'] ?? '-' }} | {{ $klaim['reg_name'] ?? '-' }}
                                 </td>
                                 <td class="px-4 py-2">{{ $klaim['dr_name'] ?? '-' }}</td>
