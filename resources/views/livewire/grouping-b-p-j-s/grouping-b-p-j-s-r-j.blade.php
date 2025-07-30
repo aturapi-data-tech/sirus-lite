@@ -319,12 +319,17 @@
                                 <td class="px-4 py-2">{{ $umbal['tgl_verif'] }}
 
                                 </td>
-                                <td class="px-4 py-2 text-right">{{ number_format($umbal['riil_rs'], 0, ',', '.') }}
+                                <td class="px-4 py-2 text-right">
+                                    {{ is_numeric($umbal['riil_rs'] ?? null) ? number_format($umbal['riil_rs'], 0, ',', '.') : $umbal['riil_rs'] ?? '-' }}
                                 </td>
-                                <td class="px-4 py-2 text-right">{{ number_format($umbal['diajukan'], 0, ',', '.') }}
+                                <td class="px-4 py-2 text-right">
+                                    {{ is_numeric($umbal['diajukan'] ?? null) ? number_format($umbal['diajukan'], 0, ',', '.') : $umbal['diajukan'] ?? '-' }}
                                 </td>
-                                <td class="px-4 py-2 text-right">{{ number_format($umbal['disetujui'], 0, ',', '.') }}
+                                <td class="px-4 py-2 text-right">
+                                    {{ is_numeric($umbal['disetujui'] ?? null) ? number_format($umbal['disetujui'], 0, ',', '.') : $umbal['disetujui'] ?? '-' }}
                                 </td>
+
+
                             </tr>
                         @endforeach
                     </tbody>

@@ -142,6 +142,7 @@ class GroupingBPJSRJ extends Component
         $lines = array_values(array_filter($filtered)); // Reset index
         //reset linesCleaned
         $linesCleaned = [];
+        $buffer = [];
         //reset dataUmbalBPJSTidakAdaDiRS
         $this->dataUmbalBPJSTidakAdaDiRS = [];
 
@@ -156,9 +157,9 @@ class GroupingBPJSRJ extends Component
                 $linesCleaned[] = $line; // fallback
             }
         }
+
         $lines = array_values($linesCleaned);
         $chunks = array_chunk($lines, 6);
-
 
         $myRefdate = $this->myTopBar['refDate'];
 
@@ -175,6 +176,7 @@ class GroupingBPJSRJ extends Component
             ->toArray();
 
 
+
         $dataUgdLookup = DB::table('rsview_ugdkasir')
             ->select('vno_sep', 'rj_no')
             ->where(DB::raw("nvl(rj_status,'A')"), '=', 'L')
@@ -186,6 +188,45 @@ class GroupingBPJSRJ extends Component
             ->where(DB::raw("to_char(rj_date,'mm/yyyy')"), '=', $myRefdate)
             ->pluck('rj_no', 'vno_sep') // hasil: ['0184R006xxxx' => 'RJ2025xxxx']
             ->toArray();
+
+
+
+        // LOG NOT IN RS
+        // $allNoSepRS = collect($dataRjLookup)->keys()
+        //     ->merge(collect($dataUgdLookup)->keys())
+        //     ->unique()
+        //     ->values();
+
+
+        // $notFoundInRS = collect($chunks)
+        //     ->filter(function ($chunk) {
+        //         // validasi format baris
+        //         return count($chunk) === 6;
+        //     })
+        //     ->map(function ($chunk) {
+        //         return [
+        //             'no_sep'    => $chunk[1],
+        //             'tgl_verif' => $chunk[2],
+        //             'riil_rs'   => $chunk[3],
+        //             'diajukan'  => $chunk[4],
+        //             'disetujui' => $chunk[5],
+        //         ];
+        //     })
+        //     ->whereNotIn('no_sep', $allNoSepRS)
+        //     ->values();
+        // dd($notFoundInRS);
+
+
+        // $duplicateNoSep = $allNoSepRS->duplicates();
+
+        // // Tampilkan jika ada duplikat
+        // if ($duplicateNoSep->isNotEmpty()) {
+        //     dd($duplicateNoSep); // akan menampilkan key => value dari duplikat
+        // } else {
+        //     dd('No SEP RS tidak ada yang duplikat');
+        // }
+
+
 
         foreach ($chunks as $chunk) {
 
@@ -224,6 +265,15 @@ class GroupingBPJSRJ extends Component
                 } else {
                     $this->dataUmbalBPJSTidakAdaDiRS[] = $umbal;
                 }
+            } else {
+                $umbal = [
+                    'no_sep'    => $chunk[1] ?? '',
+                    'tgl_verif' => $chunk[2] ?? '',
+                    'riil_rs'   =>  $chunk[3] ?? '',
+                    'diajukan'  =>  $chunk[4] ?? '',
+                    'disetujui' =>  $chunk[5] ?? '',
+                ];
+                $this->dataUmbalBPJSTidakAdaDiRS[] = $umbal;
             }
         }
         // 3. Bersihkan input & error
@@ -567,6 +617,22 @@ class GroupingBPJSRJ extends Component
             if (strtoupper($row->poli_desc) === 'UGD') {
                 // UGD
                 $json = json_decode($row->datadaftarugd_json, true);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    $this->klaimTidakDisetujui[] = [
+                        'vno_sep'     => $row->vno_sep,
+                        'rj_no'       => $row->rj_no,
+                        'reg_no'      => $row->reg_no,
+                        'reg_name'    => $row->reg_name,
+                        'poli_desc'   => $row->poli_desc,
+                        'pasien'      => $row->pasien_name ?? '-',
+                        'dr_id'       => $row->dr_id,
+                        'dr_name'     => $row->dr_name,
+                        'tarif_total' => $row->tarif_total,
+                        'rj_date'     => $row->rj_date ?? '-',
+                        'status'      => 'Json Bermasalah',
+                    ];
+                }
+
                 if (!empty($json['umbalBpjs']['disetujui'])) {
                     $jumlahDisetujuiUGD   += (int) $json['umbalBpjs']['disetujui'];
                     $jmlKlaimDisetujuiUGD++;
@@ -588,6 +654,21 @@ class GroupingBPJSRJ extends Component
             } else {
                 // Rawat Jalan
                 $json = json_decode($row->datadaftarpolirj_json, true);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    $this->klaimTidakDisetujui[] = [
+                        'vno_sep'     => $row->vno_sep,
+                        'rj_no'       => $row->rj_no,
+                        'reg_no'      => $row->reg_no,
+                        'reg_name'    => $row->reg_name,
+                        'poli_desc'   => $row->poli_desc,
+                        'pasien'      => $row->pasien_name ?? '-',
+                        'dr_id'       => $row->dr_id,
+                        'dr_name'     => $row->dr_name,
+                        'tarif_total' => $row->tarif_total,
+                        'rj_date'     => $row->rj_date ?? '-',
+                        'status'      => 'Json Bermasalah',
+                    ];
+                }
                 if (!empty($json['umbalBpjs']['disetujui'])) {
                     $jumlahDisetujuiRJ    += (int) $json['umbalBpjs']['disetujui'];
                     $jmlKlaimDisetujuiRJ++;
