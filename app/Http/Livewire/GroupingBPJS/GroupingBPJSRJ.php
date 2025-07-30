@@ -629,7 +629,6 @@ class GroupingBPJSRJ extends Component
     {
         $mySearch = $this->refFilter;
         $myRefdate = $this->myTopBar['refDate'];
-        $myRefStatusKlaim = $this->myTopBar['statusKlaimId'];
         //////////////////////////////////////////
         // Query Khusus BPJS///////////////////////////////
         //////////////////////////////////////////
