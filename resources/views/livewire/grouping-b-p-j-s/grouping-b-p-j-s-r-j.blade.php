@@ -354,7 +354,7 @@
                             <tr class="border-b">
                                 <td class="px-4 py-2">{{ $index + 1 }}</td>
                                 <td class="px-4 py-2">{{ $klaim['vno_sep'] ?? '-' }}</td>
-                                <td class="px-4 py-2">{{ $klaim['rj_no'] ?? '-' }}</td>
+                                <td class="px-4 py-2">{{ $klaim['rj_date'] ?? '-' }}</td>
                                 <td class="px-4 py-2">{{ $klaim['reg_no'] ?? '-' }} | {{ $klaim['reg_name'] ?? '-' }}
                                 </td>
                                 <td class="px-4 py-2">{{ $klaim['dr_name'] ?? '-' }}</td>
