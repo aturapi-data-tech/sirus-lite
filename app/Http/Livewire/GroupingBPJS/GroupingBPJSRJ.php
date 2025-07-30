@@ -34,8 +34,26 @@ class GroupingBPJSRJ extends Component
 
 
     // my Top Bar
-    public array $myTopBar = ['refDate' => ''];
+    public array $myTopBar = [
+        'refDate' => '',
+        'statusKlaimId' => 'All',
+        'statusKlaimOptions' => [
+            [
+                'statusKlaimId' => 'All',
+                'statusKlaimDesc' => 'All'
+            ],
+            [
+                'statusKlaimId' => 'Disetujui',
+                'statusKlaimDesc' => 'Disetujui'
+            ],
+            [
+                'statusKlaimId' => 'Tidak Disetujui',
+                'statusKlaimDesc' => 'Tidak Disetujui'
+            ]
+        ]
+    ];
     public array $myQueryDataSum = [];
+    public array $klaimTidakDisetujui = [];
 
     public string $refFilter = '';
     // search logic -resetExcept////////////////
@@ -156,7 +174,9 @@ class GroupingBPJSRJ extends Component
         $lines = array_values($linesCleaned);
         $chunks = array_chunk($lines, 6);
 
+        // dd(json_encode($chunks, true));
 
+        // dd($chunks);
         $myRefdate = $this->myTopBar['refDate'];
 
         $dataRjLookup = DB::table('rsview_rjkasir')
@@ -226,6 +246,7 @@ class GroupingBPJSRJ extends Component
         // 3. Bersihkan input & error
         $this->reset(['file', 'dataUmbalBPJSTidakAdaDiRS']);          // kosongkan input–nya
         $this->resetValidation();      // hapus semua pesan error
+        $this->hitungTotallAll();
     }
 
 
@@ -544,7 +565,6 @@ class GroupingBPJSRJ extends Component
             ->get();
         $queryRJUGDGridAll = $this->perhitunganTarifRawatJalanUGDAll($queryRJUGDGridAll);
 
-
         $jumlahDisetujuiRJ       = 0;
         $jmlKlaimDisetujuiRJ     = 0;
         $jumlahDisetujuiUGD      = 0;
@@ -565,6 +585,19 @@ class GroupingBPJSRJ extends Component
                 if (!empty($json['umbalBpjs']['disetujui'])) {
                     $jumlahDisetujuiUGD   += (int) $json['umbalBpjs']['disetujui'];
                     $jmlKlaimDisetujuiUGD++;
+                } else {
+                    $this->klaimTidakDisetujui[] = [
+                        'vno_sep'     => $row->vno_sep,
+                        'rj_no'       => $row->rj_no,
+                        'reg_no'      => $row->reg_no,
+                        'reg_name'    => $row->reg_name,
+                        'poli_desc'   => $row->poli_desc,
+                        'pasien'      => $row->pasien_name ?? '-',
+                        'dr_id'       => $row->dr_id,
+                        'dr_name'     => $row->dr_name,
+                        'tarif_total' => $row->tarif_total,
+                        'status'      => 'Tidak Disetujui',
+                    ];
                 }
             } else {
                 // Rawat Jalan
@@ -572,6 +605,19 @@ class GroupingBPJSRJ extends Component
                 if (!empty($json['umbalBpjs']['disetujui'])) {
                     $jumlahDisetujuiRJ    += (int) $json['umbalBpjs']['disetujui'];
                     $jmlKlaimDisetujuiRJ++;
+                } else {
+                    $this->klaimTidakDisetujui[] = [
+                        'vno_sep'     => $row->vno_sep,
+                        'rj_no'       => $row->rj_no,
+                        'reg_no'      => $row->reg_no,
+                        'reg_name'    => $row->reg_name,
+                        'poli_desc'   => $row->poli_desc,
+                        'pasien'      => $row->pasien_name ?? '-',
+                        'dr_id'       => $row->dr_id,
+                        'dr_name'     => $row->dr_name,
+                        'tarif_total' => $row->tarif_total,
+                        'status'      => 'Tidak Disetujui',
+                    ];
                 }
             }
         }
@@ -596,7 +642,7 @@ class GroupingBPJSRJ extends Component
     {
         $mySearch = $this->refFilter;
         $myRefdate = $this->myTopBar['refDate'];
-
+        $myRefStatusKlaim = $this->myTopBar['statusKlaimId'];
         //////////////////////////////////////////
         // Query Khusus BPJS///////////////////////////////
         //////////////////////////////////////////
@@ -621,6 +667,8 @@ class GroupingBPJSRJ extends Component
                     ->where('klaim_status', 'BPJS');
             })
             ->where(DB::raw("to_char(rj_date,'mm/yyyy')"), '=', $myRefdate);
+
+
 
         $queryRJ->where(function ($q) use ($mySearch) {
             $q->Where(DB::raw('upper(reg_name)'), 'like', '%' . strtoupper($mySearch) . '%')
@@ -662,8 +710,9 @@ class GroupingBPJSRJ extends Component
 
 
         $qUnionRJUGD = $queryRJ->unionAll($queryUGD);
+
         $queryRJUGDGridPagination = DB::query()
-            ->fromSub($qUnionRJUGD, 'u')     // Laravel≥5.5 / Yajra Oci8 mendukung
+            ->fromSub($qUnionRJUGD, 'u')   // Laravel≥5.5 / Yajra Oci8 mendukung
             ->orderBy('u.rj_date1', 'desc')
             ->paginate($this->limitPerPage);
 

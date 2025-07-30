@@ -49,6 +49,8 @@
                         wire:model="myTopBar.refDate" />
                 </div>
 
+
+
                 <form wire:submit.prevent="readPdfUmbalBPJS()" enctype="multipart/form-data"
                     class="grid grid-cols-2 gap-2">
 
@@ -86,6 +88,14 @@
             </div>
 
 
+
+
+            <div class="grid grid-cols-3 gap-2">
+                @foreach ($myTopBar['statusKlaimOptions'] as $status)
+                    <x-radio-button :label="__($status['statusKlaimDesc'])" value="{{ $status['statusKlaimId'] }}"
+                        wire:model="myTopBar.statusKlaimId" />
+                @endforeach
+            </div>
 
             <div class="flex justify-end w-1/2">
                 <x-dropdown align="right" :width="__('20')">
@@ -329,6 +339,47 @@
                 </table>
             @endif
 
+        </div>
+
+        <div>
+            @if (!empty($klaimTidakDisetujui))
+                <h3 class="mt-6 mb-2 text-lg font-semibold text-gray-800">Daftar Klaim Tidak Disetujui</h3>
+                <table class="w-full text-sm text-left text-gray-700 border border-gray-200 table-auto">
+                    <thead class="text-xs text-gray-900 uppercase bg-gray-100">
+                        <tr>
+                            <th class="px-4 py-2">No</th>
+                            <th class="px-4 py-2">No SEP</th>
+                            <th class="px-4 py-2">No RM / Nama Pasien</th>
+                            <th class="px-4 py-2">Dokter</th>
+                            <th class="px-4 py-2">Poli</th>
+                            <th class="px-4 py-2">Tarif Total</th>
+                            <th class="px-4 py-2">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white">
+                        @forelse ($klaimTidakDisetujui as $index => $klaim)
+                            <tr class="border-b">
+                                <td class="px-4 py-2">{{ $index + 1 }}</td>
+                                <td class="px-4 py-2">{{ $klaim['vno_sep'] ?? '-' }}</td>
+                                <td class="px-4 py-2">{{ $klaim['reg_no'] ?? '-' }} | {{ $klaim['reg_name'] ?? '-' }}
+                                </td>
+                                <td class="px-4 py-2">{{ $klaim['dr_name'] ?? '-' }}</td>
+                                <td class="px-4 py-2">{{ $klaim['poli_desc'] ?? '-' }}</td>
+                                <td class="px-4 py-2 text-right">
+                                    {{ number_format($klaim['tarif_total'] ?? 0, 0, ',', '.') }}</td>
+                                <td class="px-4 py-2 font-semibold text-red-600">
+                                    {{ $klaim['status'] ?? 'Tidak Disetujui' }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="7" class="px-4 py-3 text-center text-gray-500">Tidak ada data klaim
+                                    yang
+                                    ditolak</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            @endif
         </div>
 
 
