@@ -143,7 +143,7 @@ class GroupingBPJSRJ extends Component
         $lines = array_values(array_filter($filtered)); // Reset index
         $linesCleaned = [];
 
-        foreach ($filtered as $line) {
+        foreach ($lines as $line) {
             $line = preg_replace('/\s+/u', ' ', trim($line)); // Normalisasi whitespace
             $parts = explode(' ', $line);
 
@@ -157,9 +157,7 @@ class GroupingBPJSRJ extends Component
         $lines = array_values($linesCleaned);
         $chunks = array_chunk($lines, 6);
 
-        // dd(json_encode($chunks, true));
 
-        // dd($chunks);
         $myRefdate = $this->myTopBar['refDate'];
 
         $dataRjLookup = DB::table('rsview_rjkasir')
