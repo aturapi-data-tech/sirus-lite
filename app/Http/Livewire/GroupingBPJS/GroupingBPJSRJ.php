@@ -139,12 +139,14 @@ class GroupingBPJSRJ extends Component
                 0184R006\s*-\s*.*      # Baris nama faskes
             )$/ix', $line);
         });
-
         $lines = array_values(array_filter($filtered)); // Reset index
+        //reset linesCleaned
         $linesCleaned = [];
+        //reset dataUmbalBPJSTidakAdaDiRS
+        $this->dataUmbalBPJSTidakAdaDiRS = [];
 
         foreach ($lines as $line) {
-            $line = preg_replace('/\s+/u', ' ', trim($line)); // Normalisasi whitespace
+            $line = preg_replace('/\s+/u', ' ', trim($line)); // Normalisasi whitespaceP4sswordku]
             $parts = explode(' ', $line);
 
             if (count($parts) === 2 && is_numeric($parts[0]) && str_starts_with($parts[1], '0184R006')) {
@@ -209,9 +211,7 @@ class GroupingBPJSRJ extends Component
                     $dataDaftarPoliRJ['umbalBpjs'] = $umbal;
 
                     $this->updateJsonRJ($rj_no, $dataDaftarPoliRJ);
-                }
-
-                if (!empty($dataUgdLookup[$no_sep])) {
+                } elseif (!empty($dataUgdLookup[$no_sep])) {
                     $rj_no = $dataUgdLookup[$no_sep];
 
                     $findDataUGD = $this->findDataUGD($rj_no);
@@ -221,11 +221,13 @@ class GroupingBPJSRJ extends Component
                     $dataDaftarPoliUGD['umbalBpjs'] = $umbal;
 
                     $this->updateJsonUGD($rj_no, $dataDaftarPoliUGD);
+                } else {
+                    $this->dataUmbalBPJSTidakAdaDiRS[] = $umbal;
                 }
             }
         }
         // 3. Bersihkan input & error
-        $this->reset(['file', 'dataUmbalBPJSTidakAdaDiRS']);          // kosongkan input–nya
+        $this->reset(['file']);          // kosongkan input–nya
         $this->resetValidation();      // hapus semua pesan error
         $this->hitungTotallAll();
     }
