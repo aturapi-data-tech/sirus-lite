@@ -306,7 +306,7 @@ class GajiDokter extends Component
 
             $row->disetujui = $disetujuiBpjs;
             $row->tidak_disetujui = $notApprovedRihdr;
-            $row->debug_json = $debugJson;
+            $row->debug_json = $debugJson ?? [];
         }
         $allSepPerDokter     = array_values(array_unique($allSepPerDokter ?? []));
 

@@ -616,7 +616,7 @@ class GroupingBPJSRJ extends Component
 
             if (strtoupper($row->poli_desc) === 'UGD') {
                 // UGD
-                $json = json_decode($row->datadaftarugd_json, true);
+                $json = json_decode($row->datadaftarugd_json, true) ?? [];
                 if (json_last_error() !== JSON_ERROR_NONE) {
                     $this->klaimTidakDisetujui[] = [
                         'vno_sep'     => $row->vno_sep,
@@ -653,7 +653,7 @@ class GroupingBPJSRJ extends Component
                 }
             } else {
                 // Rawat Jalan
-                $json = json_decode($row->datadaftarpolirj_json, true);
+                $json = json_decode($row->datadaftarpolirj_json, true) ?? [];
                 if (json_last_error() !== JSON_ERROR_NONE) {
                     $this->klaimTidakDisetujui[] = [
                         'vno_sep'     => $row->vno_sep,
