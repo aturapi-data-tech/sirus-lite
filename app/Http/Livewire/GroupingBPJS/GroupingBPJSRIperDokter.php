@@ -47,6 +47,8 @@ class GroupingBPJSRIperDokter extends Component
     {
         $myrefAllSepPerDokter = $this->allSepPerDokter;
 
+        $allNoSep = collect($myrefAllSepPerDokter)->pluck('noSep')->all();
+        $allTxnNo = collect($myrefAllSepPerDokter)->pluck('txnNo')->all();
 
         //////////////////////////////////////////
         // Query Khusus BPJS///////////////////////////////
@@ -140,7 +142,8 @@ class GroupingBPJSRIperDokter extends Component
 
             )
 
-            ->whereIn('vno_sep', $myrefAllSepPerDokter)
+            ->whereIn('vno_sep', $allNoSep)
+            ->whereIn('rihdr_no', $allTxnNo)
             ->orderBy('exit_date1',  'desc');
 
         $detail = $query->get();

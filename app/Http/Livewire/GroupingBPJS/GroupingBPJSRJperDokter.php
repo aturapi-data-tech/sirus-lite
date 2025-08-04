@@ -300,7 +300,8 @@ class GroupingBPJSRJperDokter extends Component
 
     public function hitungTotallAll($myrefAllSepPerDokter)
     {
-
+        $allNoSep = collect($myrefAllSepPerDokter)->pluck('noSep')->all();
+        $allTxnNo = collect($myrefAllSepPerDokter)->pluck('txnNo')->all();
         //////////////////////////////////////////
         // Query Khusus BPJS///////////////////////////////
         //////////////////////////////////////////
@@ -318,7 +319,8 @@ class GroupingBPJSRJperDokter extends Component
                 'dr_name',
 
             )
-            ->whereIn('vno_sep', $myrefAllSepPerDokter);
+            ->whereIn('vno_sep', $allNoSep)
+            ->whereIn('rj_no', $allTxnNo);
 
         $queryUGD = DB::table('rsview_ugdkasir')
             ->select(
@@ -334,7 +336,8 @@ class GroupingBPJSRJperDokter extends Component
                 'dr_name',
 
             )
-            ->whereIn('vno_sep', $myrefAllSepPerDokter);
+            ->whereIn('vno_sep', $allNoSep)
+            ->whereIn('rj_no', $allTxnNo);
 
         $qUnionRJUGD = $queryRJ->unionAll($queryUGD);
 
@@ -397,6 +400,10 @@ class GroupingBPJSRJperDokter extends Component
 
         $myrefAllSepPerDokter = $this->allSepPerDokter;
 
+        $allNoSep = collect($myrefAllSepPerDokter)->pluck('noSep')->all();
+        $allTxnNo = collect($myrefAllSepPerDokter)->pluck('txnNo')->all();
+
+        // dd($myrefAllSepPerDokter);
         //////////////////////////////////////////
         // Query Khusus BPJS///////////////////////////////
         //////////////////////////////////////////
@@ -414,7 +421,8 @@ class GroupingBPJSRJperDokter extends Component
                 'dr_name',
 
             )
-            ->whereIn('vno_sep', $myrefAllSepPerDokter);
+            ->whereIn('vno_sep', $allNoSep)
+            ->whereIn('rj_no', $allTxnNo);
 
 
 
@@ -432,7 +440,8 @@ class GroupingBPJSRJperDokter extends Component
                 'dr_name',
 
             )
-            ->whereIn('vno_sep', $myrefAllSepPerDokter);
+            ->whereIn('vno_sep', $allNoSep)
+            ->whereIn('rj_no', $allTxnNo);
 
 
         $qUnionRJUGD = $queryRJ->unionAll($queryUGD);
@@ -442,7 +451,6 @@ class GroupingBPJSRJperDokter extends Component
             ->paginate($this->limitPerPage);
 
         $queryRJUGDGrid = $this->perhitunganTarifRawatJalanUGD($queryRJUGDGridPagination);
-
 
         return view(
             'livewire.grouping-b-p-j-s.grouping-b-p-j-s-r-jper-dokter',

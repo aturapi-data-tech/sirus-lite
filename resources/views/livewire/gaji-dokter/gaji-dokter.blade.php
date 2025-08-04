@@ -155,6 +155,8 @@
                                                 ({{ number_format($tidakDisetujuiu['doc_nominal'], 0, ',', '.') }} /
                                                 sep:
                                                 {{ $tidakDisetujuiu['vno_sep'] }})
+                                                {{ $tidakDisetujuiu['desc_doc'] }}
+
                                             </div>
                                         @empty
                                             <em class="text-xs text-red-500">Semua OK</em>

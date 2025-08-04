@@ -105,6 +105,7 @@ class GajiDokter extends Component
                 'v.dr_name',
                 DB::raw('SUM(v.doc_nominal) AS doc_nominal'),
                 DB::raw('k.klaim_status AS klaim_status'),
+                DB::raw('COUNT(*) AS jumlah'),
             ])
             ->join('rsmst_klaimtypes as k', 'v.klaim_id', '=', 'k.klaim_id')
             ->where('dr_id', $myRefdrId)
@@ -124,7 +125,6 @@ class GajiDokter extends Component
             ->orderBy('v.group_doc')
             ->orderBy('v.desc_doc')
             ->get();
-
 
         foreach ($query as $row) {
             $txnNoList = DB::table('rsview_newdocsalaries as v')
@@ -154,6 +154,7 @@ class GajiDokter extends Component
                 )
                 ->get();
 
+
             $disetujuiBpjs = 0;
             $notApprovedRihdr = [];
             foreach ($txnNoList as $txn) {
@@ -166,7 +167,7 @@ class GajiDokter extends Component
                         case 'OPERATOR':
                         case 'ANASTESI':
                             $datadaftar = DB::table('rstxn_oks as a')
-                                ->select('b.datadaftarri_json', 'vno_sep')
+                                ->select('b.datadaftarri_json', 'b.rihdr_no', 'vno_sep')
                                 ->join('rstxn_rihdrs as b', 'a.rihdr_no', '=', 'b.rihdr_no')
                                 ->where('a.ok_reg', $txn->txn_no)
                                 ->first();
@@ -175,21 +176,21 @@ class GajiDokter extends Component
                         // Rawat Inap
                         case 'VISIT':
                             $datadaftar = DB::table('rstxn_rivisits as v')
-                                ->select('ri.datadaftarri_json', 'vno_sep')
+                                ->select('ri.datadaftarri_json', 'ri.rihdr_no', 'vno_sep')
                                 ->join('rstxn_rihdrs as ri', 'v.rihdr_no', '=', 'ri.rihdr_no')
                                 ->where('v.visit_no', $txn->txn_no)
                                 ->first();
                             break;
                         case 'KONSUL':
                             $datadaftar = DB::table('rstxn_rikonsuls as k')
-                                ->select('ri.datadaftarri_json', 'vno_sep')
+                                ->select('ri.datadaftarri_json', 'ri.rihdr_no', 'vno_sep')
                                 ->join('rstxn_rihdrs as ri', 'k.rihdr_no', '=', 'ri.rihdr_no')
                                 ->where('k.konsul_no', $txn->txn_no)
                                 ->first();
                             break;
                         case 'JD RI':
                             $datadaftar = DB::table('rstxn_riactdocs as a')
-                                ->select('ri.datadaftarri_json', 'vno_sep')
+                                ->select('ri.datadaftarri_json', 'ri.rihdr_no', 'vno_sep')
                                 ->join('rstxn_rihdrs as ri', 'a.rihdr_no', '=', 'ri.rihdr_no')
                                 ->where('a.actd_no', $txn->txn_no)
                                 ->first();
@@ -198,13 +199,13 @@ class GajiDokter extends Component
                         // UGD
                         case 'UP UGD':
                             $datadaftar = DB::table('rstxn_ugdhdrs as u')
-                                ->select('u.datadaftarugd_json', 'vno_sep')
+                                ->select('u.datadaftarugd_json', 'u.rj_no', 'vno_sep')
                                 ->where('u.rj_no', $txn->txn_no)
                                 ->first();
                             break;
                         case 'JD UGD':
                             $datadaftar = DB::table('rstxn_ugdaccdocs as a')
-                                ->select('u.datadaftarugd_json', 'vno_sep')
+                                ->select('u.datadaftarugd_json', 'u.rj_no', 'vno_sep')
                                 ->join('rstxn_ugdhdrs as u', 'a.rj_no', '=', 'u.rj_no')
                                 ->where('a.rjhn_dtl', $txn->txn_no)
                                 ->first();
@@ -214,7 +215,7 @@ class GajiDokter extends Component
                         case 'UP UGDTRF':
                         case 'JD UGDTRF':
                             $datadaftar = DB::table('rstxn_rihdrs as ri')
-                                ->select('ri.datadaftarri_json', 'vno_sep')
+                                ->select('ri.datadaftarri_json', 'ri.rihdr_no', 'vno_sep')
                                 ->where('ri.rihdr_no', $txn->txn_no)
                                 ->first();
                             break;
@@ -222,13 +223,13 @@ class GajiDokter extends Component
                         // Rawat Jalan
                         case 'UP RJ':
                             $datadaftar = DB::table('rstxn_rjhdrs as rj')
-                                ->select('rj.datadaftarpolirj_json', 'vno_sep')
+                                ->select('rj.datadaftarpolirj_json', 'rj.rj_no', 'vno_sep')
                                 ->where('rj.rj_no', $txn->txn_no)
                                 ->first();
                             break;
                         case 'JD RJ':
                             $datadaftar = DB::table('rstxn_rjaccdocs as a')
-                                ->select('rj.datadaftarpolirj_json', 'vno_sep')
+                                ->select('rj.datadaftarpolirj_json', 'rj.rj_no', 'vno_sep')
                                 ->join('rstxn_rjhdrs as rj', 'a.rj_no', '=', 'rj.rj_no')
                                 ->where('a.rjhn_dtl', $txn->txn_no)
                                 ->first();
@@ -238,7 +239,7 @@ class GajiDokter extends Component
                         case 'UP RJTRF':
                         case 'JD RJTRF':
                             $datadaftar = DB::table('rstxn_rihdrs as ri')
-                                ->select('ri.datadaftarri_json', 'vno_sep')
+                                ->select('ri.datadaftarri_json', 'ri.rihdr_no', 'vno_sep')
                                 ->where('ri.rihdr_no', $txn->txn_no)
                                 ->first();
                             break;
@@ -247,7 +248,7 @@ class GajiDokter extends Component
                         case 'UP KLINIK':
                         case 'JD KLINIK':
                             $datadaftar = DB::table('rstxn_rjhdrks as rjk')
-                                ->select('rjk.datadaftarpolirj_json', 'vno_sep')
+                                ->select('rjk.datadaftarpolirj_json', 'rjk.rj_no', 'vno_sep')
                                 ->where('rjk.rj_no', $txn->txn_no)
                                 ->first();
                             break;
@@ -264,13 +265,17 @@ class GajiDokter extends Component
                         ?? $datadaftar->datadaftarugd_json
                         ?? '{}';
 
+                    $txn_no = $datadaftar->rihdr_no
+                        ?? $datadaftar->rj_no
+                        ?? '';
+
                     // Decode JSON ke array
                     $json = json_decode($jsonString, true);
 
                     //Kumpulkan semua SEP
                     $vno_sep = $datadaftar->vno_sep ?? null;
                     if (!empty($vno_sep)) {
-                        $allSepPerDokter[]     = $vno_sep;
+                        $allSepPerDokter[]     = ['noSep' => $vno_sep, 'txnNo' => $txn_no];
                     }
 
                     $approved = (isset($json['umbalBpjs']['disetujui']));
@@ -308,15 +313,13 @@ class GajiDokter extends Component
             $row->tidak_disetujui = $notApprovedRihdr;
             $row->debug_json = $debugJson ?? [];
         }
-        $allSepPerDokter     = array_values(array_unique($allSepPerDokter ?? []));
-
 
 
         ////////////////////////////////////////////////
         // end Query
         ///////////////////////////////////////////////
 
-
+        $allSepPerDokter = $allSepPerDokter ?? [];
 
         return view(
             'livewire.gaji-dokter.gaji-dokter',
