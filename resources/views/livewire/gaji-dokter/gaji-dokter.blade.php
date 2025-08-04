@@ -159,7 +159,7 @@
 
                                             </div>
                                         @empty
-                                            <em class="text-xs text-red-500">Semua OK</em>
+                                            <em class="text-xs text-green-500">Semua OK</em>
                                         @endforelse
                                     </td>
                                 </tr>
