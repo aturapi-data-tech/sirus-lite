@@ -187,6 +187,20 @@
                                                             </div>
                                                         </div>
 
+                                                        <div>
+                                                            <x-green-button
+                                                                wire:click.prevent="cetakRekamMedisRJGrid1('{{ $myQData->txn_no }}',
+                                                        '{{ $myQData->layanan_status }}',
+                                                        {{ $myQData->datadaftar_json }}
+                                                        )"
+                                                                type="button" wire:loading.remove>
+                                                                Cetak Resume Medis1
+                                                            </x-green-button>
+                                                            <div wire:loading wire:target="cetakRekamMedisRJGrid1">
+                                                                <x-loading />
+                                                            </div>
+                                                        </div>
+
                                                         @if (isset($datadaftar_json['poliId']) && $datadaftar_json['poliId'] == '12')
                                                             <div>
                                                                 <x-yellow-button
