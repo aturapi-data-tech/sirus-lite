@@ -379,6 +379,39 @@
                                         ) !!}
 
                                     </td>
+                                    <td class="w-1/4 ">
+
+                                    </td>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+
+
+
+                    {{-- ttd --}}
+                    <tr>
+                        <td
+                            class="p-2 m-2 text-xs align-bottom border-b-2 border-l-2 border-r-2 border-black text-start">
+                            <table class="w-full text-xs table-auto">
+                                <tbody>
+                                    <td class="w-1/4 ">
+                                        <div class ="py-2 text-center">
+                                            <span>{{ '(.....................)' }}</span>
+                                            <br>
+                                            <span>
+                                                {{ 'Tanda tangan Pasien' }}
+                                            </span>
+
+                                        </div>
+                                    </td>
+                                </tbody>
+                            </table>
+                        </td>
+                        <td class="p-2 m-2 text-xs border-b-2 border-l-2 border-r-2 border-black text-start">
+
+                            <table class="w-full text-xs table-auto">
+                                <tbody>
                                     @inject('carbon', 'Carbon\Carbon')
                                     <td class="w-1/4 ">
                                         <div class ="text-center">
@@ -419,7 +452,53 @@
                 </tbody>
             </table>
         </div>
-        {{-- Keadaan Umum --}}
+        <div>
+            <table class="w-full table-auto">
+                <tbody>
+                    <tr>
+                        <td class="p-2 m-2 text-xs border-b-2 border-l-2 border-r-2 border-black text-start">
+                            <div class="p-1 mx-auto my-8 bg-white rounded-lg shadow">
+                                <!-- Judul -->
+                                <h2 class="mb-2 text-sm font-semibold text-center">
+                                    PERNYATAAN PERSETUJUAN
+                                </h2>
+                                <!-- Isi Pernyataan -->
+                                <div class="space-y-2 text-xs leading-relaxed text-justify">
+                                    <p>
+                                        Dengan ini, saya selaku pasien/tertanggung, dengan sadar dan
+                                        sukarela
+                                        memberikan izin kepada <span class="font-semibold">RSI
+                                            MADINAH</span>
+                                        untuk
+                                        membagikan informasi lengkap mengenai riwayat penyakit, kondisi
+                                        medis,
+                                        atau data perawatan saya kepada pihak ketiga yang sah dan telah
+                                        ditunjuk,
+                                        sesuai dengan ketentuan yang berlaku.
+                                    </p>
+                                    <p>
+                                        Pemberian informasi ini dimaksudkan untuk keperluan medis,
+                                        administrasi,
+                                        atau legal yang relevan, dengan tetap menjaga kerahasiaan dan
+                                        keamanan
+                                        data pribadi saya.
+                                    </p>
+                                </div>
+
+                                <!-- Catatan -->
+                                <div class="mt-8 text-xs text-gray-600">
+                                    Catatan: Formulir ini berlaku untuk pemberian informasi yang terkait
+                                    langsung dengan pelayanan kesehatan pasien dan tunduk pada regulasi
+                                    yang berlaku.
+                                </div>
+
+                            </div>
+                        </td>
+
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
     </div>
     {{-- End Content --}}
