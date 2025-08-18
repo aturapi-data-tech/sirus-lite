@@ -239,19 +239,19 @@ class EresepRIHdr extends Component
     {
         // Validasi: Pastikan $dataObat merupakan array dan tidak kosong
         if (!is_array($dataObat) || empty($dataObat)) {
-            throw new \Exception("Data obat tidak tersedia atau format tidak valid.");
+            throw new Exception("Data obat tidak tersedia atau format tidak valid.");
         }
 
         // Validasi: Pastikan regNo ada di tabel rsmst_pasiens
         $pasien = DB::table('rsmst_pasiens')->where('reg_no', $regNo)->first();
         if (!$pasien) {
-            throw new \Exception("Data pasien dengan reg_no {$regNo} tidak ditemukan.");
+            throw new Exception("Data pasien dengan reg_no {$regNo} tidak ditemukan.");
         }
 
         // Validasi: Pastikan drId ada di tabel rsmst_doctors
         $dokter = DB::table('rsmst_doctors')->where('dr_id', $drId)->first();
         if (!$dokter) {
-            throw new \Exception("Data dokter dengan dr_id {$drId} tidak ditemukan.");
+            throw new Exception("Data dokter dengan dr_id {$drId} tidak ditemukan.");
         }
 
 

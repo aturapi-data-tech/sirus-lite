@@ -23,7 +23,7 @@
                             </th>
                             <th scope="col" class="px-4 py-3">
                                 <x-sort-link :active="false" wire:click.prevent="" role="button" href="#">
-                                    Review
+                                    Rencana Edukasi Pasien & Keluarga
                                 </x-sort-link>
                             </th>
                             <th scope="col" class="w-8 px-4 py-3 text-center">
