@@ -45,13 +45,22 @@
                                             </div>
 
                                             <div class="grid grid-cols-2 gap-2">
-                                                <div class="">
+                                                <div class="grid grid-cols-2 gap-2 ">
                                                     <x-yellow-button
                                                         wire:click="showResepHdr('{{ $header['resepNo'] }}')"
                                                         class="" wire:loading.remove>
                                                         Tampil Data {{ ' No. ' . $header['resepNo'] }}
                                                     </x-yellow-button>
                                                     <div wire:loading wire:target="showResepHdr">
+                                                        <x-loading />
+                                                    </div>
+
+                                                    <x-green-button
+                                                        wire:click="simpanPlanCppt('{{ $header['resepNo'] }}')"
+                                                        class="" wire:loading.remove>
+                                                        {{ 'Simpan Plan Cppt' }}
+                                                    </x-green-button>
+                                                    <div wire:loading wire:target="simpanPlanCppt">
                                                         <x-loading />
                                                     </div>
                                                 </div>

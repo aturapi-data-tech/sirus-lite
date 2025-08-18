@@ -14,8 +14,14 @@ class CPPT extends Component
     use WithPagination, EmrRITrait;
     // listener from blade////////////////
     protected $listeners = [
-        'syncronizeAssessmentPerawatRIFindData' => 'mount'
+        'syncronizeAssessmentPerawatRIFindData' => 'mount',
+        'syncronizeCpptPlan' => 'setCpptPlan'
+
     ];
+    public function setCpptPlan($cpptPlan)
+    {
+        $this->formEntryCPPT['soap']['plan'] = $cpptPlan;
+    }
 
     //////////////////////////////
     // Ref on top bar

@@ -205,7 +205,7 @@ class EresepRIHdr extends Component
                     try {
                         // Panggil method sendDataToApotek
                         $this->sendDataToApotek($resepDate, $regNo, $riHdrNo, $dokterPeresepCode, $dataObat, $index);
-                    } catch (\Exception $e) {
+                    } catch (Exception $e) {
                         // Jika terjadi error, tampilkan pesan dan hentikan proses
                         toastr()->closeOnHover(true)
                             ->closeDuration(3)
@@ -384,6 +384,97 @@ class EresepRIHdr extends Component
                     break;
                 }
             }
+        }
+    }
+
+    public function simpanPlanCppt($resepNo)
+    {
+        try {
+            // Filter header sesuai resepNo (Collection)
+            $resepHdr = collect($this->dataDaftarRi['eresepHdr'] ?? [])
+                ->firstWhere('resepNo', $resepNo);
+
+            if (!$resepHdr) {
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')
+                    ->addWarning('Data resep tidak ditemukan.');
+                return;
+            }
+
+
+            $eresepNonRacikan = PHP_EOL;
+            $eresepRacikan    = PHP_EOL;
+
+            // --- Non Racikan (dari key 'eresep') ---
+            foreach (($resepHdr['eresep'] ?? []) as $item) {
+                $jenis = strtolower($item['jenisKeterangan'] ?? 'nonracikan');
+
+                if ($jenis === 'nonracikan') {
+                    // --- Non Racikan ---
+                    $catatanKhusus = trim((string)($item['catatanKhusus'] ?? ''));
+                    $catatanSuffix = $catatanKhusus !== '' ? ' (' . $catatanKhusus . ')' : '';
+
+                    $eresepNonRacikan .=
+                        'R/ ' .
+                        ($item['productName'] ?? '-') .
+                        ' | No. ' . ($item['qty'] ?? '-') .
+                        ' | S ' . ($item['signaX'] ?? '-') . 'dd' . ($item['signaHari'] ?? '-') .
+                        $catatanSuffix .
+                        PHP_EOL;
+                } else {
+                    // --- Racikan ---
+                    $noRacikan       = (string)($item['noRacikan'] ?? '');
+                    $productName     = (string)($item['productName'] ?? '');
+                    $dosis           = (string)($item['dosis'] ?? '');
+                    $qty             = $item['qty'] ?? null;
+                    $catatan         = (string)($item['catatan'] ?? '');
+                    $catatanKhusus   = (string)($item['catatanKhusus'] ?? '');
+
+                    $jmlRacikanLine  = $qty
+                        ? ('Jml Racikan ' . $qty . ' | ' . $catatan . ' | S ' . $catatanKhusus . PHP_EOL)
+                        : '';
+
+                    $eresepRacikan .=
+                        $noRacikan . '/ ' . $productName . ' - ' . $dosis . PHP_EOL .
+                        $jmlRacikanLine;
+                }
+            }
+
+            // --- Racikan (dari key 'eresepRacikan') ---
+            foreach (($resepHdr['eresepRacikan'] ?? []) as $item) {
+                $noRacikan     = (string)($item['noRacikan'] ?? '');
+                $productName   = (string)($item['productName'] ?? '');
+                $dosis         = (string)($item['dosis'] ?? '');
+                $qty           = $item['qty'] ?? null;
+                $catatan       = (string)($item['catatan'] ?? '');
+                $catatanKhusus = (string)($item['catatanKhusus'] ?? '');
+
+                $jmlRacikanLine = $qty
+                    ? ('Jml Racikan ' . $qty . ' | ' . $catatan . ' | S ' . $catatanKhusus . PHP_EOL)
+                    : '';
+
+                $eresepRacikan .=
+                    $noRacikan . '/ ' . $productName . ' - ' . $dosis . PHP_EOL .
+                    $jmlRacikanLine;
+            }
+
+            // Simpan ke struktur cppt
+            $this->emit('syncronizeCpptPlan', trim($eresepNonRacikan . $eresepRacikan));
+            // Toast sukses
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addSuccess('Plan CPPT berhasil disimpan.');
+        } catch (Exception $e) {
+            // Toast error
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Gagal menyimpan Plan CPPT: " . $e->getMessage());
         }
     }
 

@@ -14,7 +14,7 @@
     <div class="w-full mb-1">
         <div id="EresepHeader" class="p-2">
             <div class="p-2 rounded-lg bg-gray-50">
-                <div class="grid grid-cols-2 gap-2 px-4">
+                <div class="grid grid-cols-4 gap-2 px-4">
                     {{-- <div>
                         <x-input-label for="formEntryEresepRIHdr.regNo" :value="__('Nomor Registrasi')" :required="true"
                             class="pt-2" />
@@ -37,7 +37,7 @@
                         @enderror
                     </div> --}}
 
-                    <div>
+                    <div class="hidden">
                         {{-- Nomor Resep --}}
                         <x-input-label for="formEntryEresepRIHdr.resepNo" :value="__('Nomor Resep')" :required="true"
                             class="pt-2" />
