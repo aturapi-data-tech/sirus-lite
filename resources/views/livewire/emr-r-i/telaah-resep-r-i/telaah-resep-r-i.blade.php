@@ -173,10 +173,7 @@
                         Pasien
                     </th>
 
-                    <th scope="col" class="w-1/4 px-4 py-3 ">
-                        Poli
-                    </th>
-                    <th scope="col" class="w-1/4 px-2 py-3 ">
+                    <th scope="col" class="w-2/4 px-4 py-3 ">
                         Status Layanan
                     </th>
                     <th scope="col" class="w-1/4 px-4 py-3 ">
@@ -189,6 +186,17 @@
 
                 @foreach ($myQueryData as $myQData)
                     @php
+                        // Cek klaim BPJS
+                        $klaim = DB::table('rsmst_klaimtypes')
+                            ->where('klaim_id', $myQData->klaim_id)
+                            ->select('klaim_status', 'klaim_desc')
+                            ->first();
+                        // Boolean BPJS
+                        $isBpjs = optional($klaim)->klaim_status === 'BPJS';
+
+                        // Deskripsi klaim (fallback jika null)
+                        $klaimDesc = $klaim->klaim_desc ?? 'Asuransi Lain';
+
                         $datadaftar_json = json_decode($myQData->datadaftarri_json, true);
 
                         $eresep = isset($datadaftar_json['eresep']) ? 1 : 0;
@@ -276,106 +284,77 @@
                         </td>
 
                         <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap ">
-                            <div class="">
-                                <div class="font-semibold text-primary">
-                                    {{ 'Resep' }}
+
+                            <div class="grid grid-cols-4 gap-2">
+                                <div class="col-span-3">
+                                    <span class="mr-1 text-xs font-semibold">Dokter & Tanggal Resep:</span>
+                                    <div>
+                                        {{ $myQData->dr_name . ' | ' }}
+                                        {{ $myQData->sls_date }}
+                                        {{ '| Shift : ' . $myQData->shift }}
+                                    </div>
+
+                                    <div class="grid grid-cols-1 gap-2 mt-2">
+                                        <div class="grid gap-2 text-xs text-gray-700">
+
+                                            {{-- Bangsal, Kamar & Bed --}}
+                                            <div class="space-y-0.5">
+                                                <div class="font-medium">{{ $myQData->bangsal_name }}</div>
+                                                <div class="text-gray-600">
+                                                    {{ $myQData->room_name }} &middot; Bed:
+                                                    {{ $myQData->bed_no }}
+                                                </div>
+                                            </div>
+
+                                            {{-- Badges: Klaim / SEP / Laborat / Radiologi --}}
+                                            <div class="flex flex-wrap items-center gap-2 pt-1">
+                                                {{-- Klaim --}}
+                                                @if (optional($klaim)->klaim_status === 'BPJS')
+                                                    <span
+                                                        class="inline-flex items-center px-2 py-0.5 rounded bg-yellow-100 text-yellow-800 text-xs font-medium">
+                                                        {{ $klaim->klaim_status }} – {{ $klaimDesc }}
+                                                    </span>
+                                                @else
+                                                    <span
+                                                        class="inline-flex items-center px-2 py-0.5 rounded bg-gray-100 text-gray-800 text-xs font-medium">
+                                                        {{ $klaimDesc }}
+                                                    </span>
+                                                @endif
+
+                                                {{-- Nomor SEP --}}
+                                                @if ($myQData->vno_sep)
+                                                    <span
+                                                        class="inline-flex items-center px-2 py-0.5 rounded bg-blue-50 text-blue-800 text-xs">
+                                                        SEP: {{ $myQData->vno_sep }}
+                                                    </span>
+                                                @endif
+
+                                                {{-- Laborat --}}
+                                                @if ($myQData->lab_status)
+                                                    <span
+                                                        class="inline-flex items-center px-2 py-0.5 rounded bg-blue-100 text-blue-800 text-xs font-medium">
+                                                        Laborat
+                                                    </span>
+                                                @endif
+
+                                                {{-- Radiologi --}}
+                                                @if ($myQData->rad_status)
+                                                    <span
+                                                        class="inline-flex items-center px-2 py-0.5 rounded bg-blue-100 text-blue-800 text-xs font-medium">
+                                                        Radiologi
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="font-semibold text-gray-900">
-                                    {{ $myQData->dr_name . ' / ' }}
-                                    <x-badge :badgecolor="__($badgecolorKlaim)">
-                                        {{ $myQData->klaim_id == 'UM'
-                                            ? 'UMUM'
-                                            : ($myQData->klaim_id == 'JM'
-                                                ? 'BPJS'
-                                                : ($myQData->klaim_id == 'KR'
-                                                    ? 'Kronis'
-                                                    : 'Asuransi Lain')) }}
-                                    </x-badge>
-                                </div>
-                                <div class="font-normal">
-                                    {{ $myQData->vno_sep }}
-                                </div>
-
-
-
-
                             </div>
                         </td>
 
-                        <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap ">
-                            <div class="w-full overflow-auto">
 
-                                <div class="font-semibold text-gray-900">
-                                    {{ 'Nomer Pelayanan : ' . $myQData->sls_no }}
-                                </div>
-                                <div class = "flex space-x-1">
-                                    <x-badge :badgecolor="__($badgecolorStatus)">
-                                        {{ isset($myQData->status)
-                                            ? ($myQData->status === 'A'
-                                                ? 'Pelayanan'
-                                                : ($myQData->status === 'L'
-                                                    ? 'Selesai Pelayanan'
-                                                    : ($myQData->status === 'I'
-                                                        ? 'Transfer Inap'
-                                                        : ($myQData->status === 'F'
-                                                            ? 'Batal Transaksi'
-                                                            : ''))))
-                                            : '' }}
-                                    </x-badge>
-                                    <x-badge :badgecolor="__($badgecolorEresep)">
-                                        E-Resep: {{ $prosentaseEMR . '%' }}
-                                    </x-badge>
-                                </div>
-
-                                <div>
-
-
-                                </div>
-
-                                <div class="font-normal text-gray-700">
-                                    {{ $myQData->sls_date }}
-                                    {{ '| Shift : ' . $myQData->shift }}
-                                </div>
-
-                                <div>
-                                    @if ($jenisResep == 'racikan' && $eresep > 0)
-                                        <x-badge :badgecolor="__('default')"> {{ $jenisResep }}</x-badge>
-                                    @elseif($jenisResep == 'non racikan' && $eresep > 0)
-                                        <x-badge :badgecolor="__('green')"> {{ $jenisResep }}</x-badge>
-                                    @else
-                                        <x-badge :badgecolor="__('red')"> {{ '---' }}</x-badge>
-                                    @endif
-                                </div>
-
-
-
-                                <div class="font-normal text-gray-700">
-                                    <x-badge :badgecolor="__($badgecolorAdministrasiRj)">
-                                        Administrasi :
-                                        @isset($datadaftar_json['AdministrasiRj'])
-                                            {{ $datadaftar_json['AdministrasiRj']['userLog'] }}
-                                        @else
-                                            {{ '---' }}
-                                        @endisset
-                                    </x-badge>
-                                </div>
-
-                                {{-- <div class="italic font-normal text-gray-900">
-                                    {{ 'TaskId5 ' . $taskId5 }}
-                                </div> --}}
-                                <div class="italic font-normal text-gray-900">
-                                    {{ 'TaskId6 ' . $taskId6 }}
-                                </div>
-                                <div class="italic font-normal text-gray-900">
-                                    {{ 'TaskId7 ' . $taskId7 }}
-                                </div>
-
-
-                            </div>
-                        </td>
 
                         <td class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-primary">
-                            <div class="grid grid-cols-2 gap-2">
+                            {{-- <div class="grid grid-cols-2 gap-2">
 
                                 <x-red-button wire:click="masukApotek('{{ $myQData->sls_no }}')">
                                     Mulai Pelayanan Apotek
@@ -384,7 +363,7 @@
                                     Selesai Pelayanan Apotek
                                 </x-red-button>
 
-                            </div>
+                            </div> --}}
 
                             <div class="grid grid-cols-2 gap-2">
 
@@ -398,13 +377,15 @@
                                         Resep</x-light-button>
                                 @endif
 
+                                <div>
+                                    <livewire:cetak.cetak-eresep-r-i :riHdrNoRef="$myQData->rihdr_no" :resepNoRef="$header['resepNo'] ?? ''"
+                                        wire:key="cetak.cetak-eresep-r-i-{{ $myQData->rihdr_no }}-{{ $header['resepNo'] ?? $myQData->sls_no }}">
+
+                                </div>
+
 
                             </div>
-                            <div>
-                                <livewire:cetak.cetak-eresep-r-i :riHdrNoRef="$myQData->rihdr_no" :resepNoRef="$header['resepNo'] ?? ''"
-                                    wire:key="cetak.cetak-eresep-r-i-{{ $myQData->rihdr_no }}-{{ $header['resepNo'] ?? $myQData->sls_no }}">
 
-                            </div>
 
 
                         </td>

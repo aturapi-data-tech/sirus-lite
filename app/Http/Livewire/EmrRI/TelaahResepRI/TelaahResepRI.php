@@ -569,53 +569,68 @@ class TelaahResepRI extends Component
         //////////////////////////////////////////
         // Query ///////////////////////////////
         //////////////////////////////////////////
-        $query = DB::table('imview_slshdrs')
+        $query = DB::table('imview_slshdrs as s')
+            ->join('rsview_rihdrs as r', 'r.rihdr_no', '=', 's.rihdr_no')
             ->select(
-                DB::raw("to_char(sls_date,'dd/mm/yyyy hh24:mi:ss') AS sls_date"),
-                DB::raw("to_char(sls_date,'yyyymmddhh24miss') AS sls_date1"),
-                'sls_no',
-                'rihdr_no',
-                'reg_no',
-                'reg_name',
-                'sex',
-                'address',
-                'thn',
-                DB::raw("to_char(birth_date,'dd/mm/yyyy') AS birth_date"),
-                // 'poli_id',
-                // 'poli_desc',
-                'dr_id',
-                'dr_name',
-                'klaim_id',
-                'shift',
-                'vno_sep',
-                // 'no_antrian',
-                'status',
-                // 'nobooking',
-                'datadaftarri_json'
+                // ambil dari S (tetap pakai nama aslinya)
+                's.sls_no',
+                's.reg_no',
+                's.reg_name',
+                's.dr_id',
+                's.dr_name',
+                's.emp_id',
+                's.emp_name',
+                's.status',
+                's.shift',
+                's.klaim_id',
+                's.rihdr_no',
+                's.acc_id',
+                's.vno_sep',
+                's.datadaftarri_json',
+                's.sex',
+                's.address',
+                's.thn',
+                DB::raw("to_char(s.sls_date,'dd/mm/yyyy hh24:mi:ss') as sls_date"),
+                DB::raw("to_char(s.sls_date,'yyyymmddhh24miss') as sls_date1"),
+                DB::raw("to_char(s.birth_date,'dd/mm/yyyy') as birth_date"),
 
+                // dari R: alias supaya tidak nabrak kolom S
+                'r.ri_status',
+                'r.room_id',
+                'r.room_name',
+                'r.bangsal_id',
+                'r.bangsal_name',
+                'r.bed_no',
+                DB::raw('r.reg_no as r_reg_no'),
+                DB::raw('r.reg_name as r_reg_name'),
+                DB::raw("to_char(r.birth_date,'dd/mm/yyyy') as r_birth_date"),
+                DB::raw('r.vno_sep as r_vno_sep'),
+                DB::raw('r.klaim_id as r_klaim_id'),
+                DB::raw('r.datadaftarri_json as r_datadaftarri_json'),
+                DB::raw('r.thn as r_thn'),
+
+                // counter penunjang
+                DB::raw("(select count(*) from lbtxn_checkuphdrs l
+                  where l.status_rjri='RI' and l.checkup_status!='B'
+                    and l.ref_no = r.rihdr_no) as lab_status"),
+                DB::raw("(select count(*) from rstxn_riradiologs rr
+                  where rr.rihdr_no = r.rihdr_no) as rad_status")
             )
-            ->where(DB::raw("nvl(status,'A')"), '=', $myRefstatusId)
-            // ->where('status', '!=', 'F')
-            // ->where('klaim_id', '!=', 'KR')
 
-            // ->where('shift', '=', $myRefshift)
-            ->where(DB::raw("to_char(sls_date,'dd/mm/yyyy')"), '=', $myRefdate);
-
+            ->where(DB::raw("nvl(s.status,'A')"), '=', $myRefstatusId)
+            ->where(DB::raw("to_char(s.sls_date,'dd/mm/yyyy')"), '=', $myRefdate);
 
 
         // Jika where dokter tidak kosong
         if ($myRefdrId != 'All') {
-            $query->where('dr_id', $myRefdrId);
+            $query->where('s.dr_id', $myRefdrId);
         }
 
         $query->where(function ($q) use ($mySearch) {
-            $q->Where(DB::raw('upper(reg_name)'), 'like', '%' . strtoupper($mySearch) . '%')
-                ->orWhere(DB::raw('upper(reg_no)'), 'like', '%' . strtoupper($mySearch) . '%')
-                ->orWhere(DB::raw('upper(dr_name)'), 'like', '%' . strtoupper($mySearch) . '%');
-        })
-            // ->orderBy('sls_date1',  'desc')
-            // ->orderBy('sls_no',  'desc')
-        ;
+            $q->Where(DB::raw('upper(s.reg_name)'), 'like', '%' . strtoupper($mySearch) . '%')
+                ->orWhere(DB::raw('upper(s.reg_no)'), 'like', '%' . strtoupper($mySearch) . '%')
+                ->orWhere(DB::raw('upper(s.dr_name)'), 'like', '%' . strtoupper($mySearch) . '%');
+        });
 
         // 1 urutkan berdasarkan json table
         $myQueryPagination = $query->get()

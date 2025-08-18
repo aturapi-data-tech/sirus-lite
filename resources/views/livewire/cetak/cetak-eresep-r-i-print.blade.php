@@ -107,7 +107,7 @@
                         </tr>
 
                         <tr>
-                            <td class="p-1 m-1">Klaim</td>
+                            <td class="p-1 m-1">Klaim & Room</td>
                             <td class="p-1 m-1">:</td>
                             <td class="p-1 m-1 font-semibold">
                                 {{ $dataDaftarRi['klaimId'] == 'UM'
@@ -118,7 +118,7 @@
                                             ? 'Kronis'
                                             : 'Asuransi Lain')) }}
                                 /
-                                {{ isset($dataDaftarRi['poliDesc']) ? $dataDaftarRi['poliDesc'] : '-' }}
+                                {{ $dataDaftarRi['roomDesc'] ?? '-' }}
                             </td>
                         </tr>
 
