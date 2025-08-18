@@ -52,7 +52,8 @@
                 </tr>
 
                 <tr>
-                    <td class="p-1 m-1 text-lg font-semibold text-center uppercase ">
+                    <td class="p-1 m-1 text-lg font-semibold text-center uppercase"
+                        style="text-decoration: underline; text-decoration-color: red;">
                         resep rawat inap
                     </td>
                 </tr>
