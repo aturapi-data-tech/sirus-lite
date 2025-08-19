@@ -175,6 +175,43 @@ class CPPT extends Component
             ->addSuccess("Data CPPT berhasil dihapus.");
     }
 
+    public function copyCPPT($index): void
+    {
+
+        // Pastikan data CPPT ada dan valid
+        if (isset($this->dataDaftarRi['cppt'][$index]) && is_array($this->dataDaftarRi['cppt'][$index])) {
+            $cppt = $this->dataDaftarRi['cppt'][$index];
+
+            // Set formEntryCPPT berdasarkan data lama
+            $this->formEntryCPPT = [
+                "tglCPPT" => "", // Tanggal dikosongkan agar nanti diisi ulang
+                "petugasCPPT" =>  "",
+                "petugasCPPTCode" =>  "",
+                "profession" =>  "",
+                "soap" => [
+                    "subjective" => $cppt['soap']['subjective'] ?? "",
+                    "objective" => $cppt['soap']['objective'] ?? "",
+                    "assessment" => $cppt['soap']['assessment'] ?? "",
+                    "plan" => $cppt['soap']['plan'] ?? "",
+                ],
+                "instruction" => "", // kosong
+                "review" => "",      // kosong
+            ];
+
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addSuccess("Data CPPT berhasil dicopy ke form entry.");
+        } else {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Data CPPT tidak ditemukan untuk dicopy.");
+        }
+    }
+
 
 
     public bool $isOpenEresepRI = false;

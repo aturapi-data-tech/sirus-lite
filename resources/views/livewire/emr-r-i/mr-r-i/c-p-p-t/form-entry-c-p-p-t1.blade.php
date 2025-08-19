@@ -74,7 +74,7 @@
 
         <!-- Review -->
         <div>
-            <x-input-label for="review" :value="__('Rencana Edukasi Pasien & Keluarga')" :required="false" />
+            <x-input-label for="review" :value="__('Plan Edukasi')" :required="false" />
             <x-text-input-area id="review" wire:model.debounce.500ms="formEntryCPPT.review" :errorshas="$errors->has('formEntryCPPT.review')"
                 :disabled="$disabledPropertyRjStatus" />
             @error('formEntryCPPT.review')
@@ -152,5 +152,5 @@
     </div>
 
     <!-- Tabel Data CPPT -->
-    @include('livewire.emr-r-i.mr-r-i.c-p-p-t.form-entry-c-p-p-t2-table')
+    @include('livewire.emr-r-i.mr-r-i.c-p-p-t.form-entry-c-p-p-t2-tab')
 </div>

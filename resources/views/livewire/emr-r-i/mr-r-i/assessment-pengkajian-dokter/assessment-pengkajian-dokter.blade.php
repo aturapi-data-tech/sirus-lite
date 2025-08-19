@@ -28,14 +28,14 @@
                                     @click="activeTab = 'Bagian 2.1: Pemeriksaan Fisik'">Bagian 2.1: Pemeriksaan
                                     Fisik</label>
                             </li>
-                            <li class="mr-2">
+                            {{-- <li class="mr-2">
                                 <label
                                     class="inline-block p-2 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
                                     :class="activeTab === 'Bagian 2.2: Pemeriksaan Anatomi' ?
                                         'text-primary border-primary bg-gray-100' : ''"
                                     @click="activeTab = 'Bagian 2.2: Pemeriksaan Anatomi'">Bagian 2.2: Pemeriksaan
                                     Anatomi</label>
-                            </li>
+                            </li> --}}
                             <li class="mr-2">
                                 <label
                                     class="inline-block p-2 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
@@ -83,11 +83,11 @@
                         @include('livewire.emr-r-i.mr-r-i.pengkajian-dokter.bagian2-1-pemeriksaan-fisik')
                     </div>
 
-                    <div class="p-2 rounded-lg bg-gray-50"
+                    {{-- <div class="p-2 rounded-lg bg-gray-50"
                         :class="{ 'active': activeTab === 'Bagian 2.2: Pemeriksaan Anatomi' }"
                         x-show.transition.in.opacity.duration.600="activeTab === 'Bagian 2.2: Pemeriksaan Anatomi'">
                         @include('livewire.emr-r-i.mr-r-i.pengkajian-dokter.bagian2-2-pemeriksaan-anatomi')
-                    </div>
+                    </div> --}}
 
                     <div class="p-2 rounded-lg bg-gray-50"
                         :class="{ 'active': activeTab === 'Bagian 3: Status Lokalis' }"
