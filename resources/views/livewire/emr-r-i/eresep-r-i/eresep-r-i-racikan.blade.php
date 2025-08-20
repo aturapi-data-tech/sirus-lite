@@ -147,9 +147,38 @@
                                                         Racikan
                                                     </x-sort-link>
                                                 </th>
-                                                <th scope="col" class="px-4 py-3">
-                                                    <x-sort-link :active="false" role="button" href="#">
+                                                <th scope="col" class="px-4 py-3 ">
+                                                    <x-sort-link :active=false wire:click.prevent="" role="button"
+                                                        href="#">
                                                         Obat
+                                                    </x-sort-link>
+                                                </th>
+
+                                                <th scope="col" class="px-4 py-3 ">
+                                                    <x-sort-link :active=false wire:click.prevent="" role="button"
+                                                        href="#">
+                                                        Dosis
+                                                    </x-sort-link>
+                                                </th>
+
+                                                <th scope="col" class="px-4 py-3 ">
+                                                    <x-sort-link :active=false wire:click.prevent="" role="button"
+                                                        href="#">
+                                                        Jml Racikan
+                                                    </x-sort-link>
+                                                </th>
+
+                                                <th scope="col" class="px-4 py-3 ">
+                                                    <x-sort-link :active=false wire:click.prevent="" role="button"
+                                                        href="#">
+                                                        Catatan
+                                                    </x-sort-link>
+                                                </th>
+
+                                                <th scope="col" class="px-4 py-3 ">
+                                                    <x-sort-link :active=false wire:click.prevent="" role="button"
+                                                        href="#">
+                                                        Signa____
                                                     </x-sort-link>
                                                 </th>
                                                 <th scope="col" class="w-8 px-4 py-3 text-center">
@@ -169,51 +198,66 @@
                                                                 $myPreviousRow !== $eresep['noRacikan']
                                                                     ? 'border-t-2 '
                                                                     : '';
-
-                                                            if (isset($eresep['jenisKeterangan'])) {
-                                                                $catatan = $eresep['catatan'] ?? '';
-                                                                $catatanKhusus = $eresep['catatanKhusus'] ?? '';
-                                                                $noRacikan = $eresep['noRacikan'] ?? '';
-                                                                $productName = $eresep['productName'] ?? '';
-                                                                $qty = $eresep['qty'] ?? null;
-
-                                                                $jmlRacikan = $qty
-                                                                    ? 'Jml Racikan ' .
-                                                                        $qty .
-                                                                        ' | ' .
-                                                                        $catatan .
-                                                                        ' | S ' .
-                                                                        $catatanKhusus .
-                                                                        PHP_EOL
-                                                                    : '';
-
-                                                                $dosis = $eresep['dosis'] ?? '';
-
-                                                                // Inisialisasi $eresepRacikan jika belum ada
-                                                                $eresepRacikan =
-                                                                    $noRacikan .
-                                                                    '/ ' .
-                                                                    $productName .
-                                                                    ' - ' .
-                                                                    $dosis .
-                                                                    PHP_EOL .
-                                                                    $jmlRacikan;
-                                                            } else {
-                                                                $eresepRacikan = '';
-                                                            }
                                                         @endphp
                                                         <tr wire:key="racikan-{{ $key }}"
                                                             class="{{ $myRacikanBorder }} group">
+                                                            {{-- Racikan --}}
                                                             <td
                                                                 class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                                {{ $eresep['jenisKeterangan'] . ' (' . $eresep['noRacikan'] . ')' }}
+                                                                {{ ($eresep['jenisKeterangan'] ?? 'Racikan') . ' (' . ($eresep['noRacikan'] ?? '-') . ')' }}
                                                             </td>
 
+                                                            {{-- Obat (read-only) --}}
                                                             <td
                                                                 class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
+                                                                {{ $eresep['productName'] ?? '-' }}
+                                                            </td>
 
+                                                            {{-- Dosis (editable) --}}
+                                                            <td
+                                                                class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
                                                                 <div>
-                                                                    {{ $eresepRacikan }}
+                                                                    <x-text-input placeholder="Dosis" class="w-24"
+                                                                        :disabled="$disabledPropertyResepTtdDokter"
+                                                                        wire:model.lazy="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresepRacikan.{{ $key }}.dosis"
+                                                                        x-ref="riRacikan{{ $resepIndexRef }}{{ $key }}Dosis"
+                                                                        x-on:keyup.enter="$refs.riRacikan{{ $resepIndexRef }}{{ $key }}Qty?.focus()" />
+                                                                </div>
+                                                            </td>
+
+                                                            {{-- Jml Racikan (editable) --}}
+                                                            <td
+                                                                class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
+                                                                <div>
+                                                                    <x-text-input placeholder="Jml Racikan" class="w-24"
+                                                                        :disabled="$disabledPropertyResepTtdDokter"
+                                                                        wire:model.lazy="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresepRacikan.{{ $key }}.qty"
+                                                                        x-ref="riRacikan{{ $resepIndexRef }}{{ $key }}Qty"
+                                                                        x-on:keyup.enter="$refs.riRacikan{{ $resepIndexRef }}{{ $key }}Catatan?.focus()" />
+                                                                </div>
+                                                            </td>
+
+                                                            {{-- Catatan (editable) --}}
+                                                            <td
+                                                                class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
+                                                                <div>
+                                                                    <x-text-input placeholder="Catatan" class="w-56"
+                                                                        :disabled="$disabledPropertyResepTtdDokter"
+                                                                        wire:model.lazy="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresepRacikan.{{ $key }}.catatan"
+                                                                        x-ref="riRacikan{{ $resepIndexRef }}{{ $key }}Catatan"
+                                                                        x-on:keyup.enter="$refs.riRacikan{{ $resepIndexRef }}{{ $key }}Signa?.focus()" />
+                                                                </div>
+                                                            </td>
+
+                                                            {{-- Signa (editable) -> pakai catatanKhusus --}}
+                                                            <td
+                                                                class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
+                                                                <div>
+                                                                    <x-text-input placeholder="Signa" class="w-56"
+                                                                        :disabled="$disabledPropertyResepTtdDokter"
+                                                                        wire:model.lazy="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresepRacikan.{{ $key }}.catatanKhusus"
+                                                                        x-ref="riRacikan{{ $resepIndexRef }}{{ $key }}Signa"
+                                                                        x-on:keyup.enter="$wire.updateProductRIRacikan({{ $resepIndexRef }}, {{ $key }})" />
                                                                 </div>
                                                             </td>
 

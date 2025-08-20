@@ -73,9 +73,18 @@
                                             <x-input-error :messages="$message" />
                                         @enderror
                                     </div>
+
+                                    <div class="basis-[4%]">
+                                        <x-input-label for="" :value="__('*')" :required="__(false)" />
+
+                                        <div>
+                                            <span class="text-sm">{{ 'dd' }}</span>
+                                        </div>
+                                    </div>
+
                                     <!-- Signa2 -->
                                     <div class="basis-1/12">
-                                        <x-input-label for="formEntryEresepRINonRacikan.signaHari" :value="__('Signa2')"
+                                        <x-input-label for="formEntryEresepRINonRacikan.signaHari" :value="__('*')"
                                             :required="false" />
                                         <x-text-input id="formEntryEresepRINonRacikan.signaHari" placeholder="Signa2"
                                             class="mt-1 ml-2" :errorshas="__($errors->has('formEntryEresepRINonRacikan.signaHari'))" :disabled="$disabledPropertyResepTtdDokter"
@@ -138,11 +147,27 @@
                                                         Non Racikan
                                                     </x-sort-link>
                                                 </th>
-                                                <th scope="col" class="px-4 py-3">
-                                                    <x-sort-link :active="false" role="button" href="#">
+                                                <th scope="col" class="px-4 py-3 ">
+                                                    <x-sort-link :active=false wire:click.prevent="" role="button"
+                                                        href="#">
                                                         Obat
                                                     </x-sort-link>
                                                 </th>
+
+                                                <th scope="col" class="px-4 py-3 ">
+                                                    <x-sort-link :active=false wire:click.prevent="" role="button"
+                                                        href="#">
+                                                        Jumlah
+                                                    </x-sort-link>
+                                                </th>
+
+                                                <th scope="col" class="px-4 py-3 ">
+                                                    <x-sort-link :active=false wire:click.prevent="" role="button"
+                                                        href="#">
+                                                        Signa
+                                                    </x-sort-link>
+                                                </th>
+
                                                 <th scope="col" class="w-8 px-4 py-3 text-center">
                                                     Action
                                                 </th>
@@ -159,12 +184,58 @@
                                                         </td>
                                                         <td
                                                             class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                            @php
-                                                                $catatanKhusus = $eresep['catatanKhusus']
-                                                                    ? ' (' . $eresep['catatanKhusus'] . ')'
-                                                                    : '';
-                                                            @endphp
-                                                            {{ 'R/' . ' ' . $eresep['productName'] . ' | No. ' . $eresep['qty'] . ' | S ' . $eresep['signaX'] . 'dd' . $eresep['signaHari'] . $catatanKhusus }}
+                                                            {{ $eresep['productName'] }}
+                                                        </td>
+
+                                                        <td
+                                                            class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
+                                                            <div>
+                                                                <x-text-input placeholder="Jumlah" class="w-24 mt-1"
+                                                                    :disabled="$disabledPropertyResepTtdDokter"
+                                                                    wire:model="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresep.{{ $key }}.qty"
+                                                                    x-ref="riEresep{{ $resepIndexRef }}{{ $key }}Qty"
+                                                                    x-on:keyup.enter="$refs.riEresep{{ $resepIndexRef }}{{ $key }}SignaX.focus()" />
+                                                            </div>
+                                                        </td>
+
+                                                        <td
+                                                            class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
+                                                            <div class="flex items-baseline space-x-2">
+                                                                {{-- Signa1 --}}
+                                                                <div class="basis-1/5">
+                                                                    <x-text-input placeholder="Signa1" class="w-full mt-1"
+                                                                        :disabled="$disabledPropertyResepTtdDokter"
+                                                                        wire:model="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresep.{{ $key }}.signaX"
+                                                                        x-ref="riEresep{{ $resepIndexRef }}{{ $key }}SignaX"
+                                                                        x-on:keyup.enter="$refs.riEresep{{ $resepIndexRef }}{{ $key }}SignaHari.focus()" />
+                                                                </div>
+
+                                                                {{-- dd label --}}
+                                                                <div class="flex-none">
+                                                                    <span class="text-sm">dd</span>
+                                                                </div>
+
+                                                                {{-- Signa2 --}}
+                                                                <div class="basis-1/5">
+                                                                    <x-text-input placeholder="Signa2" class="w-full mt-1"
+                                                                        :disabled="$disabledPropertyResepTtdDokter"
+                                                                        wire:model="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresep.{{ $key }}.signaHari"
+                                                                        x-ref="riEresep{{ $resepIndexRef }}{{ $key }}SignaHari"
+                                                                        x-on:keyup.enter="$refs.riEresep{{ $resepIndexRef }}{{ $key }}Catatan.focus()" />
+                                                                </div>
+
+                                                                {{-- Catatan Khusus --}}
+                                                                <div class="flex-1">
+                                                                    <x-text-input placeholder="Catatan Khusus"
+                                                                        class="w-full mt-1" :disabled="$disabledPropertyResepTtdDokter"
+                                                                        wire:model="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresep.{{ $key }}.catatanKhusus"
+                                                                        x-ref="riEresep{{ $resepIndexRef }}{{ $key }}Catatan"
+                                                                        x-on:keyup.enter="
+                                                                            $wire.updateProductRi({{ $resepIndexRef }}, {{ $key }});
+                                                                            $refs.riEresep{{ $resepIndexRef }}{{ $key }}Qty.focus()
+                                                                        " />
+                                                                </div>
+                                                            </div>
                                                         </td>
 
                                                         <td

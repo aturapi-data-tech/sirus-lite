@@ -9,7 +9,7 @@ use Livewire\WithPagination;
 
 use App\Http\Traits\EmrRI\EmrRITrait;
 use App\Http\Traits\LOV\LOVProduct\LOVProductTrait;
-
+use Illuminate\Support\Facades\Validator;
 
 use Exception;
 
@@ -157,6 +157,85 @@ class EresepRINonRacikan extends Component
         // goto start;
     }
 
+    public function updateProductRi(int $resepIndexRef, int $key): void
+    {
+        $this->checkRiStatus();
+
+        if (!isset($this->dataDaftarRi['eresepHdr'][$resepIndexRef]['eresep'][$key])) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Baris resep tidak ditemukan.');
+            return;
+        }
+
+        $row = &$this->dataDaftarRi['eresepHdr'][$resepIndexRef]['eresep'][$key];
+
+        if (empty($row['riObatDtl'])) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('ID detail resep tidak valid.');
+            return;
+        }
+
+        $rules = [
+            'qty'           => 'required|integer|min:1',
+            'signaX'        => 'required|integer|min:1',
+            'signaHari'     => 'required|integer|min:1',
+            'catatanKhusus' => 'nullable|string|max:200',
+        ];
+
+        $messages = [
+            // --- qty ---
+            'qty.required'  => 'Jumlah (Qty) wajib diisi.',
+            'qty.integer'   => 'Jumlah (Qty) harus berupa angka.',
+            'qty.min'       => 'Jumlah (Qty) minimal 1.',
+
+            // --- signaX ---
+            'signaX.required' => 'Signa X wajib diisi.',
+            'signaX.integer'  => 'Signa X harus berupa angka.',
+            'signaX.min'      => 'Signa X minimal 1.',
+
+            // --- signaHari ---
+            'signaHari.required' => 'Signa Hari wajib diisi.',
+            'signaHari.integer'  => 'Signa Hari harus berupa angka.',
+            'signaHari.min'      => 'Signa Hari minimal 1.',
+
+            // --- catatan khusus ---
+            'catatanKhusus.string' => 'Catatan khusus harus berupa teks.',
+            'catatanKhusus.max'    => 'Catatan khusus maksimal 200 karakter.',
+        ];
+
+        $validator = Validator::make($row, $rules, $messages);
+
+        if ($validator->fails()) {
+            // Ambil pesan error pertama
+            $message = $validator->errors()->first();
+
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError($message);
+
+            return; // stop proses update
+        }
+
+        // Normalisasi
+        $row['qty']           = max(1, (int)($row['qty'] ?? 1));
+        $row['signaX']        = max(1, (int)($row['signaX'] ?? 1));
+        $row['signaHari']     = max(1, (int)($row['signaHari'] ?? 1));
+        $row['catatanKhusus'] = trim((string)($row['catatanKhusus'] ?? ''));
+
+        // (opsional, tapi disarankan kalau dipakai di UI/cetak)
+        $row['signaText'] = 'S ' . $row['signaX'] . 'dd' . $row['signaHari'];
+
+        try {
+            $this->store(); // sesuai permintaanmu, cukup update array + store
+
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess('Resep berhasil diperbarui.');
+        } catch (\Throwable $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Gagal menyimpan perubahan: ' . $e->getMessage());
+        }
+    }
+
+
 
     private function updateDataRI($riHdrNo): void
     {
@@ -208,10 +287,18 @@ class EresepRINonRacikan extends Component
         $this->formEntryEresepRINonRacikan['productName'] = $this->product['ProductName'] ?? '';
         // $this->formEntryEresepRINonRacikan['productPrice'] = $this->product['ProductPrice'] ?? '';
 
-        //qty
-        if (!isset($this->formEntryEresepRINonRacikan['qty']) || empty($this->formEntryEresepRINonRacikan['qty'])) {
+        if (empty($this->formEntryEresepRINonRacikan['qty']) || $this->formEntryEresepRINonRacikan['qty'] <= 0) {
             $this->formEntryEresepRINonRacikan['qty'] = 1;
         }
+
+        if (empty($this->formEntryEresepRINonRacikan['signaX']) || $this->formEntryEresepRINonRacikan['signaX'] <= 0) {
+            $this->formEntryEresepRINonRacikan['signaX'] = 1;
+        }
+
+        if (empty($this->formEntryEresepRINonRacikan['signaHari']) || $this->formEntryEresepRINonRacikan['signaHari'] <= 0) {
+            $this->formEntryEresepRINonRacikan['signaHari'] = 1;
+        }
+
 
         //price
         if (!isset($this->formEntryEresepRINonRacikan['productPrice']) || empty($this->formEntryEresepRINonRacikan['productPrice'])) {

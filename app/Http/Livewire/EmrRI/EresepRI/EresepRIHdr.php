@@ -339,6 +339,89 @@ class EresepRIHdr extends Component
         }
     }
 
+    public function copyResepHdrInap(int $sourceResepNo): void
+    {
+        $this->checkRiStatus();
+
+        try {
+            // 1) Cari header sumber berdasar resepNo
+            $srcIdx = collect($this->dataDaftarRi['eresepHdr'] ?? [])
+                ->search(fn($h) => ($h['resepNo'] ?? null) == $sourceResepNo);
+
+            if ($srcIdx === false) {
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addError('Resep sumber tidak ditemukan.');
+                return;
+            }
+
+            $srcHdr = $this->dataDaftarRi['eresepHdr'][$srcIdx];
+
+            // 2) Hanya boleh copy jika SUDAH TTD
+            $isSigned = !empty($srcHdr['tandaTanganDokter']['dokterPeresep'] ?? null);
+            if (!$isSigned) {
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addWarning('Resep belum ditandatangani dokter, tidak dapat di-copy.');
+                return;
+            }
+
+            // 3) Tentukan resepNo baru & waktu
+            $newResepNo = (collect($this->dataDaftarRi['eresepHdr'] ?? [])->max('resepNo') ?? 0) + 1;
+            $now        = Carbon::now()->format('d/m/Y H:i:s');
+
+            // Helper reindex riObatDtl
+            $reindexDtl = function (?array $rows, int $newResepNo) {
+                $rows = array_values($rows ?? []);
+                foreach ($rows as $i => &$r) {
+                    $r['riObatDtl'] = $i + 1;
+                    $r['riHdrNo']   = $this->riHdrNoRef;
+                    $r['resepNo']   = $newResepNo;
+                }
+                return $rows;
+            };
+
+            // 4) Salin detail + reindex
+            $copiedNonRacikan = $reindexDtl($srcHdr['eresep']        ?? [], $newResepNo);
+            $copiedRacikan    = $reindexDtl($srcHdr['eresepRacikan']  ?? [], $newResepNo);
+
+            // 5) Susun header baru (TTD & slsNo TIDAK dibawa agar bisa diedit)
+            $newHdr = [
+                'regNo'     => $srcHdr['regNo']     ?? ($this->dataDaftarRi['regNo'] ?? ''),
+                'riHdrNo'   => $this->riHdrNoRef,
+                'resepDate' => $now,
+                'resepNo'   => $newResepNo,
+            ];
+            if (!empty($copiedNonRacikan)) $newHdr['eresep']        = $copiedNonRacikan;
+            if (!empty($copiedRacikan))    $newHdr['eresepRacikan'] = $copiedRacikan;
+
+            // 6) Tambahkan & simpan
+            $this->dataDaftarRi['eresepHdr'][] = $newHdr;
+            $this->store();
+            // === TAMPILKAN: set sebagai aktif + sync child
+            $this->showResepHdr($newResepNo); // <- ini kuncinya
+
+
+            // 7) Jadikan aktif + sinkronisasi child
+            $this->formEntryEresepRIHdr = [
+                'regNo'     => $newHdr['regNo'],
+                'riHdrNo'   => $newHdr['riHdrNo'],
+                'resepDate' => $newHdr['resepDate'],
+                'resepNo'   => $newHdr['resepNo'],
+            ];
+            $this->setResepNoIndex($newHdr['resepNo']);
+            $this->emit('syncronizeAssessmentDokterRIFindData');
+            $this->emit('syncronizeAssessmentPerawatRIFindData');
+            $this->emit('resepNoUpdated', $newHdr['resepNo'], $this->resepIndexRef);
+
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess('Resep (TTD) berhasil di-copy ke nomor: ' . $newResepNo . '. Silakan edit sebelum TTD.');
+        } catch (\Throwable $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Gagal menyalin resep: ' . $e->getMessage());
+        }
+    }
+
+
+
     private function findData($riHdrNo): void
     {
         $this->riStatusRef = DB::table('rstxn_rihdrs')->select('ri_status')->where('rihdr_no', $riHdrNo)->first()->ri_status;
@@ -400,6 +483,14 @@ class EresepRIHdr extends Component
                     ->closeDuration(3)
                     ->positionClass('toast-top-left')
                     ->addWarning('Data resep tidak ditemukan.');
+                return;
+            }
+
+            // hanya boleh simpan ke CPPT jika SUDAH TTD dokter
+            $isSigned = !empty($resepHdr['tandaTanganDokter']['dokterPeresep'] ?? null);
+            if (!$isSigned) {
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addWarning('Resep belum ditandatangani dokter, tidak dapat disimpan ke CPPT.');
                 return;
             }
 

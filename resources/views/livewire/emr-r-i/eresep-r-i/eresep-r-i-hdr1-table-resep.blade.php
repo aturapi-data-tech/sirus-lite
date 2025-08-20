@@ -17,7 +17,7 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white dark:bg-gray-800">
-                        @foreach ($dataDaftarRi['eresepHdr'] ?? [] as $key => $header)
+                        @foreach (collect($dataDaftarRi['eresepHdr'] ?? [])->sortByDesc('resepDate') as $key => $header)
                             @if (isset($header['resepNo']))
                                 <tr class="border-b group dark:border-gray-700">
                                     <td class="w-1/6 px-2 py-1 whitespace-nowrap">
@@ -45,25 +45,77 @@
                                             </div>
 
                                             <div class="grid grid-cols-2 gap-2">
-                                                <div class="grid grid-cols-2 gap-2 ">
-                                                    <x-yellow-button
-                                                        wire:click="showResepHdr('{{ $header['resepNo'] }}')"
-                                                        class="" wire:loading.remove>
-                                                        Tampil Data {{ ' No. ' . $header['resepNo'] }}
+                                                <div class="grid grid-cols-3 gap-2">
+                                                    {{-- Tampil Data --}}
+                                                    <x-yellow-button wire:click="showResepHdr({{ $header['resepNo'] }})"
+                                                        wire:loading.remove>
+                                                        @if (isset($header['tandaTanganDokter']['dokterPeresep']))
+                                                            {{-- Icon mata untuk Tampil --}}
+                                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                                class="inline-block w-4 h-4 mr-1" fill="none"
+                                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="2"
+                                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="2"
+                                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943
+                                                                           9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                            </svg>
+                                                            Resep {{ $header['resepNo'] }}
+                                                        @else
+                                                            {{-- Icon pensil untuk Edit --}}
+                                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                                class="inline-block w-4 h-4 mr-1" fill="none"
+                                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="2"
+                                                                    d="M11 5h2m2 0h2a2 2 0 012 2v2m0 2v2m0 2v2a2 2 0 01-2 2h-2m-2
+                                                                           0h-2m-2 0H7a2 2 0 01-2-2v-2m0-2v-2m0-2V7a2 2 0 012-2h2" />
+                                                            </svg>
+                                                            Edit Resep {{ $header['resepNo'] }}
+                                                        @endif
                                                     </x-yellow-button>
+
                                                     <div wire:loading wire:target="showResepHdr">
                                                         <x-loading />
                                                     </div>
 
+                                                    {{-- Simpan Plan Cppt --}}
                                                     <x-green-button
-                                                        wire:click="simpanPlanCppt('{{ $header['resepNo'] }}')"
-                                                        class="" wire:loading.remove>
-                                                        {{ 'Simpan Plan Cppt' }}
+                                                        wire:click="simpanPlanCppt({{ $header['resepNo'] }})"
+                                                        wire:loading.remove>
+                                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                                            class="inline-block w-4 h-4 mr-1" fill="none"
+                                                            viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2" d="M5 13l4 4L19 7" />
+                                                        </svg>
+                                                        Simpan Cppt
                                                     </x-green-button>
                                                     <div wire:loading wire:target="simpanPlanCppt">
                                                         <x-loading />
                                                     </div>
+
+                                                    {{-- Copy Resep --}}
+                                                    <x-yellow-button
+                                                        wire:click="copyResepHdrInap({{ $header['resepNo'] }})"
+                                                        wire:loading.remove>
+                                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                                            class="inline-block w-4 h-4 mr-1" fill="none"
+                                                            viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M8 16h8M8 12h8m-6 8h6a2 2 0 002-2V8l-6-6H8a2 2 0 00-2 2v4" />
+                                                        </svg>
+                                                        Copy Resep
+                                                    </x-yellow-button>
+                                                    <div wire:loading wire:target="copyResepHdrInap">
+                                                        <x-loading />
+                                                    </div>
                                                 </div>
+
+
 
                                                 <div class="grid place-items-center">
                                                     @php

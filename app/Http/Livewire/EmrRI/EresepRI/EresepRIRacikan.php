@@ -9,6 +9,7 @@ use Livewire\WithPagination;
 
 use App\Http\Traits\LOV\LOVProduct\LOVProductTrait;
 use App\Http\Traits\EmrRI\EmrRITrait;
+use Illuminate\Support\Facades\Validator;
 
 use Exception;
 
@@ -181,6 +182,99 @@ class EresepRIRacikan extends Component
         }
         // goto start;
     }
+
+    public function updateProductRIRacikan(int $resepIndexRef, int $key): void
+    {
+        $this->checkRiStatus();
+
+        if (!isset($this->dataDaftarRi['eresepHdr'][$resepIndexRef]['eresepRacikan'][$key])) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')->addError('Baris racikan tidak ditemukan.');
+            return;
+        }
+
+        $row = &$this->dataDaftarRi['eresepHdr'][$resepIndexRef]['eresepRacikan'][$key];
+
+        if (empty($row['riObatDtl'])) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')->addError('ID detail racikan tidak valid.');
+            return;
+        }
+
+        // Validasi manual (opsional: pakai Validator::make seperti sebelumnya)
+        $rules = [
+            'dosis'         => 'required|string|max:100',
+            'qty'           => 'nullable|integer|min:1',
+            'catatan'       => 'nullable|string|max:200',
+            'catatanKhusus' => 'nullable|string|max:200', // dipakai sebagai "Signa"
+        ];
+
+        $messages = [
+            // Dosis
+            'dosis.required' => 'Dosis wajib diisi.',
+            'dosis.string'   => 'Dosis harus berupa teks.',
+            'dosis.max'      => 'Dosis maksimal 100 karakter.',
+
+            // Qty
+            'qty.required'   => 'Jumlah racikan wajib diisi.',
+            'qty.integer'    => 'Jumlah racikan harus berupa angka.',
+            'qty.min'        => 'Jumlah racikan minimal 1.',
+
+            // Catatan
+            'catatan.string' => 'Catatan harus berupa teks.',
+            'catatan.max'    => 'Catatan maksimal 200 karakter.',
+
+            // Signa
+            'catatanKhusus.string' => 'Signa harus berupa teks.',
+            'catatanKhusus.max'    => 'Signa maksimal 200 karakter.',
+        ];
+        $validator = Validator::make($row, $rules, $messages);
+
+        if ($validator->fails()) {
+            foreach ($validator->errors()->all() as $err) {
+                toastr()
+                    ->closeOnHover(true)
+                    ->closeDuration(3)
+                    ->positionClass('toast-top-left')->addError($err);
+            }
+            return;
+        }
+
+        // Normalisasi
+        $row['qty']           = max(1, (int)($row['qty'] ?? 1));
+        $row['dosis']         = trim((string)($row['dosis'] ?? ''));
+        $row['catatan']       = trim((string)($row['catatan'] ?? ''));
+        $row['catatanKhusus'] = trim((string)($row['catatanKhusus'] ?? ''));
+
+        try {
+            // Jika perlu update ke DB detail racikan, lakukan di sini.
+            // Contoh:
+            // RiObatDtl::whereKey($row['riObatDtl'])->update([
+            //     'dosis'          => $row['dosis'],
+            //     'qty'            => $row['qty'],
+            //     'catatan'        => $row['catatan'],
+            //     'catatan_khusus' => $row['catatanKhusus'], // "Signa"
+            // ]);
+
+            // Simpan state (atau update JSON header)
+            $this->store(); // atau $this->updateJsonRI($this->riHdrNoRef, $this->dataDaftarRi);
+
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')->addSuccess('Racikan berhasil diperbarui.');
+        } catch (\Throwable $e) {
+            toastr()
+                ->closeOnHover(true)
+                ->closeDuration(3)
+                ->positionClass('toast-top-left')->addError('Gagal memperbarui racikan: ' . $e->getMessage());
+        }
+    }
+
 
 
     private function updateDataRI($riHdrNo): void
