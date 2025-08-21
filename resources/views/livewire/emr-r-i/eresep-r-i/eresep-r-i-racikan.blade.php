@@ -257,9 +257,7 @@
                                                                 class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
                                                                 <x-text-input placeholder="Dosis" class="w-24"
                                                                     :disabled="$disabledPropertyResepTtdDokter"
-                                                                    wire:model.lazy="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresepRacikan.{{ $key }}.dosis"
-                                                                    x-ref="{{ $refBase }}_Dosis"
-                                                                    x-on:keyup.enter="$refs['{{ $refBase }}_Qty']?.focus()" />
+                                                                    wire:model.lazy="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresepRacikan.{{ $key }}.dosis" />
                                                             </td>
 
                                                             {{-- Jumlah Racikan --}}
@@ -267,9 +265,7 @@
                                                                 class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
                                                                 <x-text-input placeholder="Jml Racikan" class="w-24"
                                                                     :disabled="$disabledPropertyResepTtdDokter"
-                                                                    wire:model.lazy="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresepRacikan.{{ $key }}.qty"
-                                                                    x-ref="{{ $refBase }}_Qty"
-                                                                    x-on:keyup.enter="$refs['{{ $refBase }}_Catatan']?.focus()" />
+                                                                    wire:model.lazy="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresepRacikan.{{ $key }}.qty" />
                                                             </td>
 
                                                             {{-- Catatan --}}
@@ -277,9 +273,7 @@
                                                                 class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
                                                                 <x-text-input placeholder="Catatan" class="w-56"
                                                                     :disabled="$disabledPropertyResepTtdDokter"
-                                                                    wire:model.lazy="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresepRacikan.{{ $key }}.catatan"
-                                                                    x-ref="{{ $refBase }}_Catatan"
-                                                                    x-on:keyup.enter="$refs['{{ $refBase }}_Signa']?.focus()" />
+                                                                    wire:model.lazy="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresepRacikan.{{ $key }}.catatan" />
                                                             </td>
 
                                                             {{-- Signa (catatanKhusus) --}}
@@ -288,11 +282,7 @@
                                                                 <x-text-input placeholder="Signa" class="w-56"
                                                                     :disabled="$disabledPropertyResepTtdDokter"
                                                                     wire:model.lazy="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresepRacikan.{{ $key }}.catatanKhusus"
-                                                                    x-ref="{{ $refBase }}_Signa"
-                                                                    x-on:keyup.enter="
-                                                                        $wire.updateProductRIRacikan({{ $resepIndexRef }}, {{ $key }});
-                                                                        $nextTick(() => $refs['{{ $refBase }}_Dosis']?.focus())
-                                                                    " />
+                                                                    x-on:keyup.enter="$wire.updateProductRIRacikan({{ $resepIndexRef }}, {{ $key }})" />
                                                             </td>
 
                                                             {{-- Tombol hapus --}}
@@ -305,12 +295,13 @@
                                                                             aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                                                             fill="currentColor" viewBox="0 0 18 20">
                                                                             <path
-                                                                                d="M17 4h-4V2a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v2H1a1 1 0 0 0 0 2h1v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1a1 1 0 1 0 0-2ZM7 2h4v2H7V2Zm1 14a1 1 0 1 1-2 0V8a1 1 0 0 1 2 0v8Z" />
+                                                                                d="M17 4h-4V2a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v2H1a1 1 0 0 0 0 2h1v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1a1 1 0 1 0 0-2ZM7 2h4v2H7V2Zm1 14a1 1 0 1 1-2 0V8a1 1 0 0 1 2 0v8Zm4 0a1 1 0 0 1-2 0V8a1 1 0 0 1 2 0v8Z" />
                                                                         </svg>
                                                                     </x-alternative-button>
                                                                 @endrole
                                                             </td>
                                                         </tr>
+
 
                                                         @php $myPreviousRow = $eresep['noRacikan']; @endphp
                                                     @endisset

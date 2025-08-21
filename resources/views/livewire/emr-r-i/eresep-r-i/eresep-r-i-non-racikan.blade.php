@@ -206,9 +206,7 @@
                                                             class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
                                                             <x-text-input placeholder="Jumlah" class="w-24 mt-1"
                                                                 :disabled="$disabledPropertyResepTtdDokter"
-                                                                wire:model="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresep.{{ $key }}.qty"
-                                                                x-ref="{{ $refBase }}_Qty"
-                                                                x-on:keyup.enter="$refs['{{ $refBase }}_SignaX']?.focus()" />
+                                                                wire:model="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresep.{{ $key }}.qty" />
                                                         </td>
 
                                                         <td
@@ -218,9 +216,7 @@
                                                                 <div class="basis-1/5">
                                                                     <x-text-input placeholder="Signa1" class="w-full mt-1"
                                                                         :disabled="$disabledPropertyResepTtdDokter"
-                                                                        wire:model="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresep.{{ $key }}.signaX"
-                                                                        x-ref="{{ $refBase }}_SignaX"
-                                                                        x-on:keyup.enter="$refs['{{ $refBase }}_SignaHari']?.focus()" />
+                                                                        wire:model="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresep.{{ $key }}.signaX" />
                                                                 </div>
 
                                                                 <div class="flex-none"><span class="text-sm">dd</span>
@@ -230,9 +226,7 @@
                                                                 <div class="basis-1/5">
                                                                     <x-text-input placeholder="Signa2" class="w-full mt-1"
                                                                         :disabled="$disabledPropertyResepTtdDokter"
-                                                                        wire:model="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresep.{{ $key }}.signaHari"
-                                                                        x-ref="{{ $refBase }}_SignaHari"
-                                                                        x-on:keyup.enter="$refs['{{ $refBase }}_Catatan']?.focus()" />
+                                                                        wire:model="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresep.{{ $key }}.signaHari" />
                                                                 </div>
 
                                                                 {{-- Catatan Khusus --}}
@@ -240,11 +234,7 @@
                                                                     <x-text-input placeholder="Catatan Khusus"
                                                                         class="w-full mt-1" :disabled="$disabledPropertyResepTtdDokter"
                                                                         wire:model="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresep.{{ $key }}.catatanKhusus"
-                                                                        x-ref="{{ $refBase }}_Catatan"
-                                                                        x-on:keyup.enter="
-                                                            $wire.updateProductRi({{ $resepIndexRef }}, {{ $key }});
-                                                            $nextTick(() => $refs['{{ $refBase }}_Qty']?.focus())
-                                                          " />
+                                                                        x-on:keyup.enter="$wire.updateProductRi({{ $resepIndexRef }}, {{ $key }})" />
                                                                 </div>
                                                             </div>
                                                         </td>
