@@ -15,12 +15,32 @@ class CPPT extends Component
     // listener from blade////////////////
     protected $listeners = [
         'syncronizeAssessmentPerawatRIFindData' => 'mount',
-        'syncronizeCpptPlan' => 'setCpptPlan'
-
+        'syncronizeCpptPlan' => 'setCpptPlan',
+        'laboratSelectedText' => 'appendLaboratText'
     ];
     public function setCpptPlan($cpptPlan)
     {
         $this->formEntryCPPT['soap']['plan'] = $cpptPlan;
+    }
+
+    public function appendLaboratText(string $text): void
+    {
+        // Ambil isi sekarang (kalau belum ada, pakai string kosong)
+        $current = data_get(
+            $this->formEntryCPPT,
+            'soap.objective',
+            ''
+        );
+
+        // Pilih separator baris baru hanya jika sudah ada isi sebelumnya
+        $sep = $current !== '' ? "\n" : '';
+
+        // Simpan kembali ke struktur array $formEntryCPPT
+        data_set(
+            $this->formEntryCPPT,
+            'soap.objective',
+            $current . $sep . $text
+        );
     }
 
     //////////////////////////////
