@@ -14,11 +14,30 @@ class PengkajianDokter extends Component
 
     // listener from blade////////////////
     protected $listeners = [
-        'syncronizeAssessmentPerawatRIFindData' => 'mount'
+        'syncronizeAssessmentPerawatRIFindData' => 'mount',
+        'laboratSelectedText' => 'appendLaboratText'
     ];
 
 
+    public function appendLaboratText(string $text): void
+    {
+        // Ambil isi sekarang (kalau belum ada, pakai string kosong)
+        $current = data_get(
+            $this->dataDaftarRi,
+            'pengkajianDokter.hasilPemeriksaanPenunjang.laboratorium',
+            ''
+        );
 
+        // Pilih separator baris baru hanya jika sudah ada isi sebelumnya
+        $sep = $current !== '' ? "\n" : '';
+
+        // Simpan kembali ke struktur array $dataDaftarRi
+        data_set(
+            $this->dataDaftarRi,
+            'pengkajianDokter.hasilPemeriksaanPenunjang.laboratorium',
+            $current . $sep . $text
+        );
+    }
     //////////////////////////////
     // Ref on top bar
     //////////////////////////////

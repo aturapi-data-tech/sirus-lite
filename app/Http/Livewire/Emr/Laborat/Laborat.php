@@ -52,6 +52,7 @@ class Laborat extends Component
     {
 
         $this->isOpenRekamMedisLaborat = true;
+        $this->reset(['selectedRows']);
 
         $dataDaftarTxnHeader  = collect(DB::select("select distinct a.emp_id,a.checkup_no,checkup_date,a.reg_no,reg_name,a.dr_id,dr_name,'dr. KRISTINA DYAH LESTARI, Sp. PK' as dr_penanggungjawab,sex,birth_date,c.address,emp_name,waktu_selesai_pelayanan,checkup_kesimpulan
         from lbtxn_checkuphdrs a,
@@ -453,6 +454,47 @@ class Laborat extends Component
         } else {
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Data Rekam Medis Tidak di Temukan');
         }
+    }
+    public array $selectedRows = [];
+
+    public function rowSelected(array $payload): void
+    {
+
+        $index = collect($this->selectedRows)
+            ->search(fn($r) => $r['id'] == $payload['id']);
+
+        if ($index !== false) {
+            unset($this->selectedRows[$index]);
+            $this->selectedRows = array_values($this->selectedRows);
+        } else {
+            $this->selectedRows[] = $payload;
+        }
+        // setiap kali ada perubahan, emit update
+    }
+
+    public function emitSelectedRowsText(): void
+    {
+        // Format jadi string, misalnya: "HA00002 - HAEMOGLOBIN (11.7 g/dL); ER00003 - ERITROSIT (4,900,000 /uL)"
+        $text = collect($this->selectedRows)
+            ->map(function ($r) {
+                $id   = data_get($r, 'id');
+                $desc = trim(data_get($r, 'desc'));
+                $hasil = data_get($r, 'hasil');
+                $unit  = data_get($r, 'unit');
+
+                // kalau hasil kosong, cukup tampilkan "ID - DESC ( )"
+                if ($hasil === '' || $hasil === null) {
+                    return "{$id} - {$desc} ( )";
+                }
+
+                // kalau ada hasil → "DESC (hasil unit)"
+                return "{$desc} ({$hasil} {$unit})";
+            })
+            ->implode("\n"); // pakai newline biar per baris
+
+        // kirim via emit supaya bisa ditangkap di JS / komponen lain
+        $this->emit('laboratSelectedText', $text);
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess($text);
     }
 
     // when new form instance
