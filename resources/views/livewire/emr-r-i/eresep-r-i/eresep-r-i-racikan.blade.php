@@ -257,15 +257,25 @@
                                                                 class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
                                                                 <x-text-input placeholder="Dosis" class="w-24"
                                                                     :disabled="$disabledPropertyResepTtdDokter"
-                                                                    wire:model.lazy="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresepRacikan.{{ $key }}.dosis" />
+                                                                    wire:model.lazy="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresepRacikan.{{ $key }}.dosis"
+                                                                    data-field="Dosis"
+                                                                    x-on:keyup.enter="
+                                                                    const tr = $event.target.closest('tr');
+                                                                    tr?.querySelector('[data-field=Qty]')?.focus();
+                                                                    " />
                                                             </td>
 
-                                                            {{-- Jumlah Racikan --}}
+                                                            {{-- Jumlah Racikan (Qty) --}}
                                                             <td
                                                                 class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
                                                                 <x-text-input placeholder="Jml Racikan" class="w-24"
                                                                     :disabled="$disabledPropertyResepTtdDokter"
-                                                                    wire:model.lazy="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresepRacikan.{{ $key }}.qty" />
+                                                                    wire:model.lazy="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresepRacikan.{{ $key }}.qty"
+                                                                    data-field="Qty"
+                                                                    x-on:keyup.enter="
+                                                                    const tr = $event.target.closest('tr');
+                                                                    tr?.querySelector('[data-field=Catatan]')?.focus();
+                                                                    " />
                                                             </td>
 
                                                             {{-- Catatan --}}
@@ -273,7 +283,12 @@
                                                                 class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
                                                                 <x-text-input placeholder="Catatan" class="w-56"
                                                                     :disabled="$disabledPropertyResepTtdDokter"
-                                                                    wire:model.lazy="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresepRacikan.{{ $key }}.catatan" />
+                                                                    wire:model.lazy="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresepRacikan.{{ $key }}.catatan"
+                                                                    data-field="Catatan"
+                                                                    x-on:keyup.enter="
+                                                                    const tr = $event.target.closest('tr');
+                                                                    tr?.querySelector('[data-field=Signa]')?.focus();
+                                                                    " />
                                                             </td>
 
                                                             {{-- Signa (catatanKhusus) --}}
@@ -282,6 +297,7 @@
                                                                 <x-text-input placeholder="Signa" class="w-56"
                                                                     :disabled="$disabledPropertyResepTtdDokter"
                                                                     wire:model.lazy="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresepRacikan.{{ $key }}.catatanKhusus"
+                                                                    data-field="Signa"
                                                                     x-on:keyup.enter="$wire.updateProductRIRacikan({{ $resepIndexRef }}, {{ $key }})" />
                                                             </td>
 

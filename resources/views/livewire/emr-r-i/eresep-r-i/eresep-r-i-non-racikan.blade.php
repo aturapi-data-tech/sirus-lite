@@ -206,7 +206,11 @@
                                                             class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
                                                             <x-text-input placeholder="Jumlah" class="w-24 mt-1"
                                                                 :disabled="$disabledPropertyResepTtdDokter"
-                                                                wire:model="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresep.{{ $key }}.qty" />
+                                                                wire:model="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresep.{{ $key }}.qty"
+                                                                data-seq="1"
+                                                                x-on:keydown.enter.prevent="
+                                                                    $el.closest('tr')?.querySelector('[data-seq=&quot;2&quot;]')?.focus()
+                                                                " />
                                                         </td>
 
                                                         <td
@@ -216,7 +220,11 @@
                                                                 <div class="basis-1/5">
                                                                     <x-text-input placeholder="Signa1" class="w-full mt-1"
                                                                         :disabled="$disabledPropertyResepTtdDokter"
-                                                                        wire:model="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresep.{{ $key }}.signaX" />
+                                                                        wire:model="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresep.{{ $key }}.signaX"
+                                                                        data-seq="2"
+                                                                        x-on:keydown.enter.prevent="
+                                                                            $el.closest('tr')?.querySelector('[data-seq=&quot;3&quot;]')?.focus()
+                                                                        " />
                                                                 </div>
 
                                                                 <div class="flex-none"><span class="text-sm">dd</span>
@@ -226,7 +234,11 @@
                                                                 <div class="basis-1/5">
                                                                     <x-text-input placeholder="Signa2" class="w-full mt-1"
                                                                         :disabled="$disabledPropertyResepTtdDokter"
-                                                                        wire:model="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresep.{{ $key }}.signaHari" />
+                                                                        wire:model="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresep.{{ $key }}.signaHari"
+                                                                        data-seq="3"
+                                                                        x-on:keydown.enter.prevent="
+                                                                            $el.closest('tr')?.querySelector('[data-seq=&quot;4&quot;]')?.focus()
+                                                                        " />
                                                                 </div>
 
                                                                 {{-- Catatan Khusus --}}
@@ -234,7 +246,13 @@
                                                                     <x-text-input placeholder="Catatan Khusus"
                                                                         class="w-full mt-1" :disabled="$disabledPropertyResepTtdDokter"
                                                                         wire:model="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresep.{{ $key }}.catatanKhusus"
-                                                                        x-on:keyup.enter="$wire.updateProductRi({{ $resepIndexRef }}, {{ $key }})" />
+                                                                        data-seq="4"
+                                                                        x-on:keydown.enter.prevent="
+                                                                            $wire.updateProductRi({{ $resepIndexRef }}, {{ $key }});
+                                                                            $nextTick(() => {
+                                                                                $el.closest('tr')?.querySelector('[data-seq=&quot;1&quot;]')?.focus()
+                                                                            })
+                                                                        " />
                                                                 </div>
                                                             </div>
                                                         </td>
