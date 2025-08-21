@@ -1,13 +1,12 @@
 <div>
     @php
-        $headerResep = isset($dataDaftarRi['eresepHdr'][$resepIndexRef]['tandaTanganDokter']['dokterPeresep']);
-        $disabledPropertyResepTtdDokter = $headerResep ? true : false;
         $headerResepTtd = isset($dataDaftarRi['eresepHdr'][$resepIndexRef]['tandaTanganDokter']['dokterPeresep']);
+        $disabledPropertyResepTtdDokter = $headerResepTtd;
     @endphp
     <div class="w-full mb-1">
-        <div id="TransaksiRawatInap" class="p-2">
+        <div id="TransaksiRawatInapx" class="p-2">
             <div class="p-2 rounded-lg bg-gray-50">
-                <div id="TransaksiRawatInap" class="px-4">
+                <div id="TransaksiRawatInapFormx" class="px-4">
                     @role(['Dokter', 'Admin'])
                         {{-- Jika belum ada produk yang dipilih --}}
                         @if (empty($headerResepTtd))
@@ -174,28 +173,42 @@
                                             </tr>
                                         </thead>
                                         <tbody class="bg-white dark:bg-gray-800">
+                                            @php
+                                                // sekali per header
+                                                $header = $dataDaftarRi['eresepHdr'][$resepIndexRef] ?? [];
+                                                $hdrId = $header['resepNo'] ?? $resepIndexRef;
+                                                $disabledPropertyResepTtdDokter = !empty(
+                                                    $header['tandaTanganDokter']['dokterPeresep']
+                                                );
+                                            @endphp
                                             @isset($dataDaftarRi['eresepHdr'][$resepIndexRef]['eresep'])
                                                 @foreach ($dataDaftarRi['eresepHdr'][$resepIndexRef]['eresep'] as $key => $eresep)
-                                                    <tr wire:key="non-racikan-{{ $resepIndexRef }}-{{ $key }}"
+                                                    @php
+                                                        // unik per baris
+                                                        $rowId = $eresep['riObatDtl'] ?? ($eresep['uuid'] ?? $key);
+                                                        // prefix huruf supaya aman buat x-ref
+                                                        $refBase = "riEresep_r{$resepIndexRef}_{$rowId}";
+                                                    @endphp
+
+                                                    <tr wire:key="non-racikan-{{ $hdrId }}-{{ $rowId }}"
                                                         class="border-b group dark:border-gray-700">
                                                         <td
                                                             class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                            {{ $eresep['jenisKeterangan'] }}
-                                                        </td>
-                                                        <td
-                                                            class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                            {{ $eresep['productName'] }}
+                                                            {{ $eresep['jenisKeterangan'] ?? '-' }}
                                                         </td>
 
                                                         <td
                                                             class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                            <div>
-                                                                <x-text-input placeholder="Jumlah" class="w-24 mt-1"
-                                                                    :disabled="$disabledPropertyResepTtdDokter"
-                                                                    wire:model="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresep.{{ $key }}.qty"
-                                                                    x-ref="riEresep{{ $resepIndexRef }}{{ $key }}Qty"
-                                                                    x-on:keyup.enter="$refs.riEresep{{ $resepIndexRef }}{{ $key }}SignaX.focus()" />
-                                                            </div>
+                                                            {{ $eresep['productName'] ?? '-' }}
+                                                        </td>
+
+                                                        <td
+                                                            class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
+                                                            <x-text-input placeholder="Jumlah" class="w-24 mt-1"
+                                                                :disabled="$disabledPropertyResepTtdDokter"
+                                                                wire:model="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresep.{{ $key }}.qty"
+                                                                x-ref="{{ $refBase }}_Qty"
+                                                                x-on:keyup.enter="$refs['{{ $refBase }}_SignaX']?.focus()" />
                                                         </td>
 
                                                         <td
@@ -206,13 +219,11 @@
                                                                     <x-text-input placeholder="Signa1" class="w-full mt-1"
                                                                         :disabled="$disabledPropertyResepTtdDokter"
                                                                         wire:model="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresep.{{ $key }}.signaX"
-                                                                        x-ref="riEresep{{ $resepIndexRef }}{{ $key }}SignaX"
-                                                                        x-on:keyup.enter="$refs.riEresep{{ $resepIndexRef }}{{ $key }}SignaHari.focus()" />
+                                                                        x-ref="{{ $refBase }}_SignaX"
+                                                                        x-on:keyup.enter="$refs['{{ $refBase }}_SignaHari']?.focus()" />
                                                                 </div>
 
-                                                                {{-- dd label --}}
-                                                                <div class="flex-none">
-                                                                    <span class="text-sm">dd</span>
+                                                                <div class="flex-none"><span class="text-sm">dd</span>
                                                                 </div>
 
                                                                 {{-- Signa2 --}}
@@ -220,8 +231,8 @@
                                                                     <x-text-input placeholder="Signa2" class="w-full mt-1"
                                                                         :disabled="$disabledPropertyResepTtdDokter"
                                                                         wire:model="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresep.{{ $key }}.signaHari"
-                                                                        x-ref="riEresep{{ $resepIndexRef }}{{ $key }}SignaHari"
-                                                                        x-on:keyup.enter="$refs.riEresep{{ $resepIndexRef }}{{ $key }}Catatan.focus()" />
+                                                                        x-ref="{{ $refBase }}_SignaHari"
+                                                                        x-on:keyup.enter="$refs['{{ $refBase }}_Catatan']?.focus()" />
                                                                 </div>
 
                                                                 {{-- Catatan Khusus --}}
@@ -229,11 +240,11 @@
                                                                     <x-text-input placeholder="Catatan Khusus"
                                                                         class="w-full mt-1" :disabled="$disabledPropertyResepTtdDokter"
                                                                         wire:model="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresep.{{ $key }}.catatanKhusus"
-                                                                        x-ref="riEresep{{ $resepIndexRef }}{{ $key }}Catatan"
+                                                                        x-ref="{{ $refBase }}_Catatan"
                                                                         x-on:keyup.enter="
-                                                                            $wire.updateProductRi({{ $resepIndexRef }}, {{ $key }});
-                                                                            $refs.riEresep{{ $resepIndexRef }}{{ $key }}Qty.focus()
-                                                                        " />
+                                                            $wire.updateProductRi({{ $resepIndexRef }}, {{ $key }});
+                                                            $nextTick(() => $refs['{{ $refBase }}_Qty']?.focus())
+                                                          " />
                                                                 </div>
                                                             </div>
                                                         </td>
@@ -242,12 +253,12 @@
                                                             class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
                                                             @role(['Dokter', 'Admin'])
                                                                 <x-alternative-button class="inline-flex" :disabled="$disabledPropertyResepTtdDokter"
-                                                                    wire:click="removeProduct('{{ $eresep['riObatDtl'] }}','{{ $resepIndexRef }}')">
+                                                                    wire:click="removeProduct('{{ $eresep['riObatDtl'] ?? '' }}','{{ $resepIndexRef }}')">
                                                                     <svg class="w-5 h-5 text-gray-800 dark:text-white"
                                                                         aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                                                         fill="currentColor" viewBox="0 0 18 20">
                                                                         <path
-                                                                            d="M17 4h-4V2a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v2H1a1 1 0 0 0 0 2h1v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1a1 1 0 1 0 0-2ZM7 2h4v2H7V2Zm1 14a1 1 0 1 1-2 0V8a1 1 0 0 1 2 0v8Zm4 0a1 1 0 0 1-2 0V8a1 1 0 0 1 2 0v8Z" />
+                                                                            d="M17 4h-4V2a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v2H1a1 1 0 0 0 0 2h1v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1a1 1 0 1 0 0-2ZM7 2h4v2H7V2Zm1 14a1 1 0 1 1-2 0V8a1 1 0 0 1 2 0v8Z" />
                                                                     </svg>
                                                                 </x-alternative-button>
                                                             @endrole
@@ -255,8 +266,8 @@
                                                     </tr>
                                                 @endforeach
                                             @endisset
-
                                         </tbody>
+
                                     </table>
                                 </div>
                             </div>

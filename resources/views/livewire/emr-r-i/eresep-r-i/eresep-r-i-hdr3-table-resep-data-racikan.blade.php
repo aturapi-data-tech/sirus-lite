@@ -11,8 +11,11 @@
                 @php
                     $myPreviousRow = '';
                 @endphp
-                @foreach ($header['eresepRacikan'] as $detail)
+                @foreach ($header['eresepRacikan'] as $i => $detail)
                     @php
+                        $rowId = $detail['riObatDtl'] ?? $i;
+                        $hdrId = $header['resepNo'] ?? 'hdr';
+
                         $myRacikanBorder = $myPreviousRow !== $detail['noRacikan'] ? 'border-t-2 ' : '';
 
                         if (isset($detail['jenisKeterangan'])) {
@@ -35,7 +38,8 @@
                         }
                     @endphp
 
-                    <tr wire:key="racikan-{{ $key }}" class="{{ $myRacikanBorder }} group">
+                    <tr wire:key="eresep-racikan-{{ $hdrId }}-{{ $rowId }}"
+                        class="{{ $myRacikanBorder }} group">
                         <td class="w-1/2 px-4 py-2">
                             {{ $detailRacikan }}
                         </td>

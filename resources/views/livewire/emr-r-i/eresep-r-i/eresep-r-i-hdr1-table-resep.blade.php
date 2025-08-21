@@ -19,7 +19,8 @@
                     <tbody class="bg-white dark:bg-gray-800">
                         @foreach (collect($dataDaftarRi['eresepHdr'] ?? [])->sortByDesc('resepDate') as $key => $header)
                             @if (isset($header['resepNo']))
-                                <tr class="border-b group dark:border-gray-700">
+                                <tr wire:key="resep-hdr-{{ $riHdrNoRef }}-{{ $header['resepNo'] }}"
+                                    class="border-b group dark:border-gray-700">
                                     <td class="w-1/6 px-2 py-1 whitespace-nowrap">
                                         <span class="font-semibold text-primary">{{ $header['regNo'] }}</span>
                                         </br>

@@ -1,14 +1,13 @@
 <div>
     @php
-        $headerResep = isset($dataDaftarRi['eresepHdr'][$resepIndexRef]['tandaTanganDokter']['dokterPeresep']);
-        $disabledPropertyResepTtdDokter = $headerResep ? true : false;
         $headerResepTtd = isset($dataDaftarRi['eresepHdr'][$resepIndexRef]['tandaTanganDokter']['dokterPeresep']);
+        $disabledPropertyResepTtdDokter = $headerResepTtd;
     @endphp
 
     <div class="w-full mb-1">
         <div id="TransaksiRawatInap" class="p-2">
             <div class="p-2 rounded-lg bg-gray-50">
-                <div id="TransaksiRawatInap" class="px-4">
+                <div id="TransaksiRawatInapForm" class="px-4">
                     @role(['Dokter', 'Admin'])
                         {{-- Jika belum ada produk racikan dipilih --}}
                         @if (empty($headerResepTtd))
@@ -26,7 +25,11 @@
                                             <x-text-input id="formEntryEresepRIRacikan.noRacikan" placeholder="Racikan"
                                                 class="mt-1 ml-2" :errorshas="$errors->has('formEntryEresepRIRacikan.noRacikan')" :disabled="$disabledPropertyResepTtdDokter" wire:model="noRacikan"
                                                 x-ref="formEntryEresepRIRacikanNoRacikan"
-                                                x-on:keyup.enter="$refs.formEntryEresepRIRacikanProductName.focus()" />
+                                                x-on:keyup.enter="$nextTick(() => {
+                                                if ($refs.formEntryEresepRIRacikanProductName) {
+                                                    $refs.formEntryEresepRIRacikanProductName.focus();
+                                                }
+                                            })" />
                                             @error('formEntryEresepRIRacikan.noRacikan')
                                                 <x-input-error :messages="$message" />
                                             @enderror
@@ -62,9 +65,13 @@
                                         <div>
                                             <x-text-input id="formEntryEresepRIRacikan.dosis" placeholder="Dosis"
                                                 class="mt-1 ml-2" :errorshas="$errors->has('formEntryEresepRIRacikan.dosis')" :disabled="$disabledPropertyResepTtdDokter"
-                                                x-ref="formEntryEresepRIRacikanDosis" x-init="$refs.formEntryEresepRIRacikanDosis.focus()"
-                                                x-on:keyup.enter="$refs.formEntryEresepRIRacikanQty.focus()"
-                                                wire:model="formEntryEresepRIRacikan.dosis" />
+                                                x-ref="formEntryEresepRIRacikanDosis"
+                                                x-on:keyup.enter="
+                                                    $nextTick(() => {
+                                                        $refs.formEntryEresepRIRacikanQty?.focus()
+                                                    })
+                                                " />
+                                            wire:model="formEntryEresepRIRacikan.dosis" />
                                             @error('formEntryEresepRIRacikan.dosis')
                                                 <x-input-error :messages="$message" />
                                             @enderror
@@ -78,7 +85,11 @@
                                                 class="mt-1 ml-2" :errorshas="$errors->has('formEntryEresepRIRacikan.qty')" :disabled="$disabledPropertyResepTtdDokter"
                                                 wire:model="formEntryEresepRIRacikan.qty"
                                                 x-ref="formEntryEresepRIRacikanQty"
-                                                x-on:keyup.enter="$refs.formEntryEresepRIRacikanCatatan.focus()" />
+                                                x-on:keyup.enter="
+                                                    $nextTick(() => {
+                                                        $refs.formEntryEresepRIRacikanCatatan?.focus()
+                                                    })
+                                                " />
                                             @error('formEntryEresepRIRacikan.qty')
                                                 <x-input-error :messages="$message" />
                                             @enderror
@@ -90,9 +101,13 @@
                                         <div>
                                             <x-text-input id="formEntryEresepRIRacikan.catatan" placeholder="Catatan"
                                                 class="mt-1 ml-2" :errorshas="$errors->has('formEntryEresepRIRacikan.catatan')" :disabled="$disabledPropertyResepTtdDokter"
+                                                wire:model="formEntryEresepRIRacikan.catatan"
                                                 x-ref="formEntryEresepRIRacikanCatatan"
-                                                x-on:keyup.enter="$refs.formEntryEresepRIRacikanCatatanKhusus.focus()"
-                                                wire:model="formEntryEresepRIRacikan.catatan" />
+                                                x-on:keyup.enter="
+                                                    $nextTick(() => {
+                                                        $refs.formEntryEresepRIRacikanCatatanKhusus?.focus()
+                                                    })
+                                                " />
                                             @error('formEntryEresepRIRacikan.catatan')
                                                 <x-input-error :messages="$message" />
                                             @enderror
@@ -120,7 +135,11 @@
                                         <x-input-label for="" :value="__('Hapus')" :required="false" />
                                         <x-alternative-button class="inline-flex ml-2"
                                             wire:click="resetFormEntryEresepRIRacikan()"
-                                            x-on:click="$refs.formEntryEresepRIRacikanProductName.focus()">
+                                            x-on:click="$nextTick(() => {
+                                                if ($refs.formEntryEresepRIRacikanProductName) {
+                                                    $refs.formEntryEresepRIRacikanProductName.focus();
+                                                }
+                                            })">
                                             <svg class="w-5 h-5 text-gray-800 dark:text-white" aria-hidden="true"
                                                 xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 20">
                                                 <path
@@ -189,17 +208,37 @@
                                         <tbody class="bg-white dark:bg-gray-800">
                                             @isset($dataDaftarRi['eresepHdr'][$resepIndexRef]['eresepRacikan'])
                                                 @php
+                                                    // --- Identitas header ---
+                                                    $hdr = $dataDaftarRi['eresepHdr'][$resepIndexRef] ?? [];
+                                                    $hdrId = $hdr['resepNo'] ?? $resepIndexRef;
+
+                                                    // --- Status TTD dokter (berlaku ke seluruh detail di header ini) ---
+                                                    $disabledPropertyResepTtdDokter = !empty(
+                                                        $hdr['tandaTanganDokter']['dokterPeresep']
+                                                    );
+
+                                                    // --- Koleksi racikan + state pemisah baris racikan ---
+                                                    $racikanItems = $hdr['eresepRacikan'] ?? [];
                                                     $myPreviousRow = '';
                                                 @endphp
+
                                                 @foreach ($dataDaftarRi['eresepHdr'][$resepIndexRef]['eresepRacikan'] as $key => $eresep)
                                                     @isset($eresep['jenisKeterangan'])
                                                         @php
+                                                            // id unik per row
+                                                            $rowId = $eresep['riObatDtl'] ?? ($eresep['uuid'] ?? $key);
+
+                                                            // x-ref base: selalu diawali huruf
+                                                            $refBase = "riRacikan_r{$resepIndexRef}_{$rowId}";
+
+                                                            // border grouping berdasarkan noRacikan
                                                             $myRacikanBorder =
-                                                                $myPreviousRow !== $eresep['noRacikan']
+                                                                $myPreviousRow !== ($eresep['noRacikan'] ?? null)
                                                                     ? 'border-t-2 '
                                                                     : '';
                                                         @endphp
-                                                        <tr wire:key="racikan-{{ $key }}"
+
+                                                        <tr wire:key="racikan-{{ $hdrId }}-{{ $rowId }}"
                                                             class="{{ $myRacikanBorder }} group">
                                                             {{-- Racikan --}}
                                                             <td
@@ -213,72 +252,67 @@
                                                                 {{ $eresep['productName'] ?? '-' }}
                                                             </td>
 
-                                                            {{-- Dosis (editable) --}}
+                                                            {{-- Dosis --}}
                                                             <td
                                                                 class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                                <div>
-                                                                    <x-text-input placeholder="Dosis" class="w-24"
-                                                                        :disabled="$disabledPropertyResepTtdDokter"
-                                                                        wire:model.lazy="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresepRacikan.{{ $key }}.dosis"
-                                                                        x-ref="riRacikan{{ $resepIndexRef }}{{ $key }}Dosis"
-                                                                        x-on:keyup.enter="$refs.riRacikan{{ $resepIndexRef }}{{ $key }}Qty?.focus()" />
-                                                                </div>
+                                                                <x-text-input placeholder="Dosis" class="w-24"
+                                                                    :disabled="$disabledPropertyResepTtdDokter"
+                                                                    wire:model.lazy="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresepRacikan.{{ $key }}.dosis"
+                                                                    x-ref="{{ $refBase }}_Dosis"
+                                                                    x-on:keyup.enter="$refs['{{ $refBase }}_Qty']?.focus()" />
                                                             </td>
 
-                                                            {{-- Jml Racikan (editable) --}}
+                                                            {{-- Jumlah Racikan --}}
                                                             <td
                                                                 class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                                <div>
-                                                                    <x-text-input placeholder="Jml Racikan" class="w-24"
-                                                                        :disabled="$disabledPropertyResepTtdDokter"
-                                                                        wire:model.lazy="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresepRacikan.{{ $key }}.qty"
-                                                                        x-ref="riRacikan{{ $resepIndexRef }}{{ $key }}Qty"
-                                                                        x-on:keyup.enter="$refs.riRacikan{{ $resepIndexRef }}{{ $key }}Catatan?.focus()" />
-                                                                </div>
+                                                                <x-text-input placeholder="Jml Racikan" class="w-24"
+                                                                    :disabled="$disabledPropertyResepTtdDokter"
+                                                                    wire:model.lazy="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresepRacikan.{{ $key }}.qty"
+                                                                    x-ref="{{ $refBase }}_Qty"
+                                                                    x-on:keyup.enter="$refs['{{ $refBase }}_Catatan']?.focus()" />
                                                             </td>
 
-                                                            {{-- Catatan (editable) --}}
+                                                            {{-- Catatan --}}
                                                             <td
                                                                 class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                                <div>
-                                                                    <x-text-input placeholder="Catatan" class="w-56"
-                                                                        :disabled="$disabledPropertyResepTtdDokter"
-                                                                        wire:model.lazy="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresepRacikan.{{ $key }}.catatan"
-                                                                        x-ref="riRacikan{{ $resepIndexRef }}{{ $key }}Catatan"
-                                                                        x-on:keyup.enter="$refs.riRacikan{{ $resepIndexRef }}{{ $key }}Signa?.focus()" />
-                                                                </div>
+                                                                <x-text-input placeholder="Catatan" class="w-56"
+                                                                    :disabled="$disabledPropertyResepTtdDokter"
+                                                                    wire:model.lazy="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresepRacikan.{{ $key }}.catatan"
+                                                                    x-ref="{{ $refBase }}_Catatan"
+                                                                    x-on:keyup.enter="$refs['{{ $refBase }}_Signa']?.focus()" />
                                                             </td>
 
-                                                            {{-- Signa (editable) -> pakai catatanKhusus --}}
+                                                            {{-- Signa (catatanKhusus) --}}
                                                             <td
                                                                 class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
-                                                                <div>
-                                                                    <x-text-input placeholder="Signa" class="w-56"
-                                                                        :disabled="$disabledPropertyResepTtdDokter"
-                                                                        wire:model.lazy="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresepRacikan.{{ $key }}.catatanKhusus"
-                                                                        x-ref="riRacikan{{ $resepIndexRef }}{{ $key }}Signa"
-                                                                        x-on:keyup.enter="$wire.updateProductRIRacikan({{ $resepIndexRef }}, {{ $key }})" />
-                                                                </div>
+                                                                <x-text-input placeholder="Signa" class="w-56"
+                                                                    :disabled="$disabledPropertyResepTtdDokter"
+                                                                    wire:model.lazy="dataDaftarRi.eresepHdr.{{ $resepIndexRef }}.eresepRacikan.{{ $key }}.catatanKhusus"
+                                                                    x-ref="{{ $refBase }}_Signa"
+                                                                    x-on:keyup.enter="
+                                                                        $wire.updateProductRIRacikan({{ $resepIndexRef }}, {{ $key }});
+                                                                        $nextTick(() => $refs['{{ $refBase }}_Dosis']?.focus())
+                                                                    " />
                                                             </td>
 
+                                                            {{-- Tombol hapus --}}
                                                             <td
                                                                 class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
                                                                 @role(['Dokter', 'Admin'])
                                                                     <x-alternative-button class="inline-flex" :disabled="$disabledPropertyResepTtdDokter"
-                                                                        wire:click="removeProduct('{{ $eresep['riObatDtl'] }}','{{ $resepIndexRef }}')">
+                                                                        wire:click="removeProduct('{{ $eresep['riObatDtl'] ?? '' }}','{{ $resepIndexRef }}')">
                                                                         <svg class="w-5 h-5 text-gray-800 dark:text-white"
                                                                             aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                                                             fill="currentColor" viewBox="0 0 18 20">
                                                                             <path
-                                                                                d="M17 4h-4V2a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v2H1a1 1 0 0 0 0 2h1v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1a1 1 0 1 0 0-2ZM7 2h4v2H7V2Zm1 14a1 1 0 1 1-2 0V8a1 1 0 0 1 2 0v8Zm4 0a1 1 0 0 1-2 0V8a1 1 0 0 1 2 0v8Z" />
+                                                                                d="M17 4h-4V2a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v2H1a1 1 0 0 0 0 2h1v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1a1 1 0 1 0 0-2ZM7 2h4v2H7V2Zm1 14a1 1 0 1 1-2 0V8a1 1 0 0 1 2 0v8Z" />
                                                                         </svg>
                                                                     </x-alternative-button>
                                                                 @endrole
                                                             </td>
                                                         </tr>
-                                                        @php
-                                                            $myPreviousRow = $eresep['noRacikan'];
-                                                        @endphp
+
+                                                        @php $myPreviousRow = $eresep['noRacikan']; @endphp
                                                     @endisset
                                                 @endforeach
                                             @endisset

@@ -8,12 +8,14 @@
         </thead>
         <tbody>
             @if (isset($header['eresep']) && count($header['eresep']) > 0)
-                @foreach ($header['eresep'] as $detail)
+                @foreach ($header['eresep'] as $i => $detail)
                     @php
-                        $catatanKhusus = $detail['catatanKhusus'] ? ' (' . $detail['catatanKhusus'] . ')' : '';
+                        $rowId = $detail['riObatDtl'] ?? $i;
+                        $hdrId = $header['resepNo'] ?? 'hdr';
+                        $catatanKhusus = !empty($detail['catatanKhusus']) ? ' (' . $detail['catatanKhusus'] . ')' : '';
                     @endphp
 
-                    <tr class="border-b dark:border-gray-700">
+                    <tr wire:key="eresep-{{ $hdrId }}-{{ $rowId }}" class="border-b dark:border-gray-700">
                         <td class="w-1/2 px-4 py-2">
                             {{ 'R/' . ' ' . $detail['productName'] . ' | No. ' . $detail['qty'] . ' | S ' . $detail['signaX'] . 'dd' . $detail['signaHari'] . $catatanKhusus }}
                         </td>

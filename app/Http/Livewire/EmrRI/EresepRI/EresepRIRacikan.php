@@ -10,6 +10,7 @@ use Livewire\WithPagination;
 use App\Http\Traits\LOV\LOVProduct\LOVProductTrait;
 use App\Http\Traits\EmrRI\EmrRITrait;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 use Exception;
 
@@ -124,9 +125,6 @@ class EresepRIRacikan extends Component
                             $this->dataDaftarRi['eresepHdr'][$index]['eresepRacikan'] = [];
                         }
 
-                        $lastInserted = isset($this->dataDaftarRi['eresepHdr'][$index]['eresepRacikan'])
-                            ? count($this->dataDaftarRi['eresepHdr'][$index]['eresepRacikan'])
-                            : 0;
                         // Tambahkan data detail resep
                         $this->dataDaftarRi['eresepHdr'][$index]['eresepRacikan'][] = [
                             'noRacikan'       => $this->formEntryEresepRIRacikan['noRacikan'],
@@ -141,7 +139,7 @@ class EresepRIRacikan extends Component
                             'catatan'         => $this->formEntryEresepRIRacikan['catatan'],
                             'sedia'           => $this->formEntryEresepRIRacikan['sedia'],
                             'dosis'           => $this->formEntryEresepRIRacikan['dosis'],
-                            'riObatDtl'       => $lastInserted + 1,
+                            'riObatDtl'      => (string) Str::uuid(),
                             'riHdrNo'         => $this->riHdrNoRef,
                             'resepNo'         => $this->resepNoRef,
                         ];

@@ -101,24 +101,23 @@
                                     </ul>
                                 </div>
                                 <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50"
-                                    :class="{
-                                        'active': activeTabRacikanNonRacikan === 'NonRacikan'
-                                    }"
-                                    x-show.transition.in.opacity.duration.600="activeTabRacikanNonRacikan === 'NonRacikan'">
+                                    :class="{ 'active': activeTabRacikanNonRacikan === 'NonRacikan' }"
+                                    x-show.transition.in.opacity.duration.600="activeTabRacikanNonRacikan === 'NonRacikan'"
+                                    wire:key="pane-nonracikan-{{ $formEntryEresepRIHdr['resepNo'] }}">
                                     <livewire:emr-r-i.eresep-r-i.eresep-r-i-non-racikan
-                                        :wire:key="'eresep-r-i-non-racikan'" :riHdrNoRef="$riHdrNoRef" :resepNoRef="$formEntryEresepRIHdr['resepNo']">
-
+                                        :wire:key="'nonracikan-'.$formEntryEresepRIHdr['resepNo']" :riHdrNoRef="$riHdrNoRef"
+                                        :resepNoRef="$formEntryEresepRIHdr['resepNo']" />
                                 </div>
 
                                 <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50"
-                                    :class="{
-                                        'active': activeTabRacikanNonRacikan === 'Racikan'
-                                    }"
-                                    x-show.transition.in.opacity.duration.600="activeTabRacikanNonRacikan === 'Racikan'">
-                                    <livewire:emr-r-i.eresep-r-i.eresep-r-i-racikan :wire:key="'eresep-r-i-racikan'"
-                                        :riHdrNoRef="$riHdrNoRef" :resepNoRef="$formEntryEresepRIHdr['resepNo']">
-
+                                    :class="{ 'active': activeTabRacikanNonRacikan === 'Racikan' }"
+                                    x-show.transition.in.opacity.duration.600="activeTabRacikanNonRacikan === 'Racikan'"
+                                    wire:key="pane-racikan-{{ $formEntryEresepRIHdr['resepNo'] }}">
+                                    <livewire:emr-r-i.eresep-r-i.eresep-r-i-racikan
+                                        :wire:key="'racikan-'.$formEntryEresepRIHdr['resepNo']" :riHdrNoRef="$riHdrNoRef"
+                                        :resepNoRef="$formEntryEresepRIHdr['resepNo']" />
                                 </div>
+
 
                             </div>
                         </div>

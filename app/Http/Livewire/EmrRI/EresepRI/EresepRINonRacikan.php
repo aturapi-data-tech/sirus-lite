@@ -10,6 +10,7 @@ use Livewire\WithPagination;
 use App\Http\Traits\EmrRI\EmrRITrait;
 use App\Http\Traits\LOV\LOVProduct\LOVProductTrait;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 use Exception;
 
@@ -102,9 +103,8 @@ class EresepRINonRacikan extends Component
                             $this->dataDaftarRi['eresepHdr'][$index]['eresep'] = [];
                         }
 
-                        $lastInserted = isset($this->dataDaftarRi['eresepHdr'][$index]['eresep'])
-                            ? count($this->dataDaftarRi['eresepHdr'][$index]['eresep'])
-                            : 0;
+
+
                         // Tambahkan data detail resep
                         $this->dataDaftarRi['eresepHdr'][$index]['eresep'][] = [
                             'productId'      => $this->formEntryEresepRINonRacikan['productId'],
@@ -115,7 +115,7 @@ class EresepRINonRacikan extends Component
                             'qty'            => $this->formEntryEresepRINonRacikan['qty'],
                             'productPrice'   => $this->formEntryEresepRINonRacikan['productPrice'],
                             'catatanKhusus'  => $this->formEntryEresepRINonRacikan['catatanKhusus'],
-                            'riObatDtl'      => $lastInserted + 1,
+                            'riObatDtl'      => (string) Str::uuid(),
                             'riHdrNo'        => $this->riHdrNoRef,
                             'resepNo'        => $this->resepNoRef,
                         ];
@@ -276,7 +276,7 @@ class EresepRINonRacikan extends Component
         $this->resepNoRef = $newResepNo;
         // setIndex Untuk membantu status record
         $this->resepIndexRef = $newResepIndex;
-        // toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError($newResepIndex . ' x  ' . $this->resepNoRef);
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError($newResepIndex . ' x  ' . $this->resepNoRef);
     }
 
 
