@@ -389,7 +389,6 @@ class TelaahResepRI extends Component
             $dataRI['telaahObat'] = $this->telaahObat;
         }
 
-        $this->dataDaftarRi = $dataRI;
         return ($dataRI);
     }
 
@@ -420,53 +419,44 @@ class TelaahResepRI extends Component
         return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, $options);
     }
 
-    public function masukApotek($riHdrNo)
+    public function masukApotek($slsNo, $riHdrNo)
     {
         $this->findData($riHdrNo);
+
         $masukApotek = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
 
         //////updateDB/////////////////////
-        $sql = "select waktu_masuk_apt from imtxn_slshdrs where sls_no=:riHdrNo";
-        $cek_waktu_masuk_apt = DB::scalar($sql, ['riHdrNo' => $riHdrNo]);
+        $sql = "select waktu_selesai_pelayanan from imtxn_slshdrs where sls_no=:slsNo";
+        $cek_waktu_selesai_pelayanan = DB::scalar($sql, ['slsNo' => $slsNo]);
 
 
-        // ketika cek_waktu_masuk_apt kosong lalu update
-        if (!$cek_waktu_masuk_apt) {
+        // ketika cek_waktu_selesai_pelayanan kosong lalu update
+        if (!$cek_waktu_selesai_pelayanan) {
             DB::table('imtxn_slshdrs')
-                ->where('sls_no', $riHdrNo)
+                ->where('sls_no', $slsNo)
                 ->update([
-                    'waktu_masuk_apt' => DB::raw("to_date('" . $masukApotek . "','dd/mm/yyyy hh24:mi:ss')"), //waktu masuk = rjdate
+                    'waktu_selesai_pelayanan' => DB::raw("to_date('" . $masukApotek . "','dd/mm/yyyy hh24:mi:ss')"), //waktu masuk = rjdate
                 ]);
         }
         //////////////////////////////////
 
-        // add antrian Apotek
 
-        // update no antrian Apotek
-
-        // cek
-        // if (!$this->dataDaftarRi['taskIdPelayanan']['taskId5']) {
-        //      toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError( "Anda tidak dapat melakukan taskId6 ketika taskId5 Kosong");
-        //     return;
-        // }
-
-        $noBooking =  $this->dataDaftarRi['noBooking'];
         //////PushDataAntrianApotek////////////////////
 
         // cekNoantrian Apotek sudah ada atau belum
         if (!isset($this->dataDaftarRi['noAntrianApotek'])) {
-            $cekAntrianEresep = $this->findData($riHdrNo);
+
             $eresepRacikan = collect(isset($cekAntrianEresep['eresepRacikan']) ? $cekAntrianEresep['eresepRacikan'] : [])->count();
             $jenisResep = $eresepRacikan ? 'racikan' : 'non racikan';
 
-            $query = DB::table('imtxn_slshdrs')
+            $query = DB::table('imview_slshdrs')
                 ->select(
                     DB::raw("to_char(sls_date,'dd/mm/yyyy') AS sls_date"),
                     DB::raw("to_char(sls_date,'yyyymmdd') AS sls_date1"),
                     'datadaftarri_json'
                 )
                 ->where('status', '!=', ['F'])
-                ->where('klaim_id', '!=', 'KR')
+                // ->where('klaim_id', '!=', 'KR')
                 ->where(DB::raw("to_char(sls_date,'dd/mm/yyyy')"), '=', $this->myTopBar['refDate'])
                 ->get();
 
@@ -502,7 +492,7 @@ class TelaahResepRI extends Component
         // cekNoantrian Apotek sudah ada atau belum
 
         // update taskId6
-        if (!$this->dataDaftarRi['taskIdPelayanan']['taskId6']) {
+        if (empty($this->dataDaftarRi['taskIdPelayanan']['taskId6'])) {
             $this->dataDaftarRi['taskIdPelayanan']['taskId6'] = $masukApotek;
             // update DB
             $this->updateJsonRI($riHdrNo, $this->dataDaftarRi);
@@ -513,20 +503,20 @@ class TelaahResepRI extends Component
         }
     }
 
-    public function keluarApotek($riHdrNo)
+    public function keluarApotek($slsNo, $riHdrNo)
     {
         $this->findData($riHdrNo);
         $keluarApotek = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
 
         //////updateDB/////////////////////
-        $sql = "select waktu_selesai_pelayanan from imtxn_slshdrs where sls_no=:riHdrNo";
-        $cek_waktu_selesai_pelayanan = DB::scalar($sql, ['riHdrNo' => $riHdrNo]);
+        $sql = "select waktu_selesai_pelayanan from imtxn_slshdrs where sls_no=:slsNo";
+        $cek_waktu_selesai_pelayanan = DB::scalar($sql, ['slsNo' => $slsNo]);
 
 
         // ketika cek_waktu_selesai_pelayanan kosong lalu update
         if (!$cek_waktu_selesai_pelayanan) {
             DB::table('imtxn_slshdrs')
-                ->where('sls_no', $riHdrNo)
+                ->where('sls_no', $slsNo)
                 ->update([
                     'waktu_selesai_pelayanan' => DB::raw("to_date('" . $keluarApotek . "','dd/mm/yyyy hh24:mi:ss')"), //waktu masuk = rjdate
                 ]);

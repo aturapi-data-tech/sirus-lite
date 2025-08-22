@@ -354,16 +354,18 @@
 
 
                         <td class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-primary">
-                            {{-- <div class="grid grid-cols-2 gap-2">
+                            <div class="grid grid-cols-2 gap-2">
 
-                                <x-red-button wire:click="masukApotek('{{ $myQData->sls_no }}')">
+                                <x-red-button
+                                    wire:click="masukApotek('{{ $myQData->sls_no }}','{{ $myQData->rihdr_no }}')">
                                     Mulai Pelayanan Apotek
                                 </x-red-button>
-                                <x-red-button wire:click="keluarApotek('{{ $myQData->sls_no }}')">
+                                <x-red-button
+                                    wire:click="keluarApotek('{{ $myQData->sls_no }}','{{ $myQData->rihdr_no }}')">
                                     Selesai Pelayanan Apotek
                                 </x-red-button>
 
-                            </div> --}}
+                            </div>
 
                             <div class="grid grid-cols-2 gap-2">
 

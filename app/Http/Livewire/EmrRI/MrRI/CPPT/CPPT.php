@@ -173,63 +173,80 @@ class CPPT extends Component
             ->addSuccess("Data CPPT berhasil ditambahkan.");
     }
 
-    public function removeCPPT($index): void
+    public function removeCPPT(string $tgl): void
     {
-        // Pastikan data CPPT ada dan merupakan array
-        if (isset($this->dataDaftarRi['cppt']) && is_array($this->dataDaftarRi['cppt'])) {
-            // Hapus data berdasarkan indeks
-            unset($this->dataDaftarRi['cppt'][$index]);
+        $cppts = collect($this->dataDaftarRi['cppt'] ?? []);
 
-            // Reset indeks array setelah penghapusan
-            $this->dataDaftarRi['cppt'] = array_values($this->dataDaftarRi['cppt']);
+        // cari index berdasarkan tglCPPT
+        $index = $cppts->search(function ($row) use ($tgl) {
+            if (!isset($row['tglCPPT'])) return false;
+
+            try {
+                $rowTgl = Carbon::createFromFormat('d/m/Y H:i:s', trim($row['tglCPPT']));
+                $target = Carbon::createFromFormat('d/m/Y H:i:s', trim($tgl));
+                return $rowTgl->equalTo($target);
+            } catch (\Exception $e) {
+                return trim($row['tglCPPT']) === trim($tgl);
+            }
+        });
+
+        if ($index === false) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError("Data CPPT dengan tanggal {$tgl} tidak ditemukan.");
+            return;
         }
 
-        // Simpan perubahan ke penyimpanan
+        // hapus
+        $cppts->forget($index);
+        $this->dataDaftarRi['cppt'] = $cppts->values()->all();
+
         $this->store();
 
-        // Tampilkan pesan sukses
-        toastr()
-            ->closeOnHover(true)
-            ->closeDuration(3)
-            ->positionClass('toast-top-left')
-            ->addSuccess("Data CPPT berhasil dihapus.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+            ->addSuccess("Data CPPT ({$tgl}) berhasil dihapus.");
     }
 
-    public function copyCPPT($index): void
+
+    public function copyCPPT(string $tgl): void
     {
+        $cppts = collect($this->dataDaftarRi['cppt'] ?? []);
 
-        // Pastikan data CPPT ada dan valid
-        if (isset($this->dataDaftarRi['cppt'][$index]) && is_array($this->dataDaftarRi['cppt'][$index])) {
-            $cppt = $this->dataDaftarRi['cppt'][$index];
+        // ambil item pertama yang cocok
+        $cppt = $cppts->first(function ($row) use ($tgl) {
+            if (!isset($row['tglCPPT'])) return false;
 
-            // Set formEntryCPPT berdasarkan data lama
-            $this->formEntryCPPT = [
-                "tglCPPT" => "", // Tanggal dikosongkan agar nanti diisi ulang
-                "petugasCPPT" =>  "",
-                "petugasCPPTCode" =>  "",
-                "profession" =>  "",
-                "soap" => [
-                    "subjective" => $cppt['soap']['subjective'] ?? "",
-                    "objective" => $cppt['soap']['objective'] ?? "",
-                    "assessment" => $cppt['soap']['assessment'] ?? "",
-                    "plan" => $cppt['soap']['plan'] ?? "",
-                ],
-                "instruction" => "", // kosong
-                "review" => "",      // kosong
-            ];
-
-            toastr()
-                ->closeOnHover(true)
-                ->closeDuration(3)
-                ->positionClass('toast-top-left')
-                ->addSuccess("Data CPPT berhasil dicopy ke form entry.");
-        } else {
-            toastr()
-                ->closeOnHover(true)
-                ->closeDuration(3)
-                ->positionClass('toast-top-left')
-                ->addError("Data CPPT tidak ditemukan untuk dicopy.");
+            try {
+                $rowTgl = Carbon::createFromFormat('d/m/Y H:i:s', trim($row['tglCPPT']));
+                $target = Carbon::createFromFormat('d/m/Y H:i:s', trim($tgl));
+                return $rowTgl->equalTo($target);
+            } catch (\Exception $e) {
+                return trim($row['tglCPPT']) === trim($tgl);
+            }
+        });
+        if (!$cppt) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError("Data CPPT dengan tanggal {$tgl} tidak ditemukan untuk dicopy.");
+            return;
         }
+
+        // copy ke form (reset identitas & tanggal)
+        $this->formEntryCPPT = [
+            "tglCPPT" => "",
+            "petugasCPPT" => "",
+            "petugasCPPTCode" => "",
+            "profession" => "",
+            "soap" => [
+                "subjective" => $cppt['soap']['subjective'] ?? "",
+                "objective"  => $cppt['soap']['objective']  ?? "",
+                "assessment" => $cppt['soap']['assessment'] ?? "",
+                "plan"       => $cppt['soap']['plan']       ?? "",
+            ],
+            "instruction" => "",
+            "review"      => "",
+        ];
+
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+            ->addSuccess("CPPT ({$tgl}) berhasil dicopy ke form entry.");
     }
 
 

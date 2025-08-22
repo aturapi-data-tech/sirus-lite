@@ -101,7 +101,7 @@
                                         <div class="grid grid-cols-2 gap-4">
 
                                             <x-yellow-button class="inline-flex"
-                                                wire:click.prevent="copyCPPT('{{ $key }}')">
+                                                wire:click.prevent="copyCPPT('{{ $cppt['tglCPPT'] ?? '-' }}')">
                                                 <svg class="w-5 h-5 text-white" aria-hidden="true"
                                                     xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                                     fill="currentColor" viewBox="0 0 24 24">
@@ -116,7 +116,7 @@
                                             </x-yellow-button>
 
                                             <x-alternative-button class="inline-flex"
-                                                wire:click.prevent="removeCPPT('{{ $key }}')">
+                                                wire:click.prevent="removeCPPT('{{ $cppt['tglCPPT'] ?? '-' }}')">
                                                 <svg class="w-5 h-5 text-gray-800" aria-hidden="true"
                                                     xmlns="http://www.w3.org/2000/svg" fill="currentColor"
                                                     viewBox="0 0 18 20">
