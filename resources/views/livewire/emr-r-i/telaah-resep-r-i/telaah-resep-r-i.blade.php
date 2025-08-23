@@ -186,79 +186,67 @@
 
                 @foreach ($myQueryData as $myQData)
                     @php
-                        // Cek klaim BPJS
+                        // --- Klaim ---
                         $klaim = DB::table('rsmst_klaimtypes')
                             ->where('klaim_id', $myQData->klaim_id)
                             ->select('klaim_status', 'klaim_desc')
                             ->first();
-                        // Boolean BPJS
                         $isBpjs = optional($klaim)->klaim_status === 'BPJS';
-
-                        // Deskripsi klaim (fallback jika null)
                         $klaimDesc = $klaim->klaim_desc ?? 'Asuransi Lain';
 
-                        $datadaftar_json = json_decode($myQData->datadaftarri_json, true);
+                        // --- JSON RI ---
+                        $riJson = json_decode($myQData->datadaftarri_json, true) ?: [];
+                        $headers = $riJson['eresepHdr'] ?? [];
 
-                        $eresep = isset($datadaftar_json['eresep']) ? 1 : 0;
-                        $noAntrianFarmasi = isset($datadaftar_json['noAntrianApotek']['noAntrian'])
-                            ? $datadaftar_json['noAntrianApotek']['noAntrian']
-                            : 0;
-
-                        $eresepRacikan = collect(
-                            isset($datadaftar_json['eresepRacikan']) ? $datadaftar_json['eresepRacikan'] : [],
-                        )->count();
-                        $jenisResep = $eresepRacikan ? 'racikan' : 'non racikan';
-
-                        $prosentaseEMR = ($eresep / 1) * 100;
-
-                        $badgecolorStatus = isset($myQData->status)
-                            ? ($myQData->status === 'A'
-                                ? 'red'
-                                : ($myQData->status === 'L'
-                                    ? 'green'
-                                    : ($myQData->status === 'I'
-                                        ? 'green'
-                                        : ($myQData->status === 'F'
-                                            ? 'yellow'
-                                            : 'default'))))
-                            : '';
-
-                        $badgecolorEresep = $eresep ? 'green' : 'red';
-
-                        $badgecolorKlaim =
-                            $myQData->klaim_id == 'UM'
-                                ? 'green'
-                                : ($myQData->klaim_id == 'JM'
-                                    ? 'default'
-                                    : ($myQData->klaim_id == 'KR'
-                                        ? 'yellow'
-                                        : 'red'));
-
-                        $badgecolorAdministrasiRj = isset($datadaftar_json['AdministrasiRj']) ? 'green' : 'red';
-
-                        $taskId5 = $datadaftar_json['taskIdPelayanan']['taskId5'] ?? 'xxxx-xx-xx xx:xx:xx';
-                        $taskId6 = $datadaftar_json['taskIdPelayanan']['taskId6'] ?? 'xxxx-xx-xx xx:xx:xx';
-                        $taskId7 = $datadaftar_json['taskIdPelayanan']['taskId7'] ?? 'xxxx-xx-xx xx:xx:xx';
-
-                        $telaahResepStatus = isset($datadaftar_json['telaahResep']['penanggungJawab'])
-                            ? ($datadaftar_json['telaahResep']['penanggungJawab']
-                                ? true
-                                : false)
-                            : false;
-                        $telaahObatStatus = isset($datadaftar_json['telaahObat']['penanggungJawab'])
-                            ? ($datadaftar_json['telaahObat']['penanggungJawab']
-                                ? true
-                                : false)
-                            : false;
-
-                        // Pastikan data exists, jika tidak, jadikan sebagai array kosong
-                        $eresepHdr = isset($datadaftar_json['eresepHdr']) ? $datadaftar_json['eresepHdr'] : [];
-
-                        // Menggunakan collection untuk mencari elemen yang sesuai
-                        $header = collect($eresepHdr)->first(function ($foundHeader) use ($myQData) {
-                            return isset($foundHeader['slsNo']) && $foundHeader['slsNo'] == $myQData->sls_no;
+                        // Ambil header yang cocok dengan baris transaksi ini (sls_no)
+                        $header = collect($headers)->first(function ($h) use ($myQData) {
+                            return isset($h['slsNo']) && (string) $h['slsNo'] === (string) $myQData->sls_no;
                         });
+
+                        // Fallback: kalau belum ketemu, ambil header terbaru yang punya slsNo / resepNo
+                        if (!$header) {
+                            $header =
+                                collect($headers)
+                                    ->sortByDesc(fn($h) => $h['resepNo'] ?? 0)
+                                    ->first(fn($h) => !empty($h['slsNo'] ?? null)) ??
+                                (collect($headers)->sortByDesc(fn($h) => $h['resepNo'] ?? 0)->first() ?: []);
+                        }
+
+                        // ======= BACA DARI HEADER (baru) =======
+                        // eResep per header
+                        $hasEresepHeader =
+                            !empty($header['eresep'] ?? null) || !empty($header['eresepRacikan'] ?? null);
+
+                        // Racikan per header
+                        $countRacikan = collect($header['eresepRacikan'] ?? [])->count();
+                        $jenisResep = $countRacikan > 0 ? 'racikan' : 'non racikan';
+
+                        // Nomor Antrian Apotek: utamakan SLS, fallback ke header JSON
+                        $slsQueue = is_numeric($myQData->no_antrian ?? null) ? (int) $myQData->no_antrian : null;
+
+                        $headerMinQ = collect($headers)
+                            ->map(fn($h) => $h['noAntrianApotek']['noAntrian'] ?? null)
+                            ->filter(fn($n) => is_numeric($n) && (int) $n > 0) // 0 bukan nomor valid
+                            ->map(fn($n) => (int) $n)
+                            ->min();
+
+                        $effectiveQueue = $slsQueue ?? $headerMinQ; // pakai SLS jika ada
+                        $hasQueue = is_numeric($effectiveQueue) && ($effectiveQueue > 0 || $effectiveQueue === 999);
+                        $isKronisQueue = $effectiveQueue === 999;
+                        $noAntrianLabel = $isKronisQueue ? 'KR' : ($hasQueue ? $effectiveQueue : '-'); // label yg ditampilkan
+
+                        // Task per header (apotek)
+                        $taskId6 = $header['taskIdPelayanan']['taskId6'] ?? 'xxxx-xx-xx xx:xx:xx'; // Masuk Apotek
+                        $taskId7 = $header['taskIdPelayanan']['taskId7'] ?? 'xxxx-xx-xx xx:xx:xx'; // Keluar Apotek
+
+                        // Telaah status di HEADER (baru)
+                        $telaahResepStatus = !empty($header['telaahResep']['penanggungJawab']['userLog'] ?? null);
+                        $telaahObatStatus = !empty($header['telaahObat']['penanggungJawab']['userLog'] ?? null);
+
+                        // Badge
+
                     @endphp
+
 
 
                     <tr class="border-b group ">
@@ -267,7 +255,7 @@
                                 <div>
                                     <p>Antrian Farmasi
                                         <span class="text-5xl font-semibold text-gray-700">
-                                            {{ $noAntrianFarmasi }}
+                                            {{ $noAntrianLabel }}
                                         </span>
                                     </p>
                                 </div>
@@ -343,6 +331,26 @@
                                                         class="inline-flex items-center px-2 py-0.5 rounded bg-blue-100 text-blue-800 text-xs font-medium">
                                                         Radiologi
                                                     </span>
+                                                @endif
+                                            </div>
+
+                                            <div class="flex flex-wrap items-center gap-2 pt-1">
+                                                {{-- TaskId6 Masuk Apotek --}}
+                                                <span class="text-xs text-gray-700">
+                                                    Masuk Apotek: {{ $taskId6 }}
+                                                </span>
+                                                <span>/</span>
+                                                {{-- TaskId7 Keluar Apotek --}}
+                                                <span class="text-xs text-gray-700">
+                                                    Keluar Apotek: {{ $taskId7 }}
+                                                </span>
+                                            </div>
+
+                                            <div>
+                                                @if (strtolower($jenisResep ?? '') === 'racikan')
+                                                    <x-badge badgecolor="defult">
+                                                        racikan
+                                                    </x-badge>
                                                 @endif
                                             </div>
                                         </div>

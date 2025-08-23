@@ -315,80 +315,123 @@ class TelaahResepRI extends Component
     ////////////////////////////////////////////////
 
 
-    public function setttdTelaahResep($riHdrNo)
+    public function setttdTelaahResep(string $riHdrNo, ?int $slsNo = null, ?int $resepNo = null): void
     {
-        $myUserNameActive = auth()->user()->myuser_name;
-        if (auth()->user()->hasRole('Apoteker')) {
-            if (isset($this->dataDaftarRi['telaahResep']['penanggungJawab']) == false) {
-                $this->dataDaftarRi['telaahResep']['penanggungJawab'] = [
-                    'userLog' => auth()->user()->myuser_name,
-                    'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'),
-                    'userLogCode' => auth()->user()->myuser_code
-                ];
+        $user = auth()->user();
 
-                // DB::table('imtxn_slshdrs')
-                //     ->where('sls_no', $riHdrNo)
-                //     ->update([
-                //         'datadaftarri_json' => json_encode($this->dataDaftarRi, true),
-                //         'datadaftarUgd_xml' => ArrayToXml::convert($this->dataDaftarRi),
-                //     ]);
-
-                $this->updateJsonRI($riHdrNo, $this->dataDaftarRi);
-
-
-                $this->emit('syncronizeAssessmentDokterRIFindData');
-                $this->emit('syncronizeAssessmentPerawatRIFindData');
-            }
-        } else {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Anda tidak dapat melakukan TTD-E karena User Role " . $myUserNameActive . ' Bukan Apoteker.');
+        // 1) Guard role
+        if (!$user->hasAnyRole(['Apoteker', 'Admin'])) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError("Anda tidak dapat melakukan TTD-E karena {$user->myuser_name} bukan Apoteker/Admin.");
             return;
         }
-    }
 
-    public function setttdTelaahObat($riHdrNo)
-    {
-        $myUserNameActive = auth()->user()->myuser_name;
-        if (auth()->user()->hasRole('Apoteker')) {
-            if (isset($this->dataDaftarRi['telaahObat']['penanggungJawab']) == false) {
-                $this->dataDaftarRi['telaahObat']['penanggungJawab'] = [
-                    'userLog' => auth()->user()->myuser_name,
-                    'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'),
-                    'userLogCode' => auth()->user()->myuser_code
-                ];
+        // 2) Muat RI (untuk edit & simpan)
+        $this->dataDaftarRi = $this->findDataRI($riHdrNo);
 
-                // DB::table('imtxn_slshdrs')
-                //     ->where('sls_no', $riHdrNo)
-                //     ->update([
-                //         'datadaftarri_json' => json_encode($this->dataDaftarRi, true),
-                //         'datadaftarUgd_xml' => ArrayToXml::convert($this->dataDaftarRi),
-                //     ]);
+        // 3) Cari index header: prioritas slsNo, fallback resepNo (pakai helper yang SUDAH ADA)
+        $idx = null;
+        if ($slsNo !== null) {
+            $idx = $this->findHeaderIndexBySlsNo($riHdrNo, (int)$slsNo);
+        }
+        if ($idx === null && $resepNo !== null && method_exists($this, 'findHeaderIndexByResepNo')) {
+            $idx = $this->findHeaderIndexByResepNo($riHdrNo, (int)$resepNo);
+        }
 
-                $this->updateJsonRI($riHdrNo, $this->dataDaftarRi);
-
-
-                $this->emit('syncronizeAssessmentDokterRIFindData');
-                $this->emit('syncronizeAssessmentPerawatRIFindData');
-            }
-        } else {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Anda tidak dapat melakukan TTD-E karena User Role " . $myUserNameActive . ' Bukan Apoteker.');
+        if ($idx === null) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Header resep tidak ditemukan untuk TTD Telaah Resep.');
             return;
         }
+
+        // 4) Pastikan container ada
+        $this->dataDaftarRi['eresepHdr'][$idx]['telaahResep'] =
+            $this->dataDaftarRi['eresepHdr'][$idx]['telaahResep'] ?? [];
+
+        // 5) Idempotent: jika sudah TTD, jangan overwrite
+        if (!empty($this->dataDaftarRi['eresepHdr'][$idx]['telaahResep']['penanggungJawab'] ?? null)) {
+            $oleh = $this->dataDaftarRi['eresepHdr'][$idx]['telaahResep']['penanggungJawab']['userLog'] ?? '-';
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addInfo("Telaah Resep sudah TTD oleh {$oleh}.");
+            return;
+        }
+
+        // 6) Set TTD di HEADER
+        $this->dataDaftarRi['eresepHdr'][$idx]['telaahResep']['penanggungJawab'] = [
+            'userLog'     => $user->myuser_name,
+            'userLogCode' => $user->myuser_code,
+            'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'),
+        ];
+
+        // 7) Simpan & sync
+        $this->updateJsonRI($riHdrNo, $this->dataDaftarRi);
+        $this->emit('syncronizeAssessmentDokterRIFindData');
+        $this->emit('syncronizeAssessmentPerawatRIFindData');
+
+        $resepNoInfo = $this->dataDaftarRi['eresepHdr'][$idx]['resepNo'] ?? '-';
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+            ->addSuccess("TTD Telaah Resep berhasil untuk Resep {$resepNoInfo}.");
     }
+
+    public function setttdTelaahObat(string $riHdrNo, ?int $slsNo = null, ?int $resepNo = null): void
+    {
+        $user = auth()->user();
+        if (!$user->hasAnyRole(['Apoteker', 'Admin'])) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError("Anda tidak dapat melakukan TTD-E karena User Role {$user->myuser_name} Bukan Apoteker.");
+            return;
+        }
+
+        // load RI sekali
+        $this->dataDaftarRi = $this->findDataRI($riHdrNo);
+        $ri = $this->dataDaftarRi;
+
+        // cari index header: prioritas slsNo, fallback resepNo
+        $idx = null;
+        if ($slsNo !== null)  $idx = $this->findHeaderIndexBySlsNo($riHdrNo, (int)$slsNo);
+        if ($idx === null && $resepNo !== null) $idx = $this->findHeaderIndexByResepNoIn($ri, (int)$resepNo);
+
+        if ($idx === null) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Header resep tidak ditemukan untuk TTD Telaah Obat.');
+            return;
+        }
+
+        // pastikan container ada
+        $ri['eresepHdr'][$idx]['telaahObat'] = $ri['eresepHdr'][$idx]['telaahObat'] ?? [];
+
+        // jika sudah TTD, jangan overwrite
+        if (!empty($ri['eresepHdr'][$idx]['telaahObat']['penanggungJawab'] ?? null)) {
+            $oleh = $ri['eresepHdr'][$idx]['telaahObat']['penanggungJawab']['userLog'] ?? '-';
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addInfo("Telaah Obat sudah TTD oleh {$oleh}.");
+            return;
+        }
+
+        // set TTD di HEADER
+        $ri['eresepHdr'][$idx]['telaahObat']['penanggungJawab'] = [
+            'userLog'     => $user->myuser_name,
+            'userLogCode' => $user->myuser_code,
+            'userLogDate' => \Carbon\Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'),
+        ];
+
+        // simpan & sync
+        $this->dataDaftarRi = $ri;
+        $this->updateJsonRI($riHdrNo, $this->dataDaftarRi);
+        $this->emit('syncronizeAssessmentDokterRIFindData');
+        $this->emit('syncronizeAssessmentPerawatRIFindData');
+
+        $resepNoInfo = $ri['eresepHdr'][$idx]['resepNo'] ?? '-';
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+            ->addSuccess("TTD Telaah Obat berhasil untuk Resep {$resepNoInfo}.");
+    }
+
 
     private function findData($riHdrNo): array
     {
 
         $this->dataDaftarRi = $this->findDataRI($riHdrNo);
         $dataRI = $this->dataDaftarRi;
-
-        if (!isset($dataRI['telaahResep'])) {
-            $dataRI['telaahResep'] = $this->telaahResep;
-        }
-
-        if (!isset($dataRI['telaahObat'])) {
-            $dataRI['telaahObat'] = $this->telaahObat;
-        }
-
         return ($dataRI);
     }
 
@@ -419,150 +462,198 @@ class TelaahResepRI extends Component
         return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, $options);
     }
 
+    private function findHeaderIndexBySlsNo(string $riHdrNo, int $slsNo): ?int
+    {
+        $ri = $this->findDataRI($riHdrNo);
+        $list = $ri['eresepHdr'] ?? [];
+        foreach ($list as $i => $h) {
+            if (!empty($h['slsNo']) && (int)$h['slsNo'] === (int)$slsNo) return $i;
+        }
+        return null;
+    }
+
+    private function findHeaderIndexByResepNo(string $riHdrNo, int $resepNo): ?int
+    {
+        $ri = $this->findDataRI($riHdrNo);
+        $list = $ri['eresepHdr'] ?? [];
+        foreach ($list as $i => $h) {
+            if (!empty($h['resepNo']) && (int)$h['resepNo'] === (int)$resepNo) return $i;
+        }
+        return null;
+    }
+
+
+
+    // fallback ambil slsNo dari header terbaru yang sudah TTD/terkirim
+    private function findSlsNoFromRiJson(string $riHdrNo, ?int $resepNo = null): ?int
+    {
+        $ri = $this->findDataRI($riHdrNo);
+        $headers = collect($ri['eresepHdr'] ?? []);
+        if ($resepNo !== null) {
+            $row = $headers->firstWhere('resepNo', $resepNo);
+            return $row['slsNo'] ?? null;
+        }
+        $row = $headers->sortByDesc('resepNo')->first(fn($h) => !empty($h['slsNo'] ?? null));
+        return $row['slsNo'] ?? null;
+    }
+
     public function masukApotek($slsNo, $riHdrNo)
     {
+        // refresh data RI
         $this->findData($riHdrNo);
 
-        $masukApotek = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
+        // pastikan punya slsNo (bisa dari parameter atau JSON)
+        $slsNo = $slsNo ?: $this->findSlsNoFromRiJson($riHdrNo);
+        if (!$slsNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('slsNo tidak ditemukan. Pastikan resep sudah TTD & terkirim ke apotek.');
+            return;
+        }
 
-        //////updateDB/////////////////////
-        $sql = "select waktu_selesai_pelayanan from imtxn_slshdrs where sls_no=:slsNo";
-        $cek_waktu_selesai_pelayanan = DB::scalar($sql, ['slsNo' => $slsNo]);
+        // temukan index header resep berdasarkan slsNo
+        $ri  = $this->dataDaftarRi;
+        $idx = $this->findHeaderIndexBySlsNo($riHdrNo, (int)$slsNo);
+        if ($idx === null) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Header resep untuk slsNo tersebut tidak ditemukan di JSON RI.');
+            return;
+        }
 
+        $now = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
 
-        // ketika cek_waktu_selesai_pelayanan kosong lalu update
-        if (!$cek_waktu_selesai_pelayanan) {
+        // isi waktu_masuk_pelayanan di DB jika kosong
+        $waktuMasuk = DB::scalar(
+            "select waktu_masuk_pelayanan from imtxn_slshdrs where sls_no=:slsNo",
+            ['slsNo' => $slsNo]
+        );
+        if (!$waktuMasuk) {
             DB::table('imtxn_slshdrs')
                 ->where('sls_no', $slsNo)
-                ->update([
-                    'waktu_selesai_pelayanan' => DB::raw("to_date('" . $masukApotek . "','dd/mm/yyyy hh24:mi:ss')"), //waktu masuk = rjdate
-                ]);
+                ->update(['waktu_masuk_pelayanan' => DB::raw("to_date('{$now}','dd/mm/yyyy hh24:mi:ss')")]);
         }
-        //////////////////////////////////
 
+        // jenis resep (ada racikan?)
+        $adaRacikan = collect($ri['eresepHdr'][$idx]['eresepRacikan'] ?? [])->count() > 0;
+        $jenisResep = $adaRacikan ? 'racikan' : 'non racikan';
 
-        //////PushDataAntrianApotek////////////////////
-
-        // cekNoantrian Apotek sudah ada atau belum
-        if (!isset($this->dataDaftarRi['noAntrianApotek'])) {
-
-            $eresepRacikan = collect(isset($cekAntrianEresep['eresepRacikan']) ? $cekAntrianEresep['eresepRacikan'] : [])->count();
-            $jenisResep = $eresepRacikan ? 'racikan' : 'non racikan';
-
-            $query = DB::table('imview_slshdrs')
-                ->select(
-                    DB::raw("to_char(sls_date,'dd/mm/yyyy') AS sls_date"),
-                    DB::raw("to_char(sls_date,'yyyymmdd') AS sls_date1"),
-                    'datadaftarri_json'
-                )
-                ->where('status', '!=', ['F'])
-                // ->where('klaim_id', '!=', 'KR')
-                ->where(DB::raw("to_char(sls_date,'dd/mm/yyyy')"), '=', $this->myTopBar['refDate'])
-                ->get();
-
-            $nomerAntrian = $query->filter(function ($item) {
-                try {
-                    $datadaftarri_json = json_decode($item->datadaftarri_json, true);
-                } catch (\Exception $e) {
-                    $datadaftarri_json = [];
-                }
-
-                $noAntrianApotek = isset($datadaftarri_json['noAntrianApotek']) ? 1 : 0;
-                if ($noAntrianApotek > 0) {
-                    return 'x';
-                }
-            })->count();
-
-
-            // Antrian ketika data antrian kosong
-            // proses antrian
-            if ($this->dataDaftarRi['klaimId'] != 'KR') {
-                $noAntrian = $nomerAntrian + 1;
-            } else {
-                // Kronis
-                $noAntrian = 999;
-            }
-            $this->dataDaftarRi['noAntrianApotek'] = [
-                'noAntrian' => $noAntrian,
-                'jenisResep' => $jenisResep
-            ];
-
-            $this->updateJsonRI($riHdrNo, $this->dataDaftarRi);
-        }
-        // cekNoantrian Apotek sudah ada atau belum
-
-        // update taskId6
-        if (empty($this->dataDaftarRi['taskIdPelayanan']['taskId6'])) {
-            $this->dataDaftarRi['taskIdPelayanan']['taskId6'] = $masukApotek;
-            // update DB
-            $this->updateJsonRI($riHdrNo, $this->dataDaftarRi);
-
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("masuk Apotek " . $this->dataDaftarRi['taskIdPelayanan']['taskId6']);
+        // tentukan no antrian resmi (di SLS)
+        $klaimId = $ri['klaimId'] ?? '';
+        if ($klaimId === 'KR') {
+            $noAntrian = 999;
         } else {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("masuk Apotek " . $this->dataDaftarRi['taskIdPelayanan']['taskId6']);
+            $myRefdate     = $this->myTopBar['refDate'];
+            // ambil max no_antrian untuk hari ini (exclude 999)
+            $max = DB::table('imtxn_slshdrs as t')
+                ->whereRaw("to_char(t.sls_date,'dd/mm/yyyy') = ?", [$myRefdate]) // 'dd/mm/yyyy'
+                ->whereNotNull('t.no_antrian')
+                ->where('t.no_antrian', '!=', 999)
+                ->max('t.no_antrian');
+
+            $noAntrian = (int)($max ?? 0) + 1;
+        }
+
+        // simpan ke SLS (sumber kebenaran no antrian)
+
+        $existingNoAntrian = (int) DB::table('imtxn_slshdrs')
+            ->where('sls_no', $slsNo)
+            ->value('no_antrian');
+
+        if ($existingNoAntrian) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError("Sudah memiliki no antrian (Resep {$ri['eresepHdr'][$idx]['resepNo']}) • No Antrian {$existingNoAntrian}");
+            return;
+        }
+        DB::table('imtxn_slshdrs')
+            ->where('sls_no', $slsNo)
+            ->update(['no_antrian' => $noAntrian]);
+
+        // mirror ke JSON header RI
+        $ri['eresepHdr'][$idx]['noAntrianApotek'] = [
+            'noAntrian'  => $noAntrian,
+            'jenisResep' => $jenisResep,
+        ];
+        $ri['eresepHdr'][$idx]['taskIdPelayanan'] = $ri['eresepHdr'][$idx]['taskIdPelayanan'] ?? [];
+
+        // set taskId6 (masuk) kalau belum ada
+        if (empty($ri['eresepHdr'][$idx]['taskIdPelayanan']['taskId6'])) {
+            $ri['eresepHdr'][$idx]['taskIdPelayanan']['taskId6'] = $now;
+            $this->dataDaftarRi = $ri;
+            $this->updateJsonRI($riHdrNo, $this->dataDaftarRi);
+
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess("Masuk Apotek (Resep {$ri['eresepHdr'][$idx]['resepNo']}) • No Antrian {$noAntrian}");
+        } else {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError("Masuk Apotek sudah tercatat: " . $ri['eresepHdr'][$idx]['taskIdPelayanan']['taskId6']);
         }
     }
+
+
 
     public function keluarApotek($slsNo, $riHdrNo)
     {
         $this->findData($riHdrNo);
-        $keluarApotek = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
 
-        //////updateDB/////////////////////
-        $sql = "select waktu_selesai_pelayanan from imtxn_slshdrs where sls_no=:slsNo";
-        $cek_waktu_selesai_pelayanan = DB::scalar($sql, ['slsNo' => $slsNo]);
-
-
-        // ketika cek_waktu_selesai_pelayanan kosong lalu update
-        if (!$cek_waktu_selesai_pelayanan) {
-            DB::table('imtxn_slshdrs')
-                ->where('sls_no', $slsNo)
-                ->update([
-                    'waktu_selesai_pelayanan' => DB::raw("to_date('" . $keluarApotek . "','dd/mm/yyyy hh24:mi:ss')"), //waktu masuk = rjdate
-                ]);
-        }
-        //////////////////////////////////
-        // add antrian Apotek
-        // update no antrian Apotek
-        // cek
-        if (!$this->dataDaftarRi['taskIdPelayanan']['taskId6']) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Anda tidak dapat melakukan taskId7 ketika taskId6 Kosong");
+        $slsNo = $slsNo ?: $this->findSlsNoFromRiJson($riHdrNo);
+        if (!$slsNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('slsNo tidak ditemukan.');
             return;
         }
 
-        // update taskId7
-        if (!$this->dataDaftarRi['taskIdPelayanan']['taskId7']) {
-            $this->dataDaftarRi['taskIdPelayanan']['taskId7'] = $keluarApotek;
-            // update DB
-            $this->updateJsonRI($riHdrNo, $this->dataDaftarRi);
+        $ri = $this->dataDaftarRi;
+        $idx = $this->findHeaderIndexBySlsNo($riHdrNo, (int)$slsNo);
+        if ($idx === null) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Header resep untuk slsNo tersebut tidak ditemukan di JSON RI.');
+            return;
+        }
 
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("keluar Apotek " . $this->dataDaftarRi['taskIdPelayanan']['taskId7']);
+        $ri['eresepHdr'][$idx]['taskIdPelayanan'] = $ri['eresepHdr'][$idx]['taskIdPelayanan'] ?? [];
+        if (empty($ri['eresepHdr'][$idx]['taskIdPelayanan']['taskId6'])) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError("Tidak bisa taskId7 karena taskId6 (masuk) header resep ini belum diisi.");
+            return;
+        }
+
+        $now = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
+
+        // isi waktu_selesai_pelayanan di DB jika kosong
+        $waktuSelesai = DB::scalar("select waktu_selesai_pelayanan from imtxn_slshdrs where sls_no=:slsNo", ['slsNo' => $slsNo]);
+        if (!$waktuSelesai) {
+            DB::table('imtxn_slshdrs')
+                ->where('sls_no', $slsNo)
+                ->update(['waktu_selesai_pelayanan' => DB::raw("to_date('{$now}','dd/mm/yyyy hh24:mi:ss')")]);
+        }
+
+        // set taskId7 (keluar)
+        if (empty($ri['eresepHdr'][$idx]['taskIdPelayanan']['taskId7'])) {
+            $ri['eresepHdr'][$idx]['taskIdPelayanan']['taskId7'] = $now;
+            $this->dataDaftarRi = $ri;
+            $this->updateJsonRI($riHdrNo, $this->dataDaftarRi);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess("Keluar Apotek (Resep {$ri['eresepHdr'][$idx]['resepNo']}) pada {$now}");
         } else {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("keluar Apotek " . $this->dataDaftarRi['taskIdPelayanan']['taskId7']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError("Keluar Apotek sudah tercatat: " . $ri['eresepHdr'][$idx]['taskIdPelayanan']['taskId7']);
         }
     }
+
 
     // select data start////////////////
     public function render()
     {
         $this->gettermyTopBardrOptions();
 
-        // set mySearch
-        $mySearch = $this->refFilter;
-        $myRefdate = $this->myTopBar['refDate'];
-        // $myRefshift = $this->myTopBar['refShiftId'];
+        $mySearch      = $this->refFilter;
+        $myRefdate     = $this->myTopBar['refDate'];
         $myRefstatusId = $this->myTopBar['refStatusId'];
-        $myRefdrId = $this->myTopBar['drId'];
+        $myRefdrId     = $this->myTopBar['drId'];
 
-
-
-        //////////////////////////////////////////
-        // Query ///////////////////////////////
-        //////////////////////////////////////////
         $query = DB::table('imview_slshdrs as s')
             ->join('rsview_rihdrs as r', 'r.rihdr_no', '=', 's.rihdr_no')
             ->select(
-                // ambil dari S (tetap pakai nama aslinya)
+                // SLS
                 's.sls_no',
                 's.reg_no',
                 's.reg_name',
@@ -580,84 +671,110 @@ class TelaahResepRI extends Component
                 's.sex',
                 's.address',
                 's.thn',
-                DB::raw("to_char(s.sls_date,'dd/mm/yyyy hh24:mi:ss') as sls_date"),
-                DB::raw("to_char(s.sls_date,'yyyymmddhh24miss') as sls_date1"),
-                DB::raw("to_char(s.birth_date,'dd/mm/yyyy') as birth_date"),
+                's.no_antrian', // <<— ambil nomor antrian resmi
+                DB::raw("to_char(s.waktu_masuk_pelayanan,'dd/mm/yyyy hh24:mi:ss') as waktu_masuk_pelayanan"),
+                DB::raw("to_char(s.waktu_selesai_pelayanan,'dd/mm/yyyy hh24:mi:ss') as waktu_selesai_pelayanan"),
+                DB::raw("to_char(s.sls_date,'dd/mm/yyyy hh24:mi:ss')  as sls_date"),
+                DB::raw("to_char(s.sls_date,'yyyymmddhh24miss')       as sls_date1"),
+                DB::raw("to_char(s.birth_date,'dd/mm/yyyy')           as birth_date"),
 
-                // dari R: alias supaya tidak nabrak kolom S
+                // RIHDR
                 'r.ri_status',
                 'r.room_id',
                 'r.room_name',
                 'r.bangsal_id',
                 'r.bangsal_name',
                 'r.bed_no',
-                DB::raw('r.reg_no as r_reg_no'),
-                DB::raw('r.reg_name as r_reg_name'),
+                DB::raw('r.reg_no                           as r_reg_no'),
+                DB::raw('r.reg_name                         as r_reg_name'),
                 DB::raw("to_char(r.birth_date,'dd/mm/yyyy') as r_birth_date"),
-                DB::raw('r.vno_sep as r_vno_sep'),
-                DB::raw('r.klaim_id as r_klaim_id'),
-                DB::raw('r.datadaftarri_json as r_datadaftarri_json'),
-                DB::raw('r.thn as r_thn'),
+                DB::raw('r.vno_sep                          as r_vno_sep'),
+                DB::raw('r.klaim_id                         as r_klaim_id'),
+                DB::raw('r.datadaftarri_json                as r_datadaftarri_json'),
+                DB::raw('r.thn                              as r_thn'),
 
-                // counter penunjang
+                // Penunjang
                 DB::raw("(select count(*) from lbtxn_checkuphdrs l
-                  where l.status_rjri='RI' and l.checkup_status!='B'
-                    and l.ref_no = r.rihdr_no) as lab_status"),
+                          where l.status_rjri='RI' and l.checkup_status!='B'
+                            and l.ref_no = r.rihdr_no) as lab_status"),
                 DB::raw("(select count(*) from rstxn_riradiologs rr
-                  where rr.rihdr_no = r.rihdr_no) as rad_status")
+                          where rr.rihdr_no = r.rihdr_no) as rad_status")
             )
-
             ->where(DB::raw("nvl(s.status,'A')"), '=', $myRefstatusId)
             ->where(DB::raw("to_char(s.sls_date,'dd/mm/yyyy')"), '=', $myRefdate);
 
-
-        // Jika where dokter tidak kosong
         if ($myRefdrId != 'All') {
             $query->where('s.dr_id', $myRefdrId);
         }
 
         $query->where(function ($q) use ($mySearch) {
-            $q->Where(DB::raw('upper(s.reg_name)'), 'like', '%' . strtoupper($mySearch) . '%')
-                ->orWhere(DB::raw('upper(s.reg_no)'), 'like', '%' . strtoupper($mySearch) . '%')
+            $q->where(DB::raw('upper(s.reg_name)'), 'like', '%' . strtoupper($mySearch) . '%')
+                ->orWhere(DB::raw('upper(s.reg_no)'),  'like', '%' . strtoupper($mySearch) . '%')
                 ->orWhere(DB::raw('upper(s.dr_name)'), 'like', '%' . strtoupper($mySearch) . '%');
         });
 
-        // 1 urutkan berdasarkan json table
-        $myQueryPagination = $query->get()
-            ->sortByDesc(
-                function ($mySortByJson) {
-                    $datadaftar_json = json_decode($mySortByJson->datadaftarri_json, true);
-                    $myQueryAntrianFarmasi = isset($datadaftar_json['noAntrianApotek']['noAntrian']) ? $datadaftar_json['noAntrianApotek']['noAntrian'] : 0;
-                    $myQueryPagination = isset($datadaftar_json['eresep']) ? 1 : 0;
-                    $myQueryPagination1 = isset($datadaftar_json['AdministrasiRj']) ? 1 : 0;
-                    return ($myQueryAntrianFarmasi . $myQueryPagination . $myQueryPagination1 . $mySortByJson->sls_date1);
-                }
-            )->sortBy(
-                function ($mySortByJson) {
-                    $datadaftar_json = json_decode($mySortByJson->datadaftarri_json, true);
-                    $myQueryAntrianFarmasi = isset($datadaftar_json['noAntrianApotek']['noAntrian']) ? $datadaftar_json['noAntrianApotek']['noAntrian'] : 9999;
-                    return ($myQueryAntrianFarmasi);
-                }
+        $rows = $query->get();
+
+        // ===== Urutan khusus RI (pakai SLS.no_antrian, fallback JSON header) =====
+        $sorted = $rows->sortBy(function ($row) {
+            $json = [];
+            try {
+                $json = json_decode($row->datadaftarri_json, true) ?: [];
+            } catch (\Throwable $e) {
+            }
+            $headers = $json['eresepHdr'] ?? [];
+
+            // Sumber nomor antrian: SLS > mirror header (MIN)
+            $slsQueue = is_numeric($row->no_antrian ?? null) ? (int)$row->no_antrian : null;
+            $headerMinQ = collect($headers)
+                ->map(fn($h) => $h['noAntrianApotek']['noAntrian'] ?? null)
+                ->filter(fn($n) => is_numeric($n) && (int)$n > 0) // 0 bukan nomor valid
+                ->map(fn($n) => (int)$n)
+                ->min();
+            $effectiveQ = $slsQueue ?? $headerMinQ;
+
+            // Flag & urutan antrian
+            $hasQueue = ($effectiveQ !== null) && (($effectiveQ > 0) || ($effectiveQ === 999));
+            $isKronis = ($effectiveQ === 999);
+            $queueOrder = $isKronis ? PHP_INT_MAX : (int)($effectiveQ ?? PHP_INT_MAX); // non-KR ASC, KR di belakang
+
+            // eResep?
+            $hasAnyEresep = collect($headers)->contains(
+                fn($h) => !empty($h['eresep']) || !empty($h['eresepRacikan'])
             );
 
+            // taskId6 paling awal (juga dipakai sebagai tie-breaker utk nomor sama)
+            $task6Times = collect($headers)
+                ->map(fn($h) => $h['taskIdPelayanan']['taskId6'] ?? null)
+                ->filter(fn($t) => is_string($t) && trim($t) !== '')
+                ->map(function ($t) {
+                    $t  = str_replace('/', '-', $t);
+                    $ts = strtotime($t);
+                    return $ts ?: PHP_INT_MAX;
+                });
+            $minTask6 = $task6Times->isNotEmpty() ? $task6Times->min() : PHP_INT_MAX;
 
-        $myQueryPagination = $this->paginate($myQueryPagination, $this->limitPerPage);
+            // sls_date terbaru (pakai nilai negatif supaya ASC → DESC)
+            $sls1 = is_numeric($row->sls_date1 ?? null) ? (int)$row->sls_date1 : 0;
 
+            return [
+                $hasQueue ? 0 : 1,                   // 0 = punya antrian dulu
+                $hasQueue ? ($isKronis ? 1 : 0) : 0, // queued: non-KR (0) sebelum KR (1)
+                $hasQueue ? $queueOrder : PHP_INT_MAX, // queued: nomor ASC
+                $hasQueue ? 0 : ($hasAnyEresep ? 0 : 1), // belum queued: sudah eResep dulu
+                $hasQueue ? $minTask6 : $minTask6,      // tie-breaker: yang task6 lebih awal dulu
+                -$sls1,                                  // terakhir: sls_date terbaru
+            ];
+        });
 
-        ////////////////////////////////////////////////
-        // end Query
-        ///////////////////////////////////////////////
-
-
+        $myQueryPagination = $this->paginate($sorted, $this->limitPerPage);
 
         return view(
             'livewire.emr-r-i.telaah-resep-r-i.telaah-resep-r-i',
-            // ['myQueryData' => $query->paginate($this->limitPerPage)],
             ['myQueryData' => $myQueryPagination],
-
-
         );
     }
+
     // select data end////////////////
 
 
