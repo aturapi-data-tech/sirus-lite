@@ -20,13 +20,11 @@ class TelaahResepRI extends Component
     use WithPagination, EmrRITrait;
 
     protected $listeners = [];
-
-    // primitive Variable
     public string $myTitle = 'Resep RI';
     public string $mySnipt = 'Rekam Medis Pasien';
     public string $myProgram = 'Pasien RI';
 
-    public array $myLimitPerPages = [5, 10, 15, 20, 100];
+    public array $myLimitPerPages = [5, 10, 15, 20, 100];    // limit record per page -resetExcept////////////////
     // limit record per page -resetExcept////////////////
     public int $limitPerPage = 10;
 
@@ -193,17 +191,17 @@ class TelaahResepRI extends Component
     ];
 
     // reset page when myTopBar Change
-    public function updatedReffilter()
+    public function updatedRefFilter()
     {
         $this->resetPage();
     }
 
-    public function updatedMytopbarRefdate()
+    public function updatedMyTopBarRefDate()
     {
         $this->resetPage();
     }
 
-    public function updatedMytopbarRefstatusid()
+    public function updatedMyTopBarRefStatusId()
     {
         $this->resetPage();
     }
@@ -266,20 +264,23 @@ class TelaahResepRI extends Component
     public bool $isOpenTelaahResep = false;
     public string $isOpenModeTelaahResep = 'insert';
 
-    public int $eresepRacikan;
-    public int $eresep;
+
 
     public string $regNoRef;
 
 
 
 
-    private function openModalEditTelaahResep($riHdrNo, $regNoRef): void
+
+    public ?string $riHdrNoRefForEdit = null;
+    public ?int    $resepHeaderIndexForEdit = null;
+    private function openModalEditTelaahResep(string $riHdrNo, int $headerIndex, string $regNoRef): void
     {
-        $this->isOpenTelaahResep = true;
-        $this->isOpenModeTelaahResep = 'update';
-        $this->dataDaftarRi = $riHdrNo;
-        $this->regNoRef = $regNoRef;
+        $this->isOpenTelaahResep        = true;
+        $this->isOpenModeTelaahResep    = 'update';
+        $this->riHdrNoRefForEdit        = $riHdrNo;
+        $this->resepHeaderIndexForEdit  = $headerIndex;
+        $this->regNoRef                 = $regNoRef;
     }
 
 
@@ -290,13 +291,32 @@ class TelaahResepRI extends Component
         $this->resetInputFields();
     }
 
-    public function editTelaahResep($eresep, $riHdrNo, $regNoRef)
+    public function editTelaahResep($hasEresep, $slsNo, $riHdrNo): void
     {
-        if (!$eresep) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('E-Resep Tidak ditemukan');
-        } else {
-            $this->openModalEditTelaahResep($riHdrNo, $regNoRef);
+        // validasi minimal
+        if (!(int)$hasEresep) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('E-Resep tidak ditemukan pada header ini.');
+            return;
         }
+
+        // muat RI, cari header by SLS
+        $this->dataDaftarRi = $this->findDataRI($riHdrNo);
+        $idx = $this->findHeaderIndexBySlsNo($riHdrNo, (int)$slsNo);
+        if ($idx === null) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Header resep untuk slsNo tersebut tidak ditemukan.');
+            return;
+        }
+
+        // siapkan struktur telaahResep (DI DALAM HEADER) bila belum ada
+        $this->dataDaftarRi['eresepHdr'][$idx]['telaahResep'] = ($this->dataDaftarRi['eresepHdr'][$idx]['telaahResep'] ?? []) ?: $this->telaahResep;
+        $this->dataDaftarRi['eresepHdr'][$idx]['telaahObat'] = ($this->dataDaftarRi['eresepHdr'][$idx]['telaahObat'] ?? []) ?: $this->telaahObat;
+
+
+        // buka modal + set pointer header yang sedang diedit
+        $regNoRef = $this->dataDaftarRi['regNo'] ?? '-';
+        $this->openModalEditTelaahResep($riHdrNo, $idx, $regNoRef);
     }
 
     // open and close modal end////////////////
@@ -315,7 +335,7 @@ class TelaahResepRI extends Component
     ////////////////////////////////////////////////
 
 
-    public function setttdTelaahResep(string $riHdrNo, ?int $slsNo = null, ?int $resepNo = null): void
+    public function setttdTelaahResep(string $riHdrNo, ?int $idx = null): void
     {
         $user = auth()->user();
 
@@ -326,27 +346,6 @@ class TelaahResepRI extends Component
             return;
         }
 
-        // 2) Muat RI (untuk edit & simpan)
-        $this->dataDaftarRi = $this->findDataRI($riHdrNo);
-
-        // 3) Cari index header: prioritas slsNo, fallback resepNo (pakai helper yang SUDAH ADA)
-        $idx = null;
-        if ($slsNo !== null) {
-            $idx = $this->findHeaderIndexBySlsNo($riHdrNo, (int)$slsNo);
-        }
-        if ($idx === null && $resepNo !== null && method_exists($this, 'findHeaderIndexByResepNo')) {
-            $idx = $this->findHeaderIndexByResepNo($riHdrNo, (int)$resepNo);
-        }
-
-        if ($idx === null) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-                ->addError('Header resep tidak ditemukan untuk TTD Telaah Resep.');
-            return;
-        }
-
-        // 4) Pastikan container ada
-        $this->dataDaftarRi['eresepHdr'][$idx]['telaahResep'] =
-            $this->dataDaftarRi['eresepHdr'][$idx]['telaahResep'] ?? [];
 
         // 5) Idempotent: jika sudah TTD, jangan overwrite
         if (!empty($this->dataDaftarRi['eresepHdr'][$idx]['telaahResep']['penanggungJawab'] ?? null)) {
@@ -373,7 +372,7 @@ class TelaahResepRI extends Component
             ->addSuccess("TTD Telaah Resep berhasil untuk Resep {$resepNoInfo}.");
     }
 
-    public function setttdTelaahObat(string $riHdrNo, ?int $slsNo = null, ?int $resepNo = null): void
+    public function setttdTelaahObat(string $riHdrNo, ?int $idx = null): void
     {
         $user = auth()->user();
         if (!$user->hasAnyRole(['Apoteker', 'Admin'])) {
@@ -382,46 +381,28 @@ class TelaahResepRI extends Component
             return;
         }
 
-        // load RI sekali
-        $this->dataDaftarRi = $this->findDataRI($riHdrNo);
-        $ri = $this->dataDaftarRi;
-
-        // cari index header: prioritas slsNo, fallback resepNo
-        $idx = null;
-        if ($slsNo !== null)  $idx = $this->findHeaderIndexBySlsNo($riHdrNo, (int)$slsNo);
-        if ($idx === null && $resepNo !== null) $idx = $this->findHeaderIndexByResepNoIn($ri, (int)$resepNo);
-
-        if ($idx === null) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-                ->addError('Header resep tidak ditemukan untuk TTD Telaah Obat.');
-            return;
-        }
-
-        // pastikan container ada
-        $ri['eresepHdr'][$idx]['telaahObat'] = $ri['eresepHdr'][$idx]['telaahObat'] ?? [];
 
         // jika sudah TTD, jangan overwrite
-        if (!empty($ri['eresepHdr'][$idx]['telaahObat']['penanggungJawab'] ?? null)) {
-            $oleh = $ri['eresepHdr'][$idx]['telaahObat']['penanggungJawab']['userLog'] ?? '-';
+        if (!empty($this->dataDaftarRi['eresepHdr'][$idx]['telaahObat']['penanggungJawab'] ?? null)) {
+            $oleh = $this->dataDaftarRi['eresepHdr'][$idx]['telaahObat']['penanggungJawab']['userLog'] ?? '-';
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
                 ->addInfo("Telaah Obat sudah TTD oleh {$oleh}.");
             return;
         }
 
         // set TTD di HEADER
-        $ri['eresepHdr'][$idx]['telaahObat']['penanggungJawab'] = [
+        $this->dataDaftarRi['eresepHdr'][$idx]['telaahObat']['penanggungJawab'] = [
             'userLog'     => $user->myuser_name,
             'userLogCode' => $user->myuser_code,
-            'userLogDate' => \Carbon\Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'),
+            'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'),
         ];
 
         // simpan & sync
-        $this->dataDaftarRi = $ri;
         $this->updateJsonRI($riHdrNo, $this->dataDaftarRi);
         $this->emit('syncronizeAssessmentDokterRIFindData');
         $this->emit('syncronizeAssessmentPerawatRIFindData');
 
-        $resepNoInfo = $ri['eresepHdr'][$idx]['resepNo'] ?? '-';
+        $resepNoInfo = $this->dataDaftarRi['eresepHdr'][$idx]['resepNo'] ?? '-';
         toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
             ->addSuccess("TTD Telaah Obat berhasil untuk Resep {$resepNoInfo}.");
     }
@@ -472,15 +453,7 @@ class TelaahResepRI extends Component
         return null;
     }
 
-    private function findHeaderIndexByResepNo(string $riHdrNo, int $resepNo): ?int
-    {
-        $ri = $this->findDataRI($riHdrNo);
-        $list = $ri['eresepHdr'] ?? [];
-        foreach ($list as $i => $h) {
-            if (!empty($h['resepNo']) && (int)$h['resepNo'] === (int)$resepNo) return $i;
-        }
-        return null;
-    }
+
 
 
 

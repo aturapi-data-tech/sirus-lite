@@ -145,7 +145,7 @@
 
 
             @if ($isOpenTelaahResep)
-                @include('livewire.emr-r-i.telaah-resep-r-i.create-telaahresep-r-i')
+                @include('livewire.emr-r-i.telaah-resep-r-i.create-telaahresep-ri')
             @endif
 
 
@@ -379,12 +379,14 @@
 
                                 @if ($telaahResepStatus && $telaahObatStatus)
                                     <x-green-button
-                                        wire:click="editTelaahResep('{{ $eresep }}','{{ $myQData->sls_no }}','{{ $myQData->reg_no ?? '-' }}')">Telaah
-                                        Resep</x-green-button>
+                                        wire:click="editTelaahResep('{{ (int) $hasEresepHeader }}','{{ (int) $myQData->sls_no }}','{{ $myQData->rihdr_no }}')">
+                                        Telaah Resep
+                                    </x-green-button>
                                 @else
                                     <x-light-button
-                                        wire:click="editTelaahResep('{{ $eresep }}','{{ $myQData->sls_no }}','{{ $myQData->reg_no ?? '-' }}')">Telaah
-                                        Resep</x-light-button>
+                                        wire:click="editTelaahResep('{{ (int) $hasEresepHeader }}','{{ (int) $myQData->sls_no }}','{{ $myQData->rihdr_no }}')">
+                                        Telaah Resep
+                                    </x-light-button>
                                 @endif
 
                                 <div>

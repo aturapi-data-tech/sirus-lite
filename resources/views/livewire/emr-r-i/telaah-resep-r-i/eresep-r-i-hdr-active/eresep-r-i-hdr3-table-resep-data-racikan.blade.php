@@ -7,14 +7,14 @@
             </tr>
         </thead>
         <tbody>
-            @if (isset($header['eresepRacikan']) && count($header['eresepRacikan']) > 0)
+            @if (isset($activeHdr['eresepRacikan']) && count($activeHdr['eresepRacikan']) > 0)
                 @php
                     $myPreviousRow = '';
                 @endphp
-                @foreach ($header['eresepRacikan'] as $i => $detail)
+                @foreach ($activeHdr['eresepRacikan'] as $i => $detail)
                     @php
                         $rowId = $detail['riObatDtl'] ?? $i;
-                        $hdrId = $header['resepNo'] ?? 'hdr';
+                        $hdrId = $activeHdr['resepNo'] ?? 'hdr';
 
                         $myRacikanBorder = $myPreviousRow !== $detail['noRacikan'] ? 'border-t-2 ' : '';
 
