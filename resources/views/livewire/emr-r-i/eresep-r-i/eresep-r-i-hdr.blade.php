@@ -135,7 +135,8 @@
                                 </div>
 
                                 <x-green-button :disabled=$disabledPropertyResepTtdDokter
-                                    wire:click="setDokterPeresep()" type="button" wire:loading.remove>
+                                    wire:click="setDokterPeresep('{{ $formEntryEresepRIHdr['resepNo'] }}')"
+                                    type="button" wire:loading.remove>
                                     {{ 'Ttd Dokter' }}
                                 </x-green-button>
                             </div>

@@ -179,59 +179,57 @@ class EresepRIHdr extends Component
         }
     }
 
-    public function setDokterPeresep()
+
+    public function setDokterPeresep($resepNo): void
     {
-        // ttd Dokter
-        foreach ($this->dataDaftarRi['eresepHdr'] as $index => $header) {
-            if (isset($header['resepNo']) && $header['resepNo'] == $this->formEntryEresepRIHdr['resepNo']) {
-                $myUserCodeActive = auth()->user()->myuser_code;
-                $myUserNameActive = auth()->user()->myuser_name;
 
-                if (auth()->user()->hasRole('Dokter')) {
-                    // Set data tanda tangan dokter
-                    $this->dataDaftarRi['eresepHdr'][$index]['tandaTanganDokter'] = [
-                        'dokterPeresep'     => $myUserNameActive,
-                        'dokterPeresepCode' => $myUserCodeActive,
-                    ];
 
-                    // Ambil data header resep dan nilai-nilai yang diperlukan
-                    $eresepHdr         = $this->dataDaftarRi['eresepHdr'][$index];
-                    $resepDate         = $eresepHdr['resepDate'];
-                    $regNo             = $eresepHdr['regNo'];
-                    $riHdrNo           = $eresepHdr['riHdrNo'];
-                    $dokterPeresepCode = $eresepHdr['tandaTanganDokter']['dokterPeresepCode'];
-                    $dataObat          = $this->dataDaftarRi['eresepHdr'][$index]['eresep'];
+        try {
+            // Cari index header sesuai $resepNo
+            $idx = collect($this->dataDaftarRi['eresepHdr'] ?? [])
+                ->search(fn($h) => (string)($h['resepNo'] ?? '') === (string)$resepNo);
 
-                    try {
-                        // Panggil method sendDataToApotek
-                        $this->sendDataToApotek($resepDate, $regNo, $riHdrNo, $dokterPeresepCode, $dataObat, $index);
-                    } catch (Exception $e) {
-                        // Jika terjadi error, tampilkan pesan dan hentikan proses
-                        toastr()->closeOnHover(true)
-                            ->closeDuration(3)
-                            ->positionClass('toast-top-left')
-                            ->addError("Gagal mengirim data ke apotek: " . $e->getMessage());
-                        return;
-                    }
-
-                    // Jika sendDataToApotek berhasil, lanjutkan dengan menyimpan perubahan
-                    $this->store();
-
-                    // Notifikasi sukses
-                    toastr()->closeOnHover(true)
-                        ->closeDuration(3)
-                        ->positionClass('toast-top-left')
-                        ->addSuccess("TTD Dokter berhasil diisi oleh " . $myUserNameActive);
-                } else {
-                    // Notifikasi error jika peran tidak sesuai
-                    toastr()->closeOnHover(true)
-                        ->closeDuration(3)
-                        ->positionClass('toast-top-left')
-                        ->addError("Anda tidak dapat melakukan TTD karena User Role " . $myUserNameActive . ' bukan Dokter.');
-                    return;
-                }
-                break;
+            if ($idx === false) {
+                toastr()->closeOnHover(true)->closeDuration(3)->addError("Header resep #{$resepNo} tidak ditemukan.");
+                return;
             }
+
+            // Kalau sudah pernah kirim ke apotek (punya slsNo), jangan kirim lagi
+            if (!empty($this->dataDaftarRi['eresepHdr'][$idx]['slsNo'])) {
+                toastr()->closeOnHover(true)->closeDuration(3)->addInfo("Resep #{$resepNo} sudah terkirim ke apotek.");
+                return;
+            }
+
+            // Validasi role
+            $user = auth()->user();
+            if (!$user->hasAnyRole(['Dokter', 'Admin'])) {
+                toastr()->closeOnHover(true)->closeDuration(3)->addError("User {$user->myuser_name} bukan Dokter.");
+                return;
+            }
+
+            // Set TTD dokter
+            $this->dataDaftarRi['eresepHdr'][$idx]['tandaTanganDokter'] = [
+                'dokterPeresep'     => $user->myuser_name,
+                'dokterPeresepCode' => $user->myuser_code,
+            ];
+
+            // Ambil nilai penting
+            $hdr               = $this->dataDaftarRi['eresepHdr'][$idx];
+            $resepDate         = $hdr['resepDate'];
+            $regNo             = $hdr['regNo'];
+            $riHdrNo           = $hdr['riHdrNo'];
+            $dokterPeresepCode = $this->dataDaftarRi['eresepHdr'][$idx]['tandaTanganDokter']['dokterPeresepCode'];
+            $dataObat          = $hdr['eresep'];
+
+            // Kirim ke apotek (pastikan fungsi ini idempoten)
+            $this->sendDataToApotek($resepDate, $regNo, $riHdrNo, $dokterPeresepCode, $dataObat, $idx);
+
+            // Simpan state jika perlu
+            $this->store();
+
+            toastr()->closeOnHover(true)->closeDuration(3)->addSuccess("TTD & kirim resep #{$resepNo} sukses.");
+        } catch (\Throwable $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->addError("Gagal: " . $e->getMessage());
         }
     }
 
