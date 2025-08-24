@@ -63,15 +63,12 @@
                                         <x-input-label for="formEntryEresepRIRacikan.dosis" :value="__('Dosis')"
                                             :required="true" />
                                         <div>
-                                            <x-text-input id="formEntryEresepRIRacikan.dosis" placeholder="Dosis"
+                                            <x-text-input id="formEntryEresepRIRacikan_dosis" placeholder="Dosis"
                                                 class="mt-1 ml-2" :errorshas="$errors->has('formEntryEresepRIRacikan.dosis')" :disabled="$disabledPropertyResepTtdDokter"
+                                                wire:model.defer="formEntryEresepRIRacikan.dosis"
                                                 x-ref="formEntryEresepRIRacikanDosis"
-                                                x-on:keyup.enter="
-                                                    $nextTick(() => {
-                                                        $refs.formEntryEresepRIRacikanQty?.focus()
-                                                    })
-                                                " />
-                                            wire:model="formEntryEresepRIRacikan.dosis" />
+                                                x-on:keyup.enter="$nextTick(() => { $refs.formEntryEresepRIRacikanQty?.focus() })" />
+
                                             @error('formEntryEresepRIRacikan.dosis')
                                                 <x-input-error :messages="$message" />
                                             @enderror
