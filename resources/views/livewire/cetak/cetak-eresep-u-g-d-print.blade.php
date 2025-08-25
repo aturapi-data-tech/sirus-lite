@@ -132,6 +132,16 @@
                                     '-' /
                                     {{ 'UGD' }}
                                 @endisset
+                                @php
+                                    $tindakLanjut = data_get(
+                                        $dataDaftarUgd,
+                                        'perencanaan.tindakLanjut.tindakLanjut',
+                                        '',
+                                    );
+                                @endphp
+                                @if ($tindakLanjut === 'MRS')
+                                    / {{ 'MRS' }}
+                                @endif
 
                             </td>
                         </tr>

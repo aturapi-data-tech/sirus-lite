@@ -247,6 +247,12 @@
                                 : false)
                             : false;
 
+                        $tindakLanjut = data_get($datadaftar_json, 'perencanaan.tindakLanjut.tindakLanjut');
+                        $ketTindakLanjut = data_get(
+                            $datadaftar_json,
+                            'perencanaan.tindakLanjut.keteranganTindakLanjut',
+                        );
+
                     @endphp
 
 
@@ -304,6 +310,20 @@
                                         <x-badge :badgecolor="__('default')">
                                             {{ 'Radiologi' }}
                                         </x-badge>
+                                    @endif
+                                </div>
+
+                                {{-- Tindak Lanjut (dibawah dokter) --}}
+                                <div class="">
+                                    @if ($tindakLanjut === 'MRS')
+                                        <span class="text-gray-700">Tindak lanjut: </span>
+                                        <x-badge :badgecolor="__('default')">
+                                            {{ $tindakLanjut }}
+                                        </x-badge>
+
+                                        @if ($ketTindakLanjut)
+                                            <span class="text-xs italic text-gray-600">— {{ $ketTindakLanjut }}</span>
+                                        @endif
                                     @endif
                                 </div>
 

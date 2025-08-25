@@ -676,6 +676,7 @@ class TelaahResepUGD extends Component
     public function masukApotek($rjNo)
     {
         $this->findData($rjNo);
+
         $masukApotek = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
 
         //////updateDB/////////////////////
