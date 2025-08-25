@@ -140,7 +140,9 @@
                                     );
                                 @endphp
                                 @if ($tindakLanjut === 'MRS')
-                                    / {{ 'MRS' }}
+                                    <span class="text-lg font-bold" style="color: red;">
+                                        / {{ $tindakLanjut }}
+                                    </span>
                                 @endif
 
                             </td>

@@ -164,6 +164,10 @@
                             $badgeColorPersentasiSirus =
                                 $persentasiSirus < 50 ? 'green' : ($persentasiSirus < 80 ? 'yellow' : 'red');
 
+                            // Kontrol BPJS
+                            $tglKontrol = data_get($datadaftar_json, 'kontrol.tglKontrol', '');
+                            $noSkdp = data_get($datadaftar_json, 'kontrol.noSKDPBPJS', '');
+
                         @endphp
 
 
@@ -299,6 +303,20 @@
                                                         <span
                                                             class="inline-flex items-center px-2 py-0.5 rounded bg-blue-50 text-blue-800 text-xs">
                                                             SEP: {{ $myQData->vno_sep }}
+                                                        </span>
+                                                    @endif
+
+                                                    {{-- Tgl Kontrol & No SKDP (muncul di bawah SEP) --}}
+                                                    @if ($tglKontrol)
+                                                        <span
+                                                            class="inline-flex items-center px-2 py-0.5 rounded bg-blue-50 text-blue-800 text-xs">
+                                                            Tgl Kontrol: {{ $tglKontrol }}
+                                                        </span>
+                                                    @endif
+                                                    @if ($noSkdp)
+                                                        <span
+                                                            class="inline-flex items-center px-2 py-0.5 rounded bg-blue-50 text-blue-800 text-xs">
+                                                            No SKDP: {{ $noSkdp }}
                                                         </span>
                                                     @endif
 
