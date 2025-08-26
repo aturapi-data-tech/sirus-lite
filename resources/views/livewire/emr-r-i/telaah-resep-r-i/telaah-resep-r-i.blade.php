@@ -391,7 +391,7 @@
 
                                 <div>
                                     <livewire:cetak.cetak-eresep-r-i :riHdrNoRef="$myQData->rihdr_no" :resepNoRef="$header['resepNo'] ?? ''"
-                                        wire:key="cetak.cetak-eresep-r-i-{{ $myQData->rihdr_no }}-{{ $header['resepNo'] ?? $myQData->sls_no }}">
+                                        wire:key="cetak.cetak-eresep-r-i-{{ $myQData->rihdr_no }}-{{ $header['resepNo'] }}-{{ $myQData->sls_no }}">
 
                                 </div>
 
