@@ -90,12 +90,12 @@ class CPPT extends Component
             'formEntryCPPT.petugasCPPT' => 'required|string|max:200', // Nama petugas wajib diisi, maksimal 100 karakter
             'formEntryCPPT.petugasCPPTCode' => 'required|string|max:50', // Kode petugas wajib diisi, maksimal 50 karakter
             'formEntryCPPT.profession' => 'required|string|max:50', // Profesi wajib diisi, maksimal 50 karakter
-            'formEntryCPPT.soap.subjective' => 'required|string|max:500', // Subjective wajib diisi, maksimal 500 karakter
-            'formEntryCPPT.soap.objective' => 'required|string|max:500', // Objective wajib diisi, maksimal 500 karakter
-            'formEntryCPPT.soap.assessment' => 'required|string|max:500', // Assessment wajib diisi, maksimal 500 karakter
-            'formEntryCPPT.soap.plan' => 'required|string|max:500', // Plan wajib diisi, maksimal 500 karakter
-            'formEntryCPPT.instruction' => 'nullable|string|max:500', // Instruksi opsional, maksimal 500 karakter
-            'formEntryCPPT.review' => 'nullable|string|max:500', // Review opsional, maksimal 500 karakter
+            'formEntryCPPT.soap.subjective' => 'required|string|max:1000', // Subjective wajib diisi, maksimal 1000 karakter
+            'formEntryCPPT.soap.objective' => 'required|string|max:1000', // Objective wajib diisi, maksimal 1000 karakter
+            'formEntryCPPT.soap.assessment' => 'required|string|max:1000', // Assessment wajib diisi, maksimal 1000 karakter
+            'formEntryCPPT.soap.plan' => 'required|string|max:1000', // Plan wajib diisi, maksimal 1000 karakter
+            'formEntryCPPT.instruction' => 'nullable|string|max:1000', // Instruksi opsional, maksimal 1000 karakter
+            'formEntryCPPT.review' => 'nullable|string|max:1000', // Review opsional, maksimal 1000 karakter
         ];
 
         $messages = [
