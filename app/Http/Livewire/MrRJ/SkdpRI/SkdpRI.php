@@ -421,8 +421,8 @@ class SkdpRI extends Component
             ->first();
 
         // cek ada resSep ada atau tidak
-        if (isset($this->dataDaftarRi['kontrol']['kontrol'])) {
-            if ($this->dataDaftarRi['kontrol']['kontrol']) {
+        if (isset($this->dataDaftarRi['kontrol'])) {
+            if ($this->dataDaftarRi['kontrol']) {
 
                 if (isset($this->dataDaftarRi['kontrol']['regNo'])) {
                     $this->setDataPasien($this->dataDaftarRi['kontrol']['regNo']);
