@@ -184,7 +184,7 @@
 
             <tbody class="bg-white ">
 
-                @foreach ($myQueryData as $myQData)
+                @foreach ($myQueryData as $key => $myQData)
                     @php
                         // --- Klaim ---
                         $klaim = DB::table('rsmst_klaimtypes')
@@ -199,19 +199,7 @@
                         $headers = $riJson['eresepHdr'] ?? [];
 
                         // Ambil header yang cocok dengan baris transaksi ini (sls_no)
-                        $header = collect($headers)->first(function ($h) use ($myQData) {
-                            return isset($h['slsNo']) && (string) $h['slsNo'] === (string) $myQData->sls_no;
-                        });
-
-                        // Fallback: kalau belum ketemu, ambil header terbaru yang punya slsNo / resepNo
-                        if (!$header) {
-                            $header =
-                                collect($headers)
-                                    ->sortByDesc(fn($h) => $h['resepNo'] ?? 0)
-                                    ->first(fn($h) => !empty($h['slsNo'] ?? null)) ??
-                                (collect($headers)->sortByDesc(fn($h) => $h['resepNo'] ?? 0)->first() ?: []);
-                        }
-
+                        $header = collect($headers)->where('slsNo', '=', $myQData->sls_no)->first();
                         // ======= BACA DARI HEADER (baru) =======
                         // eResep per header
                         $hasEresepHeader =
@@ -222,18 +210,7 @@
                         $jenisResep = $countRacikan > 0 ? 'racikan' : 'non racikan';
 
                         // Nomor Antrian Apotek: utamakan SLS, fallback ke header JSON
-                        $slsQueue = is_numeric($myQData->no_antrian ?? null) ? (int) $myQData->no_antrian : null;
-
-                        $headerMinQ = collect($headers)
-                            ->map(fn($h) => $h['noAntrianApotek']['noAntrian'] ?? null)
-                            ->filter(fn($n) => is_numeric($n) && (int) $n > 0) // 0 bukan nomor valid
-                            ->map(fn($n) => (int) $n)
-                            ->min();
-
-                        $effectiveQueue = $slsQueue ?? $headerMinQ; // pakai SLS jika ada
-                        $hasQueue = is_numeric($effectiveQueue) && ($effectiveQueue > 0 || $effectiveQueue === 999);
-                        $isKronisQueue = $effectiveQueue === 999;
-                        $noAntrianLabel = $isKronisQueue ? 'KR' : ($hasQueue ? $effectiveQueue : '-'); // label yg ditampilkan
+                        $noAntrianLabel = $myQData->no_antrian ?? '-'; // label yg ditampilkan
 
                         // Task per header (apotek)
                         $taskId6 = $header['taskIdPelayanan']['taskId6'] ?? 'xxxx-xx-xx xx:xx:xx'; // Masuk Apotek
@@ -391,7 +368,7 @@
 
                                 <div>
                                     <livewire:cetak.cetak-eresep-r-i :riHdrNoRef="$myQData->rihdr_no" :resepNoRef="$header['resepNo'] ?? ''"
-                                        wire:key="cetak.cetak-eresep-r-i-{{ $myQData->rihdr_no }}-{{ $header['resepNo'] }}-{{ $myQData->sls_no }}">
+                                        wire:key="cetak.cetak-eresep-r-i-{{ $myQData->rihdr_no }}-{{ $header['resepNo'] ?? $key }}-{{ $myQData->sls_no }}">
 
                                 </div>
 

@@ -165,7 +165,7 @@ class TelaahResepRI extends Component
         'refStatusOptions' => [
             ['refStatusId' => 'A', 'refStatusDesc' => 'Antrian'],
             ['refStatusId' => 'L', 'refStatusDesc' => 'Selesai'],
-            ['refStatusId' => 'I', 'refStatusDesc' => 'Transfer'],
+            // ['refStatusId' => 'I', 'refStatusDesc' => 'Transfer'],
         ],
 
         'drId' => 'All',
@@ -687,7 +687,6 @@ class TelaahResepRI extends Component
         });
 
         $rows = $query->get();
-
         // ===== Urutan khusus RI (pakai SLS.no_antrian, fallback JSON header) =====
         $sorted = $rows->sortBy(function ($row) {
             $json = [];
@@ -699,12 +698,8 @@ class TelaahResepRI extends Component
 
             // Sumber nomor antrian: SLS > mirror header (MIN)
             $slsQueue = is_numeric($row->no_antrian ?? null) ? (int)$row->no_antrian : null;
-            $headerMinQ = collect($headers)
-                ->map(fn($h) => $h['noAntrianApotek']['noAntrian'] ?? null)
-                ->filter(fn($n) => is_numeric($n) && (int)$n > 0) // 0 bukan nomor valid
-                ->map(fn($n) => (int)$n)
-                ->min();
-            $effectiveQ = $slsQueue ?? $headerMinQ;
+
+            $effectiveQ = $slsQueue ?? 999;
 
             // Flag & urutan antrian
             $hasQueue = ($effectiveQ !== null) && (($effectiveQ > 0) || ($effectiveQ === 999));
@@ -725,7 +720,7 @@ class TelaahResepRI extends Component
                     $ts = strtotime($t);
                     return $ts ?: PHP_INT_MAX;
                 });
-            $minTask6 = $task6Times->isNotEmpty() ? $task6Times->min() : PHP_INT_MAX;
+            $minTask6 = $task6Times->isNotEmpty() ? $task6Times->min() : $row->sls_date;
 
             // sls_date terbaru (pakai nilai negatif supaya ASC → DESC)
             $sls1 = is_numeric($row->sls_date1 ?? null) ? (int)$row->sls_date1 : 0;
