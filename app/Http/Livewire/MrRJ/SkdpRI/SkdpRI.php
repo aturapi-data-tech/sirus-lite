@@ -424,8 +424,8 @@ class SkdpRI extends Component
         if (isset($this->dataDaftarRi['kontrol'])) {
             if ($this->dataDaftarRi['kontrol']) {
 
-                if (isset($this->dataDaftarRi['kontrol']['regNo'])) {
-                    $this->setDataPasien($this->dataDaftarRi['kontrol']['regNo']);
+                if (isset($this->dataDaftarRi['regNo'])) {
+                    $this->setDataPasien($this->dataDaftarRi['regNo']);
                 }
 
                 $data = [
