@@ -23,8 +23,8 @@ class SkdpRI extends Component
     use WithPagination, EmrRITrait;
     // listener from blade////////////////
     protected $listeners = [
+        'syncronizeAssessmentPerawatRIFindData' => 'mount',
         'syncronizeAssessmentPerawatRJFindData' => 'mount'
-
     ];
 
     //////////////////////////////
@@ -279,6 +279,7 @@ class SkdpRI extends Component
         // Logic update mode start //////////
         $this->updateDataRI($this->dataDaftarRi['riHdrNo']);
         $this->emit('syncronizeAssessmentPerawatRJFindData');
+        $this->emit('syncronizeAssessmentPerawatRIFindData');
     }
 
     private function updateDataRI($riHdrNo): void
