@@ -219,7 +219,7 @@ class EresepRIHdr extends Component
             $regNo             = $hdr['regNo'];
             $riHdrNo           = $hdr['riHdrNo'];
             $dokterPeresepCode = $this->dataDaftarRi['eresepHdr'][$idx]['tandaTanganDokter']['dokterPeresepCode'];
-            $dataObat          = $hdr['eresep'];
+            $dataObat          = $hdr['eresep'] ?? [];
 
             // Kirim ke apotek (pastikan fungsi ini idempoten)
             $this->sendDataToApotek($resepDate, $regNo, $riHdrNo, $dokterPeresepCode, $dataObat, $idx);
