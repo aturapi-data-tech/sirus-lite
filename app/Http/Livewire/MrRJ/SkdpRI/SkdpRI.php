@@ -431,7 +431,7 @@ class SkdpRI extends Component
                 $data = [
                     'myQueryIdentitas' => $queryIdentitas,
                     'dataPasien' => $this->dataPasien,
-                    'dataDaftarTxn' => $this->dataDaftarRi['kontrol'],
+                    'dataDaftarTxn' => $this->dataDaftarRi,
 
                 ];
                 $pdfContent = PDF::loadView('livewire.mr-r-j.skdp-r-i.cetak-skdp-ri', $data)->output();
