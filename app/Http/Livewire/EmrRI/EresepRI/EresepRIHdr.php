@@ -190,20 +190,20 @@ class EresepRIHdr extends Component
                 ->search(fn($h) => (string)($h['resepNo'] ?? '') === (string)$resepNo);
 
             if ($idx === false) {
-                toastr()->closeOnHover(true)->closeDuration(3)->addError("Header resep #{$resepNo} tidak ditemukan.");
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Header resep #{$resepNo} tidak ditemukan.");
                 return;
             }
 
             // Kalau sudah pernah kirim ke apotek (punya slsNo), jangan kirim lagi
             if (!empty($this->dataDaftarRi['eresepHdr'][$idx]['slsNo'])) {
-                toastr()->closeOnHover(true)->closeDuration(3)->addInfo("Resep #{$resepNo} sudah terkirim ke apotek.");
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addInfo("Resep #{$resepNo} sudah terkirim ke apotek.");
                 return;
             }
 
             // Validasi role
             $user = auth()->user();
             if (!$user->hasAnyRole(['Dokter', 'Admin'])) {
-                toastr()->closeOnHover(true)->closeDuration(3)->addError("User {$user->myuser_name} bukan Dokter.");
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("User {$user->myuser_name} bukan Dokter.");
                 return;
             }
 
@@ -227,9 +227,9 @@ class EresepRIHdr extends Component
             // Simpan state jika perlu
             $this->store();
 
-            toastr()->closeOnHover(true)->closeDuration(3)->addSuccess("TTD & kirim resep #{$resepNo} sukses.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("TTD & kirim resep #{$resepNo} sukses.");
         } catch (\Throwable $e) {
-            toastr()->closeOnHover(true)->closeDuration(3)->addError("Gagal: " . $e->getMessage());
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Gagal: " . $e->getMessage());
         }
     }
 
