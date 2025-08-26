@@ -236,8 +236,8 @@ class EresepRIHdr extends Component
     private function sendDataToApotek($resepDate, $regNo, $riHdrNo, $drId, $dataObat, $indexKe)
     {
         // Validasi: Pastikan $dataObat merupakan array dan tidak kosong
-        if (!is_array($dataObat) || empty($dataObat)) {
-            throw new Exception("Data obat tidak tersedia atau format tidak valid.");
+        if (!is_array($dataObat)) {
+            throw new Exception("Data obat tidak valid.");
         }
 
         // Validasi: Pastikan regNo ada di tabel rsmst_pasiens
@@ -281,34 +281,36 @@ class EresepRIHdr extends Component
             'acte_price'            => 3000,
             'waktu_masuk_pelayanan' => DB::raw('sysdate'),
         ]);
+        // 4. Jika ada detail obat, baru insert ke imtxn_slsdtls
+        if (!empty($dataObat)) {
+            // 4. Loop untuk insert data detail obat ke imtxn_slsdtls
+            foreach ($dataObat as $eresepItem) {
+                // Ambil nomor detail transaksi berikutnya (sls_dtl)
+                $maxSlsDtl = DB::table('imtxn_slsdtls')
+                    ->select(DB::raw("nvl(max(sls_dtl)+1,1) as max_sls_dtl"))
+                    ->first()
+                    ->max_sls_dtl;
 
-        // 4. Loop untuk insert data detail obat ke imtxn_slsdtls
-        foreach ($dataObat as $eresepItem) {
-            // Ambil nomor detail transaksi berikutnya (sls_dtl)
-            $maxSlsDtl = DB::table('imtxn_slsdtls')
-                ->select(DB::raw("nvl(max(sls_dtl)+1,1) as max_sls_dtl"))
-                ->first()
-                ->max_sls_dtl;
+                // Ambil data produk untuk mendapatkan harga
+                $dataProduct = DB::table('immst_products')
+                    ->select('sales_price')
+                    ->where('product_id', $eresepItem['productId'])
+                    ->first();
 
-            // Ambil data produk untuk mendapatkan harga
-            $dataProduct = DB::table('immst_products')
-                ->select('sales_price')
-                ->where('product_id', $eresepItem['productId'])
-                ->first();
-
-            DB::table('imtxn_slsdtls')->insert([
-                'sls_dtl'         => $maxSlsDtl,
-                'qty'             => $eresepItem['qty'],
-                'exp_date'        => DB::raw("add_months(to_date('{$resepDate}','dd/mm/yyyy hh24:mi:ss'),12)"),
-                'sales_price'     => $dataProduct->sales_price ?? 0,
-                'product_id'      => $eresepItem['productId'],
-                'sls_no'          => $maxSlsNo,
-                'resep_carapakai' => $eresepItem['signaX'],
-                'resep_takar'     => 'Tablet',
-                'resep_kapsul'    => $eresepItem['signaHari'],
-                'resep_ket'       => $eresepItem['catatanKhusus'],
-                'etiket_status'   => 1,
-            ]);
+                DB::table('imtxn_slsdtls')->insert([
+                    'sls_dtl'         => $maxSlsDtl,
+                    'qty'             => $eresepItem['qty'],
+                    'exp_date'        => DB::raw("add_months(to_date('{$resepDate}','dd/mm/yyyy hh24:mi:ss'),12)"),
+                    'sales_price'     => $dataProduct->sales_price ?? 0,
+                    'product_id'      => $eresepItem['productId'],
+                    'sls_no'          => $maxSlsNo,
+                    'resep_carapakai' => $eresepItem['signaX'],
+                    'resep_takar'     => 'Tablet',
+                    'resep_kapsul'    => $eresepItem['signaHari'],
+                    'resep_ket'       => $eresepItem['catatanKhusus'],
+                    'etiket_status'   => 1,
+                ]);
+            }
         }
         $this->dataDaftarRi['eresepHdr'][$indexKe]['slsNo'] = $maxSlsNo;
     }
