@@ -16,6 +16,7 @@ use App\Http\Traits\EmrRI\EmrRITrait;
 
 // use Illuminate\Support\Str;
 // use Spatie\ArrayToXml\ArrayToXml;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 
 class SkdpRI extends Component
@@ -402,6 +403,44 @@ class SkdpRI extends Component
                 } else {
                     toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('UPDATEKONTROL ' . $HttpGetBpjs['metadata']['code'] . ' ' . $HttpGetBpjs['metadata']['message']);
                 }
+            }
+        }
+    }
+
+    public function cetakSKDP()
+    {
+        $queryIdentitas = DB::table('rsmst_identitases')
+            ->select(
+                'int_name',
+                'int_phone1',
+                'int_phone2',
+                'int_fax',
+                'int_address',
+                'int_city',
+            )
+            ->first();
+
+        // cek ada resSep ada atau tidak
+        if (isset($this->dataDaftarRi['kontrol']['kontrol'])) {
+            if ($this->dataDaftarRi['kontrol']['kontrol']) {
+
+                if (isset($this->dataDaftarRi['kontrol']['regNo'])) {
+                    $this->setDataPasien($this->dataDaftarRi['kontrol']['regNo']);
+                }
+
+                $data = [
+                    'myQueryIdentitas' => $queryIdentitas,
+                    'dataPasien' => $this->dataPasien,
+                    'dataDaftarTxn' => $this->dataDaftarRi['kontrol'],
+
+                ];
+                $pdfContent = PDF::loadView('livewire.mr-r-j.skdp-r-i.cetak-skdp-ri', $data)->output();
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('CetakSKDP');
+
+                return response()->streamDownload(
+                    fn() => print($pdfContent),
+                    "filename.pdf"
+                );
             }
         }
     }

@@ -164,8 +164,16 @@
             <div class="sticky bottom-0 flex justify-between px-4 py-3 bg-gray-50 sm:px-6">
 
                 <div class="">
-                    {{-- null --}}
+                    <div wire:loading wire:target="cetakSKDP">
+                        <x-loading />
+                    </div>
+
+                    <x-yellow-button :disabled=$disabledPropertyRjStatus wire:click.prevent="cetakSKDP()" type="button"
+                        wire:loading.remove>
+                        Cetak SKDP
+                    </x-yellow-button>
                 </div>
+
                 <div>
                     <div wire:loading wire:target="store">
                         <x-loading />
@@ -173,7 +181,7 @@
 
                     <x-green-button :disabled=$disabledPropertyRiStatus wire:click.prevent="store()" type="button"
                         wire:loading.remove>
-                        Simpan
+                        Simpan SKDP
                     </x-green-button>
                 </div>
             </div>
