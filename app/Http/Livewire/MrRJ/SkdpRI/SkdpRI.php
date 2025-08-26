@@ -445,6 +445,145 @@ class SkdpRI extends Component
         }
     }
 
+    public array $dataPasien = [];
+    private function setDataPasien($value): void
+    {
+        $findData = DB::table('rsmst_pasiens')
+            ->select('meta_data_pasien_json')
+            ->where('reg_no', $value)
+            ->first();
+
+
+        $meta_data_pasien_json = isset($findData->meta_data_pasien_json) ? $findData->meta_data_pasien_json : null;
+        // if meta_data_pasien_json = null
+        // then cari Data Pasien By Key Collection (exception when no data found)
+        //
+        // else json_decode
+        if ($meta_data_pasien_json == null) {
+
+            $findData = $this->cariDataPasienByKeyCollection('reg_no', $value);
+            if ($findData) {
+                $this->dataPasien['pasien']['regDate'] = $findData->reg_date;
+                $this->dataPasien['pasien']['regNo'] = $findData->reg_no;
+                $this->dataPasien['pasien']['regName'] = $findData->reg_name;
+                $this->dataPasien['pasien']['identitas']['idbpjs'] = $findData->nokartu_bpjs;
+                $this->dataPasien['pasien']['identitas']['nik'] = $findData->nik_bpjs;
+                $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminId'] = ($findData->sex == 'L') ? 1 : 2;
+                $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] = ($findData->sex == 'L') ? 'Laki-laki' : 'Perempuan';
+                $this->dataPasien['pasien']['tglLahir'] = $findData->birth_date;
+                $this->dataPasien['pasien']['thn'] = Carbon::createFromFormat('d/m/Y', $findData->birth_date)->diff(Carbon::now(env('APP_TIMEZONE')))->format('%y Thn, %m Bln %d Hr'); //$findData->thn;
+                $this->dataPasien['pasien']['bln'] = $findData->bln;
+                $this->dataPasien['pasien']['hari'] = $findData->hari;
+                $this->dataPasien['pasien']['tempatLahir'] = $findData->birth_place;
+                $this->dataPasien['pasien']['golonganDarah']['golonganDarahId'] = '13';
+                $this->dataPasien['pasien']['golonganDarah']['golonganDarahDesc'] = 'Tidak Tahu';
+                $this->dataPasien['pasien']['statusPerkawinan']['statusPerkawinanId'] = '1';
+                $this->dataPasien['pasien']['statusPerkawinan']['statusPerkawinanDesc'] = 'Belum Kawin';
+
+                $this->dataPasien['pasien']['agama']['agamaId'] = $findData->rel_id;
+                $this->dataPasien['pasien']['agama']['agamaDesc'] = $findData->rel_desc;
+
+                $this->dataPasien['pasien']['pendidikan']['pendidikanId'] = $findData->edu_id;
+                $this->dataPasien['pasien']['pendidikan']['pendidikanDesc'] = $findData->edu_desc;
+
+                $this->dataPasien['pasien']['pekerjaan']['pekerjaanId'] = $findData->job_id;
+                $this->dataPasien['pasien']['pekerjaan']['pekerjaanDesc'] = $findData->job_name;
+
+
+                $this->dataPasien['pasien']['hubungan']['namaPenanggungJawab'] = $findData->reg_no;
+                $this->dataPasien['pasien']['hubungan']['namaIbu'] = $findData->reg_no;
+
+                $this->dataPasien['pasien']['identitas']['nik'] = $findData->nik_bpjs;
+                $this->dataPasien['pasien']['identitas']['idBpjs'] = $findData->nokartu_bpjs;
+
+
+                $this->dataPasien['pasien']['identitas']['alamat'] = $findData->address;
+
+                $this->dataPasien['pasien']['identitas']['desaId'] = $findData->des_id;
+                $this->dataPasien['pasien']['identitas']['desaName'] = $findData->des_name;
+
+                $this->dataPasien['pasien']['identitas']['rt'] = $findData->rt;
+                $this->dataPasien['pasien']['identitas']['rw'] = $findData->rw;
+                $this->dataPasien['pasien']['identitas']['kecamatanId'] = $findData->kec_id;
+                $this->dataPasien['pasien']['identitas']['kecamatanName'] = $findData->kec_name;
+
+                $this->dataPasien['pasien']['identitas']['kotaId'] = $findData->kab_id;
+                $this->dataPasien['pasien']['identitas']['kotaName'] = $findData->kab_name;
+
+                $this->dataPasien['pasien']['identitas']['propinsiId'] = $findData->prop_id;
+                $this->dataPasien['pasien']['identitas']['propinsiName'] = $findData->prop_name;
+
+                $this->dataPasien['pasien']['kontak']['nomerTelponSelulerPasien'] = $findData->phone;
+
+                $this->dataPasien['pasien']['hubungan']['namaPenanggungJawab'] = $findData->kk;
+                $this->dataPasien['pasien']['hubungan']['namaIbu'] = $findData->nyonya;
+                // $this->dataPasien['pasien']['hubungan']['noPenanggungJawab'] = $findData->no_kk;
+            } else {
+                // when no data found
+                $this->dataPasien['pasien']['regDate'] = '-';
+                $this->dataPasien['pasien']['regNo'] = '-';
+                $this->dataPasien['pasien']['regName'] = '-';
+                $this->dataPasien['pasien']['identitas']['idbpjs'] = '-';
+                $this->dataPasien['pasien']['identitas']['nik'] = '-';
+                $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminId'] = '-';
+                $this->dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] = '-';
+                $this->dataPasien['pasien']['tglLahir'] = '-';
+                $this->dataPasien['pasien']['thn'] = '-';
+                $this->dataPasien['pasien']['bln'] = '-';
+                $this->dataPasien['pasien']['hari'] = '-';
+                $this->dataPasien['pasien']['tempatLahir'] = '-';
+                $this->dataPasien['pasien']['golonganDarah']['golonganDarahId'] = '-';
+                $this->dataPasien['pasien']['golonganDarah']['golonganDarahDesc'] = '-';
+                $this->dataPasien['pasien']['statusPerkawinan']['statusPerkawinanId'] = '-';
+                $this->dataPasien['pasien']['statusPerkawinan']['statusPerkawinanDesc'] = '-';
+
+                $this->dataPasien['pasien']['agama']['agamaId'] = '-';
+                $this->dataPasien['pasien']['agama']['agamaDesc'] = '-';
+
+                $this->dataPasien['pasien']['pendidikan']['pendidikanId'] = '-';
+                $this->dataPasien['pasien']['pendidikan']['pendidikanDesc'] = '-';
+
+                $this->dataPasien['pasien']['pekerjaan']['pekerjaanId'] = '-';
+                $this->dataPasien['pasien']['pekerjaan']['pekerjaanDesc'] = '-';
+
+
+                $this->dataPasien['pasien']['hubungan']['namaPenanggungJawab'] = '-';
+                $this->dataPasien['pasien']['hubungan']['namaIbu'] = '-';
+
+                $this->dataPasien['pasien']['identitas']['nik'] = '-';
+                $this->dataPasien['pasien']['identitas']['idBpjs'] = '-';
+
+
+                $this->dataPasien['pasien']['identitas']['alamat'] = '-';
+
+                $this->dataPasien['pasien']['identitas']['desaId'] = '-';
+                $this->dataPasien['pasien']['identitas']['desaName'] = '-';
+
+                $this->dataPasien['pasien']['identitas']['rt'] = '-';
+                $this->dataPasien['pasien']['identitas']['rw'] = '-';
+                $this->dataPasien['pasien']['identitas']['kecamatanId'] = '-';
+                $this->dataPasien['pasien']['identitas']['kecamatanName'] = '-';
+
+                $this->dataPasien['pasien']['identitas']['kotaId'] = '-';
+                $this->dataPasien['pasien']['identitas']['kotaName'] = '-';
+
+                $this->dataPasien['pasien']['identitas']['propinsiId'] = '-';
+                $this->dataPasien['pasien']['identitas']['propinsiName'] = '-';
+
+                $this->dataPasien['pasien']['kontak']['nomerTelponSelulerPasien'] = '-';
+
+                $this->dataPasien['pasien']['hubungan']['namaPenanggungJawab'] = '-';
+                $this->dataPasien['pasien']['hubungan']['namaIbu'] = '-';
+            }
+        } else {
+            // ubah data Pasien
+            $this->dataPasien = json_decode($findData->meta_data_pasien_json, true);
+            $this->dataPasien['pasien']['thn'] = Carbon::createFromFormat('d/m/Y', $this->dataPasien['pasien']['tglLahir'])->diff(Carbon::now(env('APP_TIMEZONE')))->format('%y Thn, %m Bln %d Hr'); //$findData->thn;
+
+
+        }
+    }
+
 
 
 
