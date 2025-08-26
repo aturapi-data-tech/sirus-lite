@@ -168,7 +168,7 @@
                         <x-loading />
                     </div>
 
-                    <x-yellow-button :disabled=$disabledPropertyRjStatus wire:click.prevent="cetakSKDP()" type="button"
+                    <x-yellow-button :disabled=$disabledPropertyRiStatus wire:click.prevent="cetakSKDP()" type="button"
                         wire:loading.remove>
                         Cetak SKDP
                     </x-yellow-button>
