@@ -38,9 +38,10 @@
     <div>
         <x-input-label for="dataDaftarRi.pengkajianDokter.tandaTanganDokter.dokterPengkaji" :value="__('Dokter Pengkaji')"
             :required="__(true)" />
+
         <x-text-input id="dataDaftarRi.pengkajianDokter.tandaTanganDokter.dokterPengkaji" placeholder="Dokter Pengkaji"
-            class="mt-1" :disabled="true"
-            wire:model.debounce.500ms="dataDaftarRi.pengkajianDokter.tandaTanganDokter.dokterPengkaji" />
+            class="mt-1" readonly :value="data_get($dataDaftarRi, 'pengkajianDokter.tandaTanganDokter.dokterPengkaji')" />
+
         @error('dataDaftarRi.pengkajianDokter.tandaTanganDokter.dokterPengkaji')
             <x-input-error :messages="$message" />
         @enderror
