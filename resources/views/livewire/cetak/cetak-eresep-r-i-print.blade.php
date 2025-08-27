@@ -111,13 +111,24 @@
                             <td class="p-1 m-1">Klaim & Room</td>
                             <td class="p-1 m-1">:</td>
                             <td class="p-1 m-1 font-semibold">
-                                {{ $dataDaftarRi['klaimId'] == 'UM'
-                                    ? 'UMUM'
-                                    : ($dataDaftarRi['klaimId'] == 'JM'
-                                        ? 'BPJS'
-                                        : ($dataDaftarRi['klaimId'] == 'KR'
-                                            ? 'Kronis'
-                                            : 'Asuransi Lain')) }}
+
+                                @php
+                                    // Cek klaim BPJS
+                                    $klaim = DB::table('rsmst_klaimtypes')
+                                        ->where('klaim_id', $dataDaftarRi['klaimId'])
+                                        ->select('klaim_status', 'klaim_desc')
+                                        ->first();
+                                    // Boolean BPJS
+                                    //$isBpjs = optional($klaim)->klaim_status === 'BPJS';
+
+                                    // Deskripsi klaim (fallback jika null)
+                                    $klaimDesc = $klaim->klaim_desc ?? 'Asuransi Lain';
+
+                                @endphp
+
+                                {{ $klaimDesc }}
+                                /
+                                {{ $klaim->klaim_status ?? '' }}
                                 /
                                 {{ $dataDaftarRi['roomDesc'] ?? '-' }}
                             </td>
