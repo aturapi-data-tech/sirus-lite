@@ -47,6 +47,17 @@
                                         Jadwal Kontrol Post Inap
                                     </label>
                                 </li>
+
+                                <!-- Tab Ringkasan Pasien Pulang -->
+                                <li class="mr-2">
+                                    <label
+                                        class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
+                                        :class="activeTab === 'Ringkasan Pasien Pulang' ?
+                                            'text-primary border-primary bg-gray-100' : ''"
+                                        @click="activeTab = 'Ringkasan Pasien Pulang'">
+                                        Ringkasan Pasien Pulang
+                                    </label>
+                                </li>
                             </ul>
                         </div>
 
@@ -66,6 +77,12 @@
                             <div x-show="activeTab === 'Jadwal Kontrol  Post Inap'"
                                 x-transition:enter.opacity.duration.600>
                                 @include('livewire.emr-r-i.mr-r-i.perencanaan.perencanaan3-jadwal-kontrol')
+                            </div>
+
+                            <!-- Konten Ringkasan Pasien Pulang -->
+                            <div x-show="activeTab === 'Ringkasan Pasien Pulang'"
+                                x-transition:enter.opacity.duration.600>
+                                @include('livewire.emr-r-i.mr-r-i.perencanaan.perencanaan4-ringkasan-pasien-pulang')
                             </div>
                         </div>
                     </div>
