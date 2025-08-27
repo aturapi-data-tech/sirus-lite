@@ -266,7 +266,7 @@ class EresepRIHdr extends Component
             ->select('shift')
             ->whereRaw("'{$formattedTime}' between shift_start and shift_end")
             ->first();
-        $shift = $shiftRecord->shift ?? 3;
+        $shift = $shiftRecord->shift ?? 1;
 
         // 3. Insert header transaksi ke imtxn_slshdrs
         DB::table('imtxn_slshdrs')->insert([
