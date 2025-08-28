@@ -583,8 +583,8 @@ class AssessmentPengkajianDokter extends Component
     public function setDokterPengkaji()
     {
         // Ambil data user yang sedang login
-        $myUserCodeActive = auth()->user()->myuserCode;
-        $myUserNameActive = auth()->user()->myuserName;
+        $myUserCodeActive = auth()->user()->myuser_code;
+        $myUserNameActive = auth()->user()->myuser_name;
 
         // Validasi apakah pengguna memiliki peran yang sesuai
         if (auth()->user()->hasRole('Dokter')) {

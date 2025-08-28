@@ -579,15 +579,14 @@ class PengkajianDokter extends Component
     public function setDokterPengkaji()
     {
         // Ambil data user yang sedang login
-        $myUserCodeActive = auth()->user()->myuserCode;
-        $myUserNameActive = auth()->user()->myuserName;
+        $myUserCodeActive = auth()->user()->myuser_code;
+        $myUserNameActive = auth()->user()->myuser_name;
 
         // Validasi apakah pengguna memiliki peran yang sesuai
         if (auth()->user()->hasRole('Dokter')) {
             // Isi data dokter pengkaji, kode dokter pengkaji, dan jam dokter pengkaji
             $this->dataDaftarRi['pengkajianDokter']['tandaTanganDokter']['dokterPengkaji'] = $myUserNameActive;
             $this->dataDaftarRi['pengkajianDokter']['tandaTanganDokter']['dokterPengkajiCode'] = $myUserCodeActive;
-
             // Simpan perubahan
             $this->store();
 
