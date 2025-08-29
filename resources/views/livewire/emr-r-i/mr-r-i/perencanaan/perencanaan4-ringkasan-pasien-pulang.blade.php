@@ -1,393 +1,606 @@
 <div>
-    <div class="p-3 text-sm">
-
-        {{-- ======================= HALAMAN 1: RIWAYAT PENGOBATAN ======================= --}}
-        <table class="w-full border-collapse">
-            <tr>
-                <td class="w-16 align-top border-0">
-                    {{-- <img src="{{ asset('logo.png') }}" class="h-12" /> --}}
-                </td>
-                <td class="border-0">
-                    <div class="text-lg font-bold tracking-wide text-center">RIWAYAT PENGOBATAN</div>
-                </td>
-                <td class="w-64 align-top border-0">
-                    <table class="w-full border border-collapse border-black table-auto">
-                        <tr>
-                            <th class="px-2 py-1 text-left border border-black">No. Rekam Medis</th>
-                            <td class="px-2 py-1 border border-black">
-                                {{-- 3 kotak kecil sesuai template --}}
-                                <div class="flex gap-1">
-                                    <div class="w-8 h-6 text-center border border-black">
-                                        {{ $identitas['rm_box_1'] ?? '' }}</div>
-                                    <div class="w-8 h-6 text-center border border-black">
-                                        {{ $identitas['rm_box_2'] ?? '' }}</div>
-                                    <div class="w-8 h-6 text-center border border-black">
-                                        {{ $identitas['rm_box_3'] ?? '' }}</div>
-                                </div>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-        </table>
-
-        <table class="w-full mt-2 border border-collapse border-black table-auto">
-            <tr>
-                <th class="w-40 px-2 py-1 text-left border border-black">Nama pasien</th>
-                <td class="px-2 py-1 border border-black">{{ $identitas['nama'] ?? '' }}</td>
-                <th class="w-40 px-2 py-1 text-left border border-black">Ruang Perawatan</th>
-                <td class="px-2 py-1 border border-black">{{ $identitas['ruang'] ?? '' }}</td>
-                <th class="w-24 px-2 py-1 text-left border border-black">Kamar</th>
-                <td class="px-2 py-1 border border-black">{{ $identitas['kamar'] ?? '' }}</td>
-            </tr>
-            <tr>
-                <th class="px-2 py-1 text-left border border-black">Tanggal lahir</th>
-                <td class="px-2 py-1 border border-black">{{ $identitas['tglLahir'] ?? '' }}</td>
-                <th class="px-2 py-1 text-left border border-black">Tanggal keluar/meninggal*</th>
-                <td class="px-2 py-1 border border-black" colspan="3">{{ $identitas['tglKeluar'] ?? '' }}</td>
-            </tr>
-            <tr>
-                <th class="px-2 py-1 text-left border border-black">Tanggal masuk RS</th>
-                <td class="px-2 py-1 border border-black">{{ $identitas['tglMasuk'] ?? '' }}</td>
-                <th class="px-2 py-1 text-left border border-black">DPJP</th>
-                <td class="px-2 py-1 border border-black" colspan="3">{{ $identitas['dpjp'] ?? '' }}</td>
-            </tr>
-            <tr>
-                <th class="px-2 py-1 text-left border border-black">Diagnosis masuk</th>
-                <td class="px-2 py-1 border border-black" colspan="5">{{ $ringkasan['diagnosisMasuk'] ?? '' }}</td>
-            </tr>
-            <tr>
-                <th class="px-2 py-1 text-left border border-black">Indikasi Rawat Inap</th>
-                <td class="px-2 py-1 border border-black" colspan="5">{{ $ringkasan['indikasiRawatInap'] ?? '' }}
-                </td>
-            </tr>
-        </table>
-
-        {{-- ANAMNESIS --}}
-        <table class="w-full mt-2 border border-collapse border-black table-auto">
-            <tr class="font-semibold bg-gray-100">
-                <th colspan="6" class="px-2 py-1 text-left">ANAMNESIS</th>
-            </tr>
-            <tr>
-                <th class="w-48 px-2 py-1 text-left border border-black">Keluhan utama</th>
-                <td class="px-2 py-1 border border-black" colspan="5">{{ $ringkasan['keluhanUtama'] ?? '' }}</td>
-            </tr>
-            <tr>
-                <th class="px-2 py-1 text-left border border-black">Riwayat penyakit</th>
-                <td class="px-2 py-1 border border-black" colspan="5">{{ $ringkasan['riwayatPenyakit'] ?? '' }}</td>
-            </tr>
-        </table>
-
-        {{-- PEMERIKSAAN FISIK --}}
-        <table class="w-full mt-2 border border-collapse border-black table-auto">
-            <tr class="font-semibold bg-gray-100">
-                <th colspan="6" class="px-2 py-1 text-left">PEMERIKSAAN FISIK</th>
-            </tr>
-            <tr>
-                <th class="w-48 px-2 py-1 text-left border border-black">Keadaan umum</th>
-                <td class="px-2 py-1 border border-black" colspan="5">{{ $ringkasan['keadaanUmum'] ?? '' }}</td>
-            </tr>
-            <tr>
-                <th class="px-2 py-1 text-left border border-black">Tanda vital</th>
-                <td class="px-2 py-1 border border-black" colspan="5">
-                    Tekanan darah : {{ $vitals['td'] ?? '' }} &nbsp;&nbsp;
-                    Suhu : {{ $vitals['suhu'] ?? '' }} &nbsp;&nbsp;
-                    Nadi : {{ $vitals['nadi'] ?? '' }} &nbsp;&nbsp;
-                    Frekuensi napas : {{ $vitals['rr'] ?? '' }}
-                </td>
-            </tr>
-            <tr>
-                <th class="px-2 py-1 text-left border border-black">Pemeriksaan Fisik</th>
-                <td class="px-2 py-1 border border-black" colspan="5">{{ $ringkasan['pemeriksaanFisik'] ?? '' }}
-                </td>
-            </tr>
-        </table>
-
-        {{-- PEMERIKSAAN PENUNJANG --}}
-        <table class="w-full mt-2 border border-collapse border-black table-auto">
-            <tr class="font-semibold bg-gray-100">
-                <th colspan="6" class="px-2 py-1 text-left">PEMERIKSAAN PENUNJANG</th>
-            </tr>
-            <tr>
-                <th class="w-48 px-2 py-1 text-left border border-black">1. LABORATORIUM</th>
-                <td class="px-2 py-1 border border-black" colspan="5">{{ $penunjang['lab'] ?? '' }}</td>
-            </tr>
-            <tr>
-                <th class="px-2 py-1 text-left border border-black">2. RADIOLOGI</th>
-                <td class="px-2 py-1 border border-black" colspan="5">{{ $penunjang['rad'] ?? '' }}</td>
-            </tr>
-            <tr>
-                <th class="px-2 py-1 text-left border border-black">3. LAIN-LAIN</th>
-                <td class="px-2 py-1 border border-black" colspan="5">{{ $penunjang['lain'] ?? '' }}</td>
-            </tr>
-        </table>
-
-        {{-- TERAPI/TINDAKAN DI RS --}}
-        <table class="w-full mt-2 border border-collapse border-black table-auto">
-            <tr class="font-semibold bg-gray-100">
-                <th colspan="6" class="px-2 py-1 text-left">TERAPI/TINDAKAN MEDIS SELAMA DI RUMAH SAKIT</th>
-            </tr>
-            <tr>
-                <td class="px-2 py-8 border border-black" colspan="6">{{ $ringkasan['terapiRS'] ?? '' }}</td>
-            </tr>
-        </table>
-
-        {{-- DIAGNOSIS & TINDAKAN + ICD --}}
-        <table class="w-full mt-2 border border-collapse border-black table-auto">
-            <tr>
-                <th class="w-48 px-2 py-1 text-left border border-black">DIAGNOSIS UTAMA</th>
-                <td class="px-2 py-1 border border-black">{{ $ringkasan['dxUtama'] ?? '' }}</td>
-                <th class="w-24 px-2 py-1 text-left border border-black">ICD_10.</th>
-                <td class="w-32 px-2 py-1 border border-black">{{ $ringkasan['dxUtamaICD'] ?? '' }}</td>
-            </tr>
-            <tr>
-                <th class="px-2 py-1 text-left align-top border border-black">DIAGNOSIS SEKUNDER :</th>
-                <td class="px-2 py-1 align-top border border-black">
-                    <ol class="pl-6 leading-6 list-decimal">
-                        <li>{{ $ringkasan['dxSek1'] ?? '' }}</li>
-                        <li>{{ $ringkasan['dxSek2'] ?? '' }}</li>
-                        <li>{{ $ringkasan['dxSek3'] ?? '' }}</li>
-                        <li>{{ $ringkasan['dxSek4'] ?? '' }}</li>
-                        <li>{{ $ringkasan['dxSek5'] ?? '' }}</li>
-                    </ol>
-                </td>
-                <th class="px-2 py-1 text-left align-top border border-black">ICD_10.</th>
-                <td class="px-2 py-1 align-top border border-black">
-                    <ol class="pl-6 leading-6 list-decimal">
-                        <li>{{ $ringkasan['dxSek1ICD'] ?? '' }}</li>
-                        <li>{{ $ringkasan['dxSek2ICD'] ?? '' }}</li>
-                        <li>{{ $ringkasan['dxSek3ICD'] ?? '' }}</li>
-                        <li>{{ $ringkasan['dxSek4ICD'] ?? '' }}</li>
-                        <li>{{ $ringkasan['dxSek5ICD'] ?? '' }}</li>
-                    </ol>
-                </td>
-            </tr>
-            <tr>
-                <th class="px-2 py-1 text-left align-top border border-black">TINDAKAN/PROSEDUR :</th>
-                <td class="px-2 py-1 align-top border border-black">
-                    <ol class="pl-6 leading-6 list-decimal">
-                        <li>{{ $ringkasan['tind1'] ?? '' }}</li>
-                        <li>{{ $ringkasan['tind2'] ?? '' }}</li>
-                        <li>{{ $ringkasan['tind3'] ?? '' }}</li>
-                        <li>{{ $ringkasan['tind4'] ?? '' }}</li>
-                        <li>{{ $ringkasan['tind5'] ?? '' }}</li>
-                    </ol>
-                </td>
-                <th class="px-2 py-1 text-left align-top border border-black">ICD_10.</th>
-                <td class="px-2 py-1 align-top border border-black">
-                    <ol class="pl-6 leading-6 list-decimal">
-                        <li>{{ $ringkasan['tind1ICD'] ?? '' }}</li>
-                        <li>{{ $ringkasan['tind2ICD'] ?? '' }}</li>
-                        <li>{{ $ringkasan['tind3ICD'] ?? '' }}</li>
-                    </ol>
-                </td>
-            </tr>
-            <tr>
-                <th class="px-2 py-1 text-left border border-black">DIET</th>
-                <td class="px-2 py-1 border border-black" colspan="3">{{ $edukasi['diet'] ?? '' }}</td>
-            </tr>
-            <tr>
-                <th class="px-2 py-1 text-left border border-black">INSTRUKSI DAN EDUKASI (TINDAK LANJUT)</th>
-                <td class="px-2 py-6 border border-black" colspan="3">{{ $edukasi['instruksi'] ?? '' }}</td>
-            </tr>
-        </table>
-
-        <div class="mt-1 text-xs italic text-right">Bersambung ke hal 2</div>
-
-        <div class="page-break"></div>
 
 
-        {{-- ======================= HALAMAN 2: SAMBUNGAN RINGKASAN PULANG ======================= --}}
-        <div class="font-semibold">Sambungan <span class="uppercase">RINGKASAN PULANG</span></div>
+    @php
+        // ====== Helper kecil di Blade (aman & ringkas) ======
+        $pasien = $dataPasien['pasien'] ?? [];
+        $ri = $dataDaftarRi ?? [];
 
-        <table class="w-full mt-1 border border-collapse border-black table-auto">
-            <tr>
-                <th class="w-40 px-2 py-1 text-left border border-black">Nama pasien :</th>
-                <td class="px-2 py-1 border border-black">{{ $identitas['nama'] ?? '' }}</td>
-                <th class="w-40 px-2 py-1 text-left border border-black">No. Rekam Medis :</th>
-                <td class="px-2 py-1 border border-black">
-                    <div class="flex gap-1">
-                        <div class="w-8 h-6 text-center border border-black">{{ $identitas['rm_box_1'] ?? '' }}</div>
-                        <div class="w-8 h-6 text-center border border-black">{{ $identitas['rm_box_2'] ?? '' }}</div>
-                        <div class="w-8 h-6 text-center border border-black">{{ $identitas['rm_box_3'] ?? '' }}</div>
-                    </div>
-                </td>
-            </tr>
-        </table>
+        $rm = $pasien['regNo'] ?? '';
 
-        {{-- KONDISI SAAT PULANG --}}
-        <table class="w-full mt-2 border border-collapse border-black table-auto">
-            <tr class="font-semibold bg-gray-100">
-                <th colspan="4" class="px-2 py-1 text-left">KONDISI SAAT PULANG</th>
-            </tr>
-            <tr>
-                <th class="w-48 px-2 py-1 text-left align-top border border-black">Keadaan umum</th>
-                <td class="px-2 py-1 border border-black">{{ $ringkasan['keadaanUmumPulang'] ?? '' }}</td>
-                <th class="w-24 px-2 py-1 text-left align-top border border-black">GCS</th>
-                <td class="px-2 py-1 border border-black">{{ $ringkasan['gcs'] ?? '' }}</td>
-            </tr>
-            <tr>
-                <th class="px-2 py-1 text-left border border-black">Tanda vital</th>
-                <td class="px-2 py-1 border border-black" colspan="3">
-                    Tekanan darah : {{ $vitals['td'] ?? '' }} &nbsp;&nbsp;
-                    Suhu : {{ $vitals['suhu'] ?? '' }} &nbsp;&nbsp;
-                    Nadi : {{ $vitals['nadi'] ?? '' }} &nbsp;&nbsp;
-                    Frekuensi napas : {{ $vitals['rr'] ?? '' }}
-                </td>
-            </tr>
-            <tr>
-                <th class="px-2 py-1 text-left align-top border border-black">Catatan penting (kondisi saat ini)</th>
-                <td class="px-2 py-6 border border-black" colspan="3">{{ $ringkasan['catatanPenting'] ?? '' }}
-                </td>
-            </tr>
-        </table>
+        // Identitas
+        $nama = $pasien['regName'] ?? '';
+        $tglLahir = $pasien['tglLahir'] ?? '';
+        $ruang = $ri['bangsalDesc'] ?? '';
+        $kamar = trim(($ri['roomDesc'] ?? '') . (isset($ri['bedNo']) ? ' / ' . $ri['bedNo'] : ''));
+        $tglMasuk = $ri['entryDate'] ?? '';
+        $tglKeluar = $ri['exitDate'] ?? '';
 
-        {{-- CARA KELUAR RS --}}
-        <table class="w-full mt-2 border border-collapse border-black table-auto">
-            <tr class="font-semibold bg-gray-100">
-                <th colspan="6" class="px-2 py-1 text-left">CARA KELUAR RS</th>
-            </tr>
-            <tr>
-                <td class="px-2 py-1 border border-black">
-                    <span class="inline-block w-3 h-3 mr-2 align-middle border border-black">
-                        @if (!empty($disposisi['pulangPersetujuan']))
-                            ✔
-                        @endif
-                    </span> Pulang Atas persetujuan
-                </td>
-                <td class="px-2 py-1 border border-black">
-                    <span class="inline-block w-3 h-3 mr-2 align-middle border border-black">
-                        @if (!empty($disposisi['pulangAPS']))
-                            ✔
-                        @endif
-                    </span> Pulang Atas Permintaan Sendiri
-                </td>
-                <td class="px-2 py-1 border border-black">
-                    <span class="inline-block w-3 h-3 mr-2 align-middle border border-black">
-                        @if (!empty($disposisi['dirujuk']))
-                            ✔
-                        @endif
-                    </span> Dirujuk
-                </td>
-                <td class="px-2 py-1 border border-black">Kabur</td>
-                <td class="px-2 py-1 border border-black">
-                    <span class="inline-block w-3 h-3 mr-2 align-middle border border-black">
-                        @if (!empty($disposisi['meninggal']))
-                            ✔
-                        @endif
-                    </span> Meninggal
-                </td>
-                <td class="px-2 py-1 border border-black">&nbsp;</td>
-            </tr>
-        </table>
+        $dokterUtama = collect($ri['pengkajianAwalPasienRawatInap']['levelingDokter'] ?? [])
+            ->where('levelDokter', 'Utama')
+            ->first();
 
-        {{-- TINDAK LANJUT --}}
-        <table class="w-full mt-2 border border-collapse border-black table-auto">
-            <tr class="font-semibold bg-gray-100">
-                <th colspan="6" class="px-2 py-1 text-left">TINDAK LANJUT</th>
-            </tr>
-            <tr>
-                <td class="w-1/2 px-2 py-1 border border-black">
-                    <span class="inline-block w-3 h-3 mr-2 align-middle border border-black">
-                        @if (!empty($disposisi['kontrol']))
-                            ✔
-                        @endif
-                    </span>
-                    Kontrol rawat jalan, tanggal
-                    <span class="inline-block w-56 align-middle border-b border-black border-dotted">
-                        &nbsp;{{ $disposisi['tglKontrol'] ?? '' }}&nbsp;
-                    </span>
-                </td>
-                <td class="w-1/2 px-2 py-1 border border-black">
-                    <span class="inline-block w-3 h-3 mr-2 align-middle border border-black">
-                        @if (!empty($disposisi['lainnya1']))
-                            ✔
-                        @endif
-                    </span>
-                    <span
-                        class="inline-block w-56 border-b border-black border-dotted">&nbsp;{{ $disposisi['lainnya1Text'] ?? '' }}&nbsp;</span>
-                </td>
-            </tr>
-            <tr>
-                <td class="px-2 py-1 border border-black">
-                    <span class="inline-block w-3 h-3 mr-2 align-middle border border-black">
-                        @if (!empty($disposisi['rujuk']))
-                            ✔
-                        @endif
-                    </span>
-                    Dirujuk ke
-                    <span
-                        class="inline-block w-64 border-b border-black border-dotted">&nbsp;{{ $disposisi['rujukKe'] ?? '' }}&nbsp;</span>
-                </td>
-                <td class="px-2 py-1 border border-black">
-                    <span class="inline-block w-3 h-3 mr-2 align-middle border border-black">
-                        @if (!empty($disposisi['lainnya2']))
-                            ✔
-                        @endif
-                    </span>
-                    <span
-                        class="inline-block w-56 border-b border-black border-dotted">&nbsp;{{ $disposisi['lainnya2Text'] ?? '' }}&nbsp;</span>
-                </td>
-            </tr>
-        </table>
+        $dpjp = $dokterUtama['drName'] ?? 'DPJP';
 
-        {{-- TERAPI PULANG --}}
-        <table class="w-full mt-2 border border-collapse border-black table-auto">
-            <tr class="font-semibold bg-gray-100">
-                <th colspan="4" class="px-2 py-1 text-left">TERAPI PULANG</th>
-            </tr>
-            <tr class="font-semibold bg-gray-100">
-                <th class="px-2 py-1 text-left border border-black">Nama Obat</th>
-                <th class="px-2 py-1 text-left border border-black">Jumlah</th>
-                <th class="px-2 py-1 text-left border border-black">Dosis</th>
-                <th class="px-2 py-1 text-left border border-black">Cara Pemberian</th>
-            </tr>
-            @forelse(($obatPulang ?? []) as $o)
-                <tr>
-                    <td class="px-2 py-1 border border-black">{{ $o['nama'] ?? '' }}</td>
-                    <td class="px-2 py-1 border border-black">{{ $o['jumlah'] ?? '' }}</td>
-                    <td class="px-2 py-1 border border-black">{{ $o['dosis'] ?? '' }}</td>
-                    <td class="px-2 py-1 border border-black">{{ $o['cara'] ?? '' }}</td>
-                </tr>
-            @empty
-                @for ($i = 0; $i < 8; $i++)
+        // Ringkasan masuk
+        $diagnosaMasuk = data_get($ri, 'pengkajianAwalPasienRawatInap.bagian1DataUmum.diagnosaMasuk', '');
+        $indikasiRawatInap = data_get($ri, 'pengkajianAwalPasienRawatInap.bagian1DataUmum.kondisiSaatMasuk', '');
+
+        // Anamnesis
+        $keluhanUtama = data_get($ri, 'pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.keluhanUtama', '');
+        $riwayatPenyakit = collect([
+            data_get(
+                $ri,
+                'pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.riwayatPenyakitOperasiCedera.pilihan',
+                '',
+            ),
+            data_get($ri, 'pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.riwayatKeluarga.pilihan', ''),
+        ])
+            ->filter()
+            ->implode(', ');
+
+        // Pemeriksaan fisik awal
+        $tv = data_get($ri, 'pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.tandaVital', []);
+        $td = trim(($tv['sistolik'] ?? '') . '/' . ($tv['distolik'] ?? ''));
+        $suhu = $tv['suhu'] ?? '';
+        $nadi = $tv['frekuensiNadi'] ?? '';
+        $rr = $tv['frekuensiNafas'] ?? '';
+        $gcsAwal = data_get($ri, 'pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.neurologi.gcs', ''); // fallback
+        $pemeriksaanFisik = data_get(
+            $ri,
+            'pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.pemeriksaanSistemOrgan',
+            [],
+        );
+        // ringkas: tampilkan yang tidak "normal"
+        $fisikRingkas = collect($pemeriksaanFisik ?? [])
+            ->map(function ($v, $k) {
+                $pil = $v['pilihan'] ?? '';
+                $ket = $v['keterangan'] ?? '';
+                return strtolower($pil) !== 'normal' && $pil !== ''
+                    ? strtoupper($k) . ': ' . $pil . ($ket ? ' (' . $ket . ')' : '')
+                    : null;
+            })
+            ->filter()
+            ->implode('; ');
+        if ($fisikRingkas === '') {
+            $fisikRingkas = 'Dalam batas normal';
+        }
+
+        // Penunjang
+        // ambil GDA awal & GDA terakhir observasi
+        $gdaAwal = $tv['gda'] ?? '';
+        $tandaObs = data_get($ri, 'observasi.observasiLanjutan.tandaVital', []);
+        $gdaAkhir = collect($tandaObs)->pluck('gda')->filter(fn($v) => $v !== '' && $v !== '-' && $v !== '0')->last();
+        $labText = trim(
+            'GDA awal: ' .
+                ($gdaAwal ?: '-') .
+                '; GDA terakhir: ' .
+                ($gdaAkhir ?: '-') .
+                ' ' .
+                ($ri['pengkajianDokter']['hasilPemeriksaanPenunjang']['laboratorium'] ?? ''),
+        );
+
+        // ==== RADIOLOGI ====
+        $radText = trim(
+            'Hasil radiologi: ' . ($ri['pengkajianDokter']['hasilPemeriksaanPenunjang']['radiologi'] ?? '-'),
+        );
+
+        // ==== PENUNJANG LAIN ====
+        $lainText = trim(
+            'Pemeriksaan penunjang lain: ' .
+                ($ri['pengkajianDokter']['hasilPemeriksaanPenunjang']['penunjangLain'] ?? '-'),
+        );
+
+        // Terapi/Tindakan selama di RS (dari pemberian obat & cairan)
+        //$obc = data_get($ri, 'observasi.obatDanCairan.pemberianObatDanCairan', []);
+        //$terapiRS = collect($obc)
+        //    ->map(function ($o) {
+        //        $nama = $o['namaObatAtauJenisCairan'] ?? '';
+        //        $d = $o['dosis'] ?? '';
+        //        $r = $o['rute'] ?? '';
+        //        return trim($nama . ' ' . $d . ($r ? ' (' . $r . ')' : ''));
+        //    })
+        //    ->filter()
+        //    ->implode('; ');
+
+        $cppt = data_get($ri, 'cppt', []);
+        // ambil CPPT yang jelas-jelas dokter (profession berisi 'Dokter' atau nama petugas diawali 'dr.')
+        $plansDokter = collect($cppt)
+            ->filter(fn($row) => strcasecmp($row['profession'] ?? '', 'Dokter') === 0)
+            ->pluck('soap.plan')
+            ->filter()
+            ->map(fn($p) => trim($p))
+            ->unique()
+            ->implode(' | ');
+
+        $terapiRS = $plansDokter ?: '';
+
+        // ====== DIAGNOSIS (ICD + Free Text) ======
+        $dxList = collect(data_get($ri, 'diagnosis', []));
+        $dxFree = trim((string) data_get($ri, 'diagnosisFreeText', ''));
+
+        // tentukan diagnosis utama (prioritas kategori Utama/Primer)
+        $dxUtamaRow =
+            $dxList->first(function ($d) {
+                $k = strtolower($d['kategoriDiagnosa'] ?? '');
+                return in_array($k, ['utama', 'primer', 'primary', 'utama/primer']);
+            }) ?? $dxList->first();
+
+        $dxUtama = $dxUtamaRow['diagDesc'] ?? '';
+        $dxUtamaICD = $dxUtamaRow['icdX'] ?? '';
+
+        // diagnosis sekunder (ICD) = selain yang utama
+        $dxSekunderRows = $dxList
+            ->reject(function ($d) use ($dxUtamaRow) {
+                return $dxUtamaRow && ($d['diagId'] ?? null) === ($dxUtamaRow['diagId'] ?? null);
+            })
+            ->values();
+
+        $dxSekunder = $dxSekunderRows->pluck('diagDesc')->filter()->values()->all();
+        $dxSekunderICD = $dxSekunderRows->pluck('icdX')->filter()->values()->all();
+
+        // gabungkan free text → item sekunder tanpa kode
+        if ($dxFree !== '') {
+            $freeDxItems = collect(preg_split('/\r\n|\r|\n|;|\|/', $dxFree))->map('trim')->filter()->values();
+            // jika utama kosong, ambil baris pertama free text sebagai utama
+            if ($dxUtama === '' && $freeDxItems->isNotEmpty()) {
+                $dxUtama = $freeDxItems->shift();
+            }
+            // sisa free text masuk sekunder (tanpa kode)
+            foreach ($freeDxItems as $item) {
+                $dxSekunder[] = $item;
+                $dxSekunderICD[] = '';
+            }
+        }
+
+        // ====== TINDAKAN/PROSEDUR (ICD-9-CM + Free Text) ======
+        $procList = collect(data_get($ri, 'procedure', []))
+            ->map(function ($p) {
+                return [
+                    'desc' => trim((string) ($p['procedureDesc'] ?? '')),
+                    'code' => trim((string) ($p['procedureId'] ?? '')),
+                ];
+            })
+            ->filter(fn($x) => $x['desc'] !== '');
+
+        $procFree = trim((string) data_get($ri, 'procedureFreeText', ''));
+        if ($procFree !== '') {
+            $freeProcItems = collect(preg_split('/\r\n|\r|\n|;|\|/', $procFree))->map('trim')->filter();
+            foreach ($freeProcItems as $fp) {
+                $procList->push(['desc' => $fp, 'code' => '']);
+            }
+        }
+
+        $tindakanDesc = $procList->pluck('desc')->values();
+        $tindakanCode = $procList->pluck('code')->values();
+
+        //DIET
+
+        $diet = trim((string) data_get($ri, 'pengkajianDokter.rencana.diet', '-'));
+
+        // Edukasi / Instruksi: ambil PLAN CPPT terakhir
+        $lastPlan =
+            collect($ri['cppt'] ?? [])
+                ->pluck('soap.plan')
+                ->filter()
+                ->last() ?? '';
+
+        // Halaman 2 - kondisi saat pulang
+        $gcsPulang = collect($tandaObs)->pluck('gcs')->filter()->last() ?: $gcsAwal;
+        $catatanPenting =
+            collect($ri['cppt'] ?? [])
+                ->pluck('soap.subjective')
+                ->filter()
+                ->last() ?? '';
+
+        // Cara keluar RS / Disposisi
+        $statusPulang = data_get($ri, 'perencanaan.tindakLanjut.statusPulang', '');
+        $isKontrol = !empty(data_get($ri, 'kontrol.tglKontrol')) || $statusPulang === 'Pulang';
+        $tglKontrol = data_get($ri, 'kontrol.tglKontrol', '');
+
+        // Heuristik ringan (opsional, boleh dihapus): jika ada "PERAWATAN JENAZAH" di log, tandai meninggal
+        $logDescs = collect($ri['AdministrasiRI']['userLogs'] ?? [])
+            ->pluck('userLogDesc')
+            ->implode(' | ');
+        $isMeninggal =
+            stripos($statusPulang, 'meninggal') !== false || stripos($logDescs, 'PERAWATAN JENAZAH') !== false;
+    @endphp
+
+    {{-- ======================= HEADER + NO. RM ======================= --}}
+    <table class="w-full border-collapse">
+        <tr>
+            <td class="w-16 align-top border-0">
+                {{-- <img src="{{ asset('logo.png') }}" class="h-12" /> --}}
+                <x-application-logo class="block w-auto h-16 text-gray-800 fill-current dark:text-gray-200" />
+            </td>
+            <td class="border-0">
+                <div class="text-lg font-bold tracking-wide text-center">RIWAYAT PENGOBATAN</div>
+            </td>
+            <td class="w-64 align-top border-0">
+                <table class="w-full border border-collapse border-black table-auto">
                     <tr>
-                        <td class="px-2 py-3 border border-black">&nbsp;</td>
-                        <td class="px-2 py-3 border border-black">&nbsp;</td>
-                        <td class="px-2 py-3 border border-black">&nbsp;</td>
-                        <td class="px-2 py-3 border border-black">&nbsp;</td>
+                        <th class="px-2 py-1 text-left border border-black">No. Rekam Medis</th>
+                        <td class="px-2 py-1 border border-black">
+                            <div class="text-center border border-black">
+                                {{ $rm }}
+                            </div>
+                        </td>
                     </tr>
-                @endfor
-            @endforelse
-        </table>
+                </table>
+            </td>
+        </tr>
+    </table>
 
-        {{-- TTD --}}
-        <table class="w-full mt-3 border border-collapse border-black table-auto">
+    {{-- ======================= IDENTITAS ======================= --}}
+    <table class="w-full mt-2 border border-collapse border-black table-auto">
+        <tr>
+            <th class="w-40 px-2 py-1 text-left border border-black">Nama pasien</th>
+            <td class="px-2 py-1 border border-black">{{ $nama }}</td>
+
+            <th class="w-40 px-2 py-1 text-left border border-black">Ruang Perawatan</th>
+            <td class="px-2 py-1 border border-black">{{ $ruang }}</td>
+
+            <th class="w-24 px-2 py-1 text-left border border-black">Kamar</th>
+            <td class="px-2 py-1 border border-black">{{ $kamar }}</td>
+        </tr>
+        <tr>
+            <th class="px-2 py-1 text-left border border-black">Tanggal lahir</th>
+            <td class="px-2 py-1 border border-black">{{ $tglLahir }}</td>
+
+            <th class="px-2 py-1 text-left border border-black">Tanggal keluar</th>
+            <td class="px-2 py-1 border border-black" colspan="3">
+                @if (strtolower($statusPulang) === 'meninggal')
+                    Meninggal, {{ $tglKeluar }}
+                @else
+                    {{ $tglKeluar }}
+                @endif
+            </td>
+        </tr>
+        <tr>
+            <th class="px-2 py-1 text-left border border-black">Tanggal masuk RS</th>
+            <td class="px-2 py-1 border border-black">{{ $tglMasuk }}</td>
+
+            <th class="px-2 py-1 text-left border border-black">DPJP</th>
+            <td class="px-2 py-1 border border-black" colspan="3">{{ $dpjp }}</td>
+        </tr>
+        <tr>
+            <th class="px-2 py-1 text-left border border-black">Diagnosis masuk</th>
+            <td class="px-2 py-1 border border-black" colspan="5">{{ $diagnosaMasuk }}</td>
+        </tr>
+        <tr>
+            <th class="px-2 py-1 text-left border border-black">Indikasi Rawat Inap</th>
+            <td class="px-2 py-1 border border-black" colspan="5">{{ $indikasiRawatInap }}</td>
+        </tr>
+    </table>
+
+    {{-- ======================= ANAMNESIS ======================= --}}
+    <table class="w-full mt-2 border border-collapse border-black table-auto">
+        <tr class="font-semibold bg-gray-100">
+            <th colspan="6" class="px-2 py-1 text-left">ANAMNESIS</th>
+        </tr>
+        <tr>
+            <th class="w-48 px-2 py-1 text-left border border-black">Keluhan utama</th>
+            <td class="px-2 py-1 border border-black" colspan="5">{{ $keluhanUtama }}</td>
+        </tr>
+        <tr>
+            <th class="px-2 py-1 text-left border border-black">Riwayat penyakit</th>
+            <td class="px-2 py-1 border border-black" colspan="5">{{ $riwayatPenyakit }}</td>
+        </tr>
+    </table>
+
+    {{-- ======================= PEMERIKSAAN FISIK ======================= --}}
+    <table class="w-full mt-2 border border-collapse border-black table-auto">
+        <tr class="font-semibold bg-gray-100">
+            <th colspan="6" class="px-2 py-1 text-left">PEMERIKSAAN FISIK</th>
+        </tr>
+        <tr>
+            <th class="w-48 px-2 py-1 text-left border border-black">Keadaan umum</th>
+            <td class="px-2 py-1 border border-black" colspan="5">
+                {{ data_get($ri, 'pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.aktivitas.pilihan', '') ?: '-' }}
+            </td>
+        </tr>
+        <tr>
+            <th class="px-2 py-1 text-left border border-black">Tanda vital</th>
+            <td class="px-2 py-1 border border-black" colspan="5">
+                Tekanan darah : {{ $td }} &nbsp;&nbsp;
+                Suhu : {{ $suhu }} &nbsp;&nbsp;
+                Nadi : {{ $nadi }} &nbsp;&nbsp;
+                Frekuensi napas : {{ $rr }}
+            </td>
+        </tr>
+        <tr>
+            <th class="px-2 py-1 text-left border border-black">Pemeriksaan Fisik</th>
+            <td class="px-2 py-1 border border-black" colspan="5">{{ $fisikRingkas }}</td>
+        </tr>
+    </table>
+
+    {{-- ======================= PEMERIKSAAN PENUNJANG ======================= --}}
+    <table class="w-full mt-2 border border-collapse border-black table-auto">
+        <tr class="font-semibold bg-gray-100">
+            <th colspan="6" class="px-2 py-1 text-left">PEMERIKSAAN PENUNJANG</th>
+        </tr>
+        <tr>
+            <th class="w-48 px-2 py-1 text-left border border-black">1. LABORATORIUM</th>
+            <td class="px-2 py-1 border border-black" colspan="5">{{ $labText }}</td>
+        </tr>
+        <tr>
+            <th class="px-2 py-1 text-left border border-black">2. RADIOLOGI</th>
+            <td class="px-2 py-1 border border-black" colspan="5">{{ $radText }}</td>
+        </tr>
+        <tr>
+            <th class="px-2 py-1 text-left border border-black">3. LAIN-LAIN</th>
+            <td class="px-2 py-1 border border-black" colspan="5">
+                {{ $lainText }}
+                {{-- contoh menampilkan pemakaian oksigen terakhir --}}
+                {{-- @php
+                    $oks = collect(data_get($ri, 'observasi.pemakaianOksigen.pemakaianOksigenData', []))->last();
+                @endphp
+                @if ($oks)
+                    Oksigen: {{ $oks['jenisAlatOksigen'] ?? '' }}; Dosis: {{ $oks['dosisOksigen'] ?? '' }}; Mulai:
+                    {{ $oks['tanggalWaktuMulai'] ?? '' }}
+                @endif --}}
+            </td>
+        </tr>
+    </table>
+
+    {{-- ======================= TERAPI/TINDAKAN DI RS ======================= --}}
+    <table class="w-full mt-2 border border-collapse border-black table-auto">
+        <tr class="font-semibold bg-gray-100">
+            <th colspan="6" class="px-2 py-1 text-left">TERAPI/TINDAKAN MEDIS SELAMA DI RUMAH SAKIT</th>
+        </tr>
+        <tr>
+            <td class="px-2 py-8 border border-black" colspan="6">{{ $terapiRS }}</td>
+        </tr>
+    </table>
+
+    {{-- ======================= DIAGNOSIS & TINDAKAN + ICD ======================= --}}
+    <table class="w-full mt-2 border border-collapse border-black table-auto">
+        <tr>
+            <th class="w-48 px-2 py-1 text-left border border-black">DIAGNOSIS UTAMA</th>
+            <td class="px-2 py-1 border border-black">{{ $dxUtama }}</td>
+            <th class="w-24 px-2 py-1 text-left border border-black">ICD-10</th>
+            <td class="w-32 px-2 py-1 border border-black">{{ $dxUtamaICD }}</td>
+        </tr>
+
+        <tr>
+            <th class="px-2 py-1 text-left align-top border border-black">DIAGNOSIS SEKUNDER :</th>
+            <td class="px-2 py-1 align-top border border-black">
+                <ol class="pl-6 leading-6 list-decimal">
+                    @forelse($dxSekunder as $dx)
+                        <li>{{ $dx }}</li>
+                    @empty
+                        <li>&nbsp;</li>
+                    @endforelse
+                </ol>
+            </td>
+            <th class="px-2 py-1 text-left align-top border border-black">ICD-10</th>
+            <td class="px-2 py-1 align-top border border-black">
+                <ol class="pl-6 leading-6 list-decimal">
+                    @forelse($dxSekunderICD as $code)
+                        <li>{{ $code }}</li>
+                    @empty
+                        <li>&nbsp;</li>
+                    @endforelse
+                </ol>
+            </td>
+        </tr>
+
+        <tr>
+            <th class="px-2 py-1 text-left align-top border border-black">TINDAKAN/PROSEDUR :</th>
+            <td class="px-2 py-1 align-top border border-black">
+                <ol class="pl-6 leading-6 list-decimal">
+                    @forelse($tindakanDesc as $t)
+                        <li>{{ $t }}</li>
+                    @empty
+                        <li>&nbsp;</li>
+                    @endforelse
+                </ol>
+            </td>
+            <th class="px-2 py-1 text-left align-top border border-black">ICD-9-CM</th>
+            <td class="px-2 py-1 align-top border border-black">
+                <ol class="pl-6 leading-6 list-decimal">
+                    @forelse($tindakanCode as $c)
+                        <li>{{ $c }}</li>
+                    @empty
+                        <li>&nbsp;</li>
+                    @endforelse
+                </ol>
+            </td>
+        </tr>
+
+        <tr>
+            <th class="px-2 py-1 text-left border border-black">DIET</th>
+            <td class="px-2 py-1 border border-black" colspan="3">{{ $diet }}</td>
+        </tr>
+        {{-- <tr>
+            <th class="px-2 py-1 text-left border border-black">INSTRUKSI DAN EDUKASI (TINDAK LANJUT)</th>
+            <td class="px-2 py-6 border border-black" colspan="3">{{ $lastPlan }}</td>
+        </tr> --}}
+    </table>
+
+    <div class="mt-1 text-xs italic text-right">Bersambung ke hal 2</div>
+    <div class="page-break"></div>
+
+    {{-- ======================= HALAMAN 2 ======================= --}}
+    <div class="font-semibold">Sambungan <span class="uppercase">RINGKASAN PULANG</span></div>
+
+    <table class="w-full mt-1 border border-collapse border-black table-auto">
+        <tr>
+            <th class="w-40 px-2 py-1 text-left border border-black">Nama pasien :</th>
+            <td class="px-2 py-1 border border-black">{{ $nama }}</td>
+            <th class="w-40 px-2 py-1 text-left border border-black">No. Rekam Medis :</th>
+            <td class="px-2 py-1 border border-black">
+                <div class="flex gap-1">
+                    {{ $rm }}
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    {{-- KONDISI SAAT PULANG --}}
+    <table class="w-full mt-2 border border-collapse border-black table-auto">
+        <tr class="font-semibold bg-gray-100">
+            <th colspan="4" class="px-2 py-1 text-left">KONDISI SAAT PULANG</th>
+        </tr>
+        <tr>
+            <th class="w-48 px-2 py-1 text-left align-top border border-black">Keadaan umum</th>
+            <td class="px-2 py-1 border border-black">
+                {{ $isMeninggal ? 'Meninggal' : data_get($ri, 'pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.aktivitas.pilihan', '') }}
+            </td>
+            <th class="w-24 px-2 py-1 text-left align-top border border-black">GCS</th>
+            <td class="px-2 py-1 border border-black">{{ $gcsPulang }}</td>
+        </tr>
+        <tr>
+            <th class="px-2 py-1 text-left border border-black">Tanda vital</th>
+            <td class="px-2 py-1 border border-black" colspan="3">
+                Tekanan darah : {{ $td }} &nbsp;&nbsp;
+                Suhu : {{ $suhu }} &nbsp;&nbsp;
+                Nadi : {{ $nadi }} &nbsp;&nbsp;
+                Frekuensi napas : {{ $rr }}
+            </td>
+        </tr>
+        <tr>
+            <th class="px-2 py-1 text-left align-top border border-black">Catatan penting (kondisi saat ini)</th>
+            <td class="px-2 py-6 border border-black" colspan="3">{{ $catatanPenting }}</td>
+        </tr>
+    </table>
+
+    {{-- CARA KELUAR RS --}}
+    <table class="w-full mt-2 border border-collapse border-black table-auto">
+        <tr class="font-semibold bg-gray-100">
+            <th colspan="6" class="px-2 py-1 text-left">CARA KELUAR RS</th>
+        </tr>
+        <tr>
+            <td class="px-2 py-1 border border-black">
+                <span class="inline-block w-3 h-3 mr-2 align-middle border border-black">
+                    @if ($statusPulang === 'Pulang')
+                        ✔
+                    @endif
+                </span> Pulang Atas persetujuan
+            </td>
+            <td class="px-2 py-1 border border-black">
+                <span class="inline-block w-3 h-3 mr-2 align-middle border border-black">
+                    @if ($statusPulang === 'APS')
+                        ✔
+                    @endif
+                </span> Pulang Atas Permintaan Sendiri
+            </td>
+            <td class="px-2 py-1 border border-black">
+                <span class="inline-block w-3 h-3 mr-2 align-middle border border-black">
+                    @if ($statusPulang === 'Dirujuk')
+                        ✔
+                    @endif
+                </span> Dirujuk
+            </td>
+            <td class="px-2 py-1 border border-black">Kabur</td>
+            <td class="px-2 py-1 border border-black">
+                <span class="inline-block w-3 h-3 mr-2 align-middle border border-black">
+                    @if ($isMeninggal)
+                        ✔
+                    @endif
+                </span> Meninggal
+            </td>
+            <td class="px-2 py-1 border border-black">&nbsp;</td>
+        </tr>
+    </table>
+
+    {{-- TINDAK LANJUT --}}
+    <table class="w-full mt-2 border border-collapse border-black table-auto">
+        <tr class="font-semibold bg-gray-100">
+            <th colspan="6" class="px-2 py-1 text-left">TINDAK LANJUT</th>
+        </tr>
+        <tr>
+            <td class="w-1/2 px-2 py-1 border border-black">
+                <span class="inline-block w-3 h-3 mr-2 align-middle border border-black">
+                    @if ($isKontrol)
+                        ✔
+                    @endif
+                </span>
+                Kontrol rawat jalan, tanggal
+                <span class="inline-block w-56 align-middle border-b border-black border-dotted">
+                    &nbsp;{{ $tglKontrol }}&nbsp;
+                </span>
+            </td>
+            <td class="w-1/2 px-2 py-1 border border-black">
+                <span class="inline-block w-3 h-3 mr-2 align-middle border border-black"></span>
+                <span class="inline-block w-56 border-b border-black border-dotted">&nbsp;&nbsp;</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="px-2 py-1 border border-black">
+                <span class="inline-block w-3 h-3 mr-2 align-middle border border-black">
+                    @if ($statusPulang === 'Dirujuk')
+                        ✔
+                    @endif
+                </span>
+                Dirujuk ke
+                <span class="inline-block w-64 border-b border-black border-dotted">&nbsp;&nbsp;</span>
+            </td>
+            <td class="px-2 py-1 border border-black">
+                <span class="inline-block w-3 h-3 mr-2 align-middle border border-black"></span>
+                <span class="inline-block w-56 border-b border-black border-dotted">&nbsp;&nbsp;</span>
+            </td>
+        </tr>
+    </table>
+
+    {{-- TERAPI PULANG --}}
+    <table class="w-full mt-2 border border-collapse border-black table-auto">
+        <tr class="font-semibold bg-gray-100">
+            <th colspan="4" class="px-2 py-1 text-left">TERAPI PULANG</th>
+        </tr>
+        <tr class="font-semibold bg-gray-100">
+            <th class="px-2 py-1 text-left border border-black">Nama Obat</th>
+            <th class="px-2 py-1 text-left border border-black">Jumlah</th>
+            <th class="px-2 py-1 text-left border border-black">Dosis</th>
+            <th class="px-2 py-1 text-left border border-black">Cara Pemberian</th>
+        </tr>
+        @php
+            $obatPulang = (array) data_get($ri, 'obatPulang', []);
+        @endphp
+        @forelse($obatPulang as $o)
             <tr>
-                <td class="px-2 py-10 align-bottom border border-black">
-                    Tanda tangan pasien/keluarga,
-                    <div class="mt-8">( ................................................ )</div>
-                </td>
-                <td class="px-2 py-10 align-bottom border border-black">
-                    Jakarta,
-                    <span
-                        class="inline-block align-bottom border-b border-black border-dotted w-72">&nbsp;{{ $identitas['kotaTanggalTTD'] ?? '' }}&nbsp;</span>
-                    <div class="mt-8 text-center">( ................................................ )<br />Tanda
-                        tangan dan nama dokter</div>
-                </td>
+                <td class="px-2 py-1 border border-black">{{ $o['nama'] ?? '' }}</td>
+                <td class="px-2 py-1 border border-black">{{ $o['jumlah'] ?? '' }}</td>
+                <td class="px-2 py-1 border border-black">{{ $o['dosis'] ?? '' }}</td>
+                <td class="px-2 py-1 border border-black">{{ $o['cara'] ?? '' }}</td>
             </tr>
-        </table>
+        @empty
+            @for ($i = 0; $i < 8; $i++)
+                <tr>
+                    <td class="px-2 py-3 border border-black">&nbsp;</td>
+                    <td class="px-2 py-3 border border-black">&nbsp;</td>
+                    <td class="px-2 py-3 border border-black">&nbsp;</td>
+                    <td class="px-2 py-3 border border-black">&nbsp;</td>
+                </tr>
+            @endfor
+        @endforelse
+    </table>
 
-        {{-- FOOTER --}}
-        <div class="text-center text-[10px] mt-2 font-semibold">
-            MOHON UNTUK TIDAK MENGGUNAKAN SINGKATAN DALAM PENULISAN DIAGNOSIS DAN TINDAKAN<br />
-            SERTA DITULIS DENGAN RAPI
-        </div>
-        <div class="text-center text-[10px]">
-            Jl. Danau Sunter Utara, Sunter Paradise I, Jakarta 14350 Telepon : (021) 6400261, 6459877 (Hunting) Fax :
-            (021) 6400778
-            &nbsp; E-Mail : info@royalprogress.com &nbsp; www.royalprogress.com
-        </div>
-        <div class="text-right text-[10px]">2/2</div>
+    {{-- TTD --}}
+    <table class="w-full mt-3 border border-collapse border-black table-auto">
+        <tr>
+            <td class="px-2 py-10 align-bottom border border-black">
+                Tanda tangan pasien/keluarga,
+                <div class="mt-8">( ................................................ )</div>
+            </td>
+            <td class="px-2 py-10 align-bottom border border-black">
+                Jakarta,
+                <span class="inline-block align-bottom border-b border-black border-dotted w-72">&nbsp;&nbsp;</span>
+                <div class="mt-8 text-center">
+                    ( ................................................ )<br />Tanda tangan dan nama dokter
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    {{-- FOOTER --}}
+    <div class="text-center text-[10px] mt-2 font-semibold">
+        MOHON UNTUK TIDAK MENGGUNAKAN SINGKATAN DALAM PENULISAN DIAGNOSIS DAN TINDAKAN<br />
+        SERTA DITULIS DENGAN RAPI
     </div>
+    <div class="text-center text-[10px]">
+        Jl. Danau Sunter Utara, Sunter Paradise I, Jakarta 14350 Telepon : (021) 6400261, 6459877 (Hunting) Fax :
+        (021) 6400778 &nbsp; E-Mail : info@royalprogress.com &nbsp; www.royalprogress.com
+    </div>
+    <div class="text-right text-[10px]">2/2</div>
 </div>

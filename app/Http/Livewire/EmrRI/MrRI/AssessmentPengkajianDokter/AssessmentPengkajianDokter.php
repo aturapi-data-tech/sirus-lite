@@ -7,10 +7,12 @@ use Livewire\WithPagination;
 
 use App\Http\Traits\EmrRI\EmrRITrait;
 use App\Http\Traits\customErrorMessagesTrait;
+use App\Http\Traits\MasterPasien\MasterPasienTrait;
+
 
 class AssessmentPengkajianDokter extends Component
 {
-    use WithPagination, EmrRITrait, customErrorMessagesTrait;
+    use WithPagination, EmrRITrait, customErrorMessagesTrait, MasterPasienTrait;
 
     // listener from blade////////////////
     protected $listeners = [
@@ -51,6 +53,7 @@ class AssessmentPengkajianDokter extends Component
     public $riHdrNoRef;
 
     public array $dataDaftarRi = [];
+    public array $dataPasien = [];
 
     public array $pengkajianDokter = [
         "anamnesa" => [
@@ -550,6 +553,8 @@ class AssessmentPengkajianDokter extends Component
     {
 
         $this->dataDaftarRi = $this->findDataRI($riHdrNo);
+        $this->dataPasien = $this->findDataMasterPasien($this->dataDaftarRi['regNo'] ?? '');
+
         // dd($this->dataDaftarRi);
         // jika pengkajianDokter tidak ditemukan tambah variable pengkajianDokter pda array
         if (isset($this->dataDaftarRi['pengkajianDokter']) == false) {

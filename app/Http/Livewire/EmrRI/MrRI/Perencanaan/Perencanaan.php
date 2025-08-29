@@ -10,11 +10,12 @@ use Livewire\WithPagination;
 use Carbon\Carbon;
 use App\Http\Traits\BPJS\VclaimTrait;
 use App\Http\Traits\EmrRI\EmrRITrait;
+use App\Http\Traits\MasterPasien\MasterPasienTrait;
 
 
 class Perencanaan extends Component
 {
-    use WithPagination, EmrRITrait;
+    use WithPagination, EmrRITrait, MasterPasienTrait;
 
     // listener from blade////////////////
     protected $listeners = [
@@ -29,6 +30,7 @@ class Perencanaan extends Component
 
     // dataDaftarRi RJ
     public array $dataDaftarRi = [];
+    public array $dataPasien = [];
 
     public array $perencanaan = [
         "tindakLanjut" => [
@@ -481,6 +483,8 @@ class Perencanaan extends Component
     {
 
         $this->dataDaftarRi = $this->findDataRI($riHdrNo);
+        $this->dataPasien = $this->findDataMasterPasien($this->dataDaftarRi['regNo'] ?? '');
+
         // dd($this->dataDaftarRi);
         // jika perencanaan tidak ditemukan tambah variable perencanaan pda array
         if (isset($this->dataDaftarRi['perencanaan']) == false) {

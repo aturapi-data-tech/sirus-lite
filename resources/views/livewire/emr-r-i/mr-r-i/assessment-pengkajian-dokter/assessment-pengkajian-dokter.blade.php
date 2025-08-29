@@ -68,6 +68,14 @@
                                     @click="activeTab = 'Bagian 6: Tanda Tangan Dokter'">Bagian 6: Tanda Tangan
                                     Dokter</label>
                             </li>
+                            <li class="mr-2">
+                                <label
+                                    class="inline-block p-2 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
+                                    :class="activeTab === 'Bagian 7: Ringkasan Pasien Pulang' ?
+                                        'text-primary border-primary bg-gray-100' : ''"
+                                    @click="activeTab = 'Bagian 7: Ringkasan Pasien Pulang'">Bagian 7: Ringkasan Pasien
+                                    Pulang</label>
+                            </li>
                         </ul>
                     </div>
 
@@ -111,6 +119,12 @@
                         :class="{ 'active': activeTab === 'Bagian 6: Tanda Tangan Dokter' }"
                         x-show.transition.in.opacity.duration.600="activeTab === 'Bagian 6: Tanda Tangan Dokter'">
                         @include('livewire.emr-r-i.mr-r-i.pengkajian-dokter.bagian6-tanda-tangan-dokter')
+                    </div>
+
+                    <div class="p-2 rounded-lg bg-gray-50"
+                        :class="{ 'active': activeTab === 'Bagian 7: Ringkasan Pasien Pulang' }"
+                        x-show.transition.in.opacity.duration.600="activeTab === 'Bagian 7: Ringkasan Pasien Pulang'">
+                        @include('livewire.emr-r-i.mr-r-i.perencanaan.perencanaan4-ringkasan-pasien-pulang')
                     </div>
                 </div>
             </div>
