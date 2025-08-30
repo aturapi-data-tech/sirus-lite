@@ -115,7 +115,17 @@
             ->unique()
             ->implode(' | ');
 
-        $terapiRS = $plansDokter ?: '';
+        // pecah pakai delimiter " | " → jadi baris-baris
+        $items = preg_split('/\s*\|\s*/', $plansDokter ?? '', -1, PREG_SPLIT_NO_EMPTY) ?: [];
+
+        // opsional: rapihkan spasi & kapitalisasi ringan
+        $items = array_map(function ($s) {
+            $s = preg_replace('/\s+/', ' ', trim($s));
+            return $s;
+        }, $items);
+
+        // jadikan multiline (setiap item satu baris, boleh pakai bullet)
+        $terapiRS = count($items) ? '• ' . implode("\n• ", $items) : '';
 
         // ====== DIAGNOSIS (ICD + Free Text) ======
         $dxList = collect(data_get($ri, 'diagnosis', []));
