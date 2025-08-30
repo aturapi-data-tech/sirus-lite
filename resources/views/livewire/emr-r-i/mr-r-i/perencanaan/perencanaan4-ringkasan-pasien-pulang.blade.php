@@ -1,5 +1,7 @@
 <div>
-
+    @php
+        use Carbon\Carbon;
+    @endphp
 
     @php
         // ====== Helper kecil di Blade (aman & ringkas) ======
@@ -451,7 +453,7 @@
         $lastObsExit = $exitDateOnly
             ? $tandaObs->last(function ($r) use ($exitDateOnly) {
                 $w = $r['waktuPemeriksaan'] ?? null;
-                return $w && Carbon::createFromFormat('d/m/Y H:i:s', $w)->isSameDay($exitDt);
+                return $w && Carbon::createFromFormat('d/m/Y H:i:s', $w)->isSameDay($exitDateOnly);
             })
             : null;
 
@@ -473,7 +475,7 @@
         // Ambil header terakhir by resepDate (format "d/m/Y H:i:s")
         $eresepHdrs = collect(data_get($ri, 'eresepHdr', []));
 
-        $eresepLastHdr = collect(data_get($ri, 'eresepHdr', []))
+        $eresepLastHdr = $eresepHdrs
             ->sortBy(function ($h) {
                 $d = data_get($h, 'resepDate');
                 try {
