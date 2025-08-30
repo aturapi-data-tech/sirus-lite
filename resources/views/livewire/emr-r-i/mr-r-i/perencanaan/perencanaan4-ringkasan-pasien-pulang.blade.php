@@ -94,17 +94,6 @@
         );
 
         // Terapi/Tindakan selama di RS (dari pemberian obat & cairan)
-        //$obc = data_get($ri, 'observasi.obatDanCairan.pemberianObatDanCairan', []);
-        //$terapiRS = collect($obc)
-        //    ->map(function ($o) {
-        //        $nama = $o['namaObatAtauJenisCairan'] ?? '';
-        //        $d = $o['dosis'] ?? '';
-        //        $r = $o['rute'] ?? '';
-        //        return trim($nama . ' ' . $d . ($r ? ' (' . $r . ')' : ''));
-        //    })
-        //    ->filter()
-        //    ->implode('; ');
-
         $cppt = data_get($ri, 'cppt', []);
         // ambil CPPT yang jelas-jelas dokter (profession berisi 'Dokter' atau nama petugas diawali 'dr.')
         $plansDokter = collect($cppt)
@@ -113,7 +102,7 @@
             ->filter()
             ->map(fn($p) => trim($p))
             ->unique()
-            ->implode(' | ');
+            ->implode(' ----- ');
 
         // pecah pakai delimiter " | " → jadi baris-baris
         $items = preg_split('/\s*\|\s*/', $plansDokter ?? '', -1, PREG_SPLIT_NO_EMPTY) ?: [];
@@ -361,7 +350,7 @@
             <th colspan="6" class="px-2 py-1 text-left">TERAPI/TINDAKAN MEDIS SELAMA DI RUMAH SAKIT</th>
         </tr>
         <tr>
-            <td class="px-2 py-8 border border-black" colspan="6">{{ $terapiRS }}</td>
+            <td class="px-2 py-8 border border-black " colspan="6">{{ $terapiRS }}</td>
         </tr>
     </table>
 
