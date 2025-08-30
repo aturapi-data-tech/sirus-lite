@@ -490,87 +490,65 @@
         // Ambil header terakhir by resepDate (format "d/m/Y H:i:s")
         $eresepHdrs = collect(data_get($ri, 'eresepHdr', []));
 
-        $eresepLastHdr = $eresepHdrs
-            ->sortBy(function ($h) {
-                $d = data_get($h, 'resepDate');
-                try {
-                    return $d ? Carbon::createFromFormat('d/m/Y H:i:s', $d)->timestamp : 0;
-                } catch (\Throwable $e) {
-                    return 0;
+        if ($exitDateOnly) {
+            // filter resep yang same-day
+            $sameDay = $eresepHdrs->filter(function ($h) use ($exitDateOnly) {
+                $tgl = data_get($h, 'resepDate');
+                if (!$tgl) {
+                    return false;
                 }
-            })
-            ->last();
+                try {
+                    $parsed = Carbon::createFromFormat('d/m/Y H:i:s', $tgl);
+                    return $parsed->isSameDay($exitDateOnly);
+                } catch (\Throwable $e) {
+                    return false;
+                }
+            });
 
-        // --- Non-racikan seperti sebelumnya ---
-        $nonRacik = collect(data_get($eresepLastHdr, 'eresep', []))->map(function ($e) {
-            $nama = trim((string) ($e['productName'] ?? ''));
-            $jumlah = trim((string) ($e['qty'] ?? ''));
-
-            $x = trim((string) ($e['signaX'] ?? ''));
-            $h = trim((string) ($e['signaHari'] ?? ''));
-            $dosis = trim($x . ($x !== '' && $h !== '' ? ' x ' : '') . $h);
-
-            $lower = strtolower($nama);
-            $cara = '';
-            if (str_contains($lower, 'inj')) {
-                $cara = 'inj';
-            } elseif (str_contains($lower, 'inf') || str_contains($lower, 'infus')) {
-                $cara = 'inf';
-            } elseif (
-                str_contains($lower, 'tab') ||
-                str_contains($lower, 'capsul') ||
-                str_contains($lower, 'cap') ||
-                str_contains($lower, 'syr')
-            ) {
-                $cara = 'po';
+            // kalau ada di hari yang sama
+            if ($sameDay->isNotEmpty()) {
+                $eresepLastHdr = $sameDay
+                    ->sortByDesc(function ($h) {
+                        try {
+                            return Carbon::createFromFormat('d/m/Y H:i:s', data_get($h, 'resepDate'))->timestamp;
+                        } catch (\Throwable $e) {
+                            return 0;
+                        }
+                    })
+                    ->first();
+            } else {
+                // fallback: ambil record terakhir dari semua HDR
+                $eresepLastHdr = $eresepHdrs
+                    ->sortByDesc(function ($h) {
+                        try {
+                            return Carbon::createFromFormat('d/m/Y H:i:s', data_get($h, 'resepDate'))->timestamp;
+                        } catch (\Throwable $e) {
+                            return 0;
+                        }
+                    })
+                    ->first();
             }
+        } else {
+            // kalau exitDate kosong → langsung ambil HDR terakhir overall
+            $eresepLastHdr = $eresepHdrs
+                ->sortByDesc(function ($h) {
+                    try {
+                        return Carbon::createFromFormat('d/m/Y H:i:s', data_get($h, 'resepDate'))->timestamp;
+                    } catch (\Throwable $e) {
+                        return 0;
+                    }
+                })
+                ->first();
+        }
 
-            return [
-                'nama' => $nama,
-                'jumlah' => $jumlah,
-                'dosis' => $dosis,
-                'cara' => $cara,
-            ];
-        });
+        // No & Tgl resep dari HDR
+        $noResep = (string) data_get($eresepLastHdr, 'resepNo', '-');
+        $tglResep = (string) data_get($eresepLastHdr, 'resepDate', '-'); // sudah d/m/Y H:i:s di data kamu
 
-        // --- Racikan: pakai field yang kamu simpan di array racikan ---
-        $racik = collect(data_get($eresepLastHdr, 'eresepRacikan', []))->map(function ($r) {
-            $noRacik = trim((string) ($r['noRacikan'] ?? ''));
-            $nama = trim((string) ($r['productName'] ?? 'Racikan'));
-            $jumlah = trim((string) ($r['qty'] ?? ''));
+        // Safety: pastikan array
+        $racikList = (array) data_get($eresepLastHdr, 'eresepRacikan', []);
+        $nonRacikList = (array) data_get($eresepLastHdr, 'eresep', []);
 
-            // dosis prioritaskan field 'dosis' dari racikan; kalau kosong, format dari signa
-            $dosisDok = trim((string) ($r['dosis'] ?? ''));
-            $x = trim((string) ($r['signaX'] ?? ''));
-            $h = trim((string) ($r['signaHari'] ?? ''));
-            $dosis = $dosisDok !== '' ? $dosisDok : trim($x . ($x !== '' && $h !== '' ? ' x ' : '') . $h);
-
-            // cara pemberian dari 'sedia' atau nama
-            $sedia = strtolower(trim((string) ($r['sedia'] ?? '')));
-            $lower = strtolower($nama . ' ' . $sedia);
-            $cara = 'po';
-            if (str_contains($lower, 'inj')) {
-                $cara = 'inj';
-            } elseif (str_contains($lower, 'inf')) {
-                $cara = 'inf';
-            } elseif (str_contains($lower, 'salep') || str_contains($lower, 'topikal')) {
-                $cara = 'top';
-            }
-            // (default tetap 'po')
-
-            // tambahkan label racikan biar jelas
-            $namaTampil = ($noRacik !== '' ? "Racikan #{$noRacik} - " : 'Racikan - ') . $nama;
-
-            return [
-                'nama' => $namaTampil,
-                'jumlah' => $jumlah,
-                'dosis' => $dosis,
-                'cara' => $cara,
-            ];
-        });
-
-        // --- Gabungkan untuk ditampilkan di tabel TERAPI PULANG ---
-        $obatPulang = $nonRacik->merge($racik)->values()->all();
     @endphp
 
     {{-- KONDISI SAAT PULANG --}}
@@ -685,12 +663,7 @@
             <th colspan="4" class="px-2 py-1 text-left">TERAPI PULANG</th>
         </tr>
 
-        @php
-            $obatPulang = (array) data_get($ri, 'obatPulang', []);
-            // Ambil no & tgl resep dari item pertama (karena semua dari HDR yang sama)
-            $noResep = $obatPulang[0]['resepNo'] ?? '-';
-            $tglResep = $obatPulang[0]['resepDate'] ?? '-';
-        @endphp
+
 
         {{-- Baris info resep (bukan looping) --}}
         <tr>
@@ -700,35 +673,100 @@
             <td class="px-2 py-1 border border-black">{{ $tglResep }}</td>
         </tr>
 
+        {{-- ================== NON-RACIKAN (setelah racikan) ================== --}}
+        @if (!empty($nonRacikanList))
+            @foreach ($nonRacikanList as $i => $detail)
+                @php
+                    $rowId = $detail['riObatDtl'] ?? $i;
+                    $hdrId = $tglResep ?? 'hdr';
+                    $productName = $detail['productName'] ?? '-';
+                    $qty = $detail['qty'] ?? '-';
+                    $signaX = $detail['signaX'] ?? '';
+                    $signaHari = $detail['signaHari'] ?? '';
+                    $catatanKhusus = !empty($detail['catatanKhusus']) ? ' (' . $detail['catatanKhusus'] . ')' : '';
 
-        <tr class="font-semibold bg-gray-100">
-            <th class="px-2 py-1 text-left border border-black">Nama Obat</th>
-            <th class="px-2 py-1 text-left border border-black">Jumlah</th>
-            <th class="px-2 py-1 text-left border border-black">Dosis</th>
-            <th class="px-2 py-1 text-left border border-black">Cara Pemberian</th>
-        </tr>
+                    // Format string: "R/ {product} | No. {qty} | S {signaX}dd{signaHari}(catatanKhusus)"
+                    $line =
+                        'R/ ' .
+                        $productName .
+                        ' | No. ' .
+                        $qty .
+                        ' | S ' .
+                        $signaX .
+                        'dd' .
+                        $signaHari .
+                        $catatanKhusus;
+                @endphp
 
-
-
-        @if (!empty($obatPulang))
-            @foreach ($obatPulang as $o)
-                <tr>
-                    <td class="px-2 py-1 border border-black">{{ $o['nama'] ?? '' }}</td>
-                    <td class="px-2 py-1 border border-black">{{ $o['jumlah'] ?? '' }}</td>
-                    <td class="px-2 py-1 border border-black">{{ $o['dosis'] ?? '' }}</td>
-                    <td class="px-2 py-1 border border-black">{{ $o['cara'] ?? '' }}</td>
+                <tr wire:key="eresep-{{ $hdrId }}-{{ $rowId }}" class="border-b dark:border-gray-700">
+                    <td class="w-1/2 px-4 py-2">
+                        {{ $line }}
+                    </td>
                 </tr>
             @endforeach
         @else
-            @for ($i = 0; $i < 2; $i++)
-                <tr>
-                    <td class="px-2 py-3 border border-black">&nbsp;</td>
-                    <td class="px-2 py-3 border border-black">&nbsp;</td>
-                    <td class="px-2 py-3 border border-black">&nbsp;</td>
-                    <td class="px-2 py-3 border border-black">&nbsp;</td>
-                </tr>
-            @endfor
+            <tr class="border-b dark:border-gray-700">
+                <td class="w-1/2 px-4 py-2">Belum ada resep non racikan.</td>
+            </tr>
         @endif
+
+
+        {{-- ================== RACIKAN (ditampilkan lebih dulu) ================== --}}
+        @if (!empty($racikList))
+            @php $myPreviousRow = null; @endphp
+            @foreach ($racikList as $i => $detail)
+                @php
+                    // guard
+                    if (!isset($detail['jenisKeterangan'])) {
+                        // kalau tidak ada jenisKeterangan, lewati (menjaga konsistensi contohmu)
+                        continue;
+                    }
+
+                    $rowId = $detail['riObatDtl'] ?? $i;
+                    $hdrId = $tglResep ?? 'hdr';
+
+                    $noRacikan = $detail['noRacikan'] ?? '';
+                    $productName = $detail['productName'] ?? '';
+                    $qty = $detail['qty'] ?? null; // bisa 0/null
+                    $catatan = $detail['catatan'] ?? '';
+                    $catatanKhusus = $detail['catatanKhusus'] ?? '';
+                    $dosis = $detail['dosis'] ?? '';
+
+                    // Border top saat ganti noRacikan (grouping)
+                    $myRacikanBorder = $myPreviousRow !== $noRacikan ? 'border-t-2 ' : '';
+
+                    // Baris detail: "noRacikan/ product - dosis"
+                    $lineDetail = trim(($noRacikan !== '' ? $noRacikan : '') . '/ ' . $productName . ' - ' . $dosis);
+
+                    // Baris ringkas racikan (hanya jika ada qty): "Jml Racikan {qty} | {catatan} | S {catatanKhusus}"
+                    $jmlRacikan =
+                        $qty !== null && $qty !== ''
+                            ? 'Jml Racikan ' .
+                                $qty .
+                                ($catatan !== '' ? ' | ' . $catatan : '') .
+                                ($catatanKhusus !== '' ? ' | S ' . $catatanKhusus : '')
+                            : '';
+                @endphp
+
+                <tr wire:key="eresep-racikan-{{ $hdrId }}-{{ $rowId }}"
+                    class="{{ $myRacikanBorder }} group">
+                    <td class="w-1/2 px-4 py-2 whitespace-pre-line">
+                        {{ $lineDetail }}
+                        @if ($jmlRacikan !== '')
+                            {{ "\n" . $jmlRacikan }}
+                        @endif
+                    </td>
+                </tr>
+
+                @php $myPreviousRow = $noRacikan; @endphp
+            @endforeach
+        @else
+            <tr class="border-b dark:border-gray-700">
+                <td class="w-1/2 px-4 py-2">Belum ada resep racikan.</td>
+            </tr>
+        @endif
+
+
     </table>
 
     {{-- TTD --}}
