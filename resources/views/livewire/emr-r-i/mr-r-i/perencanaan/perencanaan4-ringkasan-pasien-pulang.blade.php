@@ -667,12 +667,32 @@
         <tr class="font-semibold bg-gray-100">
             <th colspan="4" class="px-2 py-1 text-left">TERAPI PULANG</th>
         </tr>
+
+        @php
+            $obatPulang = (array) data_get($ri, 'obatPulang', []);
+            // Ambil no & tgl resep dari item pertama (karena semua dari HDR yang sama)
+            $noResep = $obatPulang[0]['resepNo'] ?? '-';
+            $tglResep = $obatPulang[0]['resepDate'] ?? '-';
+        @endphp
+
+        {{-- Baris info resep (bukan looping) --}}
+        <tr>
+            <th class="px-2 py-1 text-left border border-black">No Resep</th>
+            <td class="px-2 py-1 border border-black">{{ $noResep }}</td>
+            <th class="px-2 py-1 text-left border border-black">Tgl Resep</th>
+            <td class="px-2 py-1 border border-black">{{ $tglResep }}</td>
+        </tr>
+
+
         <tr class="font-semibold bg-gray-100">
             <th class="px-2 py-1 text-left border border-black">Nama Obat</th>
             <th class="px-2 py-1 text-left border border-black">Jumlah</th>
             <th class="px-2 py-1 text-left border border-black">Dosis</th>
             <th class="px-2 py-1 text-left border border-black">Cara Pemberian</th>
         </tr>
+
+
+
         @if (!empty($obatPulang))
             @foreach ($obatPulang as $o)
                 <tr>
