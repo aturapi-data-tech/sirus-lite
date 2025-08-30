@@ -437,10 +437,129 @@
         </tr>
     </table>
 
+
+    @php
+        // kumpulan TTV
+        $tandaObs = collect(data_get($ri, 'observasi.observasiLanjutan.tandaVital', []));
+
+        // filter observasi pada tanggal exitDate (format "dd/mm/yyyy hh:mm:ss")
+        $exitDateOnly = !empty($ri['exitDate'])
+            ? Carbon::createFromFormat('d/m/Y H:i:s', $ri['exitDate'])->format('d/m/Y')
+            : null;
+
+        // filter observasi yang tanggalnya sama dengan exitDate
+        $lastObsExit = $exitDateOnly
+            ? $tandaObs->last(function ($r) use ($exitDateOnly) {
+                $w = $r['waktuPemeriksaan'] ?? null;
+                return $w && Carbon::createFromFormat('d/m/Y H:i:s', $w)->isSameDay($exitDt);
+            })
+            : null;
+
+        // fallback: kalau gak ada yang sama harinya, ambil yang paling akhir (opsional sort kalau urutan tidak terjamin)
+        $obs = $lastObsExit ?: $tandaObs->sortBy('waktuPemeriksaan')->last() ?: [];
+
+        // set variabel *pulang*
+        $sis = trim((string) data_get($obs, 'sistolik', ''));
+        $dis = trim((string) data_get($obs, 'distolik', ''));
+
+        $tdPulang =
+            $sis !== '' && $dis !== '' ? "{$sis}/{$dis}" : ($sis !== '' ? $sis : ($dis !== '' ? "/{$dis}" : '-'));
+        $suhuPulang = ($tmp = trim((string) data_get($obs, 'suhu', ''))) !== '' ? $tmp : '-';
+        $nadiPulang = ($tmp = trim((string) data_get($obs, 'frekuensiNadi', ''))) !== '' ? $tmp : '-';
+        $rrPulang = ($tmp = trim((string) data_get($obs, 'frekuensiNafas', ''))) !== '' ? $tmp : '-';
+        $gcsPulang = ($tmp = trim((string) data_get($obs, 'gcs', ''))) !== '' ? $tmp : ($isMeninggal ? '0' : '-');
+
+        //ResepPulang
+        // Ambil header terakhir by resepDate (format "d/m/Y H:i:s")
+        $eresepHdrs = collect(data_get($ri, 'eresepHdr', []));
+
+        $eresepLastHdr = collect(data_get($ri, 'eresepHdr', []))
+            ->sortBy(function ($h) {
+                $d = data_get($h, 'resepDate');
+                try {
+                    return $d ? Carbon::createFromFormat('d/m/Y H:i:s', $d)->timestamp : 0;
+                } catch (\Throwable $e) {
+                    return 0;
+                }
+            })
+            ->last();
+
+        // --- Non-racikan seperti sebelumnya ---
+        $nonRacik = collect(data_get($eresepLastHdr, 'eresep', []))->map(function ($e) {
+            $nama = trim((string) ($e['productName'] ?? ''));
+            $jumlah = trim((string) ($e['qty'] ?? ''));
+
+            $x = trim((string) ($e['signaX'] ?? ''));
+            $h = trim((string) ($e['signaHari'] ?? ''));
+            $dosis = trim($x . ($x !== '' && $h !== '' ? ' x ' : '') . $h);
+
+            $lower = strtolower($nama);
+            $cara = '';
+            if (str_contains($lower, 'inj')) {
+                $cara = 'inj';
+            } elseif (str_contains($lower, 'inf') || str_contains($lower, 'infus')) {
+                $cara = 'inf';
+            } elseif (
+                str_contains($lower, 'tab') ||
+                str_contains($lower, 'capsul') ||
+                str_contains($lower, 'cap') ||
+                str_contains($lower, 'syr')
+            ) {
+                $cara = 'po';
+            }
+
+            return [
+                'nama' => $nama,
+                'jumlah' => $jumlah,
+                'dosis' => $dosis,
+                'cara' => $cara,
+            ];
+        });
+
+        // --- Racikan: pakai field yang kamu simpan di array racikan ---
+        $racik = collect(data_get($eresepLastHdr, 'eresepRacikan', []))->map(function ($r) {
+            $noRacik = trim((string) ($r['noRacikan'] ?? ''));
+            $nama = trim((string) ($r['productName'] ?? 'Racikan'));
+            $jumlah = trim((string) ($r['qty'] ?? ''));
+
+            // dosis prioritaskan field 'dosis' dari racikan; kalau kosong, format dari signa
+            $dosisDok = trim((string) ($r['dosis'] ?? ''));
+            $x = trim((string) ($r['signaX'] ?? ''));
+            $h = trim((string) ($r['signaHari'] ?? ''));
+            $dosis = $dosisDok !== '' ? $dosisDok : trim($x . ($x !== '' && $h !== '' ? ' x ' : '') . $h);
+
+            // cara pemberian dari 'sedia' atau nama
+            $sedia = strtolower(trim((string) ($r['sedia'] ?? '')));
+            $lower = strtolower($nama . ' ' . $sedia);
+            $cara = 'po';
+            if (str_contains($lower, 'inj')) {
+                $cara = 'inj';
+            } elseif (str_contains($lower, 'inf')) {
+                $cara = 'inf';
+            } elseif (str_contains($lower, 'salep') || str_contains($lower, 'topikal')) {
+                $cara = 'top';
+            }
+            // (default tetap 'po')
+
+            // tambahkan label racikan biar jelas
+            $namaTampil = ($noRacik !== '' ? "Racikan #{$noRacik} - " : 'Racikan - ') . $nama;
+
+            return [
+                'nama' => $namaTampil,
+                'jumlah' => $jumlah,
+                'dosis' => $dosis,
+                'cara' => $cara,
+            ];
+        });
+
+        // --- Gabungkan untuk ditampilkan di tabel TERAPI PULANG ---
+        $obatPulang = $nonRacik->merge($racik)->values()->all();
+    @endphp
+
     {{-- KONDISI SAAT PULANG --}}
     <table class="w-full mt-2 border border-collapse border-black table-auto">
         <tr class="font-semibold bg-gray-100">
-            <th colspan="4" class="px-2 py-1 text-left">KONDISI SAAT PULANG</th>
+            <th colspan="4" class="px-2 py-1 text-left">KONDISI SAAT PULANGX</th>
         </tr>
         <tr>
             <th class="w-48 px-2 py-1 text-left align-top border border-black">Keadaan umum</th>
@@ -453,10 +572,10 @@
         <tr>
             <th class="px-2 py-1 text-left border border-black">Tanda vital</th>
             <td class="px-2 py-1 border border-black" colspan="3">
-                Tekanan darah : {{ $td }} &nbsp;&nbsp;
-                Suhu : {{ $suhu }} &nbsp;&nbsp;
-                Nadi : {{ $nadi }} &nbsp;&nbsp;
-                Frekuensi napas : {{ $rr }}
+                Tekanan darah : {{ $tdPulang }} &nbsp;&nbsp;
+                Suhu : {{ $suhuPulang }} &nbsp;&nbsp;
+                Nadi : {{ $nadiPulang }} &nbsp;&nbsp;
+                Frekuensi napas : {{ $rrPulang }}
             </td>
         </tr>
         <tr>
@@ -554,18 +673,17 @@
             <th class="px-2 py-1 text-left border border-black">Dosis</th>
             <th class="px-2 py-1 text-left border border-black">Cara Pemberian</th>
         </tr>
-        @php
-            $obatPulang = (array) data_get($ri, 'obatPulang', []);
-        @endphp
-        @forelse($obatPulang as $o)
-            <tr>
-                <td class="px-2 py-1 border border-black">{{ $o['nama'] ?? '' }}</td>
-                <td class="px-2 py-1 border border-black">{{ $o['jumlah'] ?? '' }}</td>
-                <td class="px-2 py-1 border border-black">{{ $o['dosis'] ?? '' }}</td>
-                <td class="px-2 py-1 border border-black">{{ $o['cara'] ?? '' }}</td>
-            </tr>
-        @empty
-            @for ($i = 0; $i < 8; $i++)
+        @if (!empty($obatPulang))
+            @foreach ($obatPulang as $o)
+                <tr>
+                    <td class="px-2 py-1 border border-black">{{ $o['nama'] ?? '' }}</td>
+                    <td class="px-2 py-1 border border-black">{{ $o['jumlah'] ?? '' }}</td>
+                    <td class="px-2 py-1 border border-black">{{ $o['dosis'] ?? '' }}</td>
+                    <td class="px-2 py-1 border border-black">{{ $o['cara'] ?? '' }}</td>
+                </tr>
+            @endforeach
+        @else
+            @for ($i = 0; $i < 2; $i++)
                 <tr>
                     <td class="px-2 py-3 border border-black">&nbsp;</td>
                     <td class="px-2 py-3 border border-black">&nbsp;</td>
@@ -573,7 +691,7 @@
                     <td class="px-2 py-3 border border-black">&nbsp;</td>
                 </tr>
             @endfor
-        @endforelse
+        @endif
     </table>
 
     {{-- TTD --}}
@@ -584,7 +702,7 @@
                 <div class="mt-8">( ................................................ )</div>
             </td>
             <td class="px-2 py-10 align-bottom border border-black">
-                Jakarta,
+                Tulungagung,
                 <span class="inline-block align-bottom border-b border-black border-dotted w-72">&nbsp;&nbsp;</span>
                 <div class="mt-8 text-center">
                     ( ................................................ )<br />Tanda tangan dan nama dokter
@@ -599,8 +717,7 @@
         SERTA DITULIS DENGAN RAPI
     </div>
     <div class="text-center text-[10px]">
-        Jl. Danau Sunter Utara, Sunter Paradise I, Jakarta 14350 Telepon : (021) 6400261, 6459877 (Hunting) Fax :
-        (021) 6400778 &nbsp; E-Mail : info@royalprogress.com &nbsp; www.royalprogress.com
+        Jl. Jatiwayang, RT.002/RW.001, Lingkungan 2, Ngunut, Kec. Ngunut, Kabupaten Tulungagung, Jawa Timur 66292
     </div>
     <div class="text-right text-[10px]">2/2</div>
 </div>
