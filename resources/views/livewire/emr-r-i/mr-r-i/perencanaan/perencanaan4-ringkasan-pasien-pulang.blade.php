@@ -674,8 +674,8 @@
         </tr>
 
         {{-- ================== NON-RACIKAN (setelah racikan) ================== --}}
-        @if (!empty($nonRacikanList))
-            @foreach ($nonRacikanList as $i => $detail)
+        @if (!empty($nonRacikList))
+            @foreach ($nonRacikList as $i => $detail)
                 @php
                     $rowId = $detail['riObatDtl'] ?? $i;
                     $hdrId = $tglResep ?? 'hdr';
