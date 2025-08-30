@@ -445,16 +445,31 @@
         $tandaObs = collect(data_get($ri, 'observasi.observasiLanjutan.tandaVital', []));
 
         // filter observasi pada tanggal exitDate (format "dd/mm/yyyy hh:mm:ss")
-        $exitDateOnly = !empty($ri['exitDate'])
-            ? Carbon::createFromFormat('d/m/Y H:i:s', $ri['exitDate'])->format('d/m/Y')
-            : null;
+        $exitDateOnly = !empty($ri['exitDate']) ? Carbon::createFromFormat('d/m/Y H:i:s', $ri['exitDate']) : null;
 
-        // filter observasi yang tanggalnya sama dengan exitDate
         $lastObsExit = $exitDateOnly
-            ? $tandaObs->last(function ($r) use ($exitDateOnly) {
-                $w = $r['waktuPemeriksaan'] ?? null;
-                return $w && Carbon::createFromFormat('d/m/Y H:i:s', $w)->isSameDay($exitDateOnly);
-            })
+            ? $tandaObs
+                ->filter(function ($r) use ($exitDateOnly) {
+                    $waktuPemeriksaan = $r['waktuPemeriksaan'] ?? null;
+                    if (!$waktuPemeriksaan) {
+                        return false;
+                    }
+
+                    try {
+                        $parsed = Carbon::createFromFormat('d/m/Y H:i:s', $waktuPemeriksaan);
+                        return $parsed->isSameDay($exitDateOnly);
+                    } catch (\Throwable $e) {
+                        return false;
+                    }
+                })
+                ->sortBy(function ($r) {
+                    try {
+                        return Carbon::createFromFormat('d/m/Y H:i:s', $r['waktuPemeriksaan'])->timestamp;
+                    } catch (\Throwable $e) {
+                        return 0;
+                    }
+                })
+                ->last()
             : null;
 
         // fallback: kalau gak ada yang sama harinya, ambil yang paling akhir (opsional sort kalau urutan tidak terjamin)
