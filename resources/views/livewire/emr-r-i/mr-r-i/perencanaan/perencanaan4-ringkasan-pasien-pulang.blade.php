@@ -102,7 +102,7 @@
             ->filter()
             ->map(fn($p) => trim($p))
             ->unique()
-            ->implode(' ----- ');
+            ->implode(' \n ');
 
         // pecah pakai delimiter " | " → jadi baris-baris
         $items = preg_split('/\s*\|\s*/', $plansDokter ?? '', -1, PREG_SPLIT_NO_EMPTY) ?: [];
@@ -350,7 +350,8 @@
             <th colspan="6" class="px-2 py-1 text-left">TERAPI/TINDAKAN MEDIS SELAMA DI RUMAH SAKIT</th>
         </tr>
         <tr>
-            <td class="px-2 py-8 border border-black " colspan="6">{{ $terapiRS }}</td>
+            <td class="px-2 py-8 break-words whitespace-pre-line border border-black" colspan="6">
+                {{ $terapiRS }}</td>
         </tr>
     </table>
 
