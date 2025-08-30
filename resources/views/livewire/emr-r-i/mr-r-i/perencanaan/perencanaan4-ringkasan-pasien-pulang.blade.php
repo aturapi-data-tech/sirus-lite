@@ -102,7 +102,7 @@
             ->filter()
             ->map(fn($p) => trim($p))
             ->unique()
-            ->implode(' \n ');
+            ->implode(' | ');
 
         // pecah pakai delimiter " | " → jadi baris-baris
         $items = preg_split('/\s*\|\s*/', $plansDokter ?? '', -1, PREG_SPLIT_NO_EMPTY) ?: [];
