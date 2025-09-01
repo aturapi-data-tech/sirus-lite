@@ -17,7 +17,10 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white dark:bg-gray-800">
-                        @foreach (collect($dataDaftarRi['eresepHdr'] ?? [])->sortByDesc('resepDate') as $key => $header)
+                        @php
+                            use Carbon\Carbon;
+                        @endphp
+                        @foreach (collect($dataDaftarRi['eresepHdr'] ?? [])->sortByDesc(fn($row) => Carbon::createFromFormat('d/m/Y H:i:s', $row['resepDate'])) as $key => $header)
                             @if (isset($header['resepNo']))
                                 <tr wire:key="resep-hdr-{{ $riHdrNoRef }}-{{ $header['resepNo'] }}"
                                     class="border-b group dark:border-gray-700">
