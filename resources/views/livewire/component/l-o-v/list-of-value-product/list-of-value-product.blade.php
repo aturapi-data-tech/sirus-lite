@@ -30,8 +30,11 @@
                             <x-dropdown-link role="option" :aria-selected="$key === $selecteddataProductLovIndex"
                                 wire:click="setMydataProductLov('{{ $key }}')"
                                 class="text-base font-normal {{ $key === $selecteddataProductLovIndex ? 'bg-gray-100 outline-none' : '' }}">
-                                <div>{{ $lov['product_id'] . '/ ' . $lov['product_name'] }}</div>
-                                <div>{{ number_format($lov['sales_price']) }}</div>
+                                <div class="text-lg font-semibold">{{ $lov['product_name'] }}</div>
+                                <div class="text-xs">{{ number_format($lov['sales_price']) }}</div>
+                                <div class="text-xs italic">
+                                    {{ '(' }}{{ $lov['product_content'] ?? '-' }}{{ ')' }}{{ $lov['product_id'] }}
+                                </div>
                             </x-dropdown-link>
                         </li>
                     @endforeach

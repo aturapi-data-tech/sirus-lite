@@ -32,6 +32,14 @@ trait LOVProductTrait
                 'product_id',
                 'product_name',
                 'sales_price',
+                DB::raw("(select replace(string_agg(cont_desc),',','')||product_name
+                                            from immst_productcontents z,immst_contents x
+                                            where z.product_id=immst_products.product_id
+                                            and z.cont_id=x.cont_id) as elasticSearch"),
+                DB::raw("(select string_agg(cont_desc)
+                                            from immst_productcontents z,immst_contents x
+                                            where z.product_id=immst_products.product_id
+                                            and z.cont_id=x.cont_id) as product_content"),
             )
             ->where('product_id', '=', $search)
             ->where('active_status', '1')
@@ -40,7 +48,7 @@ trait LOVProductTrait
         if ($dataProductLovs) {
 
             // set Product sep
-            $this->addProduct($dataProductLovs->product_id, $dataProductLovs->product_name, $dataProductLovs->sales_price);;
+            $this->addProduct($dataProductLovs->product_id, $dataProductLovs->product_name, $dataProductLovs->sales_price);
             $this->resetdataProductLov();
         } else {
 
@@ -48,22 +56,34 @@ trait LOVProductTrait
             if (strlen($search) < 1) {
                 $this->dataProductLov = [];
             } else {
-                $this->dataProductLov = json_decode(
-                    DB::table('immst_products')
-                        ->select(
-                            'product_id',
-                            'product_name',
-                            'sales_price',
-                        )
-                        ->where('active_status', '1')
-                        ->Where(DB::raw('upper(product_name)'), 'like', '%' . strtoupper($search) . '%')
-                        ->orWhere(DB::raw('upper(product_id)'), 'like', '%' . strtoupper($search) . '%')
-                        ->limit(10)
-                        ->orderBy('product_name', 'ASC')
-                        ->orderBy('product_id', 'ASC')
-                        ->get(),
-                    true
+
+                $this->dataProductLov = DB::select(
+                    "select * from (
+                    select product_id,
+                    product_name,
+                    sales_price,
+
+                    (select replace(string_agg(cont_desc),',','')||product_name
+                    from immst_productcontents z,immst_contents x
+                    where z.product_id=a.product_id
+                    and z.cont_id=x.cont_id)elasticsearch,
+
+                    (select string_agg(cont_desc)
+                    from immst_productcontents z,immst_contents x
+                    where z.product_id=a.product_id
+                    and z.cont_id=x.cont_id)product_content
+
+                    from immst_products a
+                    where active_status='1'
+                    group by product_id,product_name, sales_price
+                    order by product_name)
+
+                    where upper(elasticsearch) like '%'||:search||'%'
+                    ",
+                    ['search' => strtoupper($search)],
                 );
+
+                $this->dataProductLov = json_decode(json_encode($this->dataProductLov, true), true);
             }
             $this->dataProductLovStatus = true;
             // set doing nothing
@@ -79,6 +99,14 @@ trait LOVProductTrait
                 'product_id',
                 'product_name',
                 'sales_price',
+                DB::raw("(select replace(string_agg(cont_desc),',','')||product_name
+                                            from immst_productcontents z,immst_contents x
+                                            where z.product_id=immst_products.product_id
+                                            and z.cont_id=x.cont_id) as elasticSearch"),
+                DB::raw("(select string_agg(cont_desc)
+                                            from immst_productcontents z,immst_contents x
+                                            where z.product_id=immst_products.product_id
+                                            and z.cont_id=x.cont_id) as product_content"),
             )
             ->where('product_id', $this->dataProductLov[$id]['product_id'])
             ->first();
