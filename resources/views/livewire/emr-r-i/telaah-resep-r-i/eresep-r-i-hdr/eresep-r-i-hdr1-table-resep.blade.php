@@ -15,7 +15,7 @@
                     @endphp
 
                     <tbody class="bg-white dark:bg-gray-800">
-                        @foreach (collect($dataDaftarRi['eresepHdr'] ?? [])->sortByDesc(fn($row) => Carbon::createFromFormat('d/m/Y H:i:s', $row['resepDate'])) as $idx => $header)
+                        @forelse (collect($dataDaftarRi['eresepHdr'] ?? [])->sortByDesc(fn($row) => Carbon::createFromFormat('d/m/Y H:i:s', $row['resepDate'])) as $idx => $header)
                             @php
                                 $resepNo = data_get($header, 'resepNo');
                             @endphp
@@ -67,14 +67,14 @@
                                     </div>
                                 </td>
                             </tr>
-                            @empty
-                                <tr>
-                                    <td class="px-2 py-3 text-center text-gray-500">Tidak ada data resep.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
+                        @empty
+                            <tr>
+                                <td class="px-2 py-3 text-center text-gray-500">Tidak ada data resep.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
+</div>
