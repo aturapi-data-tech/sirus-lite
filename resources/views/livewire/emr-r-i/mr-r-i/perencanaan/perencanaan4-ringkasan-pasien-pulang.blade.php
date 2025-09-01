@@ -370,7 +370,7 @@
         </tr>
         <tr>
             <td class="break-words whitespace-pre-line border border-black" colspan="6">
-                <div class="px-2 py-8 m-2 bg-gray-500">
+                <div class="p-2 m-2">
                     {{ $terapiRS }}
                 </div>
             </td>
