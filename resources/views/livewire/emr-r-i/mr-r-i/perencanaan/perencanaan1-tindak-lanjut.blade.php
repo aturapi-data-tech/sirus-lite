@@ -13,18 +13,16 @@
 
 
     <!-- Input teks untuk opsi "Lain-lain" -->
-    @if ($dataDaftarRi['perencanaan']['tindakLanjut']['tindakLanjut'] === '74964007')
-        <div class="mt-2">
-            <x-text-input id="dataDaftarRi.perencanaan.tindakLanjut.keteranganTindakLanjut"
-                placeholder="Silakan jelaskan tindak lanjut" class="w-full mt-1"
-                wire:model="dataDaftarRi.perencanaan.tindakLanjut.keteranganTindakLanjut" :disabled="$disabledPropertyRjStatus"
-                :errorshas="$errors->has('dataDaftarRi.perencanaan.tindakLanjut.keteranganTindakLanjut')" />
-            <!-- Menampilkan pesan error jika ada -->
-            @error('dataDaftarRi.perencanaan.tindakLanjut.keteranganTindakLanjut')
-                <x-input-error :messages="$message" />
-            @enderror
-        </div>
-    @endif
+    <div class="mt-2">
+        <x-text-input id="dataDaftarRi.perencanaan.tindakLanjut.keteranganTindakLanjut"
+            placeholder="Silakan jelaskan tindak lanjut" class="w-full mt-1"
+            wire:model="dataDaftarRi.perencanaan.tindakLanjut.keteranganTindakLanjut" :disabled="$disabledPropertyRjStatus"
+            :errorshas="$errors->has('dataDaftarRi.perencanaan.tindakLanjut.keteranganTindakLanjut')" />
+        <!-- Menampilkan pesan error jika ada -->
+        @error('dataDaftarRi.perencanaan.tindakLanjut.keteranganTindakLanjut')
+            <x-input-error :messages="$message" />
+        @enderror
+    </div>
 
     <!-- Menampilkan pesan error untuk input Tindak Lanjut -->
     @error('dataDaftarRi.perencanaan.tindakLanjut.tindakLanjut')

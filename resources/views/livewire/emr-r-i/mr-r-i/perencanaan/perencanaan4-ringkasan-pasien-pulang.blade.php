@@ -26,20 +26,25 @@
 
         // Ringkasan masuk
         $diagnosaMasuk = data_get($ri, 'pengkajianAwalPasienRawatInap.bagian1DataUmum.diagnosaMasuk', '');
-        $indikasiRawatInap = data_get($ri, 'pengkajianAwalPasienRawatInap.bagian1DataUmum.kondisiSaatMasuk', '');
+        $indikasiRawatInap = data_get(
+            $ri,
+            'pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.catatanUmum',
+            '',
+        );
 
         // Anamnesis
-        $keluhanUtama = data_get($ri, 'pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.keluhanUtama', '');
-        $riwayatPenyakit = collect([
-            data_get(
-                $ri,
-                'pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.riwayatPenyakitOperasiCedera.pilihan',
-                '',
-            ),
-            data_get($ri, 'pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.riwayatKeluarga.pilihan', ''),
-        ])
-            ->filter()
-            ->implode(', ');
+        $keluhanUtama = data_get($ri, 'pengkajianDokter.anamnesa.keluhanUtama', '');
+
+        $riwayatPenyakit =
+            'Riwayat Penyakit Sekarang: ' .
+            data_get($ri, 'pengkajianDokter.anamnesa.riwayatPenyakit.sekarang', '-') .
+            "\n" .
+            'Riwayat Penyakit Dahulu: ' .
+            data_get($ri, 'pengkajianDokter.anamnesa.riwayatPenyakit.dahulu', '-') .
+            "\n" .
+            'Riwayat Penyakit Keluarga: ' .
+            data_get($ri, 'pengkajianDokter.anamnesa.riwayatPenyakit.keluarga', '-') .
+            "\n";
 
         // Pemeriksaan fisik awal
         $tv = data_get($ri, 'pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.tandaVital', []);
@@ -48,25 +53,7 @@
         $nadi = $tv['frekuensiNadi'] ?? '';
         $rr = $tv['frekuensiNafas'] ?? '';
         $gcsAwal = data_get($ri, 'pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.neurologi.gcs', ''); // fallback
-        $pemeriksaanFisik = data_get(
-            $ri,
-            'pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.pemeriksaanSistemOrgan',
-            [],
-        );
-        // ringkas: tampilkan yang tidak "normal"
-        $fisikRingkas = collect($pemeriksaanFisik ?? [])
-            ->map(function ($v, $k) {
-                $pil = $v['pilihan'] ?? '';
-                $ket = $v['keterangan'] ?? '';
-                return strtolower($pil) !== 'normal' && $pil !== ''
-                    ? strtoupper($k) . ': ' . $pil . ($ket ? ' (' . $ket . ')' : '')
-                    : null;
-            })
-            ->filter()
-            ->implode('; ');
-        if ($fisikRingkas === '') {
-            $fisikRingkas = 'Dalam batas normal';
-        }
+        $pemeriksaanFisik = data_get($ri, 'pengkajianDokter.fisik', '');
 
         // Penunjang
         // ambil GDA awal & GDA terakhir observasi
@@ -79,18 +66,18 @@
                 '; GDA terakhir: ' .
                 ($gdaAkhir ?: '-') .
                 ' ' .
-                ($ri['pengkajianDokter']['hasilPemeriksaanPenunjang']['laboratorium'] ?? ''),
+                data_get($ri, 'pengkajianDokter.hasilPemeriksaanPenunjang.laboratorium', ''),
         );
 
         // ==== RADIOLOGI ====
         $radText = trim(
-            'Hasil radiologi: ' . ($ri['pengkajianDokter']['hasilPemeriksaanPenunjang']['radiologi'] ?? '-'),
+            'Hasil radiologi: ' . data_get($ri, 'pengkajianDokter.hasilPemeriksaanPenunjang.radiologi', '-'),
         );
 
         // ==== PENUNJANG LAIN ====
         $lainText = trim(
             'Pemeriksaan penunjang lain: ' .
-                ($ri['pengkajianDokter']['hasilPemeriksaanPenunjang']['penunjangLain'] ?? '-'),
+                data_get($ri, 'pengkajianDokter.hasilPemeriksaanPenunjang.penunjangLain', '-'),
         );
 
         // Terapi/Tindakan selama di RS (dari pemberian obat & cairan)
@@ -195,16 +182,55 @@
                 ->last() ?? '';
 
         // Cara keluar RS / Disposisi
-        $statusPulang = data_get($ri, 'perencanaan.tindakLanjut.statusPulang', '');
-        $isKontrol = !empty(data_get($ri, 'kontrol.tglKontrol')) || $statusPulang === 'Pulang';
-        $tglKontrol = data_get($ri, 'kontrol.tglKontrol', '');
+        // 1) Opsi master (seperti yang kamu punya)
+        $tindakLanjutOptions = [
+            ['tindakLanjut' => 'Pulang Sehat', 'tindakLanjutKode' => '371827001', 'tindakLanjutKodeBpjs' => 1],
+            [
+                'tindakLanjut' => 'Pulang dengan Permintaan Sendiri',
+                'tindakLanjutKode' => '266707007',
+                'tindakLanjutKodeBpjs' => 3,
+            ],
+            ['tindakLanjut' => 'Pulang Pindah / Rujuk', 'tindakLanjutKode' => '306206005', 'tindakLanjutKodeBpjs' => 5], // tidak ada padanan di BPJS SEP
+            [
+                'tindakLanjut' => 'Pulang Tanpa Perbaikan',
+                'tindakLanjutKode' => '371828006',
+                'tindakLanjutKodeBpjs' => 5,
+            ], // tidak ada padanan di BPJS SEP
+            ['tindakLanjut' => 'Meninggal', 'tindakLanjutKode' => '419099009', 'tindakLanjutKodeBpjs' => 4],
+            ['tindakLanjut' => 'Lain-lain', 'tindakLanjutKode' => '74964007', 'tindakLanjutKodeBpjs' => 5],
+        ];
 
-        // Heuristik ringan (opsional, boleh dihapus): jika ada "PERAWATAN JENAZAH" di log, tandai meninggal
-        $logDescs = collect($ri['AdministrasiRI']['userLogs'] ?? [])
-            ->pluck('userLogDesc')
-            ->implode(' | ');
+        // 2) Jadikan lookup by KODE (lebih gampang dipanggil)
+        $tindakLanjutLookup = collect($tindakLanjutOptions)->keyBy('tindakLanjutKode');
+
+        // 3) Ambil model data dari $ri (keduanya kode; pakai salah satu yang terisi)
+        $modelTindakLanjut = data_get($ri, 'perencanaan.tindakLanjut', []);
+        $selectedKodeTL =
+            data_get($modelTindakLanjut, 'tindakLanjutKode') ?: data_get($modelTindakLanjut, 'tindakLanjut'); // ex: "419099009"
+        $selectedTindakLanjut = $selectedKodeTL ? $tindakLanjutLookup->get($selectedKodeTL) : null;
+
+        $labelTerpilihTindakLanjut = data_get($selectedTindakLanjut, 'tindakLanjut', ''); // ex: "Meninggal"
+        $labelTerpilihTindakLanjutKode = data_get($selectedTindakLanjut, 'tindakLanjutKode', ''); // ex: "266707007"
+        $kodeBpjsTerpilihTindakLanjut = data_get($selectedTindakLanjut, 'tindakLanjutKodeBpjs'); // ex: 4
+        $keteranganTambahanTindakLanjut = trim(data_get($modelTindakLanjut, 'keteranganTindakLanjut', '-'));
+
+        // 4) Sesuaikan $statusPulang (kalau field lama kosong, pakai hasil mapping)
+        $statusPulang = $labelTerpilihTindakLanjut ?: '-';
+
+        // 5) Tgl kontrol & aturan kontrol
+        $tglKontrol = data_get($ri, 'kontrol.tglKontrol', '');
+        // - ada tanggal kontrol, ATAU
+        // - status mengandung "Pulang" (pulang sehat / permintaan sendiri / rujuk / tanpa perbaikan)
+        $isKontrol = !empty($tglKontrol);
+        // 6) Heuristik meninggal (dari label)
         $isMeninggal =
-            stripos($statusPulang, 'meninggal') !== false || stripos($logDescs, 'PERAWATAN JENAZAH') !== false;
+            stripos((string) $statusPulang, 'meninggal') !== false || (string) $kodeBpjsTerpilihTindakLanjut === '4';
+
+        // 7) (Opsional) Buat string final yang enak dipajang
+        $statusPulangDisplay = 'Status Pulang: ' . ($statusPulang !== '' ? $statusPulang : '- (belum diisi)');
+        if ($keteranganTambahanTindakLanjut !== '') {
+            $statusPulangDisplay .= " — Keterangan: {$keteranganTambahanTindakLanjut}";
+        }
     @endphp
 
     {{-- ======================= HEADER + NO. RM ======================= --}}
@@ -311,7 +337,7 @@
         </tr>
         <tr>
             <th class="px-2 py-1 text-left border border-black">Pemeriksaan Fisik</th>
-            <td class="px-2 py-1 border border-black" colspan="5">{{ $fisikRingkas }}</td>
+            <td class="px-2 py-1 border border-black" colspan="5">{{ $pemeriksaanFisik }}</td>
         </tr>
     </table>
 
@@ -554,12 +580,12 @@
     {{-- KONDISI SAAT PULANG --}}
     <table class="w-full mt-2 border border-collapse border-black table-auto">
         <tr class="font-semibold bg-gray-100">
-            <th colspan="4" class="px-2 py-1 text-left">KONDISI SAAT PULANGX</th>
+            <th colspan="4" class="px-2 py-1 text-left">KONDISI SAAT PULANG</th>
         </tr>
         <tr>
             <th class="w-48 px-2 py-1 text-left align-top border border-black">Keadaan umum</th>
             <td class="px-2 py-1 border border-black">
-                {{ $isMeninggal ? 'Meninggal' : data_get($ri, 'pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.aktivitas.pilihan', '') }}
+                {{ $statusPulangDisplay }}
             </td>
             <th class="w-24 px-2 py-1 text-left align-top border border-black">GCS</th>
             <td class="px-2 py-1 border border-black">{{ $gcsPulang }}</td>
@@ -578,7 +604,6 @@
             <td class="px-2 py-6 border border-black" colspan="3">{{ $catatanPenting }}</td>
         </tr>
     </table>
-
     {{-- CARA KELUAR RS --}}
     <table class="w-full mt-2 border border-collapse border-black table-auto">
         <tr class="font-semibold bg-gray-100">
@@ -586,37 +611,45 @@
         </tr>
         <tr>
             <td class="px-2 py-1 border border-black">
-                <span class="inline-block w-3 h-3 mr-2 align-middle border border-black">
-                    @if ($statusPulang === 'Pulang')
-                        ✔
-                    @endif
-                </span> Pulang Atas persetujuan
+                <span
+                    class="inline-block w-3 h-3 mr-2 align-middle border border-black @if ($labelTerpilihTindakLanjutKode === '371827001') bg-gray-900 @endif">
+                    &nbsp;
+                </span> Pulang Sehat
             </td>
             <td class="px-2 py-1 border border-black">
-                <span class="inline-block w-3 h-3 mr-2 align-middle border border-black">
-                    @if ($statusPulang === 'APS')
-                        ✔
-                    @endif
+                <span
+                    class="inline-block w-3 h-3 mr-2 align-middle border border-black @if ($labelTerpilihTindakLanjutKode === '266707007') bg-gray-900 @endif">
+                    &nbsp;
                 </span> Pulang Atas Permintaan Sendiri
             </td>
             <td class="px-2 py-1 border border-black">
-                <span class="inline-block w-3 h-3 mr-2 align-middle border border-black">
-                    @if ($statusPulang === 'Dirujuk')
-                        ✔
-                    @endif
+                <span
+                    class="inline-block w-3 h-3 mr-2 align-middle border border-black @if ($labelTerpilihTindakLanjutKode === '306206005') bg-gray-900 @endif">
+                    &nbsp;
                 </span> Dirujuk
             </td>
-            <td class="px-2 py-1 border border-black">Kabur</td>
             <td class="px-2 py-1 border border-black">
-                <span class="inline-block w-3 h-3 mr-2 align-middle border border-black">
-                    @if ($isMeninggal)
-                        ✔
-                    @endif
+                <span
+                    class="inline-block w-3 h-3 mr-2 align-middle border border-black @if ($labelTerpilihTindakLanjutKode === '371828006') bg-gray-900 @endif">
+                    &nbsp;
+                </span> Pulang Tanpa Perbaikan
+            </td>
+            <td class="px-2 py-1 border border-black">
+                <span
+                    class="inline-block w-3 h-3 mr-2 align-middle border border-black @if ($labelTerpilihTindakLanjutKode === '419099009') bg-gray-900 @endif">
+                    &nbsp;
                 </span> Meninggal
             </td>
-            <td class="px-2 py-1 border border-black">&nbsp;</td>
+            <td class="px-2 py-1 border border-black">
+                <span
+                    class="inline-block w-3 h-3 mr-2 align-middle border border-black @if ($labelTerpilihTindakLanjutKode === '74964007') bg-gray-900 @endif">
+                    &nbsp;
+                </span> Lain-lain
+            </td>
         </tr>
     </table>
+
+
 
     {{-- TINDAK LANJUT --}}
     <table class="w-full mt-2 border border-collapse border-black table-auto">
@@ -625,10 +658,10 @@
         </tr>
         <tr>
             <td class="w-1/2 px-2 py-1 border border-black">
-                <span class="inline-block w-3 h-3 mr-2 align-middle border border-black">
-                    @if ($isKontrol)
-                        ✔
-                    @endif
+                <span
+                    class="inline-block w-3 h-3 mr-2 align-middle border border-black
+                    @if ($isKontrol) bg-gray-900 @endif">
+                    &nbsp;
                 </span>
                 Kontrol rawat jalan, tanggal
                 <span class="inline-block w-56 align-middle border-b border-black border-dotted">
@@ -636,26 +669,27 @@
                 </span>
             </td>
             <td class="w-1/2 px-2 py-1 border border-black">
-                <span class="inline-block w-3 h-3 mr-2 align-middle border border-black"></span>
+                <span class="inline-block w-3 h-3 mr-2 align-middle border border-black">&nbsp;</span>
                 <span class="inline-block w-56 border-b border-black border-dotted">&nbsp;&nbsp;</span>
             </td>
         </tr>
         <tr>
             <td class="px-2 py-1 border border-black">
-                <span class="inline-block w-3 h-3 mr-2 align-middle border border-black">
-                    @if ($statusPulang === 'Dirujuk')
-                        ✔
-                    @endif
+                <span
+                    class="inline-block w-3 h-3 mr-2 align-middle border border-black
+                    @if ($statusPulang === 'Dirujuk') bg-gray-900 @endif">
+                    &nbsp;
                 </span>
                 Dirujuk ke
                 <span class="inline-block w-64 border-b border-black border-dotted">&nbsp;&nbsp;</span>
             </td>
             <td class="px-2 py-1 border border-black">
-                <span class="inline-block w-3 h-3 mr-2 align-middle border border-black"></span>
+                <span class="inline-block w-3 h-3 mr-2 align-middle border border-black">&nbsp;</span>
                 <span class="inline-block w-56 border-b border-black border-dotted">&nbsp;&nbsp;</span>
             </td>
         </tr>
     </table>
+
 
     {{-- TERAPI PULANG --}}
     <table class="w-full mt-2 border border-collapse border-black table-auto">
@@ -774,13 +808,14 @@
         <tr>
             <td class="px-2 py-10 align-bottom border border-black">
                 Tanda tangan pasien/keluarga,
-                <div class="mt-8">( ................................................ )</div>
+                <div class="mt-8 text-center">( ................................................ )<br />.</div>
             </td>
             <td class="px-2 py-10 align-bottom border border-black">
-                Tulungagung,
-                <span class="inline-block align-bottom border-b border-black border-dotted w-72">&nbsp;&nbsp;</span>
+                Tulungagung,{{ data_get($ri, 'exitDate', '-') }}
                 <div class="mt-8 text-center">
-                    ( ................................................ )<br />Tanda tangan dan nama dokter
+                    ( ................................................ )
+                    <br />
+                    {{ $dpjp }}
                 </div>
             </td>
         </tr>
