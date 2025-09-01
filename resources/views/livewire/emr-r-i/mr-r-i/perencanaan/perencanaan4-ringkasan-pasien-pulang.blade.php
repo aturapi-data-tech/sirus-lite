@@ -82,26 +82,19 @@
 
         // Terapi/Tindakan selama di RS (dari pemberian obat & cairan)
         $cppt = data_get($ri, 'cppt', []);
-        // ambil CPPT yang jelas-jelas dokter (profession berisi 'Dokter' atau nama petugas diawali 'dr.')
-        $plansDokter = collect($cppt)
-            ->filter(fn($row) => strcasecmp($row['profession'] ?? '', 'Dokter') === 0)
-            ->pluck('soap.plan')
-            ->filter()
-            ->map(fn($p) => trim($p))
-            ->unique()
-            ->implode(' | ');
 
-        // pecah pakai delimiter " | " → jadi baris-baris
-        $items = preg_split('/\s*\|\s*/', $plansDokter ?? '', -1, PREG_SPLIT_NO_EMPTY) ?: [];
+        // 1) Ambil CPPT dokter: profession = "Dokter" ATAU nama petugas diawali "dr."
+        $cpptDokter = collect($cppt)->filter(function ($row) {
+            $isDokterByProfession = strcasecmp((string) ($row['profession'] ?? ''), 'Dokter') === 0;
+            $nama = (string) ($row['petugasCPPT'] ?? '');
+            $isDokterByName = preg_match('/^\s*dr\.?\s+/i', $nama); // "dr ", "dr. "
+            return $isDokterByProfession || $isDokterByName;
+        });
 
-        // opsional: rapihkan spasi & kapitalisasi ringan
-        $items = array_map(function ($s) {
-            $s = preg_replace('/\s+/', ' ', trim($s));
-            return $s;
-        }, $items);
+        // 2) Gabungkan semua field plan menjadi satu teks besar
+        $plansGabung = $cpptDokter->map(fn($row) => (string) data_get($row, 'soap.plan', ''))->filter()->implode(" \n");
 
-        // jadikan multiline (setiap item satu baris, boleh pakai bullet)
-        $terapiRS = count($items) ? '• ' . implode("\n• ", $items) : '';
+        $terapiRS = $plansGabung;
 
         // ====== DIAGNOSIS (ICD + Free Text) ======
         $dxList = collect(data_get($ri, 'diagnosis', []));
@@ -376,8 +369,11 @@
             <th colspan="6" class="px-2 py-1 text-left">TERAPI/TINDAKAN MEDIS SELAMA DI RUMAH SAKIT</th>
         </tr>
         <tr>
-            <td class="px-2 py-8 break-words whitespace-pre-line border border-black" colspan="6">
-                {{ $terapiRS }}</td>
+            <td class="break-words whitespace-pre-line border border-black" colspan="6">
+                <div class="px-2 py-8 m-2 bg-gray-500">
+                    {{ $terapiRS }}
+                </div>
+            </td>
         </tr>
     </table>
 
