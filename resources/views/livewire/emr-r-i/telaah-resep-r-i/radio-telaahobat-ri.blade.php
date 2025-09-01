@@ -52,9 +52,9 @@
             @else
                 {{-- PENTING: wire:click pakai string biasa --}}
                 <x-green-button :disabled="$disabledPropertyRiStatusObat"
-                wire:click.prevent="setttdTelaahObat(@js($dataDaftarRi['riHdrNo']), @js($resepHeaderIndexForEdit))">
-                TTD Telaah Obat
-            </x-green-button>
+                    wire:click.prevent="setttdTelaahObat('{{ $dataDaftarRi['riHdrNo'] }}', '{{ $resepHeaderIndexForEdit }}')">
+                    TTD Telaah Obat
+                </x-green-button>
             @endif
         @endrole
     </div>

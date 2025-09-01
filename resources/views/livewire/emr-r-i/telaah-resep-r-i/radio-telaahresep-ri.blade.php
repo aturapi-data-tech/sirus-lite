@@ -4,7 +4,7 @@
          * :telaahResepHdr="data_get($dataDaftarRi, 'eresepHdr.'.$resepHeaderIndexForEdit.'.telaahResep')"
          * :bindPath="'dataDaftarRi.eresepHdr.'.$resepHeaderIndexForEdit.'.telaahResep'"
          * :disabled="$disabledPropertyRjStatusObat"
-  
+
          */
 
         $hdr = $telaahResepHdr ?? [];
@@ -64,7 +64,7 @@
                 <x-badge badgecolor="green">{{ $penanggung }}</x-badge>
             @else
                 <x-green-button :disabled="$disabledPropertyRiStatusResep"
-                    wire:click.prevent="setttdTelaahResep(@js($dataDaftarRi['riHdrNo']), @js($resepHeaderIndexForEdit))">
+                    wire:click.prevent="setttdTelaahResep('{{ $dataDaftarRi['riHdrNo'] }}', '{{ $resepHeaderIndexForEdit }}')">
                     TTD Telaah Resep
                 </x-green-button>
             @endif

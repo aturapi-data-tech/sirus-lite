@@ -34,7 +34,7 @@ trait LOVProductTrait
                 'sales_price',
             )
             ->where('product_id', '=', $search)
-            // ->where('active_status', '1')
+            ->where('active_status', '1')
             ->first();
 
         if ($dataProductLovs) {
@@ -55,7 +55,7 @@ trait LOVProductTrait
                             'product_name',
                             'sales_price',
                         )
-                        // ->where('active_status', '1')
+                        ->where('active_status', '1')
                         ->Where(DB::raw('upper(product_name)'), 'like', '%' . strtoupper($search) . '%')
                         ->orWhere(DB::raw('upper(product_id)'), 'like', '%' . strtoupper($search) . '%')
                         ->limit(10)
