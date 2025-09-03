@@ -297,6 +297,12 @@ class EresepRIHdr extends Component
                     ->where('product_id', $eresepItem['productId'])
                     ->first();
 
+                $productTakar = DB::table('immst_products')
+                    ->where('product_id', $eresepItem['productId'])
+                    ->value('takar');
+
+                $resepTakar = $productTakar ?: 'Tablet';
+
                 DB::table('imtxn_slsdtls')->insert([
                     'sls_dtl'         => $maxSlsDtl,
                     'qty'             => $eresepItem['qty'],
@@ -305,7 +311,7 @@ class EresepRIHdr extends Component
                     'product_id'      => $eresepItem['productId'],
                     'sls_no'          => $maxSlsNo,
                     'resep_carapakai' => $eresepItem['signaX'],
-                    'resep_takar'     => 'Tablet',
+                    'resep_takar'     => $resepTakar,
                     'resep_kapsul'    => $eresepItem['signaHari'],
                     'resep_ket'       => $eresepItem['catatanKhusus'],
                     'etiket_status'   => 1,

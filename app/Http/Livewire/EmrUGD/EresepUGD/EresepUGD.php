@@ -290,6 +290,13 @@ class EresepUGD extends Component
             // select nvl(max(rjobat_dtl)+1,1) into :rstxn_ugdobats.rjobat_dtl from rstxn_ugdobats;
 
             $lastInserted = DB::table('rstxn_ugdobats')->select(DB::raw('nvl(max(rjobat_dtl)+1,1) as rjobat_dtl_max'))->first();
+
+            $productTakar = DB::table('immst_products')
+                ->where('product_id', $this->collectingMyProduct['productId'])
+                ->value('takar');
+
+            $ugdTakar = $productTakar ?: 'Tablet';
+
             // insert into table transaksi
             DB::table('rstxn_ugdobats')->insert([
                 'rjobat_dtl' => $lastInserted->rjobat_dtl_max,
@@ -299,7 +306,7 @@ class EresepUGD extends Component
                 'price' => $this->collectingMyProduct['productPrice'],
                 'ugd_carapakai' => $this->collectingMyProduct['signaX'],
                 'ugd_kapsul' => $this->collectingMyProduct['signaHari'],
-                'ugd_takar' => 'Tablet',
+                'ugd_takar' => $ugdTakar,
                 'catatan_khusus' => $this->collectingMyProduct['catatanKhusus'],
                 'ugd_ket' => $this->collectingMyProduct['catatanKhusus'],
                 'exp_date' => DB::raw("to_date('" . $this->dataDaftarUgd['rjDate'] . "','dd/mm/yyyy hh24:mi:ss')+30"),

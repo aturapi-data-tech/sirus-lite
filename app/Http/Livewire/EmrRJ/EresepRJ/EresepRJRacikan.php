@@ -324,6 +324,12 @@ class EresepRJRacikan extends Component
             $lastInserted = DB::table('rstxn_rjobatracikans')
                 ->select(DB::raw("nvl(max(rjobat_dtl)+1,1) as rjobat_dtl_max"))
                 ->first();
+
+            $productTakar = DB::table('immst_products')
+                ->where('product_id', $this->collectingMyProduct['productId'])
+                ->value('takar');
+
+            $rjTakar = $productTakar ?: 'Tablet';
             // insert into table transaksi
             DB::table('rstxn_rjobatracikans')
                 ->insert([
@@ -341,7 +347,7 @@ class EresepRJRacikan extends Component
                     'catatan_khusus' => isset($this->collectingMyProduct['catatanKhusus']) ? $this->collectingMyProduct['catatanKhusus'] : null,
                     'no_racikan' => $this->noRacikan,
 
-                    'rj_takar' => 'Tablet',
+                    'rj_takar' => $rjTakar,
                     'exp_date' => DB::raw("to_date('" . $this->dataDaftarPoliRJ['rjDate'] . "','dd/mm/yyyy hh24:mi:ss')+30"),
                     'etiket_status' => 1,
                 ]);

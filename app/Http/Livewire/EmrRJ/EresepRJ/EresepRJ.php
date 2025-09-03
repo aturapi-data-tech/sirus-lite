@@ -297,6 +297,13 @@ class EresepRJ extends Component
             // select nvl(max(rjobat_dtl)+1,1) into :rstxn_rjobats.rjobat_dtl from rstxn_rjobats;
 
             $lastInserted = DB::table('rstxn_rjobats')->select(DB::raw('nvl(max(rjobat_dtl)+1,1) as rjobat_dtl_max'))->first();
+
+            $productTakar = DB::table('immst_products')
+                ->where('product_id', $this->collectingMyProduct['productId'])
+                ->value('takar');
+
+            $rjTakar = $productTakar ?: 'Tablet';
+
             // insert into table transaksi
             DB::table('rstxn_rjobats')->insert([
                 'rjobat_dtl' => $lastInserted->rjobat_dtl_max,
@@ -306,7 +313,7 @@ class EresepRJ extends Component
                 'price' => $this->collectingMyProduct['productPrice'],
                 'rj_carapakai' => $this->collectingMyProduct['signaX'],
                 'rj_kapsul' => $this->collectingMyProduct['signaHari'],
-                'rj_takar' => 'Tablet',
+                'rj_takar'     => $rjTakar,
                 'catatan_khusus' => $this->collectingMyProduct['catatanKhusus'],
                 'rj_ket' => $this->collectingMyProduct['catatanKhusus'],
                 'exp_date' => DB::raw("to_date('" . $this->dataDaftarPoliRJ['rjDate'] . "','dd/mm/yyyy hh24:mi:ss')+30"),

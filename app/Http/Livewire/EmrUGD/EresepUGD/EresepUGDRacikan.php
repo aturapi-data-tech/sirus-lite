@@ -321,6 +321,13 @@ class EresepUGDRacikan extends Component
             $lastInserted = DB::table('rstxn_ugdobatracikans')
                 ->select(DB::raw("nvl(max(rjobat_dtl)+1,1) as rjobat_dtl_max"))
                 ->first();
+
+            $productTakar = DB::table('immst_products')
+                ->where('product_id', $this->collectingMyProduct['productId'])
+                ->value('takar');
+
+            $ugdTakar = $productTakar ?: 'Tablet';
+
             // insert into table transaksi
             DB::table('rstxn_ugdobatracikans')
                 ->insert([
@@ -338,7 +345,7 @@ class EresepUGDRacikan extends Component
                     'catatan_khusus' => isset($this->collectingMyProduct['catatanKhusus']) ? $this->collectingMyProduct['catatanKhusus'] : null,
                     'no_racikan' => $this->noRacikan,
 
-                    'ugd_takar' => 'Tablet',
+                    'ugd_takar' => $ugdTakar,
                     'exp_date' => DB::raw("to_date('" . $this->dataDaftarUgd['rjDate'] . "','dd/mm/yyyy hh24:mi:ss')+30"),
                     'etiket_status' => 1,
                 ]);
