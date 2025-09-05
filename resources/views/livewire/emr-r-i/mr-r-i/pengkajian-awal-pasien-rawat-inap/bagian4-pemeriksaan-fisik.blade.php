@@ -1,4 +1,19 @@
 <div>
+
+    <div>
+        <div x-data="{ showCopy: false }" x-init="// patuhi event dari Livewire
+        window.addEventListener('copyDone', () => { showCopy = false });">
+            <x-yellow-button @click="showCopy = !showCopy">
+                Copy Assessment dari UGD
+            </x-yellow-button>
+
+            <div x-show="showCopy" x-transition>
+                @include('livewire.emr-r-i.mr-r-i.pengkajian-dokter.bagian-0-create-copy-u-g-d')
+            </div>
+        </div>
+    </div>
+
+
     <div class="space-y-4">
         <!-- Tanda Vital -->
         <div>

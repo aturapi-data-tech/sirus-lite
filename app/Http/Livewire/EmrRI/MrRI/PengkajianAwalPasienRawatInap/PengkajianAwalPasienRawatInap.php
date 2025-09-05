@@ -18,10 +18,65 @@ class PengkajianAwalPasienRawatInap extends Component
 
     // listener from blade////////////////
     protected $listeners = [
-        'syncronizeAssessmentPerawatRIFindData' => 'mount'
+        'syncronizeAssessmentPerawatRIFindData' => 'mount',
+        'requestCopyAssessmentFromUGDPerawat' => 'handleCopyAssessmentFromUGDPerawat',
     ];
 
 
+
+
+    public function handleCopyAssessmentFromUGDPerawat($dataDaftarTxn): void
+    {
+        // pastikan array
+        $data = $dataDaftarTxn;
+
+        // -----------------------
+        // 1) Keluhan Utama
+        // -----------------------
+        $keluhanUtama = trim((string) data_get($data, 'anamnesa.keluhanUtama.keluhanUtama', ''));
+        if ($keluhanUtama !== '') {
+            $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['bagian4PemeriksaanFisik']['keluhanUtama'] = $keluhanUtama;
+        }
+
+        // -----------------------
+        // 2) Tanda Vital (multiple path fallbacks)
+        // -----------------------
+        $ttv = data_get($data, 'pemeriksaan.tandaVital', []);
+
+        // nilai kemungkinan kosong string jika tidak ada
+        $sistolik = trim((string) data_get($ttv, 'sistolik', ''));
+        $distolik = trim((string) data_get($ttv, 'distolik', ''));
+        $nadi     = trim((string) data_get($ttv, 'frekuensiNadi', ''));
+        $nafasp   = trim((string) data_get($ttv, 'frekuensiNafas', ''));
+        $suhu     = trim((string) data_get($ttv, 'suhu', ''));
+        $spo2     = trim((string) data_get($ttv, 'spo2', ''));
+        $gda      = trim((string) data_get($ttv, 'gda', ''));
+
+        // tulis ke struktur => jika ada nilai baru set, jika kosong pertahankan existing
+        $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['bagian4PemeriksaanFisik']['tandaVital']['sistolik'] = $sistolik;
+        $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['bagian4PemeriksaanFisik']['tandaVital']['distolik']  = $distolik;
+        $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['bagian4PemeriksaanFisik']['tandaVital']['frekuensiNadi'] = $nadi;
+        $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['bagian4PemeriksaanFisik']['tandaVital']['frekuensiNafas'] = $nafasp;
+        $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['bagian4PemeriksaanFisik']['tandaVital']['suhu'] = $suhu;
+        $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['bagian4PemeriksaanFisik']['tandaVital']['spo2'] = $spo2;
+        $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['bagian4PemeriksaanFisik']['tandaVital']['gda'] = $gda;
+        // -----------------------
+        // 3) TB & BB (nutrisi)
+        // -----------------------
+        $nutrisi = data_get($data, 'pemeriksaan.nutrisi', []);
+        $bb = trim((string) data_get($nutrisi, 'bb', ''));
+        $tb = trim((string) data_get($nutrisi, 'tb', ''));
+
+        $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['bagian4PemeriksaanFisik']['tandaVital']['bb'] = $bb;
+        $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['bagian4PemeriksaanFisik']['tandaVital']['tb'] = $tb;
+
+        // contoh ambil GCS jika ada
+        $gcs = trim((string)data_get($data, 'pemeriksaan.tandaVital.gcs', ''));
+        $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['bagian4PemeriksaanFisik']['pemeriksaanSistemOrgan']['neurologi']['gcs'] = $gcs;
+
+        $this->store();
+        $this->dispatchBrowserEvent('copyDone');
+    }
 
     //////////////////////////////
     // Ref on top bar
@@ -411,7 +466,7 @@ class PengkajianAwalPasienRawatInap extends Component
     {
         $this->updateJsonRI($riHdrNo, $this->dataDaftarRi);
 
-        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Anamnesa berhasil disimpan.");
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Pengkajian awal pasien Rawat Inap berhasil disimpan.");
     }
     // insert and update record end////////////////
 
