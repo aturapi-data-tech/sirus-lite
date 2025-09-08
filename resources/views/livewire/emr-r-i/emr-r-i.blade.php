@@ -453,7 +453,7 @@
                                                     </x-dropdown-link>
                                                 </li>
                                             @endrole
-                                            @role('Perawat')
+                                            @role(['Perawat', 'Gizi', 'Casemix'])
                                                 <li>
                                                     <x-dropdown-link
                                                         wire:click="edit('{{ $myQData->rihdr_no }}','{{ $myQData->reg_no }}')">
