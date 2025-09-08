@@ -16,11 +16,12 @@ class CPPT extends Component
     protected $listeners = [
         'syncronizeAssessmentPerawatRIFindData' => 'mount',
         'syncronizeCpptPlan' => 'setCpptPlan',
-        'laboratSelectedText' => 'appendLaboratText'
+        'laboratSelectedText' => 'appendLaboratText',
     ];
     public function setCpptPlan($cpptPlan)
     {
         $this->formEntryCPPT['soap']['plan'] = $cpptPlan;
+        $this->closeModalEresepRI();
     }
 
     public function appendLaboratText(string $text): void
