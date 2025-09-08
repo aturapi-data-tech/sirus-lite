@@ -28,7 +28,7 @@ class FormEntryDokter extends Component
 
     // rules///////////////////
     protected $rules = [
-        'FormEntryDokter.dokterId' => 'required|numeric|digits_between:1,3',
+        'FormEntryDokter.dokterId' => 'required|numeric|digits_between:1,4',
         'FormEntryDokter.dokterName' => 'required',
         'FormEntryDokter.dokterIdBPJS' => '',
         'FormEntryDokter.dokterUuid' => '',
