@@ -100,7 +100,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/MyPermissions', Permissions::class)->name('MyPermissions');
 });
 
-Route::group(['middleware' => ['role:Admin|Mr|Perawat|Dokter|Apoteker|Tu']], function () {
+Route::group(['middleware' => ['role:Admin|Mr|Perawat|Dokter|Apoteker|Tu|Gizi|Casemix']], function () {
     Route::get('pendaftaranMandiriPasienPoli', PendaftaranMandiriPasienPoli::class)->middleware('auth')->name('pendaftaranMandiriPasienPoli');
     // Route::view('/cetak-tiket', 'livewire.pendaftaran-mandiri-pasien-poli.cetak-tiket');
 

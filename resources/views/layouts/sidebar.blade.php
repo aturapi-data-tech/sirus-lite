@@ -90,7 +90,7 @@
                                     </x-nav-link>
                                 @endrole
 
-                                @role(['Dokter', 'Perawat', 'Mr', 'Admin'])
+                                @role(['Dokter', 'Perawat', 'Mr', 'Admin', 'Tu', 'Gizi', 'Casemix'])
                                     <x-nav-link class="pl-4" :href="route('EmrRJ')" :active="request()->routeIs('EmrRJ')">
                                         <!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
 
@@ -166,7 +166,7 @@
                                     </x-nav-link>
                                 @endrole
 
-                                @role(['Dokter', 'Perawat', 'Mr', 'Admin'])
+                                @role(['Dokter', 'Perawat', 'Mr', 'Admin', 'Tu', 'Gizi', 'Casemix'])
                                     <x-nav-link class="pl-4" :href="route('EmrUGD')" :active="request()->routeIs('EmrUGD')">
                                         {{ __('Rekam Medis UGD') }}
                                     </x-nav-link>
@@ -224,7 +224,7 @@
                                     </x-nav-link>
                                 @endrole
 
-                                @role(['Dokter', 'Perawat', 'Mr', 'Admin', 'Tu'])
+                                @role(['Dokter', 'Perawat', 'Mr', 'Admin', 'Tu', 'Gizi', 'Casemix'])
                                     <x-nav-link class="pl-4" :href="route('EmrRI')" :active="request()->routeIs('EmrRI')">
                                         {{ __('Rekam Medis Rawat Inap  (Status Inap)') }}
                                     </x-nav-link>
@@ -314,7 +314,7 @@
                     @endrole
 
 
-                    @role(['Perawat', 'Mr', 'Admin'])
+                    @role(['Mr', 'Admin', 'Casmix'])
                         <li class="border border-gray-300 rounded-lg ">
 
                             <button type="button"
@@ -414,7 +414,7 @@
                         </li>
                     @endrole
 
-                    @role(['Admin', 'Tu'])
+                    @role(['Admin', 'Tu', 'Casmix'])
                         <li class="border border-gray-300 rounded-lg ">
 
                             <button type="button"
