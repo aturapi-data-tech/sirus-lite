@@ -213,6 +213,18 @@ class Users extends Component
         $user = $user->where('id', $id)->first();
         $user->assignRole('Apoteker');
     }
+    public function assignRoleGizi($id)
+    {
+        $user = new User;
+        $user = $user->where('id', $id)->first();
+        $user->assignRole('Gizi');
+    }
+    public function assignRoleCasmix($id)
+    {
+        $user = new User;
+        $user = $user->where('id', $id)->first();
+        $user->assignRole('Casmix');
+    }
     public function assignRoleAdmin($id)
     {
         $user = new User;
@@ -253,6 +265,18 @@ class Users extends Component
         $user = $user->where('id', $id)->first();
         $user->removeRole('Apoteker');
     }
+    public function removeRoleGizi($id)
+    {
+        $user = new User;
+        $user = $user->where('id', $id)->first();
+        $user->removeRole('Gizi');
+    }
+    public function removeRoleCasmix($id)
+    {
+        $user = new User;
+        $user = $user->where('id', $id)->first();
+        $user->removeRole('Casmix');
+    }
     public function removeRoleAdmin($id)
     {
         $user = new User;
@@ -287,7 +311,13 @@ class Users extends Component
         $myQueryData->where(function ($q) use ($mySearch) {
             $q->orWhere(DB::raw('upper(name)'), 'like', '%' . strtoupper($mySearch) . '%')
                 ->orWhere(DB::raw('upper(id)'), 'like', '%' . strtoupper($mySearch) . '%')
-                ->orWhere(DB::raw('upper(email)'), 'like', '%' . strtoupper($mySearch) . '%');
+                ->orWhere(DB::raw('upper(email)'), 'like', '%' . strtoupper($mySearch) . '%')
+                ->orWhereIn('users.id', function ($sub) use ($mySearch) {
+                    $sub->select('m.model_id')
+                        ->from('model_has_roles as m')
+                        ->join('roles as r', 'r.id', '=', 'm.role_id')
+                        ->whereRaw('upper(r.name) LIKE ?', ["%" . strtoupper($mySearch) . "%"]);
+                });
         })
             ->orderBy('myrole', 'asc')
             ->orderBy('name', 'asc');
