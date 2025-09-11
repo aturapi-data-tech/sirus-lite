@@ -38,38 +38,51 @@ class LockMonitor extends Component
             $objectView = 'all_objects'; // ganti ke 'dba_objects' jika punya privilege
 
             $sql = <<<'SQL'
-WITH locks AS (
-    SELECT /* blockers */ l1.sid AS blocker_sid,
-           l2.sid AS waiter_sid,
-           l1.id1, l1.id2
-    FROM v$lock l1
-    JOIN v$lock l2
-      ON l2.id1 = l1.id1 AND l2.id2 = l1.id2
-    WHERE l1.block = 1 AND l2.block = 0
-)
-SELECT
-    bs.sid                     AS blocker_sid,
-    bs.serial#                 AS blocker_serial,
-    bs.username                AS blocker_user,
-    bs.program                 AS blocker_program,
-    bs.event                   AS blocker_event,
-    NVL(bs.seconds_in_wait,0)  AS blocker_seconds_wait,
+            WITH locks AS (
+                SELECT l1.sid AS blocker_sid,
+                       l2.sid AS waiter_sid,
+                       l1.id1, l1.id2
+                FROM v$lock l1
+                JOIN v$lock l2
+                  ON l2.id1 = l1.id1 AND l2.id2 = l1.id2
+                WHERE l1.block = 1 AND l2.block = 0
+            )
+            SELECT
+                -- BLOCKER
+                bs.sid                      AS blocker_sid,
+                bs.serial#                  AS blocker_serial,
+                bs.username                 AS blocker_user,
+                bs.program                  AS blocker_program,
+                bs.module                   AS blocker_module,
+                bs.machine                  AS blocker_machine,
+                bs.event                    AS blocker_event,
+                NVL(bs.seconds_in_wait,0)   AS blocker_seconds_wait,
+                NVL(bs.sql_id, bs.prev_sql_id) AS blocker_sql_id,
+                SUBSTR(sb.sql_text,1,1000)  AS blocker_sql_text,
 
-    ws.sid                     AS waiter_sid,
-    ws.serial#                 AS waiter_serial,
-    ws.username                AS waiter_user,
-    ws.program                 AS waiter_program,
-    ws.event                   AS waiter_event,
-    NVL(ws.seconds_in_wait,0)  AS waiter_seconds_wait,
+                -- WAITER
+                ws.sid                      AS waiter_sid,
+                ws.serial#                  AS waiter_serial,
+                ws.username                 AS waiter_user,
+                ws.program                  AS waiter_program,
+                ws.module                   AS waiter_module,
+                ws.machine                  AS waiter_machine,
+                ws.event                    AS waiter_event,
+                NVL(ws.seconds_in_wait,0)   AS waiter_seconds_wait,
+                NVL(ws.sql_id, ws.prev_sql_id) AS waiter_sql_id,
+                SUBSTR(sw.sql_text,1,1000)  AS waiter_sql_text,
 
-    o.owner||'.'||o.object_name AS locked_object,
-    o.object_type
-FROM locks k
-JOIN v$session bs ON bs.sid = k.blocker_sid
-JOIN v$session ws ON ws.sid = k.waiter_sid
-LEFT JOIN __OBJECT_VIEW__ o ON o.object_id = k.id1
-ORDER BY ws.seconds_in_wait DESC NULLS LAST
-SQL;
+                -- OBJECT
+                o.owner||'.'||o.object_name AS locked_object,
+                o.object_type
+            FROM locks k
+            JOIN v$session bs ON bs.sid = k.blocker_sid
+            JOIN v$session ws ON ws.sid = k.waiter_sid
+            LEFT JOIN __OBJECT_VIEW__ o ON o.object_id = k.id1
+            LEFT JOIN v$sqlarea sb ON sb.sql_id = NVL(bs.sql_id, bs.prev_sql_id)
+            LEFT JOIN v$sqlarea sw ON sw.sql_id = NVL(ws.sql_id, ws.prev_sql_id)
+            ORDER BY ws.seconds_in_wait DESC NULLS LAST
+            SQL;
 
             $sql = str_replace('__OBJECT_VIEW__', $objectView, $sql);
 

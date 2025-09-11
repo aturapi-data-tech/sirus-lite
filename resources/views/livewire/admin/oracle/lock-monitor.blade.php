@@ -49,7 +49,18 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @forelse($rows as $r)
+                                            @forelse ($rows as $r)
+                                                @php
+                                                    $bOk =
+                                                        isset($r['blocker_sid'], $r['blocker_serial']) &&
+                                                        is_numeric($r['blocker_sid']) &&
+                                                        is_numeric($r['blocker_serial']);
+                                                    $wOk =
+                                                        isset($r['waiter_sid'], $r['waiter_serial']) &&
+                                                        is_numeric($r['waiter_sid']) &&
+                                                        is_numeric($r['waiter_serial']);
+                                                @endphp
+
                                                 <tr class="border-t">
                                                     <td class="px-2 py-2 font-mono">
                                                         {{ $r['waiter_sid'] ?? '' }},{{ $r['waiter_serial'] ?? '' }}
@@ -58,22 +69,31 @@
                                                     <td class="px-2 py-2">{{ $r['waiter_program'] ?? '-' }}</td>
                                                     <td class="px-2 py-2">{{ $r['waiter_event'] ?? '-' }}</td>
                                                     <td class="px-2 py-2">{{ $r['waiter_seconds_wait'] ?? 0 }}</td>
+
                                                     <td class="px-2 py-2 font-mono">
                                                         {{ $r['blocker_sid'] ?? '' }},{{ $r['blocker_serial'] ?? '' }}
                                                     </td>
                                                     <td class="px-2 py-2">{{ $r['blocker_user'] ?? '-' }}</td>
                                                     <td class="px-2 py-2">{{ $r['blocker_program'] ?? '-' }}</td>
                                                     <td class="px-2 py-2">{{ $r['locked_object'] ?? '-' }}</td>
+
                                                     <td class="px-2 py-2">
                                                         <div class="flex gap-2">
-                                                            <x-red-button
-                                                                wire:click="confirmKill({{ $r['blocker_sid'] ?? 0 }}, {{ $r['blocker_serial'] ?? 0 }})">
+                                                            <button
+                                                                class="px-3 py-1 text-white bg-red-600 rounded disabled:opacity-50"
+                                                                wire:click="confirmKill(@json($r['blocker_sid'] ?? null), @json($r['blocker_serial'] ?? null))"
+                                                                @if (!$bOk) disabled @endif
+                                                                title="{{ $bOk ? 'Kill blocker' : 'SID/SERIAL tidak tersedia' }}">
                                                                 Kill Blocker
-                                                            </x-red-button>
-                                                            <x-light-button
-                                                                wire:click="confirmKill({{ $r['waiter_sid'] ?? 0 }}, {{ $r['waiter_serial'] ?? 0 }})">
+                                                            </button>
+
+                                                            <button
+                                                                class="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+                                                                wire:click="confirmKill(@json($r['waiter_sid'] ?? null), @json($r['waiter_serial'] ?? null))"
+                                                                @if (!$wOk) disabled @endif
+                                                                title="{{ $wOk ? 'Kill waiter' : 'SID/SERIAL tidak tersedia' }}">
                                                                 Kill Waiter
-                                                            </x-light-button>
+                                                            </button>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -86,6 +106,7 @@
                                             @endforelse
                                         </tbody>
                                     </table>
+
                                 </div>
 
                                 {{-- Modal konfirmasi --}}
