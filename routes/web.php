@@ -62,7 +62,7 @@ use App\Http\Livewire\GroupingBPJS\GroupingBPJSRI;
 use App\Http\Livewire\GajiDokter\GajiDokter;
 
 
-
+use App\Http\Livewire\Admin\Oracle\LockMonitor;
 
 /*
 |--------------------------------------------------------------------------
@@ -176,6 +176,9 @@ Route::group(['middleware' => ['role:Admin|Mr|Perawat|Dokter|Apoteker|Tu|Gizi|Ca
 
     //Gaji Dokter
     Route::get('GajiDokter', GajiDokter::class)->middleware('auth')->name('GajiDokter');
+
+
+    Route::get('LockMonitor', LockMonitor::class)->middleware('auth')->name('LockMonitor');
 });
 
 
