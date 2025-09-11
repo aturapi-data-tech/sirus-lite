@@ -35,49 +35,49 @@
                                     <table class="w-full text-sm table-auto">
                                         <thead class="text-left bg-gray-100">
                                             <tr>
-                                                <th class="px-2 py-1">Waiter (SID,SER)</th>
-                                                <th class="px-2 py-1">Waiter User</th>
-                                                <th class="px-2 py-1">Waiter Program</th>
-                                                <th class="px-2 py-1">Wait Event</th>
-                                                <th class="px-2 py-1">Wait (s)</th>
-                                                <th class="px-2 py-1">Blocker (SID,SER)</th>
-                                                <th class="px-2 py-1">Blocker User</th>
-                                                <th class="px-2 py-1">Blocker Program</th>
-                                                <th class="px-2 py-1">Locked Object</th>
-                                                <th class="px-2 py-1">Action</th>
+                                                <th class="px-2 py-2">Waiter (SID,SER)</th>
+                                                <th class="px-2 py-2">Waiter User</th>
+                                                <th class="px-2 py-2">Waiter Program</th>
+                                                <th class="px-2 py-2">Wait Event</th>
+                                                <th class="px-2 py-2">Wait (s)</th>
+                                                <th class="px-2 py-2">Blocker (SID,SER)</th>
+                                                <th class="px-2 py-2">Blocker User</th>
+                                                <th class="px-2 py-2">Blocker Program</th>
+                                                <th class="px-2 py-2">Locked Object</th>
+                                                <th class="px-2 py-2">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @forelse($rows as $r)
                                                 <tr class="border-t">
-                                                    <td class="px-2 py-1 font-mono">
+                                                    <td class="px-2 py-2 font-mono">
                                                         {{ $r['waiter_sid'] ?? '' }},{{ $r['waiter_serial'] ?? '' }}
                                                     </td>
-                                                    <td class="px-2 py-1">
+                                                    <td class="px-2 py-2">
                                                         {{ $r['waiter_user'] ?? '-' }}
                                                     </td>
-                                                    <td class="px-2 py-1">
+                                                    <td class="px-2 py-2">
                                                         {{ $r['waiter_program'] ?? '-' }}
                                                     </td>
-                                                    <td class="px-2 py-1">
+                                                    <td class="px-2 py-2">
                                                         {{ $r['waiter_event'] ?? '-' }}
                                                     </td>
-                                                    <td class="px-2 py-1">
+                                                    <td class="px-2 py-2">
                                                         {{ $r['waiter_seconds_wait'] ?? 0 }}
                                                     </td>
-                                                    <td class="px-2 py-1 font-mono">
+                                                    <td class="px-2 py-2 font-mono">
                                                         {{ $r['blocker_sid'] ?? '' }},{{ $r['blocker_serial'] ?? '' }}
                                                     </td>
-                                                    <td class="px-2 py-1">
+                                                    <td class="px-2 py-2">
                                                         {{ $r['blocker_user'] ?? '-' }}
                                                     </td>
-                                                    <td class="px-2 py-1">
+                                                    <td class="px-2 py-2">
                                                         {{ $r['blocker_program'] ?? '-' }}
                                                     </td>
-                                                    <td class="px-2 py-1">
+                                                    <td class="px-2 py-2">
                                                         {{ $r['locked_object'] ?? '-' }}
                                                     </td>
-                                                    <td class="px-2 py-1">
+                                                    <td class="px-2 py-2">
                                                         <div class="flex gap-2">
                                                             <x-red-button x-data
                                                                 x-on:click="$dispatch('open-kill', { sid: @json($r['blocker_sid'] ?? null), serial: @json($r['blocker_serial'] ?? null) })">
