@@ -30,7 +30,7 @@
 
         <!-- Keluhan Tambahan -->
         <div>
-            <x-input-label for="dataDaftarRi.pengkajianDokter.anamnesa.keluhanTambahan" :value="__('Keluhan Tambahan')"
+            <x-input-label for="dataDaftarRi.pengkajianDokter.anamnesa.keluhanTambahan" :value="__('Indikasi Rawat Inap')"
                 :required="true" />
             <x-text-input-area id="dataDaftarRi.pengkajianDokter.anamnesa.keluhanTambahan"
                 placeholder="Keluhan Tambahan" class="mt-1"

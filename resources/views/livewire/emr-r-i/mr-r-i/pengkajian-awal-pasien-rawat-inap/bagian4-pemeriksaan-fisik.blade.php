@@ -157,9 +157,9 @@
         <!-- Keluhan Utama -->
         <div>
             <x-input-label for="dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.keluhanUtama"
-                :value="__('Keluhan Utama')" :required="__(true)" />
+                :value="__('Keadaan Umum')" :required="__(true)" />
             <x-text-input-area id="dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.keluhanUtama"
-                placeholder="Keluhan Utama" class="mt-1" :errorshas="__(
+                placeholder="Keadaan Umum" class="mt-1" :errorshas="__(
                     $errors->has('dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.keluhanUtama'),
                 )" :disabled="$disabledPropertyRjStatus"
                 wire:model.debounce.500ms="dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.keluhanUtama" />

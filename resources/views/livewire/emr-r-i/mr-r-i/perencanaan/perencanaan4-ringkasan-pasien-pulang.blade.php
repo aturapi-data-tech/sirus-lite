@@ -34,6 +34,7 @@
 
         // Anamnesis
         $keluhanUtama = data_get($ri, 'pengkajianDokter.anamnesa.keluhanUtama', '');
+        $keluhanTambahanIndikasiInap = data_get($ri, 'pengkajianDokter.anamnesa.keluhanTambahan', '');
 
         $riwayatPenyakit =
             'Riwayat Penyakit Sekarang: ' .
@@ -52,7 +53,11 @@
         $suhu = $tv['suhu'] ?? '';
         $nadi = $tv['frekuensiNadi'] ?? '';
         $rr = $tv['frekuensiNafas'] ?? '';
-        $gcsAwal = data_get($ri, 'pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.neurologi.gcs', ''); // fallback
+        $gcsAwal = data_get(
+            $ri,
+            'pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.pemeriksaanSistemOrgan.neurologi.gcs',
+            '',
+        ); // fallback
         $pemeriksaanFisik = data_get($ri, 'pengkajianDokter.fisik', '');
 
         // Penunjang
@@ -60,15 +65,9 @@
         $gdaAwal = $tv['gda'] ?? '';
         $tandaObs = data_get($ri, 'observasi.observasiLanjutan.tandaVital', []);
         $gdaAkhir = collect($tandaObs)->pluck('gda')->filter(fn($v) => $v !== '' && $v !== '-' && $v !== '0')->last();
-        $labText = trim(
-            'GDA awal: ' .
-                ($gdaAwal ?: '-') .
-                '; GDA terakhir: ' .
-                ($gdaAkhir ?: '-') .
-                ' ' .
-                data_get($ri, 'pengkajianDokter.hasilPemeriksaanPenunjang.laboratorium', ''),
-        );
+        $gdaText = 'GDA awal: ' . ($gdaAwal ?: '-') . '; GDA terakhir: ' . ($gdaAkhir ?: '-') . ' ';
 
+        $labText = trim(data_get($ri, 'pengkajianDokter.hasilPemeriksaanPenunjang.laboratorium', ''));
         // ==== RADIOLOGI ====
         $radText = trim(
             'Hasil radiologi: ' . data_get($ri, 'pengkajianDokter.hasilPemeriksaanPenunjang.radiologi', '-'),
@@ -81,20 +80,20 @@
         );
 
         // Terapi/Tindakan selama di RS (dari pemberian obat & cairan)
-        $cppt = data_get($ri, 'cppt', []);
+        //$cppt = data_get($ri, 'cppt', []);
 
         // 1) Ambil CPPT dokter: profession = "Dokter" ATAU nama petugas diawali "dr."
-        $cpptDokter = collect($cppt)->filter(function ($row) {
-            $isDokterByProfession = strcasecmp((string) ($row['profession'] ?? ''), 'Dokter') === 0;
-            $nama = (string) ($row['petugasCPPT'] ?? '');
-            $isDokterByName = preg_match('/^\s*dr\.?\s+/i', $nama); // "dr ", "dr. "
-            return $isDokterByProfession || $isDokterByName;
-        });
+        //$cpptDokter = collect($cppt)->filter(function ($row) {
+        //    $isDokterByProfession = strcasecmp((string) ($row['profession'] ?? ''), 'Dokter') === 0;
+        //    $nama = (string) ($row['petugasCPPT'] ?? '');
+        //    $isDokterByName = preg_match('/^\s*dr\.?\s+/i', $nama); // "dr ", "dr. "
+        //    return $isDokterByProfession || $isDokterByName;
+        //});
 
         // 2) Gabungkan semua field plan menjadi satu teks besar
-        $plansGabung = $cpptDokter->map(fn($row) => (string) data_get($row, 'soap.plan', ''))->filter()->implode(" \n");
+        //$plansGabung = $cpptDokter->map(fn($row) => (string) data_get($row, 'soap.plan', ''))->filter()->implode(" \n");
 
-        $terapiRS = $plansGabung;
+        //$terapiRS = '-';
 
         // ====== DIAGNOSIS (ICD + Free Text) ======
         $dxList = collect(data_get($ri, 'diagnosis', []));
@@ -220,10 +219,8 @@
             stripos((string) $statusPulang, 'meninggal') !== false || (string) $kodeBpjsTerpilihTindakLanjut === '4';
 
         // 7) (Opsional) Buat string final yang enak dipajang
-        $statusPulangDisplay = 'Status Pulang: ' . ($statusPulang !== '' ? $statusPulang : '- (belum diisi)');
-        if ($keteranganTambahanTindakLanjut !== '') {
-            $statusPulangDisplay .= " — Keterangan: {$keteranganTambahanTindakLanjut}";
-        }
+
+        $statusPulangDisplay = " — Keterangan: {$keteranganTambahanTindakLanjut}";
     @endphp
 
     {{-- ======================= HEADER + NO. RM ======================= --}}
@@ -289,7 +286,7 @@
         </tr>
         <tr>
             <th class="px-2 py-1 text-left border border-black">Indikasi Rawat Inap</th>
-            <td class="px-2 py-1 border border-black" colspan="5">{{ $indikasiRawatInap }}</td>
+            <td class="px-2 py-1 border border-black" colspan="5">{{ $keluhanTambahanIndikasiInap }}</td>
         </tr>
     </table>
 
@@ -316,7 +313,7 @@
         <tr>
             <th class="w-48 px-2 py-1 text-left border border-black">Keadaan umum</th>
             <td class="px-2 py-1 border border-black" colspan="5">
-                {{ data_get($ri, 'pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.aktivitas.pilihan', '') ?: '-' }}
+                {{ data_get($ri, 'pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.keluhanUtama', '') ?: '-' }}
             </td>
         </tr>
         <tr>
@@ -325,7 +322,9 @@
                 Tekanan darah : {{ $td }} &nbsp;&nbsp;
                 Suhu : {{ $suhu }} &nbsp;&nbsp;
                 Nadi : {{ $nadi }} &nbsp;&nbsp;
-                Frekuensi napas : {{ $rr }}
+                Frekuensi napas : {{ $rr }}&nbsp;&nbsp;
+                {{ $gdaText }}&nbsp;&nbsp;
+                GCS Awal :{{ $gcsAwal }}
             </td>
         </tr>
         <tr>
@@ -364,18 +363,126 @@
     </table>
 
     {{-- ======================= TERAPI/TINDAKAN DI RS ======================= --}}
+    {{-- {{ $terapiRS }} --}}
+    @php
+        // 1) Kumpulkan SEMUA HDR
+        $hdrs = collect((array) data_get($ri, 'eresepHdr', []));
+
+        // 2) Flatten semua detail dari tiap HDR
+        $allNonRacik = $hdrs->flatMap(fn($h) => (array) data_get($h, 'eresep', []))->values();
+        $allRacik = $hdrs->flatMap(fn($h) => (array) data_get($h, 'eresepRacikan', []))->values();
+
+        // 3) Normalizer untuk distinct racikan
+        $normalize = function (?string $s) {
+            $s = trim((string) $s);
+            $s = preg_replace('/\s+/u', ' ', $s ?? '');
+            return mb_strtolower($s ?? '', 'UTF-8');
+        };
+
+        // 4) Distinct RACIKAN (by productName + dosis), SUM qty
+        $racikDistinct = collect($allRacik)
+            ->filter(fn($x) => isset($x['jenisKeterangan']))
+            ->map(function ($x) use ($normalize) {
+                $name = $normalize(data_get($x, 'productName', ''));
+                $dose = $normalize(data_get($x, 'dosis', ''));
+                $x['__uniq'] = $name . '|' . $dose;
+                return $x;
+            })
+            ->groupBy('__uniq')
+            ->map(function ($rows) {
+                $first = $rows->first();
+                $sumQty = $rows->sum(function ($r) {
+                    $q = data_get($r, 'qty');
+                    return is_numeric($q) ? (float) $q : 0;
+                });
+                $first['qty'] = $sumQty > 0 ? $sumQty : data_get($first, 'qty', null);
+                return $first;
+            })
+            ->sortBy([['productName', 'asc'], ['dosis', 'asc']])
+            ->values();
+
+        // 5) Helper format tampilan
+        $fmtNonRacik = function ($d) {
+            $name = trim((string) data_get($d, 'productName', '-'));
+            $qty = trim((string) data_get($d, 'qty', '-'));
+            $signaX = trim((string) data_get($d, 'signaX', ''));
+            $signaHari = trim((string) data_get($d, 'signaHari', ''));
+            $cat = trim((string) data_get($d, 'catatanKhusus', ''));
+            return 'R/ ' .
+                $name .
+                ' | No. ' .
+                ($qty !== '' ? $qty : '-') .
+                ' | S ' .
+                ($signaX !== '' ? $signaX : '-') .
+                'dd' .
+                ($signaHari !== '' ? $signaHari : '-') .
+                ($cat !== '' ? ' (' . $cat . ')' : '');
+        };
+
+        $fmtRacik = function ($d) {
+            $noR = trim((string) data_get($d, 'noRacikan', ''));
+            $name = trim((string) data_get($d, 'productName', ''));
+            $dose = trim((string) data_get($d, 'dosis', ''));
+            $qty = data_get($d, 'qty');
+            $cat = trim((string) data_get($d, 'catatan', ''));
+            $ckhus = trim((string) data_get($d, 'catatanKhusus', ''));
+
+            $line = ($noR !== '' ? $noR . '/ ' : '') . $name . ($dose !== '' ? ' - ' . $dose : '');
+            if ($qty !== null && $qty !== '') {
+                $line .=
+                    "\nJml Racikan " .
+                    $qty .
+                    ($cat !== '' ? ' | ' . $cat : '') .
+                    ($ckhus !== '' ? ' | S ' . $ckhus : '');
+            }
+            return $line;
+        };
+    @endphp
+
     <table class="w-full mt-2 border border-collapse border-black table-auto">
         <tr class="font-semibold bg-gray-100">
-            <th colspan="6" class="px-2 py-1 text-left">TERAPI/TINDAKAN MEDIS SELAMA DI RUMAH SAKIT</th>
+            <th colspan="4" class="px-2 py-1 text-left">TERAPI / TINDAKAN MEDIS SELAMA DI RUMAH SAKIT
+            </th>
         </tr>
-        <tr>
-            <td class="break-words whitespace-pre-line border border-black" colspan="6">
-                <div class="p-2 m-2">
-                    {{ $terapiRS }}
-                </div>
-            </td>
+
+        {{-- A. NON-RACIKAN --}}
+        <tr class="bg-gray-50">
+            <th colspan="4" class="px-2 py-1 text-left border border-black">A. Non-Racikan</th>
         </tr>
+        @if ($allNonRacik->isNotEmpty())
+            @foreach ($allNonRacik as $i => $d)
+                <tr>
+                    <td class="px-3 py-0.5 text-sm break-words whitespace-pre-line border border-black" colspan="4">
+                        {{ $fmtNonRacik($d) }}
+                    </td>
+                </tr>
+            @endforeach
+        @else
+            <tr>
+                <td class="px-4 py-1 border border-black" colspan="4">Belum ada resep non-racikan.
+                </td>
+            </tr>
+        @endif
+
+        {{-- B. RACIKAN --}}
+        <tr class="bg-gray-50">
+            <th colspan="4" class="px-2 py-1 text-left border border-black">B. Racikan</th>
+        </tr>
+        @if ($racikDistinct->isNotEmpty())
+            @foreach ($racikDistinct as $i => $d)
+                <tr>
+                    <td class="px-3 py-0.5 text-sm break-words whitespace-pre-line border border-black" colspan="4">
+                        {{ $fmtRacik($d) }}
+                    </td>
+                </tr>
+            @endforeach
+        @else
+            <tr>
+                <td class="px-4 py-2 border border-black" colspan="4">Belum ada resep racikan.</td>
+            </tr>
+        @endif
     </table>
+
 
     {{-- ======================= DIAGNOSIS & TINDAKAN + ICD ======================= --}}
     <table class="w-full mt-2 border border-collapse border-black table-auto">
