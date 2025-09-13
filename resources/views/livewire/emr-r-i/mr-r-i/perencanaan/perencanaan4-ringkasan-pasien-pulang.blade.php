@@ -159,11 +159,7 @@
         $diet = trim((string) data_get($ri, 'pengkajianDokter.rencana.diet', '-'));
 
         // Edukasi / Instruksi: ambil PLAN CPPT terakhir
-        $lastPlan =
-            collect($ri['cppt'] ?? [])
-                ->pluck('soap.plan')
-                ->filter()
-                ->last() ?? '';
+        $cppt = collect($ri['cppt'] ?? []);
 
         // Halaman 2 - kondisi saat pulang
         $gcsPulang = collect($tandaObs)->pluck('gcs')->filter()->last() ?: $gcsAwal;
@@ -204,7 +200,7 @@
         $labelTerpilihTindakLanjut = data_get($selectedTindakLanjut, 'tindakLanjut', ''); // ex: "Meninggal"
         $labelTerpilihTindakLanjutKode = data_get($selectedTindakLanjut, 'tindakLanjutKode', ''); // ex: "266707007"
         $kodeBpjsTerpilihTindakLanjut = data_get($selectedTindakLanjut, 'tindakLanjutKodeBpjs'); // ex: 4
-        $keteranganTambahanTindakLanjut = trim(data_get($modelTindakLanjut, 'keteranganTindakLanjut', '-'));
+        $keteranganTindakLanjut = trim(data_get($modelTindakLanjut, 'keteranganTindakLanjut', ''));
 
         // 4) Sesuaikan $statusPulang (kalau field lama kosong, pakai hasil mapping)
         $statusPulang = $labelTerpilihTindakLanjut ?: '-';
@@ -220,7 +216,6 @@
 
         // 7) (Opsional) Buat string final yang enak dipajang
 
-        $statusPulangDisplay = " — Keterangan: {$keteranganTambahanTindakLanjut}";
     @endphp
 
     {{-- ======================= HEADER + NO. RM ======================= --}}
@@ -576,6 +571,26 @@
         // filter observasi pada tanggal exitDate (format "dd/mm/yyyy hh:mm:ss")
         $exitDateOnly = !empty($ri['exitDate']) ? Carbon::createFromFormat('d/m/Y H:i:s', $ri['exitDate']) : null;
 
+        if ($exitDateOnly) {
+            // Ambil record CPPT terakhir di hari exitDate
+            $lastCppt = $cppt
+                ->filter(
+                    fn($row) => !empty($row['tglCPPT']) &&
+                        Carbon::createFromFormat('d/m/Y H:i:s', $row['tglCPPT'])->isSameDay($exitDateOnly),
+                )
+                ->sortByDesc(fn($row) => Carbon::createFromFormat('d/m/Y H:i:s', $row['tglCPPT']))
+                ->first();
+        } else {
+            // Fallback → ambil CPPT terakhir dari semua
+            $lastCppt = $cppt
+                ->sortByDesc(fn($row) => Carbon::createFromFormat('d/m/Y H:i:s', $row['tglCPPT']))
+                ->first();
+        }
+
+        // Extract plan & subject kalau ada
+        $lastPlan = $lastCppt['soap']['plan'] ?? '';
+        $lastSubjective = $lastCppt['soap']['subjective'] ?? '';
+
         $lastObsExit = $exitDateOnly
             ? $tandaObs
                 ->filter(function ($r) use ($exitDateOnly) {
@@ -688,7 +703,7 @@
         <tr>
             <th class="w-48 px-2 py-1 text-left align-top border border-black">Keadaan umum</th>
             <td class="px-2 py-1 border border-black">
-                {{ $statusPulangDisplay }}
+                {{ $lastSubjective }}
             </td>
             <th class="w-24 px-2 py-1 text-left align-top border border-black">GCS</th>
             <td class="px-2 py-1 border border-black">{{ $gcsPulang }}</td>
@@ -702,10 +717,10 @@
                 Frekuensi napas : {{ $rrPulang }}
             </td>
         </tr>
-        <tr>
+        {{-- <tr>
             <th class="px-2 py-1 text-left align-top border border-black">Catatan penting (kondisi saat ini)</th>
             <td class="px-2 py-6 border border-black" colspan="3">{{ $catatanPenting }}</td>
-        </tr>
+        </tr> --}}
     </table>
     {{-- CARA KELUAR RS --}}
     <table class="w-full mt-2 border border-collapse border-black table-auto">
@@ -784,7 +799,8 @@
                     &nbsp;
                 </span>
                 Dirujuk ke
-                <span class="inline-block w-64 border-b border-black border-dotted">&nbsp;&nbsp;</span>
+                <span
+                    class="inline-block w-64 border-b border-black border-dotted">&nbsp;&nbsp;{{ $keteranganTindakLanjut }}</span>
             </td>
             <td class="px-2 py-1 border border-black">
                 <span class="inline-block w-3 h-3 mr-2 align-middle border border-black">&nbsp;</span>
