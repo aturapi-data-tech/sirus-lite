@@ -81,7 +81,7 @@
                                                         <div class="flex gap-2">
                                                             <button
                                                                 class="px-3 py-1 text-white bg-red-600 rounded disabled:opacity-50"
-                                                                wire:click="confirmKill(@json($r['blocker_sid'] ?? null), @json($r['blocker_serial'] ?? null))"
+                                                                wire:click="confirmKill('{{ $r['blocker_sid'] ?? null }}','{{ $r['blocker_serial'] ?? null }}')"
                                                                 @if (!$bOk) disabled @endif
                                                                 title="{{ $bOk ? 'Kill blocker' : 'SID/SERIAL tidak tersedia' }}">
                                                                 Kill Blocker
@@ -89,7 +89,7 @@
 
                                                             <button
                                                                 class="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
-                                                                wire:click="confirmKill(@json($r['waiter_sid'] ?? null), @json($r['waiter_serial'] ?? null))"
+                                                                wire:click="confirmKill('{{ $r['waiter_sid'] ?? null }}','{{ $r['waiter_serial'] ?? null }}')"
                                                                 @if (!$wOk) disabled @endif
                                                                 title="{{ $wOk ? 'Kill waiter' : 'SID/SERIAL tidak tersedia' }}">
                                                                 Kill Waiter
