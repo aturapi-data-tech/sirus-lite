@@ -26,11 +26,11 @@
 
         // Ringkasan masuk
         $diagnosaMasuk = data_get($ri, 'pengkajianAwalPasienRawatInap.bagian1DataUmum.diagnosaMasuk', '');
-        $indikasiRawatInap = data_get(
-            $ri,
-            'pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.catatanUmum',
-            '',
-        );
+        //$indikasiRawatInap = data_get(
+        //    $ri,
+        //    'pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.catatanUmum',
+        //    '',
+        //);
 
         // Anamnesis
         $keluhanUtama = data_get($ri, 'pengkajianDokter.anamnesa.keluhanUtama', '');
@@ -162,12 +162,12 @@
         $cppt = collect($ri['cppt'] ?? []);
 
         // Halaman 2 - kondisi saat pulang
-        $gcsPulang = collect($tandaObs)->pluck('gcs')->filter()->last() ?: $gcsAwal;
-        $catatanPenting =
-            collect($ri['cppt'] ?? [])
-                ->pluck('soap.subjective')
-                ->filter()
-                ->last() ?? '';
+        //$gcsPulang = collect($tandaObs)->pluck('gcs')->filter()->last() ?: $gcsAwal;
+        //$catatanPenting =
+        //    collect($ri['cppt'] ?? [])
+        //        ->pluck('soap.subjective')
+        //        ->filter()
+        //        ->last() ?? '';
 
         // Cara keluar RS / Disposisi
         // 1) Opsi master (seperti yang kamu punya)
@@ -588,7 +588,7 @@
         }
 
         // Extract plan & subject kalau ada
-        $lastPlan = $lastCppt['soap']['plan'] ?? '';
+        //$lastPlan = $lastCppt['soap']['plan'] ?? '';
         $lastSubjective = $lastCppt['soap']['subjective'] ?? '';
 
         $lastObsExit = $exitDateOnly
@@ -795,7 +795,7 @@
             <td class="px-2 py-1 border border-black">
                 <span
                     class="inline-block w-3 h-3 mr-2 align-middle border border-black
-                    @if ($statusPulang === 'Dirujuk') bg-gray-900 @endif">
+                    @if ($labelTerpilihTindakLanjutKode === '306206005') bg-gray-900 @endif">
                     &nbsp;
                 </span>
                 Dirujuk ke
