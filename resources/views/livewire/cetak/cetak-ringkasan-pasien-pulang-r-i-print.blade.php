@@ -252,7 +252,7 @@
         <table class="w-full border-collapse">
             <tr>
                 <td class="w-16 align-top border-0">
-                    <img class="w-16 h-16" src="madinahlogopersegi.png" alt="user photo">
+                    <img class="w-auto h-16" src="madinahlogopersegi.png" alt="user photo">
                     {{-- <x-application-logo class="block w-auto h-16 text-gray-800 fill-current dark:text-gray-200" /> --}}
                 </td>
                 <td class="border-0">
