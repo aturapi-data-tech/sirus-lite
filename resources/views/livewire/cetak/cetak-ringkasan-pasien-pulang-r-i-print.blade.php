@@ -1002,10 +1002,7 @@
         </div>
         <div class="text-right text-[10px]">2/2</div>
 
-        <div>
-            <livewire:cetak.cetak-ringkasan-pasien-pulang-r-i :riHdrNoRef="$riHdrNoRef"
-                :wire:key="$riHdrNoRef.'-cetak-ringkasan-pulang-ri'" />
-        </div>
+
     </div>
 
 
