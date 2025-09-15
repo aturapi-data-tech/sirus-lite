@@ -364,8 +364,25 @@
         $hdrs = collect((array) data_get($ri, 'eresepHdr', []));
 
         // 2) Flatten semua detail dari tiap HDR
-        $allNonRacik = $hdrs->flatMap(fn($h) => (array) data_get($h, 'eresep', []))->values();
-        $allRacik = $hdrs->flatMap(fn($h) => (array) data_get($h, 'eresepRacikan', []))->values();
+        // cari HDR terakhir (berdasarkan resepDate)
+        $lastHdr = $hdrs
+            ->sortByDesc(function ($h) {
+                try {
+                    return \Carbon\Carbon::createFromFormat('d/m/Y H:i:s', data_get($h, 'resepDate'))->timestamp;
+                } catch (\Throwable $e) {
+                    return 0;
+                }
+            })
+            ->first();
+
+        // buang HDR terakhir dari koleksi
+        $hdrsExceptLast = $lastHdr
+            ? $hdrs->reject(fn($h) => data_get($h, 'resepNo') == data_get($lastHdr, 'resepNo'))
+            : $hdrs;
+
+        // flatten non-racikan & racikan KECUALI resep terakhir
+        $allNonRacik = $hdrsExceptLast->flatMap(fn($h) => (array) data_get($h, 'eresep', []))->values();
+        $allRacik = $hdrsExceptLast->flatMap(fn($h) => (array) data_get($h, 'eresepRacikan', []))->values();
 
         // 3) Normalizer untuk distinct racikan
         $normalize = function (?string $s) {
