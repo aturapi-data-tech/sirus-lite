@@ -252,8 +252,8 @@
         <table class="w-full border-collapse">
             <tr>
                 <td class="w-16 align-top border-0">
-                    {{-- <img src="{{ asset('logo.png') }}" class="h-12" /> --}}
-                    <x-application-logo class="block w-auto h-16 text-gray-800 fill-current dark:text-gray-200" />
+                    <img class="w-8 h-8 rounded-full" src="madinahlogopersegi.png" alt="user photo">
+                    {{-- <x-application-logo class="block w-auto h-16 text-gray-800 fill-current dark:text-gray-200" /> --}}
                 </td>
                 <td class="border-0">
                     <div class="text-lg font-bold tracking-wide text-center">RIWAYAT PENGOBATAN</div>
@@ -494,8 +494,7 @@
             @if ($allNonRacik->isNotEmpty())
                 @foreach ($allNonRacik as $i => $d)
                     <tr>
-                        <td class="px-3 py-0.5 text-sm break-words whitespace-pre-line border border-black"
-                            colspan="4">
+                        <td class="px-3 py-0.5 break-words whitespace-pre-line border border-black" colspan="4">
                             {{ $fmtNonRacik($d) }}
                         </td>
                     </tr>
@@ -514,8 +513,7 @@
             @if ($racikDistinct->isNotEmpty())
                 @foreach ($racikDistinct as $i => $d)
                     <tr>
-                        <td class="px-3 py-0.5 text-sm break-words whitespace-pre-line border border-black"
-                            colspan="4">
+                        <td class="px-3 py-0.5 break-words whitespace-pre-line border border-black" colspan="4">
                             {{ $fmtRacik($d) }}
                         </td>
                     </tr>
