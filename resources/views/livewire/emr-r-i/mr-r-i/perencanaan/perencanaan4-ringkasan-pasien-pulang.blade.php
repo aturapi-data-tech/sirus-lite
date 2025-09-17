@@ -1,146 +1,109 @@
 <div>
     @php
         use Carbon\Carbon;
-    @endphp
 
-    @php
-        // ====== Helper kecil di Blade (aman & ringkas) ======
-        $pasien = $dataPasien['pasien'] ?? [];
+        /* ========= 1) Sumber data dasar ========= */
+        $pasien = data_get($dataPasien, 'pasien', []);
         $ri = $dataDaftarRi ?? [];
 
-        $rm = $pasien['regNo'] ?? '';
+        /* ========= 2) Identitas Pasien & Perawatan ========= */
+        $rm = (string) data_get($pasien, 'regNo', '');
+        $nama = (string) data_get($pasien, 'regName', '');
+        $tglLahir = (string) data_get($pasien, 'tglLahir', '');
+        $ruang = (string) data_get($ri, 'bangsalDesc', '');
+        $kamar = trim(
+            (string) data_get($ri, 'roomDesc', '') . (data_get($ri, 'bedNo') ? ' / ' . data_get($ri, 'bedNo') : ''),
+        );
+        $tglMasuk = (string) data_get($ri, 'entryDate', '');
+        $tglKeluar = (string) data_get($ri, 'exitDate', '');
 
-        // Identitas
-        $nama = $pasien['regName'] ?? '';
-        $tglLahir = $pasien['tglLahir'] ?? '';
-        $ruang = $ri['bangsalDesc'] ?? '';
-        $kamar = trim(($ri['roomDesc'] ?? '') . (isset($ri['bedNo']) ? ' / ' . $ri['bedNo'] : ''));
-        $tglMasuk = $ri['entryDate'] ?? '';
-        $tglKeluar = $ri['exitDate'] ?? '';
+        /* DPJP (levelingDokter = Utama) */
+        $dokterUtama = collect(data_get($ri, 'pengkajianAwalPasienRawatInap.levelingDokter', []))->first(
+            fn($r) => strcasecmp((string) data_get($r, 'levelDokter', ''), 'Utama') === 0,
+        );
+        $dpjp = (string) data_get($dokterUtama, 'drName', 'DPJP');
 
-        $dokterUtama = collect($ri['pengkajianAwalPasienRawatInap']['levelingDokter'] ?? [])
-            ->where('levelDokter', 'Utama')
-            ->first();
-
-        $dpjp = $dokterUtama['drName'] ?? 'DPJP';
-
-        // Ringkasan masuk
-        $diagnosaMasuk = data_get($ri, 'pengkajianAwalPasienRawatInap.bagian1DataUmum.diagnosaMasuk', '');
-        //$indikasiRawatInap = data_get(
-        //    $ri,
-        //    'pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.catatanUmum',
-        //    '',
-        //);
-
-        // Anamnesis
-        $keluhanUtama = data_get($ri, 'pengkajianDokter.anamnesa.keluhanUtama', '');
-        $keluhanTambahanIndikasiInap = data_get($ri, 'pengkajianDokter.anamnesa.keluhanTambahan', '');
-
+        /* ========= 3) Ringkasan Masuk & Anamnesis ========= */
+        $diagnosaMasuk = (string) data_get($ri, 'pengkajianAwalPasienRawatInap.bagian1DataUmum.diagnosaMasuk', '');
+        $keluhanUtama = (string) data_get($ri, 'pengkajianDokter.anamnesa.keluhanUtama', '');
+        $keluhanTambahanIndikasiInap = (string) data_get($ri, 'pengkajianDokter.anamnesa.keluhanTambahan', '');
         $riwayatPenyakit =
             'Riwayat Penyakit Sekarang: ' .
-            data_get($ri, 'pengkajianDokter.anamnesa.riwayatPenyakit.sekarang', '-') .
+            (string) data_get($ri, 'pengkajianDokter.anamnesa.riwayatPenyakit.sekarang', '-') .
             "\n" .
             'Riwayat Penyakit Dahulu: ' .
-            data_get($ri, 'pengkajianDokter.anamnesa.riwayatPenyakit.dahulu', '-') .
+            (string) data_get($ri, 'pengkajianDokter.anamnesa.riwayatPenyakit.dahulu', '-') .
             "\n" .
             'Riwayat Penyakit Keluarga: ' .
-            data_get($ri, 'pengkajianDokter.anamnesa.riwayatPenyakit.keluarga', '-') .
+            (string) data_get($ri, 'pengkajianDokter.anamnesa.riwayatPenyakit.keluarga', '-') .
             "\n";
 
-        // Pemeriksaan fisik awal
-        $tv = data_get($ri, 'pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.tandaVital', []);
-        $td = trim(($tv['sistolik'] ?? '') . '/' . ($tv['distolik'] ?? ''));
-        $suhu = $tv['suhu'] ?? '';
-        $nadi = $tv['frekuensiNadi'] ?? '';
-        $rr = $tv['frekuensiNafas'] ?? '';
-        $gcsAwal = data_get(
+        /* ========= 4) Pemeriksaan Fisik Awal ========= */
+        $tv = (array) data_get($ri, 'pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.tandaVital', []);
+        $td = trim((string) data_get($tv, 'sistolik', '') . '/' . (string) data_get($tv, 'distolik', ''));
+        $suhu = (string) data_get($tv, 'suhu', '');
+        $nadi = (string) data_get($tv, 'frekuensiNadi', '');
+        $rr = (string) data_get($tv, 'frekuensiNafas', '');
+        $gcsAwal = (string) data_get(
             $ri,
             'pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.pemeriksaanSistemOrgan.neurologi.gcs',
             '',
-        ); // fallback
-        $pemeriksaanFisik = data_get($ri, 'pengkajianDokter.fisik', '');
+        );
+        $pemeriksaanFisik = (string) data_get($ri, 'pengkajianDokter.fisik', '');
 
-        // Penunjang
-        // ambil GDA awal & GDA terakhir observasi
-        $gdaAwal = $tv['gda'] ?? '';
-        $tandaObs = data_get($ri, 'observasi.observasiLanjutan.tandaVital', []);
-        $gdaAkhir = collect($tandaObs)->pluck('gda')->filter(fn($v) => $v !== '' && $v !== '-' && $v !== '0')->last();
+        /* ========= 5) Penunjang (GDA, Lab, Rad, Lain) ========= */
+        $tandaObs = collect(data_get($ri, 'observasi.observasiLanjutan.tandaVital', []));
+        $gdaAwal = (string) data_get($tv, 'gda', '');
+        $gdaAkhir = $tandaObs->pluck('gda')->filter(fn($v) => $v !== '' && $v !== '-' && $v !== '0')->last();
         $gdaText = 'GDA awal: ' . ($gdaAwal ?: '-') . '; GDA terakhir: ' . ($gdaAkhir ?: '-') . ' ';
 
-        $labText = trim(data_get($ri, 'pengkajianDokter.hasilPemeriksaanPenunjang.laboratorium', ''));
-        // ==== RADIOLOGI ====
-        $radText = trim(
-            'Hasil radiologi: ' . data_get($ri, 'pengkajianDokter.hasilPemeriksaanPenunjang.radiologi', '-'),
-        );
-
-        // ==== PENUNJANG LAIN ====
-        $lainText = trim(
+        $labText = trim((string) data_get($ri, 'pengkajianDokter.hasilPemeriksaanPenunjang.laboratorium', ''));
+        $radText =
+            'Hasil radiologi: ' .
+            trim((string) data_get($ri, 'pengkajianDokter.hasilPemeriksaanPenunjang.radiologi', '-'));
+        $lainText =
             'Pemeriksaan penunjang lain: ' .
-                data_get($ri, 'pengkajianDokter.hasilPemeriksaanPenunjang.penunjangLain', '-'),
-        );
+            trim((string) data_get($ri, 'pengkajianDokter.hasilPemeriksaanPenunjang.penunjangLain', '-'));
 
-        // Terapi/Tindakan selama di RS (dari pemberian obat & cairan)
-        //$cppt = data_get($ri, 'cppt', []);
-
-        // 1) Ambil CPPT dokter: profession = "Dokter" ATAU nama petugas diawali "dr."
-        //$cpptDokter = collect($cppt)->filter(function ($row) {
-        //    $isDokterByProfession = strcasecmp((string) ($row['profession'] ?? ''), 'Dokter') === 0;
-        //    $nama = (string) ($row['petugasCPPT'] ?? '');
-        //    $isDokterByName = preg_match('/^\s*dr\.?\s+/i', $nama); // "dr ", "dr. "
-        //    return $isDokterByProfession || $isDokterByName;
-        //});
-
-        // 2) Gabungkan semua field plan menjadi satu teks besar
-        //$plansGabung = $cpptDokter->map(fn($row) => (string) data_get($row, 'soap.plan', ''))->filter()->implode(" \n");
-
-        //$terapiRS = '-';
-
-        // ====== DIAGNOSIS (ICD + Free Text) ======
+        /* ========= 6) Diagnosis (ICD + Free Text) ========= */
         $dxList = collect(data_get($ri, 'diagnosis', []));
         $dxFree = trim((string) data_get($ri, 'diagnosisFreeText', ''));
 
-        // tentukan diagnosis utama (prioritas kategori Utama/Primer)
         $dxUtamaRow =
             $dxList->first(function ($d) {
                 $k = strtolower($d['kategoriDiagnosa'] ?? '');
-                return in_array($k, ['utama', 'primer', 'primary', 'utama/primer']);
-            }) ?? $dxList->first();
+                return in_array($k, ['utama', 'primer', 'primary', 'utama/primer'], true);
+            }) ?:
+            $dxList->first();
 
-        $dxUtama = $dxUtamaRow['diagDesc'] ?? '';
-        $dxUtamaICD = $dxUtamaRow['icdX'] ?? '';
-
-        // diagnosis sekunder (ICD) = selain yang utama
+        $dxUtama = (string) data_get($dxUtamaRow, 'diagDesc', '');
+        $dxUtamaICD = (string) data_get($dxUtamaRow, 'icdX', '');
         $dxSekunderRows = $dxList
-            ->reject(function ($d) use ($dxUtamaRow) {
-                return $dxUtamaRow && ($d['diagId'] ?? null) === ($dxUtamaRow['diagId'] ?? null);
-            })
+            ->reject(fn($d) => $dxUtamaRow && data_get($d, 'diagId') === data_get($dxUtamaRow, 'diagId'))
             ->values();
-
         $dxSekunder = $dxSekunderRows->pluck('diagDesc')->filter()->values()->all();
         $dxSekunderICD = $dxSekunderRows->pluck('icdX')->filter()->values()->all();
 
-        // gabungkan free text → item sekunder tanpa kode
+        /* Free text -> utama/sekunder */
         if ($dxFree !== '') {
             $freeDxItems = collect(preg_split('/\r\n|\r|\n|;|\|/', $dxFree))->map('trim')->filter()->values();
-            // jika utama kosong, ambil baris pertama free text sebagai utama
             if ($dxUtama === '' && $freeDxItems->isNotEmpty()) {
                 $dxUtama = $freeDxItems->shift();
             }
-            // sisa free text masuk sekunder (tanpa kode)
             foreach ($freeDxItems as $item) {
                 $dxSekunder[] = $item;
                 $dxSekunderICD[] = '';
             }
         }
 
-        // ====== TINDAKAN/PROSEDUR (ICD-9-CM + Free Text) ======
+        /* ========= 7) Tindakan/Prosedur (ICD-9-CM + Free Text) ========= */
         $procList = collect(data_get($ri, 'procedure', []))
-            ->map(function ($p) {
-                return [
-                    'desc' => trim((string) ($p['procedureDesc'] ?? '')),
-                    'code' => trim((string) ($p['procedureId'] ?? '')),
-                ];
-            })
+            ->map(
+                fn($p) => [
+                    'desc' => trim((string) data_get($p, 'procedureDesc', '')),
+                    'code' => trim((string) data_get($p, 'procedureId', '')),
+                ],
+            )
             ->filter(fn($x) => $x['desc'] !== '');
 
         $procFree = trim((string) data_get($ri, 'procedureFreeText', ''));
@@ -154,23 +117,186 @@
         $tindakanDesc = $procList->pluck('desc')->values();
         $tindakanCode = $procList->pluck('code')->values();
 
-        //DIET
-
+        /* ========= 8) Diet ========= */
         $diet = trim((string) data_get($ri, 'pengkajianDokter.rencana.diet', '-'));
 
-        // Edukasi / Instruksi: ambil PLAN CPPT terakhir
-        $cppt = collect($ri['cppt'] ?? []);
+        /* ========= 9) Terapi/Tindakan Selama di RS (bukan resep pulang) ========= */
+        $hdrs = collect((array) data_get($ri, 'eresepHdr', []));
 
-        // Halaman 2 - kondisi saat pulang
-        //$gcsPulang = collect($tandaObs)->pluck('gcs')->filter()->last() ?: $gcsAwal;
-        //$catatanPenting =
-        //    collect($ri['cppt'] ?? [])
-        //        ->pluck('soap.subjective')
-        //        ->filter()
-        //        ->last() ?? '';
+        /* HDR terakhir (untuk dipisahkan) */
+        $lastHdr = $hdrs
+            ->sortByDesc(function ($h) {
+                try {
+                    return Carbon::createFromFormat('d/m/Y H:i:s', (string) data_get($h, 'resepDate'))->timestamp;
+                } catch (\Throwable $e) {
+                    return 0;
+                }
+            })
+            ->first();
 
-        // Cara keluar RS / Disposisi
-        // 1) Opsi master (seperti yang kamu punya)
+        /* Buang HDR terakhir => yang tersisa untuk ringkasan "selama di RS" */
+        $hdrsExceptLast = $lastHdr
+            ? $hdrs->reject(fn($h) => data_get($h, 'resepNo') == data_get($lastHdr, 'resepNo'))
+            : $hdrs;
+
+        /* ========== Normalizer serbaguna (pakai di non-racik & racik) ========== */
+        $normalize = function (?string $s) {
+            $s = trim((string) $s);
+            $s = preg_replace('/\s+/u', ' ', $s ?? '');
+            return mb_strtolower($s ?? '', 'UTF-8');
+        };
+
+        /* =========================================================
+        NON-RACIKAN — Flatten lalu GROUP BY obat (+ regimen) dan sum qty
+        ========================================================= */
+        // Flatten semua NON-RACIKAN (kecuali HDR terakhir)
+        $allNonRacikRaw = $hdrsExceptLast->flatMap(fn($h) => (array) data_get($h, 'eresep', []))->values();
+
+        /**
+         * Kunci grouping:
+         * - productId (utama) ATAU productName (fallback)
+         * - signaX + signaHari (agar regimen berbeda tidak digabung)
+         * - catatanKhusus (opsional — ikut digabungkan agar catatan berbeda tidak tercampur)
+         *
+         * Jika ingin murni "per obat saja", ubah $uniqKey cukup ke productId/productName.
+         */
+        $allNonRacik = collect($allNonRacikRaw)
+            ->map(function ($x) use ($normalize) {
+                $pid = (string) data_get($x, 'productId', '');
+                $pname = (string) data_get($x, 'productName', '');
+                $sx = trim((string) data_get($x, 'signaX', ''));
+                $sh = trim((string) data_get($x, 'signaHari', ''));
+                $ck = (string) data_get($x, 'catatanKhusus', '');
+
+                $uniqKey = implode('|', [
+                    $pid !== '' ? $normalize($pid) : $normalize($pname),
+                    $normalize($sx),
+                    $normalize($sh),
+                    $normalize($ck),
+                ]);
+
+                $x['__uniq'] = $uniqKey;
+
+                // ==== SORT KEY (komposit & stabil) ====
+                $nameKey = $pid !== '' ? $normalize($pid) : $normalize($pname);
+                $sxKey = str_pad((string) $sx, 4, '0', STR_PAD_LEFT); // 0001, 0010, dst.
+                $shKey = str_pad((string) $sh, 4, '0', STR_PAD_LEFT);
+                $ckKey = $normalize($ck);
+
+                $x['__sort'] = $nameKey . '|' . $sxKey . '|' . $shKey . '|' . $ckKey;
+
+                return $x;
+            })
+            ->groupBy('__uniq')
+            ->map(function ($rows) {
+                $first = $rows->first();
+                $sumQty = $rows->sum(function ($r) {
+                    $q = data_get($r, 'qty');
+                    return is_numeric($q) ? (float) $q : 0;
+                });
+                $first['qty'] = $sumQty > 0 ? $sumQty : data_get($first, 'qty', null);
+                return $first;
+            })
+            ->sortBy('__sort', SORT_NATURAL | SORT_FLAG_CASE)
+            ->values();
+
+        /* =========================================================
+        RACIKAN — Flatten lalu GROUP BY obat + dosis dan sum qty
+        ========================================================= */
+        $allRacikRaw = $hdrsExceptLast->flatMap(fn($h) => (array) data_get($h, 'eresepRacikan', []))->values();
+
+        $racikDistinct = collect($allRacikRaw)
+            ->filter(fn($x) => isset($x['jenisKeterangan'])) // jaga-jaga konsistensi
+            ->map(function ($x) use ($normalize) {
+                $pid = (string) data_get($x, 'productId', '');
+                $pname = (string) data_get($x, 'productName', '');
+                $dose = (string) data_get($x, 'dosis', '');
+                $noR = (string) data_get($x, 'noRacikan', '');
+
+                // Kunci nama (pakai productId kalau ada; fallback productName)
+                $nameKey = $pid !== '' ? $normalize($pid) : $normalize($pname);
+                $doseKey = $normalize($dose);
+
+                // Ambil angka dari noRacikan untuk sort yang natural (R/1, R/2, …)
+                $noRNum = (int) preg_replace('/\D+/', '', $noR ?: '0');
+                $noRKey = str_pad((string) $noRNum, 4, '0', STR_PAD_LEFT);
+
+                // ===== GROUP KEY: obat + dosis =====
+                $x['__uniq'] = $nameKey . '|' . $doseKey;
+
+                // ===== SORT KEY: nama → dosis → noRacikan(angka) =====
+                $x['__sort'] = $nameKey . '|' . $doseKey . '|' . $noRKey;
+
+                return $x;
+            })
+            ->groupBy('__uniq')
+            ->map(function ($rows) {
+                $first = $rows->first();
+
+                // jumlahkan QTY aman untuk "4"/4/"4.0"
+                $sumQty = $rows->sum(function ($r) {
+                    $q = data_get($r, 'qty');
+                    return is_numeric($q) ? (float) $q : 0;
+                });
+                $first['qty'] = $sumQty > 0 ? $sumQty : data_get($first, 'qty', null);
+
+                // pilih noRacikan yang terkecil angkanya (biar rapi)
+                $minNoR = collect($rows)
+                    ->sortBy(function ($r) {
+                        $nr = (string) data_get($r, 'noRacikan', '');
+                        return (int) preg_replace('/\D+/', '', $nr ?: '0');
+                    })
+                    ->first();
+                if ($minNoR) {
+                    $first['noRacikan'] = data_get($minNoR, 'noRacikan', data_get($first, 'noRacikan', ''));
+                }
+
+                // simpan sort key dari baris pertama (semuanya sama di group)
+                $first['__sort'] = data_get($rows->first(), '__sort', '');
+
+                return $first;
+            })
+            ->sortBy('__sort', SORT_NATURAL | SORT_FLAG_CASE)
+            ->values();
+
+        /* =========================================================
+        Helper format tampilan resep (untuk tabel halaman 1)
+        ========================================================= */
+        $fmtNonRacik = function ($d) {
+            $name = trim((string) data_get($d, 'productName', '-'));
+            $qty = trim((string) data_get($d, 'qty', '-'));
+            $signaX = trim((string) data_get($d, 'signaX', ''));
+            $signaHari = trim((string) data_get($d, 'signaHari', ''));
+            $cat = trim((string) data_get($d, 'catatanKhusus', ''));
+
+            return 'R/ ' .
+                $name .
+                ' | No. ' .
+                ($qty !== '' ? $qty : '-') .
+                ' | S ' .
+                ($signaX !== '' ? $signaX : '-') .
+                'dd' .
+                ($signaHari !== '' ? $signaHari : '-') .
+                ($cat !== '' ? ' (' . $cat . ')' : '');
+        };
+
+        $fmtRacik = function ($d) {
+            $noR = trim((string) data_get($d, 'noRacikan', ''));
+            $name = trim((string) data_get($d, 'productName', ''));
+            $dose = trim((string) data_get($d, 'dosis', ''));
+            $qty = data_get($d, 'qty');
+            $cat = trim((string) data_get($d, 'catatan', ''));
+            $ck = trim((string) data_get($d, 'catatanKhusus', ''));
+
+            $line = ($noR !== '' ? $noR . '/ ' : '') . $name . ($dose !== '' ? ' - ' . $dose : '');
+            if ($qty !== null && $qty !== '') {
+                $line .=
+                    "\nJml Racikan " . $qty . ($cat !== '' ? ' | ' . $cat : '') . ($ck !== '' ? ' | S ' . $ck : '');
+            }
+            return $line;
+        };
+
+        /* ========= 10) Tindak Lanjut / Cara Keluar RS ========= */
         $tindakLanjutOptions = [
             ['tindakLanjut' => 'Pulang Sehat', 'tindakLanjutKode' => '371827001', 'tindakLanjutKodeBpjs' => 1],
             [
@@ -178,45 +304,142 @@
                 'tindakLanjutKode' => '266707007',
                 'tindakLanjutKodeBpjs' => 3,
             ],
-            ['tindakLanjut' => 'Pulang Pindah / Rujuk', 'tindakLanjutKode' => '306206005', 'tindakLanjutKodeBpjs' => 5], // tidak ada padanan di BPJS SEP
+            ['tindakLanjut' => 'Pulang Pindah / Rujuk', 'tindakLanjutKode' => '306206005', 'tindakLanjutKodeBpjs' => 5],
             [
                 'tindakLanjut' => 'Pulang Tanpa Perbaikan',
                 'tindakLanjutKode' => '371828006',
                 'tindakLanjutKodeBpjs' => 5,
-            ], // tidak ada padanan di BPJS SEP
+            ],
             ['tindakLanjut' => 'Meninggal', 'tindakLanjutKode' => '419099009', 'tindakLanjutKodeBpjs' => 4],
             ['tindakLanjut' => 'Lain-lain', 'tindakLanjutKode' => '74964007', 'tindakLanjutKodeBpjs' => 5],
         ];
-
-        // 2) Jadikan lookup by KODE (lebih gampang dipanggil)
         $tindakLanjutLookup = collect($tindakLanjutOptions)->keyBy('tindakLanjutKode');
 
-        // 3) Ambil model data dari $ri (keduanya kode; pakai salah satu yang terisi)
-        $modelTindakLanjut = data_get($ri, 'perencanaan.tindakLanjut', []);
+        $modelTindakLanjut = (array) data_get($ri, 'perencanaan.tindakLanjut', []);
         $selectedKodeTL =
-            data_get($modelTindakLanjut, 'tindakLanjutKode') ?: data_get($modelTindakLanjut, 'tindakLanjut'); // ex: "419099009"
+            (string) (data_get($modelTindakLanjut, 'tindakLanjutKode') ?: data_get($modelTindakLanjut, 'tindakLanjut'));
         $selectedTindakLanjut = $selectedKodeTL ? $tindakLanjutLookup->get($selectedKodeTL) : null;
 
-        $labelTerpilihTindakLanjut = data_get($selectedTindakLanjut, 'tindakLanjut', ''); // ex: "Meninggal"
-        $labelTerpilihTindakLanjutKode = data_get($selectedTindakLanjut, 'tindakLanjutKode', ''); // ex: "266707007"
-        $kodeBpjsTerpilihTindakLanjut = data_get($selectedTindakLanjut, 'tindakLanjutKodeBpjs'); // ex: 4
-        $keteranganTindakLanjut = trim(data_get($modelTindakLanjut, 'keteranganTindakLanjut', ''));
+        $labelTerpilihTindakLanjut = (string) data_get($selectedTindakLanjut, 'tindakLanjut', '');
+        $labelTerpilihTindakLanjutKode = (string) data_get($selectedTindakLanjut, 'tindakLanjutKode', '');
+        $kodeBpjsTerpilihTindakLanjut = data_get($selectedTindakLanjut, 'tindakLanjutKodeBpjs');
+        $keteranganTindakLanjut = trim((string) data_get($modelTindakLanjut, 'keteranganTindakLanjut', ''));
 
-        // 4) Sesuaikan $statusPulang (kalau field lama kosong, pakai hasil mapping)
         $statusPulang = $labelTerpilihTindakLanjut ?: '-';
-
-        // 5) Tgl kontrol & aturan kontrol
-        $tglKontrol = data_get($ri, 'kontrol.tglKontrol', '');
-        // - ada tanggal kontrol, ATAU
-        // - status mengandung "Pulang" (pulang sehat / permintaan sendiri / rujuk / tanpa perbaikan)
+        $tglKontrol = (string) data_get($ri, 'kontrol.tglKontrol', '');
         $isKontrol = !empty($tglKontrol);
-        // 6) Heuristik meninggal (dari label)
         $isMeninggal =
             stripos((string) $statusPulang, 'meninggal') !== false || (string) $kodeBpjsTerpilihTindakLanjut === '4';
 
-        // 7) (Opsional) Buat string final yang enak dipajang
+        /* ========= 11) Halaman 2: Kondisi Saat Pulang ========= */
+        $cppt = collect(data_get($ri, 'cppt', []));
+        $exitDateOnly = !empty($tglKeluar) ? Carbon::createFromFormat('d/m/Y H:i:s', $tglKeluar) : null;
 
+        if ($exitDateOnly) {
+            $lastCppt = $cppt
+                ->filter(
+                    fn($row) => !empty($row['tglCPPT']) &&
+                        Carbon::createFromFormat('d/m/Y H:i:s', $row['tglCPPT'])->isSameDay($exitDateOnly),
+                )
+                ->sortByDesc(fn($row) => Carbon::createFromFormat('d/m/Y H:i:s', $row['tglCPPT']))
+                ->first();
+        } else {
+            $lastCppt = $cppt
+                ->sortByDesc(fn($row) => Carbon::createFromFormat('d/m/Y H:i:s', $row['tglCPPT']))
+                ->first();
+        }
+        $lastSubjective = (string) data_get($lastCppt, 'soap.subjective', '');
+
+        /* Observasi terakhir di hari pulang (fallback: yang terakhir) */
+        $lastObsExit = $exitDateOnly
+            ? $tandaObs
+                ->filter(function ($r) use ($exitDateOnly) {
+                    $w = data_get($r, 'waktuPemeriksaan');
+                    if (!$w) {
+                        return false;
+                    }
+                    try {
+                        return Carbon::createFromFormat('d/m/Y H:i:s', $w)->isSameDay($exitDateOnly);
+                    } catch (\Throwable $e) {
+                        return false;
+                    }
+                })
+                ->sortBy(function ($r) {
+                    try {
+                        return Carbon::createFromFormat('d/m/Y H:i:s', data_get($r, 'waktuPemeriksaan'))->timestamp;
+                    } catch (\Throwable $e) {
+                        return 0;
+                    }
+                })
+                ->last()
+            : null;
+
+        $obs = $lastObsExit ?: $tandaObs->sortBy('waktuPemeriksaan')->last() ?: [];
+        $sis = trim((string) data_get($obs, 'sistolik', ''));
+        $dis = trim((string) data_get($obs, 'distolik', ''));
+        $tdPulang =
+            $sis !== '' && $dis !== '' ? "{$sis}/{$dis}" : ($sis !== '' ? $sis : ($dis !== '' ? "/{$dis}" : '-'));
+        $suhuPulang = ($tmp = trim((string) data_get($obs, 'suhu', ''))) !== '' ? $tmp : '-';
+        $nadiPulang = ($tmp = trim((string) data_get($obs, 'frekuensiNadi', ''))) !== '' ? $tmp : '-';
+        $rrPulang = ($tmp = trim((string) data_get($obs, 'frekuensiNafas', ''))) !== '' ? $tmp : '-';
+        $gcsPulang = ($tmp = trim((string) data_get($obs, 'gcs', ''))) !== '' ? $tmp : ($isMeninggal ? '0' : '-');
+
+        /* ========= 12) TERAPI PULANG (HDR terakhir same-day exitDate, kalau ada; else last overall) ========= */
+        $eresepHdrs = collect(data_get($ri, 'eresepHdr', []));
+
+        if ($exitDateOnly) {
+            $sameDay = $eresepHdrs->filter(function ($h) use ($exitDateOnly) {
+                $tgl = data_get($h, 'resepDate');
+                if (!$tgl) {
+                    return false;
+                }
+                try {
+                    return Carbon::createFromFormat('d/m/Y H:i:s', $tgl)->isSameDay($exitDateOnly);
+                } catch (\Throwable $e) {
+                    return false;
+                }
+            });
+            $eresepLastHdr = $sameDay->isNotEmpty()
+                ? $sameDay
+                    ->sortByDesc(
+                        fn($h) => (function ($d) {
+                            try {
+                                return Carbon::createFromFormat('d/m/Y H:i:s', $d)->timestamp;
+                            } catch (\Throwable $e) {
+                                return 0;
+                            }
+                        })(data_get($h, 'resepDate')),
+                    )
+                    ->first()
+                : $eresepHdrs
+                    ->sortByDesc(
+                        fn($h) => (function ($d) {
+                            try {
+                                return Carbon::createFromFormat('d/m/Y H:i:s', $d)->timestamp;
+                            } catch (\Throwable $e) {
+                                return 0;
+                            }
+                        })(data_get($h, 'resepDate')),
+                    )
+                    ->first();
+        } else {
+            $eresepLastHdr = $eresepHdrs
+                ->sortByDesc(function ($h) {
+                    try {
+                        return Carbon::createFromFormat('d/m/Y H:i:s', (string) data_get($h, 'resepDate'))->timestamp;
+                    } catch (\Throwable $e) {
+                        return 0;
+                    }
+                })
+                ->first();
+        }
+
+        $noResep = (string) data_get($eresepLastHdr, 'resepNo', '-');
+        $tglResep = (string) data_get($eresepLastHdr, 'resepDate', '-');
+        $racikList = (array) data_get($eresepLastHdr, 'eresepRacikan', []);
+        $nonRacikList = (array) data_get($eresepLastHdr, 'eresep', []);
     @endphp
+
 
     {{-- ======================= HEADER + NO. RM ======================= --}}
     <table class="w-full border-collapse">
@@ -358,99 +581,6 @@
     </table>
 
     {{-- ======================= TERAPI/TINDAKAN DI RS ======================= --}}
-    {{-- {{ $terapiRS }} --}}
-    @php
-        // 1) Kumpulkan SEMUA HDR
-        $hdrs = collect((array) data_get($ri, 'eresepHdr', []));
-
-        // 2) Flatten semua detail dari tiap HDR
-        // cari HDR terakhir (berdasarkan resepDate)
-        $lastHdr = $hdrs
-            ->sortByDesc(function ($h) {
-                try {
-                    return \Carbon\Carbon::createFromFormat('d/m/Y H:i:s', data_get($h, 'resepDate'))->timestamp;
-                } catch (\Throwable $e) {
-                    return 0;
-                }
-            })
-            ->first();
-
-        // buang HDR terakhir dari koleksi
-        $hdrsExceptLast = $lastHdr
-            ? $hdrs->reject(fn($h) => data_get($h, 'resepNo') == data_get($lastHdr, 'resepNo'))
-            : $hdrs;
-
-        // flatten non-racikan & racikan KECUALI resep terakhir
-        $allNonRacik = $hdrsExceptLast->flatMap(fn($h) => (array) data_get($h, 'eresep', []))->values();
-        $allRacik = $hdrsExceptLast->flatMap(fn($h) => (array) data_get($h, 'eresepRacikan', []))->values();
-
-        // 3) Normalizer untuk distinct racikan
-        $normalize = function (?string $s) {
-            $s = trim((string) $s);
-            $s = preg_replace('/\s+/u', ' ', $s ?? '');
-            return mb_strtolower($s ?? '', 'UTF-8');
-        };
-
-        // 4) Distinct RACIKAN (by productName + dosis), SUM qty
-        $racikDistinct = collect($allRacik)
-            ->filter(fn($x) => isset($x['jenisKeterangan']))
-            ->map(function ($x) use ($normalize) {
-                $name = $normalize(data_get($x, 'productName', ''));
-                $dose = $normalize(data_get($x, 'dosis', ''));
-                $x['__uniq'] = $name . '|' . $dose;
-                return $x;
-            })
-            ->groupBy('__uniq')
-            ->map(function ($rows) {
-                $first = $rows->first();
-                $sumQty = $rows->sum(function ($r) {
-                    $q = data_get($r, 'qty');
-                    return is_numeric($q) ? (float) $q : 0;
-                });
-                $first['qty'] = $sumQty > 0 ? $sumQty : data_get($first, 'qty', null);
-                return $first;
-            })
-            ->sortBy([['productName', 'asc'], ['dosis', 'asc']])
-            ->values();
-
-        // 5) Helper format tampilan
-        $fmtNonRacik = function ($d) {
-            $name = trim((string) data_get($d, 'productName', '-'));
-            $qty = trim((string) data_get($d, 'qty', '-'));
-            $signaX = trim((string) data_get($d, 'signaX', ''));
-            $signaHari = trim((string) data_get($d, 'signaHari', ''));
-            $cat = trim((string) data_get($d, 'catatanKhusus', ''));
-            return 'R/ ' .
-                $name .
-                ' | No. ' .
-                ($qty !== '' ? $qty : '-') .
-                ' | S ' .
-                ($signaX !== '' ? $signaX : '-') .
-                'dd' .
-                ($signaHari !== '' ? $signaHari : '-') .
-                ($cat !== '' ? ' (' . $cat . ')' : '');
-        };
-
-        $fmtRacik = function ($d) {
-            $noR = trim((string) data_get($d, 'noRacikan', ''));
-            $name = trim((string) data_get($d, 'productName', ''));
-            $dose = trim((string) data_get($d, 'dosis', ''));
-            $qty = data_get($d, 'qty');
-            $cat = trim((string) data_get($d, 'catatan', ''));
-            $ckhus = trim((string) data_get($d, 'catatanKhusus', ''));
-
-            $line = ($noR !== '' ? $noR . '/ ' : '') . $name . ($dose !== '' ? ' - ' . $dose : '');
-            if ($qty !== null && $qty !== '') {
-                $line .=
-                    "\nJml Racikan " .
-                    $qty .
-                    ($cat !== '' ? ' | ' . $cat : '') .
-                    ($ckhus !== '' ? ' | S ' . $ckhus : '');
-            }
-            return $line;
-        };
-    @endphp
-
     <table class="w-full mt-2 border border-collapse border-black table-auto">
         <tr class="font-semibold bg-gray-100">
             <th colspan="4" class="px-2 py-1 text-left">TERAPI / TINDAKAN MEDIS SELAMA DI RUMAH SAKIT
@@ -580,138 +710,6 @@
         </tr>
     </table>
 
-
-    @php
-        // kumpulan TTV
-        $tandaObs = collect(data_get($ri, 'observasi.observasiLanjutan.tandaVital', []));
-
-        // filter observasi pada tanggal exitDate (format "dd/mm/yyyy hh:mm:ss")
-        $exitDateOnly = !empty($ri['exitDate']) ? Carbon::createFromFormat('d/m/Y H:i:s', $ri['exitDate']) : null;
-
-        if ($exitDateOnly) {
-            // Ambil record CPPT terakhir di hari exitDate
-            $lastCppt = $cppt
-                ->filter(
-                    fn($row) => !empty($row['tglCPPT']) &&
-                        Carbon::createFromFormat('d/m/Y H:i:s', $row['tglCPPT'])->isSameDay($exitDateOnly),
-                )
-                ->sortByDesc(fn($row) => Carbon::createFromFormat('d/m/Y H:i:s', $row['tglCPPT']))
-                ->first();
-        } else {
-            // Fallback → ambil CPPT terakhir dari semua
-            $lastCppt = $cppt
-                ->sortByDesc(fn($row) => Carbon::createFromFormat('d/m/Y H:i:s', $row['tglCPPT']))
-                ->first();
-        }
-
-        // Extract plan & subject kalau ada
-        //$lastPlan = $lastCppt['soap']['plan'] ?? '';
-        $lastSubjective = $lastCppt['soap']['subjective'] ?? '';
-
-        $lastObsExit = $exitDateOnly
-            ? $tandaObs
-                ->filter(function ($r) use ($exitDateOnly) {
-                    $waktuPemeriksaan = $r['waktuPemeriksaan'] ?? null;
-                    if (!$waktuPemeriksaan) {
-                        return false;
-                    }
-
-                    try {
-                        $parsed = Carbon::createFromFormat('d/m/Y H:i:s', $waktuPemeriksaan);
-                        return $parsed->isSameDay($exitDateOnly);
-                    } catch (\Throwable $e) {
-                        return false;
-                    }
-                })
-                ->sortBy(function ($r) {
-                    try {
-                        return Carbon::createFromFormat('d/m/Y H:i:s', $r['waktuPemeriksaan'])->timestamp;
-                    } catch (\Throwable $e) {
-                        return 0;
-                    }
-                })
-                ->last()
-            : null;
-
-        // fallback: kalau gak ada yang sama harinya, ambil yang paling akhir (opsional sort kalau urutan tidak terjamin)
-        $obs = $lastObsExit ?: $tandaObs->sortBy('waktuPemeriksaan')->last() ?: [];
-
-        // set variabel *pulang*
-        $sis = trim((string) data_get($obs, 'sistolik', ''));
-        $dis = trim((string) data_get($obs, 'distolik', ''));
-
-        $tdPulang =
-            $sis !== '' && $dis !== '' ? "{$sis}/{$dis}" : ($sis !== '' ? $sis : ($dis !== '' ? "/{$dis}" : '-'));
-        $suhuPulang = ($tmp = trim((string) data_get($obs, 'suhu', ''))) !== '' ? $tmp : '-';
-        $nadiPulang = ($tmp = trim((string) data_get($obs, 'frekuensiNadi', ''))) !== '' ? $tmp : '-';
-        $rrPulang = ($tmp = trim((string) data_get($obs, 'frekuensiNafas', ''))) !== '' ? $tmp : '-';
-        $gcsPulang = ($tmp = trim((string) data_get($obs, 'gcs', ''))) !== '' ? $tmp : ($isMeninggal ? '0' : '-');
-
-        //ResepPulang
-        // Ambil header terakhir by resepDate (format "d/m/Y H:i:s")
-        $eresepHdrs = collect(data_get($ri, 'eresepHdr', []));
-
-        if ($exitDateOnly) {
-            // filter resep yang same-day
-            $sameDay = $eresepHdrs->filter(function ($h) use ($exitDateOnly) {
-                $tgl = data_get($h, 'resepDate');
-                if (!$tgl) {
-                    return false;
-                }
-                try {
-                    $parsed = Carbon::createFromFormat('d/m/Y H:i:s', $tgl);
-                    return $parsed->isSameDay($exitDateOnly);
-                } catch (\Throwable $e) {
-                    return false;
-                }
-            });
-
-            // kalau ada di hari yang sama
-            if ($sameDay->isNotEmpty()) {
-                $eresepLastHdr = $sameDay
-                    ->sortByDesc(function ($h) {
-                        try {
-                            return Carbon::createFromFormat('d/m/Y H:i:s', data_get($h, 'resepDate'))->timestamp;
-                        } catch (\Throwable $e) {
-                            return 0;
-                        }
-                    })
-                    ->first();
-            } else {
-                // fallback: ambil record terakhir dari semua HDR
-                $eresepLastHdr = $eresepHdrs
-                    ->sortByDesc(function ($h) {
-                        try {
-                            return Carbon::createFromFormat('d/m/Y H:i:s', data_get($h, 'resepDate'))->timestamp;
-                        } catch (\Throwable $e) {
-                            return 0;
-                        }
-                    })
-                    ->first();
-            }
-        } else {
-            // kalau exitDate kosong → langsung ambil HDR terakhir overall
-            $eresepLastHdr = $eresepHdrs
-                ->sortByDesc(function ($h) {
-                    try {
-                        return Carbon::createFromFormat('d/m/Y H:i:s', data_get($h, 'resepDate'))->timestamp;
-                    } catch (\Throwable $e) {
-                        return 0;
-                    }
-                })
-                ->first();
-        }
-
-        // No & Tgl resep dari HDR
-        $noResep = (string) data_get($eresepLastHdr, 'resepNo', '-');
-        $tglResep = (string) data_get($eresepLastHdr, 'resepDate', '-'); // sudah d/m/Y H:i:s di data kamu
-
-        // Safety: pastikan array
-        $racikList = (array) data_get($eresepLastHdr, 'eresepRacikan', []);
-        $nonRacikList = (array) data_get($eresepLastHdr, 'eresep', []);
-
-    @endphp
-
     {{-- KONDISI SAAT PULANG --}}
     <table class="w-full mt-2 border border-collapse border-black table-auto">
         <tr class="font-semibold bg-gray-100">
@@ -739,6 +737,7 @@
             <td class="px-2 py-6 border border-black" colspan="3">{{ $catatanPenting }}</td>
         </tr> --}}
     </table>
+
     {{-- CARA KELUAR RS --}}
     <table class="w-full mt-2 border border-collapse border-black table-auto">
         <tr class="font-semibold bg-gray-100">
@@ -784,8 +783,6 @@
         </tr>
     </table>
 
-
-
     {{-- TINDAK LANJUT --}}
     <table class="w-full mt-2 border border-collapse border-black table-auto">
         <tr class="font-semibold bg-gray-100">
@@ -825,7 +822,6 @@
             </td>
         </tr>
     </table>
-
 
     {{-- TERAPI PULANG --}}
     <table class="w-full mt-2 border border-collapse border-black table-auto">
