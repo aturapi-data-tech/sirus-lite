@@ -68,6 +68,7 @@
         /* ========= 6) Diagnosis (ICD + Free Text) ========= */
         $dxList = collect(data_get($ri, 'diagnosis', []));
         $dxFree = trim((string) data_get($ri, 'diagnosisFreeText', ''));
+        $scDxFree = trim((string) data_get($ri, 'secondaryDiagnosisFreeText', ''));
 
         $dxUtamaRow =
             $dxList->first(function ($d) {
@@ -630,7 +631,7 @@
     <table class="w-full mt-2 border border-collapse border-black table-auto">
         <tr>
             <th class="w-48 px-2 py-1 text-left border border-black">DIAGNOSIS UTAMA</th>
-            <td class="px-2 py-1 border border-black">{{ $dxUtama }}</td>
+            <td class="px-2 py-1 border border-black">{{ $dxFree }}</td>
             <th class="w-24 px-2 py-1 text-left border border-black">ICD-10</th>
             <td class="w-32 px-2 py-1 border border-black">{{ $dxUtamaICD }}</td>
         </tr>
@@ -639,8 +640,11 @@
             <th class="px-2 py-1 text-left align-top border border-black">DIAGNOSIS SEKUNDER :</th>
             <td class="px-2 py-1 align-top border border-black">
                 <ol class="pl-6 leading-6 list-decimal">
+                    <li>{{ $scDxFree }}</li>
+
                     @forelse($dxSekunder as $dx)
-                        <li>{{ $dx }}</li>
+                        {{-- <li>{{ $dx }}</li> --}}
+                        <li>&nbsp;</li>
                     @empty
                         <li>&nbsp;</li>
                     @endforelse
@@ -662,8 +666,11 @@
             <th class="px-2 py-1 text-left align-top border border-black">TINDAKAN/PROSEDUR :</th>
             <td class="px-2 py-1 align-top border border-black">
                 <ol class="pl-6 leading-6 list-decimal">
+                    <li>{{ $procFree }}</li>
+
                     @forelse($tindakanDesc as $t)
-                        <li>{{ $t }}</li>
+                        {{-- <li>{{ $t }}</li> --}}
+                        <li>&nbsp;</li>
                     @empty
                         <li>&nbsp;</li>
                     @endforelse

@@ -252,12 +252,12 @@
 
             <div id="TransaksiRawatJalanFreeText" class="px-4">
                 <div>
-                    <x-input-label for="dataDaftarRi.diagnosisFreeText" :value="__('Diagnosis')" :required="__(true)"
+                    <x-input-label for="dataDaftarRi.diagnosisFreeText" :value="__('Diagnosis Utama')" :required="__(true)"
                         class="pt-2 sm:text-xl" />
 
                     <div class="mb-2 ">
-                        <x-text-input-area id="dataDaftarRi.diagnosisFreeText" placeholder="Diagnosis" class="mt-1 ml-2"
-                            :errorshas="__($errors->has('dataDaftarRi.diagnosisFreeText'))" :disabled=$disabledPropertyRjStatus :rows=7
+                        <x-text-input-area id="dataDaftarRi.diagnosisFreeText" placeholder="Diagnosis Utama"
+                            class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarRi.diagnosisFreeText'))" :disabled=$disabledPropertyRjStatus :rows=7
                             wire:model.debounce.500ms="dataDaftarRi.diagnosisFreeText" />
 
                     </div>
@@ -267,12 +267,27 @@
                 </div>
 
                 <div>
+                    <x-input-label for="dataDaftarRi.secondaryDiagnosisFreeText" :value="__('Diagnosis Sekunder')" :required="__(true)"
+                        class="pt-2 sm:text-xl" />
+
+                    <div class="mb-2 ">
+                        <x-text-input-area id="dataDaftarRi.secondaryDiagnosisFreeText" placeholder="Diagnosis Sekunder"
+                            class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarRi.secondaryDiagnosisFreeText'))" :disabled=$disabledPropertyRjStatus :rows=7
+                            wire:model.debounce.500ms="dataDaftarRi.secondaryDiagnosisFreeText" />
+
+                    </div>
+                    @error('dataDaftarRi.secondaryDiagnosisFreeText')
+                        <x-input-error :messages=$message />
+                    @enderror
+                </div>
+
+                <div>
                     <x-input-label for="dataDaftarRi.procedureFreeText" :value="__('Procedure')" :required="__(true)"
                         class="pt-2 sm:text-xl" />
 
                     <div class="mb-2 ">
-                        <x-text-input-area id="dataDaftarRi.procedureFreeText" placeholder="Procedure" class="mt-1 ml-2"
-                            :errorshas="__($errors->has('dataDaftarRi.procedureFreeText'))" :disabled=$disabledPropertyRjStatus :rows=7
+                        <x-text-input-area id="dataDaftarRi.procedureFreeText" placeholder="Procedure"
+                            class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarRi.procedureFreeText'))" :disabled=$disabledPropertyRjStatus :rows=7
                             wire:model.debounce.500ms="dataDaftarRi.procedureFreeText" />
 
                     </div>

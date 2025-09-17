@@ -573,6 +573,9 @@ class Diagnosis extends Component
         if (isset($this->dataDaftarRi['diagnosisFreeText']) == false) {
             $this->dataDaftarRi['diagnosisFreeText'] = '';
         }
+        if (isset($this->dataDaftarRi['secondaryDiagnosisFreeText']) == false) {
+            $this->dataDaftarRi['secondaryDiagnosisFreeText'] = '';
+        }
 
         // jika procedure tidak ditemukan tambah variable procedure pda array
         if (isset($this->dataDaftarRi['procedureFreeText']) == false) {
