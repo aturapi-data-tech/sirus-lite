@@ -639,7 +639,7 @@
         <tr>
             <th class="px-2 py-1 text-left align-top border border-black">DIAGNOSIS SEKUNDER :</th>
             <td class="px-2 py-1 align-top border border-black">
-                <ol class="pl-6 leading-6 list-decimal">
+                <ol class="pl-6 leading-6 list-none">
                     <li>{{ $scDxFree }}</li>
 
                     @forelse($dxSekunder as $dx)
@@ -652,7 +652,7 @@
             </td>
             <th class="px-2 py-1 text-left align-top border border-black">ICD-10</th>
             <td class="px-2 py-1 align-top border border-black">
-                <ol class="pl-6 leading-6 list-decimal">
+                <ol class="pl-6 leading-6 list-none">
                     @forelse($dxSekunderICD as $code)
                         <li>{{ $code }}</li>
                     @empty
@@ -665,7 +665,7 @@
         <tr>
             <th class="px-2 py-1 text-left align-top border border-black">TINDAKAN/PROSEDUR :</th>
             <td class="px-2 py-1 align-top border border-black">
-                <ol class="pl-6 leading-6 list-decimal">
+                <ol class="pl-6 leading-6 list-none">
                     <li>{{ $procFree }}</li>
 
                     @forelse($tindakanDesc as $t)
@@ -678,7 +678,7 @@
             </td>
             <th class="px-2 py-1 text-left align-top border border-black">ICD-9-CM</th>
             <td class="px-2 py-1 align-top border border-black">
-                <ol class="pl-6 leading-6 list-decimal">
+                <ol class="pl-6 leading-6 list-none">
                     @forelse($tindakanCode as $c)
                         <li>{{ $c }}</li>
                     @empty
