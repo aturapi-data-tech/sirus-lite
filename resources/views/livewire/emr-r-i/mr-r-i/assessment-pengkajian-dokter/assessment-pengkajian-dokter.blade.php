@@ -6,9 +6,9 @@
 
     {{-- Jika data pengkajian dokter ada --}}
     @if (isset($pengkajianDokter))
-        <div class="w-full mb-1">
+        <div class="w-full mb-1" x-data="{ activeTab: 'Bagian 1: Anamnesa' }">
             <div id="PengkajianDokter" class="px-2">
-                <div id="PengkajianDokter" x-data="{ activeTab: 'Bagian 1: Anamnesa' }">
+                <div id="PengkajianDokter">
 
                     {{-- Tab Navigation --}}
                     <div class="px-2 mb-2 border-b border-gray-200 dark:border-gray-700">
@@ -130,7 +130,8 @@
             </div>
 
             {{-- Tombol Simpan --}}
-            <div class="sticky bottom-0 flex justify-between px-4 py-3 bg-gray-50 sm:px-6">
+            <div class="sticky bottom-0 flex justify-between px-4 py-3 bg-gray-50 sm:px-6"
+                x-show="activeTab !== 'Bagian 7: Ringkasan Pasien Pulang'" x-transition.opacity x-cloak>
                 <div></div>
                 <div>
                     <div wire:loading wire:target="store">
@@ -141,6 +142,7 @@
                     </x-green-button>
                 </div>
             </div>
+
         </div>
     @endif
 </div>
