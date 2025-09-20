@@ -145,6 +145,7 @@
             $diet = trim((string) data_get($ri, 'pengkajianDokter.rencana.diet', '-'));
 
             /* ========= 9) Terapi/Tindakan Selama di RS (bukan resep pulang) ========= */
+            $terapiRS = (string) data_get($ri, 'pengkajianDokter.rencana.terapi', '');
             $hdrs = collect((array) data_get($ri, 'eresepHdr', []));
 
             /* HDR terakhir (untuk dipisahkan) */
@@ -362,6 +363,7 @@
                 (string) $kodeBpjsTerpilihTindakLanjut === '4';
 
             /* ========= 11) Halaman 2: Kondisi Saat Pulang ========= */
+            $terapiPulang = (string) data_get($ri, 'pengkajianDokter.rencana.terapiPulang', '');
             $cppt = collect(data_get($ri, 'cppt', []));
             $exitDateOnly = !empty($tglKeluar) ? Carbon::createFromFormat('d/m/Y H:i:s', $tglKeluar) : null;
 
@@ -619,9 +621,14 @@
                 <th colspan="4" class="px-2 py-1 text-left">TERAPI / TINDAKAN MEDIS SELAMA DI RUMAH SAKIT
                 </th>
             </tr>
+            <tr>
+                <td class="px-3 py-0.5 break-words whitespace-pre-line border border-black" colspan="4">
+                    {{ $terapiRS }}
+                </td>
+            </tr>
 
             {{-- A. NON-RACIKAN --}}
-            <tr class="bg-gray-50">
+            {{-- <tr class="bg-gray-50">
                 <th colspan="4" class="px-2 py-1 text-left border border-black">A. Non-Racikan</th>
             </tr>
             @if ($allNonRacik->isNotEmpty())
@@ -637,10 +644,10 @@
                     <td class="px-4 py-1 border border-black" colspan="4">Belum ada resep non-racikan.
                     </td>
                 </tr>
-            @endif
+            @endif --}}
 
             {{-- B. RACIKAN --}}
-            <tr class="bg-gray-50">
+            {{-- <tr class="bg-gray-50">
                 <th colspan="4" class="px-2 py-1 text-left border border-black">B. Racikan</th>
             </tr>
             @if ($racikDistinct->isNotEmpty())
@@ -655,7 +662,7 @@
                 <tr>
                     <td class="px-4 py-2 border border-black" colspan="4">Belum ada resep racikan.</td>
                 </tr>
-            @endif
+            @endif --}}
         </table>
 
 
@@ -867,19 +874,22 @@
             <tr class="font-semibold bg-gray-100">
                 <th colspan="4" class="px-2 py-1 text-left">TERAPI PULANG</th>
             </tr>
-
-
+            <tr>
+                <td class="px-3 py-0.5 break-words whitespace-pre-line border border-black" colspan="4">
+                    {{ $terapiPulang }}
+                </td>
+            </tr>
 
             {{-- Baris info resep (bukan looping) --}}
-            <tr>
+            {{-- <tr>
                 <th class="px-2 py-1 text-left border border-black">No Resep</th>
                 <td class="px-2 py-1 border border-black">{{ $noResep }}</td>
                 <th class="px-2 py-1 text-left border border-black">Tgl Resep</th>
                 <td class="px-2 py-1 border border-black">{{ $tglResep }}</td>
-            </tr>
+            </tr> --}}
 
             {{-- ================== NON-RACIKAN (setelah racikan) ================== --}}
-            @if (!empty($nonRacikList))
+            {{-- @if (!empty($nonRacikList))
                 @foreach ($nonRacikList as $i => $detail)
                     @php
                         $rowId = $detail['riObatDtl'] ?? $i;
@@ -914,11 +924,11 @@
                 <tr class="border-b dark:border-gray-700">
                     <td class="w-1/2 px-4 py-2">Belum ada resep non racikan.</td>
                 </tr>
-            @endif
+            @endif --}}
 
 
             {{-- ================== RACIKAN (ditampilkan lebih dulu) ================== --}}
-            @if (!empty($racikList))
+            {{-- @if (!empty($racikList))
                 @php $myPreviousRow = null; @endphp
                 @foreach ($racikList as $i => $detail)
                     @php
@@ -972,7 +982,7 @@
                 <tr class="border-b dark:border-gray-700">
                     <td class="w-1/2 px-4 py-2">Belum ada resep racikan.</td>
                 </tr>
-            @endif
+            @endif --}}
 
 
         </table>

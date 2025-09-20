@@ -36,22 +36,19 @@
             @error('dataDaftarRi.pengkajianDokter.rencana.terapi')
                 <x-input-error :messages="__($message)" />
             @enderror
+        </div>
 
-            @role(['Dokter', 'Admin'])
-                <div class="grid grid-cols-1 gap-2 mt-2">
-                    <x-yellow-button :disabled="false" wire:click="openModalEresepRI" type="button" wire:loading.remove>
-                        E-resep
-                    </x-yellow-button>
-
-                    <div wire:loading wire:target="openModalEresepRI">
-                        <x-loading />
-                    </div>
-
-                    @if ($isOpenEresepRI)
-                        @include('livewire.emr-r-i.create-emr-r-i-racikan-nonracikan')
-                    @endif
-                </div>
-            @endrole
+        {{-- Rencana - Terapi Pulang --}}
+        <div>
+            <x-input-label for="terapiPulang" :value="__('Terapi Pulang')" :required="false"
+                class="block text-sm font-medium text-gray-700" />
+            <x-text-input-area id="terapiPulang"
+                wire:model.debounce.500ms="dataDaftarRi.pengkajianDokter.rencana.terapiPulang" :errorshas="$errors->has('dataDaftarRi.pengkajianDokter.rencana.terapiPulang')"
+                :disabled="false" rows="3"
+                class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring-primary sm:text-sm" />
+            @error('dataDaftarRi.pengkajianDokter.rencana.terapiPulang')
+                <x-input-error :messages="__($message)" />
+            @enderror
         </div>
 
         {{-- Rencana - Diet --}}

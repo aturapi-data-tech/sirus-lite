@@ -444,6 +444,7 @@ class PengkajianDokter extends Component
         "rencana" => [
             "penegakanDiagnosa" => "",
             "terapi" => "",
+            "terapiPulang" => "",
             "diet" => "",
             "edukasi" => "",
             "monitoring" => ""
@@ -493,6 +494,7 @@ class PengkajianDokter extends Component
         // Rencana
         'dataDaftarRi.pengkajianDokter.rencana.penegakanDiagnosa' => 'nullable|string|max:500',
         'dataDaftarRi.pengkajianDokter.rencana.terapi' => 'nullable|string|max:500',
+        'dataDaftarRi.pengkajianDokter.rencana.terapiPulang' => 'nullable|string|max:500',
         'dataDaftarRi.pengkajianDokter.rencana.diet' => 'nullable|string|max:500',
         'dataDaftarRi.pengkajianDokter.rencana.edukasi' => 'nullable|string|max:500',
         'dataDaftarRi.pengkajianDokter.rencana.monitoring' => 'nullable|string|max:500',
@@ -572,6 +574,9 @@ class PengkajianDokter extends Component
 
         'dataDaftarRi.pengkajianDokter.rencana.terapi.string' => 'Terapi harus berupa teks.',
         'dataDaftarRi.pengkajianDokter.rencana.terapi.max' => 'Terapi tidak boleh lebih dari 500 karakter.',
+
+        'dataDaftarRi.pengkajianDokter.rencana.terapiPulang.string' => 'Terapi Pulang harus berupa teks.',
+        'dataDaftarRi.pengkajianDokter.rencana.terapiPulang.max' => 'Terapi Pulang tidak boleh lebih dari 500 karakter.',
 
         'dataDaftarRi.pengkajianDokter.rencana.diet.string' => 'Diet harus berupa teks.',
         'dataDaftarRi.pengkajianDokter.rencana.diet.max' => 'Diet tidak boleh lebih dari 500 karakter.',
