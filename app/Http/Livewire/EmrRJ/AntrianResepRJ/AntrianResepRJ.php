@@ -13,11 +13,7 @@ use Illuminate\Support\Collection;
 
 use Carbon\Carbon;
 
-use Spatie\ArrayToXml\ArrayToXml;
-
 use App\Http\Traits\EmrRJ\EmrRJTrait;
-use App\Http\Traits\BPJS\AntrianTrait;
-use Exception;
 
 class AntrianResepRJ extends Component
 {
@@ -35,7 +31,7 @@ class AntrianResepRJ extends Component
 
     public array $myLimitPerPages = [5, 10, 15, 20, 100];
     // limit record per page -resetExcept////////////////
-    public int $limitPerPage = 10;
+    public int $limitPerPage = 20;
 
     public array $dataDaftarPoliRJ = [];
 
@@ -169,26 +165,17 @@ class AntrianResepRJ extends Component
             ->select(
                 DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
                 DB::raw("to_char(rj_date,'yyyymmddhh24miss') AS rj_date1"),
-                'rj_no',
-                'reg_no',
                 'reg_name',
-                'sex',
-                'address',
-                'thn',
-                DB::raw("to_char(birth_date,'dd/mm/yyyy') AS birth_date"),
-                'poli_id',
                 'poli_desc',
-                'dr_id',
                 'dr_name',
-                'klaim_id',
-                'shift',
-                'vno_sep',
-                'no_antrian',
-                'rj_status',
-                'nobooking',
-                'push_antrian_bpjs_status',
-                'push_antrian_bpjs_json',
-                DB::raw("CAST(DBMS_LOB.SUBSTR(datadaftarpolirj_json, 4000, 1) AS VARCHAR2(4000)) AS datadaftarpolirj_json"),
+                DB::raw("DBMS_LOB.SUBSTR(datadaftarpolirj_json, 4000,     1) AS j1"),
+                DB::raw("DBMS_LOB.SUBSTR(datadaftarpolirj_json, 4000,  4001) AS j2"),
+                DB::raw("DBMS_LOB.SUBSTR(datadaftarpolirj_json, 4000,  8001) AS j3"),
+                DB::raw("DBMS_LOB.SUBSTR(datadaftarpolirj_json, 4000, 12001) AS j4"),
+                DB::raw("DBMS_LOB.SUBSTR(datadaftarpolirj_json, 4000, 16001) AS j5"),
+                DB::raw("DBMS_LOB.SUBSTR(datadaftarpolirj_json, 4000, 20001) AS j6"),
+                DB::raw("DBMS_LOB.SUBSTR(datadaftarpolirj_json, 4000, 24001) AS j7"),
+                DB::raw("DBMS_LOB.SUBSTR(datadaftarpolirj_json, 4000, 28001) AS j8"),
                 DB::raw("(select count(*) from lbtxn_checkuphdrs where status_rjri='RJ' and checkup_status!='B' and ref_no = rsview_rjkasir.rj_no) AS lab_status"),
                 DB::raw("(select count(*) from rstxn_rjrads where rj_no = rsview_rjkasir.rj_no) AS rad_status")
             )
@@ -200,7 +187,21 @@ class AntrianResepRJ extends Component
             ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $myRefdate);
 
         // 1 urutkan berdasarkan json table
-        $myQueryPagination = $query->get();
+        $myQueryPagination = $query->get()->map(function ($r) {
+            // gabung hanya chunk yang ada (stop saat ketemu null/empty)
+            $raw = '';
+            foreach (['j1', 'j2', 'j3', 'j4', 'j5', 'j6', 'j7', 'j8'] as $k) {
+                $part = $r->$k ?? '';
+                if ($part === '' || $part === null) break;
+                $raw .= $part;
+                unset($r->$k); // bersihkan properti chunk biar objek r lebih ringkas
+            }
+
+            // aman: selalu string → tidak akan OCILob
+            $r->datadaftarpolirj_json = json_decode($raw !== '' ? $raw : '[]', true, 512, JSON_PARTIAL_OUTPUT_ON_ERROR) ?? [];
+
+            return $r;
+        });
 
         // Sort ketiga: datadaftarpolirj_json (desc)
         $myQueryPagination = $myQueryPagination->sortBy(
@@ -208,10 +209,10 @@ class AntrianResepRJ extends Component
                 // Decode JSON payload
                 $raw = $mySortByJson->datadaftarpolirj_json ?? '[]';
                 // aman untuk decode
-                $jsonData = json_decode($raw, true) ?: [];
+                $jsonData = $raw ?: [];
 
                 // 1) Ambil nomor antrian apotek (0 jika tidak ada)
-                $pharmacyQueueNumber = (int) data_get($jsonData, 'noAntrianApotek.noAntrian', 0) ?: 1000;
+                $pharmacyQueueNumber = $jsonData['noAntrianApotek']['noAntrian'] ?? 1000;
 
 
                 // 2) Flag untuk grouping: 1 = punya antrian, 0 = tidak
@@ -250,7 +251,6 @@ class AntrianResepRJ extends Component
                 ];
             }
         );
-
 
         $myQueryPagination = $this->paginate($myQueryPagination, $this->limitPerPage);
 

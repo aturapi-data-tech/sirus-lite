@@ -5,19 +5,21 @@
     {{-- Canvas
     Main BgColor /
     Size H/W --}}
-    <div class="w-full h-[calc(100vh-68px)] bg-white border border-gray-200 px-4 pt-6">
+    <div class="w-full h-[calc(100vh-68px)] bg-white border border-gray-200 px-4 pt-6" x-data="autoScroller({ step: 1, interval: 25, waitTop: 800, waitBottom: 1200 })"
+        x-init="start()">
 
         {{-- Title  --}}
         <div class="mb-2">
             <h3 class="text-3xl font-bold text-gray-900 ">{{ $myTitle }}</h3>
             <span class="text-base font-normal text-gray-700">{{ $mySnipt }}</span>
         </div>
-        {{-- Title --}}
 
         @if ($myTopBar['autoRefresh'] == 'Ya')
-            <div wire:poll.30s="render" class="h-[calc(100vh-250px)] mt-2 overflow-auto">
+            <div wire:poll.30s="render" class="h-[calc(100vh-250px)] mt-2 overflow-auto" x-ref="scroller"
+                x-on:mouseenter="pause()" x-on:mouseleave="resume()">
             @else
-                <div class="h-[calc(100vh-250px)] mt-2 overflow-auto">
+                <div class="h-[calc(100vh-250px)] mt-2 overflow-auto" x-ref="scroller" x-on:mouseenter="pause()"
+                    x-on:mouseleave="resume()">
         @endif
 
         <p class="text-xs text-gray-700">Data Terakhir: {{ now()->format('d-m-y H:i:s') }}</p>
@@ -45,7 +47,7 @@
 
                     @foreach ($myQueryData as $myQData)
                         @php
-                            $datadaftar_json = json_decode($myQData->datadaftarpolirj_json, true);
+                            $datadaftar_json = $myQData->datadaftarpolirj_json;
 
                             $eresep = isset($datadaftar_json['eresep']) ? 1 : 0;
                             $noAntrianFarmasi = isset($datadaftar_json['noAntrianApotek']['noAntrian'])
@@ -59,47 +61,6 @@
 
                             $prosentaseEMR = ($eresep / 1) * 100;
 
-                            $badgecolorStatus = isset($myQData->rj_status)
-                                ? ($myQData->rj_status === 'A'
-                                    ? 'red'
-                                    : ($myQData->rj_status === 'L'
-                                        ? 'green'
-                                        : ($myQData->rj_status === 'I'
-                                            ? 'green'
-                                            : ($myQData->rj_status === 'F'
-                                                ? 'yellow'
-                                                : 'default'))))
-                                : '';
-
-                            $badgecolorEresep = $eresep ? 'green' : 'red';
-
-                            $badgecolorKlaim =
-                                $myQData->klaim_id == 'UM'
-                                    ? 'green'
-                                    : ($myQData->klaim_id == 'JM'
-                                        ? 'default'
-                                        : ($myQData->klaim_id == 'KR'
-                                            ? 'yellow'
-                                            : 'red'));
-
-                            $badgecolorAdministrasiRj = isset($datadaftar_json['AdministrasiRj']) ? 'green' : 'red';
-
-                            $taskId5 = $datadaftar_json['taskIdPelayanan']['taskId5'] ?? 'xxxx-xx-xx xx:xx:xx';
-                            $taskId6 = $datadaftar_json['taskIdPelayanan']['taskId6'] ?? 'xxxx-xx-xx xx:xx:xx';
-                            $taskId7 = $datadaftar_json['taskIdPelayanan']['taskId7'] ?? 'xxxx-xx-xx xx:xx:xx';
-
-                            $telaahResepStatus = isset($datadaftar_json['telaahResep']['penanggungJawab'])
-                                ? ($datadaftar_json['telaahResep']['penanggungJawab']
-                                    ? true
-                                    : false)
-                                : false;
-                            $telaahObatStatus = isset($datadaftar_json['telaahObat']['penanggungJawab'])
-                                ? ($datadaftar_json['telaahObat']['penanggungJawab']
-                                    ? true
-                                    : false)
-                                : false;
-
-                            $statusPRB = $datadaftar_json['statusPRB']['penanggungJawab']['statusPRB'] ?? 0;
                         @endphp
 
 
@@ -157,7 +118,7 @@
                 </tbody>
             </table>
 
-            <div class="w-full text-sm text-left text-gray-700">
+            <div class="sticky top-0 z-10 self-start w-full text-sm text-left text-gray-700">
                 <style>
                     @keyframes flash-pulse {
 
@@ -214,7 +175,90 @@
 
 
 
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('autoScroller', (opts = {}) => ({
+                // opsi
+                step: opts.step ?? 1, // px per “tick”
+                interval: opts.interval ?? 25, // ms per “tick”
+                waitTop: opts.waitTop ?? 800, // jeda ketika baru di-top
+                waitBottom: opts.waitBottom ?? 1200, // jeda ketika sampai bottom
+                timer: null,
+                running: false,
 
+                start() {
+                    this.running = true;
+                    // restart setiap render Livewire agar tetap mulus
+                    window.addEventListener('livewire:load', () => {
+                        if (window.Livewire) {
+                            Livewire.hook('message.processed', () => this.restart());
+                        }
+                    });
+                    // hormati prefers-reduced-motion
+                    const mql = window.matchMedia('(prefers-reduced-motion: reduce)');
+                    if (mql.matches) return; // jangan gerak otomatis
+                    this.scrollLoop(true); // mulai dari atas dengan jeda top
+                },
+
+                restart() {
+                    // dipanggil setelah data refresh/paginate
+                    this.pause();
+                    const el = this.$refs.scroller;
+                    if (el) el.scrollTop = 0;
+                    this.resume(true);
+                },
+
+                pause() {
+                    this.running = false;
+                    if (this.timer) {
+                        clearTimeout(this.timer);
+                        this.timer = null;
+                    }
+                },
+
+                resume(fromTop = false) {
+                    if (this.running) return; // sudah jalan
+                    this.running = true;
+                    this.scrollLoop(fromTop);
+                },
+
+                scrollLoop(fromTop = false) {
+                    if (!this.running) return;
+                    const el = this.$refs.scroller;
+                    if (!el) return;
+
+                    // kalau baru mulai & ada permintaan jeda di top
+                    if (fromTop) {
+                        this.timer = setTimeout(() => this.tick(), this.waitTop);
+                    } else {
+                        this.tick();
+                    }
+                },
+
+                tick() {
+                    if (!this.running) return;
+                    const el = this.$refs.scroller;
+
+                    // kalau sudah di bawah (>=)
+                    const atBottom = Math.ceil(el.scrollTop + el.clientHeight) >= el.scrollHeight;
+                    if (atBottom) {
+                        // jeda di bawah, lalu lompat ke atas dan lanjut lagi
+                        this.timer = setTimeout(() => {
+                            el.scrollTop = 0; // langsung ke atas (tanpa animasi)
+                            this.timer = setTimeout(() => { // jeda kecil di top bila mau
+                                if (this.running) this.tick();
+                            }, this.waitTop);
+                        }, this.waitBottom);
+                        return;
+                    }
+
+                    // scroll turun sedikit
+                    el.scrollTop += this.step;
+                    this.timer = setTimeout(() => this.tick(), this.interval);
+                }
+            }));
+        });
+    </script>
 
 
 
