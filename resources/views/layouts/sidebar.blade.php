@@ -291,6 +291,15 @@
                                 </li>
 
                                 <li>
+                                    <x-nav-link class="pl-4" :href="route('AntrianResepRJ')" :active="request()->routeIs('AntrianResepRJ')">
+                                        <!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
+
+
+                                        {{ __('Antrian Resep Rawat Jalan') }}
+                                    </x-nav-link>
+                                </li>
+
+                                <li>
                                     <x-nav-link class="pl-4" :href="route('TelaahResepUGD')" :active="request()->routeIs('TelaahResepUGD')">
                                         <!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
 
@@ -557,6 +566,12 @@
 
                                     <x-nav-link class="pl-4" :href="route('MyPermissions')" :active="request()->routeIs('MyPermissions')">
                                         {{ __('MyPermissions') }}
+                                    </x-nav-link>
+                                </li>
+
+                                <li>
+                                    <x-nav-link class="pl-4" :href="route('LockMonitor')" :active="request()->routeIs('LockMonitor')">
+                                        {{ __('Lock Monitor') }}
                                     </x-nav-link>
                                 </li>
                             </ul>
