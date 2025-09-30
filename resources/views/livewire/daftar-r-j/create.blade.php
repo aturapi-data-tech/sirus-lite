@@ -1150,6 +1150,25 @@
                                             wire:model.debounce.500ms="dataPasienLovSearch" />
 
                                     </div>
+
+                                    @if ($kronisNotice)
+                                        <div
+                                            class="flex items-start p-3 mb-3 ml-4 mr-4 text-yellow-900 border border-yellow-300 rounded-lg bg-yellow-50">
+                                            <svg class="w-5 h-5 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20"
+                                                aria-hidden="true">
+                                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                                    d="M8.257 3.099c.765-1.36 2.72-1.36 3.485 0l6.518 11.59c.75 1.335-.213 2.99-1.742 2.99H3.48c-1.53 0-2.492-1.655-1.743-2.99L8.257 3.1zM11 14a1 1 0 10-2 0 1 1 0 002 0zm-1-2a1 1 0 01-1-1V8a1 1 0 112 0v3a1 1 0 01-1 1z" />
+                                            </svg>
+                                            <div class="flex-1 text-sm leading-5">
+                                                {{ $kronisNotice }}
+                                            </div>
+                                            <button wire:click.prevent="clearKronisNotice"
+                                                class="ml-3 text-yellow-900/80 hover:text-yellow-900 focus:outline-none">
+                                                &times;
+                                            </button>
+                                        </div>
+                                    @endif
+
                                     @error('dataDaftarPoliRJ.regNo')
                                         <x-input-error :messages=$message />
                                     @enderror

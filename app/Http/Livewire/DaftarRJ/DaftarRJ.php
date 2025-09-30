@@ -14,8 +14,8 @@ use App\Http\Traits\BPJS\VclaimTrait;
 use App\Http\Traits\EmrRJ\EmrRJTrait;
 
 
-use Illuminate\Support\Str;
-use Spatie\ArrayToXml\ArrayToXml;
+// use Illuminate\Support\Str;
+// use Spatie\ArrayToXml\ArrayToXml;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Exception;
 
@@ -706,7 +706,7 @@ class DaftarRJ extends Component
         $this->resetInputFields();
     }
     // date
-    public function updatedDaterjref(): void
+    public function updatedDateRjRef(): void
     {
         //  toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError( "date.");
 
@@ -715,7 +715,7 @@ class DaftarRJ extends Component
         $this->resetInputFields();
     }
     // status
-    public function updatedStatusrjref(): void
+    public function updatedStatusRjRef(): void
     {
         //  toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError( "status.");
 
@@ -930,8 +930,7 @@ class DaftarRJ extends Component
             $this->updateDataRJ($this->dataDaftarPoliRJ['rjNo']);
         }
 
-
-
+        $this->clearKronisNotice();
 
         // Opstional (Jika ingin fast Entry resert setelah proses diatas)
         // Jika ingin auto close resert dan close aktifkan
@@ -1347,6 +1346,7 @@ class DaftarRJ extends Component
         }
 
         $this->setDataPasien($this->dataDaftarPoliRJ['regNo']);
+        $this->notifyPasienKronis($this->dataDaftarPoliRJ['regNo'], $this->dataDaftarPoliRJ['rjDate'] ?? null);
         $this->dataPasienLovSearch = $this->dataDaftarPoliRJ['regNo'];
         $this->JenisKlaim['JenisKlaimId'] = $this->dataDaftarPoliRJ['klaimId'] == 'JM' ? 'JM' : 'UM';
         $this->JenisKlaim['JenisKlaimDesc'] = $this->dataDaftarPoliRJ['klaimId']  == 'JM' ? 'BPJS' : 'UMUM';
@@ -1360,7 +1360,7 @@ class DaftarRJ extends Component
     ////////////////////////////////////////////////
     // Lov Pasien //////////////////////
     ////////////////////////////////////////////////
-    public function updateddataPasienlovsearch()
+    public function updatedDataPasienLovSearch()
     {
         // Variable Search
         $search = $this->dataPasienLovSearch;
@@ -1500,6 +1500,9 @@ class DaftarRJ extends Component
         $this->dataPasienLovStatus = false;
         $this->dataPasienLov = [];
         $this->dataPasienLovSearch = $id;
+
+        // === PEMBERITAHUAN KRONIS 30 HARI ===
+        $this->notifyPasienKronis($id);
     }
     ////////////////////////////////////////////////
     // Lov Pasien //////////////////////
@@ -1516,7 +1519,7 @@ class DaftarRJ extends Component
         $this->dataDokterLov = [];
     }
 
-    public function updateddataDokterlovsearch()
+    public function updatedDataDokterLovSearch()
     {
         // Variable Search
         $search = $this->dataDokterLovSearch;
@@ -2030,7 +2033,7 @@ class DaftarRJ extends Component
         $this->dataRefBPJSLovStatus = true;
         $this->dataRefBPJSLov = [];
     }
-    public function updateddataRefBPJSlovsearch()
+    public function updatedDataRefBPJSLovSearch()
     {
         // Variable Search
         $search = $this->dataRefBPJSLovSearch;
@@ -2274,9 +2277,9 @@ class DaftarRJ extends Component
                             ? "" : (($cariDataIdBpjs_dr_poli->kd_dr_bpjs && $this->JenisKunjungan['JenisKunjunganId'] == 3)
                                 ? $cariDataIdBpjs_dr_poli->kd_dr_bpjs : "") . "", //tidak di isi jika jenis kunjungan selain KONTROL
                     ],
-                    "dpjpLayan" => "" . $dataRefBPJSLov['pelayanan']['kode'] == 1
-                        ? "" : ($cariDataIdBpjs_dr_poli->kd_dr_bpjs
-                            ? $cariDataIdBpjs_dr_poli->kd_dr_bpjs : "") . "", //(tidak diisi jika jnsPelayanan = "1" (RANAP),
+                    "dpjpLayan" => ($dataRefBPJSLov['pelayanan']['kode'] == 1)
+                        ? ""
+                        : ($cariDataIdBpjs_dr_poli->kd_dr_bpjs ?? ""), //(tidak diisi jika jnsPelayanan = "1" (RANAP),
                     "dpjpLayanNama" => "" . $cariDataIdBpjs_dr_poli->dr_name . "", //(tidak diisi jika jnsPelayanan = "1" (RANAP),
                     "noTelp" => "" . $dataRefBPJSLov['peserta']['mr']['noTelepon'] . "",
                     "user" => "sirus App",
@@ -2388,7 +2391,7 @@ class DaftarRJ extends Component
         $this->dataDokterBPJSLov = [];
     }
 
-    public function updateddataDokterBPJSlovsearch()
+    public function updatedDataDokterBPJSLovSearch()
     {
         // Variable Search
         $search = $this->dataDokterBPJSLovSearch;
@@ -2506,7 +2509,7 @@ class DaftarRJ extends Component
         if ($this->dataDaftarPoliRJ['postInap']) {
             $this->SEPJsonReq['request']['t_sep']['skdp']['kodeDPJP'] = $dataDokterBPJS->kd_dr_bpjs;
         }
-        $this->SEPJsonReq['request']['t_sep']['kodeDPJP']['dpjpLayanNama'] = $dataDokterBPJS->dr_name;
+        $this->SEPJsonReq['request']['t_sep']['dpjpLayanNama'] = $dataDokterBPJS->dr_name;
         $this->SEPJsonReq['request']['t_sep']['poli']['tujuan'] = $dataDokterBPJS->kd_poli_bpjs;
         $this->SEPJsonReq['request']['t_sep']['poli']['tujuanNama'] = $dataDokterBPJS->poli_desc;
 
@@ -2529,7 +2532,7 @@ class DaftarRJ extends Component
         $this->dataDiagnosaBPJSLov = [];
     }
 
-    public function updateddataDiagnosaBPJSlovsearch()
+    public function updatedDataDiagnosaBPJSLovSearch()
     {
         // Variable Search
         $search = $this->dataDiagnosaBPJSLovSearch;
@@ -2841,6 +2844,87 @@ class DaftarRJ extends Component
     {
         dd($jsonSep);
     }
+
+
+
+
+
+
+
+    // --- Konfigurasi jendela cek kronis (hari) ---
+    private const KRONIS_WINDOW_DAYS = 30;
+
+    /**
+     * Hanya memberi pemberitahuan jika dalam 30 hari terakhir
+     * ada kunjungan dengan klaim_id = 'KR'.
+     * Tidak memblok proses; hanya toastr warning.
+     *
+     * @param string $regNo
+     * @param string|null $refDateDMYHIS Tanggal acuan format 'd/m/Y H:i:s'
+     */
+    private function notifyPasienKronis(string $regNo, ?string $refDateDMYHIS = null): void
+    {
+        // Tentukan tanggal acuan:
+        // 1) parameter; 2) rjDate form; 3) dateRjRef (jam 00:00:00); 4) now
+        $ref = $refDateDMYHIS
+            ?? ($this->dataDaftarPoliRJ['rjDate'] ?? null)
+            ?? ($this->dateRjRef ? ($this->dateRjRef . ' 00:00:00') : null)
+            ?? Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
+
+        $refCarbon = Carbon::createFromFormat('d/m/Y H:i:s', $ref, env('APP_TIMEZONE'));
+        $startTs   = $refCarbon->copy()->subDays(self::KRONIS_WINDOW_DAYS)->format('Y-m-d H:i:s');
+        $endTs     = $refCarbon->format('Y-m-d H:i:s');
+
+        // Ambil kunjungan KR terakhir dalam window
+        $row = DB::selectOne(
+            "SELECT TO_CHAR(MAX(rj_date), 'dd/mm/yyyy hh24:mi:ss') AS last_txt
+           FROM rstxn_rjhdrs
+          WHERE reg_no = :regNo
+            AND klaim_id = 'KR'
+            AND NVL(rj_status,'A') = 'L'
+            AND rj_date BETWEEN TO_DATE(:startDt,'YYYY-MM-DD HH24:MI:SS')
+                            AND TO_DATE(:endDt,  'YYYY-MM-DD HH24:MI:SS')",
+            [
+                'regNo'   => $regNo,
+                'startDt' => $startTs,
+                'endDt'   => $endTs,
+            ]
+        );
+
+        if (!empty($row) && !empty($row->last_txt)) {
+            $this->kronisLastVisitText = $row->last_txt;
+            $this->kronisNotice = "Peringatan: Pasien punya kunjungan KRONIS dalam "
+                . self::KRONIS_WINDOW_DAYS . " hari terakhir. Terakhir: {$row->last_txt}";
+        } else {
+            // Pastikan kosong kalau tidak ada temuan
+            $this->clearKronisNotice();
+        }
+    }
+
+    // Livewire component
+    public ?string $kronisNotice = null;        // pesan siap tampil di Blade
+    public ?string $kronisLastVisitText = null; // opsional: timestamp kunjungan terakhir KR
+
+    public function clearKronisNotice(): void
+    {
+        $this->kronisNotice = null;
+        $this->kronisLastVisitText = null;
+    }
+
+    public function updatedDataDaftarPoliRJRjDate($value): void
+    {
+        $regNo = data_get($this->dataDaftarPoliRJ, 'regNo');
+        if ($regNo) $this->notifyPasienKronis($regNo, $value);
+    }
+
+
+
+
+
+
+
+
+
 
     // when new form instance
     public function mount()
