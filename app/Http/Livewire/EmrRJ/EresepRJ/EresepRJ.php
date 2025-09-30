@@ -6,13 +6,13 @@ use Illuminate\Support\Facades\DB;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-// use Carbon\Carbon;
+use Carbon\Carbon;
 
 use App\Http\Traits\customErrorMessagesTrait;
 use App\Http\Traits\EmrRJ\EmrRJTrait;
 
 // use Illuminate\Support\Str;
-use Spatie\ArrayToXml\ArrayToXml;
+// use Spatie\ArrayToXml\ArrayToXml;
 use Exception;
 use Illuminate\Support\Facades\Validator;
 
@@ -48,6 +48,25 @@ class EresepRJ extends Component
 
     public $collectingMyProduct = [];
 
+
+
+
+
+
+
+
+
+    /** ======= State Obat Kronis (untuk UI & guard) ======= */
+    public bool $isChronic = false;
+    public $maxQty = 0;
+    public ?string $lastTebusDate = null;   // 'Y-m-d'
+    public ?int $daysSince = null;          // selisih hari dari rjDate sekarang
+    public $qty30d = 0;             // total qty di 30 hari (tanpa kunjungan sekarang)
+    public bool $warnRepeatUnder30d = false;
+    public bool $warnOverMaxQty = false;
+    public ?string $kronisMessage = null;
+
+
     ////////////////////////////////////////////////
     ///////////begin////////////////////////////////
     ////////////////////////////////////////////////
@@ -66,7 +85,7 @@ class EresepRJ extends Component
         $this->dataProductLov = [];
     }
 
-    public function updateddataProductLovsearch()
+    public function updatedDataProductLovSearch()
     {
         // Reset index of LoV
         $this->reset(['selecteddataProductLovIndex', 'dataProductLov']);
@@ -268,6 +287,70 @@ class EresepRJ extends Component
             'productPrice' => $salesPrice,
             'catatanKhusus' => '',
         ];
+
+        // 2) Ambil klaim status (inline, tanpa helper)
+        $isBpjsOrKronis = $this->isBpjsOrKronis();
+
+        // 3) Hanya untuk BPJS/KRONIS jalankan guard obat kronis
+        if ($isBpjsOrKronis) {
+            // cek kronis segera (pakai qty default 1 dari collectingMyProduct)
+            $this->checkObatKronis($productId, 1);
+
+            if ($this->isChronic && ($this->warnRepeatUnder30d || $this->warnOverMaxQty)) {
+                toastr()->closeOnHover(true)
+                    ->closeDuration(5)
+                    ->positionClass('toast-top-left')
+                    ->addWarning($this->kronisMessage ?? 'Peringatan obat kronis.');
+            }
+        }
+    }
+
+    // Tambah di class (state kecil buat throttle)
+    protected ?float $lastKronisCheckAt = null; // microtime
+
+    public function updatedCollectingMyProductQty($newValue = null) // bisa tangkap value langsung
+    {
+
+        // 0) Jika form terkunci (pasien sudah pulang), stop
+        if (($this->rjStatusRef ?? '') !== 'A') {
+            return;
+        }
+
+        // 1) Ambil productId & qty dengan aman
+        $productId  = data_get($this->collectingMyProduct, 'productId');
+        $plannedQty =  ($newValue ?? data_get($this->collectingMyProduct, 'qty', 0));
+        // Normalisasi qty (minimal 1; buang pecahan negatif)
+        if ($plannedQty < 0) $plannedQty = 0;
+        if ($plannedQty && $plannedQty < 1) $plannedQty = 1;
+        $this->collectingMyProduct['qty'] = $plannedQty;
+
+        // 2) Pastikan ada item & qty > 0
+        if (!$productId || $plannedQty <= 0) {
+            return;
+        }
+
+        // 3) Cek status klaim hanya BPJS/KRONIS yang butuh guard
+        if (!$this->isBpjsOrKronis()) {
+            return;
+        }
+
+        // 4) Throttle  (cek max 1x/250ms biar gak banjir query saat user mengetik)
+        $now = microtime(true);
+        if ($this->lastKronisCheckAt && ($now - $this->lastKronisCheckAt) < 0.25) {
+            return;
+        }
+        $this->lastKronisCheckAt = $now;
+
+        // 5) Jalankan cek kronis
+        $this->checkObatKronis($productId, $plannedQty);
+
+        // 6) (Opsional) munculkan warning realtime
+        if ($this->isChronic && ($this->warnRepeatUnder30d || $this->warnOverMaxQty)) {
+            toastr()->closeOnHover(true)
+                ->closeDuration(4)
+                ->positionClass('toast-top-left')
+                ->addWarning($this->kronisMessage ?? 'Peringatan obat kronis.');
+        }
     }
 
     public function insertProduct(): void
@@ -290,6 +373,22 @@ class EresepRJ extends Component
         $this->validate($rules, $messages);
 
         // validate
+
+        // === Guard kronis ===
+        $this->checkObatKronis(
+            $this->collectingMyProduct['productId'],
+            $this->collectingMyProduct['qty'],
+        );
+
+        if ($this->isChronic && ($this->warnRepeatUnder30d || $this->warnOverMaxQty)) {
+            // Mode 1 (default): hanya warning, tetap lanjut insert
+            toastr()->closeOnHover(true)->closeDuration(6)->positionClass('toast-top-left')
+                ->addWarning($this->kronisMessage ?? 'Peringatan obat kronis.');
+
+            // Mode 2 (ketat): BLOK simpan — buka komentar baris di bawah bila ingin memaksa gagal
+            // $this->addError('obatKronis', $this->kronisMessage ?? 'Pelanggaran obat kronis.');
+            // return;
+        }
 
         // pengganti race condition
         // start:
@@ -335,6 +434,7 @@ class EresepRJ extends Component
 
             $this->store();
             $this->reset(['collectingMyProduct']);
+            $this->resetKronisState();
 
             //
         } catch (Exception $e) {
@@ -346,32 +446,60 @@ class EresepRJ extends Component
 
     public function updateProduct($rjobat_dtl, $qty = null, $signaX = null, $signaHari = null, $catatanKhusus = null): void
     {
-        // validate
+        // 0) Lock form kalau pasien sudah pulang
         $this->checkRjStatus();
 
+        // 1) Normalisasi input sederhana (opsional)
         $r = [
-            'qty' => $qty,
-            'signaX' => $signaX,
-            'signaHari' => $signaHari,
+            'qty'           => (int) $qty,
+            'signaX'        => $signaX,
+            'signaHari'     => $signaHari,
             'catatanKhusus' => $catatanKhusus,
         ];
 
-        // customErrorMessages
+        // 2) Validasi
         $messages = customErrorMessagesTrait::messages();
-        // require nik ketika pasien tidak dikenal
         $rules = [
-            'qty' => 'bail|required|digits_between:1,3|',
-            'signaX' => 'bail|required|',
-            'signaHari' => 'bail|required|',
+            'qty'           => 'bail|required|integer|min:1|max:999', // lebih eksplisit dari digits_between
+            'signaX'        => 'bail|required',
+            'signaHari'     => 'bail|required',
             'catatanKhusus' => 'bail|',
         ];
-        // Proses Validasi///////////////////////////////////////////
         $validator = Validator::make($r, $rules, $messages);
-
         if ($validator->fails()) {
             dd($validator->errors()->first());
         }
-        // validate
+
+
+        // 3) Ambil product_id untuk rjobat_dtl ini (dibutuhkan untuk cek kronis)
+        $row = DB::table('rstxn_rjobats')
+            ->select('product_id')
+            ->where('rjobat_dtl', $rjobat_dtl)
+            ->first();
+
+        if (!$row || empty($row->product_id)) {
+            toastr()->closeOnHover(true)->closeDuration(4)->positionClass('toast-top-left')
+                ->addError('Item resep tidak ditemukan.');
+            dd('Item resep tidak ditemukan: rjobat_dtl=' . $rjobat_dtl);
+        }
+
+
+
+        $productId = $row->product_id;
+        // 4) Guard obat kronis hanya untuk BPJS/KRONIS
+        if ($this->isBpjsOrKronis()) {
+            $this->checkObatKronis($productId, $r['qty']);
+
+            if ($this->isChronic && ($this->warnRepeatUnder30d || $this->warnOverMaxQty)) {
+                // Mode default: hanya WARNING (tetap lanjut update)
+                toastr()->closeOnHover(true)->closeDuration(6)->positionClass('toast-top-left')
+                    ->addWarning($this->kronisMessage ?? 'Peringatan obat kronis.');
+
+                // --- Mode ketat (opsional): BLOK simpan ---
+                // $this->addError('obatKronis', $this->kronisMessage ?? 'Pelanggaran obat kronis.');
+                // return;
+            }
+        }
 
         // pengganti race condition
         // start:
@@ -389,6 +517,7 @@ class EresepRJ extends Component
 
 
             $this->store();
+            $this->resetKronisState();
 
             //
         } catch (Exception $e) {
@@ -396,6 +525,7 @@ class EresepRJ extends Component
             dd($e->getMessage());
         }
         // goto start;
+
     }
 
     public function removeProduct($rjObatDtl)
@@ -413,6 +543,7 @@ class EresepRJ extends Component
                 ->toArray();
             $this->dataDaftarPoliRJ['eresep'] = $Product;
             $this->store();
+            $this->resetKronisState();
 
             //
         } catch (Exception $e) {
@@ -439,6 +570,191 @@ class EresepRJ extends Component
             return dd('Pasien Sudah Pulang, Trasaksi Terkuncixx.');
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /** Ambil RJ_DATE sekarang dari data json (format 'dd/mm/yyyy hh24:mi:ss') → Carbon */
+    private function getRjDateCarbon(): ?Carbon
+    {
+        $str = data_get($this->dataDaftarPoliRJ, 'rjDate');
+        if (!$str) return null;
+
+        // contoh data: '25/09/2025 09:31:00'
+        try {
+            return Carbon::createFromFormat('d/m/Y H:i:s', $str);
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Cek aturan obat kronis untuk (productId, qty) terhadap pasien & kunjungan saat ini.
+     * - < 30 hari sejak tebus terakhir → warn
+     * - akumulasi qty 30 hari (termasuk rencana qty saat ini) > MAXQTY → warn
+     */
+    private function checkObatKronis($productId, $plannedQty): void
+    {
+        // ===== Reset state untuk UI/guard =====
+        $this->resetKronisState();
+
+        // ===== Data kontekstual yang wajib ada =====
+        $patientRegNo       = data_get($this->dataDaftarPoliRJ, 'regNo') ?? data_get($this->dataDaftarPoliRJ, 'pasien.regNo');
+        $currentVisitRjNo   = $this->rjNoRef;
+        $currentVisitDate   = $this->getRjDateCarbon(); // Carbon (tanggal kunjungan sekarang)
+
+        if (!$patientRegNo || !$currentVisitRjNo || !$currentVisitDate) {
+            return; // tidak cukup data untuk melakukan pengecekan
+        }
+
+        // ===== 1) Baca master: apakah produk ini kronis? berapa MAXQTY bulanan? =====
+        $chronicMaster = DB::selectOne("
+            SELECT
+                NVL(MAXQTY,0)    AS maxqty
+            FROM RSMST_LISTOBATBPJSES
+            WHERE PRODUCT_ID = :pid
+        ", ['pid' => $productId]);
+        $maxqty = (int) data_get($chronicMaster, 'maxqty', 0);
+        $this->isChronic = $maxqty > 0;
+        $this->maxQty    = $maxqty;
+        if (!$this->isChronic) {
+            return; // bukan obat kronis → tidak perlu cek lanjut
+        }
+
+        // ===== 2) Tentukan jendela waktu 30 hari terakhir (anchor = tanggal kunjungan saat ini) =====
+        $windowEndDate   = $currentVisitDate->copy();             // batas akhir = hari ini (kunjungan sekarang)
+        $windowStartDate = $currentVisitDate->copy()->subDays(30); // batas awal = 30 hari ke belakang
+
+        // ===== 3) Ringkas pemakaian/tebus 30 hari terakhir utk obat & pasien yg sama (kecuali RJ sekarang) =====
+        $recentDispenseSummary = DB::selectOne("
+            SELECT
+                MAX(rjh.rj_date)     AS last_date,        -- tanggal tebus terakhir untuk obat ini
+                NVL(SUM(rjo.qty), 0) AS total_qty_30d     -- total QTY di window 30 hari
+            FROM RSTXN_RJOBATS rjo
+            JOIN RSTXN_RJHDRS  rjh ON rjh.rj_no = rjo.rj_no
+            WHERE rjh.reg_no     = :regNo
+              AND rjo.product_id = :pid
+              AND rjh.rj_no     <> :currRjNo
+              AND rjh.rj_date BETWEEN
+                    TO_DATE(:startDate,'YYYY-MM-DD HH24:MI:SS')
+                AND TO_DATE(:endDate,'YYYY-MM-DD HH24:MI:SS')
+              AND NVL(rjh.txn_status,'X') <> 'C'  -- exclude transaksi batal (sesuaikan kodenya bila berbeda)
+              AND NVL(rjh.rj_status,'?') IN ('A','L')    -- ⬅ antri & lunas saja
+        ", [
+            'regNo'     => $patientRegNo,
+            'pid'       => $productId,
+            'currRjNo'  => $currentVisitRjNo,
+            'startDate' => $windowStartDate->format('Y-m-d H:i:s'),
+            'endDate'   => $windowEndDate->format('Y-m-d H:i:s'),
+        ]);
+        $this->qty30d = (int) data_get($recentDispenseSummary, 'total_qty_30d', 0);
+        if ($last = data_get($recentDispenseSummary, 'last_date')) {
+            $lastDispenseDate     = Carbon::parse($last);
+            $this->lastTebusDate  = $lastDispenseDate->format('Y-m-d');
+            $this->daysSince      = $windowEndDate->diffInDays($lastDispenseDate);
+        }
+
+        // ===== 4) Aturan peringatan =====
+        $this->warnRepeatUnder30d = $this->daysSince !== null && $this->daysSince < 30;
+        $this->warnOverMaxQty     = ($this->maxQty > 0) && (($this->qty30d + $plannedQty) > $this->maxQty);
+        // dd($this->maxQty);
+        // ===== 5) Rangkai pesan =====
+        // 5) compose message
+        // 5) compose message
+        $messages = [];
+
+        $acc = ($this->qty30d ?? 0) + ($plannedQty ?? 0);     // akumulasi termasuk rencana
+        $remainBefore = ($this->maxQty > 0) ? max(0, $this->maxQty - ($this->qty30d ?? 0)) : null;
+        $allowedNow   = ($this->maxQty > 0) ? max(0, $this->maxQty - ($this->qty30d ?? 0)) : null;
+
+        // Info tebus terakhir
+        if ($this->lastTebusDate) {
+            $sinceTxt   = $this->daysSince !== null ? " ({$this->daysSince} hari lalu)" : '';
+            $messages[] = "Tebus terakhir: {$this->lastTebusDate}{$sinceTxt}.";
+        }
+
+        // < 30 hari sejak tebus terakhir
+        if ($this->warnRepeatUnder30d) {
+            $messages[] = "Belum 30 hari sejak tebus terakhir. Rencana: {$plannedQty}, akumulasi 30 hari: {$acc}.";
+        }
+
+        // Melebihi kuota bulanan
+        if ($this->warnOverMaxQty) {
+            $accF    = number_format((int)$acc, 0, ',', '.');
+            $maxF    = number_format((int)$this->maxQty, 0, ',', '.');
+            $remainF = $remainBefore !== null ? number_format((int)$remainBefore, 0, ',', '.') : null;
+            $allowF  = $allowedNow   !== null ? number_format((int)$allowedNow,   0, ',', '.') : null;
+
+            $lines = [
+                '⚠️ Batas obat kronis terlampaui',
+                "• Akumulasi 30 hari: {$accF}",
+                "• Batas bulanan (MAX): {$maxF}",
+                $remainF !== null ? "• Sisa kuota saat ini: {$remainF}" : null,
+                $allowF  !== null ? ($allowedNow > 0
+                    ? "• Saran tebus saat ini: {$allowF}"
+                    : "• Kuota habis — tidak disarankan menambah qty")
+                    : null,
+            ];
+
+            $messages[] = implode(' ', array_filter($lines));
+        }
+
+        $this->kronisMessage = $messages ? implode(' ', $messages) : null;
+    }
+
+    /** Reset semua state/flag Peringatan Obat Kronis (BPJS) */
+    private function resetKronisState(): void
+    {
+        $this->isChronic          = false;
+        $this->maxQty             = 0;
+        $this->lastTebusDate      = null;
+        $this->daysSince          = null;
+        $this->qty30d             = 0;
+        $this->warnRepeatUnder30d = false;
+        $this->warnOverMaxQty     = false;
+        $this->kronisMessage      = null;
+        $this->lastKronisCheckAt  = null; // clear throttle
+    }
+
+    private function getKlaimStatusNormalized(): string
+    {
+        try {
+            $klaimId = data_get($this->dataDaftarPoliRJ, 'klaimId')
+                ?? DB::table('rstxn_rjhdrs')->where('rj_no', $this->rjNoRef)->value('klaim_id');
+
+            $status = DB::table('rsmst_klaimtypes')
+                ->where('klaim_id', $klaimId ?? '')
+                ->value('klaim_status');
+
+            return strtoupper(trim($status ?? 'UMUM'));
+        } catch (\Throwable $e) {
+            return 'UMUM';
+        }
+    }
+
+    private function isBpjsOrKronis(): bool
+    {
+        return in_array($this->getKlaimStatusNormalized(), ['BPJS', 'KRONIS'], true);
+    }
+
+
 
     // when new form instance
     public function mount()

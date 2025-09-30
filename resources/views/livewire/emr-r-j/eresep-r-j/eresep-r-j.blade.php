@@ -15,6 +15,34 @@
 
                 <div id="TransaksiRawatJalan" class="px-4">
                     <x-input-label for="" :value="__('Non Racikan')" :required="__(false)" class="pt-2 sm:text-xl" />
+
+                    {{-- ⬇⬇⬇ Peringatan Obat Kronis – letakkan DI SINI --}}
+                    @if ($isChronic && ($warnRepeatUnder30d || $warnOverMaxQty))
+                        <div class="p-3 my-2 text-sm border rounded bg-amber-50 border-amber-300 text-amber-900">
+                            <div class="font-semibold">Peringatan Obat Kronis (BPJS)</div>
+                            <ul class="pl-5 mt-1 space-y-1 list-disc">
+                                @if ($warnRepeatUnder30d)
+                                    <li>
+                                        Ditebus terakhir: <span class="font-medium">{{ $lastTebusDate }}</span>
+                                        ({{ $daysSince }} hari lalu) — minimal 30 hari.
+                                    </li>
+                                @endif
+                                @if ($warnOverMaxQty)
+                                    <li>
+                                        Akumulasi QTY 30 hari:
+                                        <span class="font-medium">
+                                            {{ $qty30d + (float) data_get($collectingMyProduct, 'qty', 0) }}
+                                        </span>
+                                        / MAXQTY: <span class="font-medium">{{ $maxQty }}</span>.
+                                    </li>
+                                @endif
+                            </ul>
+                            @if ($kronisMessage)
+                                <div class="mt-2 text-xs opacity-80">{{ $kronisMessage }}</div>
+                            @endif
+                        </div>
+                    @endif
+                    {{-- ⬆⬆⬆ end warning --}}
                     @role(['Dokter', 'Admin'])
                         @if (!$collectingMyProduct)
                             <div>
@@ -41,15 +69,14 @@
                                         x-transition x-ref="dataProductLovSearch">
                                         {{-- alphine --}}
                                         {{-- <template x-for="(dataProductLovx, index) in $wire.dataProductLov">
-                                        <button x-text="dataProductLovx.product_name"
-                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100"
-                                            :class="{
-                                                'bg-gray-100 outline-none': index === $wire
-                                                    .selecteddataProductLovIndex
-                                            }"
-                                            x-on:click.prevent="$wire.setMydataProductLov(index)"></button>
-                                    </template> --}}
-
+                                            <button x-text="dataProductLovx.product_name"
+                                                class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100"
+                                                :class="{
+                                                    'bg-gray-100 outline-none': index === $wire
+                                                        .selecteddataProductLovIndex
+                                                }"
+                                                x-on:click.prevent="$wire.setMydataProductLov(index)"></button>
+                                        </template> --}}
                                         {{-- livewire --}}
                                         @foreach ($dataProductLov as $key => $lov)
                                             <li wire:key='dataProductLov{{ $lov['product_name'] }}'>
