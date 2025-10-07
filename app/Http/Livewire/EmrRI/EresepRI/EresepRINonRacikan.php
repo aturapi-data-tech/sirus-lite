@@ -287,17 +287,17 @@ class EresepRINonRacikan extends Component
         $this->formEntryEresepRINonRacikan['productName'] = $this->product['ProductName'] ?? '';
         // $this->formEntryEresepRINonRacikan['productPrice'] = $this->product['ProductPrice'] ?? '';
 
-        if (empty($this->formEntryEresepRINonRacikan['qty']) || $this->formEntryEresepRINonRacikan['qty'] <= 0) {
-            $this->formEntryEresepRINonRacikan['qty'] = 1;
-        }
+        // if (empty($this->formEntryEresepRINonRacikan['qty']) || $this->formEntryEresepRINonRacikan['qty'] <= 0) {
+        //     $this->formEntryEresepRINonRacikan['qty'] = 1;
+        // }
 
-        if (empty($this->formEntryEresepRINonRacikan['signaX']) || $this->formEntryEresepRINonRacikan['signaX'] <= 0) {
-            $this->formEntryEresepRINonRacikan['signaX'] = 1;
-        }
+        // if (empty($this->formEntryEresepRINonRacikan['signaX']) || $this->formEntryEresepRINonRacikan['signaX'] <= 0) {
+        //     $this->formEntryEresepRINonRacikan['signaX'] = 1;
+        // }
 
-        if (empty($this->formEntryEresepRINonRacikan['signaHari']) || $this->formEntryEresepRINonRacikan['signaHari'] <= 0) {
-            $this->formEntryEresepRINonRacikan['signaHari'] = 1;
-        }
+        // if (empty($this->formEntryEresepRINonRacikan['signaHari']) || $this->formEntryEresepRINonRacikan['signaHari'] <= 0) {
+        //     $this->formEntryEresepRINonRacikan['signaHari'] = 1;
+        // }
 
 
         //price
