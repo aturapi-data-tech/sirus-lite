@@ -321,14 +321,18 @@
                                                         </div>
                                                         <div class="font-semibold text-gray-900">
                                                             {{ $RJp->dr_name . ' / ' }}
+                                                            @php
+                                                                // Cek klaim dari database
+                                                                $klaim = DB::table('rsmst_klaimtypes')
+                                                                    ->where('klaim_id', $myQData->klaim_id)
+                                                                    ->select('klaim_status', 'klaim_desc')
+                                                                    ->first();
+
+                                                                // Deskripsi klaim (fallback jika null)
+                                                                $klaimDesc = $klaim->klaim_desc ?? 'Asuransi Lain';
+                                                            @endphp
                                                             <x-badge :badgecolor="__($badgecolorKlaim)">
-                                                                {{ $RJp->klaim_id == 'UM'
-                                                                    ? 'UMUM'
-                                                                    : ($RJp->klaim_id == 'JM'
-                                                                        ? 'BPJS'
-                                                                        : ($RJp->klaim_id == 'KR'
-                                                                            ? 'Kronis'
-                                                                            : 'Asuransi Lain')) }}
+                                                                {{ $klaimDesc }}
                                                             </x-badge>
 
                                                         </div>

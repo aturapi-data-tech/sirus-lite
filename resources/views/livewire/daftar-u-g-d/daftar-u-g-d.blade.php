@@ -2,8 +2,8 @@
 
     {{-- Start Coding  --}}
 
-    {{-- Canvas 
-    Main BgColor / 
+    {{-- Canvas
+    Main BgColor /
     Size H/W --}}
     <div class="w-full h-[calc(100vh-68px)] bg-white border border-gray-200 px-4 pt-6">
 
@@ -195,13 +195,28 @@
                                     </div>
                                     <div class="font-semibold text-gray-900">
                                         {{ $myQData->dr_name . ' / ' }}
-                                        {{ $myQData->klaim_id == 'UM'
-                                            ? 'UMUM'
-                                            : ($myQData->klaim_id == 'JM'
-                                                ? 'BPJS'
-                                                : ($myQData->klaim_id == 'KR'
-                                                    ? 'Kronis'
-                                                    : 'Asuransi Lain')) }}
+                                        @php
+                                            // Cek klaim dari database
+                                            $klaim = DB::table('rsmst_klaimtypes')
+                                                ->where('klaim_id', $myQData->klaim_id)
+                                                ->select('klaim_status', 'klaim_desc')
+                                                ->first();
+
+                                            // Deskripsi klaim (fallback jika null)
+                                            $klaimDesc = $klaim->klaim_desc ?? 'Asuransi Lain';
+
+                                            $badgecolorKlaim =
+                                                $myQData->klaim_id == 'UM'
+                                                    ? 'green'
+                                                    : ($myQData->klaim_id == 'JM'
+                                                        ? 'default'
+                                                        : ($myQData->klaim_id == 'KR'
+                                                            ? 'yellow'
+                                                            : 'red'));
+                                        @endphp
+                                        <x-badge :badgecolor="__($badgecolorKlaim)">
+                                            {{ $klaimDesc }}
+                                        </x-badge>
                                     </div>
                                     <div class="font-normal text-gray-900">
                                         {{ 'Nomer Pelayanan ' . $myQData->no_antrian }}
@@ -307,8 +322,8 @@
         ])
     @endif
 
-    {{-- Canvas 
-    Main BgColor / 
+    {{-- Canvas
+    Main BgColor /
     Size H/W --}}
 
     {{-- End Coding --}}

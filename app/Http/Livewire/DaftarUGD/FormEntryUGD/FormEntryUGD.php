@@ -196,6 +196,7 @@ class FormEntryUGD extends Component
         'JenisKlaimOptions' => [
             ['JenisKlaimId' => 'UM', 'JenisKlaimDesc' => 'UMUM'],
             ['JenisKlaimId' => 'JM', 'JenisKlaimDesc' => 'BPJS'],
+            ['JenisKlaimId' => 'JR', 'JenisKlaimDesc' => 'JASA RAHARJA'],
             ['JenisKlaimId' => 'JML', 'JenisKlaimDesc' => 'Asuransi Lain'],
             ['JenisKlaimId' => 'KR', 'JenisKlaimDesc' => 'Kronis'],
 
