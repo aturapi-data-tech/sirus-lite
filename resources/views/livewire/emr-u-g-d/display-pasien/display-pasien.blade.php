@@ -39,11 +39,13 @@
                     <div class="px-2 font-semibold text-gray-700 justify-self-end">
                         {{ 'Instalasi Gawat Darurat' }}
                     </div>
-                    <div class="px-2 font-semibold text-primary justify-self-end">
+                    <div class="px-2 text-sm text-gray-900">
                         @php
                             $klaimId = isset($dataDaftarUgd['klaimId']) ? $dataDaftarUgd['klaimId'] : '-';
                         @endphp
-                        {{ $dataDaftarUgd['drDesc'] . ' / ' }}
+                        <p class="font-semibold text-right">
+                            {{ $dataDaftarUgd['drDesc'] . ' / ' }}
+                        </p>
                         <p class="text-right">
                             Jenis Klaim:
                             @php

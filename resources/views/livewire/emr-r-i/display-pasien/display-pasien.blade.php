@@ -30,8 +30,6 @@
                     <p class="text-right">{{ $myQData['bangsalDesc'] ?? '-' }}</p>
                     <p class="font-semibold text-right">
                         {{ $myQData['roomDesc'] ?? '-' }} / Bed : {{ $myQData['bedNo'] ?? '-' }}
-                    </p>
-                    <p class="text-right">
                         Jenis Klaim:
                         @php
                             use Illuminate\Support\Facades\DB;
