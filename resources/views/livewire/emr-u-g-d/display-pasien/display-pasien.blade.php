@@ -44,7 +44,33 @@
                             $klaimId = isset($dataDaftarUgd['klaimId']) ? $dataDaftarUgd['klaimId'] : '-';
                         @endphp
                         {{ $dataDaftarUgd['drDesc'] . ' / ' }}
-                        {{ $klaimId == 'UM' ? 'UMUM' : ($klaimId == 'JM' ? 'BPJS' : ($klaimId == 'KR' ? 'Kronis' : 'Asuransi Lain')) }}
+                        <p class="text-right">
+                            Jenis Klaim:
+                            @php
+                                use Illuminate\Support\Facades\DB;
+
+                                // Ambil klaim dari database
+                                $klaim = DB::table('rsmst_klaimtypes')
+                                    ->where('klaim_id', $klaimId ?? null)
+                                    ->select('klaim_status', 'klaim_desc')
+                                    ->first();
+
+                                // Deskripsi klaim (fallback)
+                                $klaimDesc = $klaim->klaim_desc ?? 'Asuransi Lain';
+
+                                // Tentukan warna badge berdasarkan klaim_id
+                                $badgecolorKlaim = match ($klaimId ?? '') {
+                                    'UM' => 'green',
+                                    'JM' => 'default',
+                                    'KR' => 'yellow',
+                                    default => 'red',
+                                };
+                            @endphp
+
+                            <x-badge :badgecolor="__($badgecolorKlaim)">
+                                {{ $klaimDesc }}
+                            </x-badge>
+                        </p>
                     </div>
                     <div class="px-2 font-normal text-gray-900 justify-self-end">
                         {{ 'Nomer Pelayanan ' . $dataDaftarUgd['noAntrian'] }}

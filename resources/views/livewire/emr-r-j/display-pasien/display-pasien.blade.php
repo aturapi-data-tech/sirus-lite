@@ -64,13 +64,30 @@
 
                     <div class="px-2 text-base font-semibold text-primary justify-self-end">
                         {{ $dataDaftarPoliRJ['drDesc'] . ' / ' }}
-                        {{ $dataDaftarPoliRJ['klaimId'] == 'UM'
-                            ? 'UMUM'
-                            : ($dataDaftarPoliRJ['klaimId'] == 'JM'
-                                ? 'BPJS'
-                                : ($dataDaftarPoliRJ['klaimId'] == 'KR'
-                                    ? 'Kronis'
-                                    : 'Asuransi Lain')) }}
+                        @php
+                            use Illuminate\Support\Facades\DB;
+
+                            // Ambil klaim dari database
+                            $klaim = DB::table('rsmst_klaimtypes')
+                                ->where('klaim_id', $dataDaftarPoliRJ['klaimId'] ?? null)
+                                ->select('klaim_status', 'klaim_desc')
+                                ->first();
+
+                            // Deskripsi klaim (fallback)
+                            $klaimDesc = $klaim->klaim_desc ?? 'Asuransi Lain';
+
+                            // Tentukan warna badge berdasarkan klaim_id
+                            $badgecolorKlaim = match ($dataDaftarPoliRJ['klaimId'] ?? '') {
+                                'UM' => 'green',
+                                'JM' => 'default',
+                                'KR' => 'yellow',
+                                default => 'red',
+                            };
+                        @endphp
+
+                        <x-badge :badgecolor="__($badgecolorKlaim)">
+                            {{ $klaimDesc }}
+                        </x-badge>
                     </div>
 
                     <div class="px-2 font-normal text-gray-700 justify-self-end">
