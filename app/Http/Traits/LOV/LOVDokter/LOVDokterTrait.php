@@ -38,7 +38,7 @@ trait LOVDokterTrait
             )
             ->join('rsmst_polis', 'rsmst_polis.poli_id', '=', 'rsmst_doctors.poli_id')
             ->where('rsmst_doctors.dr_id', '=', $search)
-            // ->where('active_status', '1')
+            ->where('active_status', '=', '1')
             ->first();
 
         if ($dataDokterLovs) {
@@ -63,7 +63,7 @@ trait LOVDokterTrait
                             'kd_dr_bpjs'
                         )
                         ->join('rsmst_polis', 'rsmst_polis.poli_id', '=', 'rsmst_doctors.poli_id')
-                        // ->where('active_status', '1')
+                        ->where('active_status', '=', '1')
                         ->Where(DB::raw('upper(dr_name)'), 'like', '%' . strtoupper($search) . '%')
                         ->orWhere(DB::raw('upper(rsmst_doctors.dr_id)'), 'like', '%' . strtoupper($search) . '%')
                         ->orWhere(DB::raw('upper(rsmst_doctors.poli_id)'), 'like', '%' . strtoupper($search) . '%')
