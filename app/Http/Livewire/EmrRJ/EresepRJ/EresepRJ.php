@@ -556,6 +556,7 @@ class EresepRJ extends Component
     public function resetcollectingMyProduct()
     {
         $this->reset(['collectingMyProduct']);
+        $this->resetKronisState();
     }
 
     public function checkRjStatus()
@@ -686,12 +687,12 @@ class EresepRJ extends Component
         // Info tebus terakhir
         if ($this->lastTebusDate) {
             $sinceTxt   = $this->daysSince !== null ? " ({$this->daysSince} hari lalu)" : '';
-            $messages[] = "Tebus terakhir: {$this->lastTebusDate}{$sinceTxt}.";
+            $messages[] = "Pengambilan obat terakhir belum 30 hari sejak : {$this->lastTebusDate}{$sinceTxt}.";
         }
 
         // < 30 hari sejak tebus terakhir
         if ($this->warnRepeatUnder30d) {
-            $messages[] = "Belum 30 hari sejak tebus terakhir. Rencana: {$plannedQty}, akumulasi 30 hari: {$acc}.";
+            $messages[] = " Rencana yang akan diberikan: {$plannedQty}, total pemberian dengan obat sebelumnya: {$acc}.";
         }
 
         // Melebihi kuota bulanan

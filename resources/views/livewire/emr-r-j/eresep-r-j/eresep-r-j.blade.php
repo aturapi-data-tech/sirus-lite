@@ -19,21 +19,22 @@
                     {{-- ⬇⬇⬇ Peringatan Obat Kronis – letakkan DI SINI --}}
                     @if ($isChronic && ($warnRepeatUnder30d || $warnOverMaxQty))
                         <div class="p-3 my-2 text-sm border rounded bg-amber-50 border-amber-300 text-amber-900">
-                            <div class="font-semibold">Peringatan Obat Kronis (BPJS)</div>
+                            <div class="font-semibold">Peringatan Obat Kronis</div>
                             <ul class="pl-5 mt-1 space-y-1 list-disc">
                                 @if ($warnRepeatUnder30d)
                                     <li>
-                                        Ditebus terakhir: <span class="font-medium">{{ $lastTebusDate }}</span>
-                                        ({{ $daysSince }} hari lalu) — minimal 30 hari.
+                                        Pengambilan obat terakhir: <span class="font-medium">{{ $lastTebusDate }}</span>
+                                        ({{ $daysSince }} hari lalu).
                                     </li>
                                 @endif
                                 @if ($warnOverMaxQty)
                                     <li>
-                                        Akumulasi QTY 30 hari:
+                                        Pemberian dalam 30 hari terakhir adalah:
                                         <span class="font-medium">
                                             {{ $qty30d + (float) data_get($collectingMyProduct, 'qty', 0) }}
                                         </span>
-                                        / MAXQTY: <span class="font-medium">{{ $maxQty }}</span>.
+                                        / Disarankan maksimal pemberian obat : <span
+                                            class="font-medium">{{ $maxQty }}</span>.
                                     </li>
                                 @endif
                             </ul>
