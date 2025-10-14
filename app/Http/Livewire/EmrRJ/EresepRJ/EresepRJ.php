@@ -637,7 +637,6 @@ class EresepRJ extends Component
         if (!$this->isChronic) {
             return; // bukan obat kronis → tidak perlu cek lanjut
         }
-
         // ===== 2) Tentukan jendela waktu 30 hari terakhir (anchor = tanggal kunjungan saat ini) =====
         $windowEndDate   = $currentVisitDate->copy();             // batas akhir = hari ini (kunjungan sekarang)
         $windowStartDate = $currentVisitDate->copy()->subDays(30); // batas awal = 30 hari ke belakang
@@ -751,7 +750,7 @@ class EresepRJ extends Component
 
     private function isBpjsOrKronis(): bool
     {
-        return in_array($this->getKlaimStatusNormalized(), ['BPJS', 'KRONIS'], true);
+        return in_array($this->getKlaimStatusNormalized(), ['UMUM', 'BPJS', 'KRONIS'], true);
     }
 
 
