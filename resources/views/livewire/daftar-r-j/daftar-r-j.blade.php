@@ -324,7 +324,7 @@
                                                             @php
                                                                 // Cek klaim dari database
                                                                 $klaim = DB::table('rsmst_klaimtypes')
-                                                                    ->where('klaim_id', $myQData->klaim_id)
+                                                                    ->where('klaim_id', $RJp->klaim_id)
                                                                     ->select('klaim_status', 'klaim_desc')
                                                                     ->first();
 
