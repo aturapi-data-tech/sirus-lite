@@ -50,46 +50,33 @@
                                 <x-input-label for="dataProductLovSearch" :value="__('Nama Obat')" :required="__(true)" />
 
                                 {{-- Lov dataProductLov --}}
-                                <div x-data="{ selecteddataProductLovIndex: @entangle('selecteddataProductLovIndex') }" @click.outside="$wire.dataProductLovSearch = ''">
+                                <div x-data="{ selecteddataProductLovIndex: @entangle('selecteddataProductLovIndex') }"
+                                    x-on:click.window="
+    const inSearch = $refs.dataProductLovSearchMain?.contains($event.target)
+    const inList   = $refs.dataProductLovSearch?.contains($event.target)
+    if (!inSearch && !inList) { $wire.resetdataProductLov() }
+  ">
                                     <x-text-input id="dataProductLovSearchMain" placeholder="Nama Obat" class="mt-1 ml-2"
                                         :errorshas="__($errors->has('dataProductLovSearchMain'))" :disabled="$disabledPropertyRjStatus" wire:model.debounce.500ms="dataProductLovSearch"
-                                        x-on:click.outside="$wire.resetdataProductLov()"
-                                        x-on:keyup.escape="$wire.resetdataProductLov()" {{-- <!-- Navigasi pakai keydown +
-                                        prevent --> --}}
+                                        x-on:keyup.escape="$wire.resetdataProductLov()"
                                         x-on:keydown.down.prevent="$wire.selectNextdataProductLov()"
                                         x-on:keydown.up.prevent="$wire.selectPreviousdataProductLov()"
                                         x-on:keydown.enter.prevent="
-                                            if (($wire.dataProductLov?.length ?? 0) > 0 && (selecteddataProductLovIndex ?? -1) >= 0) {
-                                            $wire.enterMydataProductLov(selecteddataProductLovIndex)
-                                            }
-                                        "
-                                        x-ref="dataProductLovSearchMain" x-init="// fokus setelah mount/re-render (kalau tidak disabled)
-                                        $nextTick(() => { if (!$el.disabled) { $el.focus() } });
-                                        
-                                        // amankan scrollIntoView saat index berubah
+      if (($wire.dataProductLov?.length ?? 0) > 0 && (selecteddataProductLovIndex ?? -1) >= 0) {
+        $wire.enterMydataProductLov(selecteddataProductLovIndex)
+      }
+    "
+                                        x-ref="dataProductLovSearchMain" x-init="$nextTick(() => { if (!$el.disabled) $el.focus() });
                                         $watch('selecteddataProductLovIndex', (val) => {
                                             const list = $refs.dataProductLovSearch;
                                             if (!list || typeof val !== 'number' || val < 0) return;
-                                            const items = list.querySelectorAll('li'); // tidak bergantung offset +1
-                                            const target = items[val];
-                                            target?.scrollIntoView({ block: 'nearest' });
+                                            const items = list.querySelectorAll('li');
+                                            items[val]?.scrollIntoView({ block: 'nearest' });
                                         });" data-lov-search />
 
-                                    {{-- Lov --}}
                                     <div class="py-2 mt-1 overflow-y-auto bg-white border rounded-md shadow-lg max-h-64"
                                         x-show="$wire.dataProductLovSearch.length>3 && $wire.dataProductLov.length>0"
-                                        x-transition x-ref="dataProductLovSearch">
-                                        {{-- alphine --}}
-                                        {{-- <template x-for="(dataProductLovx, index) in $wire.dataProductLov">
-                                            <button x-text="dataProductLovx.product_name"
-                                                class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100"
-                                                :class="{
-                                                    'bg-gray-100 outline-none': index === $wire
-                                                        .selecteddataProductLovIndex
-                                                }"
-                                                x-on:click.prevent="$wire.setMydataProductLov(index)"></button>
-                                        </template> --}}
-                                        {{-- livewire --}}
+                                        x-transition x-ref="dataProductLovSearch" wire:ignore.self>
                                         @foreach ($dataProductLov as $key => $lov)
                                             <li wire:key='dataProductLov{{ $lov['product_name'] }}'>
                                                 <x-dropdown-link wire:click="setMydataProductLov('{{ $key }}')"
@@ -97,32 +84,11 @@
                                                     <div>
                                                         {{ $lov['product_name'] . ' / ' . number_format($lov['sales_price']) }}
                                                     </div>
-                                                    <div class="text-xs">
-                                                        {{ '(' . $lov['product_content'] . ')' }}
-                                                    </div>
+                                                    <div class="text-xs">{{ '(' . $lov['product_content'] . ')' }}</div>
                                                 </x-dropdown-link>
                                             </li>
                                         @endforeach
-
                                     </div>
-
-
-                                    {{-- Start Lov exceptions --}}
-
-                                    @if (strlen($dataProductLovSearch) > 0 && strlen($dataProductLovSearch) < 3 && count($dataProductLov) == 0)
-                                        <div class="w-full p-2 text-sm text-center text-gray-500 dark:text-gray-400">
-                                            {{ 'Masukkan minimal 3 karakter' }}
-                                        </div>
-                                    @elseif(strlen($dataProductLovSearch) >= 3 && count($dataProductLov) == 0)
-                                        <div class="w-full p-2 text-sm text-center text-gray-500 dark:text-gray-400">
-                                            {{ 'Data Tidak ditemukan' }}
-                                        </div>
-                                    @endif
-                                    {{-- End Lov exceptions --}}
-
-                                    @error('dataProductLovSearch')
-                                        <x-input-error :messages=$message />
-                                    @enderror
                                 </div>
                                 {{-- Lov dataProductLov --}}
                             </div>
