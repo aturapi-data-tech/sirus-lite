@@ -43,7 +43,7 @@
                 }
             </style>
 
-            <div class="p-2 mt-2 text-lg border rounded sm:text-sm bg-amber-50 border-amber-200 text-amber-900 sm:p-3 blink-soft"
+            <div class="p-2 mt-2 text-lg border rounded sm:text-lg bg-amber-50 border-amber-200 text-amber-900 sm:p-3 blink-soft"
                 style="animation: flash-soft 10.2s linear infinite;">
                 Kepada pasien yang memiliki resep mengandung <strong>obat racikan</strong>, proses peracikan
                 memerlukan
@@ -65,7 +65,7 @@
         <p class="sticky top-0 z-50 text-xs text-gray-700 bg-white rounded-lg">Data Terakhir:
             {{ now()->format('d-m-y H:i:s') }}</p>
 
-        <div class="sticky top-0 z-20 grid w-full grid-cols-2 gap-2 my-2">
+        <div class="sticky top-0 z-20 grid w-full grid-cols-2 gap-2 py-2">
             <div class="bg-white border-b border-gray-200 ">
                 <h2 class="px-4 py-2 text-base font-semibold text-red-800">
                     🕐 Proses Resep
