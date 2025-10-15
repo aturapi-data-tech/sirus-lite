@@ -89,7 +89,6 @@ class AntrianResepRJ extends Component
         // dd/mm/yyyy hh24:mi:ss
         $this->myTopBar['refDate'] = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y');
 
-        $this->myTopBar['refDate'] = '09/06/2025';
         // dd(Carbon::now(env('APP_TIMEZONE'))->format('H:i:s'));
 
         // shift
