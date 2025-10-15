@@ -62,7 +62,7 @@
                                         x-ref="dataProductLovSearchMain" x-init="$watch('selecteddataProductLovIndex', (value, oldValue) => $refs.dataProductLovSearch.children[selecteddataProductLovIndex + 1].scrollIntoView({
                                             block: 'nearest'
                                         }))
-                                        $refs.dataProductLovSearchMain.focus()" />
+                                        $refs.dataProductLovSearchMain.focus()" data-lov-search />
 
                                     {{-- Lov --}}
                                     <div class="py-2 mt-1 overflow-y-auto bg-white border rounded-md shadow-lg max-h-64"
@@ -119,7 +119,7 @@
 
                         @if ($collectingMyProduct)
                             {{-- collectingMyProduct / obat --}}
-                            <div class="flex items-baseline space-x-2" x-data>
+                            <div class="flex items-baseline space-x-2" x-data data-form="rjNonRacikHeader">
 
                                 <div class="hidden">
                                     <x-input-label for="collectingMyProduct.productId" :value="__('Kode Obat')"
@@ -155,11 +155,15 @@
                                     <x-input-label for="collectingMyProduct.qty" :value="__('Jml')" :required="__(true)" />
 
                                     <div>
+                                        <!-- Qty -->
                                         <x-text-input id="collectingMyProduct.qty" placeholder="Jml Obat" class="mt-1 ml-2"
                                             :errorshas="__($errors->has('collectingMyProduct.qty'))" :disabled=$disabledPropertyRjStatus
-                                            wire:model.debounce.500ms="collectingMyProduct.qty" x-init="$refs.collectingMyProductqty.focus()"
-                                            x-ref="collectingMyProductqty"
-                                            x-on:keyup.enter="$refs.collectingMyProductsignaX.focus()" />
+                                            wire:model.debounce.500ms="collectingMyProduct.qty" data-seq="1"
+                                            x-init="$nextTick(() => {
+                                                $el.closest('[data-form=&quot;rjNonRacikHeader&quot;]')
+                                                    ?.querySelector('[data-seq=&quot;1&quot;]')?.focus()
+                                            })"
+                                            x-on:keydown.enter.prevent="$el.closest('[data-form=&quot;rjNonRacikHeader&quot;]')?.querySelector('[data-seq=&quot;2&quot;]')?.focus()" />
 
                                         @error('collectingMyProduct.qty')
                                             <x-input-error :messages=$message />
@@ -187,10 +191,11 @@
                                     <x-input-label for="collectingMyProduct.signaX" :value="__('Signa')" :required="__(false)" />
 
                                     <div>
+                                        <!-- Signa1 -->
                                         <x-text-input id="collectingMyProduct.signaX" placeholder="Signa1" class="mt-1 ml-2"
                                             :errorshas="__($errors->has('collectingMyProduct.signaX'))" :disabled=$disabledPropertyRjStatus
-                                            wire:model="collectingMyProduct.signaX" x-ref="collectingMyProductsignaX"
-                                            x-on:keyup.enter="$refs.collectingMyProductsignaHari.focus()" />
+                                            wire:model="collectingMyProduct.signaX" data-seq="2"
+                                            x-on:keydown.enter.prevent="$el.closest('[data-form=&quot;rjNonRacikHeader&quot;]')?.querySelector('[data-seq=&quot;3&quot;]')?.focus()" />
 
                                         @error('collectingMyProduct.signaX')
                                             <x-input-error :messages=$message />
@@ -211,10 +216,11 @@
                                         :required="__(false)" />
 
                                     <div>
+                                        <!-- Signa2 -->
                                         <x-text-input id="collectingMyProduct.signaHari" placeholder="Signa2"
                                             class="mt-1 ml-2" :errorshas="__($errors->has('collectingMyProduct.signaHari'))" :disabled=$disabledPropertyRjStatus
-                                            wire:model="collectingMyProduct.signaHari" x-ref="collectingMyProductsignaHari"
-                                            x-on:keyup.enter="$refs.collectingMyProductcatatanKhusus.focus()" />
+                                            wire:model="collectingMyProduct.signaHari" data-seq="3"
+                                            x-on:keydown.enter.prevent="$el.closest('[data-form=&quot;rjNonRacikHeader&quot;]')?.querySelector('[data-seq=&quot;4&quot;]')?.focus()" />
 
                                         @error('collectingMyProduct.signaHari')
                                             <x-input-error :messages=$message />
@@ -227,12 +233,11 @@
                                         :required="__(true)" />
 
                                     <div>
+                                        <!-- Catatan Khusus -->
                                         <x-text-input id="collectingMyProduct.catatanKhusus" placeholder="Catatan Khusus"
                                             class="mt-1 ml-2" :errorshas="__($errors->has('collectingMyProduct.catatanKhusus'))" :disabled=$disabledPropertyRjStatus
-                                            wire:model="collectingMyProduct.catatanKhusus"
-                                            x-on:keyup.enter="$wire.insertProduct()
-                                        $refs.collectingMyProductqty.focus()"
-                                            x-ref="collectingMyProductcatatanKhusus" />
+                                            wire:model="collectingMyProduct.catatanKhusus" data-seq="4"
+                                            x-on:keydown.enter.prevent="$wire.insertProduct(); $nextTick(() => {$el.closest('[data-form=&quot;rjNonRacikHeader&quot;]')?.querySelector('[data-seq=&quot;1&quot;]')?.focus()})" />
 
                                         @error('collectingMyProduct.catatanKhusus')
                                             <x-input-error :messages=$message />
@@ -245,7 +250,7 @@
 
                                     <x-alternative-button class="inline-flex ml-2"
                                         wire:click.prevent="resetcollectingMyProduct()"
-                                        x-on:click="$refs.collectingMyProductproductName.focus()">
+                                        x-on:click="$nextTick(() => {$root.querySelector('[data-lov-search]')?.focus()})">
                                         <svg class="w-5 h-5 text-gray-800 dark:text-white" aria-hidden="true"
                                             xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 20">
                                             <path
