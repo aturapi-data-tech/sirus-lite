@@ -65,16 +65,26 @@
         <p class="sticky top-0 z-50 text-xs text-gray-700 bg-white rounded-lg">Data Terakhir:
             {{ now()->format('d-m-y H:i:s') }}</p>
 
+        <div class="sticky top-0 z-20 grid w-full grid-cols-2 gap-2">
+            <div class="bg-white border-b border-gray-200 ">
+                <h2 class="px-4 py-2 text-base font-semibold text-red-800">
+                    🕐 Proses Resep
+                </h2>
+            </div>
+
+            <div class="sticky top-0 z-20 bg-white border-b border-gray-200">
+                <h2 class="px-4 py-2 text-base font-semibold text-primary">
+                    ✅ Sudah Selesai
+                </h2>
+            </div>
+        </div>
+
         <div class="grid w-full grid-cols-2 gap-4 overflow-hidden">
 
             {{-- KIRI: ANTRI --}}
             <div class="overflow-y-auto max-h-[calc(100vh-220px)]">
 
-                <div class="sticky top-0 z-20 bg-white border-b border-gray-200">
-                    <h2 class="px-4 py-2 text-base font-semibold text-red-800">
-                        🕐 Proses Resep
-                    </h2>
-                </div>
+
 
                 <table class="min-w-full text-sm text-left text-gray-700 border-collapse table-fixed">
                     {{-- Kunci lebar kolom identik di 2 tabel --}}
@@ -131,11 +141,7 @@
             {{-- KANAN: LUNAS --}}
             <div class="overflow-y-auto max-h-[calc(100vh-220px)]">
 
-                <div class="sticky top-0 z-20 bg-white border-b border-gray-200">
-                    <h2 class="px-4 py-2 text-base font-semibold text-primary">
-                        ✅ Sudah Selesai
-                    </h2>
-                </div>
+
 
                 <table class="min-w-full text-sm text-left text-gray-700 border-collapse table-fixed">
                     <colgroup>
