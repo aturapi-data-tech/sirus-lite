@@ -281,9 +281,9 @@ class EresepRJ extends Component
             'productId' => $productId,
             'productName' => $productName,
             'jenisKeterangan' => 'NonRacikan', //Racikan non racikan
-            'signaX' => 1,
-            'signaHari' => 1,
-            'qty' => 1,
+            'signaX' => "",
+            'signaHari' => "",
+            'qty' => "",
             'productPrice' => $salesPrice,
             'catatanKhusus' => '',
         ];

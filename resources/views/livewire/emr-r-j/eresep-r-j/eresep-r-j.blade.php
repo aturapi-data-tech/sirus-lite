@@ -52,17 +52,28 @@
                                 {{-- Lov dataProductLov --}}
                                 <div x-data="{ selecteddataProductLovIndex: @entangle('selecteddataProductLovIndex') }" @click.outside="$wire.dataProductLovSearch = ''">
                                     <x-text-input id="dataProductLovSearchMain" placeholder="Nama Obat" class="mt-1 ml-2"
-                                        :errorshas="__($errors->has('dataProductLovSearchMain'))" :disabled=$disabledPropertyRjStatus
-                                        wire:model.debounce.500ms="dataProductLovSearch"
+                                        :errorshas="__($errors->has('dataProductLovSearchMain'))" :disabled="$disabledPropertyRjStatus" wire:model.debounce.500ms="dataProductLovSearch"
                                         x-on:click.outside="$wire.resetdataProductLov()"
-                                        x-on:keyup.escape="$wire.resetdataProductLov()"
-                                        x-on:keyup.down="$wire.selectNextdataProductLov()"
-                                        x-on:keyup.up="$wire.selectPreviousdataProductLov()"
-                                        x-on:keyup.enter="$wire.enterMydataProductLov(selecteddataProductLovIndex)"
-                                        x-ref="dataProductLovSearchMain" x-init="$watch('selecteddataProductLovIndex', (value, oldValue) => $refs.dataProductLovSearch.children[selecteddataProductLovIndex + 1].scrollIntoView({
-                                            block: 'nearest'
-                                        }))
-                                        $refs.dataProductLovSearchMain.focus()" data-lov-search />
+                                        x-on:keyup.escape="$wire.resetdataProductLov()" {{-- <!-- Navigasi pakai keydown +
+                                        prevent --> --}}
+                                        x-on:keydown.down.prevent="$wire.selectNextdataProductLov()"
+                                        x-on:keydown.up.prevent="$wire.selectPreviousdataProductLov()"
+                                        x-on:keydown.enter.prevent="
+                                            if (($wire.dataProductLov?.length ?? 0) > 0 && (selecteddataProductLovIndex ?? -1) >= 0) {
+                                            $wire.enterMydataProductLov(selecteddataProductLovIndex)
+                                            }
+                                        "
+                                        x-ref="dataProductLovSearchMain" x-init="// fokus setelah mount/re-render (kalau tidak disabled)
+                                        $nextTick(() => { if (!$el.disabled) { $el.focus() } });
+                                        
+                                        // amankan scrollIntoView saat index berubah
+                                        $watch('selecteddataProductLovIndex', (val) => {
+                                            const list = $refs.dataProductLovSearch;
+                                            if (!list || typeof val !== 'number' || val < 0) return;
+                                            const items = list.querySelectorAll('li'); // tidak bergantung offset +1
+                                            const target = items[val];
+                                            target?.scrollIntoView({ block: 'nearest' });
+                                        });" data-lov-search />
 
                                     {{-- Lov --}}
                                     <div class="py-2 mt-1 overflow-y-auto bg-white border rounded-md shadow-lg max-h-64"
@@ -248,9 +259,15 @@
                                 <div class="basis-1/6">
                                     <x-input-label for="" :value="__('Hapus')" :required="__(true)" />
 
-                                    <x-alternative-button class="inline-flex ml-2"
-                                        wire:click.prevent="resetcollectingMyProduct()"
-                                        x-on:click="$nextTick(() => {$root.querySelector('[data-lov-search]')?.focus()})">
+                                    <x-alternative-button class="inline-flex ml-2" :disabled="$disabledPropertyRjStatus"
+                                        x-on:click.prevent="$wire.resetcollectingMyProduct()
+                                            .then(() => {
+                                                // tunggu frame berikutnya supaya DOM hasil re-render sudah siap
+                                                requestAnimationFrame(() => {
+                                                document.querySelector('[data-lov-search]')?.focus()
+                                                })
+                                            })
+                                        ">
                                         <svg class="w-5 h-5 text-gray-800 dark:text-white" aria-hidden="true"
                                             xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 20">
                                             <path
