@@ -52,10 +52,12 @@
                                 {{-- Lov dataProductLov --}}
                                 <div x-data="{ selecteddataProductLovIndex: @entangle('selecteddataProductLovIndex') }"
                                     x-on:click.window="
-    const inSearch = $refs.dataProductLovSearchMain?.contains($event.target)
-    const inList   = $refs.dataProductLovSearch?.contains($event.target)
-    if (!inSearch && !inList) { $wire.resetdataProductLov() }
-  ">
+                                (t = $event.target,
+                                 s = $refs.dataProductLovSearchMain,
+                                 l = $refs.dataProductLovSearch,
+                                 ((s && s.contains(t)) || (l && l.contains(t))) ? 0 : $wire.resetdataProductLov()
+                                )
+                              ">
                                     <x-text-input id="dataProductLovSearchMain" placeholder="Nama Obat" class="mt-1 ml-2"
                                         :errorshas="__($errors->has('dataProductLovSearchMain'))" :disabled="$disabledPropertyRjStatus" wire:model.debounce.500ms="dataProductLovSearch"
                                         x-on:keyup.escape="$wire.resetdataProductLov()"
@@ -69,16 +71,16 @@
                                         x-ref="dataProductLovSearchMain" x-init="$nextTick(() => { if (!$el.disabled) $el.focus() });
                                         $watch('selecteddataProductLovIndex', (val) => {
                                             const list = $refs.dataProductLovSearch;
-                                            if (!list || typeof val !== 'number' || val < 0) return;
+                                            if (!list || typeof val !== 'number' || val < div 0) return;
                                             const items = list.querySelectorAll('li');
                                             items[val]?.scrollIntoView({ block: 'nearest' });
                                         });" data-lov-search />
 
                                     <div class="py-2 mt-1 overflow-y-auto bg-white border rounded-md shadow-lg max-h-64"
                                         x-show="$wire.dataProductLovSearch.length>3 && $wire.dataProductLov.length>0"
-                                        x-transition x-ref="dataProductLovSearch" wire:ignore.self>
+                                        x-ref="dataProductLovSearch" wire:ignore.self>
                                         @foreach ($dataProductLov as $key => $lov)
-                                            <li wire:key='dataProductLov{{ $lov['product_name'] }}'>
+                                            <li wire:key="dataProductLov-{{ $lov['product_id'] ?? $key }}">
                                                 <x-dropdown-link wire:click="setMydataProductLov('{{ $key }}')"
                                                     class="text-base font-normal {{ $key === $selecteddataProductLovIndex ? 'bg-gray-100 outline-none' : '' }}">
                                                     <div>
@@ -325,11 +327,12 @@
                                                             class="px-4 py-3 font-normal text-gray-700 group-hover:bg-gray-50 whitespace-nowrap dark:text-white">
                                                             {{-- {{ $eresep['qty'] }} --}}
                                                             <div>
-                                                                <x-text-input placeholder="Jml Racikan" class=""
-                                                                    :disabled=$disabledPropertyRjStatus
+                                                                {{-- Qty (seq=1) --}}
+                                                                <x-text-input placeholder="Jml" :disabled="$disabledPropertyRjStatus"
                                                                     wire:model="dataDaftarPoliRJ.eresep.{{ $key }}.qty"
-                                                                    x-ref="dataDaftarPoliRJeresep{{ $key }}qty"
-                                                                    x-on:keyup.enter="$refs.dataDaftarPoliRJeresep{{ $key }}signaX.focus()" />
+                                                                    data-seq="1"
+                                                                    x-on:keydown.enter.prevent="$el.closest('tr')?.querySelector('[data-seq=&quot;2&quot;]')?.focus()" />
+
                                                             </div>
                                                         </td>
 
@@ -343,11 +346,12 @@
                                                             <div class="flex items-baseline space-x-2">
                                                                 {{-- Signa1 = 20% --}}
                                                                 <div class="basis-1/5">
-                                                                    <x-text-input placeholder="Signa1" class="w-full mt-1"
-                                                                        :disabled="$disabledPropertyRjStatus"
+                                                                    {{-- Signa1 (seq=2) --}}
+                                                                    <x-text-input placeholder="Signa1" :disabled="$disabledPropertyRjStatus"
                                                                         wire:model="dataDaftarPoliRJ.eresep.{{ $key }}.signaX"
-                                                                        x-ref="dataDaftarPoliRJeresep{{ $key }}signaX"
-                                                                        x-on:keyup.enter="$refs.dataDaftarPoliRJeresep{{ $key }}signaHari.focus()" />
+                                                                        data-seq="2"
+                                                                        x-on:keydown.enter.prevent="$el.closest('tr')?.querySelector('[data-seq=&quot;3&quot;]')?.focus()" />
+
                                                                 </div>
 
                                                                 {{-- “dd” label (auto-width) --}}
@@ -357,28 +361,29 @@
 
                                                                 {{-- Signa2 = 20% --}}
                                                                 <div class="basis-1/5">
-                                                                    <x-text-input placeholder="Signa2" class="w-full mt-1"
-                                                                        :disabled="$disabledPropertyRjStatus"
+                                                                    {{-- Signa2 (seq=3) --}}
+                                                                    <x-text-input placeholder="Signa2" :disabled="$disabledPropertyRjStatus"
                                                                         wire:model="dataDaftarPoliRJ.eresep.{{ $key }}.signaHari"
-                                                                        x-ref="dataDaftarPoliRJeresep{{ $key }}signaHari"
-                                                                        x-on:keyup.enter="$refs.dataDaftarPoliRJeresep{{ $key }}catatanKhusus.focus()" />
+                                                                        data-seq="3"
+                                                                        x-on:keydown.enter.prevent="$el.closest('tr')?.querySelector('[data-seq=&quot;4&quot;]')?.focus()" />
                                                                 </div>
 
                                                                 {{-- Catatan Khusus = remaining space --}}
                                                                 <div class="flex-1">
+                                                                    {{-- Catatan Khusus (seq=4) --}}
                                                                     <x-text-input placeholder="Catatan Khusus"
-                                                                        class="w-full mt-1" :disabled="$disabledPropertyRjStatus"
+                                                                        :disabled="$disabledPropertyRjStatus"
                                                                         wire:model="dataDaftarPoliRJ.eresep.{{ $key }}.catatanKhusus"
-                                                                        x-ref="dataDaftarPoliRJeresep{{ $key }}catatanKhusus"
-                                                                        x-on:keyup.enter="
-                                                                      $wire.updateProduct(
-                                                                        '{{ $dataDaftarPoliRJ['eresep'][$key]['rjObatDtl'] ?? null }}',
-                                                                        '{{ $dataDaftarPoliRJ['eresep'][$key]['qty'] ?? null }}',
-                                                                        '{{ $dataDaftarPoliRJ['eresep'][$key]['signaX'] ?? null }}',
-                                                                        '{{ $dataDaftarPoliRJ['eresep'][$key]['signaHari'] ?? null }}',
-                                                                        '{{ $dataDaftarPoliRJ['eresep'][$key]['catatanKhusus'] ?? null }}'
-                                                                      );
-                                                                      $refs.dataDaftarPoliRJeresep{{ $key }}qty.focus()
+                                                                        data-seq="4"
+                                                                        x-on:keydown.enter.prevent="
+                                                                        $wire.updateProduct(
+                                                                        '{{ $eresep['rjObatDtl'] ?? null }}',
+                                                                        '{{ $eresep['qty'] ?? null }}',
+                                                                        '{{ $eresep['signaX'] ?? null }}',
+                                                                        '{{ $eresep['signaHari'] ?? null }}',
+                                                                        '{{ $eresep['catatanKhusus'] ?? null }}'
+                                                                        );
+                                                                        $nextTick(() => { $el.closest('tr')?.querySelector('[data-seq=&quot;1&quot;]')?.focus() })
                                                                     " />
                                                                 </div>
                                                             </div>
