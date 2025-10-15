@@ -31,7 +31,7 @@ class AntrianResepRJ extends Component
 
     public array $myLimitPerPages = [5, 10, 15, 20, 100];
     // limit record per page -resetExcept////////////////
-    public int $limitPerPage = 20;
+    public int $limitPerPage = 30;
 
     public array $dataDaftarPoliRJ = [];
 
@@ -88,6 +88,8 @@ class AntrianResepRJ extends Component
     {
         // dd/mm/yyyy hh24:mi:ss
         $this->myTopBar['refDate'] = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y');
+
+        $this->myTopBar['refDate'] = '09/06/2025';
         // dd(Carbon::now(env('APP_TIMEZONE'))->format('H:i:s'));
 
         // shift
@@ -151,18 +153,15 @@ class AntrianResepRJ extends Component
     {
 
         // set mySearch
-        $mySearch = $this->refFilter;
         $myRefdate = $this->myTopBar['refDate'];
         $myRefstatusId = $this->myTopBar['refStatusId'];
-        $myRefdrId = $this->myTopBar['drId'];
-
-
 
         //////////////////////////////////////////
         // Query ///////////////////////////////
         //////////////////////////////////////////
         $query = DB::table('rsview_rjkasir')
             ->select(
+                'rj_status',
                 DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
                 DB::raw("to_char(rj_date,'yyyymmddhh24miss') AS rj_date1"),
                 'reg_name',
@@ -179,15 +178,16 @@ class AntrianResepRJ extends Component
                 DB::raw("(select count(*) from lbtxn_checkuphdrs where status_rjri='RJ' and checkup_status!='B' and ref_no = rsview_rjkasir.rj_no) AS lab_status"),
                 DB::raw("(select count(*) from rstxn_rjrads where rj_no = rsview_rjkasir.rj_no) AS rad_status")
             )
-            ->where(DB::raw("nvl(rj_status,'A')"), '=', $myRefstatusId)
-            // ->where('rj_status', '!=', 'F')
+            ->whereIn(DB::raw("nvl(rj_status,'A')"), ['A', 'L'])
             ->where('klaim_id', '!=', 'KR')
-
+            // ->where('rj_status', '!=', 'F')
             // ->where('shift', '=', $myRefshift)
             ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $myRefdate);
 
+
+
         // 1 urutkan berdasarkan json table
-        $myQueryPagination = $query->get()->map(function ($r) {
+        $rows = $query->get()->map(function ($r) {
             // gabung hanya chunk yang ada (stop saat ketemu null/empty)
             $raw = '';
             foreach (['j1', 'j2', 'j3', 'j4', 'j5', 'j6', 'j7', 'j8'] as $k) {
@@ -203,8 +203,10 @@ class AntrianResepRJ extends Component
             return $r;
         });
 
+        $rowsAntri = $rows->filter(fn($r) => ($r->rj_status ?? 'A') === 'A');
+        $rowsLunas = $rows->filter(fn($r) => ($r->rj_status ?? 'A') === 'L');
         // Sort ketiga: datadaftarpolirj_json (desc)
-        $myQueryPagination = $myQueryPagination->sortBy(
+        $rowsAntri = $rowsAntri->sortBy(
             function ($mySortByJson) {
                 // Decode JSON payload
                 $raw = $mySortByJson->datadaftarpolirj_json ?? '[]';
@@ -252,7 +254,58 @@ class AntrianResepRJ extends Component
             }
         );
 
-        $myQueryPagination = $this->paginate($myQueryPagination, $this->limitPerPage);
+
+        $rowsLunas = $rowsLunas->sortByDesc(
+            function ($mySortByJson) {
+                // Decode JSON payload
+                $raw = $mySortByJson->datadaftarpolirj_json ?? '[]';
+                // aman untuk decode
+                $jsonData = $raw ?: [];
+
+                // 1) Ambil nomor antrian apotek (0 jika tidak ada)
+                $pharmacyQueueNumber = $jsonData['noAntrianApotek']['noAntrian'] ?? 1000;
+
+
+                // 2) Flag untuk grouping: 1 = punya antrian, 0 = tidak
+                $hasPharmacyQueue = $pharmacyQueueNumber > 0 ? 1 : 0;
+
+                // 3) Flag transaksi selesai: 1 jika sudah ada eresep + administrasirj
+                // flag masing-masing
+                $hasEresep             = isset($jsonData['eresep'])             ? 1 : 0;
+                $hasAdministrasiRj     = isset($jsonData['AdministrasiRj'])     ? 1 : 0;
+
+                // 4) Parse timestamp taskId5 (fallback ke VERY LARGE agar muncul di akhir jika null)
+                $task5Time = isset($jsonData['taskIdPelayanan']['taskId5'])
+                    ? strtotime(str_replace('/', '-', $jsonData['taskIdPelayanan']['taskId5']))
+                    : PHP_INT_MAX;
+
+                // 5) Parse timestamp taskId6 (sama fallback)
+                $task6Time = isset($jsonData['taskIdPelayanan']['taskId6'])
+                    ? strtotime(str_replace('/', '-', $jsonData['taskIdPelayanan']['taskId6']))
+                    : PHP_INT_MAX;
+
+                // 6) Parse timestamp rjDateTime (fallback ke VERY LARGE agar muncul di akhir jika null)
+                $rjDateTime = isset($jsonData['rjDate'])
+                    ? strtotime(str_replace('/', '-', $jsonData['rjDate']))
+                    : PHP_INT_MAX;
+
+
+                // Composite key untuk sortByDesc:
+                return [
+                    $hasPharmacyQueue,                       // grup antrian
+                    $hasPharmacyQueue ? $pharmacyQueueNumber : 1000, // nilai antrian (DESC)
+                    $hasPharmacyQueue ? 0 : $hasEresep, // transaksi selesai (DESC)
+                    $hasPharmacyQueue ? 0 : $hasAdministrasiRj, // transaksi selesai (DESC)
+                    $hasPharmacyQueue ? 0 : -$task5Time,    // taskId5 pertama (ascending)
+                    $hasPharmacyQueue ? 0 : -$task6Time,    // taskId6 berikutnya (ascending)
+                    $hasPharmacyQueue ? 0 : -$rjDateTime,    // rjDateTime pertama (ascending)
+                ];
+            }
+        );
+
+        $rowsAntri = $this->paginate($rowsAntri, $this->limitPerPage);
+        $rowsLunas = $this->paginate($rowsLunas, $this->limitPerPage);
+
 
 
         ////////////////////////////////////////////////
@@ -263,8 +316,10 @@ class AntrianResepRJ extends Component
 
         return view(
             'livewire.emr-r-j.antrian-resep-r-j.antrian-resep-r-j',
-            // ['myQueryData' => $query->paginate($this->limitPerPage)],
-            ['myQueryData' => $myQueryPagination],
+            [
+                'myQueryDataAntri' => $rowsAntri,
+                'myQueryDataLunas' => $rowsLunas,
+            ],
 
 
         );
