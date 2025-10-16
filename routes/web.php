@@ -82,6 +82,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/antrian-resep-poli-rawat-jalan', function () {
+    return view('livewire/emr-r-j/antrian-resep-r-j/antrian-resep-r-j-with-out-password');
+});
+
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');

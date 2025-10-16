@@ -19,78 +19,31 @@ class AntrianResepRJ extends Component
 {
     use WithPagination, EmrRJTrait;
 
-    protected $listeners = [
-        'syncronizeAssessmentDokterRJFindData' => 'sumAll',
-        'syncronizeAssessmentPerawatRJFindData' => 'sumAll'
-    ];
+    protected $listeners = [];
 
     // primitive Variable
     public string $myTitle = 'Antrian Resep Rawat Jalan';
     public string $mySnipt = 'Antrian Pasien';
     public string $myProgram = 'Pasien Rawat Jalan';
-
-    public array $myLimitPerPages = [5, 10, 15, 20, 100];
-    // limit record per page -resetExcept////////////////
     public int $limitPerPage = 30;
-
-    public array $dataDaftarPoliRJ = [];
-
 
 
     // my Top Bar
-    public array $myTopBar = [
-        'refDate' => '',
+    public array $myTopBar = [];
 
-        'refShiftId' => '1',
-        'refShiftDesc' => '1',
-        'refShiftOptions' => [
-            ['refShiftId' => '1', 'refShiftDesc' => '1'],
-            ['refShiftId' => '2', 'refShiftDesc' => '2'],
-            ['refShiftId' => '3', 'refShiftDesc' => '3'],
-        ],
-
-        'refStatusId' => 'A',
-        'refStatusDesc' => 'Antrian',
-        'refStatusOptions' => [
-            ['refStatusId' => 'A', 'refStatusDesc' => 'Antrian'],
-            ['refStatusId' => 'L', 'refStatusDesc' => 'Selesai'],
-            ['refStatusId' => 'I', 'refStatusDesc' => 'Transfer'],
-        ],
-
-        'drId' => 'All',
-        'drName' => 'All',
-        'drOptions' => [
-            [
-                'drId' => 'All',
-                'drName' => 'All'
-            ]
-        ],
-        'autoRefresh' => 'Ya',
-        'autoRefreshOptions' => [
-            ['autoRefresh' => 'Ya'],
-            ['autoRefresh' => 'Tidak']
-        ]
-    ];
-
-    public string $refFilter = '';
     // search logic -resetExcept////////////////
     protected $queryString = [
-        'refFilter' => ['except' => '', 'as' => 'cariData'],
         'page' => ['except' => 1, 'as' => 'p'],
     ];
 
-    // reset page when myTopBar Change
 
 
 
     // setter myTopBar Shift and myTopBar refDate
-    private function settermyTopBarShiftandmyTopBarrefDate(): void
+    private function settermyTopBar(): void
     {
         // dd/mm/yyyy hh24:mi:ss
         $this->myTopBar['refDate'] = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y');
-
-        // dd(Carbon::now(env('APP_TIMEZONE'))->format('H:i:s'));
-
         // shift
         $findShift = DB::table('rstxn_shiftctls')->select('shift')
             ->whereRaw("'" . Carbon::now(env('APP_TIMEZONE'))->format('H:i:s') . "' between
@@ -102,41 +55,15 @@ class AntrianResepRJ extends Component
 
 
 
-
-
-
-    public int $rjNoRef;
-    public string $regNoRef;
-
-
-
-
-
-
-
-
-
     ////////////////////////////////////////////////
     ///////////begin////////////////////////////////
     ////////////////////////////////////////////////
-
-    // is going to insert data////////////////
-
-
-
-
-
-
-
-
-
-
 
 
     // when new form instance
     public function mount()
     {
-        $this->settermyTopBarShiftandmyTopBarrefDate();
+        $this->settermyTopBar();
     }
 
 
@@ -153,7 +80,6 @@ class AntrianResepRJ extends Component
 
         // set mySearch
         $myRefdate = $this->myTopBar['refDate'];
-        $myRefstatusId = $this->myTopBar['refStatusId'];
 
         //////////////////////////////////////////
         // Query ///////////////////////////////
@@ -162,7 +88,6 @@ class AntrianResepRJ extends Component
             ->select(
                 'rj_status',
                 DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
-                DB::raw("to_char(rj_date,'yyyymmddhh24miss') AS rj_date1"),
                 'reg_name',
                 'poli_desc',
                 'dr_name',
@@ -174,8 +99,6 @@ class AntrianResepRJ extends Component
                 DB::raw("DBMS_LOB.SUBSTR(datadaftarpolirj_json, 4000, 20001) AS j6"),
                 DB::raw("DBMS_LOB.SUBSTR(datadaftarpolirj_json, 4000, 24001) AS j7"),
                 DB::raw("DBMS_LOB.SUBSTR(datadaftarpolirj_json, 4000, 28001) AS j8"),
-                DB::raw("(select count(*) from lbtxn_checkuphdrs where status_rjri='RJ' and checkup_status!='B' and ref_no = rsview_rjkasir.rj_no) AS lab_status"),
-                DB::raw("(select count(*) from rstxn_rjrads where rj_no = rsview_rjkasir.rj_no) AS rad_status")
             )
             ->whereIn(DB::raw("nvl(rj_status,'A')"), ['A', 'L'])
             ->where('klaim_id', '!=', 'KR')

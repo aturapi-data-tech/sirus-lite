@@ -1,5 +1,4 @@
 <div>
-
     {{-- Start Coding  --}}
 
     {{-- Canvas
@@ -54,247 +53,246 @@
             </div>
         </div>
 
-        @if ($myTopBar['autoRefresh'] == 'Ya')
-            <div wire:poll.30s="render" class="h-[calc(100vh-250px)] mt-2 overflow-auto" x-ref="scroller"
-                x-on:mouseenter="pause()" x-on:mouseleave="resume()">
-            @else
-                <div class="h-[calc(100vh-250px)] mt-2 overflow-auto" x-ref="scroller" x-on:mouseenter="pause()"
-                    x-on:mouseleave="resume()">
-        @endif
 
-        <p class="sticky top-0 z-50 text-xs text-gray-700 bg-white rounded-lg">Data Terakhir:
-            {{ now()->format('d-m-y H:i:s') }}</p>
+        <div class="h-[calc(100vh-250px)] mt-2 overflow-auto" x-ref="scroller" x-on:mouseenter="pause()"
+            x-on:mouseleave="resume()">
 
-        <div class="sticky top-0 z-20 grid w-full grid-cols-2 gap-2 py-2">
-            <div class="bg-white border-b border-gray-200 ">
-                <h2 class="px-4 py-2 text-base font-semibold text-red-800">
-                    🕐 Proses Resep
-                </h2>
+            <p class="sticky top-0 z-50 text-xs text-gray-700 bg-white rounded-lg">Data Terakhir:
+                {{ now()->format('d-m-y H:i:s') }}</p>
+
+            <div class="sticky top-0 z-20 grid w-full grid-cols-2 gap-2 py-2">
+                <div class="bg-white border-b border-gray-200 ">
+                    <h2 class="px-4 py-2 text-base font-semibold text-red-800">
+                        🕐 Proses Resep
+                    </h2>
+                </div>
+
+                <div class="sticky top-0 z-20 bg-white border-b border-gray-200">
+                    <h2 class="px-4 py-2 text-base font-semibold text-primary">
+                        ✅ Sudah Selesai
+                    </h2>
+                </div>
             </div>
 
-            <div class="sticky top-0 z-20 bg-white border-b border-gray-200">
-                <h2 class="px-4 py-2 text-base font-semibold text-primary">
-                    ✅ Sudah Selesai
-                </h2>
+            <div class="grid w-full grid-cols-2 gap-4 overflow-hidden">
+
+                {{-- KIRI: ANTRI --}}
+                <div class="overflow-y-auto max-h-[calc(100vh-220px)]">
+
+
+
+                    <table class="min-w-full text-sm text-left text-gray-700 border-collapse table-fixed">
+                        {{-- Kunci lebar kolom identik di 2 tabel --}}
+                        <colgroup>
+                            <col class="w-[36%]">
+                            <col class="w-[44%]">
+                            <col class="w-[20%]">
+                        </colgroup>
+
+                        <thead class="sticky top-0 z-10 text-xs text-gray-900 uppercase bg-gray-100">
+                            <tr>
+                                <th class="px-4 py-3">Nama Pasien</th>
+                                <th class="px-4 py-3">Dokter Peresep</th>
+                                <th class="px-2 py-3">Antrian</th>
+                            </tr>
+                        </thead>
+
+                        <tbody class="bg-white">
+                            @foreach ($myQueryDataAntri as $myQData)
+                                @php
+                                    $j = $myQData->datadaftarpolirj_json;
+                                    $eresep = isset($j['eresep']) ? 1 : 0;
+                                    $antrian = $j['noAntrianApotek']['noAntrian'] ?? 0;
+                                    $racikan = collect($j['eresepRacikan'] ?? [])->count() > 0;
+                                    $jenis = $racikan ? 'racikan' : 'non racikan';
+                                @endphp
+                                <tr class="border-b hover:bg-gray-50">
+                                    <td class="px-4 py-3 font-semibold text-gray-900 truncate whitespace-nowrap">
+                                        {{ $myQData->reg_name }}
+                                    </td>
+                                    <td class="px-4 py-3 truncate whitespace-nowrap">
+                                        <span class="text-xs ">{{ $myQData->dr_name }} </span><br>
+                                        {{ $myQData->poli_desc }}
+                                    </td>
+                                    <td class="px-2 py-3">
+                                        <div class="items-center gap-2">
+                                            <span class="text-xl font-semibold">{{ $antrian }}</span>
+                                            <br>
+                                            @if ($eresep)
+                                                <x-badge :badgecolor="$jenis === 'racikan' ? 'default' : 'green'">{{ $jenis }}</x-badge>
+                                            @else
+                                                <x-badge :badgecolor="'red'">---</x-badge>
+                                            @endif
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+
+                    <div class="mt-2">{{ $myQueryDataAntri->links() }}</div>
+                </div>
+
+                {{-- KANAN: LUNAS --}}
+                <div class="overflow-y-auto max-h-[calc(100vh-220px)]">
+
+
+
+                    <table class="min-w-full text-sm text-left text-gray-700 border-collapse table-fixed">
+                        <colgroup>
+                            <col class="w-[36%]">
+                            <col class="w-[44%]">
+                            <col class="w-[20%]">
+                        </colgroup>
+
+                        <thead class="sticky top-0 z-10 text-xs text-gray-900 uppercase bg-gray-100">
+                            <tr>
+                                <th class="px-4 py-3">Nama Pasien</th>
+                                <th class="px-4 py-3">Dokter Peresep</th>
+                                <th class="px-2 py-3">Antrian</th>
+                            </tr>
+                        </thead>
+
+                        <tbody class="bg-white">
+                            @foreach ($myQueryDataLunas as $myQData)
+                                @php
+                                    $j = $myQData->datadaftarpolirj_json;
+                                    $eresep = isset($j['eresep']) ? 1 : 0;
+                                    $antrian = $j['noAntrianApotek']['noAntrian'] ?? 0;
+                                    $racikan = collect($j['eresepRacikan'] ?? [])->count() > 0;
+                                    $jenis = $racikan ? 'racikan' : 'non racikan';
+                                @endphp
+                                <tr class="border-b hover:bg-gray-50">
+                                    <td class="px-4 py-3 font-semibold text-gray-900 truncate whitespace-nowrap">
+                                        {{ $myQData->reg_name }}
+                                    </td>
+                                    <td class="px-4 py-3 truncate whitespace-nowrap">
+                                        <span class="text-xs">{{ $myQData->dr_name }}</span><br>
+                                        {{ $myQData->poli_desc }}
+                                    </td>
+                                    <td class="px-2 py-3">
+                                        <div class="">
+                                            <span class="text-sm font-semibold">{{ 'Selesai' }}</span>
+                                            <br>
+                                            @if ($eresep)
+                                                <x-badge :badgecolor="$jenis === 'racikan' ? 'default' : 'green'">{{ $jenis }}</x-badge>
+                                            @else
+                                                <x-badge :badgecolor="'red'">---</x-badge>
+                                            @endif
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+
+                    <div class="mt-2">{{ $myQueryDataLunas->links() }}</div>
+                </div>
+
             </div>
+
+
+            {{-- no data found start --}}
+            @if ($myQueryDataLunas->count() == 0)
+                <div class="w-full p-4 text-sm text-center text-gray-900 dark:text-gray-400">
+                    {{ 'Data ' . $myProgram . ' Tidak ditemukan' }}
+                </div>
+            @endif
+            {{-- no data found end --}}
+
         </div>
 
-        <div class="grid w-full grid-cols-2 gap-4 overflow-hidden">
-
-            {{-- KIRI: ANTRI --}}
-            <div class="overflow-y-auto max-h-[calc(100vh-220px)]">
 
 
 
-                <table class="min-w-full text-sm text-left text-gray-700 border-collapse table-fixed">
-                    {{-- Kunci lebar kolom identik di 2 tabel --}}
-                    <colgroup>
-                        <col class="w-[36%]">
-                        <col class="w-[44%]">
-                        <col class="w-[20%]">
-                    </colgroup>
 
-                    <thead class="sticky top-0 z-10 text-xs text-gray-900 uppercase bg-gray-100">
-                        <tr>
-                            <th class="px-4 py-3">Nama Pasien</th>
-                            <th class="px-4 py-3">Dokter Peresep</th>
-                            <th class="px-2 py-3">Antrian</th>
-                        </tr>
-                    </thead>
+        <script>
+            document.addEventListener('alpine:init', () => {
+                Alpine.data('autoScroller', (opts = {}) => ({
+                    // opsi
+                    step: opts.step ?? 1, // px per “tick”
+                    interval: opts.interval ?? 25, // ms per “tick”
+                    waitTop: opts.waitTop ?? 800, // jeda ketika baru di-top
+                    waitBottom: opts.waitBottom ?? 1200, // jeda ketika sampai bottom
+                    timer: null,
+                    running: false,
 
-                    <tbody class="bg-white">
-                        @foreach ($myQueryDataAntri as $myQData)
-                            @php
-                                $j = $myQData->datadaftarpolirj_json;
-                                $eresep = isset($j['eresep']) ? 1 : 0;
-                                $antrian = $j['noAntrianApotek']['noAntrian'] ?? 0;
-                                $racikan = collect($j['eresepRacikan'] ?? [])->count() > 0;
-                                $jenis = $racikan ? 'racikan' : 'non racikan';
-                            @endphp
-                            <tr class="border-b hover:bg-gray-50">
-                                <td class="px-4 py-3 font-semibold text-gray-900 truncate whitespace-nowrap">
-                                    {{ $myQData->reg_name }}
-                                </td>
-                                <td class="px-4 py-3 truncate whitespace-nowrap">
-                                    <span class="text-xs ">{{ $myQData->dr_name }} </span><br>
-                                    {{ $myQData->poli_desc }}
-                                </td>
-                                <td class="px-2 py-3">
-                                    <div class="items-center gap-2">
-                                        <span class="text-xl font-semibold">{{ $antrian }}</span>
-                                        <br>
-                                        @if ($eresep)
-                                            <x-badge :badgecolor="$jenis === 'racikan' ? 'default' : 'green'">{{ $jenis }}</x-badge>
-                                        @else
-                                            <x-badge :badgecolor="'red'">---</x-badge>
-                                        @endif
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                    start() {
+                        this.running = true;
+                        // restart setiap render Livewire agar tetap mulus
+                        window.addEventListener('livewire:load', () => {
+                            if (window.Livewire) {
+                                Livewire.hook('message.processed', () => this.restart());
+                            }
+                        });
+                        // hormati prefers-reduced-motion
+                        const mql = window.matchMedia('(prefers-reduced-motion: reduce)');
+                        if (mql.matches) return; // jangan gerak otomatis
+                        this.scrollLoop(true); // mulai dari atas dengan jeda top
+                    },
 
-                <div class="mt-2">{{ $myQueryDataAntri->links() }}</div>
-            </div>
+                    restart() {
+                        // dipanggil setelah data refresh/paginate
+                        this.pause();
+                        const el = this.$refs.scroller;
+                        if (el) el.scrollTop = 0;
+                        this.resume(true);
+                    },
 
-            {{-- KANAN: LUNAS --}}
-            <div class="overflow-y-auto max-h-[calc(100vh-220px)]">
+                    pause() {
+                        this.running = false;
+                        if (this.timer) {
+                            clearTimeout(this.timer);
+                            this.timer = null;
+                        }
+                    },
 
+                    resume(fromTop = false) {
+                        if (this.running) return; // sudah jalan
+                        this.running = true;
+                        this.scrollLoop(fromTop);
+                    },
 
+                    scrollLoop(fromTop = false) {
+                        if (!this.running) return;
+                        const el = this.$refs.scroller;
+                        if (!el) return;
 
-                <table class="min-w-full text-sm text-left text-gray-700 border-collapse table-fixed">
-                    <colgroup>
-                        <col class="w-[36%]">
-                        <col class="w-[44%]">
-                        <col class="w-[20%]">
-                    </colgroup>
+                        // kalau baru mulai & ada permintaan jeda di top
+                        if (fromTop) {
+                            this.timer = setTimeout(() => this.tick(), this.waitTop);
+                        } else {
+                            this.tick();
+                        }
+                    },
 
-                    <thead class="sticky top-0 z-10 text-xs text-gray-900 uppercase bg-gray-100">
-                        <tr>
-                            <th class="px-4 py-3">Nama Pasien</th>
-                            <th class="px-4 py-3">Dokter Peresep</th>
-                            <th class="px-2 py-3">Antrian</th>
-                        </tr>
-                    </thead>
+                    tick() {
+                        if (!this.running) return;
+                        const el = this.$refs.scroller;
 
-                    <tbody class="bg-white">
-                        @foreach ($myQueryDataLunas as $myQData)
-                            @php
-                                $j = $myQData->datadaftarpolirj_json;
-                                $eresep = isset($j['eresep']) ? 1 : 0;
-                                $antrian = $j['noAntrianApotek']['noAntrian'] ?? 0;
-                                $racikan = collect($j['eresepRacikan'] ?? [])->count() > 0;
-                                $jenis = $racikan ? 'racikan' : 'non racikan';
-                            @endphp
-                            <tr class="border-b hover:bg-gray-50">
-                                <td class="px-4 py-3 font-semibold text-gray-900 truncate whitespace-nowrap">
-                                    {{ $myQData->reg_name }}
-                                </td>
-                                <td class="px-4 py-3 truncate whitespace-nowrap">
-                                    <span class="text-xs">{{ $myQData->dr_name }}</span><br> {{ $myQData->poli_desc }}
-                                </td>
-                                <td class="px-2 py-3">
-                                    <div class="">
-                                        <span class="text-sm font-semibold">{{ 'Selesai' }}</span>
-                                        <br>
-                                        @if ($eresep)
-                                            <x-badge :badgecolor="$jenis === 'racikan' ? 'default' : 'green'">{{ $jenis }}</x-badge>
-                                        @else
-                                            <x-badge :badgecolor="'red'">---</x-badge>
-                                        @endif
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        // kalau sudah di bawah (>=)
+                        const atBottom = Math.ceil(el.scrollTop + el.clientHeight) >= el.scrollHeight;
+                        if (atBottom) {
+                            // jeda di bawah, lalu lompat ke atas dan lanjut lagi
+                            this.timer = setTimeout(() => {
+                                el.scrollTop = 0; // langsung ke atas (tanpa animasi)
+                                this.timer = setTimeout(() => { // jeda kecil di top bila mau
+                                    if (this.running) this.tick();
+                                }, this.waitTop);
+                            }, this.waitBottom);
+                            return;
+                        }
 
-                <div class="mt-2">{{ $myQueryDataLunas->links() }}</div>
-            </div>
-
-        </div>
+                        // scroll turun sedikit
+                        el.scrollTop += this.step;
+                        this.timer = setTimeout(() => this.tick(), this.interval);
+                    }
+                }));
+            });
+        </script>
 
 
-        {{-- no data found start --}}
-        @if ($myQueryDataLunas->count() == 0)
-            <div class="w-full p-4 text-sm text-center text-gray-900 dark:text-gray-400">
-                {{ 'Data ' . $myProgram . ' Tidak ditemukan' }}
-            </div>
-        @endif
-        {{-- no data found end --}}
 
     </div>
-
-
-
-
-
-    <script>
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('autoScroller', (opts = {}) => ({
-                // opsi
-                step: opts.step ?? 1, // px per “tick”
-                interval: opts.interval ?? 25, // ms per “tick”
-                waitTop: opts.waitTop ?? 800, // jeda ketika baru di-top
-                waitBottom: opts.waitBottom ?? 1200, // jeda ketika sampai bottom
-                timer: null,
-                running: false,
-
-                start() {
-                    this.running = true;
-                    // restart setiap render Livewire agar tetap mulus
-                    window.addEventListener('livewire:load', () => {
-                        if (window.Livewire) {
-                            Livewire.hook('message.processed', () => this.restart());
-                        }
-                    });
-                    // hormati prefers-reduced-motion
-                    const mql = window.matchMedia('(prefers-reduced-motion: reduce)');
-                    if (mql.matches) return; // jangan gerak otomatis
-                    this.scrollLoop(true); // mulai dari atas dengan jeda top
-                },
-
-                restart() {
-                    // dipanggil setelah data refresh/paginate
-                    this.pause();
-                    const el = this.$refs.scroller;
-                    if (el) el.scrollTop = 0;
-                    this.resume(true);
-                },
-
-                pause() {
-                    this.running = false;
-                    if (this.timer) {
-                        clearTimeout(this.timer);
-                        this.timer = null;
-                    }
-                },
-
-                resume(fromTop = false) {
-                    if (this.running) return; // sudah jalan
-                    this.running = true;
-                    this.scrollLoop(fromTop);
-                },
-
-                scrollLoop(fromTop = false) {
-                    if (!this.running) return;
-                    const el = this.$refs.scroller;
-                    if (!el) return;
-
-                    // kalau baru mulai & ada permintaan jeda di top
-                    if (fromTop) {
-                        this.timer = setTimeout(() => this.tick(), this.waitTop);
-                    } else {
-                        this.tick();
-                    }
-                },
-
-                tick() {
-                    if (!this.running) return;
-                    const el = this.$refs.scroller;
-
-                    // kalau sudah di bawah (>=)
-                    const atBottom = Math.ceil(el.scrollTop + el.clientHeight) >= el.scrollHeight;
-                    if (atBottom) {
-                        // jeda di bawah, lalu lompat ke atas dan lanjut lagi
-                        this.timer = setTimeout(() => {
-                            el.scrollTop = 0; // langsung ke atas (tanpa animasi)
-                            this.timer = setTimeout(() => { // jeda kecil di top bila mau
-                                if (this.running) this.tick();
-                            }, this.waitTop);
-                        }, this.waitBottom);
-                        return;
-                    }
-
-                    // scroll turun sedikit
-                    el.scrollTop += this.step;
-                    this.timer = setTimeout(() => this.tick(), this.interval);
-                }
-            }));
-        });
-    </script>
-
-
 
 </div>
