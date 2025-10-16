@@ -3,21 +3,29 @@
 namespace App\Http\Livewire\EmrRI\MrRI\CPPT;
 
 use Livewire\Component;
-use Livewire\WithPagination;
-use Carbon\Carbon;
+
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 use App\Http\Traits\EmrRI\EmrRITrait;
 
 
 class CPPT extends Component
 {
-    use WithPagination, EmrRITrait;
+    use  EmrRITrait;
     // listener from blade////////////////
     protected $listeners = [
-        'syncronizeAssessmentPerawatRIFindData' => 'mount',
+        'syncronizeAssessmentPerawatRIFindData' => 'refreshData',
         'syncronizeCpptPlan' => 'setCpptPlan',
         'laboratSelectedText' => 'appendLaboratText',
     ];
+
+    public function refreshData()
+    {
+        $this->findData($this->riHdrNoRef);
+    }
+
     public function setCpptPlan($cpptPlan)
     {
         $this->formEntryCPPT['soap']['plan'] = $cpptPlan;
@@ -83,8 +91,7 @@ class CPPT extends Component
         // Isi data petugas CPPT dari user yang sedang login
         $this->formEntryCPPT['petugasCPPT'] = auth()->user()->myuser_name;
         $this->formEntryCPPT['petugasCPPTCode'] = auth()->user()->myuser_code;
-        $this->formEntryCPPT['profession'] = auth()->user()->roles->first()['name']; // Misalnya, profesi user disimpan di kolom 'profession'
-
+        $this->formEntryCPPT['profession'] = auth()->user()->roles->first()->name ?? ''; // Misalnya, profesi user disimpan di kolom 'profession'
         // Aturan validasi
         $rules = [
             'formEntryCPPT.tglCPPT' => 'required|date_format:d/m/Y H:i:s', // Tanggal CPPT wajib diisi dan sesuai format
@@ -122,30 +129,30 @@ class CPPT extends Component
             // Subjective (SOAP)
             'formEntryCPPT.soap.subjective.required' => 'Subjective wajib diisi.',
             'formEntryCPPT.soap.subjective.string' => 'Subjective harus berupa teks.',
-            'formEntryCPPT.soap.subjective.max' => 'Subjective tidak boleh lebih dari 500 karakter.',
+            'formEntryCPPT.soap.subjective.max' => 'Subjective tidak boleh lebih dari 1000 karakter.',
 
             // Objective (SOAP)
             'formEntryCPPT.soap.objective.required' => 'Objective wajib diisi.',
             'formEntryCPPT.soap.objective.string' => 'Objective harus berupa teks.',
-            'formEntryCPPT.soap.objective.max' => 'Objective tidak boleh lebih dari 500 karakter.',
+            'formEntryCPPT.soap.objective.max' => 'Objective tidak boleh lebih dari 1000 karakter.',
 
             // Assessment (SOAP)
             'formEntryCPPT.soap.assessment.required' => 'Assessment wajib diisi.',
             'formEntryCPPT.soap.assessment.string' => 'Assessment harus berupa teks.',
-            'formEntryCPPT.soap.assessment.max' => 'Assessment tidak boleh lebih dari 500 karakter.',
+            'formEntryCPPT.soap.assessment.max' => 'Assessment tidak boleh lebih dari 1000 karakter.',
 
             // Plan (SOAP)
             'formEntryCPPT.soap.plan.required' => 'Plan wajib diisi.',
             'formEntryCPPT.soap.plan.string' => 'Plan harus berupa teks.',
-            'formEntryCPPT.soap.plan.max' => 'Plan tidak boleh lebih dari 500 karakter.',
+            'formEntryCPPT.soap.plan.max' => 'Plan tidak boleh lebih dari 1000 karakter.',
 
             // Instruksi
             'formEntryCPPT.instruction.string' => 'Instruksi harus berupa teks.',
-            'formEntryCPPT.instruction.max' => 'Instruksi tidak boleh lebih dari 500 karakter.',
+            'formEntryCPPT.instruction.max' => 'Instruksi tidak boleh lebih dari 1000 karakter.',
 
             // Review
             'formEntryCPPT.review.string' => 'Review harus berupa teks.',
-            'formEntryCPPT.review.max' => 'Review tidak boleh lebih dari 500 karakter.',
+            'formEntryCPPT.review.max' => 'Review tidak boleh lebih dari 1000 karakter.',
         ];
 
         // Proses validasi
@@ -153,84 +160,139 @@ class CPPT extends Component
             $this->validate($rules, $messages);
         } catch (\Illuminate\Validation\ValidationException $e) {
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Lakukan pengecekan kembali input data. " . $e->getMessage());
-            $this->validate($rules, $messages);
             return;
         }
 
-        // Tambahkan data CPPT ke dalam array
-        $this->dataDaftarRi['cppt'][] = $this->formEntryCPPT;
+        $riHdrNo = $this->dataDaftarRi['riHdrNo'] ?? null;
+        if (!$riHdrNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("riHdrNo kosong.");
+            return;
+        }
 
-        // Simpan perubahan ke penyimpanan
-        $this->store();
+        // ----- LOCK per RI: cegah tulis bersamaan -----
+        $lockKey = "cppt:ri:{$riHdrNo}";
+        $shouldEmit = false;
+        $inserted   = false;
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($riHdrNo, &$shouldEmit, &$inserted) {
+                // Ambil state TERBARU dari DB di dalam lock
+                $fresh = $this->findDataRI($riHdrNo);
+                if (!isset($fresh['cppt']) || !is_array($fresh['cppt'])) {
+                    $fresh['cppt'] = [];
+                }
 
-        // Reset form setelah data berhasil ditambahkan
-        $this->reset(['formEntryCPPT']);
+                // Idempotency fingerprint untuk cegah duplikat
+                $fingerprint = md5(json_encode([
+                    $this->formEntryCPPT['tglCPPT']      ?? null,
+                    $this->formEntryCPPT['soap']         ?? [],
+                    $this->formEntryCPPT['instruction']  ?? null,
+                    $this->formEntryCPPT['review']       ?? null,
+                ], JSON_UNESCAPED_UNICODE));
 
-        // Tampilkan pesan sukses
-        toastr()
-            ->closeOnHover(true)
-            ->closeDuration(3)
-            ->positionClass('toast-top-left')
-            ->addSuccess("Data CPPT berhasil ditambahkan.");
-    }
+                // Cek duplikat (dobel klik)
+                $dupe = collect($fresh['cppt'])->first(fn($row) => ($row['fingerprint'] ?? null) === $fingerprint);
+                if ($dupe) {
+                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                        ->addInfo("CPPT yang sama sudah tersimpan.");
+                    return;
+                }
 
-    public function removeCPPT(string $tgl): void
-    {
-        $cppts = collect($this->dataDaftarRi['cppt'] ?? []);
+                // Payload final + UUID
+                $payload = $this->formEntryCPPT;
+                $payload['cpptId']     = (string) Str::uuid();
+                $payload['fingerprint'] = $fingerprint;
 
-        // cari index berdasarkan tglCPPT
-        $index = $cppts->search(function ($row) use ($tgl) {
-            if (!isset($row['tglCPPT'])) return false;
+                // Simpan dalam TRANSAKSI (opsional tapi bagus)
+                DB::transaction(function () use ($riHdrNo, &$fresh, $payload) {
+                    $fresh['cppt'][] = $payload;
+                    $this->updateJsonRI($riHdrNo, $fresh); // method dari EmrRITrait milikmu
+                });
 
-            try {
-                $rowTgl = Carbon::createFromFormat('d/m/Y H:i:s', trim($row['tglCPPT']));
-                $target = Carbon::createFromFormat('d/m/Y H:i:s', trim($tgl));
-                return $rowTgl->equalTo($target);
-            } catch (\Exception $e) {
-                return trim($row['tglCPPT']) === trim($tgl);
-            }
-        });
-
-        if ($index === false) {
+                // Sinkronkan state komponen
+                $this->dataDaftarRi = $fresh;
+                $shouldEmit = true;
+                $inserted   = true;
+            });
+        } catch (\Illuminate\Contracts\Cache\LockTimeoutException $e) {
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-                ->addError("Data CPPT dengan tanggal {$tgl} tidak ditemukan.");
+                ->addError('Sistem sibuk, coba lagi sebentar.');
             return;
         }
 
-        // hapus
-        $cppts->forget($index);
-        $this->dataDaftarRi['cppt'] = $cppts->values()->all();
+        if ($shouldEmit) {
+            $this->emit('syncronizeAssessmentPerawatRIFindData');
+        }
 
-        $this->store();
+        if ($inserted) {
+            $this->reset(['formEntryCPPT']);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess("Data CPPT berhasil ditambahkan.");
+        }
+    }
 
-        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-            ->addSuccess("Data CPPT ({$tgl}) berhasil dihapus.");
+    public function removeCPPT(string $cpptId): void
+    {
+
+        $riHdrNo = $this->dataDaftarRi['riHdrNo'] ?? null;
+        if (!$riHdrNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError("riHdrNo kosong.");
+            return;
+        }
+
+        $lockKey = "cppt:ri:{$riHdrNo}";
+        $shouldEmit = false;
+        $deleted    = false;
+
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($riHdrNo, $cpptId, &$shouldEmit, &$deleted) {
+                $fresh = $this->findDataRI($riHdrNo);
+                $cppts = collect($fresh['cppt'] ?? []);
+
+                $index = $cppts->search(fn($row) => ($row['cpptId'] ?? null) === $cpptId);
+                if ($index === false) {
+                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                        ->addError("Data CPPT tidak ditemukan.");
+                    return;
+                }
+
+                $cppts->forget($index);
+                $fresh['cppt'] = $cppts->values()->all();
+                DB::transaction(function () use ($riHdrNo, $fresh) {
+                    $this->updateJsonRI($riHdrNo, $fresh);
+                });
+
+                $this->dataDaftarRi = $fresh;
+                $shouldEmit = true;
+                $deleted    = true;
+            });
+        } catch (\Illuminate\Contracts\Cache\LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sibuk, coba lagi sebentar.');
+            return;
+        }
+
+        if ($shouldEmit) {
+            $this->emit('syncronizeAssessmentPerawatRIFindData');
+        }
+        if ($deleted) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess("Data CPPT berhasil dihapus.");
+        }
     }
 
 
-    public function copyCPPT(string $tgl): void
+    public function copyCPPT(string $cpptId): void
     {
         $cppts = collect($this->dataDaftarRi['cppt'] ?? []);
+        $cppt  = $cppts->first(fn($row) => ($row['cpptId'] ?? null) === $cpptId);
 
-        // ambil item pertama yang cocok
-        $cppt = $cppts->first(function ($row) use ($tgl) {
-            if (!isset($row['tglCPPT'])) return false;
-
-            try {
-                $rowTgl = Carbon::createFromFormat('d/m/Y H:i:s', trim($row['tglCPPT']));
-                $target = Carbon::createFromFormat('d/m/Y H:i:s', trim($tgl));
-                return $rowTgl->equalTo($target);
-            } catch (\Exception $e) {
-                return trim($row['tglCPPT']) === trim($tgl);
-            }
-        });
         if (!$cppt) {
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-                ->addError("Data CPPT dengan tanggal {$tgl} tidak ditemukan untuk dicopy.");
+                ->addError("Data CPPT tidak ditemukan untuk dicopy.");
             return;
         }
 
-        // copy ke form (reset identitas & tanggal)
         $this->formEntryCPPT = [
             "tglCPPT" => "",
             "petugasCPPT" => "",
@@ -247,8 +309,9 @@ class CPPT extends Component
         ];
 
         toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-            ->addSuccess("CPPT ({$tgl}) berhasil dicopy ke form entry.");
+            ->addSuccess("CPPT berhasil dicopy ke form entry.");
     }
+
 
 
 
@@ -273,28 +336,10 @@ class CPPT extends Component
     // RJ Logic
     // ////////////////
 
-
-
-    // insert and update record start////////////////
-    public function store()
-    {
-        $this->updateDataRi($this->dataDaftarRi['riHdrNo']);
-
-        $this->emit('syncronizeAssessmentPerawatRIFindData');
-    }
-
-    private function updateDataRi($riHdrNo): void
-    {
-        $this->updateJsonRI($riHdrNo, $this->dataDaftarRi);
-
-        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Penilaian berhasil disimpan.");
-    }
     // insert and update record end////////////////
-
 
     private function findData($rjno): void
     {
-
 
         $this->dataDaftarRi = $this->findDataRI($rjno);
         // dd($this->dataDaftarRi);

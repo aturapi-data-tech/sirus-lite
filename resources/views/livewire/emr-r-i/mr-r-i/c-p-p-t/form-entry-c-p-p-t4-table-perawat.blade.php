@@ -18,9 +18,10 @@
                             </th>
                             <th scope="col" class="px-4 py-3">
                                 <x-sort-link :active="false" wire:click.prevent="" role="button" href="#">
-                                    Instruksi & Plan Edukasi
+                                    Instruksi &Plan Edukasi
                                 </x-sort-link>
                             </th>
+
                             <th scope="col" class="px-4 py-3 text-center">
                                 Action
                             </th>
@@ -29,8 +30,9 @@
                     <tbody class="bg-white">
                         @php
                             use Carbon\Carbon;
+
                             $sortedCppt = collect($dataDaftarRi['cppt'] ?? [])
-                                ->where('profession', '=', 'Dokter')
+                                ->where('profession', '=', 'Perawat')
                                 ->sortByDesc(function ($item) {
                                     $tgl = $item['tglCPPT'] ?? '';
 
@@ -55,7 +57,7 @@
 
                         @if ($sortedCppt->isNotEmpty())
                             @foreach ($sortedCppt as $key => $cppt)
-                                <tr wire:key="cppt-dokter-row-{{ $cppt['cpptId'] ?? $key }}" class="border-b group">
+                                <tr wire:key="cppt-row-perawat-{{ $cppt['cpptId'] ?? $key }}" class="border-b group">
                                     <!-- Tanggal & Petugas -->
                                     <td
                                         class="px-2 py-2 font-normal text-gray-700 whitespace-normal align-top w-1/7 group-hover:bg-gray-50">

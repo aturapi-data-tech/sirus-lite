@@ -22,7 +22,22 @@
                                 @click="activeTab = 'CPPT Perawat'">CPPT Perawat
                             </label>
                         </li>
-
+                        <li class="mr-2">
+                            <label
+                                class="inline-block p-2 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
+                                :class="activeTab === 'CPPT Apoteker' ?
+                                    'text-primary border-primary bg-gray-100' : ''"
+                                @click="activeTab = 'CPPT Apoteker'">CPPT Apoteker
+                            </label>
+                        </li>
+                        <li class="mr-2">
+                            <label
+                                class="inline-block p-2 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
+                                :class="activeTab === 'CPPT Penunjang' ?
+                                    'text-primary border-primary bg-gray-100' : ''"
+                                @click="activeTab = 'CPPT Penunjang'">CPPT Penunjang
+                            </label>
+                        </li>
                     </ul>
                 </div>
 
@@ -34,7 +49,17 @@
 
                 <div class="p-2 rounded-lg bg-gray-50" :class="{ 'active': activeTab === 'CPPT Perawat' }"
                     x-show.transition.in.opacity.duration.600="activeTab === 'CPPT Perawat'">
-                    @include('livewire.emr-r-i.mr-r-i.c-p-p-t.form-entry-c-p-p-t3-table')
+                    @include('livewire.emr-r-i.mr-r-i.c-p-p-t.form-entry-c-p-p-t4-table-perawat')
+                </div>
+
+                <div class="p-2 rounded-lg bg-gray-50" :class="{ 'active': activeTab === 'CPPT Apoteker' }"
+                    x-show.transition.in.opacity.duration.600="activeTab === 'CPPT Apoteker'">
+                    @include('livewire.emr-r-i.mr-r-i.c-p-p-t.form-entry-c-p-p-t5-table-apoteker')
+                </div>
+
+                <div class="p-2 rounded-lg bg-gray-50" :class="{ 'active': activeTab === 'CPPT Penunjang' }"
+                    x-show.transition.in.opacity.duration.600="activeTab === 'CPPT Penunjang'">
+                    @include('livewire.emr-r-i.mr-r-i.c-p-p-t.form-entry-c-p-p-t6-table-penunjang')
                 </div>
 
             </div>

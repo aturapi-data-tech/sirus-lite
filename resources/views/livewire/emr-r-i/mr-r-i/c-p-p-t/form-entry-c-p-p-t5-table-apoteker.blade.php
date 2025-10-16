@@ -32,7 +32,7 @@
                             use Carbon\Carbon;
 
                             $sortedCppt = collect($dataDaftarRi['cppt'] ?? [])
-                                ->where('profession', '!=', 'Dokter')
+                                ->where('profession', '=', 'Apoteker')
                                 ->sortByDesc(function ($item) {
                                     $tgl = $item['tglCPPT'] ?? '';
 
@@ -57,7 +57,7 @@
 
                         @if ($sortedCppt->isNotEmpty())
                             @foreach ($sortedCppt as $key => $cppt)
-                                <tr class="border-b group">
+                                <tr wire:key="cppt--apoteker-row-{{ $cppt['cpptId'] ?? $key }}" class="border-b group">
                                     <!-- Tanggal & Petugas -->
                                     <td
                                         class="px-2 py-2 font-normal text-gray-700 whitespace-normal align-top w-1/7 group-hover:bg-gray-50">
@@ -103,7 +103,7 @@
                                         <div class="grid grid-cols-2 gap-4">
 
                                             <x-yellow-button class="inline-flex"
-                                                wire:click.prevent="copyCPPT('{{ $cppt['tglCPPT'] ?? '-' }}')">
+                                                wire:click.prevent="copyCPPT('{{ $cppt['cpptId'] ?? '-' }}')">
                                                 <svg class="w-5 h-5 text-white" aria-hidden="true"
                                                     xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                                     fill="currentColor" viewBox="0 0 24 24">
@@ -118,7 +118,7 @@
                                             </x-yellow-button>
 
                                             <x-alternative-button class="inline-flex"
-                                                wire:click.prevent="removeCPPT('{{ $cppt['tglCPPT'] ?? '-' }}')">
+                                                wire:click.prevent="removeCPPT('{{ $cppt['cpptId'] ?? '-' }}')">
                                                 <svg class="w-5 h-5 text-gray-800" aria-hidden="true"
                                                     xmlns="http://www.w3.org/2000/svg" fill="currentColor"
                                                     viewBox="0 0 18 20">
