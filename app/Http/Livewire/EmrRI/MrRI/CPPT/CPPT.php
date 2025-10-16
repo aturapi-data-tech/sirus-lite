@@ -7,7 +7,7 @@ use Livewire\Component;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
-
+use Carbon\Carbon;
 use App\Http\Traits\EmrRI\EmrRITrait;
 
 
@@ -83,7 +83,7 @@ class CPPT extends Component
 
     public function setTglCPPT($tanggal)
     {
-        $this->formEntryCPPT['tglCPPT'] = $tanggal;
+        $this->formEntryCPPT['tglCPPT'] = Carbon::now()->format('d/m/Y H:i:s');
     }
 
     public function addCPPT(): void
