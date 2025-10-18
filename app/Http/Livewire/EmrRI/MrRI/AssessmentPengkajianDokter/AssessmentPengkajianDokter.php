@@ -3,25 +3,32 @@
 namespace App\Http\Livewire\EmrRI\MrRI\AssessmentPengkajianDokter;
 
 use Livewire\Component;
-use Livewire\WithPagination;
 
 use App\Http\Traits\EmrRI\EmrRITrait;
 use App\Http\Traits\customErrorMessagesTrait;
 use App\Http\Traits\MasterPasien\MasterPasienTrait;
 
 
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+
 class AssessmentPengkajianDokter extends Component
 {
-    use WithPagination, EmrRITrait, customErrorMessagesTrait, MasterPasienTrait;
+    use  EmrRITrait, customErrorMessagesTrait, MasterPasienTrait;
 
     // listener from blade////////////////
     protected $listeners = [
-        'syncronizeAssessmentPerawatRIFindData' => 'mount',
+        'syncronizeAssessmentPerawatRIFindData' => 'refreshData',
         'laboratSelectedText' => 'appendLaboratText',
         'requestCopyAssessmentFromUGDDokter' => 'handleCopyAssessmentFromUGDDokter',
 
     ];
 
+    public function refreshData(): void
+    {
+        $this->findData($this->riHdrNoRef);
+    }
 
     public function appendLaboratText(string $text): void
     {
@@ -33,7 +40,7 @@ class AssessmentPengkajianDokter extends Component
         );
 
         // Pilih separator baris baru hanya jika sudah ada isi sebelumnya
-        $sep = $current !== '' ? "\n" : '';
+        $sep = $current !== '' ? PHP_EOL : '';
 
         // Simpan kembali ke struktur array $dataDaftarRi
         data_set(
@@ -96,7 +103,7 @@ class AssessmentPengkajianDokter extends Component
 
         if ($newLab !== '') {
             $this->dataDaftarRi['pengkajianDokter']['hasilPemeriksaanPenunjang']['laboratorium'] =
-                $currentLab !== '' ? $currentLab . "\n" . $newLab : $newLab;
+                $currentLab !== '' ? $currentLab . PHP_EOL . $newLab : $newLab;
         }
 
         // Radiologi
@@ -105,7 +112,7 @@ class AssessmentPengkajianDokter extends Component
 
         if ($newRad !== '') {
             $this->dataDaftarRi['pengkajianDokter']['hasilPemeriksaanPenunjang']['radiologi'] =
-                $currentRad !== '' ? $currentRad . "\n" . $newRad : $newRad;
+                $currentRad !== '' ? $currentRad . PHP_EOL . $newRad : $newRad;
         }
 
         // Penunjang lain
@@ -114,7 +121,7 @@ class AssessmentPengkajianDokter extends Component
 
         if ($newOther !== '') {
             $this->dataDaftarRi['pengkajianDokter']['hasilPemeriksaanPenunjang']['penunjangLain'] =
-                $currentOther !== '' ? $currentOther . "\n" . $newOther : $newOther;
+                $currentOther !== '' ? $currentOther . PHP_EOL . $newOther : $newOther;
         }
 
 
@@ -288,7 +295,7 @@ class AssessmentPengkajianDokter extends Component
                 ],
                 "desc" => "",
             ],
-            "payudarah" => [
+            "payudara" => [
                 "kelainan" => "Tidak Diperiksa",
                 "kelainanOptions" => [
                     ["kelainan" => "Tidak Diperiksa"],
@@ -464,48 +471,48 @@ class AssessmentPengkajianDokter extends Component
 
     protected $rules = [
         // Anamnesa
-        'dataDaftarRi.pengkajianDokter.anamnesa.keluhanUtama' => 'required|string|max:500',
-        'dataDaftarRi.pengkajianDokter.anamnesa.keluhanTambahan' => 'nullable|string|max:500',
-        'dataDaftarRi.pengkajianDokter.anamnesa.riwayatPenyakit.sekarang' => 'nullable|string|max:500',
-        'dataDaftarRi.pengkajianDokter.anamnesa.riwayatPenyakit.dahulu' => 'nullable|string|max:500',
-        'dataDaftarRi.pengkajianDokter.anamnesa.riwayatPenyakit.keluarga' => 'nullable|string|max:500',
-        'dataDaftarRi.pengkajianDokter.anamnesa.jenisAlergi' => 'nullable|string|max:500',
+        'dataDaftarRi.pengkajianDokter.anamnesa.keluhanUtama' => 'required|string|max:1000',
+        'dataDaftarRi.pengkajianDokter.anamnesa.keluhanTambahan' => 'nullable|string|max:1000',
+        'dataDaftarRi.pengkajianDokter.anamnesa.riwayatPenyakit.sekarang' => 'nullable|string|max:1000',
+        'dataDaftarRi.pengkajianDokter.anamnesa.riwayatPenyakit.dahulu' => 'nullable|string|max:1000',
+        'dataDaftarRi.pengkajianDokter.anamnesa.riwayatPenyakit.keluarga' => 'nullable|string|max:1000',
+        'dataDaftarRi.pengkajianDokter.anamnesa.jenisAlergi' => 'nullable|string|max:1000',
 
         // Rekonsiliasi Obat
-        'dataDaftarRi.pengkajianDokter.anamnesa.rekonsiliasiObat.*.namaObat' => 'required|string|max:500',
-        'dataDaftarRi.pengkajianDokter.anamnesa.rekonsiliasiObat.*.dosis' => 'required|string|max:500',
-        'dataDaftarRi.pengkajianDokter.anamnesa.rekonsiliasiObat.*.rute' => 'required|string|max:500',
+        'dataDaftarRi.pengkajianDokter.anamnesa.rekonsiliasiObat.*.namaObat' => 'required|string|max:1000',
+        'dataDaftarRi.pengkajianDokter.anamnesa.rekonsiliasiObat.*.dosis' => 'required|string|max:1000',
+        'dataDaftarRi.pengkajianDokter.anamnesa.rekonsiliasiObat.*.rute' => 'required|string|max:1000',
 
         // Fisik
-        'dataDaftarRi.pengkajianDokter.fisik' => 'nullable|string|max:500',
+        'dataDaftarRi.pengkajianDokter.fisik' => 'nullable|string|max:1000',
 
         // Anatomi
         'dataDaftarRi.pengkajianDokter.anatomi.*.kelainan' => 'nullable|string|in:Tidak Diperiksa,Tidak Ada Kelainan,Ada',
-        'dataDaftarRi.pengkajianDokter.anatomi.*.desc' => 'nullable|string|max:500|required_if:dataDaftarRi.pengkajianDokter.anatomi.*.kelainan,Ada',
+        'dataDaftarRi.pengkajianDokter.anatomi.*.desc' => 'nullable|string|max:1000|required_if:dataDaftarRi.pengkajianDokter.anatomi.*.kelainan,Ada',
 
         // Status Lokalis
-        'dataDaftarRi.pengkajianDokter.statusLokalis.deskripsiGambar' => 'nullable|string|max:500',
+        'dataDaftarRi.pengkajianDokter.statusLokalis.deskripsiGambar' => 'nullable|string|max:1000',
 
         // Hasil Pemeriksaan Penunjang
-        'dataDaftarRi.pengkajianDokter.hasilPemeriksaanPenunjang.laboratorium' => 'nullable|string|max:500',
-        'dataDaftarRi.pengkajianDokter.hasilPemeriksaanPenunjang.radiologi' => 'nullable|string|max:500',
-        'dataDaftarRi.pengkajianDokter.hasilPemeriksaanPenunjang.penunjangLain' => 'nullable|string|max:500',
+        'dataDaftarRi.pengkajianDokter.hasilPemeriksaanPenunjang.laboratorium' => 'nullable|string|max:1000',
+        'dataDaftarRi.pengkajianDokter.hasilPemeriksaanPenunjang.radiologi' => 'nullable|string|max:1000',
+        'dataDaftarRi.pengkajianDokter.hasilPemeriksaanPenunjang.penunjangLain' => 'nullable|string|max:1000',
 
         // Diagnosa/Assesment
-        'dataDaftarRi.pengkajianDokter.diagnosaAssesment.diagnosaAwal' => 'nullable|string|max:500',
+        'dataDaftarRi.pengkajianDokter.diagnosaAssesment.diagnosaAwal' => 'nullable|string|max:1000',
 
         // Rencana
-        'dataDaftarRi.pengkajianDokter.rencana.penegakanDiagnosa' => 'nullable|string|max:500',
-        'dataDaftarRi.pengkajianDokter.rencana.terapi' => 'nullable|string|max:500',
-        'dataDaftarRi.pengkajianDokter.rencana.terapiPulang' => 'nullable|string|max:500',
+        'dataDaftarRi.pengkajianDokter.rencana.penegakanDiagnosa' => 'nullable|string|max:1000',
+        'dataDaftarRi.pengkajianDokter.rencana.terapi' => 'nullable|string|max:1000',
+        'dataDaftarRi.pengkajianDokter.rencana.terapiPulang' => 'nullable|string|max:1000',
 
-        'dataDaftarRi.pengkajianDokter.rencana.diet' => 'nullable|string|max:500',
-        'dataDaftarRi.pengkajianDokter.rencana.edukasi' => 'nullable|string|max:500',
-        'dataDaftarRi.pengkajianDokter.rencana.monitoring' => 'nullable|string|max:500',
+        'dataDaftarRi.pengkajianDokter.rencana.diet' => 'nullable|string|max:1000',
+        'dataDaftarRi.pengkajianDokter.rencana.edukasi' => 'nullable|string|max:1000',
+        'dataDaftarRi.pengkajianDokter.rencana.monitoring' => 'nullable|string|max:1000',
 
         // Tanda Tangan Dokter
-        'dataDaftarRi.pengkajianDokter.tandaTanganDokter.dokterPengkaji' => 'nullable|string|max:500',
-        'dataDaftarRi.pengkajianDokter.tandaTanganDokter.dokterPengkajiCode' => 'nullable|string|max:500',
+        'dataDaftarRi.pengkajianDokter.tandaTanganDokter.dokterPengkaji' => 'nullable|string|max:1000',
+        'dataDaftarRi.pengkajianDokter.tandaTanganDokter.dokterPengkajiCode' => 'nullable|string|max:1000',
         'dataDaftarRi.pengkajianDokter.tandaTanganDokter.jamDokterPengkaji' => 'nullable|date_format:d/m/Y H:i:s',
     ];
 
@@ -513,90 +520,90 @@ class AssessmentPengkajianDokter extends Component
         // Anamnesa
         'dataDaftarRi.pengkajianDokter.anamnesa.keluhanUtama.required' => 'Keluhan utama wajib diisi.',
         'dataDaftarRi.pengkajianDokter.anamnesa.keluhanUtama.string' => 'Keluhan utama harus berupa teks.',
-        'dataDaftarRi.pengkajianDokter.anamnesa.keluhanUtama.max' => 'Keluhan utama tidak boleh lebih dari 500 karakter.',
+        'dataDaftarRi.pengkajianDokter.anamnesa.keluhanUtama.max' => 'Keluhan utama tidak boleh lebih dari 1000 karakter.',
 
         'dataDaftarRi.pengkajianDokter.anamnesa.keluhanTambahan.string' => 'Keluhan tambahan harus berupa teks.',
-        'dataDaftarRi.pengkajianDokter.anamnesa.keluhanTambahan.max' => 'Keluhan tambahan tidak boleh lebih dari 500 karakter.',
+        'dataDaftarRi.pengkajianDokter.anamnesa.keluhanTambahan.max' => 'Keluhan tambahan tidak boleh lebih dari 1000 karakter.',
 
         'dataDaftarRi.pengkajianDokter.anamnesa.riwayatPenyakit.sekarang.string' => 'Riwayat penyakit sekarang harus berupa teks.',
-        'dataDaftarRi.pengkajianDokter.anamnesa.riwayatPenyakit.sekarang.max' => 'Riwayat penyakit sekarang tidak boleh lebih dari 500 karakter.',
+        'dataDaftarRi.pengkajianDokter.anamnesa.riwayatPenyakit.sekarang.max' => 'Riwayat penyakit sekarang tidak boleh lebih dari 1000 karakter.',
 
         'dataDaftarRi.pengkajianDokter.anamnesa.riwayatPenyakit.dahulu.string' => 'Riwayat penyakit dahulu harus berupa teks.',
-        'dataDaftarRi.pengkajianDokter.anamnesa.riwayatPenyakit.dahulu.max' => 'Riwayat penyakit dahulu tidak boleh lebih dari 500 karakter.',
+        'dataDaftarRi.pengkajianDokter.anamnesa.riwayatPenyakit.dahulu.max' => 'Riwayat penyakit dahulu tidak boleh lebih dari 1000 karakter.',
 
         'dataDaftarRi.pengkajianDokter.anamnesa.riwayatPenyakit.keluarga.string' => 'Riwayat penyakit keluarga harus berupa teks.',
-        'dataDaftarRi.pengkajianDokter.anamnesa.riwayatPenyakit.keluarga.max' => 'Riwayat penyakit keluarga tidak boleh lebih dari 500 karakter.',
+        'dataDaftarRi.pengkajianDokter.anamnesa.riwayatPenyakit.keluarga.max' => 'Riwayat penyakit keluarga tidak boleh lebih dari 1000 karakter.',
 
         'dataDaftarRi.pengkajianDokter.anamnesa.jenisAlergi.string' => 'Jenis alergi harus berupa teks.',
-        'dataDaftarRi.pengkajianDokter.anamnesa.jenisAlergi.max' => 'Jenis alergi tidak boleh lebih dari 500 karakter.',
+        'dataDaftarRi.pengkajianDokter.anamnesa.jenisAlergi.max' => 'Jenis alergi tidak boleh lebih dari 1000 karakter.',
 
         // Rekonsiliasi Obat
         'dataDaftarRi.pengkajianDokter.anamnesa.rekonsiliasiObat.*.namaObat.required' => 'Nama obat wajib diisi.',
         'dataDaftarRi.pengkajianDokter.anamnesa.rekonsiliasiObat.*.namaObat.string' => 'Nama obat harus berupa teks.',
-        'dataDaftarRi.pengkajianDokter.anamnesa.rekonsiliasiObat.*.namaObat.max' => 'Nama obat tidak boleh lebih dari 500 karakter.',
+        'dataDaftarRi.pengkajianDokter.anamnesa.rekonsiliasiObat.*.namaObat.max' => 'Nama obat tidak boleh lebih dari 1000 karakter.',
 
         'dataDaftarRi.pengkajianDokter.anamnesa.rekonsiliasiObat.*.dosis.required' => 'Dosis obat wajib diisi.',
         'dataDaftarRi.pengkajianDokter.anamnesa.rekonsiliasiObat.*.dosis.string' => 'Dosis obat harus berupa teks.',
-        'dataDaftarRi.pengkajianDokter.anamnesa.rekonsiliasiObat.*.dosis.max' => 'Dosis obat tidak boleh lebih dari 500 karakter.',
+        'dataDaftarRi.pengkajianDokter.anamnesa.rekonsiliasiObat.*.dosis.max' => 'Dosis obat tidak boleh lebih dari 1000 karakter.',
 
         'dataDaftarRi.pengkajianDokter.anamnesa.rekonsiliasiObat.*.rute.required' => 'Rute penggunaan obat wajib diisi.',
         'dataDaftarRi.pengkajianDokter.anamnesa.rekonsiliasiObat.*.rute.string' => 'Rute penggunaan obat harus berupa teks.',
-        'dataDaftarRi.pengkajianDokter.anamnesa.rekonsiliasiObat.*.rute.max' => 'Rute penggunaan obat tidak boleh lebih dari 500 karakter.',
+        'dataDaftarRi.pengkajianDokter.anamnesa.rekonsiliasiObat.*.rute.max' => 'Rute penggunaan obat tidak boleh lebih dari 1000 karakter.',
 
         // Fisik
         'dataDaftarRi.pengkajianDokter.fisik.string' => 'Pemeriksaan fisik harus berupa teks.',
-        'dataDaftarRi.pengkajianDokter.fisik.max' => 'Pemeriksaan fisik tidak boleh lebih dari 500 karakter.',
+        'dataDaftarRi.pengkajianDokter.fisik.max' => 'Pemeriksaan fisik tidak boleh lebih dari 1000 karakter.',
 
         // Anatomi
         'dataDaftarRi.pengkajianDokter.anatomi.*.kelainan.string' => 'Nilai kelainan harus berupa teks.',
         'dataDaftarRi.pengkajianDokter.anatomi.*.kelainan.in' => 'Nilai kelainan tidak valid. Pilihan yang tersedia: Tidak Diperiksa, Tidak Ada Kelainan, atau Ada.',
         'dataDaftarRi.pengkajianDokter.anatomi.*.desc.required_if' => 'Deskripsi wajib diisi jika terdapat kelainan.',
         'dataDaftarRi.pengkajianDokter.anatomi.*.desc.string' => 'Deskripsi harus berupa teks.',
-        'dataDaftarRi.pengkajianDokter.anatomi.*.desc.max' => 'Deskripsi tidak boleh lebih dari 500 karakter.',
+        'dataDaftarRi.pengkajianDokter.anatomi.*.desc.max' => 'Deskripsi tidak boleh lebih dari 1000 karakter.',
 
         // Status Lokalis
         'dataDaftarRi.pengkajianDokter.statusLokalis.deskripsiGambar.string' => 'Deskripsi gambar harus berupa teks.',
-        'dataDaftarRi.pengkajianDokter.statusLokalis.deskripsiGambar.max' => 'Deskripsi gambar tidak boleh lebih dari 500 karakter.',
+        'dataDaftarRi.pengkajianDokter.statusLokalis.deskripsiGambar.max' => 'Deskripsi gambar tidak boleh lebih dari 1000 karakter.',
 
         // Hasil Pemeriksaan Penunjang
         'dataDaftarRi.pengkajianDokter.hasilPemeriksaanPenunjang.laboratorium.string' => 'Hasil laboratorium harus berupa teks.',
-        'dataDaftarRi.pengkajianDokter.hasilPemeriksaanPenunjang.laboratorium.max' => 'Hasil laboratorium tidak boleh lebih dari 500 karakter.',
+        'dataDaftarRi.pengkajianDokter.hasilPemeriksaanPenunjang.laboratorium.max' => 'Hasil laboratorium tidak boleh lebih dari 1000 karakter.',
 
         'dataDaftarRi.pengkajianDokter.hasilPemeriksaanPenunjang.radiologi.string' => 'Hasil radiologi harus berupa teks.',
-        'dataDaftarRi.pengkajianDokter.hasilPemeriksaanPenunjang.radiologi.max' => 'Hasil radiologi tidak boleh lebih dari 500 karakter.',
+        'dataDaftarRi.pengkajianDokter.hasilPemeriksaanPenunjang.radiologi.max' => 'Hasil radiologi tidak boleh lebih dari 1000 karakter.',
 
         'dataDaftarRi.pengkajianDokter.hasilPemeriksaanPenunjang.penunjangLain.string' => 'Hasil penunjang lain harus berupa teks.',
-        'dataDaftarRi.pengkajianDokter.hasilPemeriksaanPenunjang.penunjangLain.max' => 'Hasil penunjang lain tidak boleh lebih dari 500 karakter.',
+        'dataDaftarRi.pengkajianDokter.hasilPemeriksaanPenunjang.penunjangLain.max' => 'Hasil penunjang lain tidak boleh lebih dari 1000 karakter.',
 
         // Diagnosa/Assesment
         'dataDaftarRi.pengkajianDokter.diagnosaAssesment.diagnosaAwal.string' => 'Diagnosa awal harus berupa teks.',
-        'dataDaftarRi.pengkajianDokter.diagnosaAssesment.diagnosaAwal.max' => 'Diagnosa awal tidak boleh lebih dari 500 karakter.',
+        'dataDaftarRi.pengkajianDokter.diagnosaAssesment.diagnosaAwal.max' => 'Diagnosa awal tidak boleh lebih dari 1000 karakter.',
 
         // Rencana
         'dataDaftarRi.pengkajianDokter.rencana.penegakanDiagnosa.string' => 'Penegakan diagnosa harus berupa teks.',
-        'dataDaftarRi.pengkajianDokter.rencana.penegakanDiagnosa.max' => 'Penegakan diagnosa tidak boleh lebih dari 500 karakter.',
+        'dataDaftarRi.pengkajianDokter.rencana.penegakanDiagnosa.max' => 'Penegakan diagnosa tidak boleh lebih dari 1000 karakter.',
 
         'dataDaftarRi.pengkajianDokter.rencana.terapi.string' => 'Terapi harus berupa teks.',
-        'dataDaftarRi.pengkajianDokter.rencana.terapi.max' => 'Terapi tidak boleh lebih dari 500 karakter.',
+        'dataDaftarRi.pengkajianDokter.rencana.terapi.max' => 'Terapi tidak boleh lebih dari 1000 karakter.',
 
         'dataDaftarRi.pengkajianDokter.rencana.terapiPulang.string' => 'Terapi Pulang harus berupa teks.',
-        'dataDaftarRi.pengkajianDokter.rencana.terapiPulang.max' => 'Terapi Pulang tidak boleh lebih dari 500 karakter.',
+        'dataDaftarRi.pengkajianDokter.rencana.terapiPulang.max' => 'Terapi Pulang tidak boleh lebih dari 1000 karakter.',
 
         'dataDaftarRi.pengkajianDokter.rencana.diet.string' => 'Diet harus berupa teks.',
-        'dataDaftarRi.pengkajianDokter.rencana.diet.max' => 'Diet tidak boleh lebih dari 500 karakter.',
+        'dataDaftarRi.pengkajianDokter.rencana.diet.max' => 'Diet tidak boleh lebih dari 1000 karakter.',
 
         'dataDaftarRi.pengkajianDokter.rencana.edukasi.string' => 'Edukasi harus berupa teks.',
-        'dataDaftarRi.pengkajianDokter.rencana.edukasi.max' => 'Edukasi tidak boleh lebih dari 500 karakter.',
+        'dataDaftarRi.pengkajianDokter.rencana.edukasi.max' => 'Edukasi tidak boleh lebih dari 1000 karakter.',
 
         'dataDaftarRi.pengkajianDokter.rencana.monitoring.string' => 'Monitoring harus berupa teks.',
-        'dataDaftarRi.pengkajianDokter.rencana.monitoring.max' => 'Monitoring tidak boleh lebih dari 500 karakter.',
+        'dataDaftarRi.pengkajianDokter.rencana.monitoring.max' => 'Monitoring tidak boleh lebih dari 1000 karakter.',
 
         // Tanda Tangan Dokter
         'dataDaftarRi.pengkajianDokter.tandaTanganDokter.dokterPengkaji.string' => 'Nama dokter pengkaji harus berupa teks.',
-        'dataDaftarRi.pengkajianDokter.tandaTanganDokter.dokterPengkaji.max' => 'Nama dokter pengkaji tidak boleh lebih dari 500 karakter.',
+        'dataDaftarRi.pengkajianDokter.tandaTanganDokter.dokterPengkaji.max' => 'Nama dokter pengkaji tidak boleh lebih dari 1000 karakter.',
 
         'dataDaftarRi.pengkajianDokter.tandaTanganDokter.dokterPengkajiCode.string' => 'Kode dokter pengkaji harus berupa teks.',
-        'dataDaftarRi.pengkajianDokter.tandaTanganDokter.dokterPengkajiCode.max' => 'Kode dokter pengkaji tidak boleh lebih dari 500 karakter.',
+        'dataDaftarRi.pengkajianDokter.tandaTanganDokter.dokterPengkajiCode.max' => 'Kode dokter pengkaji tidak boleh lebih dari 1000 karakter.',
 
         'dataDaftarRi.pengkajianDokter.tandaTanganDokter.jamDokterPengkaji.date_format' => 'Format jam dokter pengkaji harus d/m/Y H:i:s.',
     ];
@@ -606,12 +613,12 @@ class AssessmentPengkajianDokter extends Component
     ////////////////////////////////////////////////
     ///////////begin////////////////////////////////
     ////////////////////////////////////////////////
-    public function updated($propertyName)
-    {
-        // dd($propertyName);
-        $this->validateOnly($propertyName);
-        $this->store();
-    }
+    // public function updated($propertyName)
+    // {
+    //     // dd($propertyName);
+    //     $this->validateOnly($propertyName);
+    //     $this->store();
+    // }
 
 
 
@@ -631,8 +638,10 @@ class AssessmentPengkajianDokter extends Component
             $this->validate($this->rules, $this->messages);
         } catch (\Illuminate\Validation\ValidationException $e) {
 
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Lakukan Pengecekan kembali Input Data.");
-            $this->validate($this->rules, $this->messages);
+            toastr()->closeOnHover(true)->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Lakukan Pengecekan kembali Input Data.");
+            throw $e; // <-- ini aja. Jangan panggil validate() lagi.
         }
     }
 
@@ -642,18 +651,50 @@ class AssessmentPengkajianDokter extends Component
         // Validate RJ
         $this->validatePengkajianDokter();
 
+        $riHdrNo = $this->dataDaftarRi['riHdrNo'] ?? $this->riHdrNoRef ?? null;
+        if (!$riHdrNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("riHdrNo kosong.");
+            return;
+        }
+        $lockKey = "ri:{$riHdrNo}"; // shared lock antar modul (CPPT/Resep/Pengkajian, dsb.)
         // Logic update mode start //////////
-        $this->updateDataRi($this->dataDaftarRi['riHdrNo']);
+
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($riHdrNo) {
+                // Ambil FRESH state dari DB di dalam lock
+                $fresh = $this->findDataRI($riHdrNo);
+                if (!is_array($fresh)) {
+                    $fresh = [];
+                }
+
+                // Siapkan struktur jika belum ada
+                if (!isset($fresh['pengkajianDokter']) || !is_array($fresh['pengkajianDokter'])) {
+                    $fresh['pengkajianDokter'] = [];
+                }
+
+                // PATCH: hanya replace subtree pengkajianDokter dari state form saat ini
+                $fresh['pengkajianDokter'] = $this->dataDaftarRi['pengkajianDokter'];
+
+                // Tulis dalam TRANSACTION
+                DB::transaction(function () use ($riHdrNo, $fresh) {
+                    $this->updateJsonRI($riHdrNo, $fresh);
+                });
+
+                // Sinkronkan komponen dari fresh terbaru
+                $this->dataDaftarRi = $fresh;
+            });
+        } catch (\Illuminate\Contracts\Cache\LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
+            return;
+        }
 
         $this->emit('syncronizeAssessmentPerawatRIFindData');
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+            ->addSuccess("Pengkajian Dokter pasien Rawat Inap berhasil disimpan.");
     }
 
-    private function updateDataRi($riHdrNo): void
-    {
-        $this->updateJsonRI($riHdrNo, $this->dataDaftarRi);
 
-        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Pengkajian dokter berhasil disimpan.");
-    }
     // insert and update record end////////////////
 
 
@@ -689,7 +730,9 @@ class AssessmentPengkajianDokter extends Component
 
     public function setJamDokterPengkaji($jam)
     {
-        $this->dataDaftarRi['pengkajianDokter']['tandaTanganDokter']['jamDokterPengkaji'] = $jam;
+
+        $this->dataDaftarRi['pengkajianDokter']['tandaTanganDokter']['jamDokterPengkaji']
+            = Carbon::now('Asia/Jakarta')->format('d/m/Y H:i:s');
     }
 
 
@@ -757,8 +800,7 @@ class AssessmentPengkajianDokter extends Component
         ];
 
         // Simpan perubahan ke dalam penyimpanan (misalnya, database atau session)
-        $this->updateDataRi($this->dataDaftarRi['riHdrNo']);
-        $this->emit('syncronizeAssessmentPerawatRIFindData');
+        $this->store();
 
         // Reset input setelah data berhasil ditambahkan
         $this->reset(['rekonsiliasiObat']);
@@ -798,8 +840,7 @@ class AssessmentPengkajianDokter extends Component
         $this->dataDaftarRi['pengkajianDokter']['anamnesa']['rekonsiliasiObat'] = $rekonsiliasiObat;
 
         // Simpan perubahan ke dalam penyimpanan (misalnya, database atau session)
-        $this->updateDataRi($this->dataDaftarRi['riHdrNo']);
-        $this->emit('syncronizeAssessmentPerawatRIFindData');
+        $this->store();
 
         // Tampilkan pesan sukses
         toastr()

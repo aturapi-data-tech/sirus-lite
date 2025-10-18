@@ -3,22 +3,31 @@
 namespace App\Http\Livewire\EmrRI\MrRI\PengkajianDokter;
 
 use Livewire\Component;
-use Livewire\WithPagination;
 
 use App\Http\Traits\EmrRI\EmrRITrait;
 use App\Http\Traits\customErrorMessagesTrait;
 use App\Http\Traits\MasterPasien\MasterPasienTrait;
 
+
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+
 class PengkajianDokter extends Component
 {
-    use WithPagination, EmrRITrait, customErrorMessagesTrait, MasterPasienTrait;
+    use  EmrRITrait, customErrorMessagesTrait, MasterPasienTrait;
 
     // listener from blade////////////////
     protected $listeners = [
-        'syncronizeAssessmentPerawatRIFindData' => 'mount',
+        'syncronizeAssessmentPerawatRIFindData' => 'refreshData',
         'laboratSelectedText' => 'appendLaboratText',
         'requestCopyAssessmentFromUGDDokter' => 'handleCopyAssessmentFromUGDDokter',
     ];
+
+    public function refreshData(): void
+    {
+        $this->findData($this->riHdrNoRef);
+    }
 
 
     public function appendLaboratText(string $text): void
@@ -31,7 +40,7 @@ class PengkajianDokter extends Component
         );
 
         // Pilih separator baris baru hanya jika sudah ada isi sebelumnya
-        $sep = $current !== '' ? "\n" : '';
+        $sep = $current !== '' ? PHP_EOL : '';
 
         // Simpan kembali ke struktur array $dataDaftarRi
         data_set(
@@ -94,7 +103,7 @@ class PengkajianDokter extends Component
 
         if ($newLab !== '') {
             $this->dataDaftarRi['pengkajianDokter']['hasilPemeriksaanPenunjang']['laboratorium'] =
-                $currentLab !== '' ? $currentLab . "\n" . $newLab : $newLab;
+                $currentLab !== '' ? $currentLab . PHP_EOL . $newLab : $newLab;
         }
 
         // Radiologi
@@ -103,7 +112,7 @@ class PengkajianDokter extends Component
 
         if ($newRad !== '') {
             $this->dataDaftarRi['pengkajianDokter']['hasilPemeriksaanPenunjang']['radiologi'] =
-                $currentRad !== '' ? $currentRad . "\n" . $newRad : $newRad;
+                $currentRad !== '' ? $currentRad . PHP_EOL . $newRad : $newRad;
         }
 
         // Penunjang lain
@@ -112,7 +121,7 @@ class PengkajianDokter extends Component
 
         if ($newOther !== '') {
             $this->dataDaftarRi['pengkajianDokter']['hasilPemeriksaanPenunjang']['penunjangLain'] =
-                $currentOther !== '' ? $currentOther . "\n" . $newOther : $newOther;
+                $currentOther !== '' ? $currentOther . PHP_EOL . $newOther : $newOther;
         }
 
 
@@ -285,7 +294,7 @@ class PengkajianDokter extends Component
                 ],
                 "desc" => "",
             ],
-            "payudarah" => [
+            "payudara" => [
                 "kelainan" => "Tidak Diperiksa",
                 "kelainanOptions" => [
                     ["kelainan" => "Tidak Diperiksa"],
@@ -601,12 +610,12 @@ class PengkajianDokter extends Component
     ////////////////////////////////////////////////
     ///////////begin////////////////////////////////
     ////////////////////////////////////////////////
-    public function updated($propertyName)
-    {
-        // dd($propertyName);
-        $this->validateOnly($propertyName);
-        $this->store();
-    }
+    // public function updated($propertyName)
+    // {
+    //     // dd($propertyName);
+    //     $this->validateOnly($propertyName);
+    //     $this->store();
+    // }
 
 
 
@@ -626,8 +635,10 @@ class PengkajianDokter extends Component
             $this->validate($this->rules, $this->messages);
         } catch (\Illuminate\Validation\ValidationException $e) {
 
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Lakukan Pengecekan kembali Input Data.");
-            $this->validate($this->rules, $this->messages);
+            toastr()->closeOnHover(true)->closeDuration(3)
+                ->positionClass('toast-top-left')
+                ->addError("Lakukan Pengecekan kembali Input Data.");
+            throw $e; // <-- ini aja. Jangan panggil validate() lagi.
         }
     }
 
@@ -637,19 +648,49 @@ class PengkajianDokter extends Component
         // Validate RJ
         $this->validatePengkajianDokter();
 
+        $riHdrNo = $this->dataDaftarRi['riHdrNo'] ?? $this->riHdrNoRef ?? null;
+        if (!$riHdrNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("riHdrNo kosong.");
+            return;
+        }
+        $lockKey = "ri:{$riHdrNo}"; // shared lock antar modul (CPPT/Resep/Pengkajian, dsb.)
         // Logic update mode start //////////
-        $this->updateDataRi($this->dataDaftarRi['riHdrNo']);
+
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($riHdrNo) {
+                // Ambil FRESH state dari DB di dalam lock
+                $fresh = $this->findDataRI($riHdrNo);
+                if (!is_array($fresh)) {
+                    $fresh = [];
+                }
+
+                // Siapkan struktur jika belum ada
+                if (!isset($fresh['pengkajianDokter']) || !is_array($fresh['pengkajianDokter'])) {
+                    $fresh['pengkajianDokter'] = [];
+                }
+
+                // PATCH: hanya replace subtree pengkajianDokter dari state form saat ini
+                $fresh['pengkajianDokter'] = $this->dataDaftarRi['pengkajianDokter'];
+
+                // Tulis dalam TRANSACTION
+                DB::transaction(function () use ($riHdrNo, $fresh) {
+                    $this->updateJsonRI($riHdrNo, $fresh);
+                });
+
+                // Sinkronkan komponen dari fresh terbaru
+                $this->dataDaftarRi = $fresh;
+            });
+        } catch (\Illuminate\Contracts\Cache\LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
+            return;
+        }
 
         $this->emit('syncronizeAssessmentPerawatRIFindData');
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+            ->addSuccess("Pengkajian Dokter pasien Rawat Inap berhasil disimpan.");
     }
 
-    private function updateDataRi($riHdrNo): void
-    {
-        $this->updateJsonRI($riHdrNo, $this->dataDaftarRi);
-
-        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Pengkajian dokter berhasil disimpan.");
-    }
-    // insert and update record end////////////////
 
 
     private function findData($riHdrNo): void
@@ -684,7 +725,9 @@ class PengkajianDokter extends Component
 
     public function setJamDokterPengkaji($jam)
     {
-        $this->dataDaftarRi['pengkajianDokter']['tandaTanganDokter']['jamDokterPengkaji'] = $jam;
+
+        $this->dataDaftarRi['pengkajianDokter']['tandaTanganDokter']['jamDokterPengkaji']
+            = Carbon::now('Asia/Jakarta')->format('d/m/Y H:i:s');
     }
 
 
@@ -751,9 +794,7 @@ class PengkajianDokter extends Component
         ];
 
         // Simpan perubahan ke dalam penyimpanan (misalnya, database atau session)
-        $this->updateDataRi($this->dataDaftarRi['riHdrNo']);
-        $this->emit('syncronizeAssessmentPerawatRIFindData');
-
+        $this->store();
         // Reset input setelah data berhasil ditambahkan
         $this->reset(['rekonsiliasiObat']);
 
@@ -792,8 +833,7 @@ class PengkajianDokter extends Component
         $this->dataDaftarRi['pengkajianDokter']['anamnesa']['rekonsiliasiObat'] = $rekonsiliasiObat;
 
         // Simpan perubahan ke dalam penyimpanan (misalnya, database atau session)
-        $this->updateDataRi($this->dataDaftarRi['riHdrNo']);
-        $this->emit('syncronizeAssessmentPerawatRIFindData');
+        $this->store();
 
         // Tampilkan pesan sukses
         toastr()
