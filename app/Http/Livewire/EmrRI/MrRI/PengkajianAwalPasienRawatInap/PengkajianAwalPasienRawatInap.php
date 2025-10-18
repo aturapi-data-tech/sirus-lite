@@ -10,6 +10,8 @@ use App\Http\Traits\customErrorMessagesTrait;
 use App\Http\Traits\LOV\LOVDokter\LOVDokterTrait;
 use Carbon\Carbon;
 
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Exception;
 
 class PengkajianAwalPasienRawatInap extends Component
@@ -227,7 +229,7 @@ class PengkajianAwalPasienRawatInap extends Component
     ];
 
     // LOV Nested
-    public array $dokter;
+    public array $dokter = [];
     // LOV Nested
 
     // Opsi untuk radio button
@@ -258,63 +260,68 @@ class PengkajianAwalPasienRawatInap extends Component
     //////////////////////////////////////////////////////////////////////
 
 
+    /**
+     * Rules — diselaraskan dengan pilihan:
+     * - TTV numeric
+     * - TTD petugas & jam: nullable
+     */
     protected $rules = [
         // Bagian 1: Data Umum
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.kondisiSaatMasuk' => 'nullable|string|in:mandiri,dibantu,tirahBaring',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.asalPasien.pilihan' => 'nullable|string|in:poliklinik,gd,kamarOperasi,lainnya',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.asalPasien.keterangan' => 'required_if:dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.asalPasien.pilihan,lainnya|nullable|string',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.diagnosaMasuk' => 'nullable|string',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.dpjp' => 'nullable|string',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.barangBerharga.pilihan' => 'nullable|string|in:ada,tidakAda',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.barangBerharga.catatan' => 'nullable|string',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.alatBantu.pilihan' => 'nullable|string|in:kacamata,gigiPalsu,alatBantuDengar,lainnya',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.alatBantu.keterangan' => 'required_if:dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.alatBantu.pilihan,lainnya|nullable|string',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.alatBantu.catatan' => 'nullable|string',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.kondisiSaatMasuk'                    => 'nullable|string|in:mandiri,dibantu,tirahBaring',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.asalPasien.pilihan'                   => 'nullable|string|in:poliklinik,igd,kamarOperasi,lainnya',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.asalPasien.keterangan'               => 'required_if:dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.asalPasien.pilihan,lainnya|nullable|string',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.diagnosaMasuk'                        => 'nullable|string',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.dpjp'                                 => 'nullable|string',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.barangBerharga.pilihan'               => 'nullable|string|in:ada,tidakAda',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.barangBerharga.catatan'               => 'nullable|string',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.alatBantu.pilihan'                    => 'nullable|string|in:kacamata,gigiPalsu,alatBantuDengar,lainnya',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.alatBantu.keterangan'                => 'required_if:dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.alatBantu.pilihan,lainnya|nullable|string',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.alatBantu.catatan'                    => 'nullable|string',
 
         // Bagian 2: Riwayat Pasien
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.riwayatPenyakitOperasiCedera.pilihan' => 'nullable|string|in:hipertensi,diabetes,asma,stroke,penyakitJantung,lainnya',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.riwayatPenyakitOperasiCedera.pilihan'   => 'nullable|string|in:hipertensi,diabetes,asma,stroke,penyakitJantung,lainnya',
         'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.riwayatPenyakitOperasiCedera.keterangan' => 'required_if:dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.riwayatPenyakitOperasiCedera.pilihan,lainnya|nullable|string',
         'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.riwayatPenyakitOperasiCedera.deskripsi' => 'nullable|string',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.kebiasaan.merokok.pilihan' => 'nullable|string|in:ya,tidak,berhenti',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.kebiasaan.merokok.detail.jenis' => 'nullable|string',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.kebiasaan.merokok.pilihan'              => 'nullable|string|in:ya,tidak,berhenti',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.kebiasaan.merokok.detail.jenis'         => 'nullable|string',
         'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.kebiasaan.merokok.detail.jumlahPerHari' => 'nullable|numeric',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.kebiasaan.alkoholObat.pilihan' => 'nullable|string|in:ya,tidak,berhenti',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.kebiasaan.alkoholObat.detail.jenis' => 'nullable|string',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.kebiasaan.alkoholObat.pilihan'          => 'nullable|string|in:ya,tidak,berhenti',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.kebiasaan.alkoholObat.detail.jenis'     => 'nullable|string',
         'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.kebiasaan.alkoholObat.detail.jumlahPerHari' => 'nullable|numeric',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.vaksinasi.influenza.pilihan' => 'nullable|string|in:ya,tidak,menolak',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.vaksinasi.pneumonia.pilihan' => 'nullable|string|in:ya,tidak,menolak',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.riwayatKeluarga.pilihan' => 'nullable|string|in:penyakitJantung,hipertensi,diabetes,stroke,lainnya',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.riwayatKeluarga.keterangan' => 'required_if:dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.riwayatKeluarga.pilihan,lainnya|nullable|string',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.vaksinasi.influenza.pilihan'     => 'nullable|string|in:ya,tidak,menolak',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.vaksinasi.pneumonia.pilihan'     => 'nullable|string|in:ya,tidak,menolak',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.riwayatKeluarga.pilihan'         => 'nullable|string|in:penyakitJantung,hipertensi,diabetes,stroke,lainnya',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.riwayatKeluarga.keterangan'      => 'required_if:dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.riwayatKeluarga.pilihan,lainnya|nullable|string',
 
         // Bagian 3: Psikososial dan Ekonomi
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.agamaKepercayaan.pilihan' => 'nullable|string|in:islam,kristen,hindu,budha,lainnya',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.agamaKepercayaan.pilihan'    => 'nullable|string|in:islam,kristen,hindu,budha,lainnya',
         'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.agamaKepercayaan.keterangan' => 'required_if:dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.agamaKepercayaan.pilihan,lainnya|nullable|string',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.statusPernikahan.pilihan' => 'nullable|string|in:menikah,belumMenikah,dudaJanda',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.tempatTinggal.pilihan' => 'nullable|string|in:rumah,panti,lainnya',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.tempatTinggal.keterangan' => 'required_if:dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.tempatTinggal.pilihan,lainnya|nullable|string',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.aktivitas.pilihan' => 'nullable|string|in:mandiri,dibantu,tirahBaring',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.statusEmosional.pilihan' => 'nullable|string|in:kooperatif,cemas,depresi,lainnya',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.statusEmosional.keterangan' => 'required_if:dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.statusEmosional.pilihan,lainnya|nullable|string',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.keluargaDekat.nama' => 'nullable|string',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.keluargaDekat.hubungan' => 'nullable|string',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.keluargaDekat.telp' => 'nullable|string',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.statusPernikahan.pilihan'    => 'nullable|string|in:menikah,belumMenikah,dudaJanda',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.tempatTinggal.pilihan'       => 'nullable|string|in:rumah,panti,lainnya',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.tempatTinggal.keterangan'    => 'required_if:dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.tempatTinggal.pilihan,lainnya|nullable|string',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.aktivitas.pilihan'            => 'nullable|string|in:mandiri,dibantu,tirahBaring',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.statusEmosional.pilihan'      => 'nullable|string|in:kooperatif,cemas,depresi,lainnya',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.statusEmosional.keterangan'   => 'required_if:dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.statusEmosional.pilihan,lainnya|nullable|string',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.keluargaDekat.nama'           => 'nullable|string',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.keluargaDekat.hubungan'       => 'nullable|string',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.keluargaDekat.telp'           => 'nullable|string',
         'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.informasiDidapatDari.pilihan' => 'nullable|string|in:pasien,keluarga,lainnya',
         'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.informasiDidapatDari.keterangan' => 'required_if:dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.informasiDidapatDari.pilihan,lainnya|nullable|string',
 
-        // Bagian 4: Pemeriksaan Fisik
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.tandaVital.sistolik' => 'nullable|string',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.tandaVital.distolik' => 'nullable|string',
-
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.tandaVital.frekuensiNadi' => 'nullable|string',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.tandaVital.frekuensiNafas' => 'nullable|string',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.tandaVital.suhu' => 'nullable|string',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.tandaVital.spo2' => 'nullable|string',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.tandaVital.tb' => 'nullable|string',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.tandaVital.bb' => 'nullable|string',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.keluhanUtama' => 'nullable|string',
+        // Bagian 4: Pemeriksaan Fisik (TTV numeric)
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.tandaVital.sistolik'        => 'nullable|numeric',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.tandaVital.distolik'        => 'nullable|numeric',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.tandaVital.frekuensiNadi'   => 'nullable|numeric',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.tandaVital.frekuensiNafas'  => 'nullable|numeric',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.tandaVital.suhu'            => 'nullable|numeric',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.tandaVital.spo2'            => 'nullable|numeric',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.tandaVital.tb'              => 'nullable|numeric',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.tandaVital.bb'              => 'nullable|numeric',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.tandaVital.gda'             => 'nullable|numeric',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.keluhanUtama'               => 'nullable|string',
         'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.pemeriksaanSistemOrgan.mataTelingaHidungTenggorokan.pilihan' => 'nullable|string|in:normal,gangguanVisus,tuli,lainnya',
         'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.pemeriksaanSistemOrgan.mataTelingaHidungTenggorokan.keterangan' => 'required_if:dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.pemeriksaanSistemOrgan.mataTelingaHidungTenggorokan.pilihan,lainnya|nullable|string',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.pemeriksaanSistemOrgan.paru.pilihan' => 'nullable|string|in:normal,ronki,wheezing,lainnya',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.pemeriksaanSistemOrgan.paru.pilihan'   => 'nullable|string|in:normal,ronki,wheezing,lainnya',
         'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.pemeriksaanSistemOrgan.paru.keterangan' => 'required_if:dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.pemeriksaanSistemOrgan.paru.pilihan,lainnya|nullable|string',
         'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.pemeriksaanSistemOrgan.jantung.pilihan' => 'nullable|string|in:normal,takikardi,bradikardi,lainnya',
         'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.pemeriksaanSistemOrgan.jantung.keterangan' => 'required_if:dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.pemeriksaanSistemOrgan.jantung.pilihan,lainnya|nullable|string',
@@ -327,90 +334,36 @@ class PengkajianAwalPasienRawatInap extends Component
         'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.pemeriksaanSistemOrgan.muskuloskeletalDanKulit.pilihan' => 'nullable|string|in:normal,deformitas,luka,lainnya',
         'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.pemeriksaanSistemOrgan.muskuloskeletalDanKulit.keterangan' => 'required_if:dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.pemeriksaanSistemOrgan.muskuloskeletalDanKulit.pilihan,lainnya|nullable|string',
 
-        // Bagian 5: Catatan dan Tanda Tangan
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.catatanUmum' => 'nullable|string',
+        // Bagian 5: Catatan & TTD (tidak wajib)
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.catatanUmum'     => 'nullable|string',
         'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.petugasPengkaji' => 'nullable|string',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.jamPengkaji' => 'nullable|date_format:d/m/Y H:i:s',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.jamPengkaji'     => 'nullable|date_format:d/m/Y H:i:s',
     ];
-
 
     protected $messages = [
-        // Bagian 1: Data Umum
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.kondisiSaatMasuk.required' => 'Kondisi saat masuk harus diisi.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.kondisiSaatMasuk.in' => 'Kondisi saat masuk harus berupa mandiri, dibantu, atau tirahBaring.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.asalPasien.pilihan.required' => 'Asal pasien harus diisi.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.asalPasien.pilihan.in' => 'Asal pasien harus berupa poliklinik, gd, kamarOperasi, atau lainnya.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.asalPasien.keterangan.required_if' => 'Keterangan asal pasien harus diisi jika pilihan adalah lainnya.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.diagnosaMasuk.required' => 'Diagnosa masuk harus diisi.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.dpjp.required' => 'DPJP harus diisi.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.barangBerharga.pilihan.required' => 'Pilihan barang berharga harus diisi.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.barangBerharga.pilihan.in' => 'Pilihan barang berharga harus berupa ada atau tidakAda.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.alatBantu.pilihan.in' => 'Pilihan alat bantu harus berupa kacamata, gigiPalsu, alatBantuDengar, atau lainnya.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.alatBantu.keterangan.required_if' => 'Keterangan alat bantu harus diisi jika pilihan adalah lainnya.',
-
-        // Bagian 2: Riwayat Pasien
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.riwayatPenyakitOperasiCedera.pilihan.in' => 'Pilihan riwayat penyakit/operasi/cedera tidak valid.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.riwayatPenyakitOperasiCedera.keterangan.required_if' => 'Keterangan riwayat penyakit/operasi/cedera harus diisi jika pilihan adalah lainnya.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.kebiasaan.merokok.pilihan.required' => 'Pilihan kebiasaan merokok harus diisi.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.kebiasaan.merokok.pilihan.in' => 'Pilihan kebiasaan merokok harus berupa ya, tidak, atau berhenti.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.kebiasaan.merokok.detail.jumlahPerHari.numeric' => 'Jumlah rokok per hari harus berupa angka.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.kebiasaan.alkoholObat.pilihan.required' => 'Pilihan kebiasaan alkohol/obat harus diisi.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.kebiasaan.alkoholObat.pilihan.in' => 'Pilihan kebiasaan alkohol/obat harus berupa ya, tidak, atau berhenti.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.kebiasaan.alkoholObat.detail.jumlahPerHari.numeric' => 'Jumlah alkohol/obat per hari harus berupa angka.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.vaksinasi.influenza.pilihan.in' => 'Pilihan vaksinasi influenza tidak valid.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.vaksinasi.pneumonia.pilihan.in' => 'Pilihan vaksinasi pneumonia tidak valid.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.riwayatKeluarga.pilihan.in' => 'Pilihan riwayat keluarga tidak valid.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.riwayatKeluarga.keterangan.required_if' => 'Keterangan riwayat keluarga harus diisi jika pilihan adalah lainnya.',
-
-        // Bagian 3: Psikososial dan Ekonomi
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.agamaKepercayaan.pilihan.required' => 'Pilihan agama/kepercayaan harus diisi.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.agamaKepercayaan.pilihan.in' => 'Pilihan agama/kepercayaan tidak valid.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.agamaKepercayaan.keterangan.required_if' => 'Keterangan agama/kepercayaan harus diisi jika pilihan adalah lainnya.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.statusPernikahan.pilihan.required' => 'Status pernikahan harus diisi.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.statusPernikahan.pilihan.in' => 'Status pernikahan tidak valid.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.tempatTinggal.pilihan.in' => 'Pilihan tempat tinggal tidak valid.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.tempatTinggal.keterangan.required_if' => 'Keterangan tempat tinggal harus diisi jika pilihan adalah lainnya.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.aktivitas.pilihan.required' => 'Pilihan aktivitas harus diisi.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.aktivitas.pilihan.in' => 'Pilihan aktivitas tidak valid.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.statusEmosional.pilihan.in' => 'Pilihan status emosional tidak valid.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.statusEmosional.keterangan.required_if' => 'Keterangan status emosional harus diisi jika pilihan adalah lainnya.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.keluargaDekat.nama.required' => 'Nama keluarga dekat harus diisi.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.keluargaDekat.hubungan.required' => 'Hubungan keluarga dekat harus diisi.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.keluargaDekat.telp.required' => 'Nomor telepon keluarga dekat harus diisi.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.informasiDidapatDari.pilihan.required' => 'Pilihan sumber informasi harus diisi.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.informasiDidapatDari.pilihan.in' => 'Pilihan sumber informasi tidak valid.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.informasiDidapatDari.keterangan.required_if' => 'Keterangan sumber informasi harus diisi jika pilihan adalah lainnya.',
-
-        // Bagian 4: Pemeriksaan Fisik
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.tandaVital.sistolik.required' => 'Tekanan darah sistolik harus diisi.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.tandaVital.distolik.required' => 'Tekanan darah diastolik harus diisi.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.tandaVital.frekuensiNadi.required' => 'Frekuensi nadi harus diisi.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.tandaVital.frekuensiNafas.required' => 'Frekuensi nafas harus diisi.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.tandaVital.suhu.required' => 'Suhu tubuh harus diisi.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.tandaVital.spo2.required' => 'Saturasi oksigen (SpO2) harus diisi.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.tandaVital.tb.required' => 'Tinggi badan harus diisi.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.tandaVital.bb.required' => 'Berat badan harus diisi.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.keluhanUtama.required' => 'Keluhan utama harus diisi.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.pemeriksaanSistemOrgan.mataTelingaHidungTenggorokan.pilihan.in' => 'Pilihan pemeriksaan mata, telinga, hidung, dan tenggorokan tidak valid.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.pemeriksaanSistemOrgan.mataTelingaHidungTenggorokan.keterangan.required_if' => 'Keterangan pemeriksaan mata, telinga, hidung, dan tenggorokan harus diisi jika pilihan adalah lainnya.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.pemeriksaanSistemOrgan.paru.pilihan.in' => 'Pilihan pemeriksaan paru tidak valid.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.pemeriksaanSistemOrgan.paru.keterangan.required_if' => 'Keterangan pemeriksaan paru harus diisi jika pilihan adalah lainnya.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.pemeriksaanSistemOrgan.jantung.pilihan.in' => 'Pilihan pemeriksaan jantung tidak valid.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.pemeriksaanSistemOrgan.jantung.keterangan.required_if' => 'Keterangan pemeriksaan jantung harus diisi jika pilihan adalah lainnya.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.pemeriksaanSistemOrgan.neurologi.tingkatKesadaran.pilihan.in' => 'Pilihan tingkat kesadaran tidak valid.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.pemeriksaanSistemOrgan.neurologi.gcs.required' => 'Nilai GCS harus diisi.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.pemeriksaanSistemOrgan.gastrointestinal.pilihan.in' => 'Pilihan pemeriksaan gastrointestinal tidak valid.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.pemeriksaanSistemOrgan.gastrointestinal.keterangan.required_if' => 'Keterangan pemeriksaan gastrointestinal harus diisi jika pilihan adalah lainnya.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.pemeriksaanSistemOrgan.genitourinaria.pilihan.in' => 'Pilihan pemeriksaan genitourinaria tidak valid.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.pemeriksaanSistemOrgan.genitourinaria.keterangan.required_if' => 'Keterangan pemeriksaan genitourinaria harus diisi jika pilihan adalah lainnya.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.pemeriksaanSistemOrgan.muskuloskeletalDanKulit.pilihan.in' => 'Pilihan pemeriksaan muskuloskeletal dan kulit tidak valid.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.pemeriksaanSistemOrgan.muskuloskeletalDanKulit.keterangan.required_if' => 'Keterangan pemeriksaan muskuloskeletal dan kulit harus diisi jika pilihan adalah lainnya.',
-
-        // Bagian 5: Catatan dan Tanda Tangan
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.petugasPengkaji.required' => 'Nama petugas pengkaji harus diisi.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.jamPengkaji.required' => 'Jam pengkajian harus diisi.',
-        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.jamPengkaji.date_format' => 'Format jam pengkajian harus sesuai dengan d/m/Y H:i:s.',
+        // Hanya pesan yang relevan dengan rules di atas (tidak ada kontradiksi required vs nullable)
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.asalPasien.keterangan.required_if' => 'Isi keterangan jika asal pasien = lainnya.',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian1DataUmum.alatBantu.keterangan.required_if'  => 'Isi keterangan jika alat bantu = lainnya.',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.riwayatPenyakitOperasiCedera.keterangan.required_if' => 'Isi keterangan jika riwayat = lainnya.',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.kebiasaan.merokok.detail.jumlahPerHari.numeric' => 'Jumlah rokok per hari harus angka.',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.kebiasaan.alkoholObat.detail.jumlahPerHari.numeric' => 'Jumlah alkohol/obat per hari harus angka.',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian2RiwayatPasien.riwayatKeluarga.keterangan.required_if' => 'Isi keterangan jika riwayat keluarga = lainnya.',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.agamaKepercayaan.keterangan.required_if' => 'Isi keterangan jika agama/kepercayaan = lainnya.',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.tempatTinggal.keterangan.required_if' => 'Isi keterangan jika tempat tinggal = lainnya.',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.statusEmosional.keterangan.required_if' => 'Isi keterangan jika status emosional = lainnya.',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian3PsikososialDanEkonomi.informasiDidapatDari.keterangan.required_if' => 'Isi keterangan jika sumber informasi = lainnya.',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.tandaVital.sistolik.numeric'       => 'Sistolik harus angka.',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.tandaVital.distolik.numeric'       => 'Diastolik harus angka.',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.tandaVital.frekuensiNadi.numeric'  => 'Nadi harus angka.',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.tandaVital.frekuensiNafas.numeric' => 'Nafas harus angka.',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.tandaVital.suhu.numeric'           => 'Suhu harus angka.',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.tandaVital.spo2.numeric'           => 'SpO2 harus angka.',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.tandaVital.tb.numeric'              => 'Tinggi badan harus angka.',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.tandaVital.bb.numeric'              => 'Berat badan harus angka.',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian4PemeriksaanFisik.tandaVital.gda.numeric'             => 'Gula darah (GDA) harus angka.',
+        'dataDaftarRi.pengkajianAwalPasienRawatInap.bagian5CatatanDanTandaTangan.jamPengkaji.date_format'       => 'Format jam pengkajian harus d/m/Y H:i:s.',
     ];
+
 
 
 
@@ -418,12 +371,12 @@ class PengkajianAwalPasienRawatInap extends Component
     ////////////////////////////////////////////////
     ///////////begin////////////////////////////////
     ////////////////////////////////////////////////
-    public function updated($propertyName)
-    {
-        // dd($propertyName);
-        $this->validateOnly($propertyName);
-        $this->store();
-    }
+    // public function updated($propertyName)
+    // {
+    //     // dd($propertyName);
+    //     $this->validateOnly($propertyName);
+    //     $this->store();
+    // }
 
 
 
@@ -456,18 +409,50 @@ class PengkajianAwalPasienRawatInap extends Component
         // Validate RJ
         $this->validatePengkajianAwalPasienRawatInap();
 
+        $riHdrNo = $this->dataDaftarRi['riHdrNo'] ?? $this->riHdrNoRef ?? null;
+        if (!$riHdrNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("riHdrNo kosong.");
+            return;
+        }
+        $lockKey = "ri:{$riHdrNo}"; // shared lock antar modul (CPPT/Resep/Pengkajian, dsb.)
         // Logic update mode start //////////
-        $this->updateDataRi($this->dataDaftarRi['riHdrNo']);
+
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($riHdrNo) {
+                // Ambil FRESH state dari DB di dalam lock
+                $fresh = $this->findDataRI($riHdrNo);
+                if (!is_array($fresh)) {
+                    $fresh = [];
+                }
+
+                // Siapkan struktur jika belum ada
+                if (!isset($fresh['pengkajianAwalPasienRawatInap']) || !is_array($fresh['pengkajianAwalPasienRawatInap'])) {
+                    $fresh['pengkajianAwalPasienRawatInap'] = [];
+                }
+
+                // PATCH: hanya replace subtree pengkajianAwalPasienRawatInap dari state form saat ini
+                $fresh['pengkajianAwalPasienRawatInap'] = $this->dataDaftarRi['pengkajianAwalPasienRawatInap'];
+
+                // Tulis dalam TRANSACTION
+                DB::transaction(function () use ($riHdrNo, $fresh) {
+                    $this->updateJsonRI($riHdrNo, $fresh);
+                });
+
+                // Sinkronkan komponen dari fresh terbaru
+                $this->dataDaftarRi = $fresh;
+            });
+        } catch (\Illuminate\Contracts\Cache\LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
+            return;
+        }
 
         $this->emit('syncronizeAssessmentPerawatRIFindData');
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+            ->addSuccess("Pengkajian awal pasien Rawat Inap berhasil disimpan.");
     }
 
-    private function updateDataRi($riHdrNo): void
-    {
-        $this->updateJsonRI($riHdrNo, $this->dataDaftarRi);
 
-        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Pengkajian awal pasien Rawat Inap berhasil disimpan.");
-    }
     // insert and update record end////////////////
 
 
@@ -563,7 +548,7 @@ class PengkajianAwalPasienRawatInap extends Component
                 "levelDokter" => $this->levelingDokter['levelDokter'],
             ];
 
-            $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokter']['levelingDokterLog'] =
+            $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokterLog'] =
                 [
                     'userLogDesc' => 'Form Entry levelingDokter ' . $this->levelingDokter['drName'] . $this->levelingDokter['levelDokter'],
                     'userLog' => auth()->user()->myuser_name,
@@ -581,54 +566,75 @@ class PengkajianAwalPasienRawatInap extends Component
     public function removeLevelingDokter($tglEntry)
     {
 
-        $levelingDokter = collect($this->dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokter'])->where("tglEntry", '!=', $tglEntry)->toArray();
+        $list = collect($this->dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokter'] ?? []);
+        $levelingDokter = $list->where('tglEntry', '!=', $tglEntry)->values()->toArray();
         $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokter'] = $levelingDokter;
 
-        $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokter']['levelingDokterLog'] =
-            [
-                'userLogDesc' => 'Hapus levelingDokter',
-                'userLog' => auth()->user()->myuser_name,
-                'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
-            ];
+        $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokterLog'] = [
+            'userLogDesc' => 'Hapus levelingDokter',
+            'userLog'     => auth()->user()->myuser_name,
+            'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'),
+        ];
+
         $this->store();
     }
 
 
     public function setLevelingDokterUtama($index, $level = "Utama")
     {
-        if ($this->dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokter'][$index]['levelDokter'] === $level) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Status Dokter " . $level);
+        $list = &$this->dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokter'];
+
+        if (!isset($list) || !is_array($list) || !isset($list[$index])) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data leveling dokter tidak ditemukan.");
+            return;
+        }
+        if (($list[$index]['levelDokter'] ?? null) === $level) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Status Dokter {$level}");
             return;
         }
 
-        $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokter']['levelingDokterLog'] =
-            [
-                'userLogDesc' => 'Ubah levelingDokter' . $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokter'][$index]['drName'] . ' dari ' . $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokter'][$index]['levelDokter'] . 'ke' . $level,
-                'userLog' => auth()->user()->myuser_name,
-                'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
-            ];
+        $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokterLog'] = [
+            'userLogDesc' => 'Ubah levelingDokter ' . ($list[$index]['drName'] ?? '-') .
+                ' dari ' . ($list[$index]['levelDokter'] ?? '-') . ' ke ' . $level,
+            'userLog'     => auth()->user()->myuser_name,
+            'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'),
+        ];
 
-        $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokter'][$index]['levelDokter'] = $level;
-
+        $list[$index]['levelDokter'] = $level;
         $this->store();
     }
 
     public function setLevelingDokterRawatGabung($index, $level = "RawatGabung")
     {
 
-        if ($this->dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokter'][$index]['levelDokter'] === $level) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Status Dokter " . $level);
+        $list = &$this->dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokter'];
+        if (!isset($list) || !is_array($list)) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Data leveling dokter tidak ditemukan.');
             return;
         }
 
-        $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokter']['levelingDokterLog'] =
-            [
-                'userLogDesc' => 'Ubah levelingDokter' . $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokter'][$index]['drName'] . ' dari ' . $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokter'][$index]['levelDokter'] . 'ke' . $level,
-                'userLog' => auth()->user()->myuser_name,
-                'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
-            ];
+        if (!isset($list[$index])) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Item leveling dokter tidak ditemukan.');
+            return;
+        }
 
-        $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokter'][$index]['levelDokter'] = $level;
+        $current = $list[$index]['levelDokter'] ?? null;
+        if ($current === $level) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError("Status Dokter {$level}");
+            return;
+        }
+
+        $this->dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokterLog'] = [
+            'userLogDesc' => 'Ubah levelingDokter ' . ($list[$index]['drName'] ?? '-') .
+                ' dari ' . ($current ?? '-') . ' ke ' . $level,
+            'userLog'     => auth()->user()->myuser_name,
+            'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'),
+        ];
+
+        $list[$index]['levelDokter'] = $level;
 
         $this->store();
     }
