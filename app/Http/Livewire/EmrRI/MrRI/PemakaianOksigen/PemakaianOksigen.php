@@ -4,16 +4,19 @@ namespace App\Http\Livewire\EmrRI\MrRI\PemakaianOksigen;
 
 
 use Livewire\Component;
-use Livewire\WithPagination;
-use Carbon\Carbon;
 
+use Carbon\Carbon;
 use App\Http\Traits\EmrRI\EmrRITrait;
 use App\Http\Traits\customErrorMessagesTrait;
 use Illuminate\Support\Facades\Validator;
+use \Illuminate\Validation\ValidationException;
+use Illuminate\Contracts\Cache\LockTimeoutException;
+use Illuminate\Support\Facades\Cache;
+use \Illuminate\Support\Facades\DB;
 
 class PemakaianOksigen extends Component
 {
-    use WithPagination, EmrRITrait, customErrorMessagesTrait;
+    use  EmrRITrait, customErrorMessagesTrait;
 
     // listener from blade////////////////
     protected $listeners = [
@@ -45,7 +48,7 @@ class PemakaianOksigen extends Component
     public array $observasi =
     [
         "pemakaianOksigenTab" => "Pemakaian Oksigen",
-        "pemakaianOksigen" => [],
+        "pemakaianOksigenData" => [],
 
     ];
     //////////////////////////////////////////////////////////////////////
@@ -62,144 +65,228 @@ class PemakaianOksigen extends Component
         'pemakaianOksigen.tanggalWaktuSelesai' => 'nullable|date_format:d/m/Y H:i:s',
     ];
 
+    protected array $messages = [
+        'pemakaianOksigen.jenisAlatOksigen.required' => 'Jenis alat oksigen wajib diisi.',
+        'pemakaianOksigen.jenisAlatOksigen.in'       => 'Jenis alat oksigen tidak valid.',
+
+        'pemakaianOksigen.jenisAlatOksigenDetail.required_if'
+        => 'Detail jenis alat oksigen wajib diisi.',
+
+        'pemakaianOksigen.dosisOksigen.required' => 'Dosis oksigen wajib diisi.',
+        'pemakaianOksigen.dosisOksigen.in'       => 'Dosis oksigen tidak valid.',
+
+        'pemakaianOksigen.dosisOksigenDetail.required_if'
+        => 'Detail dosis oksigen wajib diisi.',
+
+        'pemakaianOksigen.tanggalWaktuMulai.required'     => 'Tanggal mulai wajib diisi.',
+        'pemakaianOksigen.tanggalWaktuMulai.date_format'  => 'Format tanggal mulai harus d/m/Y H:i:s.',
+
+        'pemakaianOksigen.tanggalWaktuSelesai.date_format' => 'Format tanggal selesai harus d/m/Y H:i:s.',
+    ];
+
+    protected array $validationAttributes = [
+        'pemakaianOksigen.jenisAlatOksigen'       => 'Jenis alat oksigen',
+        'pemakaianOksigen.jenisAlatOksigenDetail' => 'Detail alat oksigen',
+        'pemakaianOksigen.dosisOksigen'           => 'Dosis oksigen',
+        'pemakaianOksigen.dosisOksigenDetail'     => 'Detail dosis oksigen',
+        'pemakaianOksigen.modelPenggunaan'        => 'Model penggunaan',
+        'pemakaianOksigen.tanggalWaktuMulai'      => 'Tanggal mulai',
+        'pemakaianOksigen.tanggalWaktuSelesai'    => 'Tanggal selesai',
+    ];
+
 
 
 
     ////////////////////////////////////////////////
     ///////////begin////////////////////////////////
     ////////////////////////////////////////////////
-    public function updated($propertyName)
-    {
-        // dd($propertyName);
-        // $this->validateOnly($propertyName);
-        // $this->store();
-    }
 
-
-
-
-    // resert input private////////////////
-    private function resetInputFields(): void
-    {
-
-        // resert validation
-        $this->resetValidation();
-        // resert input kecuali
-        $this->reset(['']);
-    }
-
-
-
-
-
-    // ////////////////
-    // RJ Logic
-    // ////////////////
 
 
     // validate Data RJ//////////////////////////////////////////////////
-    private function validateDataPemakaianOksigenRi(): void
+    private function validateDataPemakaianOksigenRi(): bool
     {
-        // customErrorMessages
-        // $messages = customErrorMessagesTrait::messages();
-        $messages = [];
-
-        // Proses Validasi///////////////////////////////////////////
         try {
-            $this->validate($this->rules, $messages);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Lakukan Pengecekan kembali Input Data." . $e->getMessage());
-            $this->validate($this->rules, $messages);
+            $this->validate($this->rules, $this->messages, $this->validationAttributes);
+            return true;
+        } catch (ValidationException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError("Lakukan Pengecekan kembali Input Data." . $e->getMessage());
+            return false;
         }
     }
 
 
-    // insert and update record start////////////////
-    public function store()
-    {
-        // Validate RJ
 
-        // Logic update mode start //////////
-        $this->updateDataRi($this->dataDaftarRi['riHdrNo']);
-
-        $this->emit('syncronizeAssessmentPerawatRIFindData');
-    }
-
-    private function updateDataRi($riHdrNo): void
-    {
-        $this->updateJsonRI($riHdrNo, $this->dataDaftarRi);
-
-        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("PemakaianOksigen berhasil disimpan.");
-    }
-    // insert and update record end////////////////
 
 
     private function findData($riHdrNo): void
     {
+        $this->dataDaftarRi = $this->findDataRI($riHdrNo) ?: [];
+        $this->dataDaftarRi['riHdrNo'] = $this->dataDaftarRi['riHdrNo'] ?? $riHdrNo;
 
-        $this->dataDaftarRi = $this->findDataRI($riHdrNo);
-        // dd($this->dataDaftarRi);
-        // jika observasi tidak ditemukan tambah variable observasi pda array
-        if (isset($this->dataDaftarRi['observasi']['pemakaianOksigen']) == false) {
+        if (!isset($this->dataDaftarRi['observasi']) || !is_array($this->dataDaftarRi['observasi'])) {
+            $this->dataDaftarRi['observasi'] = [];
+        }
+        if (
+            !isset($this->dataDaftarRi['observasi']['pemakaianOksigen']) ||
+            !is_array($this->dataDaftarRi['observasi']['pemakaianOksigen'])
+        ) {
             $this->dataDaftarRi['observasi']['pemakaianOksigen'] = $this->observasi;
         }
-    }
 
+        // Normalisasi array item agar tidak ada stdClass
+        $list = $this->dataDaftarRi['observasi']['pemakaianOksigen']['pemakaianOksigenData'] ?? [];
+        $this->dataDaftarRi['observasi']['pemakaianOksigen']['pemakaianOksigenData'] =
+            collect(is_array($list) ? $list : [])
+            ->map(fn($r) => is_array($r) ? $r : (array)$r)
+            ->values()
+            ->all();
+    }
 
 
     public function addPemakaianOksigen()
     {
-        // entry Pemeriksa
+        $riHdrNo = $this->dataDaftarRi['riHdrNo'] ?? $this->riHdrNoRef ?? null;
+        if (!$riHdrNo) {
+            toastr()->positionClass('toast-top-left')->addError("riHdrNo kosong.");
+            return;
+        }
+
+        // set pemeriksa & validasi
         $this->pemakaianOksigen['pemeriksa'] = auth()->user()->myuser_name;
 
-        // validasi
-        $this->validateDataPemakaianOksigenRi();
-        // check exist
-        $cekPemakaianOksigen = collect($this->dataDaftarRi['observasi']['pemakaianOksigen']['pemakaianOksigenData'] ?? [])
-            ->where("tanggalWaktuMulai", '=', $this->pemakaianOksigen['tanggalWaktuMulai'])
-            ->count();
-        if (!$cekPemakaianOksigen) {
-            $this->dataDaftarRi['observasi']['pemakaianOksigen']['pemakaianOksigenData'][] = [
-                "jenisAlatOksigen" => $this->pemakaianOksigen['jenisAlatOksigen'],
-                "jenisAlatOksigenDetail" => $this->pemakaianOksigen['jenisAlatOksigenDetail'],
-                "dosisOksigen" => $this->pemakaianOksigen['dosisOksigen'],
-                "dosisOksigenDetail" => $this->pemakaianOksigen['dosisOksigenDetail'],
-                "durasiPenggunaan" => $this->pemakaianOksigen['durasiPenggunaan'],
-                "modelPenggunaan" => $this->pemakaianOksigen['modelPenggunaan'],
-                "tanggalWaktuMulai" => $this->pemakaianOksigen['tanggalWaktuMulai'],
-                "tanggalWaktuSelesai" => $this->pemakaianOksigen['tanggalWaktuSelesai'],
-            ];
+        if (!$this->validateDataPemakaianOksigenRi()) {
+            return; // HENTIKAN proses simpan ketika validasi gagal
+        }
 
+        $target = trim((string)$this->pemakaianOksigen['tanggalWaktuMulai']);
 
-            $this->dataDaftarRi['observasi']['pemakaianOksigen']['pemakaianOksigenLog'] =
-                [
-                    'userLogDesc' => 'Form Entry pemakaianOksigen',
-                    'userLog' => auth()->user()->myuser_name,
-                    'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
+        try {
+            $this->withRiLock($riHdrNo, function () use ($riHdrNo, $target) {
+                $fresh = $this->findDataRI($riHdrNo) ?: [];
+                $fresh['riHdrNo'] = $fresh['riHdrNo'] ?? $riHdrNo;
+
+                if (!isset($fresh['observasi']) || !is_array($fresh['observasi'])) {
+                    $fresh['observasi'] = [];
+                }
+                if (!isset($fresh['observasi']['pemakaianOksigen']) || !is_array($fresh['observasi']['pemakaianOksigen'])) {
+                    $fresh['observasi']['pemakaianOksigen'] = [
+                        'pemakaianOksigenTab'  => 'Pemakaian Oksigen',
+                        'pemakaianOksigenData' => [],
+                    ];
+                }
+
+                $list = $fresh['observasi']['pemakaianOksigen']['pemakaianOksigenData'] ?? [];
+                $list = collect($list)->map(fn($r) => is_array($r) ? $r : (array)$r)->values()->all();
+
+                // Cek duplikat
+                $dup = collect($list)->contains(
+                    fn($r) =>
+                    trim((string)($r['tanggalWaktuMulai'] ?? '')) === $target
+                );
+                if ($dup) {
+                    throw new \RuntimeException("Pemakaian Oksigen sudah ada.");
+                }
+
+                // Tambah item
+                $list[] = [
+                    "jenisAlatOksigen"       => (string)$this->pemakaianOksigen['jenisAlatOksigen'],
+                    "jenisAlatOksigenDetail" => (string)$this->pemakaianOksigen['jenisAlatOksigenDetail'],
+                    "dosisOksigen"           => (string)$this->pemakaianOksigen['dosisOksigen'],
+                    "dosisOksigenDetail"     => (string)$this->pemakaianOksigen['dosisOksigenDetail'],
+                    "durasiPenggunaan"       => (string)$this->pemakaianOksigen['durasiPenggunaan'],
+                    "modelPenggunaan"        => (string)$this->pemakaianOksigen['modelPenggunaan'],
+                    "tanggalWaktuMulai"      => $target,
+                    "tanggalWaktuSelesai"    => (string)($this->pemakaianOksigen['tanggalWaktuSelesai'] ?? ''),
+                    "pemeriksa"              => (string)$this->pemakaianOksigen['pemeriksa'],
                 ];
 
-            $this->store();
-            // reset pemakaianOksigen
+                $fresh['observasi']['pemakaianOksigen']['pemakaianOksigenData'] = array_values($list);
+                $fresh['observasi']['pemakaianOksigen']['pemakaianOksigenLog'] = [
+                    'userLogDesc' => 'Form Entry pemakaianOksigen',
+                    'userLog'     => auth()->user()->myuser_name,
+                    'userLogDate' => Carbon::now(config('app.timezone'))->format('d/m/Y H:i:s')
+                ];
+
+                $this->updateJsonRI($riHdrNo, $fresh);
+                $this->dataDaftarRi = $fresh;
+            });
+
             $this->reset(['pemakaianOksigen']);
-        } else {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("PemakaianOksigen Sudah ada.");
+            $this->emit('syncronizeAssessmentPerawatRIFindData');
+            toastr()->positionClass('toast-top-left')->addSuccess("Pemakaian Oksigen berhasil disimpan.");
+        } catch (LockTimeoutException $e) {
+            toastr()->positionClass('toast-top-left')->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
+        } catch (\RuntimeException $e) {
+            toastr()->positionClass('toast-top-left')->addError($e->getMessage());
+        } catch (\Throwable $e) {
+            toastr()->positionClass('toast-top-left')->addError('Gagal menyimpan: ' . $e->getMessage());
         }
     }
 
     public function removePemakaianOksigen($tanggalWaktuMulai)
     {
+        $riHdrNo = $this->dataDaftarRi['riHdrNo'] ?? $this->riHdrNoRef ?? null;
+        if (!$riHdrNo) {
+            toastr()->positionClass('toast-top-left')->addError("riHdrNo kosong.");
+            return;
+        }
 
-        $pemakaianOksigen = collect($this->dataDaftarRi['observasi']['pemakaianOksigen']['pemakaianOksigenData'])->where("tanggalWaktuMulai", '!=', $tanggalWaktuMulai)->toArray();
-        $this->dataDaftarRi['observasi']['pemakaianOksigen']['pemakaianOksigenData'] = $pemakaianOksigen;
+        $target = trim((string)$tanggalWaktuMulai);
 
-        $this->dataDaftarRi['observasi']['pemakaianOksigen']['pemakaianOksigenLog'] =
-            [
-                'userLogDesc' => 'Hapus pemakaianOksigen',
-                'userLog' => auth()->user()->myuser_name,
-                'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
-            ];
-        $this->store();
+        try {
+            $this->withRiLock($riHdrNo, function () use ($riHdrNo, $target) {
+                $fresh = $this->findDataRI($riHdrNo) ?: [];
+                $fresh['riHdrNo'] = $fresh['riHdrNo'] ?? $riHdrNo;
+
+                if (!isset($fresh['observasi']) || !is_array($fresh['observasi'])) {
+                    $fresh['observasi'] = [];
+                }
+                if (!isset($fresh['observasi']['pemakaianOksigen']) || !is_array($fresh['observasi']['pemakaianOksigen'])) {
+                    $fresh['observasi']['pemakaianOksigen'] = [
+                        'pemakaianOksigenTab'  => 'Pemakaian Oksigen',
+                        'pemakaianOksigenData' => [],
+                    ];
+                }
+
+                $list = $fresh['observasi']['pemakaianOksigen']['pemakaianOksigenData'] ?? [];
+                $list = collect($list)->map(fn($r) => is_array($r) ? $r : (array)$r)->values()->all();
+
+                $removed = false;
+                $filtered = [];
+                foreach ($list as $row) {
+                    $rowTime = trim((string)($row['tanggalWaktuMulai'] ?? ''));
+                    if (!$removed && $rowTime === $target) {
+                        $removed = true;
+                        continue;
+                    }
+                    $filtered[] = $row;
+                }
+                if (!$removed) {
+                    throw new \RuntimeException('Data pemakaian oksigen tidak ditemukan.');
+                }
+
+                $fresh['observasi']['pemakaianOksigen']['pemakaianOksigenData'] = array_values($filtered);
+                $fresh['observasi']['pemakaianOksigen']['pemakaianOksigenLog'] = [
+                    'userLogDesc' => 'Hapus pemakaianOksigen (by tanggalWaktuMulai)',
+                    'userLog'     => auth()->user()->myuser_name,
+                    'userLogDate' => Carbon::now(config('app.timezone'))->format('d/m/Y H:i:s')
+                ];
+
+                $this->updateJsonRI($riHdrNo, $fresh);
+                $this->dataDaftarRi = $fresh;
+            });
+
+            $this->emit('syncronizeAssessmentPerawatRIFindData');
+            toastr()->positionClass('toast-top-left')->addSuccess('Item berhasil dihapus.');
+        } catch (LockTimeoutException $e) {
+            toastr()->positionClass('toast-top-left')->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
+        } catch (\RuntimeException $e) {
+            toastr()->positionClass('toast-top-left')->addError($e->getMessage());
+        } catch (\Throwable $e) {
+            toastr()->positionClass('toast-top-left')->addError('Gagal menghapus: ' . $e->getMessage());
+        }
     }
 
 
@@ -210,76 +297,102 @@ class PemakaianOksigen extends Component
     }
     public function setTanggalWaktuSelesai($index, $myTime)
     {
-        $this->dataDaftarRi['observasi']['pemakaianOksigen']['pemakaianOksigenData'][$index]['tanggalWaktuSelesai'] = $myTime;
+        // gunakan updateTanggalWaktuSelesai supaya validasi & hitung durasi konsisten
+        $data = $this->dataDaftarRi['observasi']['pemakaianOksigen']['pemakaianOksigenData'][$index] ?? null;
+        if (!$data) return;
 
-        //Hitung Selisih Jam
-        $tanggalWaktuMulai = $this->dataDaftarRi['observasi']['pemakaianOksigen']['pemakaianOksigenData'][$index]['tanggalWaktuMulai'];
-        $tanggalWaktuSelesai = $this->dataDaftarRi['observasi']['pemakaianOksigen']['pemakaianOksigenData'][$index]['tanggalWaktuSelesai'];
-
-        if ($tanggalWaktuMulai && $tanggalWaktuSelesai) {
-            $mulai = Carbon::createFromFormat('d/m/Y H:i:s', $tanggalWaktuMulai, env('APP_TIMEZONE'));
-            $selesai = Carbon::createFromFormat('d/m/Y H:i:s', $tanggalWaktuSelesai, env('APP_TIMEZONE'));
-
-            // Hitung selisih dalam jam dan menit
-            $selisihJam = $mulai->diffInHours($selesai);
-            $selisihMenit = $mulai->diffInMinutes($selesai) % 60;
-            $this->dataDaftarRi['observasi']['pemakaianOksigen']['pemakaianOksigenData'][$index]['durasiPenggunaan'] = $selisihJam . ' jam ' . $selisihMenit . ' menit';
-
-            $this->dataDaftarRi['observasi']['pemakaianOksigen']['pemakaianOksigenLog'] =
-                [
-                    'userLogDesc' => 'Set TanggalWaktuSelesai pemakaianOksigen',
-                    'userLog' => auth()->user()->myuser_name,
-                    'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
-                ];
-            $this->store();
-        }
+        $this->updateTanggalWaktuSelesai($index, $data['tanggalWaktuMulai'] ?? '', $myTime);
     }
 
     public function updateTanggalWaktuSelesai($index, $myTimeStart, $myTimeEnd)
     {
-
+        // Validasi sederhana lokal
         $r = ['tanggalWaktuMulai' => $myTimeStart, 'tanggalWaktuSelesai' => $myTimeEnd];
         $rules = [
-            'tanggalWaktuMulai' => 'required|date_format:d/m/Y H:i:s',
+            'tanggalWaktuMulai'   => 'required|date_format:d/m/Y H:i:s',
             'tanggalWaktuSelesai' => 'required|date_format:d/m/Y H:i:s|after:tanggalWaktuMulai',
         ];
-
         $messages = [
-            'tanggalWaktuMulai.required' => 'Waktu mulai harus diisi.',
-            'tanggalWaktuMulai.date_format' => 'Format waktu mulai harus sesuai dengan d/m/Y H:i:s.',
-
+            'tanggalWaktuMulai.required'   => 'Waktu mulai harus diisi.',
+            'tanggalWaktuMulai.date_format' => 'Format waktu mulai harus d/m/Y H:i:s.',
             'tanggalWaktuSelesai.required' => 'Waktu akhir harus diisi.',
-            'tanggalWaktuSelesai.date_format' => 'Format waktu akhir harus sesuai dengan d/m/Y H:i:s.',
-            'tanggalWaktuSelesai.after' => 'Waktu akhir harus lebih besar dari waktu mulai.',
+            'tanggalWaktuSelesai.date_format' => 'Format waktu akhir harus d/m/Y H:i:s.',
+            'tanggalWaktuSelesai.after'    => 'Waktu akhir harus > waktu mulai.',
         ];
-
         $validator = Validator::make($r, $rules, $messages);
-
         if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
+            toastr()->positionClass('toast-top-left')->addError($validator->errors()->first());
+            return;
         }
 
-        //Set TanggalWaktuSelesai
-        $this->dataDaftarRi['observasi']['pemakaianOksigen']['pemakaianOksigenData'][$index]['tanggalWaktuSelesai'] = $r['tanggalWaktuSelesai'];
-
-        //Hitung Selisih Jam
-        if ($r['tanggalWaktuMulai'] && $r['tanggalWaktuSelesai']) {
-            $mulai = Carbon::createFromFormat('d/m/Y H:i:s', $r['tanggalWaktuMulai'], env('APP_TIMEZONE'));
-            $selesai = Carbon::createFromFormat('d/m/Y H:i:s', $r['tanggalWaktuSelesai'], env('APP_TIMEZONE'));
-
-            // Hitung selisih dalam jam dan menit
-            $selisihJam = $mulai->diffInHours($selesai);
-            $selisihMenit = $mulai->diffInMinutes($selesai) % 60;
-            $this->dataDaftarRi['observasi']['pemakaianOksigen']['pemakaianOksigenData'][$index]['durasiPenggunaan'] = $selisihJam . ' jam ' . $selisihMenit . ' menit';
+        $riHdrNo = $this->dataDaftarRi['riHdrNo'] ?? $this->riHdrNoRef ?? null;
+        if (!$riHdrNo) {
+            toastr()->positionClass('toast-top-left')->addError("riHdrNo kosong.");
+            return;
         }
 
-        $this->dataDaftarRi['observasi']['pemakaianOksigen']['pemakaianOksigenLog'] =
-            [
-                'userLogDesc' => 'Update TanggalWaktuSelesai pemakaianOksigen',
-                'userLog' => auth()->user()->myuser_name,
-                'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
-            ];
-        $this->store();
+        try {
+            $this->withRiLock($riHdrNo, function () use ($riHdrNo, $index, $r) {
+                $fresh = $this->findDataRI($riHdrNo) ?: [];
+                $fresh['riHdrNo'] = $fresh['riHdrNo'] ?? $riHdrNo;
+
+                if (!isset($fresh['observasi']) || !is_array($fresh['observasi'])) {
+                    $fresh['observasi'] = [];
+                }
+                if (!isset($fresh['observasi']['pemakaianOksigen']) || !is_array($fresh['observasi']['pemakaianOksigen'])) {
+                    $fresh['observasi']['pemakaianOksigen'] = [
+                        'pemakaianOksigenTab'  => 'Pemakaian Oksigen',
+                        'pemakaianOksigenData' => [],
+                    ];
+                }
+
+                $list = $fresh['observasi']['pemakaianOksigen']['pemakaianOksigenData'] ?? [];
+                $list = collect($list)->map(fn($r) => is_array($r) ? $r : (array)$r)->values()->all();
+
+                if (!isset($list[$index])) {
+                    throw new \RuntimeException('Index data tidak valid.');
+                }
+
+                // Update end time
+                $list[$index]['tanggalWaktuSelesai'] = $r['tanggalWaktuSelesai'];
+
+                // Hitung durasi
+                $mulai   = Carbon::createFromFormat('d/m/Y H:i:s', $r['tanggalWaktuMulai'], config('app.timezone'));
+                $selesai = Carbon::createFromFormat('d/m/Y H:i:s', $r['tanggalWaktuSelesai'], config('app.timezone'));
+                $selisihJam   = $mulai->diffInHours($selesai);
+                $selisihMenit = $mulai->diffInMinutes($selesai) % 60;
+                $list[$index]['durasiPenggunaan'] = $selisihJam . ' jam ' . $selisihMenit . ' menit';
+
+                $fresh['observasi']['pemakaianOksigen']['pemakaianOksigenData'] = array_values($list);
+                $fresh['observasi']['pemakaianOksigen']['pemakaianOksigenLog'] = [
+                    'userLogDesc' => 'Update TanggalWaktuSelesai pemakaianOksigen',
+                    'userLog'     => auth()->user()->myuser_name,
+                    'userLogDate' => Carbon::now(config('app.timezone'))->format('d/m/Y H:i:s')
+                ];
+
+                $this->updateJsonRI($riHdrNo, $fresh);
+                $this->dataDaftarRi = $fresh;
+            });
+
+            $this->emit('syncronizeAssessmentPerawatRIFindData');
+            toastr()->positionClass('toast-top-left')->addSuccess('Tanggal selesai & durasi diperbarui.');
+        } catch (LockTimeoutException $e) {
+            toastr()->positionClass('toast-top-left')->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
+        } catch (\RuntimeException $e) {
+            toastr()->positionClass('toast-top-left')->addError($e->getMessage());
+        } catch (\Throwable $e) {
+            toastr()->positionClass('toast-top-left')->addError('Gagal memperbarui: ' . $e->getMessage());
+        }
+    }
+
+    private function withRiLock(string $riHdrNo, callable $fn): void
+    {
+        $key = "ri:{$riHdrNo}";
+        Cache::lock($key, 10)->block(5, function () use ($fn) {
+            DB::transaction(function () use ($fn) {
+                $fn();
+            });
+        });
     }
 
 
