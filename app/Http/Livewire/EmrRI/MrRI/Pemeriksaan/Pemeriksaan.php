@@ -3,6 +3,8 @@
 namespace App\Http\Livewire\EmrRI\MrRI\Pemeriksaan;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -86,7 +88,7 @@ class Pemeriksaan extends Component
         // dd($propertyName);
         $this->validateOnly($propertyName);
         $this->scoringIMT();
-        $this->store();
+        // $this->store();
     }
 
     // lab
@@ -111,135 +113,143 @@ class Pemeriksaan extends Component
     private function renderisPemeriksaanLaboratorium()
     {
         if (empty($this->isPemeriksaanLaboratorium)) {
-            $isPemeriksaanLaboratorium = DB::table('lbmst_clabitems')
+            $rows = DB::table('lbmst_clabitems')
                 ->select('clabitem_desc', 'clabitem_id', 'price', 'clabitem_group', 'item_code')
                 ->whereNull('clabitem_group')
                 ->whereNotNull('clabitem_desc')
                 ->orderBy('clabitem_desc', 'asc')
                 ->get();
 
-            $this->isPemeriksaanLaboratorium = json_decode(
-                $isPemeriksaanLaboratorium->map(function ($isPemeriksaanLaboratorium) {
-                    $isPemeriksaanLaboratorium->labStatus = 0;
-
-                    return $isPemeriksaanLaboratorium;
-                }),
-                true
-            );
+            $this->isPemeriksaanLaboratorium = $rows
+                ->map(function ($r) {
+                    return [
+                        'clabitem_desc'  => $r->clabitem_desc,
+                        'clabitem_id'    => $r->clabitem_id,
+                        'price'          => $r->price,
+                        'clabitem_group' => $r->clabitem_group,
+                        'item_code'      => $r->item_code,
+                        'labStatus'      => 0,
+                    ];
+                })
+                ->values()
+                ->all();
         }
     }
 
     public function PemeriksaanLaboratoriumIsSelectedFor($key): void
     {
         $this->isPemeriksaanLaboratorium[$key]['labStatus'] = $this->isPemeriksaanLaboratorium[$key]['labStatus'] ? 0 : 1;
-        $this->renderPemeriksaanLaboratoriumIsSelected($key);
+        $this->renderPemeriksaanLaboratoriumIsSelected();
     }
 
     public function RemovePemeriksaanLaboratoriumIsSelectedFor($key): void
     {
         $this->isPemeriksaanLaboratorium[$key]['labStatus'] = $this->isPemeriksaanLaboratorium[$key]['labStatus'] ? 0 : 1;
-        $this->renderPemeriksaanLaboratoriumIsSelected($key);
+        $this->renderPemeriksaanLaboratoriumIsSelected();
     }
 
-    private function renderPemeriksaanLaboratoriumIsSelected($key): void
+    private function renderPemeriksaanLaboratoriumIsSelected(): void
     {
         $this->isPemeriksaanLaboratoriumSelected = collect($this->isPemeriksaanLaboratorium)
-            ->where('labStatus', 1);
+            ->where('labStatus', 1)->values()->all();
     }
 
     public function kirimLaboratorium()
     {
-        $sql = "select ri_status  from rstxn_rihdrs where rihdr_no=:riHdrNo";
-        $checkStatusRI = DB::scalar($sql, [
-            "riHdrNo" => $this->dataDaftarRi['riHdrNo'],
-        ]);
+        $selected = collect($this->isPemeriksaanLaboratorium)->where('labStatus', 1)->values()->all();
+        if (empty($selected)) {
+            toastr()->positionClass('toast-top-left')->addError('Pilih minimal satu item laboratorium.');
+            return;
+        }
 
-        if ($checkStatusRI == 'I') {
-            // hasil Key = 0 atau urutan pemeriksan lab lebih dari 1
-            $this->isPemeriksaanLaboratoriumSelectedKeyHdr = collect(isset($this->dataDaftarRi['pemeriksaan']['pemeriksaanPenunjang']['lab']) ? $this->dataDaftarRi['pemeriksaan']['pemeriksaanPenunjang']['lab'] : [])->count();
+        $riHdrNo = $this->dataDaftarRi['riHdrNo'] ?? null;
+        if (!$riHdrNo) {
+            toastr()->positionClass('toast-top-left')->addError("riHdrNo kosong.");
+            return;
+        }
 
-            $sql = "select nvl(max(to_number(checkup_no))+1,1) from lbtxn_checkuphdrs";
-            $checkupNo = DB::scalar($sql);
+        try {
+            $this->withRiLock($riHdrNo, function () use ($riHdrNo) {
+                $checkStatusRI = DB::scalar(
+                    "select ri_status from rstxn_rihdrs where rihdr_no=:riHdrNo",
+                    ["riHdrNo" => $riHdrNo]
+                );
+                if ($checkStatusRI !== 'I') {
+                    throw new \RuntimeException("Pasien Sudah Pulang, Anda tidak bisa meneruskan pemeriksaan ini.");
+                }
 
-            // array Hdr
-            $this->dataDaftarRi['pemeriksaan']['pemeriksaanPenunjang']['lab'][$this->isPemeriksaanLaboratoriumSelectedKeyHdr]['labHdr']['labHdrNo'] =  $checkupNo;
-            $this->dataDaftarRi['pemeriksaan']['pemeriksaanPenunjang']['lab'][$this->isPemeriksaanLaboratoriumSelectedKeyHdr]['labHdr']['labHdrDate'] = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
+                // generate nomor aman dalam transaksi+lock
+                $checkupNo = DB::scalar("select nvl(max(to_number(checkup_no))+1,1) from lbtxn_checkuphdrs");
 
-
-            // insert Hdr
-            DB::table('lbtxn_checkuphdrs')->insert([
-                'reg_no' => $this->dataDaftarRi['regNo'],
-                'dr_id' => $this->dataDaftarRi['drId'],
-                'checkup_date' => DB::raw("to_date('" . Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s') . "','dd/mm/yyyy hh24:mi:ss')"),
-                'status_rjri' => 'RI',
-                'checkup_status' => 'P',
-                'ref_no' => $this->dataDaftarRi['riHdrNo'],
-                'checkup_no' => $checkupNo,
-
-            ]);
-
-
-            // hasil Key Dtl dari jml yang selected -1 karena array dimulai dari 0
-            $this->isPemeriksaanLaboratoriumSelectedKeyDtl = collect($this->isPemeriksaanLaboratoriumSelected)->count() - 1;
-
-
-            // array Dtl
-            $this->dataDaftarRi['pemeriksaan']['pemeriksaanPenunjang']['lab'][$this->isPemeriksaanLaboratoriumSelectedKeyHdr]['labHdr']['labDtl'] =  collect($this->isPemeriksaanLaboratorium)
-                ->where('labStatus', 1)
-                ->toArray();
-
-            // insert Dtl
-            foreach ($this->dataDaftarRi['pemeriksaan']['pemeriksaanPenunjang']['lab'][$this->isPemeriksaanLaboratoriumSelectedKeyHdr]['labHdr']['labDtl'] as $labDtl) {
-                $sql = "select nvl(to_number(max(checkup_dtl))+1,1) from LBTXN_CHECKUPDTLS";
-                $checkupDtl = DB::scalar($sql);
-
-                // insert Prise checkup dtl
-                DB::table('lbtxn_checkupdtls')->insert([
-                    'clabitem_id' => $labDtl['clabitem_id'],
-                    'checkup_no' => $checkupNo,
-                    'checkup_dtl' => $checkupDtl,
-                    'lab_item_code' => $labDtl['item_code'],
-                    'price' => $labDtl['price']
+                // insert hdr
+                DB::table('lbtxn_checkuphdrs')->insert([
+                    'reg_no'        => $this->dataDaftarRi['regNo'],
+                    'dr_id'         => $this->dataDaftarRi['drId'],
+                    'checkup_date'  => DB::raw("to_date('" . Carbon::now(config('app.timezone'))->format('d/m/Y H:i:s') . "','dd/mm/yyyy hh24:mi:ss')"),
+                    'status_rjri'   => 'RI',
+                    'checkup_status' => 'P',
+                    'ref_no'        => $riHdrNo,
+                    'checkup_no'    => $checkupNo,
                 ]);
 
-                foreach ($this->isPemeriksaanLaboratoriumSelected as $isPemeriksaanLaboratoriumSelected) {
+                // daftar terpilih → array
+                $selected = collect($this->isPemeriksaanLaboratorium)->where('labStatus', 1)->values()->all();
 
-                    // insert No Prise checkup dtl
-                    $items = DB::table('lbmst_clabitems')->select('clabitem_desc', 'clabitem_id', 'price', 'clabitem_group', 'item_code')
+                // insert dtl utama + paket
+                foreach ($selected as $labDtl) {
+                    $checkupDtl = DB::scalar("select nvl(to_number(max(checkup_dtl))+1,1) from LBTXN_CHECKUPDTLS");
+                    DB::table('lbtxn_checkupdtls')->insert([
+                        'clabitem_id'  => $labDtl['clabitem_id'],
+                        'checkup_no'   => $checkupNo,
+                        'checkup_dtl'  => $checkupDtl,
+                        'lab_item_code' => $labDtl['item_code'],
+                        'price'        => $labDtl['price'],
+                    ]);
+
+                    // item paket (jika ada)
+                    $items = DB::table('lbmst_clabitems')
+                        ->select('clabitem_id', 'item_code', 'price')
                         ->where('clabitem_group', $labDtl['clabitem_id'])
-                        ->orderBy('item_seq', 'asc')
-                        ->orderBy('clabitem_desc', 'asc')
+                        ->orderBy('item_seq', 'asc')->orderBy('clabitem_desc', 'asc')
                         ->get();
 
                     foreach ($items as $item) {
-                        $sql = "select nvl(to_number(max(checkup_dtl))+1,1) from LBTXN_CHECKUPDTLS";
-                        $checkupDtl = DB::scalar($sql);
-
+                        $checkupDtl = DB::scalar("select nvl(to_number(max(checkup_dtl))+1,1) from LBTXN_CHECKUPDTLS");
                         DB::table('lbtxn_checkupdtls')->insert([
-                            'clabitem_id' => $item->clabitem_id,
-                            'checkup_no' => $checkupNo,
-                            'checkup_dtl' => $checkupDtl,
+                            'clabitem_id'  => $item->clabitem_id,
+                            'checkup_no'   => $checkupNo,
+                            'checkup_dtl'  => $checkupDtl,
                             'lab_item_code' => $item->item_code,
-                            'price' => $item->price
+                            'price'        => $item->price,
                         ]);
-
-                        $this->isPemeriksaanLaboratoriumSelectedKeyDtl = $this->isPemeriksaanLaboratoriumSelectedKeyDtl + 1;
                     }
                 }
 
+                // patch JSON (subtree pemeriksaan) di state komponen
+                $hdrIdx = collect($this->dataDaftarRi['pemeriksaan']['pemeriksaanPenunjang']['lab'] ?? [])->count();
+                $this->dataDaftarRi['pemeriksaan']['pemeriksaanPenunjang']['lab'][$hdrIdx]['labHdr'] = [
+                    'labHdrNo'   => $checkupNo,
+                    'labHdrDate' => Carbon::now(config('app.timezone'))->format('d/m/Y H:i:s'),
+                    'labDtl'     => $selected,
+                ];
 
-                $this->isPemeriksaanLaboratoriumSelectedKeyDtl = $this->isPemeriksaanLaboratoriumSelectedKeyDtl + 1;
-            }
+                // tulis JSON via store() tetapi JANGAN membuat lock baru: panggil langsung update di sini
+                $fresh = $this->findDataRI($riHdrNo) ?: [];
+                $fresh['pemeriksaan'] = $this->dataDaftarRi['pemeriksaan'] ?? [];
+                $this->updateJsonRI($riHdrNo, $fresh);
+                $this->dataDaftarRi = $fresh;
+            });
 
-
-
-            $this->updateDataRi($this->dataDaftarRi['riHdrNo']);
             $this->closeModalLaboratorium();
-        } else {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Pasien Sudah Pulang, Anda tidak bisa meneruskan pemeriksaan ini.");
-            return;
+            $this->emit('syncronizeAssessmentPerawatRIFindData');
+            toastr()->positionClass('toast-top-left')->addSuccess("Pemeriksaan Lab terkirim.");
+        } catch (\RuntimeException $e) {
+            toastr()->positionClass('toast-top-left')->addError($e->getMessage());
+        } catch (LockTimeoutException $e) {
+            toastr()->positionClass('toast-top-left')->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
         }
     }
+
     // Lab
 
     // Rad
@@ -264,108 +274,103 @@ class Pemeriksaan extends Component
     private function renderisPemeriksaanRadiologi()
     {
         if (empty($this->isPemeriksaanRadiologi)) {
-            $isPemeriksaanRadiologi = DB::table('rsmst_radiologis ')
+            $rows = DB::table('rsmst_radiologis')
                 ->select('rad_desc', 'rad_price', 'rad_id')
                 ->orderBy('rad_desc', 'asc')
                 ->get();
 
-            $this->isPemeriksaanRadiologi = json_decode(
-                $isPemeriksaanRadiologi->map(function ($isPemeriksaanRadiologi) {
-                    $isPemeriksaanRadiologi->radStatus = 0;
-
-                    return $isPemeriksaanRadiologi;
-                }),
-                true
-            );
+            $this->isPemeriksaanRadiologi = $rows
+                ->map(function ($r) {
+                    return [
+                        'rad_desc'  => $r->rad_desc,
+                        'rad_price' => $r->rad_price,
+                        'rad_id'    => $r->rad_id,
+                        'radStatus' => 0,
+                    ];
+                })
+                ->values()
+                ->all();
         }
     }
-
     public function PemeriksaanRadiologiIsSelectedFor($key): void
     {
         $this->isPemeriksaanRadiologi[$key]['radStatus'] = $this->isPemeriksaanRadiologi[$key]['radStatus'] ? 0 : 1;
-        $this->renderPemeriksaanRadiologiIsSelected($key);
+        $this->renderPemeriksaanRadiologiIsSelected();
     }
 
     public function RemovePemeriksaanRadiologiIsSelectedFor($key): void
     {
         $this->isPemeriksaanRadiologi[$key]['radStatus'] = $this->isPemeriksaanRadiologi[$key]['radStatus'] ? 0 : 1;
-        $this->renderPemeriksaanRadiologiIsSelected($key);
+        $this->renderPemeriksaanRadiologiIsSelected();
     }
 
-    private function renderPemeriksaanRadiologiIsSelected($key): void
+    private function renderPemeriksaanRadiologiIsSelected(): void
     {
         $this->isPemeriksaanRadiologiSelected = collect($this->isPemeriksaanRadiologi)
-            ->where('radStatus', 1);
+            ->where('radStatus', 1)->values()->all();
     }
 
     public function kirimRadiologi()
     {
 
-        $sql = "select ri_status  from rstxn_rihdrs where rihdr_no=:riHdrNo";
-        $checkStatusRI = DB::scalar($sql, [
-            "riHdrNo" => $this->dataDaftarRi['riHdrNo'],
-        ]);
-
-        if ($checkStatusRI == 'I') {
-            // hasil Key = 0 atau urutan pemeriksan lab lebih dari 1
-            $this->isPemeriksaanRadiologiSelectedKeyHdr = collect(isset($this->dataDaftarRi['pemeriksaan']['pemeriksaanPenunjang']['rad']) ? $this->dataDaftarRi['pemeriksaan']['pemeriksaanPenunjang']['rad'] : [])->count();
-
-            // $sql = "select nvl(max(rirad_no)+1,1) from rstxn_riradiologs";
-            // $checkupNo = DB::scalar($sql);
-
-            // array Hdr
-            $this->dataDaftarRi['pemeriksaan']['pemeriksaanPenunjang']['rad'][$this->isPemeriksaanRadiologiSelectedKeyHdr]['radHdr']['radHdrNo'] =  $this->dataDaftarRi['riHdrNo'];
-            $this->dataDaftarRi['pemeriksaan']['pemeriksaanPenunjang']['rad'][$this->isPemeriksaanRadiologiSelectedKeyHdr]['radHdr']['radHdrDate'] = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
-
-
-            // insert Hdr (Radiologi tidak di insert header / ikut txn rj)
-            // DB::table('lbtxn_checkuphdrs')->insert([
-            //     'reg_no' => $this->dataDaftarRi['regNo'],
-            //     'dr_id' => $this->dataDaftarRi['drId'],
-            //     'checkup_date' => DB::raw("to_date('" . Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s') . "','dd/mm/yyyy hh24:mi:ss')"),
-            //     'status_rjri' => 'RJ',
-            //     'checkup_status' => 'P',
-            //     'ref_no' => $this->dataDaftarRi['riHdrNo'],
-            //     'checkup_no' => $checkupNo,
-
-            // ]);
-
-
-            // hasil Key Dtl dari jml yang selected -1 karena array dimulai dari 0
-            $this->isPemeriksaanRadiologiSelectedKeyDtl = collect($this->isPemeriksaanRadiologiSelected)->count() - 1;
-
-
-            // array Dtl
-            $this->dataDaftarRi['pemeriksaan']['pemeriksaanPenunjang']['rad'][$this->isPemeriksaanRadiologiSelectedKeyHdr]['radHdr']['radDtl'] =  collect($this->isPemeriksaanRadiologi)
-                ->where('radStatus', 1)
-                ->toArray();
-
-            // insert Dtl
-            foreach ($this->dataDaftarRi['pemeriksaan']['pemeriksaanPenunjang']['rad'][$this->isPemeriksaanRadiologiSelectedKeyHdr]['radHdr']['radDtl'] as $radDtl) {
-                $sql = "select nvl(max(rirad_no)+1,1) from rstxn_riradiologs";
-                $checkupDtl = DB::scalar($sql);
-                // insert Prise checkup dtl
-                DB::table('rstxn_riradiologs')->insert([
-                    'rirad_no' => $checkupDtl,
-                    'rad_id' => $radDtl['rad_id'],
-                    'rihdr_no' => $this->dataDaftarRi['riHdrNo'],
-                    'rirad_price' => $radDtl['rad_price'],
-                    'dr_radiologi' => 'dr. M.A. Budi Purwito, Sp.Rad.',
-                    'waktu_entry' => DB::raw("to_date('" . Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s') . "','dd/mm/yyyy hh24:mi:ss')"),
-                    'rirad_date' => DB::raw("to_date('" . Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s') . "','dd/mm/yyyy hh24:mi:ss')"),
-                ]);
-
-
-                $this->isPemeriksaanRadiologiSelectedKeyDtl = $this->isPemeriksaanRadiologiSelectedKeyDtl + 1;
-            }
-
-
-
-            $this->updateDataRi($this->dataDaftarRi['riHdrNo']);
-            $this->closeModalRadiologi();
-        } else {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Pasien Sudah Pulang, Anda tidak bisa meneruskan pemeriksaan ini.");
+        $selected = collect($this->isPemeriksaanRadiologi)->where('radStatus', 1)->values()->all();
+        if (empty($selected)) {
+            toastr()->positionClass('toast-top-left')->addError('Pilih minimal satu item radiologi.');
             return;
+        }
+
+        $riHdrNo = $this->dataDaftarRi['riHdrNo'] ?? null;
+        if (!$riHdrNo) {
+            toastr()->positionClass('toast-top-left')->addError("riHdrNo kosong.");
+            return;
+        }
+
+        try {
+            $this->withRiLock($riHdrNo, function () use ($riHdrNo) {
+                $checkStatusRI = DB::scalar(
+                    "select ri_status from rstxn_rihdrs where rihdr_no=:riHdrNo",
+                    ["riHdrNo" => $riHdrNo]
+                );
+                if ($checkStatusRI !== 'I') {
+                    throw new \RuntimeException("Pasien Sudah Pulang, Anda tidak bisa meneruskan pemeriksaan ini.");
+                }
+
+                $selected = collect($this->isPemeriksaanRadiologi)->where('radStatus', 1)->values()->all();
+
+                foreach ($selected as $radDtl) {
+                    $riradNo = DB::scalar("select nvl(max(rirad_no)+1,1) from rstxn_riradiologs");
+                    DB::table('rstxn_riradiologs')->insert([
+                        'rirad_no'     => $riradNo,
+                        'rad_id'       => $radDtl['rad_id'],
+                        'rihdr_no'     => $riHdrNo,
+                        'rirad_price'  => $radDtl['rad_price'],
+                        'dr_radiologi' => 'dr. M.A. Budi Purwito, Sp.Rad.',
+                        'waktu_entry'  => DB::raw("to_date('" . Carbon::now(config('app.timezone'))->format('d/m/Y H:i:s') . "','dd/mm/yyyy hh24:mi:ss')"),
+                        'rirad_date'   => DB::raw("to_date('" . Carbon::now(config('app.timezone'))->format('d/m/Y H:i:s') . "','dd/mm/yyyy hh24:mi:ss')"),
+                    ]);
+                }
+
+                // patch JSON
+                $hdrIdx = collect($this->dataDaftarRi['pemeriksaan']['pemeriksaanPenunjang']['rad'] ?? [])->count();
+                $this->dataDaftarRi['pemeriksaan']['pemeriksaanPenunjang']['rad'][$hdrIdx]['radHdr'] = [
+                    'radHdrNo'   => $riHdrNo,
+                    'radHdrDate' => Carbon::now(config('app.timezone'))->format('d/m/Y H:i:s'),
+                    'radDtl'     => $selected,
+                ];
+
+                $fresh = $this->findDataRI($riHdrNo) ?: [];
+                $fresh['pemeriksaan'] = $this->dataDaftarRi['pemeriksaan'] ?? [];
+                $this->updateJsonRI($riHdrNo, $fresh);
+                $this->dataDaftarRi = $fresh;
+            });
+
+            $this->closeModalRadiologi();
+            $this->emit('syncronizeAssessmentPerawatRIFindData');
+            toastr()->positionClass('toast-top-left')->addSuccess("Pemeriksaan Radiologi terkirim.");
+        } catch (\RuntimeException $e) {
+            toastr()->positionClass('toast-top-left')->addError($e->getMessage());
+        } catch (LockTimeoutException $e) {
+            toastr()->positionClass('toast-top-left')->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
         }
     }
     // Rad
@@ -383,18 +388,51 @@ class Pemeriksaan extends Component
     // insert and update record start////////////////
     public function store()
     {
-        $this->updateDataRi($this->dataDaftarRi['riHdrNo']);
 
+        // Ambil riHdrNo dari state sekarang (fallback ke ref)
+        $riHdrNo = $this->dataDaftarRi['riHdrNo'] ?? $this->riHdrNoRef ?? null;
+        if (!$riHdrNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError("riHdrNo kosong.");
+            return;
+        }
+
+        $lockKey = "ri:{$riHdrNo}";
+
+        try {
+            // TTL 60s, tunggu hingga 10s
+            Cache::lock($lockKey, 60)->block(10, function () use ($riHdrNo) {
+                $fresh = $this->findDataRI($riHdrNo) ?: [];
+
+                // Guard: pastikan bentuk array
+                $freshPemeriksaan   = is_array($fresh['pemeriksaan'] ?? null) ? $fresh['pemeriksaan'] : [];
+                $incomingPemeriksaan = is_array($this->dataDaftarRi['pemeriksaan'] ?? null) ? $this->dataDaftarRi['pemeriksaan'] : [];
+
+                // Deep merge (overwrite hanya key yang dikirim user)
+                $fresh['pemeriksaan'] = array_replace_recursive($freshPemeriksaan, $incomingPemeriksaan);
+
+                DB::transaction(fn() => $this->updateJsonRI($riHdrNo, $fresh));
+
+                // Sinkronkan state komponen
+                $this->dataDaftarRi = $fresh;
+            });
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
+            return;
+        } catch (\Throwable $e) { // opsional, biar aman
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Gagal menyimpan: ' . $e->getMessage());
+            return;
+        }
+
+        // Broadcast ke komponen lain agar reload dari DB
         $this->emit('syncronizeAssessmentPerawatRIFindData');
+
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+            ->addSuccess("Pemeriksaan berhasil disimpan.");
     }
 
-    private function updateDataRi($riHdrNo): void
-    {
-
-        $this->updateJsonRI($riHdrNo, $this->dataDaftarRi);
-
-        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Pemeriksaan berhasil disimpan.");
-    }
     // insert and update record end////////////////
 
 
@@ -414,19 +452,14 @@ class Pemeriksaan extends Component
 
     private function scoringIMT(): void
     {
-        $bb = (isset($this->dataDaftarRi['pemeriksaan']['nutrisi']['bb'])
-            ? ($this->dataDaftarRi['pemeriksaan']['nutrisi']['bb']
-                ? $this->dataDaftarRi['pemeriksaan']['nutrisi']['bb']
-                : 1)
-            : 1);
-        $tb = (isset($this->dataDaftarRi['pemeriksaan']['nutrisi']['tb'])
-            ? ($this->dataDaftarRi['pemeriksaan']['nutrisi']['tb']
-                ? $this->dataDaftarRi['pemeriksaan']['nutrisi']['tb']
-                : 1)
-            : 1);;
-
-
-        $this->dataDaftarRi['pemeriksaan']['nutrisi']['imt'] = round($bb / (($tb / 100) * ($tb / 100)), 2);
+        $bb = (float) data_get($this->dataDaftarRi, 'pemeriksaan.nutrisi.bb', 0);
+        $tb = (float) data_get($this->dataDaftarRi, 'pemeriksaan.nutrisi.tb', 0);
+        if ($bb > 0 && $tb > 0) {
+            $m = $tb / 100;
+            $this->dataDaftarRi['pemeriksaan']['nutrisi']['imt'] = round($bb / ($m * $m), 2);
+        } else {
+            $this->dataDaftarRi['pemeriksaan']['nutrisi']['imt'] = null;
+        }
     }
 
 
@@ -460,10 +493,10 @@ class Pemeriksaan extends Component
         $this->dataDaftarRi['pemeriksaan']['uploadHasilPenunjang'][] = [
             'file' => $uploadHasilPenunjangfile,
             'desc' => $this->descPDF,
-            'tglUpload' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'),
+            'tglUpload' => Carbon::now(config('app.timezone'))->format('d/m/Y H:i:s'),
             'penanggungJawab' => [
                 'userLog' => auth()->user()->myuser_name,
-                'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'),
+                'userLogDate' => Carbon::now(config('app.timezone'))->format('d/m/Y H:i:s'),
                 'userLogCode' => auth()->user()->myuser_code
             ]
         ];
@@ -497,6 +530,16 @@ class Pemeriksaan extends Component
     {
         $this->isOpenRekamMedisuploadpenunjangHasil = false;
         $this->reset(['filePDF']);
+    }
+
+    private function withRiLock(string $riHdrNo, callable $fn): void
+    {
+        $lockKey = "ri:{$riHdrNo}";
+        Cache::lock($lockKey, 60)->block(10, function () use ($fn) {
+            DB::transaction(function () use ($fn) {
+                $fn();
+            });
+        });
     }
 
     // when new form instance
