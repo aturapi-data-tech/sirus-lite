@@ -7,7 +7,8 @@ use Livewire\WithPagination;
 use Carbon\Carbon;
 
 use App\Http\Traits\EmrRI\EmrRITrait;
-
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class Penilaian extends Component
 {
@@ -179,69 +180,42 @@ class Penilaian extends Component
 
     public function hitungSkorDanKategoriSkalaMorse()
     {
-        $dataResikoJatuh = $this->formEntryResikoJatuh['resikoJatuh']['resikoJatuhMetode']['dataResikoJatuh'];
+        $selected = $this->formEntryResikoJatuh['resikoJatuh']['resikoJatuhMetode']['dataResikoJatuh'] ?? [];
         $skor = 0;
 
-        // Hitung skor berdasarkan pilihan pengguna
         foreach ($this->skalaMorseOptions as $kategori => $options) {
-            if (isset($dataResikoJatuh[$kategori])) {
-                foreach ($options as $option) {
-                    if ($option[$kategori] === $dataResikoJatuh[$kategori]) {
-                        $skor += $option['score'];
-                        break;
-                    }
+            if (!isset($selected[$kategori])) continue;
+            foreach ($options as $option) {
+                if (($option[$kategori] ?? null) === $selected[$kategori]) {
+                    $skor += (int)$option['score'];
+                    break;
                 }
             }
         }
 
-        // Update skor
         $this->formEntryResikoJatuh['resikoJatuh']['resikoJatuhMetode']['resikoJatuhMetodeScore'] = $skor;
-
-        // Tentukan kategori risiko
-        if ($skor >= 45) {
-            $kategori = 'Tinggi';
-        } elseif ($skor >= 25) {
-            $kategori = 'Sedang';
-        } else {
-            $kategori = 'Rendah';
-        }
-
-        // Update kategori risiko
-        $this->formEntryResikoJatuh['resikoJatuh']['kategoriResiko'] = $kategori;
+        $this->formEntryResikoJatuh['resikoJatuh']['kategoriResiko'] =
+            $skor >= 45 ? 'Tinggi' : ($skor >= 25 ? 'Sedang' : 'Rendah');
     }
 
     public function hitungSkorDanKategoriSkalaHumptyDumpty()
     {
-        // Ambil data risiko jatuh dari form
-        $dataResikoJatuh = $this->formEntryResikoJatuh['resikoJatuh']['resikoJatuhMetode']['dataResikoJatuh'];
+        $selected = $this->formEntryResikoJatuh['resikoJatuh']['resikoJatuhMetode']['dataResikoJatuh'] ?? [];
         $skor = 0;
 
-        // Hitung skor berdasarkan pilihan pengguna
         foreach ($this->humptyDumptyOptions as $kategori => $options) {
-            if (isset($dataResikoJatuh[$kategori])) {
-                foreach ($options as $option) {
-                    if ($option[$kategori] === $dataResikoJatuh[$kategori]) {
-                        $skor += $option['score'];
-                        break;
-                    }
+            if (!isset($selected[$kategori])) continue;
+            foreach ($options as $option) {
+                if (($option[$kategori] ?? null) === $selected[$kategori]) {
+                    $skor += (int)$option['score'];
+                    break;
                 }
             }
         }
 
-        // Update skor
         $this->formEntryResikoJatuh['resikoJatuh']['resikoJatuhMetode']['resikoJatuhMetodeScore'] = $skor;
-
-        // Tentukan kategori risiko
-        if ($skor >= 16) {
-            $kategori = 'Tinggi';
-        } elseif ($skor >= 12) {
-            $kategori = 'Sedang';
-        } else {
-            $kategori = 'Rendah';
-        }
-
-        // Update kategori risiko
-        $this->formEntryResikoJatuh['resikoJatuh']['kategoriResiko'] = $kategori;
+        $this->formEntryResikoJatuh['resikoJatuh']['kategoriResiko'] =
+            $skor >= 16 ? 'Tinggi' : ($skor >= 12 ? 'Sedang' : 'Rendah');
     }
 
     public function updatedFormEntryResikoJatuhResikoJatuhResikoJatuhMetodeResikoJatuhMetode($value)
@@ -261,17 +235,13 @@ class Penilaian extends Component
 
     protected function defaultFormEntryResikoJatuh($metode)
     {
-        if ($metode === 'Skala Morse') {
-            $this->formEntryResikoJatuh['resikoJatuh']['resikoJatuhMetode']['dataResikoJatuh'] = $this->skalaMorseOptions;
-        } elseif ($metode === 'Skala Humpty Dumpty') {
-            $this->formEntryResikoJatuh['resikoJatuh']['resikoJatuhMetode']['dataResikoJatuh'] = $this->humptyDumptyOptions;
-        }
+        $this->formEntryResikoJatuh['resikoJatuh']['resikoJatuhMetode']['dataResikoJatuh'] = [];
     }
 
     public function setTglPenilaianResikoJatuh($tanggal)
     {
         // Set tanggal penilaian ke nilai yang diterima
-        $this->formEntryResikoJatuh['tglPenilaian'] = $tanggal;
+        $this->formEntryResikoJatuh['tglPenilaian'] = Carbon::now('Asia/Jakarta')->format('d/m/Y H:i:s');
     }
 
     // ADD REMOVE RESIKO JATUH////////////////////////////////////
@@ -342,7 +312,7 @@ class Penilaian extends Component
                 ->closeDuration(3)
                 ->positionClass('toast-top-left')
                 ->addError("Lakukan pengecekan kembali input data. " . $e->getMessage());
-            $this->validate($rules, $messages);
+            return;
         }
 
         // Tambahkan data risiko jatuh ke dalam $dataDaftarRi
@@ -352,7 +322,7 @@ class Penilaian extends Component
         $this->store();
 
         // Reset form entry risiko jatuh setelah data berhasil ditambahkan
-        $this->reset(['formEntryResikoJatuh']);
+        $this->formEntryResikoJatuh = $this->defaultFormEntryResikoJatuhState();
 
         // Tampilkan pesan sukses
         toastr()
@@ -485,7 +455,7 @@ class Penilaian extends Component
 
     public function setTglPenilaianNyeri($tanggal)
     {
-        $this->formEntryNyeri['tglPenilaian'] = $tanggal;
+        $this->formEntryNyeri['tglPenilaian'] = Carbon::now('Asia/Jakarta')->format('d/m/Y H:i:s');
     }
 
     public array $nyeriMetodeOptions = [
@@ -670,15 +640,13 @@ class Penilaian extends Component
     ];
 
     // Update Skor FLACC
-    public function updateFlaccScore($category, $score)
+    public function updateFlaccScore($category, $score): void
     {
-        foreach ($this->formEntryNyeri['nyeri']['nyeriMetode']['dataNyeri'][$category] as $key => &$item) {
-            if ($score !== $item['score']) {
-                $item['active'] = false;
-            }
+        foreach ($this->formEntryNyeri['nyeri']['nyeriMetode']['dataNyeri'][$category] as &$item) {
+            $item['active'] = ($item['score'] === (int)$score);
         }
+        unset($item);
 
-        // // Hitung total skor FLACC
         $this->calculateFlaccTotalScore();
     }
 
@@ -866,7 +834,7 @@ class Penilaian extends Component
         $this->store();
 
         // Reset form entry nyeri setelah data berhasil ditambahkan
-        $this->reset(['formEntryNyeri']);
+        $this->formEntryNyeri = $this->defaultFormEntryNyeriState();
 
         // Tampilkan pesan sukses
         toastr()
@@ -896,7 +864,48 @@ class Penilaian extends Component
 
 
 
+    private function defaultFormEntryNyeriState(): array
+    {
+        return [
+            "tglPenilaian" => "",
+            "petugasPenilai" => "",
+            "petugasPenilaiCode" => "",
+            "nyeri" => [
+                "nyeri" => "Tidak",
+                "nyeriMetode" => ["nyeriMetode" => "", "nyeriMetodeScore" => 0, "dataNyeri" => []],
+                "nyeriKet" => "",
+                "pencetus" => "",
+                "durasi" => "",
+                "lokasi" => "",
+                "waktuNyeri" => "",
+                "tingkatKesadaran" => "",
+                "tingkatAktivitas" => "",
+                "sistolik" => "",
+                "distolik" => "",
+                "frekuensiNafas" => "",
+                "frekuensiNadi" => "",
+                "suhu" => "",
+                "ketIntervensiFarmakologi" => "",
+                "ketIntervensiNonFarmakologi" => "",
+                "catatanTambahan" => "",
+            ],
+        ];
+    }
 
+    private function defaultFormEntryResikoJatuhState(): array
+    {
+        return [
+            "tglPenilaian" => "",
+            "petugasPenilai" => "",
+            "petugasPenilaiCode" => "",
+            "resikoJatuh" => [
+                "resikoJatuh" => "Tidak",
+                "resikoJatuhMetode" => ["resikoJatuhMetode" => "", "resikoJatuhMetodeScore" => 0, "dataResikoJatuh" => []],
+                "kategoriResiko" => "",
+                "rekomendasi" => "",
+            ],
+        ];
+    }
 
 
 
@@ -1081,24 +1090,58 @@ class Penilaian extends Component
     // insert and update record start////////////////
     public function store()
     {
-        $this->updateDataRi($this->dataDaftarRi['riHdrNo']);
+        $riHdrNo = $this->dataDaftarRi['riHdrNo'] ?? $this->riHdrNoRef ?? null;
+        if (!$riHdrNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError("riHdrNo kosong.");
+            return;
+        }
 
+        $lockKey = "ri:{$riHdrNo}";
+
+        try {
+            // TTL lock 60s, tunggu hingga 10s agar aman di beban puncak
+            Cache::lock($lockKey, 60)->block(10, function () use ($riHdrNo) {
+                // Selalu ambil FRESH state dari DB di dalam lock
+                $fresh = $this->findDataRI($riHdrNo);
+                if (!is_array($fresh)) {
+                    $fresh = [];
+                }
+
+                // Siapkan struktur penilaian jika belum ada
+                if (!isset($fresh['penilaian']) || !is_array($fresh['penilaian'])) {
+                    $fresh['penilaian'] = [];
+                }
+
+                // PATCH: hanya ganti subtree penilaian dari state form saat ini
+                // (hindari menulis root penuh agar bagian lain tidak hilang)
+                $fresh['penilaian'] = $this->dataDaftarRi['penilaian'] ?? $fresh['penilaian'];
+
+                // Tulis dengan transaksi
+                DB::transaction(function () use ($riHdrNo, $fresh) {
+                    $this->updateJsonRI($riHdrNo, $fresh);
+                });
+
+                // Sinkronkan komponen dari fresh terbaru
+                $this->dataDaftarRi = $fresh;
+            });
+        } catch (\Illuminate\Contracts\Cache\LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
+            return;
+        }
+
+        // Broadcast ke komponen lain agar reload dari DB
         $this->emit('syncronizeAssessmentPerawatRIFindData');
+
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+            ->addSuccess("Penilaian berhasil disimpan.");
     }
 
-    private function updateDataRi($riHdrNo): void
-    {
-        $this->updateJsonRI($riHdrNo, $this->dataDaftarRi);
-
-        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Penilaian berhasil disimpan.");
-    }
-    // insert and update record end////////////////
 
 
     private function findData($rjno): void
     {
-
-
         $this->dataDaftarRi = $this->findDataRI($rjno);
         // dd($this->dataDaftarRi);
         // jika pemeriksaan tidak ditemukan tambah variable pemeriksaan pda array
