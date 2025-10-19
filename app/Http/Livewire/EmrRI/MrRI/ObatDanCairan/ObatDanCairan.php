@@ -2,13 +2,14 @@
 
 namespace App\Http\Livewire\EmrRI\MrRI\ObatDanCairan;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 
 use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
 
-use Spatie\ArrayToXml\ArrayToXml;
 use App\Http\Traits\EmrRI\EmrRITrait;
 use App\Http\Traits\customErrorMessagesTrait;
 
@@ -70,12 +71,10 @@ class ObatDanCairan extends Component
     ////////////////////////////////////////////////
     public function updated($propertyName)
     {
-        // dd($propertyName);
-        // $this->validateOnly($propertyName);
-        // $this->store();
-
-        // reset LOV Product ketika namaObatAtauJenisCairan kosong
-        if (!$this->obatDanCairan['namaObatAtauJenisCairan']) {
+        if (
+            $propertyName === 'obatDanCairan.namaObatAtauJenisCairan' &&
+            empty($this->obatDanCairan['namaObatAtauJenisCairan'])
+        ) {
             $this->resetcollectingMyProduct();
         }
     }
@@ -120,37 +119,23 @@ class ObatDanCairan extends Component
     }
 
 
-    // insert and update record start////////////////
-    public function store()
-    {
-        // Validate RJ
+    // insert and updat record start////////////////
 
-        // Logic update mode start //////////
-        $this->updateDataRi($this->dataDaftarRi['riHdrNo']);
-
-        // reset LOV Product ketika proses simpan selesai
-        $this->resetcollectingMyProduct();
-
-        $this->emit('syncronizeAssessmentPerawatRIFindData');
-    }
-
-    private function updateDataRi($riHdrNo): void
-    {
-
-        $this->updateJsonRI($riHdrNo, $this->dataDaftarRi);
-
-        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("ObatDanCairan berhasil disimpan.");
-    }
-    // insert and update record end////////////////
 
 
     private function findData($riHdrNo): void
     {
+        $this->dataDaftarRi = $this->findDataRI($riHdrNo) ?: [];
+        $this->dataDaftarRi['riHdrNo'] = $this->dataDaftarRi['riHdrNo'] ?? $riHdrNo;
 
-        $this->dataDaftarRi = $this->findDataRI($riHdrNo);
-        // dd($this->dataDaftarRi);
-        // jika observasi tidak ditemukan tambah variable observasi pda array
-        if (isset($this->dataDaftarRi['observasi']['obatDanCairan']) == false) {
+        if (!isset($this->dataDaftarRi['observasi']) || !is_array($this->dataDaftarRi['observasi'])) {
+            $this->dataDaftarRi['observasi'] = [];
+        }
+
+        if (
+            !isset($this->dataDaftarRi['observasi']['obatDanCairan']) ||
+            !is_array($this->dataDaftarRi['observasi']['obatDanCairan'])
+        ) {
             $this->dataDaftarRi['observasi']['obatDanCairan'] = $this->observasi;
         }
     }
@@ -159,60 +144,155 @@ class ObatDanCairan extends Component
 
     public function addObatDanCairan()
     {
+        $riHdrNo = $this->dataDaftarRi['riHdrNo'] ?? $this->riHdrNoRef ?? null;
+        if (!$riHdrNo) {
+            toastr()->positionClass('toast-top-left')->addError("riHdrNo kosong.");
+            return;
+        }
 
-        // entry Pemeriksa
+        // set pemeriksa & validasi input
         $this->obatDanCairan['pemeriksa'] = auth()->user()->myuser_name;
-
-        // validasi
         $this->validateDataObatDanCairanRi();
-        // check exist
-        $cekdObatDanCairan = collect($this->dataDaftarRi['observasi']['obatDanCairan']['pemberianObatDanCairan'])
-            ->where("waktuPemberian", '=', $this->obatDanCairan['waktuPemberian'])
-            ->count();
-        if (!$cekdObatDanCairan) {
-            $this->dataDaftarRi['observasi']['obatDanCairan']['pemberianObatDanCairan'][] = [
-                "namaObatAtauJenisCairan" => $this->obatDanCairan['namaObatAtauJenisCairan'],
-                "jumlah" => $this->obatDanCairan['jumlah'],
-                "dosis" => $this->obatDanCairan['dosis'],
-                "rute" => $this->obatDanCairan['rute'],
-                "keterangan" => $this->obatDanCairan['keterangan'],
-                "waktuPemberian" => $this->obatDanCairan['waktuPemberian'],
-                "pemeriksa" => $this->obatDanCairan['pemeriksa'],
-            ];
 
-            $this->dataDaftarRi['observasi']['obatDanCairan']['pemberianObatDanCairanLog'] =
-                [
-                    'userLogDesc' => 'Form Entry obatDanCairan',
-                    'userLog' => auth()->user()->myuser_name,
-                    'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
+        $target = trim((string)$this->obatDanCairan['waktuPemberian']);
+
+        try {
+            $this->withRiLock($riHdrNo, function () use ($riHdrNo, $target) {
+                // 1) Fresh
+                $fresh = $this->findDataRI($riHdrNo) ?: [];
+                $fresh['riHdrNo'] = $fresh['riHdrNo'] ?? $riHdrNo;
+
+                if (!isset($fresh['observasi']) || !is_array($fresh['observasi'])) {
+                    $fresh['observasi'] = [];
+                }
+                if (!isset($fresh['observasi']['obatDanCairan']) || !is_array($fresh['observasi']['obatDanCairan'])) {
+                    $fresh['observasi']['obatDanCairan'] = [
+                        'pemberianObatDanCairanTab' => 'Pemberian Obat Dan Cairan',
+                        'pemberianObatDanCairan'    => [],
+                    ];
+                }
+
+                // 2) Normalisasi + cek duplikat
+                $list = $fresh['observasi']['obatDanCairan']['pemberianObatDanCairan'] ?? [];
+                $list = collect($list)->map(fn($r) => is_array($r) ? $r : (array)$r)->values()->all();
+
+                $dup = collect($list)->contains(function ($r) use ($target) {
+                    return trim((string)($r['waktuPemberian'] ?? '')) === $target;
+                });
+                if ($dup) {
+                    throw new \RuntimeException("ObatDanCairan sudah ada.");
+                }
+
+                // 3) Append item
+                $list[] = [
+                    "namaObatAtauJenisCairan" => (string)$this->obatDanCairan['namaObatAtauJenisCairan'],
+                    "jumlah"                  => (float)$this->obatDanCairan['jumlah'],
+                    "dosis"                   => (string)$this->obatDanCairan['dosis'],
+                    "rute"                    => (string)$this->obatDanCairan['rute'],
+                    "keterangan"              => (string)$this->obatDanCairan['keterangan'],
+                    "waktuPemberian"          => $target,
+                    "pemeriksa"               => (string)$this->obatDanCairan['pemeriksa'],
                 ];
 
-            $this->store();
-            // reset obatDanCairan
+                // 4) Tulis balik hanya subtree + log
+                $fresh['observasi']['obatDanCairan']['pemberianObatDanCairan'] = array_values($list);
+                $fresh['observasi']['obatDanCairan']['pemberianObatDanCairanLog'] = [
+                    'userLogDesc' => 'Form Entry obatDanCairan',
+                    'userLog'     => auth()->user()->myuser_name,
+                    'userLogDate' => Carbon::now(config('app.timezone'))->format('d/m/Y H:i:s'),
+                ];
+
+                // 5) Simpan & sinkronkan state komponen
+                $this->updateJsonRI($riHdrNo, $fresh);
+                $this->dataDaftarRi = $fresh;
+            });
+
+            // cleanup UI state
+            $this->resetcollectingMyProduct();
             $this->reset(['obatDanCairan']);
-        } else {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("ObatDanCairan Sudah ada.");
+            $this->emit('syncronizeAssessmentPerawatRIFindData');
+            toastr()->positionClass('toast-top-left')->addSuccess("ObatDanCairan berhasil disimpan.");
+        } catch (LockTimeoutException $e) {
+            toastr()->positionClass('toast-top-left')->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
+        } catch (\RuntimeException $e) {
+            toastr()->positionClass('toast-top-left')->addError($e->getMessage());
+        } catch (\Throwable $e) {
+            toastr()->positionClass('toast-top-left')->addError('Gagal menyimpan: ' . $e->getMessage());
         }
     }
 
+
     public function removeObatDanCairan($waktuPemberian)
     {
+        $riHdrNo = $this->dataDaftarRi['riHdrNo'] ?? $this->riHdrNoRef ?? null;
+        if (!$riHdrNo) {
+            toastr()->positionClass('toast-top-left')->addError("riHdrNo kosong.");
+            return;
+        }
 
-        $obatDanCairan = collect($this->dataDaftarRi['observasi']['obatDanCairan']['pemberianObatDanCairan'])->where("waktuPemberian", '!=', $waktuPemberian)->toArray();
-        $this->dataDaftarRi['observasi']['obatDanCairan']['pemberianObatDanCairan'] = $obatDanCairan;
+        $target = trim((string) $waktuPemberian);
 
-        $this->dataDaftarRi['observasi']['obatDanCairan']['pemberianObatDanCairanLog'] =
-            [
-                'userLogDesc' => 'Hapus obatDanCairan',
-                'userLog' => auth()->user()->myuser_name,
-                'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
-            ];
-        $this->store();
+        try {
+            $this->withRiLock($riHdrNo, function () use ($riHdrNo, $target) {
+                // 1) Ambil fresh
+                $fresh = $this->findDataRI($riHdrNo) ?: [];
+                $fresh['riHdrNo'] = $fresh['riHdrNo'] ?? $riHdrNo;
+
+                if (!isset($fresh['observasi']) || !is_array($fresh['observasi'])) {
+                    $fresh['observasi'] = [];
+                }
+                if (!isset($fresh['observasi']['obatDanCairan']) || !is_array($fresh['observasi']['obatDanCairan'])) {
+                    $fresh['observasi']['obatDanCairan'] = [
+                        'pemberianObatDanCairanTab' => 'Pemberian Obat Dan Cairan',
+                        'pemberianObatDanCairan'    => [],
+                    ];
+                }
+
+                $list = $fresh['observasi']['obatDanCairan']['pemberianObatDanCairan'] ?? [];
+                $list = collect($list)->map(fn($r) => is_array($r) ? $r : (array)$r)->values()->all();
+
+                // 2) Hapus hanya match pertama (strict compare)
+                $removed  = false;
+                $filtered = [];
+                foreach ($list as $row) {
+                    $rowTime = trim((string) ($row['waktuPemberian'] ?? ''));
+                    if (!$removed && $rowTime === $target) {
+                        $removed = true;
+                        continue;
+                    }
+                    $filtered[] = $row;
+                }
+
+                if (!$removed) {
+                    throw new \RuntimeException('Data dengan waktu pemberian tersebut tidak ditemukan.');
+                }
+
+                // 3) Tulis balik subtree + log
+                $fresh['observasi']['obatDanCairan']['pemberianObatDanCairan'] = array_values($filtered);
+                $fresh['observasi']['obatDanCairan']['pemberianObatDanCairanLog'] = [
+                    'userLogDesc' => 'Hapus obatDanCairan (by waktuPemberian)',
+                    'userLog'     => auth()->user()->myuser_name,
+                    'userLogDate' => Carbon::now(config('app.timezone'))->format('d/m/Y H:i:s'),
+                ];
+
+                // 4) Simpan & sinkronkan state
+                $this->updateJsonRI($riHdrNo, $fresh);
+                $this->dataDaftarRi = $fresh;
+            });
+
+            $this->emit('syncronizeAssessmentPerawatRIFindData');
+            toastr()->positionClass('toast-top-left')->addSuccess('Item berhasil dihapus.');
+        } catch (LockTimeoutException $e) {
+            toastr()->positionClass('toast-top-left')->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
+        } catch (\RuntimeException $e) {
+            toastr()->positionClass('toast-top-left')->addError($e->getMessage());
+        } catch (\Throwable $e) {
+            toastr()->positionClass('toast-top-left')->addError('Gagal menghapus: ' . $e->getMessage());
+        }
     }
-
     public function setWaktuPemberian($myTime)
     {
-        $this->obatDanCairan['waktuPemberian'] = $myTime;
+        $this->obatDanCairan['waktuPemberian'] = Carbon::now(config('app.timezone'))->format('d/m/Y H:i:s');
     }
 
 
@@ -224,7 +304,7 @@ class ObatDanCairan extends Component
     ////////////////////////////////////////////////
 
     public array $dataProductLov = [];
-    public int $dataProductLovStatus = 0;
+    public bool $dataProductLovStatus = false;
     public $dataProductLovSearch = '';
     public int $selecteddataProductLovIndex = 0;
 
@@ -237,7 +317,7 @@ class ObatDanCairan extends Component
         $this->dataProductLov = [];
     }
 
-    public function updateddataProductLovsearch()
+    public function updatedDataProductLovSearch()
     {
         // Reset index of LoV
         $this->reset(['selecteddataProductLovIndex', 'dataProductLov']);
@@ -308,6 +388,12 @@ class ObatDanCairan extends Component
 
     public function setMydataProductLov($id)
     {
+
+        if (!isset($this->dataProductLov[$id]['product_id'])) {
+            toastr()->positionClass('toast-top-left')->addError('Data Obat belum tersedia.');
+            return;
+        }
+
         // $this->checkRjStatus();
         $dataProductLovs = DB::table('immst_products')
             ->select(
@@ -405,6 +491,15 @@ class ObatDanCairan extends Component
 
 
 
+    private function withRiLock(string $riHdrNo, callable $fn): void
+    {
+        $key = "ri:{$riHdrNo}";
+        Cache::lock($key, 10)->block(5, function () use ($fn) {
+            DB::transaction(function () use ($fn) {
+                $fn();
+            });
+        });
+    }
     // when new form instance
     public function mount()
     {
