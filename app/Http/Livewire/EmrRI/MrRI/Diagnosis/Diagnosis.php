@@ -7,11 +7,8 @@ use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-use App\Http\Traits\customErrorMessagesTrait;
 use App\Http\Traits\EmrRI\EmrRITrait;
-
-use Spatie\ArrayToXml\ArrayToXml;
-use Exception;
+use Illuminate\Support\Facades\Cache;
 
 
 class Diagnosis extends Component
@@ -64,14 +61,74 @@ class Diagnosis extends Component
     ///////////begin////////////////////////////////
     ////////////////////////////////////////////////
 
-    public function updateddataDaftarRidiagnosisFreeText()
+    public function updatedDataDaftarRiDiagnosisFreeText()
     {
-        $this->store();
+        $this->updateRiJsonFields(['diagnosisFreeText' => (string) ($this->dataDaftarRi['diagnosisFreeText'] ?? '')]);
     }
 
-    public function updateddataDaftarRiprocedureFreeText()
+    /*************  ✨ Windsurf Command ⭐  *************/
+    /**
+     * Update field procedureFreeText in dataDaftarRi.
+     *
+     * @return void
+     */
+    /*******  b2eb9f16-7710-484a-b61a-eae895749420  *******/
+    public function updatedDataDaftarRiProcedureFreeText()
     {
-        $this->store();
+        $this->updateRiJsonFields(['procedureFreeText' => (string) ($this->dataDaftarRi['procedureFreeText'] ?? '')]);
+    }
+
+    // 2) Helper umum untuk update sebagian field JSON, aman dari race
+    private function updateRiJsonFields(array $patch): void
+    {
+        $riHdrNo = $this->riHdrNoRef ?? ($this->dataDaftarRi['riHdrNo'] ?? null);
+        if (!$riHdrNo) {
+            toastr()->positionClass('toast-top-left')->addError('riHdrNo kosong.');
+            return;
+        }
+
+        // (Opsional) validasi ringan untuk free-text
+        $rules = [
+            'diagnosisFreeText'  => 'nullable|string|max:2000',
+            'procedureFreeText'  => 'nullable|string|max:2000',
+        ];
+        // Ambil subset yang ingin divalidasi saja
+        $toValidate = array_intersect_key($patch, $rules);
+        if (!empty($toValidate)) {
+            $this->validate(
+                array_intersect_key($rules, $toValidate),
+                [], // pakai default / custom messages-mu
+                ['diagnosisFreeText' => 'Catatan Diagnosis', 'procedureFreeText' => 'Catatan Prosedur']
+            );
+        }
+
+        try {
+            // Pakai lock yang sama supaya semua penulisan JSON berbaris
+            $this->withDiagnosisLock($riHdrNo, function () use ($riHdrNo, $patch) {
+                // Refresh data terbaru (hindari lost update)
+                $fresh = $this->findDataRI($riHdrNo) ?: [];
+                $fresh['riHdrNo'] = $fresh['riHdrNo'] ?? $riHdrNo;
+
+                // Pastikan key ada
+                $fresh['diagnosisFreeText'] = $fresh['diagnosisFreeText'] ?? '';
+                $fresh['procedureFreeText'] = $fresh['procedureFreeText'] ?? '';
+
+                // Merge minimal fields yang diubah
+                foreach ($patch as $k => $v) {
+                    $fresh[$k] = $v;
+                }
+
+                // Persist atomik
+                $this->updateJsonRI($riHdrNo, $fresh);
+
+                // Sinkron state komponen
+                $this->dataDaftarRi = $fresh;
+            });
+
+            // Tidak perlu store() / toastr spam
+        } catch (\Throwable $e) {
+            toastr()->positionClass('toast-top-left')->addError('Gagal menyimpan catatan: ' . $e->getMessage());
+        }
     }
 
 
@@ -93,7 +150,7 @@ class Diagnosis extends Component
         $search = $this->dataDiagnosaICD10LovSearch;
 
         // check LOV by dr_id rs id
-        $dataDiagnosaICD10Lovs = DB::table('rsmst_mstdiags ')->select(
+        $dataDiagnosaICD10Lovs = DB::table('rsmst_mstdiags')->select(
             'diag_id',
             'diag_desc',
             'icdx'
@@ -123,7 +180,7 @@ class Diagnosis extends Component
                         ->Where(DB::raw('upper(diag_desc)'), 'like', '%' . strtoupper($search) . '%')
                         ->orWhere(DB::raw('upper(diag_id)'), 'like', '%' . strtoupper($search) . '%')
                         ->orWhere(DB::raw('upper(icdx)'), 'like', '%' . strtoupper($search) . '%')
-                        ->limit(10)
+                        ->limit(15)
                         ->orderBy('diag_id', 'ASC')
                         ->orderBy('diag_desc', 'ASC')
                         ->get(),
@@ -211,104 +268,167 @@ class Diagnosis extends Component
 
     private function insertDiagnosaICD10(): void
     {
-
-        // validate
-        // $this->checkRjStatus();
-        // customErrorMessages
-        $messages = customErrorMessagesTrait::messages();
-        // require nik ketika pasien tidak dikenal
+        // 1) Field-level validation (di luar lock)
         $rules = [
-            "collectingMyDiagnosaICD10.DiagnosaICD10Id" => 'bail|required|exists:rsmst_mstdiags,diag_id',
-            "collectingMyDiagnosaICD10.DiagnosaICD10Desc" => 'bail|required|',
-            "collectingMyDiagnosaICD10.DiagnosaICD10icdx" => 'bail|required|',
-
+            'collectingMyDiagnosaICD10.DiagnosaICD10Id'   => 'bail|required|exists:rsmst_mstdiags,diag_id',
+            'collectingMyDiagnosaICD10.DiagnosaICD10Desc' => 'bail|required|string|max:255',
+            'collectingMyDiagnosaICD10.DiagnosaICD10icdx' => 'bail|required|string|max:20',
         ];
 
-        // Proses Validasi///////////////////////////////////////////
-        $this->validate($rules, $messages);
+        $messages = [
+            'collectingMyDiagnosaICD10.DiagnosaICD10Id.required' => 'Kode diagnosis wajib diisi.',
+            'collectingMyDiagnosaICD10.DiagnosaICD10Id.exists'   => 'Kode diagnosis tidak ditemukan di master ICD10.',
 
-        // validate
+            'collectingMyDiagnosaICD10.DiagnosaICD10Desc.required' => 'Deskripsi diagnosis wajib diisi.',
+            'collectingMyDiagnosaICD10.DiagnosaICD10Desc.string'   => 'Deskripsi diagnosis tidak valid.',
+            'collectingMyDiagnosaICD10.DiagnosaICD10Desc.max'      => 'Deskripsi diagnosis maksimal 255 karakter.',
 
+            'collectingMyDiagnosaICD10.DiagnosaICD10icdx.required' => 'Kode ICD-X wajib diisi.',
+            'collectingMyDiagnosaICD10.DiagnosaICD10icdx.string'   => 'Kode ICD-X tidak valid.',
+            'collectingMyDiagnosaICD10.DiagnosaICD10icdx.max'      => 'Kode ICD-X maksimal 20 karakter.',
+        ];
 
-        // pengganti race condition
-        // start:
+        $attributes = [
+            'collectingMyDiagnosaICD10.DiagnosaICD10Id'   => 'Kode diagnosis',
+            'collectingMyDiagnosaICD10.DiagnosaICD10Desc' => 'Deskripsi diagnosis',
+            'collectingMyDiagnosaICD10.DiagnosaICD10icdx' => 'Kode ICD-X',
+        ];
+
+        $this->validate($rules, $messages, $attributes);
+
         try {
+            $riHdrNo = $this->riHdrNoRef;
 
-            $lastInserted = DB::table('rstxn_ridtls')
-                ->select(DB::raw("nvl(max(ridtl_dtl)+1,1) as ridtl_dtl_max"))
-                ->first();
-            // insert into table transaksi
-            DB::table('rstxn_ridtls')
-                ->insert([
-                    'ridtl_dtl' => $lastInserted->ridtl_dtl_max,
-                    'rihdr_no' => $this->riHdrNoRef,
-                    'diag_id' => $this->collectingMyDiagnosaICD10['DiagnosaICD10Id'],
+            $this->withDiagnosisLock($riHdrNo, function () use ($riHdrNo) {
+                // 2) Business rules yang perlu konsistensi DB (di dalam lock)
+
+                // a) Cegah duplikat diagnosis dengan diag_id yang sama pada header yang sama
+                $dup = DB::table('rstxn_ridtls')
+                    ->where('rihdr_no', $riHdrNo)
+                    ->where('diag_id', $this->collectingMyDiagnosaICD10['DiagnosaICD10Id'])
+                    ->lockForUpdate()
+                    ->exists();
+
+                if ($dup) {
+                    throw new \RuntimeException('Diagnosis sudah tercatat untuk pasien/riHdrNo ini.');
+                }
+
+                // b) Aturan hanya 1 "Primary" (opsional)
+                //   kalau kamu set otomatis Primary saat pertama kali, cek dulu apakah sudah ada primary
+                $existingJson = $this->findDataRI($riHdrNo) ?: [];
+                $existingJson['diagnosis'] = $existingJson['diagnosis'] ?? [];
+                $sudahAdaPrimary = collect($existingJson['diagnosis'])
+                    ->contains(fn($d) => ($d['kategoriDiagnosa'] ?? '') === 'Primary');
+
+                $isSecondary = count($existingJson['diagnosis']) > 0 || $sudahAdaPrimary; // jika sudah ada primary/entry, set Secondary
+
+                // c) Dapatkan next ridtl_dtl secara aman
+                $next = DB::table('rstxn_ridtls')
+                    ->max('ridtl_dtl');
+
+                $nextDtl = is_null($next) ? 1 : $next + 1;
+
+                // d) Insert detail row
+                DB::table('rstxn_ridtls')->insert([
+                    'rihdr_no'  => $riHdrNo,
+                    'ridtl_dtl' => $nextDtl,
+                    'diag_id'   => $this->collectingMyDiagnosaICD10['DiagnosaICD10Id'],
                 ]);
 
-            // update status diagnosa rstxn_rihdrs
-            // DB::table('rstxn_rihdrs')
-            //     ->where('rihdr_no',  $this->riHdrNoRef)
-            //     ->update([
-            //         'ri_diagnosa' => 'D',
-            //     ]);
+                // e) Mutasi JSON di memori + persist dalam transaksi
+                $newRow = [
+                    'diagId'           => $this->collectingMyDiagnosaICD10['DiagnosaICD10Id'],
+                    'diagDesc'         => $this->collectingMyDiagnosaICD10['DiagnosaICD10Desc'],
+                    'icdX'             => $this->collectingMyDiagnosaICD10['DiagnosaICD10icdx'],
+                    'ketdiagnosa'      => 'Keterangan Diagnosa',
+                    'kategoriDiagnosa' => $isSecondary ? 'Secondary' : 'Primary',
+                    'riDtlDtl'         => $nextDtl,
+                    'riHdrNo'          => $riHdrNo,
+                ];
 
-            $checkDiagnosaCount = collect($this->dataDaftarRi['diagnosis'])->count();
-            $kategoriDiagnosa = $checkDiagnosaCount ? 'Secondary' : 'Primary';
+                $existingJson['diagnosis'][] = $newRow;
 
-            $this->dataDaftarRi['diagnosis'][] = [
-                'diagId' => $this->collectingMyDiagnosaICD10['DiagnosaICD10Id'],
-                'diagDesc' => $this->collectingMyDiagnosaICD10['DiagnosaICD10Desc'],
-                'icdX' => $this->collectingMyDiagnosaICD10['DiagnosaICD10icdx'],
-                'ketdiagnosa' => 'Keterangan Diagnosa',
-                'kategoriDiagnosa' => $kategoriDiagnosa,
-                'riDtlDtl' => $lastInserted->ridtl_dtl_max,
-                'riHdrNo' => $this->riHdrNoRef,
-            ];
+                // Simpan JSON atomik
+                $this->updateJsonRI($riHdrNo, $existingJson);
+                $this->dataDaftarRi = $existingJson;
+            });
 
-            $this->store();
             $this->reset(['collectingMyDiagnosaICD10']);
-
-
-            //
-        } catch (Exception $e) {
-            // display an error to user
-            dd($e->getMessage());
+            toastr()->positionClass('toast-top-left')->addSuccess('Diagnosis berhasil ditambahkan.');
+        } catch (\Throwable $e) {
+            toastr()->positionClass('toast-top-left')->addError('Gagal menambah diagnosis: ' . $e->getMessage());
         }
-        // goto start;
     }
 
     public function removeDiagnosaICD10($riDtlDtl)
     {
-
-        // $this->checkRjStatus();
-
-
-        // pengganti race condition
-        // start:
         try {
+            $riHdrNo = $this->riHdrNoRef ?? ($this->dataDaftarRi['riHdrNo'] ?? null);
+            if (!$riHdrNo) {
+                toastr()->positionClass('toast-top-left')->addError('riHdrNo kosong.');
+                return;
+            }
 
+            $riDtlDtl = (int) $riDtlDtl;
 
-            // remove into table transaksi
-            DB::table('rstxn_ridtls')
-                ->where('ridtl_dtl', $riDtlDtl)
-                ->delete();
+            $this->withDiagnosisLock($riHdrNo, function () use ($riHdrNo, $riDtlDtl) {
+                // Muat JSON TERBARU agar tidak overwrite perubahan pihak lain
+                $fresh = $this->findDataRI($riHdrNo) ?: [];
+                $fresh['riHdrNo']    = $fresh['riHdrNo'] ?? $riHdrNo;
+                $fresh['diagnosis']  = isset($fresh['diagnosis']) && is_array($fresh['diagnosis']) ? $fresh['diagnosis'] : [];
 
+                // Cari item yang dihapus di JSON
+                $idxToRemove = null;
+                $deletedWasPrimary = false;
+                foreach ($fresh['diagnosis'] as $i => $row) {
+                    if ((int)($row['riDtlDtl'] ?? 0) === $riDtlDtl) {
+                        $idxToRemove = $i;
+                        $deletedWasPrimary = (($row['kategoriDiagnosa'] ?? '') === 'Primary');
+                        break;
+                    }
+                }
+                if ($idxToRemove === null) {
+                    throw new \RuntimeException('Diagnosis tidak ditemukan di data.');
+                }
 
-            $DiagnosaICD10 = collect($this->dataDaftarRi['diagnosis'])->where("riDtlDtl", '!=', $riDtlDtl)->toArray();
-            $this->dataDaftarRi['diagnosis'] = $DiagnosaICD10;
+                // Hapus di tabel detail (cek affected rows)
+                $affected = DB::table('rstxn_ridtls')
+                    ->where('rihdr_no', $riHdrNo)
+                    ->where('ridtl_dtl', $riDtlDtl)
+                    ->delete();
 
+                if ($affected === 0) {
+                    // Jika DB tidak punya, anggap sudah dihapus oleh proses lain
+                    // Sinkronkan saja JSON lokal dengan DB (tanpa throw)
+                }
 
-            $this->store();
+                // Hapus di JSON
+                array_splice($fresh['diagnosis'], $idxToRemove, 1);
+                $fresh['diagnosis'] = array_values($fresh['diagnosis']); // reindex
 
+                // (Opsional) Promosikan Primary baru bila yang dihapus Primary
+                if ($deletedWasPrimary && count($fresh['diagnosis']) > 0) {
+                    // reset semua ke Secondary dulu
+                    foreach ($fresh['diagnosis'] as &$d) {
+                        $d['kategoriDiagnosa'] = 'Secondary';
+                    }
+                    unset($d);
+                    // pilih satu jadi Primary (strategi: ambil yang paling awal)
+                    $fresh['diagnosis'][0]['kategoriDiagnosa'] = 'Primary';
+                }
 
-            //
-        } catch (Exception $e) {
-            // display an error to user
-            dd($e->getMessage());
+                // Persist JSON atomik
+                $this->updateJsonRI($riHdrNo, $fresh);
+
+                // sinkronkan state komponen
+                $this->dataDaftarRi = $fresh;
+            });
+
+            $this->emit('syncronizeAssessmentPerawatRIFindData');
+            toastr()->positionClass('toast-top-left')->addSuccess('Diagnosis berhasil dihapus.');
+        } catch (\Throwable $e) {
+            toastr()->positionClass('toast-top-left')->addError('Gagal menghapus diagnosis: ' . $e->getMessage());
         }
-        // goto start;
-
-
     }
     // LOV selected end
     /////////////////////////////////////////////////
@@ -338,7 +458,7 @@ class Diagnosis extends Component
         $search = $this->dataProcedureICD9CmLovSearch;
 
         // check LOV by dr_id rs id
-        $dataProcedureICD9CmLovs = DB::table('rsmst_mstprocedures ')->select(
+        $dataProcedureICD9CmLovs = DB::table('rsmst_mstprocedures')->select(
             'proc_id',
             'proc_desc',
 
@@ -367,7 +487,7 @@ class Diagnosis extends Component
                         // ->where('active_status', '1')
                         ->Where(DB::raw('upper(proc_desc)'), 'like', '%' . strtoupper($search) . '%')
                         ->orWhere(DB::raw('upper(proc_id)'), 'like', '%' . strtoupper($search) . '%')
-                        ->limit(10)
+                        ->limit(15)
                         ->orderBy('proc_id', 'ASC')
                         ->orderBy('proc_desc', 'ASC')
                         ->get(),
@@ -454,49 +574,110 @@ class Diagnosis extends Component
 
     private function insertProcedureICD9Cm(): void
     {
-
-        // validate
-        // $this->checkRjStatus();
-        // customErrorMessages
-        $messages = customErrorMessagesTrait::messages();
-        // require nik ketika pasien tidak dikenal
+        // 1) Field-level validation
         $rules = [
-            "collectingMyProcedureICD9Cm.ProcedureICD9CmId" => 'bail|required|exists:rsmst_mstprocedures,proc_id',
-            "collectingMyProcedureICD9Cm.ProcedureICD9CmDesc" => 'bail|required|',
+            'collectingMyProcedureICD9Cm.ProcedureICD9CmId'   => 'bail|required|exists:rsmst_mstprocedures,proc_id',
+            'collectingMyProcedureICD9Cm.ProcedureICD9CmDesc' => 'bail|required|string|max:255',
         ];
-
-        // Proses Validasi///////////////////////////////////////////
-        $this->validate($rules, $messages);
-
-        // validate
-
-
-        // pengganti race condition
-
-        $this->dataDaftarRi['procedure'][] = [
-            'procedureId' => $this->collectingMyProcedureICD9Cm['ProcedureICD9CmId'],
-            'procedureDesc' => $this->collectingMyProcedureICD9Cm['ProcedureICD9CmDesc'],
-            'ketProcedure' => 'Keterangan Procedure',
-            'riHdrNo' => $this->riHdrNoRef,
+        $messages = [
+            'collectingMyProcedureICD9Cm.ProcedureICD9CmId.required'   => 'Kode prosedur wajib diisi.',
+            'collectingMyProcedureICD9Cm.ProcedureICD9CmId.exists'     => 'Kode prosedur tidak ditemukan di master ICD-9-CM.',
+            'collectingMyProcedureICD9Cm.ProcedureICD9CmDesc.required' => 'Deskripsi prosedur wajib diisi.',
+            'collectingMyProcedureICD9Cm.ProcedureICD9CmDesc.string'   => 'Deskripsi prosedur tidak valid.',
+            'collectingMyProcedureICD9Cm.ProcedureICD9CmDesc.max'      => 'Deskripsi prosedur maksimal 255 karakter.',
         ];
+        $attributes = [
+            'collectingMyProcedureICD9Cm.ProcedureICD9CmId'   => 'Kode prosedur',
+            'collectingMyProcedureICD9Cm.ProcedureICD9CmDesc' => 'Deskripsi prosedur',
+        ];
+        $this->validate($rules, $messages, $attributes);
 
-        $this->store();
-        $this->reset(['collectingMyProcedureICD9Cm']);
+        // Normalisasi ringan (opsional)
+        $this->collectingMyProcedureICD9Cm['ProcedureICD9CmDesc'] =
+            trim((string)($this->collectingMyProcedureICD9Cm['ProcedureICD9CmDesc'] ?? ''));
+
+        $riHdrNo = $this->riHdrNoRef ?? ($this->dataDaftarRi['riHdrNo'] ?? null);
+        if (!$riHdrNo) {
+            toastr()->positionClass('toast-top-left')->addError('riHdrNo kosong.');
+            return;
+        }
+
+        try {
+            // Pakai lock yang sama dengan diagnosis supaya semua penulisan JSON per header berbaris
+            $this->withDiagnosisLock($riHdrNo, function () use ($riHdrNo) {
+                // Ambil JSON terbaru agar tidak overwrite perubahan pihak lain
+                $fresh = $this->findDataRI($riHdrNo) ?: [];
+                $fresh['riHdrNo']   = $fresh['riHdrNo'] ?? $riHdrNo;
+                $fresh['procedure'] = isset($fresh['procedure']) && is_array($fresh['procedure']) ? $fresh['procedure'] : [];
+
+                $procId  = (string)$this->collectingMyProcedureICD9Cm['ProcedureICD9CmId'];
+                $procDesc = (string)$this->collectingMyProcedureICD9Cm['ProcedureICD9CmDesc'];
+
+                // Cek duplikat procedureId (opsional, tapi umumnya diinginkan)
+                $dup = collect($fresh['procedure'])->contains(fn($p) => ($p['procedureId'] ?? null) === $procId);
+                if ($dup) {
+                    throw new \RuntimeException('Prosedur sudah tercatat untuk pasien/riHdrNo ini.');
+                }
 
 
-        //
+                // Tambahkan ke JSON
+                $fresh['procedure'][] = [
+                    'procedureId'   => $procId,
+                    'procedureDesc' => $procDesc,
+                    'ketProcedure'  => 'Keterangan Procedure',
+                    'riHdrNo'       => $riHdrNo,
+                ];
 
-        // goto start;
+                // Simpan atomik & sinkronkan state komponen
+                $this->updateJsonRI($riHdrNo, $fresh);
+                $this->dataDaftarRi = $fresh;
+            });
+
+            $this->reset(['collectingMyProcedureICD9Cm']);
+            toastr()->positionClass('toast-top-left')->addSuccess('Prosedur berhasil ditambahkan.');
+        } catch (\Throwable $e) {
+            toastr()->positionClass('toast-top-left')->addError('Gagal menambah prosedur: ' . $e->getMessage());
+        }
     }
 
     public function removeProcedureICD9Cm($procedureId)
     {
+        $riHdrNo = $this->riHdrNoRef ?? ($this->dataDaftarRi['riHdrNo'] ?? null);
+        if (!$riHdrNo) {
+            toastr()->positionClass('toast-top-left')->addError('riHdrNo kosong.');
+            return;
+        }
 
-        // $this->checkRjStatus();
+        try {
+            $procId = (string)$procedureId;
 
-        $ProcedureICD9Cm = collect($this->dataDaftarRi['procedure'])->where("procedureId", '!=', $procedureId)->toArray();
-        $this->dataDaftarRi['procedure'] = $ProcedureICD9Cm;
-        $this->store();
+            $this->withDiagnosisLock($riHdrNo, function () use ($riHdrNo, $procId) {
+                // Muat data terbaru
+                $fresh = $this->findDataRI($riHdrNo) ?: [];
+                $fresh['riHdrNo']   = $fresh['riHdrNo'] ?? $riHdrNo;
+                $fresh['procedure'] = isset($fresh['procedure']) && is_array($fresh['procedure']) ? $fresh['procedure'] : [];
+
+                $before = count($fresh['procedure']);
+                $fresh['procedure'] = collect($fresh['procedure'])
+                    ->reject(fn($p) => (string)($p['procedureId'] ?? '') === $procId)
+                    ->values()
+                    ->all();
+
+                if (count($fresh['procedure']) === $before) {
+                    // tidak ditemukan
+                    throw new \RuntimeException('Prosedur tidak ditemukan.');
+                }
+
+                // Persist & sinkronkan
+                $this->updateJsonRI($riHdrNo, $fresh);
+                $this->dataDaftarRi = $fresh;
+            });
+
+            $this->emit('syncronizeAssessmentPerawatRIFindData');
+            toastr()->positionClass('toast-top-left')->addSuccess('Prosedur berhasil dihapus.');
+        } catch (\Throwable $e) {
+            toastr()->positionClass('toast-top-left')->addError('Gagal menghapus prosedur: ' . $e->getMessage());
+        }
     }
     // LOV selected end
     /////////////////////////////////////////////////
@@ -504,61 +685,10 @@ class Diagnosis extends Component
     ////////////////////////////////////////////////
 
 
-
-
-    // validate Data RJ//////////////////////////////////////////////////
-    private function validateDataRi(): void
-    {
-        // customErrorMessages
-        $messages = customErrorMessagesTrait::messages();
-
-        // Proses Validasi///////////////////////////////////////////
-        try {
-            $this->validate($this->rules, $messages);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Lakukan Pengecekan kembali Input Data.");
-            $this->validate($this->rules, $messages);
-        }
-    }
-
-
-    // insert and update record start////////////////
-    public function store()
-    {
-        // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
-        $this->setDataPrimer();
-
-        // Validate RJ
-        $this->validateDataRi();
-
-        // Logic update mode start //////////
-        $this->updateDataRi($this->dataDaftarRi['riHdrNo']);
-
-        $this->emit('syncronizeAssessmentPerawatRIFindData');
-    }
-
-    private function updateDataRi($riHdrNo): void
-    {
-
-        // update table trnsaksi
-        // DB::table('rstxn_rihdrs')
-        //     ->where('rihdr_no', $riHdrNo)
-        //     ->update([
-        //         'dataDaftarRi_json' => json_encode($this->dataDaftarRi, true),
-        //         'dataDaftarRi_xml' => ArrayToXml::convert($this->dataDaftarRi),
-        //     ]);
-
-        $this->updateJsonRI($riHdrNo, $this->dataDaftarRi);
-
-        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Diagnosa berhasil disimpan.");
-    }
-    // insert and update record end////////////////
-
-
     private function findData($riHdrNo): void
     {
-        $this->dataDaftarRi = $this->findDataRI($riHdrNo);
+        $this->dataDaftarRi = $this->findDataRI($riHdrNo) ?: [];
+        $this->dataDaftarRi['riHdrNo'] = $this->dataDaftarRi['riHdrNo'] ?? $riHdrNo;
         // dd($this->dataDaftarRi);
         // jika diagnosis tidak ditemukan tambah variable diagnosis pda array
         if (isset($this->dataDaftarRi['diagnosis']) == false) {
@@ -586,13 +716,21 @@ class Diagnosis extends Component
 
     private function setDataPrimer(): void {}
 
+    private function withDiagnosisLock(string $riHdrNo, callable $fn): void
+    {
+        $key = "ri:{$riHdrNo}:json";
+        Cache::lock($key, 10)->block(5, function () use ($fn) {
+            DB::transaction(function () use ($fn) {
+                $fn();
+            }, 5);
+        });
+    }
 
     // when new form instance
     public function mount()
     {
         $this->findData($this->riHdrNoRef);
         // set data dokter ref
-        // $this->store();
     }
 
 
