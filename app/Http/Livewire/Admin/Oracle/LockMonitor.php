@@ -10,18 +10,29 @@ class LockMonitor extends Component
 {
     public string $connection = 'oracle';
 
-    // Filters
+    // ===== Filters (Locks)
     public bool $onlyWaiting = true;
     public ?string $filterUser = null;
     public ?string $filterProgram = null;
     public ?int $minSecondsInWait = 5;
 
-    public array $rows = [];
+    // ===== NEW: Filters (Long Running / Heavy Sessions)
+    public bool $excludeIdle = true;            // exclude Idle waits
+    public ?int $minSecondsActive = 30;         // min ACTIVE duration (last_call_et)
+    public ?int $minLongopsPct = 0;             // min % progress for long ops (show >= this)
 
-    // Modal/konfirmasi kill (kalau dipakai)
+    // Result sets
+    public array $rows = [];          // locks
+    public array $heavyRows = [];     // long-running active SQL
+    public array $longopsRows = [];   // session_longops
+
+    // Modal/konfirmasi kill
     public bool $showConfirm = false;
     public ?int $killSid = null;
     public ?int $killSerial = null;
+
+    // Simple tab switcher (locks | heavy | longops)
+    public string $tab = 'locks';
 
     protected $listeners = [
         'confirmKill' => 'killSessionConfirmed',
@@ -32,7 +43,20 @@ class LockMonitor extends Component
         $this->refreshData();
     }
 
+    public function setTab(string $t): void
+    {
+        $this->tab = in_array($t, ['locks', 'heavy', 'longops'], true) ? $t : 'locks';
+    }
+
     public function refreshData(): void
+    {
+        $this->refreshLocks();
+        $this->refreshHeavy();
+        $this->refreshLongops();
+    }
+
+    /** Locks (blocker ↔ waiter) */
+    public function refreshLocks(): void
     {
         try {
             $objectView = 'all_objects'; // ganti ke 'dba_objects' jika punya privilege
@@ -89,14 +113,7 @@ class LockMonitor extends Component
             $rows = DB::connection($this->connection)->select($sql);
 
             $this->rows = collect($rows)
-                ->map(function ($r) {
-                    $arr = (array) $r;
-                    $norm = [];
-                    foreach ($arr as $k => $v) {
-                        $norm[strtolower($k)] = $v;
-                    }
-                    return $norm;
-                })
+                ->map(fn($r) => collect((array) $r)->mapWithKeys(fn($v, $k) => [strtolower($k) => $v])->all())
                 ->when($this->onlyWaiting, function ($c) {
                     $min = $this->minSecondsInWait ?? 0;
                     return $c->filter(fn($r) => (int)($r['waiter_seconds_wait'] ?? 0) >= $min);
@@ -117,15 +134,101 @@ class LockMonitor extends Component
                 })
                 ->values()
                 ->toArray();
-
-            // (Opsional) kasih info ringan
-            // toastr()->closeOnHover(true)->closeDuration(3000)->positionClass('toast-top-left')->addInfo('Data locks diperbarui.');
         } catch (Throwable $e) {
-            toastr()->closeOnHover(true)
-                ->closeDuration(3000)
-                ->positionClass('toast-top-left')
-                ->addError([$e->getMessage()]);
+            toastr()->closeOnHover(true)->closeDuration(3000)->positionClass('toast-top-left')->addError([$e->getMessage()]);
             $this->rows = [];
+        }
+    }
+
+    /** NEW: Long-running ACTIVE SQL based on v$session + v$sqlarea */
+    public function refreshHeavy(): void
+    {
+        try {
+            $sql = <<<'SQL'
+            SELECT
+                s.sid,
+                s.serial#               AS serial,
+                s.username,
+                s.program,
+                s.module,
+                s.machine,
+                s.status,
+                s.event,
+                s.wait_class,
+                s.last_call_et          AS seconds_active,
+                NVL(s.sql_id, s.prev_sql_id) AS sql_id,
+                SUBSTR(sa.sql_text,1,1000)   AS sql_text,
+                sa.executions,
+                sa.elapsed_time/1e6     AS elapsed_sec,
+                sa.cpu_time/1e6         AS cpu_sec,
+                sa.buffer_gets,
+                sa.disk_reads,
+                sa.rows_processed,
+                sa.first_load_time,
+                sa.last_active_time
+            FROM v$session s
+            LEFT JOIN v$sqlarea sa ON sa.sql_id = NVL(s.sql_id, s.prev_sql_id)
+            WHERE s.username IS NOT NULL
+              AND s.status = 'ACTIVE'
+            ORDER BY s.last_call_et DESC NULLS LAST
+            SQL;
+
+            $rows = DB::connection($this->connection)->select($sql);
+
+            $this->heavyRows = collect($rows)
+                ->map(fn($r) => collect((array) $r)->mapWithKeys(fn($v, $k) => [strtolower($k) => $v])->all())
+                ->filter(function ($r) {
+                    $okTime = (int)($r['seconds_active'] ?? 0) >= (int)($this->minSecondsActive ?? 0);
+                    $okIdle = $this->excludeIdle ? (strtoupper($r['wait_class'] ?? '') !== 'IDLE') : true;
+                    return $okTime && $okIdle;
+                })
+                ->values()
+                ->toArray();
+        } catch (Throwable $e) {
+            toastr()->closeOnHover(true)->closeDuration(3000)->positionClass('toast-top-left')->addError([$e->getMessage()]);
+            $this->heavyRows = [];
+        }
+    }
+
+    /** NEW: Session Long Operations (progress-based) */
+    public function refreshLongops(): void
+    {
+        try {
+            $sql = <<<'SQL'
+            SELECT
+                sl.sid,
+                sl.serial#               AS serial,
+                sl.opname,
+                sl.target,
+                sl.sofar,
+                sl.totalwork,
+                ROUND((sl.sofar/NULLIF(sl.totalwork,0))*100,2) AS pct,
+                sl.elapsed_seconds,
+                sl.time_remaining,
+                s.username,
+                s.program,
+                s.module,
+                s.machine
+            FROM v$session_longops sl
+            JOIN v$session s ON s.sid = sl.sid AND s.serial# = sl.serial#
+            WHERE sl.totalwork > 0
+              AND sl.sofar < sl.totalwork
+            ORDER BY pct DESC NULLS LAST
+            SQL;
+
+            $rows = DB::connection($this->connection)->select($sql);
+
+            $this->longopsRows = collect($rows)
+                ->map(fn($r) => collect((array) $r)->mapWithKeys(fn($v, $k) => [strtolower($k) => $v])->all())
+                ->filter(function ($r) {
+                    $pct = (float)($r['pct'] ?? 0);
+                    return $pct >= (float)($this->minLongopsPct ?? 0);
+                })
+                ->values()
+                ->toArray();
+        } catch (Throwable $e) {
+            toastr()->closeOnHover(true)->closeDuration(3000)->positionClass('toast-top-left')->addError([$e->getMessage()]);
+            $this->longopsRows = [];
         }
     }
 
@@ -133,33 +236,24 @@ class LockMonitor extends Component
     {
         $this->killSid = $sid;
         $this->killSerial = $serial;
-        $this->showConfirm = true; // kalau pakai modal sederhana Livewire v2
-        // atau kalau tanpa modal: langsung panggil $this->killSessionConfirmed();
+        $this->showConfirm = true;
     }
 
     public function killSessionConfirmed(): void
     {
         if (!$this->killSid || !$this->killSerial) {
-            toastr()->closeOnHover(true)
-                ->closeDuration(3000)
-                ->positionClass('toast-top-left')
-                ->addError(['SID/Serial tidak valid.']);
+            toastr()->closeOnHover(true)->closeDuration(3000)->positionClass('toast-top-left')->addError(['SID/Serial tidak valid.']);
             return;
         }
 
         try {
+            // Catatan: ALTER SYSTEM CANCEL SQL bisa tersedia di 10gR2+/11g, tapi KILL SESSION paling aman & umum
             $sql = "ALTER SYSTEM KILL SESSION '{$this->killSid},{$this->killSerial}' IMMEDIATE";
             DB::connection($this->connection)->statement($sql);
 
-            toastr()->closeOnHover(true)
-                ->closeDuration(3000)
-                ->positionClass('toast-top-left')
-                ->addSuccess("Killed SID {$this->killSid}, SERIAL# {$this->killSerial}.");
+            toastr()->closeOnHover(true)->closeDuration(3000)->positionClass('toast-top-left')->addSuccess("Killed SID {$this->killSid}, SERIAL# {$this->killSerial}.");
         } catch (Throwable $e) {
-            toastr()->closeOnHover(true)
-                ->closeDuration(3000)
-                ->positionClass('toast-top-left')
-                ->addError([$e->getMessage()]);
+            toastr()->closeOnHover(true)->closeDuration(3000)->positionClass('toast-top-left')->addError([$e->getMessage()]);
         } finally {
             $this->showConfirm = false;
             $this->killSid = null;

@@ -1,112 +1,253 @@
 <div>
     <div class="px-1 pt-7">
         <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
-            <!-- Card header -->
             <div class="w-full mb-1">
-
                 <div id="TopBarMenuMaster" class="">
-
-                    {{-- text Title --}}
                     <div class="mb-2">
-                        <h3 class="text-2xl font-bold text-midnight dark:text-white">
-                            Oracle Session Lock Monitor
-                        </h3>
-                        <span class="text-base font-normal text-gray-500 dark:text-gray-400">
-                            Monitoring & Kill Blocking Session
-                        </span>
+                        <h3 class="text-2xl font-bold text-midnight dark:text-white">Oracle Session Monitor</h3>
+                        <span class="text-base font-normal text-gray-500 dark:text-gray-400">Locks, Long-Running SQL &
+                            Kill</span>
                     </div>
-
-                    {{-- end text Title --}}
-
-
-
-
-
                 </div>
 
+                <!-- Tabs -->
+                <div class="flex items-center gap-2 mt-2">
+                    <button wire:click="setTab('locks')"
+                        class="px-3 py-1 rounded-md border text-sm {{ $tab === 'locks' ? 'bg-gray-900 text-white' : 'bg-gray-100' }}">Locks</button>
+                    <button wire:click="setTab('heavy')"
+                        class="px-3 py-1 rounded-md border text-sm {{ $tab === 'heavy' ? 'bg-gray-900 text-white' : 'bg-gray-100' }}">Long-Running</button>
+                    <button wire:click="setTab('longops')"
+                        class="px-3 py-1 rounded-md border text-sm {{ $tab === 'longops' ? 'bg-gray-900 text-white' : 'bg-gray-100' }}">Long
+                        Ops</button>
+                    <div class="ml-auto text-xs text-gray-500">Auto-refresh <span class="font-mono">5s</span></div>
+                </div>
 
+                <!-- Filters Row (contextual) -->
+                <div class="grid grid-cols-1 gap-2 mt-3 md:grid-cols-3">
+                    @if ($tab === 'locks')
+                        <div class="flex items-center gap-2">
+                            <label class="text-sm">Only Waiting ≥</label>
+                            <input type="number" min="0" class="w-20 px-2 py-1 border rounded"
+                                wire:model.lazy="minSecondsInWait" />
+                            <span class="text-sm">s</span>
+                            <label class="ml-4 text-sm">User</label>
+                            <input type="text" class="px-2 py-1 border rounded" placeholder="SCOTT..."
+                                wire:model.debounce.500ms="filterUser" />
+                            <label class="ml-2 text-sm">Program</label>
+                            <input type="text" class="px-2 py-1 border rounded" placeholder="JDBC..."
+                                wire:model.debounce.500ms="filterProgram" />
+                        </div>
+                    @elseif($tab === 'heavy')
+                        <div class="flex items-center gap-2">
+                            <label class="text-sm">Active ≥</label>
+                            <input type="number" min="0" class="w-20 px-2 py-1 border rounded"
+                                wire:model.lazy="minSecondsActive" />
+                            <span class="text-sm">s</span>
+                            <label class="ml-4 text-sm">Exclude Idle</label>
+                            <input type="checkbox" class="ml-1" wire:model="excludeIdle" />
+                        </div>
+                    @elseif($tab === 'longops')
+                        <div class="flex items-center gap-2">
+                            <label class="text-sm">Min Progress ≥</label>
+                            <input type="number" min="0" max="100" class="w-20 px-2 py-1 border rounded"
+                                wire:model.lazy="minLongopsPct" />
+                            <span class="text-sm">%</span>
+                        </div>
+                    @endif
+                </div>
 
-                <!-- Table -->
-                <div class="flex flex-col mt-6">
+                <!-- Data Tables -->
+                <div class="flex flex-col mt-4">
                     <div class="overflow-x-auto rounded-lg">
                         <div class="inline-block min-w-full align-middle">
                             <div class="overflow-hidden shadow sm:rounded-lg">
 
                                 <div class="overflow-auto border rounded" wire:poll.keep-alive.5s="refreshData">
-                                    <table class="w-full text-sm table-auto">
-                                        <thead class="text-left bg-gray-100">
-                                            <tr>
-                                                <th class="px-2 py-2">Waiter (SID,SER)</th>
-                                                <th class="px-2 py-2">Waiter User</th>
-                                                <th class="px-2 py-2">Waiter Program</th>
-                                                <th class="px-2 py-2">Wait Event</th>
-                                                <th class="px-2 py-2">Wait (s)</th>
-                                                <th class="px-2 py-2">Blocker (SID,SER)</th>
-                                                <th class="px-2 py-2">Blocker User</th>
-                                                <th class="px-2 py-2">Blocker Program</th>
-                                                <th class="px-2 py-2">Locked Object</th>
-                                                <th class="px-2 py-2">Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @forelse ($rows as $r)
-                                                @php
-                                                    $bOk =
-                                                        isset($r['blocker_sid'], $r['blocker_serial']) &&
-                                                        is_numeric($r['blocker_sid']) &&
-                                                        is_numeric($r['blocker_serial']);
-                                                    $wOk =
-                                                        isset($r['waiter_sid'], $r['waiter_serial']) &&
-                                                        is_numeric($r['waiter_sid']) &&
-                                                        is_numeric($r['waiter_serial']);
-                                                @endphp
-
-                                                <tr class="border-t">
-                                                    <td class="px-2 py-2 font-mono">
-                                                        {{ $r['waiter_sid'] ?? '' }},{{ $r['waiter_serial'] ?? '' }}
-                                                    </td>
-                                                    <td class="px-2 py-2">{{ $r['waiter_user'] ?? '-' }}</td>
-                                                    <td class="px-2 py-2">{{ $r['waiter_program'] ?? '-' }}</td>
-                                                    <td class="px-2 py-2">{{ $r['waiter_event'] ?? '-' }}</td>
-                                                    <td class="px-2 py-2">{{ $r['waiter_seconds_wait'] ?? 0 }}</td>
-
-                                                    <td class="px-2 py-2 font-mono">
-                                                        {{ $r['blocker_sid'] ?? '' }},{{ $r['blocker_serial'] ?? '' }}
-                                                    </td>
-                                                    <td class="px-2 py-2">{{ $r['blocker_user'] ?? '-' }}</td>
-                                                    <td class="px-2 py-2">{{ $r['blocker_program'] ?? '-' }}</td>
-                                                    <td class="px-2 py-2">{{ $r['locked_object'] ?? '-' }}</td>
-
-                                                    <td class="px-2 py-2">
-                                                        <div class="flex gap-2">
+                                    @if ($tab === 'locks')
+                                        <table class="w-full text-sm table-auto">
+                                            <thead class="text-left bg-gray-100">
+                                                <tr>
+                                                    <th class="px-2 py-2">Waiter (SID,SER)</th>
+                                                    <th class="px-2 py-2">Waiter User</th>
+                                                    <th class="px-2 py-2">Waiter Program</th>
+                                                    <th class="px-2 py-2">Wait Event</th>
+                                                    <th class="px-2 py-2">Wait (s)</th>
+                                                    <th class="px-2 py-2">Blocker (SID,SER)</th>
+                                                    <th class="px-2 py-2">Blocker User</th>
+                                                    <th class="px-2 py-2">Blocker Program</th>
+                                                    <th class="px-2 py-2">Locked Object</th>
+                                                    <th class="px-2 py-2">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @forelse ($rows as $r)
+                                                    @php
+                                                        $bOk =
+                                                            isset($r['blocker_sid'], $r['blocker_serial']) &&
+                                                            is_numeric($r['blocker_sid']) &&
+                                                            is_numeric($r['blocker_serial']);
+                                                        $wOk =
+                                                            isset($r['waiter_sid'], $r['waiter_serial']) &&
+                                                            is_numeric($r['waiter_sid']) &&
+                                                            is_numeric($r['waiter_serial']);
+                                                    @endphp
+                                                    <tr class="border-t">
+                                                        <td class="px-2 py-2 font-mono">
+                                                            {{ $r['waiter_sid'] ?? '' }},{{ $r['waiter_serial'] ?? '' }}
+                                                        </td>
+                                                        <td class="px-2 py-2">{{ $r['waiter_user'] ?? '-' }}</td>
+                                                        <td class="px-2 py-2">{{ $r['waiter_program'] ?? '-' }}</td>
+                                                        <td class="px-2 py-2">{{ $r['waiter_event'] ?? '-' }}</td>
+                                                        <td class="px-2 py-2">{{ $r['waiter_seconds_wait'] ?? 0 }}</td>
+                                                        <td class="px-2 py-2 font-mono">
+                                                            {{ $r['blocker_sid'] ?? '' }},{{ $r['blocker_serial'] ?? '' }}
+                                                        </td>
+                                                        <td class="px-2 py-2">{{ $r['blocker_user'] ?? '-' }}</td>
+                                                        <td class="px-2 py-2">{{ $r['blocker_program'] ?? '-' }}</td>
+                                                        <td class="px-2 py-2">{{ $r['locked_object'] ?? '-' }}</td>
+                                                        <td class="px-2 py-2">
+                                                            <div class="flex gap-2">
+                                                                <button
+                                                                    class="px-3 py-1 text-white bg-red-600 rounded disabled:opacity-50"
+                                                                    wire:click="confirmKill('{{ $r['blocker_sid'] ?? null }}','{{ $r['blocker_serial'] ?? null }}')"
+                                                                    @if (!$bOk) disabled @endif
+                                                                    title="{{ $bOk ? 'Kill blocker' : 'SID/SERIAL tidak tersedia' }}">
+                                                                    Kill Blocker
+                                                                </button>
+                                                                <button
+                                                                    class="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+                                                                    wire:click="confirmKill('{{ $r['waiter_sid'] ?? null }}','{{ $r['waiter_serial'] ?? null }}')"
+                                                                    @if (!$wOk) disabled @endif
+                                                                    title="{{ $wOk ? 'Kill waiter' : 'SID/SERIAL tidak tersedia' }}">
+                                                                    Kill Waiter
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                @empty
+                                                    <tr>
+                                                        <td colspan="10" class="px-2 py-6 text-center text-gray-500">
+                                                            Tidak ada blocking rows terdeteksi.</td>
+                                                    </tr>
+                                                @endforelse
+                                            </tbody>
+                                        </table>
+                                    @elseif($tab === 'heavy')
+                                        <table class="w-full text-sm table-auto">
+                                            <thead class="text-left bg-gray-100">
+                                                <tr>
+                                                    <th class="px-2 py-2">(SID,SER)</th>
+                                                    <th class="px-2 py-2">User</th>
+                                                    <th class="px-2 py-2">Program</th>
+                                                    <th class="px-2 py-2">Wait Class / Event</th>
+                                                    <th class="px-2 py-2">Active (s)</th>
+                                                    <th class="px-2 py-2">SQL_ID</th>
+                                                    <th class="px-2 py-2">Elapsed (s)</th>
+                                                    <th class="px-2 py-2">CPU (s)</th>
+                                                    <th class="px-2 py-2">Buffers</th>
+                                                    <th class="px-2 py-2">Disk Reads</th>
+                                                    <th class="px-2 py-2">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @forelse ($heavyRows as $r)
+                                                    @php $ok = isset($r['sid'],$r['serial']) && is_numeric($r['sid']) && is_numeric($r['serial']); @endphp
+                                                    <tr class="align-top border-t">
+                                                        <td class="px-2 py-2 font-mono">
+                                                            {{ $r['sid'] ?? '' }},{{ $r['serial'] ?? '' }}</td>
+                                                        <td class="px-2 py-2">{{ $r['username'] ?? '-' }}</td>
+                                                        <td class="px-2 py-2">{{ $r['program'] ?? '-' }}</td>
+                                                        <td class="px-2 py-2">
+                                                            <div>{{ $r['wait_class'] ?? '-' }}</div>
+                                                            <div class="text-xs text-gray-500">
+                                                                {{ $r['event'] ?? '-' }}</div>
+                                                        </td>
+                                                        <td class="px-2 py-2">{{ $r['seconds_active'] ?? 0 }}</td>
+                                                        <td class="px-2 py-2 font-mono">{{ $r['sql_id'] ?? '-' }}</td>
+                                                        <td class="px-2 py-2">
+                                                            {{ number_format((float) ($r['elapsed_sec'] ?? 0), 2) }}
+                                                        </td>
+                                                        <td class="px-2 py-2">
+                                                            {{ number_format((float) ($r['cpu_sec'] ?? 0), 2) }}</td>
+                                                        <td class="px-2 py-2">{{ $r['buffer_gets'] ?? 0 }}</td>
+                                                        <td class="px-2 py-2">{{ $r['disk_reads'] ?? 0 }}</td>
+                                                        <td class="px-2 py-2">
+                                                            <div class="flex gap-2">
+                                                                <button
+                                                                    class="px-3 py-1 text-white bg-red-600 rounded disabled:opacity-50"
+                                                                    wire:click="confirmKill('{{ $r['sid'] ?? null }}','{{ $r['serial'] ?? null }}')"
+                                                                    @if (!$ok) disabled @endif
+                                                                    title="Kill session">
+                                                                    Kill Session
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="border-b">
+                                                        <td colspan="11" class="px-2 pb-3 text-xs text-gray-600">
+                                                            <div class="font-mono whitespace-pre-wrap">
+                                                                {{ $r['sql_text'] ?? '' }}</div>
+                                                        </td>
+                                                    </tr>
+                                                @empty
+                                                    <tr>
+                                                        <td colspan="11"
+                                                            class="px-2 py-6 text-center text-gray-500">Tidak ada sesi
+                                                            ACTIVE yang melebihi ambang waktu.</td>
+                                                    </tr>
+                                                @endforelse
+                                            </tbody>
+                                        </table>
+                                    @elseif($tab === 'longops')
+                                        <table class="w-full text-sm table-auto">
+                                            <thead class="text-left bg-gray-100">
+                                                <tr>
+                                                    <th class="px-2 py-2">(SID,SER)</th>
+                                                    <th class="px-2 py-2">User</th>
+                                                    <th class="px-2 py-2">Program</th>
+                                                    <th class="px-2 py-2">Opname / Target</th>
+                                                    <th class="px-2 py-2">Progress (%)</th>
+                                                    <th class="px-2 py-2">Elapsed (s)</th>
+                                                    <th class="px-2 py-2">ETA (s)</th>
+                                                    <th class="px-2 py-2">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @forelse ($longopsRows as $r)
+                                                    @php $ok = isset($r['sid'],$r['serial']) && is_numeric($r['sid']) && is_numeric($r['serial']); @endphp
+                                                    <tr class="border-t">
+                                                        <td class="px-2 py-2 font-mono">
+                                                            {{ $r['sid'] ?? '' }},{{ $r['serial'] ?? '' }}</td>
+                                                        <td class="px-2 py-2">{{ $r['username'] ?? '-' }}</td>
+                                                        <td class="px-2 py-2">{{ $r['program'] ?? '-' }}</td>
+                                                        <td class="px-2 py-2">
+                                                            <div>{{ $r['opname'] ?? '-' }}</div>
+                                                            <div class="text-xs text-gray-500 break-all">
+                                                                {{ $r['target'] ?? '-' }}</div>
+                                                        </td>
+                                                        <td class="px-2 py-2">{{ $r['pct'] ?? 0 }}</td>
+                                                        <td class="px-2 py-2">{{ $r['elapsed_seconds'] ?? 0 }}</td>
+                                                        <td class="px-2 py-2">{{ $r['time_remaining'] ?? 0 }}</td>
+                                                        <td class="px-2 py-2">
                                                             <button
                                                                 class="px-3 py-1 text-white bg-red-600 rounded disabled:opacity-50"
-                                                                wire:click="confirmKill('{{ $r['blocker_sid'] ?? null }}','{{ $r['blocker_serial'] ?? null }}')"
-                                                                @if (!$bOk) disabled @endif
-                                                                title="{{ $bOk ? 'Kill blocker' : 'SID/SERIAL tidak tersedia' }}">
-                                                                Kill Blocker
+                                                                wire:click="confirmKill('{{ $r['sid'] ?? null }}','{{ $r['serial'] ?? null }}')"
+                                                                @if (!$ok) disabled @endif
+                                                                title="Kill session">
+                                                                Kill Session
                                                             </button>
-
-                                                            <button
-                                                                class="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
-                                                                wire:click="confirmKill('{{ $r['waiter_sid'] ?? null }}','{{ $r['waiter_serial'] ?? null }}')"
-                                                                @if (!$wOk) disabled @endif
-                                                                title="{{ $wOk ? 'Kill waiter' : 'SID/SERIAL tidak tersedia' }}">
-                                                                Kill Waiter
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            @empty
-                                                <tr>
-                                                    <td colspan="10" class="px-2 py-6 text-center text-gray-500">
-                                                        Tidak ada blocking rows terdeteksi.
-                                                    </td>
-                                                </tr>
-                                            @endforelse
-                                        </tbody>
-                                    </table>
-
+                                                        </td>
+                                                    </tr>
+                                                @empty
+                                                    <tr>
+                                                        <td colspan="8"
+                                                            class="px-2 py-6 text-center text-gray-500">Tidak ada long
+                                                            operations yang berjalan.</td>
+                                                    </tr>
+                                                @endforelse
+                                            </tbody>
+                                        </table>
+                                    @endif
                                 </div>
 
                                 {{-- Modal konfirmasi --}}
@@ -114,12 +255,9 @@
                                     <div class="fixed inset-0 z-40 flex items-center justify-center bg-black/40">
                                         <div class="w-full max-w-md p-4 bg-white shadow-xl rounded-xl">
                                             <div class="text-lg font-semibold">Konfirmasi Kill Session</div>
-                                            <div class="mt-2 text-sm">
-                                                Anda akan menghentikan sesi
-                                                <span
+                                            <div class="mt-2 text-sm">Anda akan menghentikan sesi <span
                                                     class="font-mono">{{ $killSid }},{{ $killSerial }}</span>.
-                                                Lanjutkan?
-                                            </div>
+                                                Lanjutkan?</div>
                                             <div class="flex justify-end gap-2 mt-4">
                                                 <x-secondary-button
                                                     wire:click="$set('showConfirm', false)">Batal</x-secondary-button>
@@ -129,19 +267,12 @@
                                     </div>
                                 @endif
 
-
-
                             </div>
                         </div>
                     </div>
                 </div>
 
-
-
-
             </div>
         </div>
     </div>
-
-
 </div>
