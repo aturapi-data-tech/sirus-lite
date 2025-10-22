@@ -5,25 +5,256 @@
                 <div id="TopBarMenuMaster" class="">
                     <div class="mb-2">
                         <h3 class="text-2xl font-bold text-midnight dark:text-white">Oracle Session Monitor</h3>
-                        <span class="text-base font-normal text-gray-500 dark:text-gray-400">Locks, Long-Running SQL &
-                            Kill</span>
+                        <span class="text-base font-normal text-gray-500 dark:text-gray-400">
+                            Locks, Long-Running SQL & Kill
+                        </span>
                     </div>
                 </div>
 
                 <!-- Tabs -->
                 <div class="flex items-center gap-2 mt-2">
+
+
+
                     <button wire:click="setTab('locks')"
-                        class="px-3 py-1 rounded-md border text-sm {{ $tab === 'locks' ? 'bg-gray-900 text-white' : 'bg-gray-100' }}">Locks</button>
+                        class="px-3 py-1 rounded-md border text-sm {{ $tab === 'locks' ? 'bg-gray-900 text-white' : 'bg-gray-100' }}">
+                        Locks
+                    </button>
                     <button wire:click="setTab('heavy')"
-                        class="px-3 py-1 rounded-md border text-sm {{ $tab === 'heavy' ? 'bg-gray-900 text-white' : 'bg-gray-100' }}">Long-Running</button>
+                        class="px-3 py-1 rounded-md border text-sm {{ $tab === 'heavy' ? 'bg-gray-900 text-white' : 'bg-gray-100' }}">
+                        Long-Running
+                    </button>
                     <button wire:click="setTab('longops')"
-                        class="px-3 py-1 rounded-md border text-sm {{ $tab === 'longops' ? 'bg-gray-900 text-white' : 'bg-gray-100' }}">Long
-                        Ops</button>
-                    <div class="ml-auto text-xs text-gray-500">Auto-refresh <span class="font-mono">5s</span></div>
+                        class="px-3 py-1 rounded-md border text-sm {{ $tab === 'longops' ? 'bg-gray-900 text-white' : 'bg-gray-100' }}">
+                        Long Ops
+                    </button>
+                    <div class="ml-auto text-xs text-gray-500">
+                        Auto-refresh <span class="font-mono">
+                            @if ($tab === 'locks' || $tab === 'longops')
+                                5s
+                            @else
+                                15s
+                            @endif
+                        </span>
+                    </div>
+                    @if ($tab === 'heavy')
+                        <div wire:poll.3s="refreshPerf"></div>
+                        <div wire:poll.3s="refreshHeavy"></div>
+                    @endif
                 </div>
 
-                <!-- Filters Row (contextual) -->
+                <!-- Filters + Charts (contextual) -->
                 <div class="grid grid-cols-1 gap-2 mt-3 md:grid-cols-3">
+
+                    {{-- === HEAVY: Charts + filters === --}}
+                    @if ($tab === 'heavy')
+                        @once
+                            <script>
+                                window.addEventListener('perf-sample', (ev) => {
+                                    console.log('perf-sample:', ev.detail); // harus muncul tiap 3s
+                                });
+                            </script>
+
+                            <script>
+                                (function() {
+                                    let perfChart = null;
+                                    let heavyChart = null;
+
+                                    // --- Loader: pastikan Chart.js ter-load sebelum pakai
+                                    function loadChartJs() {
+                                        return new Promise((resolve, reject) => {
+                                            if (window.Chart) return resolve();
+                                            // kalau sudah ada tag script-nya, tunggu load
+                                            let tag = document.querySelector('script[data-chartjs]');
+                                            if (tag) {
+                                                tag.addEventListener('load', () => resolve());
+                                                tag.addEventListener('error', reject);
+                                                return;
+                                            }
+                                            // sisipkan script Chart.js
+                                            tag = document.createElement('script');
+                                            tag.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js';
+                                            tag.defer = true;
+                                            tag.async = true;
+                                            tag.dataset.chartjs = '';
+                                            tag.onload = () => resolve();
+                                            tag.onerror = reject;
+                                            document.head.appendChild(tag);
+                                        });
+                                    }
+
+                                    function ensurePerfChart() {
+                                        const el = document.getElementById('perfChart');
+                                        if (!el || perfChart) return;
+                                        perfChart = new Chart(el.getContext('2d'), {
+                                            type: 'line',
+                                            data: {
+                                                labels: [],
+                                                datasets: [{
+                                                        label: 'Average Active Sessions',
+                                                        data: [],
+                                                        tension: 0.3
+                                                    },
+                                                    {
+                                                        label: 'DB CPU Time Ratio (%)',
+                                                        data: [],
+                                                        yAxisID: 'y1',
+                                                        tension: 0.3
+                                                    },
+                                                    {
+                                                        label: 'Host CPU Util (%)',
+                                                        data: [],
+                                                        yAxisID: 'y1',
+                                                        tension: 0.3
+                                                    },
+                                                ]
+                                            },
+                                            options: {
+                                                responsive: true,
+                                                animation: false,
+                                                plugins: {
+                                                    legend: {
+                                                        position: 'bottom'
+                                                    }
+                                                },
+                                                scales: {
+                                                    y: {
+                                                        title: {
+                                                            display: true,
+                                                            text: 'AAS'
+                                                        }
+                                                    },
+                                                    y1: {
+                                                        position: 'right',
+                                                        title: {
+                                                            display: true,
+                                                            text: '%'
+                                                        },
+                                                        min: 0,
+                                                        max: 100,
+                                                        grid: {
+                                                            drawOnChartArea: false
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        });
+                                    }
+
+                                    function ensureHeavyChart() {
+                                        const el = document.getElementById('heavyChart');
+                                        if (!el || heavyChart) return;
+                                        heavyChart = new Chart(el.getContext('2d'), {
+                                            type: 'bar',
+                                            data: {
+                                                labels: [],
+                                                datasets: [{
+                                                    label: 'Seconds Active',
+                                                    data: []
+                                                }]
+                                            },
+                                            options: {
+                                                responsive: true,
+                                                animation: false,
+                                                plugins: {
+                                                    legend: {
+                                                        display: false
+                                                    },
+                                                    tooltip: {
+                                                        callbacks: {
+                                                            afterLabel: (ctx) => ctx?.raw?.event ? `\n${ctx.raw.event}` : ''
+                                                        }
+                                                    }
+                                                },
+                                                parsing: false,
+                                                scales: {
+                                                    y: {
+                                                        beginAtZero: true,
+                                                        title: {
+                                                            display: true,
+                                                            text: 'sec'
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        });
+                                    }
+
+                                    // Event dari Livewire → pastikan Chart.js sudah ada dulu
+                                    window.addEventListener('perf-sample', async (ev) => {
+                                        try {
+                                            await loadChartJs();
+                                            // re-grab canvas tiap kali (DOM bisa berubah)
+                                            if (!perfChart) ensurePerfChart();
+                                            if (!perfChart) return;
+                                            const {
+                                                labels,
+                                                series
+                                            } = ev.detail;
+                                            perfChart.data.labels = labels;
+                                            perfChart.data.datasets[0].data = series.aas;
+                                            perfChart.data.datasets[1].data = series.dbcpuRatio;
+                                            perfChart.data.datasets[2].data = series.hostCpu;
+                                            perfChart.update('none');
+                                        } catch {}
+                                    });
+
+                                    window.addEventListener('heavy-top', async (ev) => {
+                                        try {
+                                            await loadChartJs();
+                                            if (!heavyChart) ensureHeavyChart();
+                                            if (!heavyChart) return;
+                                            const bars = ev.detail.bars || [];
+                                            heavyChart.data.labels = bars.map(b => b.label);
+                                            heavyChart.data.datasets[0].data = bars.map(b => ({
+                                                x: b.label,
+                                                y: b.value,
+                                                event: b.event
+                                            }));
+                                            heavyChart.update('none');
+                                        } catch {}
+                                    });
+
+                                })
+                                ();
+                            </script>
+                        @endonce
+
+                        {{-- Charts row --}}
+                        <div class="grid grid-cols-1 gap-4 mt-4 lg:col-span-3 lg:grid-cols-2">
+                            {{-- Line chart: AAS, DB CPU Ratio, Host CPU --}}
+                            <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm" wire:ignore>
+                                <div class="flex items-center justify-between mb-2">
+                                    <h3 class="font-semibold">Database Performance (rolling)</h3>
+                                    <span class="text-xs text-gray-500">Live</span>
+                                </div>
+                                <canvas id="perfChart" height="140"></canvas>
+                                {{-- polling khusus sampel perf --}}
+                            </div>
+
+                            {{-- Bar chart: Top Active Sessions by seconds_active --}}
+                            <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm" wire:ignore>
+                                <div class="flex items-center justify-between mb-2">
+                                    <h3 class="font-semibold">Top Active Sessions (by seconds active)</h3>
+                                    <span class="text-xs text-gray-500">Live</span>
+                                </div>
+                                <canvas id="heavyChart" height="140"></canvas>
+                                {{-- polling khusus heavy (ini juga mengisi tabel heavyRows) --}}
+                            </div>
+                        </div>
+
+                        {{-- Filters heavy --}}
+                        <div class="flex items-center gap-2 lg:col-span-3">
+                            <label class="text-sm">Active ≥</label>
+                            <input type="number" min="0" class="w-20 px-2 py-1 border rounded"
+                                wire:model.lazy="minSecondsActive" />
+                            <span class="text-sm">s</span>
+                            <label class="ml-4 text-sm">Exclude Idle</label>
+                            <input type="checkbox" class="ml-1" wire:model="excludeIdle" />
+                        </div>
+                    @endif
+
+                    {{-- === LOCKS filters === --}}
                     @if ($tab === 'locks')
                         <div class="flex items-center gap-2">
                             <label class="text-sm">Only Waiting ≥</label>
@@ -37,16 +268,10 @@
                             <input type="text" class="px-2 py-1 border rounded" placeholder="JDBC..."
                                 wire:model.debounce.500ms="filterProgram" />
                         </div>
-                    @elseif($tab === 'heavy')
-                        <div class="flex items-center gap-2">
-                            <label class="text-sm">Active ≥</label>
-                            <input type="number" min="0" class="w-20 px-2 py-1 border rounded"
-                                wire:model.lazy="minSecondsActive" />
-                            <span class="text-sm">s</span>
-                            <label class="ml-4 text-sm">Exclude Idle</label>
-                            <input type="checkbox" class="ml-1" wire:model="excludeIdle" />
-                        </div>
-                    @elseif($tab === 'longops')
+                    @endif
+
+                    {{-- === LONGOPS filters === --}}
+                    @if ($tab === 'longops')
                         <div class="flex items-center gap-2">
                             <label class="text-sm">Min Progress ≥</label>
                             <input type="number" min="0" max="100" class="w-20 px-2 py-1 border rounded"
@@ -56,13 +281,18 @@
                     @endif
                 </div>
 
-                <!-- Data Tables -->
+                <!-- Data Tables (poll per-tab) -->
                 <div class="flex flex-col mt-4">
                     <div class="overflow-x-auto rounded-lg">
                         <div class="inline-block min-w-full align-middle">
                             <div class="overflow-hidden shadow sm:rounded-lg">
 
-                                <div class="overflow-auto border rounded" wire:poll.keep-alive.5s="refreshData">
+                                <div class="overflow-auto border rounded"
+                                    @if ($tab === 'locks') wire:poll.keep-alive.3s="refreshLocks"
+                                    @elseif($tab === 'longops') wire:poll.keep-alive.3s="refreshLongops" @endif>
+
+
+                                    {{-- LOCKS table --}}
                                     @if ($tab === 'locks')
                                         <table class="w-full text-sm table-auto">
                                             <thead class="text-left bg-gray-100">
@@ -126,13 +356,19 @@
                                                     </tr>
                                                 @empty
                                                     <tr>
-                                                        <td colspan="10" class="px-2 py-6 text-center text-gray-500">
-                                                            Tidak ada blocking rows terdeteksi.</td>
+                                                        <td colspan="10"
+                                                            class="px-2 py-6 text-center text-gray-500">
+                                                            Tidak ada blocking rows terdeteksi.
+                                                        </td>
                                                     </tr>
                                                 @endforelse
                                             </tbody>
                                         </table>
-                                    @elseif($tab === 'heavy')
+                                    @endif
+
+                                    {{-- HEAVY table --}}
+                                    @if ($tab === 'heavy')
+
                                         <table class="w-full text-sm table-auto">
                                             <thead class="text-left bg-gray-100">
                                                 <tr>
@@ -192,13 +428,17 @@
                                                 @empty
                                                     <tr>
                                                         <td colspan="11"
-                                                            class="px-2 py-6 text-center text-gray-500">Tidak ada sesi
-                                                            ACTIVE yang melebihi ambang waktu.</td>
+                                                            class="px-2 py-6 text-center text-gray-500">
+                                                            Tidak ada sesi ACTIVE yang melebihi ambang waktu.
+                                                        </td>
                                                     </tr>
                                                 @endforelse
                                             </tbody>
                                         </table>
-                                    @elseif($tab === 'longops')
+                                    @endif
+
+                                    {{-- LONGOPS table --}}
+                                    @if ($tab === 'longops')
                                         <table class="w-full text-sm table-auto">
                                             <thead class="text-left bg-gray-100">
                                                 <tr>
@@ -241,8 +481,9 @@
                                                 @empty
                                                     <tr>
                                                         <td colspan="8"
-                                                            class="px-2 py-6 text-center text-gray-500">Tidak ada long
-                                                            operations yang berjalan.</td>
+                                                            class="px-2 py-6 text-center text-gray-500">
+                                                            Tidak ada long operations yang berjalan.
+                                                        </td>
                                                     </tr>
                                                 @endforelse
                                             </tbody>
@@ -255,9 +496,12 @@
                                     <div class="fixed inset-0 z-40 flex items-center justify-center bg-black/40">
                                         <div class="w-full max-w-md p-4 bg-white shadow-xl rounded-xl">
                                             <div class="text-lg font-semibold">Konfirmasi Kill Session</div>
-                                            <div class="mt-2 text-sm">Anda akan menghentikan sesi <span
+                                            <div class="mt-2 text-sm">
+                                                Anda akan menghentikan sesi
+                                                <span
                                                     class="font-mono">{{ $killSid }},{{ $killSerial }}</span>.
-                                                Lanjutkan?</div>
+                                                Lanjutkan?
+                                            </div>
                                             <div class="flex justify-end gap-2 mt-4">
                                                 <x-secondary-button
                                                     wire:click="$set('showConfirm', false)">Batal</x-secondary-button>
@@ -272,7 +516,7 @@
                     </div>
                 </div>
 
-            </div>
-        </div>
-    </div>
+            </div> <!-- /w-full -->
+        </div> <!-- /card -->
+    </div> <!-- /px -->
 </div>

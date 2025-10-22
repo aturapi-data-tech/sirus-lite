@@ -6,9 +6,144 @@ use Throwable;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
+use Illuminate\Support\Arr;
+
 class LockMonitor extends Component
 {
     public string $connection = 'oracle';
+
+    // ===== Realtime perf chart (rolling window)
+    public int $perfWindow = 60; // simpan 60 sampel (~5 menit kalau polling 5 detik)
+    public array $perfSeries = [
+        'ts'   => [],      // label waktu (HH24:MI:SS)
+        'aas'  => [],      // Average Active Sessions
+        'dbcpu_ratio' => [], // Database CPU Time Ratio (%)
+        'host_cpu'    => [], // Host CPU Utilization (%)
+    ];
+
+    /*************  ✨ Windsurf Command ⭐  *************/
+    /**
+     * Refresh all data (locks, heavy, longops, perf)
+     */
+    /*******  4dd7b6a1-5c2f-44af-9f29-835da129f6bb  *******/
+    public function refreshData(): void
+    {
+        $this->refreshLocks();
+        $this->refreshHeavy();
+        $this->refreshLongops();
+        $this->refreshPerf(); // <- tambahkan ini
+    }
+
+    /** Realtime metrics dari v$sysmetric (1-minute group) */
+    public ?float $osBusyPrev = null;
+    public ?float $osIdlePrev = null;
+    public function refreshPerf(): void
+    {
+        $ts = date('H:i:s');
+        $aas = 0.0;
+        $dbcpu = 0.0;
+        $host = 0.0;
+
+        try {
+            // --- Ambil snapshot TERAKHIR secara eksplisit lalu pivot
+            $sql_v = <<<'SQL'
+            WITH snap AS (
+              SELECT metric_name, value
+              FROM   v$sysmetric
+              WHERE  group_id = 2
+              AND    end_time = (SELECT MAX(end_time) FROM v$sysmetric WHERE group_id = 2)
+              AND    metric_name IN (
+                       'Average Active Sessions',
+                       'Database CPU Time Ratio',
+                       'Host CPU Utilization (%)',
+                       'Database Time Per Sec',
+                       'CPU Usage Per Sec'
+                     )
+            )
+            SELECT
+              TO_CHAR(SYSDATE,'HH24:MI:SS') AS ts,
+              MAX(CASE WHEN metric_name='Average Active Sessions'  THEN value END) AS aas,
+              MAX(CASE WHEN metric_name='Database CPU Time Ratio'  THEN value END) AS dbcpu_ratio,
+              MAX(CASE WHEN metric_name='Host CPU Utilization (%)' THEN value END) AS host_cpu,
+              MAX(CASE WHEN metric_name='Database Time Per Sec'    THEN value END) AS db_time_ps,
+              MAX(CASE WHEN metric_name='CPU Usage Per Sec'        THEN value END) AS cpu_ps
+            FROM snap
+            SQL;
+
+            $sql_gv = str_replace('FROM   v$sysmetric', 'FROM   gv$sysmetric', $sql_v);
+
+            $sql_hist = <<<'SQL'
+            WITH snap AS (
+              SELECT metric_name, value
+              FROM   v$sysmetric_history
+              WHERE  group_id = 2
+              AND    end_time = (SELECT MAX(end_time) FROM v$sysmetric_history WHERE group_id = 2)
+              AND    metric_name IN (
+                       'Average Active Sessions',
+                       'Database CPU Time Ratio',
+                       'Host CPU Utilization (%)',
+                       'Database Time Per Sec',
+                       'CPU Usage Per Sec'
+                     )
+            )
+            SELECT
+              TO_CHAR(SYSDATE,'HH24:MI:SS') AS ts,
+              MAX(CASE WHEN metric_name='Average Active Sessions'  THEN value END) AS aas,
+              MAX(CASE WHEN metric_name='Database CPU Time Ratio'  THEN value END) AS dbcpu_ratio,
+              MAX(CASE WHEN metric_name='Host CPU Utilization (%)' THEN value END) AS host_cpu,
+              MAX(CASE WHEN metric_name='Database Time Per Sec'    THEN value END) AS db_time_ps,
+              MAX(CASE WHEN metric_name='CPU Usage Per Sec'        THEN value END) AS cpu_ps
+            FROM snap
+            SQL;
+
+            $db = DB::connection($this->connection);
+
+            $row = collect($db->select($sql_v))->first()
+                ?? collect($db->select($sql_gv))->first()
+                ?? collect($db->select($sql_hist))->first();
+
+            if ($row) {
+                $r = collect((array)$row)->mapWithKeys(fn($v, $k) => [strtolower($k) => $v])->all();
+
+                $ts   = $r['ts'] ?? $ts;
+                // jika AAS/DB CPU kosong, hitung dari DB_TIME_PER_SEC & CPU_USAGE_PER_SEC
+                $dbt  = (float)($r['db_time_ps']   ?? 0);
+                $cpu  = (float)($r['cpu_ps']       ?? 0);
+
+                $aas  = isset($r['aas'])         ? (float)$r['aas']         : $dbt;                      // ~ DB time / sec
+                $dbcpu = isset($r['dbcpu_ratio']) ? (float)$r['dbcpu_ratio'] : ($dbt > 0 ? 100 * $cpu / $dbt : 0);
+                $host = isset($r['host_cpu'])    ? (float)$r['host_cpu']    : 0.0;
+
+                // Jika host_cpu masih 0/null, nanti bisa dihitung dari v$osstat delta (lanjutan opsional).
+            }
+
+            // (opsional) DEBUG: tampilkan row mentah sekali-sekali
+            // \Log::info('perf row', compact('ts','aas','dbcpu','host'));
+        } catch (\Throwable $e) {
+            // \Log::warning('refreshPerf error: '.$e->getMessage());
+        }
+
+        // --- update rolling window & kirim event (selalu) ---
+        foreach (['ts' => $ts, 'aas' => $aas, 'dbcpu_ratio' => $dbcpu, 'host_cpu' => $host] as $k => $v) {
+            $this->perfSeries[$k][] = $v;
+            if (count($this->perfSeries[$k]) > $this->perfWindow) array_shift($this->perfSeries[$k]);
+        }
+
+        $this->dispatchBrowserEvent('perf-sample', [
+            'labels' => $this->perfSeries['ts'],
+            'series' => [
+                'aas'        => $this->perfSeries['aas'],
+                'dbcpuRatio' => $this->perfSeries['dbcpu_ratio'],
+                'hostCpu'    => $this->perfSeries['host_cpu'],
+            ],
+        ]);
+    }
+
+
+
+
+
+
 
     // ===== Filters (Locks)
     public bool $onlyWaiting = true;
@@ -48,12 +183,7 @@ class LockMonitor extends Component
         $this->tab = in_array($t, ['locks', 'heavy', 'longops'], true) ? $t : 'locks';
     }
 
-    public function refreshData(): void
-    {
-        $this->refreshLocks();
-        $this->refreshHeavy();
-        $this->refreshLongops();
-    }
+
 
     /** Locks (blocker ↔ waiter) */
     public function refreshLocks(): void
@@ -140,38 +270,38 @@ class LockMonitor extends Component
         }
     }
 
-    /** NEW: Long-running ACTIVE SQL based on v$session + v$sqlarea */
+    /** Setelah heavy di-refresh, kirim ringkasannya utk bar chart "proses berat saat ini" */
     public function refreshHeavy(): void
     {
         try {
             $sql = <<<'SQL'
-            SELECT
-                s.sid,
-                s.serial#               AS serial,
-                s.username,
-                s.program,
-                s.module,
-                s.machine,
-                s.status,
-                s.event,
-                s.wait_class,
-                s.last_call_et          AS seconds_active,
-                NVL(s.sql_id, s.prev_sql_id) AS sql_id,
-                SUBSTR(sa.sql_text,1,1000)   AS sql_text,
-                sa.executions,
-                sa.elapsed_time/1e6     AS elapsed_sec,
-                sa.cpu_time/1e6         AS cpu_sec,
-                sa.buffer_gets,
-                sa.disk_reads,
-                sa.rows_processed,
-                sa.first_load_time,
-                sa.last_active_time
-            FROM v$session s
-            LEFT JOIN v$sqlarea sa ON sa.sql_id = NVL(s.sql_id, s.prev_sql_id)
-            WHERE s.username IS NOT NULL
-              AND s.status = 'ACTIVE'
-            ORDER BY s.last_call_et DESC NULLS LAST
-            SQL;
+             SELECT
+                 s.sid,
+                 s.serial#               AS serial,
+                 s.username,
+                 s.program,
+                 s.module,
+                 s.machine,
+                 s.status,
+                 s.event,
+                 s.wait_class,
+                 s.last_call_et          AS seconds_active,
+                 NVL(s.sql_id, s.prev_sql_id) AS sql_id,
+                 SUBSTR(sa.sql_text,1,1000)   AS sql_text,
+                 sa.executions,
+                 sa.elapsed_time/1e6     AS elapsed_sec,
+                 sa.cpu_time/1e6         AS cpu_sec,
+                 sa.buffer_gets,
+                 sa.disk_reads,
+                 sa.rows_processed,
+                 sa.first_load_time,
+                 sa.last_active_time
+             FROM v$session s
+             LEFT JOIN v$sqlarea sa ON sa.sql_id = NVL(s.sql_id, s.prev_sql_id)
+             WHERE s.username IS NOT NULL
+               AND s.status = 'ACTIVE'
+             ORDER BY s.last_call_et DESC NULLS LAST
+             SQL;
 
             $rows = DB::connection($this->connection)->select($sql);
 
@@ -184,11 +314,25 @@ class LockMonitor extends Component
                 })
                 ->values()
                 ->toArray();
+
+            // Kirim top 5 sesi terberat (pakai seconds_active sebagai indikator cepat)
+            $top = collect($this->heavyRows)
+                ->sortByDesc('seconds_active')
+                ->take(5)
+                ->map(fn($r) => [
+                    'label' => sprintf('%s (SID %s)', $r['username'] ?? 'SYS', $r['sid'] ?? '?'),
+                    'value' => (int)($r['seconds_active'] ?? 0),
+                    'event' => $r['event'] ?? '',
+                ])->values()->all();
+
+            $this->dispatchBrowserEvent('heavy-top', ['bars' => $top]);
         } catch (Throwable $e) {
             toastr()->closeOnHover(true)->closeDuration(3000)->positionClass('toast-top-left')->addError([$e->getMessage()]);
             $this->heavyRows = [];
         }
     }
+
+
 
     /** NEW: Session Long Operations (progress-based) */
     public function refreshLongops(): void
