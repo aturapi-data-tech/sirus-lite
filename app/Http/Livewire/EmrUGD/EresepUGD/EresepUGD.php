@@ -5,32 +5,27 @@ namespace App\Http\Livewire\EmrUGD\EresepUGD;
 use Illuminate\Support\Facades\DB;
 
 use Livewire\Component;
-use Livewire\WithPagination;
-// use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 
 use App\Http\Traits\customErrorMessagesTrait;
 use App\Http\Traits\EmrUGD\EmrUGDTrait;
 
-// use Illuminate\Support\Str;
-use Spatie\ArrayToXml\ArrayToXml;
-use Exception;
 use Illuminate\Support\Facades\Validator;
 
 class EresepUGD extends Component
 {
-    use WithPagination, EmrUGDTrait;
+    use  EmrUGDTrait;
 
     // listener from blade////////////////
     protected $listeners = [
         'storeAssessmentDokterUGD' => 'store',
-        'syncronizeAssessmentDokterUGDFindData' => 'mount',
-        'syncronizeAssessmentPerawatUGDFindData' => 'mount'
     ];
 
     //////////////////////////////
     // Ref on top bar
     //////////////////////////////
-    public $rjNoRef = 472309;
+    public $rjNoRef;
     public string $rjStatusRef;
 
     // dataDaftarUgd RJ
@@ -50,11 +45,7 @@ class EresepUGD extends Component
     ////////////////////////////////////////////////
     ///////////begin////////////////////////////////
     ////////////////////////////////////////////////
-    public function updated($propertyName)
-    {
-        // dd($propertyName);
-        // $this->validateOnly($propertyName);
-    }
+
 
     /////////////////////////////////////////////////
     // Lov dataProductLov //////////////////////
@@ -65,7 +56,7 @@ class EresepUGD extends Component
         $this->dataProductLov = [];
     }
 
-    public function updateddataProductLovsearch()
+    public function updatedDataProductLovSearch()
     {
         // Reset index of LoV
         $this->reset(['selecteddataProductLovIndex', 'dataProductLov']);
@@ -136,7 +127,7 @@ class EresepUGD extends Component
     // LOV selected start
     public function setMydataProductLov($id)
     {
-        $this->checkUgdStatus();
+        if (!$this->checkUgdStatus()) return;
         $dataProductLovs = DB::table('immst_products')
             ->select(
                 'product_id',
@@ -193,7 +184,7 @@ class EresepUGD extends Component
 
     public function enterMydataProductLov($id)
     {
-        $this->checkUgdStatus();
+        if (!$this->checkUgdStatus()) return;
         // jika data obat belum siap maka toaster error
         if (isset($this->dataProductLov[$id]['product_id'])) {
             $this->addProduct($this->dataProductLov[$id]['product_id'], $this->dataProductLov[$id]['product_name'], $this->dataProductLov[$id]['sales_price']);
@@ -211,43 +202,69 @@ class EresepUGD extends Component
     // insert and update record start////////////////
     public function store()
     {
-        // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
-        $this->setDataPrimer();
+        // optionally, kunci pasien masih aktif
+        if (!$this->checkUgdStatus()) return;
 
-        // Logic update mode start //////////
-        $this->updateDataRJ($this->dataDaftarUgd['rjNo']);
-        $this->emit('syncronizeAssessmentDokterUGDFindData');
-        $this->emit('syncronizeAssessmentPerawatUGDFindData');
+        // pastikan RJ No ada
+        $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
+        if (!$rjNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('rjNo kosong.');
+            return;
+        }
+
+        $lockKey = "ugd:{$rjNo}";
+
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
+                DB::transaction(function () use ($rjNo) {
+                    // Ambil FRESH dari DB biar tidak menimpa subtree lain
+                    $fresh = $this->findDataUGD($rjNo) ?: [];
+
+                    // Pastikan subtree yang dikelola komponen ini ada
+                    if (!isset($fresh['eresep']) || !is_array($fresh['eresep'])) {
+                        $fresh['eresep'] = [];
+                    }
+
+                    // PATCH hanya bagian 'eresep' dari state lokal
+                    $fresh['eresep'] = array_values((array)($this->dataDaftarUgd['eresep'] ?? []));
+
+                    // Commit JSON besar sekali jalan
+                    $this->updateJsonUGD($rjNo, $fresh);
+
+                    // Sinkronkan state lokal supaya UI langsung up-to-date
+                    $this->dataDaftarUgd = $fresh;
+                });
+            });
+
+
+
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess('Eresep berhasil disimpan.');
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
+            return;
+        } catch (\Throwable $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Gagal menyimpan eresep.');
+            return;
+        }
     }
-
-    private function updateDataRJ($rjNo): void
-    {
-        // update table trnsaksi
-        // DB::table('rstxn_ugdhdrs')
-        //     ->where('rj_no', $rjNo)
-        //     ->update([
-        //         'datadaftarugd_json' => json_encode($this->dataDaftarUgd, true),
-        //         'datadaftarugd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
-        //     ]);
-        $this->updateJsonUGD($rjNo, $this->dataDaftarUgd);
-
-        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Eresep berhasil disimpan.');
-    }
-    // insert and update record end////////////////
 
     private function findData($rjno): void
     {
-        $this->rjStatusRef = DB::table('rstxn_ugdhdrs')->select('rj_status')->where('rj_no', $rjno)->first()->rj_status;
+        $row = DB::table('rstxn_ugdhdrs')->select('rj_status')->where('rj_no', $rjno)->first();
+        $this->rjStatusRef = $row->rj_status ?? '';
 
         $this->dataDaftarUgd = $this->findDataUGD($rjno);
-        // dd($this->dataDaftarUgd);
+
         // jika eresep tidak ditemukan tambah variable eresep pda array
         if (isset($this->dataDaftarUgd['eresep']) == false) {
             $this->dataDaftarUgd['eresep'] = [];
         }
     }
 
-    private function setDataPrimer(): void {}
 
     private function addProduct($productId, $productName, $salesPrice): void
     {
@@ -265,154 +282,180 @@ class EresepUGD extends Component
 
     public function insertProduct(): void
     {
-        // validate
-        // customErrorMessages
+        // Validasi
         $messages = customErrorMessagesTrait::messages();
-        // require nik ketika pasien tidak dikenal
         $rules = [
-            'collectingMyProduct.productId' => 'bail|required|',
-            'collectingMyProduct.productName' => 'bail|required|',
-            'collectingMyProduct.signaX' => 'bail|required|',
-            'collectingMyProduct.signaHari' => 'bail|required|',
-            'collectingMyProduct.qty' => 'bail|required|digits_between:1,3|',
-            'collectingMyProduct.productPrice' => 'bail|required|numeric|',
-            'collectingMyProduct.catatanKhusus' => 'bail|',
+            'collectingMyProduct.productId'     => 'bail|required',
+            'collectingMyProduct.productName'   => 'bail|required',
+            'collectingMyProduct.signaX'        => 'bail|required|numeric|min:1',
+            'collectingMyProduct.signaHari'     => 'bail|required|numeric|min:1',
+            'collectingMyProduct.qty'           => 'bail|required|digits_between:1,3|numeric|min:1',
+            'collectingMyProduct.productPrice'  => 'bail|required|numeric|min:0',
+            'collectingMyProduct.catatanKhusus' => 'bail|nullable',
         ];
-
-        // Proses Validasi///////////////////////////////////////////
         $this->validate($rules, $messages);
 
-        // validate
+        if (!$this->checkUgdStatus()) return;
 
-        // pengganti race condition
-        // start:
+        $rjNo = $this->rjNoRef;
+        $lockKey = "ugd:{$rjNo}";
+
         try {
-            // select nvl(max(rjobat_dtl)+1,1) into :rstxn_ugdobats.rjobat_dtl from rstxn_ugdobats;
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
+                DB::transaction(function () use ($rjNo) {
+                    $max = DB::table('rstxn_ugdobats')
+                        ->max(DB::raw('nvl(to_number(rjobat_dtl),0)'));
+                    $nextDtl = (int)$max + 1;
 
-            $lastInserted = DB::table('rstxn_ugdobats')->select(DB::raw('nvl(max(rjobat_dtl)+1,1) as rjobat_dtl_max'))->first();
+                    $productTakar = DB::table('immst_products')
+                        ->where('product_id', $this->collectingMyProduct['productId'])
+                        ->value('takar');
+                    $ugdTakar = $productTakar ?: 'Tablet';
 
-            $productTakar = DB::table('immst_products')
-                ->where('product_id', $this->collectingMyProduct['productId'])
-                ->value('takar');
+                    DB::table('rstxn_ugdobats')->insert([
+                        'rjobat_dtl'     => $nextDtl,
+                        'rj_no'          => $rjNo,
+                        'product_id'     => $this->collectingMyProduct['productId'],
+                        'qty'            => $this->collectingMyProduct['qty'],
+                        'price'          => $this->collectingMyProduct['productPrice'],
+                        'ugd_carapakai'  => $this->collectingMyProduct['signaX'],
+                        'ugd_kapsul'     => $this->collectingMyProduct['signaHari'],
+                        'ugd_takar'      => $ugdTakar,
+                        'catatan_khusus' => $this->collectingMyProduct['catatanKhusus'],
+                        'ugd_ket'        => $this->collectingMyProduct['catatanKhusus'],
+                        'exp_date'       => DB::raw("to_date('" . $this->dataDaftarUgd['rjDate'] . "','dd/mm/yyyy hh24:mi:ss')+330"),
+                        'etiket_status'  => 1,
+                    ]);
 
-            $ugdTakar = $productTakar ?: 'Tablet';
-
-            // insert into table transaksi
-            DB::table('rstxn_ugdobats')->insert([
-                'rjobat_dtl' => $lastInserted->rjobat_dtl_max,
-                'rj_no' => $this->rjNoRef,
-                'product_id' => $this->collectingMyProduct['productId'],
-                'qty' => $this->collectingMyProduct['qty'],
-                'price' => $this->collectingMyProduct['productPrice'],
-                'ugd_carapakai' => $this->collectingMyProduct['signaX'],
-                'ugd_kapsul' => $this->collectingMyProduct['signaHari'],
-                'ugd_takar' => $ugdTakar,
-                'catatan_khusus' => $this->collectingMyProduct['catatanKhusus'],
-                'ugd_ket' => $this->collectingMyProduct['catatanKhusus'],
-                'exp_date' => DB::raw("to_date('" . $this->dataDaftarUgd['rjDate'] . "','dd/mm/yyyy hh24:mi:ss')+30"),
-                'etiket_status' => 1,
-            ]);
-
-            $this->dataDaftarUgd['eresep'][] = [
-                'productId' => $this->collectingMyProduct['productId'],
-                'productName' => $this->collectingMyProduct['productName'],
-                'jenisKeterangan' => 'NonRacikan', //Racikan non racikan
-                'signaX' => $this->collectingMyProduct['signaX'],
-                'signaHari' => $this->collectingMyProduct['signaHari'],
-                'qty' => $this->collectingMyProduct['qty'],
-                'productPrice' => $this->collectingMyProduct['productPrice'],
-                'catatanKhusus' => $this->collectingMyProduct['catatanKhusus'],
-                'rjObatDtl' => $lastInserted->rjobat_dtl_max,
-                'rjNo' => $this->rjNoRef,
-            ];
+                    // patch state lokal biar UI instant
+                    $this->dataDaftarUgd['eresep'][] = [
+                        'productId'       => $this->collectingMyProduct['productId'],
+                        'productName'     => $this->collectingMyProduct['productName'],
+                        'jenisKeterangan' => 'NonRacikan',
+                        'signaX'          => $this->collectingMyProduct['signaX'],
+                        'signaHari'       => $this->collectingMyProduct['signaHari'],
+                        'qty'             => $this->collectingMyProduct['qty'],
+                        'productPrice'    => $this->collectingMyProduct['productPrice'],
+                        'catatanKhusus'   => $this->collectingMyProduct['catatanKhusus'],
+                        'rjObatDtl'       => $nextDtl,
+                        'rjNo'            => $rjNo,
+                    ];
+                });
+            });
 
             $this->store();
             $this->reset(['collectingMyProduct']);
-
-            //
-        } catch (Exception $e) {
-            // display an error to user
-            dd($e->getMessage());
+        } catch (\Throwable $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Gagal menambahkan obat.');
+            return;
         }
-        // goto start;
     }
+
 
     public function updateProduct($rjobat_dtl, $qty = null, $signaX = null, $signaHari = null, $catatanKhusus = null): void
     {
-        // validate
-        $this->checkUgdStatus();
+        if (!$this->checkUgdStatus()) return;
 
-        $r = [
-            'qty' => $qty,
-            'signaX' => $signaX,
-            'signaHari' => $signaHari,
+        $payload = [
+            'qty'           => $qty,
+            'signaX'        => $signaX,
+            'signaHari'     => $signaHari,
             'catatanKhusus' => $catatanKhusus,
         ];
 
-        // customErrorMessages
         $messages = customErrorMessagesTrait::messages();
-        // require nik ketika pasien tidak dikenal
         $rules = [
-            'qty' => 'bail|required|digits_between:1,3|',
-            'signaX' => 'bail|required|',
-            'signaHari' => 'bail|required|',
-            'catatanKhusus' => 'bail|',
+            'qty'           => 'bail|required|digits_between:1,3|numeric|min:1',
+            'signaX'        => 'bail|required|numeric|min:1',
+            'signaHari'     => 'bail|required|numeric|min:1',
+            'catatanKhusus' => 'bail|nullable',
         ];
-        // Proses Validasi///////////////////////////////////////////
-        $validator = Validator::make($r, $rules, $messages);
-
+        $validator = Validator::make($payload, $rules, $messages);
         if ($validator->fails()) {
-            dd($validator->errors()->first());
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError($validator->errors()->first());
+            return;
         }
-        // validate
 
-        // pengganti race condition
-        // start:
+        $rjNo = $this->rjNoRef;
+        $lockKey = "ugd:{$rjNo}";
+
         try {
-            // insert into table transaksi
-            DB::table('rstxn_ugdobats')
-                ->where('rjobat_dtl', $rjobat_dtl)
-                ->update([
-                    'qty' => $r['qty'],
-                    'ugd_carapakai' => $r['signaX'],
-                    'ugd_kapsul' => $r['signaHari'],
-                    'catatan_khusus' => $r['catatanKhusus'],
-                    'ugd_ket' => $r['catatanKhusus'],
-                ]);
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjobat_dtl, $payload) {
+                DB::transaction(function () use ($rjobat_dtl, $payload) {
+                    $affected = DB::table('rstxn_ugdobats')
+                        ->where('rjobat_dtl', $rjobat_dtl)
+                        ->update([
+                            'qty'            => $payload['qty'],
+                            'ugd_carapakai'  => $payload['signaX'],
+                            'ugd_kapsul'     => $payload['signaHari'],
+                            'catatan_khusus' => $payload['catatanKhusus'],
+                            'ugd_ket'        => $payload['catatanKhusus'],
+                        ]);
 
+                    if (!$affected) {
+                        throw new \RuntimeException('Data obat tidak ditemukan.');
+                    }
+
+                    // patch state lokal agar UI langsung update
+                    if (!empty($this->dataDaftarUgd['eresep'])) {
+                        foreach ($this->dataDaftarUgd['eresep'] as &$it) {
+                            if (($it['rjObatDtl'] ?? null) == $rjobat_dtl) {
+                                $it['qty']           = $payload['qty'];
+                                $it['signaX']        = $payload['signaX'];
+                                $it['signaHari']     = $payload['signaHari'];
+                                $it['catatanKhusus'] = $payload['catatanKhusus'];
+                                break;
+                            }
+                        }
+                        unset($it);
+                    }
+                });
+            });
 
             $this->store();
-
-            //
-        } catch (Exception $e) {
-            // display an error to user
-            dd($e->getMessage());
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess('Resep diperbarui.');
+        } catch (\Throwable $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError($e->getMessage() ?: 'Gagal memperbarui obat.');
+            return;
         }
-        // goto start;
     }
 
     public function removeProduct($rjObatDtl)
     {
-        $this->checkUgdStatus();
+        if (!$this->checkUgdStatus()) return;
 
-        // pengganti race condition
-        // start:
+        $rjNo = $this->rjNoRef;
+        $lockKey = "ugd:{$rjNo}";
+
         try {
-            // remove into table transaksi
-            DB::table('rstxn_ugdobats')->where('rjobat_dtl', $rjObatDtl)->delete();
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjObatDtl) {
+                DB::transaction(function () use ($rjObatDtl) {
+                    $deleted = DB::table('rstxn_ugdobats')
+                        ->where('rjobat_dtl', $rjObatDtl)
+                        ->delete();
 
-            $Product = collect($this->dataDaftarUgd['eresep'])
-                ->where('rjObatDtl', '!=', $rjObatDtl)
-                ->toArray();
-            $this->dataDaftarUgd['eresep'] = $Product;
+                    if (!$deleted) {
+                        throw new \RuntimeException('Data obat tidak ditemukan atau sudah dihapus.');
+                    }
+
+                    $this->dataDaftarUgd['eresep'] = collect($this->dataDaftarUgd['eresep'] ?? [])
+                        ->reject(fn($i) => (string)($i['rjObatDtl'] ?? '') === (string)$rjObatDtl)
+                        ->values()->all();
+                });
+            });
+
             $this->store();
-
-            //
-        } catch (Exception $e) {
-            // display an error to user
-            dd($e->getMessage());
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess('Obat dihapus.');
+        } catch (\Throwable $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError($e->getMessage() ?: 'Gagal menghapus obat.');
+            return;
         }
-        // goto start;
     }
 
     public function resetcollectingMyProduct()
@@ -420,17 +463,19 @@ class EresepUGD extends Component
         $this->reset(['collectingMyProduct']);
     }
 
-    public function checkUgdStatus()
+    private function checkUgdStatus(): bool
     {
-        $lastInserted = DB::table('rstxn_ugdhdrs')
+        $row = DB::table('rstxn_ugdhdrs')
             ->select('rj_status')
             ->where('rj_no', $this->rjNoRef)
             ->first();
 
-        if ($lastInserted->rj_status !== 'A') {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Pasien Sudah Pulang, Trasaksi Terkunci.');
-            return dd('Pasien Sudah Pulang, Trasaksi Terkuncixx.');
+        if (!$row || $row->rj_status !== 'A') {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Pasien Sudah Pulang, Transaksi Terkunci.');
+            return false;
         }
+        return true;
     }
 
     // when new form instance

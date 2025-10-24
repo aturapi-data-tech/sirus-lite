@@ -2,16 +2,10 @@
 
 namespace App\Http\Livewire\EmrUGD\MrUGDDokter\AssessmentDokter;
 
-use Illuminate\Support\Facades\DB;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-use Carbon\Carbon;
 
-use App\Http\Traits\customErrorMessagesTrait;
-
-use Illuminate\Support\Str;
-use Spatie\ArrayToXml\ArrayToXml;
 
 
 class AssessmentDokter extends Component

@@ -11,7 +11,6 @@ use App\Http\Traits\BPJS\iCareTrait;
 use App\Http\Traits\EmrRJ\EmrRJTrait;
 
 
-use Spatie\ArrayToXml\ArrayToXml;
 use Exception;
 
 
@@ -23,7 +22,6 @@ class RekamMedisDisplay extends Component
     // listener from blade////////////////
     protected $listeners = [
         'syncronizeAssessmentDokterRJFindData' => 'mount',
-        'syncronizeAssessmentDokterUGDFindData' => 'mount'
     ];
 
     // primitive Variable

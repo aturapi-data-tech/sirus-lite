@@ -11,8 +11,7 @@
                         <div class="flex items-center mb-2 ">
                             <x-text-input id="obatDanCairan.waktuPemberian"
                                 placeholder="Waktu Pemberian [dd/mm/yyyy hh24:mi:ss]" class="mt-1 ml-2" :errorshas="__($errors->has('obatDanCairan.waktuPemberian'))"
-                                :disabled=$disabledPropertyRjStatus
-                                wire:model.debounce.500ms="obatDanCairan.waktuPemberian" />
+                                :disabled=$disabledPropertyRjStatus wire:model="obatDanCairan.waktuPemberian" />
                             @if (!$obatDanCairan['waktuPemberian'])
                                 <div class="w-1/2 ml-2">
                                     <div wire:loading wire:target="setWaktuPemberian">
@@ -68,28 +67,28 @@
                                     <x-text-input id="obatDanCairan.namaObatAtauJenisCairan"
                                         placeholder="Nama Obat Atau Jenis Cairan" class="mt-1 ml-2" :errorshas="__($errors->has('obatDanCairan.namaObatAtauJenisCairan'))"
                                         :disabled=$disabledPropertyRjStatus
-                                        wire:model.debounce.500ms="obatDanCairan.namaObatAtauJenisCairan" />
+                                        wire:model="obatDanCairan.namaObatAtauJenisCairan" />
                                 </div>
                             @endif
                             <div>
                                 <x-text-input id="obatDanCairan.jumlah" placeholder="Jumlah" class="mt-1 ml-2"
                                     :errorshas="__($errors->has('obatDanCairan.jumlah'))" :disabled=$disabledPropertyRjStatus
-                                    wire:model.debounce.500ms="obatDanCairan.jumlah" />
+                                    wire:model="obatDanCairan.jumlah" />
                             </div>
                             <div>
                                 <x-text-input id="obatDanCairan.dosis" placeholder="Dosis" class="mt-1 ml-2"
                                     :errorshas="__($errors->has('obatDanCairan.dosis'))" :disabled=$disabledPropertyRjStatus
-                                    wire:model.debounce.500ms="obatDanCairan.dosis" />
+                                    wire:model="obatDanCairan.dosis" />
                             </div>
                             <div>
                                 <x-text-input id="obatDanCairan.rute" placeholder="Rute" class="mt-1 ml-2"
                                     :errorshas="__($errors->has('obatDanCairan.rute'))" :disabled=$disabledPropertyRjStatus
-                                    wire:model.debounce.500ms="obatDanCairan.rute" />
+                                    wire:model="obatDanCairan.rute" />
                             </div>
                             <div class="col-span-2">
                                 <x-text-input id="obatDanCairan.keterangan" placeholder="Keterangan" class="mt-1 ml-2"
                                     :errorshas="__($errors->has('obatDanCairan.keterangan'))" :disabled=$disabledPropertyRjStatus
-                                    wire:model.debounce.500ms="obatDanCairan.keterangan" />
+                                    wire:model="obatDanCairan.keterangan" />
                             </div>
                         </div>
                     </div>

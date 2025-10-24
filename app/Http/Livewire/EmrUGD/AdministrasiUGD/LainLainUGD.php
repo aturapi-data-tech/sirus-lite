@@ -3,6 +3,8 @@
 namespace App\Http\Livewire\EmrUGD\AdministrasiUGD;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -11,9 +13,6 @@ use Carbon\Carbon;
 use App\Http\Traits\customErrorMessagesTrait;
 use App\Http\Traits\EmrUGD\EmrUGDTrait;
 
-// use Illuminate\Support\Str;
-use Spatie\ArrayToXml\ArrayToXml;
-use Exception;
 
 
 class LainLainUGD extends Component
@@ -23,9 +22,7 @@ class LainLainUGD extends Component
 
     // listener from blade////////////////
     protected $listeners = [
-        'storeAssessmentDokterUGD' => 'store',
-        'syncronizeAssessmentDokterUGDFindData' => 'mount',
-        'syncronizeAssessmentPerawatUGDFindData' => 'mount'
+        'storeAssessmentDokterUGD' => 'store'
     ];
 
 
@@ -80,7 +77,7 @@ class LainLainUGD extends Component
         $this->dataLainLainLov = [];
     }
 
-    public function updateddataLainLainLovsearch()
+    public function updatedDataLainLainLovSearch()
     {
 
         // Reset index of LoV
@@ -206,30 +203,46 @@ class LainLainUGD extends Component
     // insert and update record start////////////////
     public function store()
     {
-        // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
-        $this->setDataPrimer();
+        if (!$this->checkUgdStatus()) return;
 
-        // Logic update mode start //////////
-        $this->updateDataRJ($this->dataDaftarUgd['rjNo']);
-        $this->emit('syncronizeAssessmentDokterUGDFindData');
-        $this->emit('syncronizeAssessmentPerawatUGDFindData');
+        $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
+        if (!$rjNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('rjNo kosong.');
+            return;
+        }
+
+        $lockKey = "ugd:{$rjNo}";
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
+                DB::transaction(function () use ($rjNo) {
+                    // Ambil fresh supaya tidak menimpa modul lain
+                    $fresh = $this->findDataUGD($rjNo) ?: [];
+
+                    if (!isset($fresh['LainLain']) || !is_array($fresh['LainLain'])) {
+                        $fresh['LainLain'] = [];
+                    }
+
+                    // PATCH hanya subtree LainLain
+                    $fresh['LainLain'] = array_values($this->dataDaftarUgd['LainLain'] ?? []);
+
+                    // Commit JSON
+                    $this->updateJsonUGD($rjNo, $fresh);
+
+                    // Sinkronkan state lokal
+                    $this->dataDaftarUgd = $fresh;
+                });
+            });
+
+            $this->emit('ugd:refresh-summary');
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Lain-Lain berhasil disimpan.");
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
+        } catch (\Throwable $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Gagal menyimpan Lain-Lain.');
+        }
     }
 
-    private function updateDataRJ($rjNo): void
-    {
 
-        // update table trnsaksi
-        // DB::table('rstxn_ugdhdrs')
-        //     ->where('rj_no', $rjNo)
-        //     ->update([
-        //         'datadaftarugd_json' => json_encode($this->dataDaftarUgd, true),
-        //         'datadaftarugd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
-        //     ]);
-
-        $this->updateJsonUGD($rjNo, $this->dataDaftarUgd);
-
-        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Lain-Lain berhasil disimpan.");
-    }
     // insert and update record end////////////////
 
 
@@ -245,10 +258,6 @@ class LainLainUGD extends Component
     }
 
 
-    private function setDataPrimer(): void {}
-
-
-
     private function addLainLain($LainLainId, $LainLainDesc, $salesPrice): void
     {
 
@@ -261,92 +270,95 @@ class LainLainUGD extends Component
 
     public function insertLainLain(): void
     {
+        if (!$this->checkUgdStatus()) return;
 
-        // validate
-        $this->checkUgdStatus();
-        // customErrorMessages
         $messages = customErrorMessagesTrait::messages();
-        // require nik ketika pasien tidak dikenal
         $rules = [
-            "collectingMyLainLain.LainLainId" => 'bail|required|exists:rsmst_others ,other_id',
-            "collectingMyLainLain.LainLainDesc" => 'bail|required|',
-            "collectingMyLainLain.LainLainPrice" => 'bail|required|numeric|',
-
+            "collectingMyLainLain.LainLainId"    => 'bail|required|exists:rsmst_others,other_id',
+            "collectingMyLainLain.LainLainDesc"  => 'bail|required',
+            "collectingMyLainLain.LainLainPrice" => 'bail|required|numeric',
         ];
-
-        // Proses Validasi///////////////////////////////////////////
         $this->validate($rules, $messages);
 
-        // validate
+        $rjNo = $this->rjNoRef;
+        $lockRj = "ugd:{$rjNo}";
+        $lockOthers = "ugdothers:counter";
 
-
-        // pengganti race condition
-        // start:
         try {
+            Cache::lock($lockRj, 5)->block(3, function () use ($rjNo, $lockOthers) {
+                Cache::lock($lockOthers, 5)->block(3, function () use ($rjNo) {
+                    DB::transaction(function () use ($rjNo) {
+                        $nextDtl = (int) DB::table('rstxn_ugdothers')
+                            ->max(DB::raw('nvl(to_number(rjo_dtl),0)')) + 1;
 
-            $lastInserted = DB::table('rstxn_ugdothers')
-                ->select(DB::raw("nvl(max(rjo_dtl)+1,1) as rjo_dtl_max"))
-                ->first();
-            // insert into table transaksi
-            DB::table('rstxn_ugdothers')
-                ->insert([
-                    'rjo_dtl' => $lastInserted->rjo_dtl_max,
-                    'rj_no' => $this->rjNoRef,
-                    'other_id' => $this->collectingMyLainLain['LainLainId'],
-                    'other_price' => $this->collectingMyLainLain['LainLainPrice'],
-                ]);
+                        DB::table('rstxn_ugdothers')->insert([
+                            'rjo_dtl'     => $nextDtl,
+                            'rj_no'       => $rjNo,
+                            'other_id'    => $this->collectingMyLainLain['LainLainId'],
+                            'other_price' => $this->collectingMyLainLain['LainLainPrice'],
+                        ]);
 
+                        // patch state lokal
+                        $this->dataDaftarUgd['LainLain'][] = [
+                            'LainLainId'    => $this->collectingMyLainLain['LainLainId'],
+                            'LainLainDesc'  => $this->collectingMyLainLain['LainLainDesc'],
+                            'LainLainPrice' => $this->collectingMyLainLain['LainLainPrice'],
+                            'rjotherDtl'    => $nextDtl,
+                            'rjNo'          => $rjNo,
+                            'userLog'       => auth()->user()->myuser_name ?? '',
+                            'userLogDate'   => Carbon::now(config('app.timezone'))->format('d/m/Y H:i:s'),
+                        ];
 
-            $this->dataDaftarUgd['LainLain'][] = [
-                'LainLainId' => $this->collectingMyLainLain['LainLainId'],
-                'LainLainDesc' => $this->collectingMyLainLain['LainLainDesc'],
-                'LainLainPrice' => $this->collectingMyLainLain['LainLainPrice'],
-                'rjotherDtl' => $lastInserted->rjo_dtl_max,
-                'rjNo' => $this->rjNoRef,
-                'userLog' => auth()->user()->myuser_name,
-                'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
-            ];
+                        // fresh-merge JSON subtree
+                        $fresh = $this->findDataUGD($rjNo) ?: [];
+                        $fresh['LainLain'] = array_values($this->dataDaftarUgd['LainLain'] ?? ($fresh['LainLain'] ?? []));
+                        $this->updateJsonUGD($rjNo, $fresh);
+                        $this->emit('ugd:refresh-summary');
 
-            $this->store();
+                        $this->dataDaftarUgd = $fresh;
+                    });
+                });
+            });
+
             $this->reset(['collectingMyLainLain']);
-
-
-            //
-        } catch (Exception $e) {
-            // display an error to user
-            dd($e->getMessage());
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Lain-Lain berhasil ditambahkan.');
+        } catch (\Throwable $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Gagal menambah Lain-Lain.');
         }
-        // goto start;
     }
 
     public function removeLainLain($rjotherDtl)
     {
+        if (!$this->checkUgdStatus()) return;
 
-        $this->checkUgdStatus();
+        $rjNo = $this->rjNoRef;
+        $lockKey = "ugd:{$rjNo}";
 
-
-        // pengganti race condition
-        // start:
         try {
-            // remove into table transaksi
-            DB::table('rstxn_ugdothers')
-                ->where('rjo_dtl', $rjotherDtl)
-                ->delete();
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo, $rjotherDtl) {
+                DB::transaction(function () use ($rjNo, $rjotherDtl) {
+                    DB::table('rstxn_ugdothers')
+                        ->where('rj_no', $rjNo)
+                        ->where('rjo_dtl', $rjotherDtl)
+                        ->delete();
 
+                    // patch state lokal
+                    $this->dataDaftarUgd['LainLain'] = collect($this->dataDaftarUgd['LainLain'] ?? [])
+                        ->reject(fn($i) => (string)($i['rjotherDtl'] ?? '') === (string)$rjotherDtl)
+                        ->values()->all();
 
-            $LainLain = collect($this->dataDaftarUgd['LainLain'])->where("rjotherDtl", '!=', $rjotherDtl)->toArray();
-            $this->dataDaftarUgd['LainLain'] = $LainLain;
-            $this->store();
+                    // fresh-merge JSON subtree
+                    $fresh = $this->findDataUGD($rjNo) ?: [];
+                    $fresh['LainLain'] = array_values($this->dataDaftarUgd['LainLain']);
+                    $this->updateJsonUGD($rjNo, $fresh);
+                    $this->dataDaftarUgd = $fresh;
+                });
+            });
 
-
-            //
-        } catch (Exception $e) {
-            // display an error to user
-            dd($e->getMessage());
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Lain-Lain dihapus.');
+        } catch (\Throwable $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Gagal menghapus Lain-Lain.');
         }
-        // goto start;
-
-
     }
 
     public function resetcollectingMyLainLain()
@@ -354,17 +366,19 @@ class LainLainUGD extends Component
         $this->reset(['collectingMyLainLain']);
     }
 
-    public function checkUgdStatus()
+    private function checkUgdStatus(): bool
     {
-        $lastInserted = DB::table('rstxn_ugdhdrs')
+        $row = DB::table('rstxn_ugdhdrs')
             ->select('rj_status')
             ->where('rj_no', $this->rjNoRef)
             ->first();
 
-        if ($lastInserted->rj_status !== 'A') {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Pasien Sudah Pulang, Trasaksi Terkunci.");
-            return (dd('Pasien Sudah Pulang, Trasaksi Terkuncixx.'));
+        if (!$row || $row->rj_status !== 'A') {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError("Pasien Sudah Pulang, Transaksi Terkunci.");
+            return false;
         }
+        return true;
     }
 
 

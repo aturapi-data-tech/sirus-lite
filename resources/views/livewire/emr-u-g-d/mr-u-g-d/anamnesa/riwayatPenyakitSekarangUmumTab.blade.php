@@ -11,7 +11,7 @@
                         $errors->has('dataDaftarUgd.anamnesa.riwayatPenyakitSekarangUmum.riwayatPenyakitSekarangUmum'),
                     )"
                     :disabled=$disabledPropertyRjStatus :rows=3
-                    wire:model.debounce.500ms="dataDaftarUgd.anamnesa.riwayatPenyakitSekarangUmum.riwayatPenyakitSekarangUmum" />
+                    wire:model="dataDaftarUgd.anamnesa.riwayatPenyakitSekarangUmum.riwayatPenyakitSekarangUmum" />
 
             </div>
             @error('dataDaftarUgd.anamnesa.riwayatPenyakitSekarangUmum.riwayatPenyakitSekarangUmum')

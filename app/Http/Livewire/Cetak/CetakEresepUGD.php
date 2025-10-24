@@ -4,11 +4,8 @@ namespace App\Http\Livewire\Cetak;
 
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 use App\Http\Traits\EmrUGD\EmrUGDTrait;
 use App\Http\Traits\MasterPasien\MasterPasienTrait;
-
-
 use Livewire\Component;
 
 class CetakEresepUGD extends Component
@@ -16,75 +13,75 @@ class CetakEresepUGD extends Component
     use EmrUGDTrait, MasterPasienTrait;
 
     // listener from blade////////////////
-    protected $listeners = [
-        'syncronizeAssessmentDokterUGDFindData' => 'mount',
-        'syncronizeAssessmentPerawatUGDFindData' => 'mount'
-    ];
+    protected $listeners = [];
 
-    // dataDaftarUgd RJ
     public $rjNoRef;
 
     public array $dataDaftarUgd = [];
-    public  array $dataPasien = [];
+    public array $dataPasien    = [];
 
 
 
-    private function findData($rjno): void
+    private function findData(string $rjno): void
     {
+        // fresh JSON UGD
+        $this->dataDaftarUgd = $this->findDataUGD($rjno) ?: [];
 
-        $this->dataDaftarUgd = $this->findDataUGD($rjno);
-        // dd($this->dataDaftarUgd);
+        // pastikan key minimal ada supaya blade aman
+        $this->dataDaftarUgd['eresep']        = $this->dataDaftarUgd['eresep']        ?? [];
+        $this->dataDaftarUgd['eresepRacikan'] = $this->dataDaftarUgd['eresepRacikan'] ?? [];
 
-        // jika eresep tidak ditemukan tambah variable eresep pda array
-        if (isset($this->dataDaftarUgd['eresep']) == false) {
-            $this->dataDaftarUgd['eresep'] = [];
-        }
-
-        // jika eresepRacikan tidak ditemukan tambah variable eresepRacikan pda array
-        if (isset($this->dataDaftarUgd['eresepRacikan']) == false) {
-            $this->dataDaftarUgd['eresepRacikan'] = [];
-        }
-
-        $this->dataPasien = $this->findDataMasterPasien($this->dataDaftarUgd['regNo'] ?? '');
+        // fresh master pasien
+        $regNo = $this->dataDaftarUgd['regNo'] ?? '';
+        $this->dataPasien = $regNo ? ($this->findDataMasterPasien($regNo) ?: []) : [];
     }
 
     public function cetak()
     {
-        $queryIdentitas = DB::table('rsmst_identitases')
-            ->select(
-                'int_name',
-                'int_phone1',
-                'int_phone2',
-                'int_fax',
-                'int_address',
-                'int_city',
-            )
+        if (!$this->rjNoRef) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('rjNo kosong.');
+            return;
+        }
+
+        // Selalu ambil data TERBARU saat tombol dicetak
+        $this->findData($this->rjNoRef);
+
+        // Ambil identitas RS (jika ada)
+        $identitas = DB::table('rsmst_identitases')
+            ->select('int_name', 'int_phone1', 'int_phone2', 'int_fax', 'int_address', 'int_city')
             ->first();
 
-        if (isset($this->dataDaftarUgd['perencanaan']['pengkajianMedis']['drPemeriksa']) && $this->dataDaftarUgd['perencanaan']['pengkajianMedis']['drPemeriksa']) {
-            if ($this->dataDaftarUgd['eresep'] || $this->dataDaftarUgd['eresepRacikan']) {
-                // cetak PDF
-                $data = [
-                    'myQueryIdentitas' => $queryIdentitas,
-                    'dataPasien' => $this->dataPasien,
-                    'dataDaftarUgd' => $this->dataDaftarUgd,
+        // Validasi TTD dokter & ada data resep
+        $dr = $this->dataDaftarUgd['perencanaan']['pengkajianMedis']['drPemeriksa'] ?? null;
+        $adaResep = !empty($this->dataDaftarUgd['eresep']) || !empty($this->dataDaftarUgd['eresepRacikan']);
 
-                ];
-                $pdfContent = PDF::loadView('livewire.cetak.cetak-eresep-u-g-d-print', $data)->output();
-                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Cetak Eresep UGD');
-
-
-                return response()->streamDownload(
-                    fn() => print($pdfContent),
-                    "eresep.pdf"
-                );
-            } else {
-                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Data Resep Tidak ditemukan');
-            }
-        } else {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Belum ada TTD pada Data Resep');
+        if (!$dr) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Belum ada TTD pada Data Resep.');
+            return;
         }
+        if (!$adaResep) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Data Resep tidak ditemukan.');
+            return;
+        }
+
+        // Render PDF
+        $data = [
+            'myQueryIdentitas' => $identitas,
+            'dataPasien'       => $this->dataPasien,
+            'dataDaftarUgd'    => $this->dataDaftarUgd,
+        ];
+
+        // Catatan: gunakan facade yang di-import (Pdf), bukan PDF::
+        $pdfContent = Pdf::loadView('livewire.cetak.cetak-eresep-u-g-d-print', $data)->output();
+
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Cetak Eresep UGD.');
+
+        return response()->streamDownload(
+            fn() => print($pdfContent),
+            'eresep.pdf'
+        );
     }
+
 
 
     public function mount()

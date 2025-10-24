@@ -281,7 +281,7 @@
                             <div class="mb-2 ">
                                 <x-text-input-area id="dataDaftarUgd.diagnosisFreeText" placeholder="Diagnosis"
                                     class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.diagnosisFreeText'))" :disabled=$disabledPropertyRjStatus :rows=7
-                                    wire:model.debounce.500ms="dataDaftarUgd.diagnosisFreeText" />
+                                    wire:model="dataDaftarUgd.diagnosisFreeText" />
 
                             </div>
                             @error('dataDaftarUgd.diagnosisFreeText')
@@ -296,7 +296,7 @@
                             <div class="mb-2 ">
                                 <x-text-input-area id="dataDaftarUgd.procedureFreeText" placeholder="Procedure"
                                     class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.procedureFreeText'))" :disabled=$disabledPropertyRjStatus :rows=7
-                                    wire:model.debounce.500ms="dataDaftarUgd.procedureFreeText" />
+                                    wire:model="dataDaftarUgd.procedureFreeText" />
 
                             </div>
                             @error('dataDaftarUgd.procedureFreeText')

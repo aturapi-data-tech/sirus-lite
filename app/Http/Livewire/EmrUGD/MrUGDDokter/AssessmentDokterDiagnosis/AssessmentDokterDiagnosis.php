@@ -6,14 +6,12 @@ use Illuminate\Support\Facades\DB;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-use Carbon\Carbon;
-
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Contracts\Cache\LockTimeoutException;
+use Illuminate\Validation\ValidationException;
 use App\Http\Traits\customErrorMessagesTrait;
 use App\Http\Traits\EmrUGD\EmrUGDTrait;
 
-use Illuminate\Support\Str;
-use Spatie\ArrayToXml\ArrayToXml;
-use Exception;
 
 
 
@@ -25,7 +23,6 @@ class AssessmentDokterDiagnosis extends Component
     // listener from blade////////////////
     protected $listeners = [
         'storeAssessmentDokterUGD' => 'store',
-        'syncronizeAssessmentDokterUGDFindData' => 'mount'
     ];
 
 
@@ -69,16 +66,6 @@ class AssessmentDokterDiagnosis extends Component
     ///////////begin////////////////////////////////
     ////////////////////////////////////////////////
 
-    public function updateddataDaftarUgddiagnosisFreeText()
-    {
-        $this->store();
-    }
-
-    public function updateddataDaftarUgdprocedureFreeText()
-    {
-        $this->store();
-    }
-
 
     /////////////////////////////////////////////////
     // Lov dataDiagnosaICD10Lov //////////////////////
@@ -89,7 +76,7 @@ class AssessmentDokterDiagnosis extends Component
         $this->dataDiagnosaICD10Lov = [];
     }
 
-    public function updateddataDiagnosaICD10Lovsearch()
+    public function updatedDataDiagnosaICD10LovSearch()
     {
 
         // Reset index of LoV
@@ -98,7 +85,7 @@ class AssessmentDokterDiagnosis extends Component
         $search = $this->dataDiagnosaICD10LovSearch;
 
         // check LOV by dr_id rs id
-        $dataDiagnosaICD10Lovs = DB::table('rsmst_mstdiags ')->select(
+        $dataDiagnosaICD10Lovs = DB::table('rsmst_mstdiags')->select(
             'diag_id',
             'diag_desc',
             'icdx'
@@ -216,105 +203,141 @@ class AssessmentDokterDiagnosis extends Component
 
     private function insertDiagnosaICD10(): void
     {
-
-        // validate
-        // $this->checkRjStatus();
-        // customErrorMessages
-        $messages = customErrorMessagesTrait::messages();
-        // require nik ketika pasien tidak dikenal
         $rules = [
-            "collectingMyDiagnosaICD10.DiagnosaICD10Id" => 'bail|required|exists:rsmst_mstdiags,diag_id',
-            "collectingMyDiagnosaICD10.DiagnosaICD10Desc" => 'bail|required|',
-            "collectingMyDiagnosaICD10.DiagnosaICD10icdx" => 'bail|required|',
-
+            "collectingMyDiagnosaICD10.DiagnosaICD10Id"   => 'bail|required|exists:rsmst_mstdiags,diag_id',
+            "collectingMyDiagnosaICD10.DiagnosaICD10Desc" => 'bail|required',
+            "collectingMyDiagnosaICD10.DiagnosaICD10icdx" => 'bail|required',
         ];
 
-        // Proses Validasi///////////////////////////////////////////
-        $this->validate($rules, $messages);
+        $attributes = [
+            'collectingMyDiagnosaICD10.DiagnosaICD10Id'   => 'Kode ICD-10',
+            'collectingMyDiagnosaICD10.DiagnosaICD10Desc' => 'Nama Diagnosa',
+            'collectingMyDiagnosaICD10.DiagnosaICD10icdx' => 'Kode ICD-X',
+        ];
 
-        // validate
+        $messages = [
+            'collectingMyDiagnosaICD10.DiagnosaICD10Id.required'   => 'Kode ICD-10 wajib diisi.',
+            'collectingMyDiagnosaICD10.DiagnosaICD10Id.exists'     => 'Kode ICD-10 tidak terdaftar di master.',
+            'collectingMyDiagnosaICD10.DiagnosaICD10Desc.required' => 'Nama diagnosa wajib diisi.',
+            'collectingMyDiagnosaICD10.DiagnosaICD10icdx.required' => 'Kode ICD-X wajib diisi.',
+        ];
 
-
-        // pengganti race condition
-        // start:
-        try {
-
-            $lastInserted = DB::table('rstxn_ugddtls')
-                ->select(DB::raw("nvl(max(rjdtl_dtl)+1,1) as rjdtl_dtl_max"))
-                ->first();
-            // insert into table transaksi
-            DB::table('rstxn_ugddtls')
-                ->insert([
-                    'rjdtl_dtl' => $lastInserted->rjdtl_dtl_max,
-                    'rj_no' => $this->rjNoRef,
-                    'diag_id' => $this->collectingMyDiagnosaICD10['DiagnosaICD10Id'],
-                ]);
-
-            // update status diagnosa rstxn_ugdhdrs
-            DB::table('rstxn_ugdhdrs')
-                ->where('rj_no',  $this->rjNoRef)
-                ->update([
-                    'rj_diagnosa' => 'D',
-                ]);
-
-            $checkDiagnosaCount = collect($this->dataDaftarUgd['diagnosis'])->count();
-            $kategoriDiagnosa = $checkDiagnosaCount ? 'Secondary' : 'Primary';
-
-            $this->dataDaftarUgd['diagnosis'][] = [
-                'diagId' => $this->collectingMyDiagnosaICD10['DiagnosaICD10Id'],
-                'diagDesc' => $this->collectingMyDiagnosaICD10['DiagnosaICD10Desc'],
-                'icdX' => $this->collectingMyDiagnosaICD10['DiagnosaICD10icdx'],
-                'ketdiagnosa' => 'Keterangan Diagnosa',
-                'kategoriDiagnosa' => $kategoriDiagnosa,
-                'rjDtlDtl' => $lastInserted->rjdtl_dtl_max,
-                'rjNo' => $this->rjNoRef,
-            ];
-
-            $this->store();
-            $this->reset(['collectingMyDiagnosaICD10']);
+        $this->validate(
+            $rules,
+            $messages,
+            $attributes
+        );
 
 
-            //
-        } catch (Exception $e) {
-            // display an error to user
-            dd($e->getMessage());
+        $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
+        if (!$rjNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("rjNo kosong.");
+            return;
         }
-        // goto start;
+
+        $lockKey = "ugd:{$rjNo}";
+
+        Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
+            DB::transaction(function () use ($rjNo) {
+                // hitung rjdtl_dtl berikutnya UNTUK rj_no INI
+                $next = DB::table('rstxn_ugddtls')
+                    ->where('rj_no', $rjNo)
+                    ->max('rjdtl_dtl');
+                $next = ($next ?? 0) + 1;
+
+                DB::table('rstxn_ugddtls')->insert([
+                    'rjdtl_dtl' => $next,
+                    'rj_no'     => $rjNo,
+                    'diag_id'   => $this->collectingMyDiagnosaICD10['DiagnosaICD10Id'],
+                ]);
+
+                DB::table('rstxn_ugdhdrs')->where('rj_no', $rjNo)
+                    ->update(['rj_diagnosa' => 'D']);
+
+                // PATCH json lokal → panggil store() agar konsisten
+                $count = count($this->dataDaftarUgd['diagnosis'] ?? []);
+                $kategori = $count ? 'Secondary' : 'Primary';
+
+                $this->dataDaftarUgd['diagnosis'][] = [
+                    'diagId'        => $this->collectingMyDiagnosaICD10['DiagnosaICD10Id'],
+                    'diagDesc'      => $this->collectingMyDiagnosaICD10['DiagnosaICD10Desc'],
+                    'icdX'          => $this->collectingMyDiagnosaICD10['DiagnosaICD10icdx'],
+                    'ketdiagnosa'   => 'Keterangan Diagnosa',
+                    'kategoriDiagnosa' => $kategori,
+                    'rjDtlDtl'      => $next,
+                    'rjNo'          => $rjNo,
+                ];
+            });
+        });
+
+        // simpan JSON besar lewat store() (store sudah pakai lock yang sama)
+        $this->store();
+        $this->reset(['collectingMyDiagnosaICD10']);
     }
 
     public function removeDiagnosaICD10($rjDtlDtl)
     {
+        $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
+        if (!$rjNo || !$rjDtlDtl) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Parameter tidak lengkap.');
+            return;
+        }
 
-        // $this->checkRjStatus();
+        $lockKey = "ugd:{$rjNo}";
 
-
-        // pengganti race condition
-        // start:
         try {
+            // 1) DB ops & patch state LOKAL di dalam lock
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo, $rjDtlDtl) {
+                DB::transaction(function () use ($rjNo, $rjDtlDtl) {
+                    $affected = DB::table('rstxn_ugddtls')
+                        ->where('rj_no', $rjNo)
+                        ->where('rjdtl_dtl', $rjDtlDtl)
+                        ->delete();
 
+                    // Patch state LOKAL diagnosis
+                    $list = (array) ($this->dataDaftarUgd['diagnosis'] ?? []);
+                    $list = collect($list)
+                        ->reject(fn($d) => (string)($d['rjDtlDtl'] ?? '') === (string)$rjDtlDtl)
+                        ->values()
+                        ->all();
 
-            // remove into table transaksi
-            DB::table('rstxn_ugddtls')
-                ->where('rjdtl_dtl', $rjDtlDtl)
-                ->delete();
+                    // Relabel primary/secondary
+                    if (!empty($list)) {
+                        $list[0]['kategoriDiagnosa'] = 'Primary';
+                        for ($i = 1; $i < count($list); $i++) $list[$i]['kategoriDiagnosa'] = 'Secondary';
+                    }
 
+                    $this->dataDaftarUgd['diagnosis'] = $list;
 
-            $DiagnosaICD10 = collect($this->dataDaftarUgd['diagnosis'])->where("rjDtlDtl", '!=', $rjDtlDtl)->toArray();
-            $this->dataDaftarUgd['diagnosis'] = $DiagnosaICD10;
+                    // Update header ringan (opsional, boleh juga dibiarkan store() yg set)
+                    DB::table('rstxn_ugdhdrs')
+                        ->where('rj_no', $rjNo)
+                        ->update(['rj_diagnosa' => count($list) ? 'D' : null]);
 
+                    if ($affected === 0) {
+                        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                            ->addInfo('Item diagnosa tidak ditemukan atau sudah dihapus.');
+                    }
+                });
+            }); // lock dilepas ✅
 
+            // 2) Commit JSON via store()
             $this->store();
 
-
-            //
-        } catch (Exception $e) {
-            // display an error to user
-            dd($e->getMessage());
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess('Diagnosa berhasil dihapus.');
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
+            return;
+        } catch (\Throwable $e) {
+            report($e);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Gagal menghapus diagnosa.');
+            return;
         }
-        // goto start;
-
-
     }
+
     // LOV selected end
     /////////////////////////////////////////////////
     // Lov dataDiagnosaICD10Lov //////////////////////
@@ -334,7 +357,7 @@ class AssessmentDokterDiagnosis extends Component
         $this->dataProcedureICD9CmLov = [];
     }
 
-    public function updateddataProcedureICD9CmLovsearch()
+    public function updatedDataProcedureICD9CmLovSearch()
     {
 
         // Reset index of LoV
@@ -459,50 +482,104 @@ class AssessmentDokterDiagnosis extends Component
 
     private function insertProcedureICD9Cm(): void
     {
-
-        // validate
-        // $this->checkRjStatus();
-        // customErrorMessages
-        $messages = customErrorMessagesTrait::messages();
-        // require nik ketika pasien tidak dikenal
+        // Validasi
         $rules = [
-            "collectingMyProcedureICD9Cm.ProcedureICD9CmId" => 'bail|required|exists:rsmst_mstprocedures,proc_id',
-            "collectingMyProcedureICD9Cm.ProcedureICD9CmDesc" => 'bail|required|',
+            "collectingMyProcedureICD9Cm.ProcedureICD9CmId"   => 'bail|required|exists:rsmst_mstprocedures,proc_id',
+            "collectingMyProcedureICD9Cm.ProcedureICD9CmDesc" => 'bail|required',
         ];
-
-        // Proses Validasi///////////////////////////////////////////
+        $messages = customErrorMessagesTrait::messages();
         $this->validate($rules, $messages);
 
-        // validate
+        $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
+        if (!$rjNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("rjNo kosong.");
+            return;
+        }
 
+        $lockKey = "ugd:{$rjNo}";
 
-        // pengganti race condition
+        // 1) Patch subtree 'procedure' berbasis FRESH state di dalam lock (tanpa update JSON)
+        Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
+            // Ambil fresh
+            $fresh = $this->findDataUGD($rjNo) ?: [];
+            $list  = (array)($fresh['procedure'] ?? []);
 
-        $this->dataDaftarUgd['procedure'][] = [
-            'procedureId' => $this->collectingMyProcedureICD9Cm['ProcedureICD9CmId'],
-            'procedureDesc' => $this->collectingMyProcedureICD9Cm['ProcedureICD9CmDesc'],
-            'ketProcedure' => 'Keterangan Procedure',
-            'rjNo' => $this->rjNoRef,
-        ];
+            // Cegah duplikat (berdasar procedureId)
+            $procId = $this->collectingMyProcedureICD9Cm['ProcedureICD9CmId'];
+            $exists = collect($list)->firstWhere('procedureId', $procId);
+            if (!$exists) {
+                $list[] = [
+                    'procedureId'   => $procId,
+                    'procedureDesc' => $this->collectingMyProcedureICD9Cm['ProcedureICD9CmDesc'],
+                    'ketProcedure'  => 'Keterangan Procedure',
+                    'rjNo'          => $rjNo,
+                ];
+            } else {
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addInfo('Tindakan sudah ada, tidak ditambahkan ulang.');
+            }
 
+            // Tulis ke state lokal (bukan ke DB JSON)
+            $this->dataDaftarUgd['procedure'] = array_values($list);
+        }); // lock dilepas ✅
+
+        // 2) Commit JSON via store()
         $this->store();
         $this->reset(['collectingMyProcedureICD9Cm']);
-
-
-        //
-
-        // goto start;
     }
+
 
     public function removeProcedureICD9Cm($procedureId)
     {
+        $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
+        if (!$rjNo || !$procedureId) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Parameter tidak lengkap.');
+            return;
+        }
 
-        // $this->checkRjStatus();
+        $lockKey = "ugd:{$rjNo}";
 
-        $ProcedureICD9Cm = collect($this->dataDaftarUgd['procedure'])->where("procedureId", '!=', $procedureId)->toArray();
-        $this->dataDaftarUgd['procedure'] = $ProcedureICD9Cm;
-        $this->store();
+        try {
+            // 1) Patch subtree 'procedure' berbasis FRESH state di dalam lock
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo, $procedureId) {
+                DB::transaction(function () use ($rjNo, $procedureId) {
+                    // Ambil FRESH JSON dari DB
+                    $fresh = $this->findDataUGD($rjNo) ?: [];
+                    $list  = (array)($fresh['procedure'] ?? []);
+
+                    // Buang item yang dihapus
+                    $list = collect($list)
+                        ->reject(fn($p) => (string)($p['procedureId'] ?? '') === (string)$procedureId)
+                        ->values()
+                        ->all();
+
+                    // Tulis ke state lokal (nanti di-commit via store())
+                    $this->dataDaftarUgd['procedure'] = $list;
+
+                    // (opsional) Kalau ada kolom status header terkait procedure, update di sini.
+                    // DB::table('rstxn_ugdhdrs')->where('rj_no', $rjNo)->update([...]);
+                });
+            }); // lock dilepas ✅
+
+            // 2) Commit JSON via store()
+            $this->store();
+
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess('Tindakan berhasil dihapus.');
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
+            return;
+        } catch (\Throwable $e) {
+            report($e);
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Gagal menghapus tindakan.');
+            return;
+        }
     }
+
+
     // LOV selected end
     /////////////////////////////////////////////////
     // Lov dataProcedureICD9CmLov //////////////////////
@@ -520,7 +597,7 @@ class AssessmentDokterDiagnosis extends Component
         // Proses Validasi///////////////////////////////////////////
         try {
             $this->validate($this->rules, $messages);
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
 
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Lakukan Pengecekan kembali Input Data.");
             $this->validate($this->rules, $messages);
@@ -531,34 +608,80 @@ class AssessmentDokterDiagnosis extends Component
     // insert and update record start////////////////
     public function store()
     {
-        // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
-        $this->setDataPrimer();
 
-        // Validate RJ
+        // Validasi (kalau rules-mu perlu)
         $this->validateDataUgd();
 
-        // Logic update mode start //////////
-        $this->updateDataUgd($this->dataDaftarUgd['rjNo']);
+        // RJ number
+        $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
+        if (!$rjNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("rjNo kosong.");
+            return;
+        }
 
-        $this->emit('syncronizeAssessmentDokterUGDFindData');
-    }
+        $lockKey = "ugd:{$rjNo}"; // shared lock antar modul UGD
 
-    private function updateDataUgd($rjNo): void
-    {
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
 
-        // update table trnsaksi
-        // DB::table('rstxn_ugdhdrs')
-        //     ->where('rj_no', $rjNo)
-        //     ->update([
-        //         'dataDaftarUgd_json' => json_encode($this->dataDaftarUgd, true),
-        //         'dataDaftarUgd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
-        //     ]);
+                // 1) Ambil FRESH state dari DB di dalam lock
+                $fresh = $this->findDataUGD($rjNo) ?: [];
 
-        $this->updateJsonUGD($rjNo, $this->dataDaftarUgd);
+                // 2) Pastikan struktur yang dikelola komponen ini ada
+                if (!isset($fresh['diagnosis']) || !is_array($fresh['diagnosis'])) {
+                    $fresh['diagnosis'] = [];
+                }
+                if (!isset($fresh['procedure']) || !is_array($fresh['procedure'])) {
+                    $fresh['procedure'] = [];
+                }
+                if (!array_key_exists('diagnosisFreeText', $fresh)) {
+                    $fresh['diagnosisFreeText'] = '';
+                }
+                if (!array_key_exists('procedureFreeText', $fresh)) {
+                    $fresh['procedureFreeText'] = '';
+                }
+
+                // 3) PATCH hanya subtree milik Diagnosis (hindari menimpa bagian lain)
+                $fresh['diagnosis']        = (array) ($this->dataDaftarUgd['diagnosis']        ?? []);
+                $fresh['procedure']        = (array) ($this->dataDaftarUgd['procedure']        ?? []);
+                $fresh['diagnosisFreeText'] = (string)($this->dataDaftarUgd['diagnosisFreeText'] ?? '');
+                $fresh['procedureFreeText'] = (string)($this->dataDaftarUgd['procedureFreeText'] ?? '');
+
+                // Opsional: status header rj_diagnosa
+                $hasDiagnosis = count($fresh['diagnosis']) > 0;
+                $rj_diagnosa  = $hasDiagnosis ? 'D' : null;
+
+                // 4) Commit atomik dalam TRANSACTION (row lock agar konsisten)
+                DB::transaction(function () use ($rjNo, $fresh, $rj_diagnosa) {
+                    // kunci baris header
+                    DB::table('rstxn_ugdhdrs')->where('rj_no', $rjNo)->first();
+
+                    if (!is_null($rj_diagnosa)) {
+                        DB::table('rstxn_ugdhdrs')
+                            ->where('rj_no', $rjNo)
+                            ->update(['rj_diagnosa' => $rj_diagnosa]);
+                    } else {
+                        // opsional: kosongkan kembali jika semua diagnosa dihapus
+                        DB::table('rstxn_ugdhdrs')
+                            ->where('rj_no', $rjNo)
+                            ->update(['rj_diagnosa' => null]);
+                    }
+
+                    // simpan JSON UGD terkini
+                    $this->updateJsonUGD($rjNo, $fresh);
+                });
+
+                // 5) Sinkronkan state komponen sendiri
+                $this->dataDaftarUgd = $fresh;
+            });
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
+            return;
+        }
 
         toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Diagnosa berhasil disimpan.");
     }
-    // insert and update record end////////////////
 
 
     private function findData($rjno): void
@@ -586,15 +709,12 @@ class AssessmentDokterDiagnosis extends Component
     }
 
 
-    private function setDataPrimer(): void {}
 
 
     // when new form instance
     public function mount()
     {
         $this->findData($this->rjNoRef);
-        // set data dokter ref
-        // $this->store();
     }
 
 

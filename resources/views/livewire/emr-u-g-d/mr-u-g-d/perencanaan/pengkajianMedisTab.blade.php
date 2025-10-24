@@ -21,7 +21,7 @@
                 <x-text-input id="dataDaftarUgd.perencanaan.pengkajianMedis.waktuPemeriksaan"
                     placeholder="Waktu Pemeriksaan [dd/mm/yyyy hh24:mi:ss]" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.perencanaan.pengkajianMedis.waktuPemeriksaan'))"
                     :disabled=$disabledPropertyRjStatus
-                    wire:model.debounce.500ms="dataDaftarUgd.perencanaan.pengkajianMedis.waktuPemeriksaan" />
+                    wire:model="dataDaftarUgd.perencanaan.pengkajianMedis.waktuPemeriksaan" />
                 @isset($dataDaftarUgd['perencanaan']['pengkajianMedis']['waktuPemeriksaan'])
                     @if (!$dataDaftarUgd['perencanaan']['pengkajianMedis']['waktuPemeriksaan'])
                         <div class="w-1/2 ml-2">
@@ -56,7 +56,7 @@
                 <x-text-input id="dataDaftarUgd.perencanaan.pengkajianMedis.selesaiPemeriksaan"
                     placeholder="Selesai Pemeriksaan [dd/mm/yyyy hh24:mi:ss]" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.perencanaan.pengkajianMedis.selesaiPemeriksaan'))"
                     :disabled=$disabledPropertyRjStatus
-                    wire:model.debounce.500ms="dataDaftarUgd.perencanaan.pengkajianMedis.selesaiPemeriksaan" />
+                    wire:model="dataDaftarUgd.perencanaan.pengkajianMedis.selesaiPemeriksaan" />
                 @isset($dataDaftarUgd['perencanaan']['pengkajianMedis']['selesaiPemeriksaan'])
                     @if (!$dataDaftarUgd['perencanaan']['pengkajianMedis']['selesaiPemeriksaan'])
                         <div class="w-1/2 ml-2">
@@ -89,7 +89,7 @@
             <div class="grid grid-cols-1 gap-2 ">
                 <x-text-input id="dataDaftarUgd.perencanaan.pengkajianMedis.drPemeriksa" placeholder="Dokter Pemeriksa"
                     class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.perencanaan.pengkajianMedis.drPemeriksa'))" :disabled=true
-                    wire:model.debounce.500ms="dataDaftarUgd.perencanaan.pengkajianMedis.drPemeriksa" />
+                    wire:model="dataDaftarUgd.perencanaan.pengkajianMedis.drPemeriksa" />
 
                 <x-yellow-button :disabled=false wire:click.prevent="setDrPemeriksa()" type="button"
                     wire:loading.remove>

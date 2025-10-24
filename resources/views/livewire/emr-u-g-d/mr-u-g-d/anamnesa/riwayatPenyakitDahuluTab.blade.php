@@ -9,7 +9,7 @@
                 <x-text-input-area id="dataDaftarUgd.anamnesa.riwayatPenyakitDahulu.riwayatPenyakitDahulu"
                     placeholder="Riwayat Perjalanan Penyakit" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.anamnesa.riwayatPenyakitDahulu.riwayatPenyakitDahulu'))"
                     :disabled=$disabledPropertyRjStatus :rows=3
-                    wire:model.debounce.500ms="dataDaftarUgd.anamnesa.riwayatPenyakitDahulu.riwayatPenyakitDahulu" />
+                    wire:model="dataDaftarUgd.anamnesa.riwayatPenyakitDahulu.riwayatPenyakitDahulu" />
 
             </div>
             @error('dataDaftarUgd.anamnesa.riwayatPenyakitDahulu.riwayatPenyakitDahulu')
@@ -24,8 +24,7 @@
             <div class="mb-2 ">
                 <x-text-input-area id="dataDaftarUgd.anamnesa.alergi.alergi"
                     placeholder="Jenis Alergi / Alergi [Makanan / Obat / Udara]" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.anamnesa.alergi.alergi'))"
-                    :disabled=$disabledPropertyRjStatus :rows=3
-                    wire:model.debounce.500ms="dataDaftarUgd.anamnesa.alergi.alergi" />
+                    :disabled=$disabledPropertyRjStatus :rows=3 wire:model="dataDaftarUgd.anamnesa.alergi.alergi" />
 
             </div>
             @error('dataDaftarUgd.anamnesa.alergi.alergi')
@@ -49,9 +48,9 @@
 
             <div class="grid grid-cols-2 pt-2">
                 <x-check-box value='1' :label="__('Merokok')"
-                    wire:model.debounce.500ms="dataDaftarUgd.anamnesa.lainLain.merokok" />
+                    wire:model="dataDaftarUgd.anamnesa.lainLain.merokok" />
                 <x-check-box value='1' :label="__('Terpapar Rokok')"
-                    wire:model.debounce.500ms="dataDaftarUgd.anamnesa.lainLain.terpaparRokok" />
+                    wire:model="dataDaftarUgd.anamnesa.lainLain.terpaparRokok" />
             </div>
         </div>
 
@@ -61,35 +60,35 @@
 
             <div class="grid grid-cols-5 gap-2 pt-2">
                 <x-check-box value='1' :label="__('hipertensi')"
-                    wire:model.debounce.500ms="dataDaftarUgd.anamnesa.faktorResiko.hipertensi" />
+                    wire:model="dataDaftarUgd.anamnesa.faktorResiko.hipertensi" />
                 <x-check-box value='1' :label="__('diabetesMelitus')"
-                    wire:model.debounce.500ms="dataDaftarUgd.anamnesa.faktorResiko.diabetesMelitus" />
+                    wire:model="dataDaftarUgd.anamnesa.faktorResiko.diabetesMelitus" />
 
 
                 <x-check-box value='1' :label="__('penyakitJantung')"
-                    wire:model.debounce.500ms="dataDaftarUgd.anamnesa.faktorResiko.penyakitJantung" />
+                    wire:model="dataDaftarUgd.anamnesa.faktorResiko.penyakitJantung" />
                 <x-check-box value='1' :label="__('asma')"
-                    wire:model.debounce.500ms="dataDaftarUgd.anamnesa.faktorResiko.asma" />
+                    wire:model="dataDaftarUgd.anamnesa.faktorResiko.asma" />
                 <x-check-box value='1' :label="__('stroke')"
-                    wire:model.debounce.500ms="dataDaftarUgd.anamnesa.faktorResiko.stroke" />
+                    wire:model="dataDaftarUgd.anamnesa.faktorResiko.stroke" />
                 <x-check-box value='1' :label="__('liver')"
-                    wire:model.debounce.500ms="dataDaftarUgd.anamnesa.faktorResiko.liver" />
+                    wire:model="dataDaftarUgd.anamnesa.faktorResiko.liver" />
 
                 <x-check-box value='1' :label="__('tuberculosisParu')"
-                    wire:model.debounce.500ms="dataDaftarUgd.anamnesa.faktorResiko.tuberculosisParu" />
+                    wire:model="dataDaftarUgd.anamnesa.faktorResiko.tuberculosisParu" />
                 <x-check-box value='1' :label="__('rokok')"
-                    wire:model.debounce.500ms="dataDaftarUgd.anamnesa.faktorResiko.rokok" />
+                    wire:model="dataDaftarUgd.anamnesa.faktorResiko.rokok" />
                 <x-check-box value='1' :label="__('minumAlkohol')"
-                    wire:model.debounce.500ms="dataDaftarUgd.anamnesa.faktorResiko.minumAlkohol" />
+                    wire:model="dataDaftarUgd.anamnesa.faktorResiko.minumAlkohol" />
                 <x-check-box value='1' :label="__('ginjal')"
-                    wire:model.debounce.500ms="dataDaftarUgd.anamnesa.faktorResiko.ginjal" />
+                    wire:model="dataDaftarUgd.anamnesa.faktorResiko.ginjal" />
 
             </div>
             <div class="mb-2 ">
                 <x-text-input id="dataDaftarUgd.anamnesa.faktorResiko.lainLain"
                     placeholder="Jenis Faktor Resiko Lain-Lain" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.anamnesa.faktorResiko.lainLain'))"
                     :disabled=$disabledPropertyRjStatus
-                    wire:model.debounce.500ms="dataDaftarUgd.anamnesa.faktorResiko.lainLain" />
+                    wire:model="dataDaftarUgd.anamnesa.faktorResiko.lainLain" />
 
             </div>
         </div>
@@ -100,19 +99,19 @@
 
             <div class="grid grid-cols-5 gap-2 pt-2">
                 <x-check-box value='1' :label="__('hipertensi')"
-                    wire:model.debounce.500ms="dataDaftarUgd.anamnesa.penyakitKeluarga.hipertensi" />
+                    wire:model="dataDaftarUgd.anamnesa.penyakitKeluarga.hipertensi" />
                 <x-check-box value='1' :label="__('diabetesMelitus')"
-                    wire:model.debounce.500ms="dataDaftarUgd.anamnesa.penyakitKeluarga.diabetesMelitus" />
+                    wire:model="dataDaftarUgd.anamnesa.penyakitKeluarga.diabetesMelitus" />
                 <x-check-box value='1' :label="__('penyakitJantung')"
-                    wire:model.debounce.500ms="dataDaftarUgd.anamnesa.penyakitKeluarga.penyakitJantung" />
+                    wire:model="dataDaftarUgd.anamnesa.penyakitKeluarga.penyakitJantung" />
                 <x-check-box value='1' :label="__('asma')"
-                    wire:model.debounce.500ms="dataDaftarUgd.anamnesa.penyakitKeluarga.asma" />
+                    wire:model="dataDaftarUgd.anamnesa.penyakitKeluarga.asma" />
             </div>
             <div class="mb-2 ">
                 <x-text-input id="dataDaftarUgd.anamnesa.penyakitKeluarga.lainLain"
                     placeholder="Jenis Faktor Resiko Lain-Lain" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.anamnesa.penyakitKeluarga.lainLain'))"
                     :disabled=$disabledPropertyRjStatus
-                    wire:model.debounce.500ms="dataDaftarUgd.anamnesa.penyakitKeluarga.lainLain" />
+                    wire:model="dataDaftarUgd.anamnesa.penyakitKeluarga.lainLain" />
 
             </div>
         </div> --}}

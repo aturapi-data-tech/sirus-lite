@@ -8,7 +8,8 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
-
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 
 use App\Http\Traits\customErrorMessagesTrait;
 use App\Http\Traits\EmrUGD\EmrUGDTrait;
@@ -26,8 +27,6 @@ class JasaKaryawanUGD extends Component
     // listener from blade////////////////
     protected $listeners = [
         'storeAssessmentDokterUGD' => 'store',
-        'syncronizeAssessmentDokterUGDFindData' => 'mount',
-        'syncronizeAssessmentPerawatUGDFindData' => 'mount'
     ];
 
 
@@ -74,30 +73,41 @@ class JasaKaryawanUGD extends Component
     // insert and update record start////////////////
     public function store()
     {
+        if (!$this->checkUgdStatus()) return;
 
+        $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
+        if (!$rjNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('rjNo kosong.');
+            return;
+        }
 
-        // Logic update mode start //////////
-        $this->updateDataUGD($this->dataDaftarUgd['rjNo']);
-        $this->emit('syncronizeAssessmentDokterUGDFindData');
-        $this->emit('syncronizeAssessmentPerawatUGDFindData');
+        $lockKey = "ugd:{$rjNo}";
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
+                DB::transaction(function () use ($rjNo) {
+                    $fresh = $this->findDataUGD($rjNo) ?: [];
+                    if (!isset($fresh['JasaKaryawan']) || !is_array($fresh['JasaKaryawan'])) $fresh['JasaKaryawan'] = [];
+                    if (!isset($fresh['LainLain'])     || !is_array($fresh['LainLain']))     $fresh['LainLain']     = [];
+
+                    // patch hanya subtree modul ini
+                    $fresh['JasaKaryawan'] = array_values($this->dataDaftarUgd['JasaKaryawan'] ?? []);
+                    $fresh['LainLain']     = array_values($this->dataDaftarUgd['LainLain']     ?? []);
+
+                    $this->updateJsonUGD($rjNo, $fresh);
+                    $this->dataDaftarUgd = $fresh;
+                });
+            });
+
+            $this->emit('ugd:refresh-summary');
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Jasa Karyawan berhasil disimpan.");
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
+        } catch (\Throwable $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Gagal menyimpan data.');
+        }
     }
 
-    private function updateDataUGD($rjNo): void
-    {
 
-        // update table trnsaksi
-        // DB::table('rstxn_ugdhdrs')
-        //     ->where('rj_no', $rjNo)
-        //     ->update([
-        //         'datadaftarugd_json' => json_encode($this->dataDaftarUgd, true),
-        //         'datadaftarugd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
-        //     ]);
-
-        $this->updateJsonUGD($rjNo, $this->dataDaftarUgd);
-
-
-        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Jasa Karyawan berhasil disimpan.");
-    }
     // insert and update record end////////////////
 
 
@@ -116,16 +126,13 @@ class JasaKaryawanUGD extends Component
 
     public function insertJasaKaryawan(): void
     {
+        if (!$this->checkUgdStatus()) return;
 
-        // validate
-        $this->checkUgdStatus();
-        // customErrorMessages
         $rules = [
             "formEntryJasaKaryawan.jasaKaryawanId"    => 'bail|required|exists:rsmst_actemps,acte_id',
             "formEntryJasaKaryawan.jasaKaryawanDesc"  => 'bail|required',
             "formEntryJasaKaryawan.jasaKaryawanPrice" => 'bail|required|numeric',
         ];
-
         $messages = [
             'formEntryJasaKaryawan.jasaKaryawanId.required'   => 'ID karyawan harus diisi.',
             'formEntryJasaKaryawan.jasaKaryawanId.exists'     => 'ID karyawan tidak valid atau tidak ditemukan.',
@@ -133,92 +140,93 @@ class JasaKaryawanUGD extends Component
             'formEntryJasaKaryawan.jasaKaryawanPrice.required' => 'Harga jasa harus diisi.',
             'formEntryJasaKaryawan.jasaKaryawanPrice.numeric' => 'Harga jasa harus berupa angka.',
         ];
-
-        // Proses Validasi///////////////////////////////////////////
         $this->validate($rules, $messages);
 
-        // validate
+        $rjNo = $this->rjNoRef;
+        $lockRj  = "ugd:{$rjNo}";
+        $lockHdr = "ugdactemps:counter";
 
-
-        // pengganti race condition
-        // start:
         try {
+            Cache::lock($lockRj, 5)->block(3, function () use ($rjNo, $lockHdr) {
+                Cache::lock($lockHdr, 5)->block(3, function () use ($rjNo) {
+                    DB::transaction(function () use ($rjNo) {
+                        $nextActeDtl = (int) DB::table('rstxn_ugdactemps')
+                            ->max(DB::raw('nvl(to_number(acte_dtl),0)')) + 1;
 
-            $lastInserted = DB::table('rstxn_ugdactemps')
-                ->select(DB::raw("nvl(max(acte_dtl)+1,1) as acte_dtl_max"))
-                ->first();
-            // insert into table transaksi
-            DB::table('rstxn_ugdactemps')
-                ->insert([
-                    'acte_dtl' => $lastInserted->acte_dtl_max,
-                    'rj_no' => $this->rjNoRef,
-                    'acte_id' => $this->formEntryJasaKaryawan['jasaKaryawanId'],
-                    'acte_price' => $this->formEntryJasaKaryawan['jasaKaryawanPrice'],
-                ]);
+                        DB::table('rstxn_ugdactemps')->insert([
+                            'acte_dtl'  => $nextActeDtl,
+                            'rj_no'     => $rjNo,
+                            'acte_id'   => $this->formEntryJasaKaryawan['jasaKaryawanId'],
+                            'acte_price' => $this->formEntryJasaKaryawan['jasaKaryawanPrice'],
+                        ]);
 
+                        $this->dataDaftarUgd['JasaKaryawan'][] = [
+                            'JasaKaryawanId'    => $this->formEntryJasaKaryawan['jasaKaryawanId'],
+                            'JasaKaryawanDesc'  => $this->formEntryJasaKaryawan['jasaKaryawanDesc'],
+                            'JasaKaryawanPrice' => $this->formEntryJasaKaryawan['jasaKaryawanPrice'],
+                            'rjActeDtl'         => $nextActeDtl,
+                            'rjNo'              => $rjNo,
+                            'userLog'           => auth()->user()->myuser_name ?? '',
+                            'userLogDate'       => Carbon::now(config('app.timezone'))->format('d/m/Y H:i:s'),
+                        ];
 
-            $this->dataDaftarUgd['JasaKaryawan'][] = [
-                'JasaKaryawanId' => $this->formEntryJasaKaryawan['jasaKaryawanId'],
-                'JasaKaryawanDesc' => $this->formEntryJasaKaryawan['jasaKaryawanDesc'],
-                'JasaKaryawanPrice' => $this->formEntryJasaKaryawan['jasaKaryawanPrice'],
-                'rjActeDtl' => $lastInserted->acte_dtl_max,
-                'rjNo' => $this->rjNoRef,
-                'userLog' => auth()->user()->myuser_name,
-                'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
-            ];
+                        $this->paketLainLainJasaKaryawan($this->formEntryJasaKaryawan['jasaKaryawanId'], $rjNo, $nextActeDtl);
+                        $this->paketObatJasaKaryawan($this->formEntryJasaKaryawan['jasaKaryawanId'], $rjNo, $nextActeDtl);
 
-            $this->paketLainLainJasaKaryawan($this->formEntryJasaKaryawan['jasaKaryawanId'], $this->rjNoRef, $lastInserted->acte_dtl_max);
-            $this->paketObatJasaKaryawan($this->formEntryJasaKaryawan['jasaKaryawanId'], $this->rjNoRef, $lastInserted->acte_dtl_max);
+                        $fresh = $this->findDataUGD($rjNo) ?: [];
+                        $fresh['JasaKaryawan'] = array_values($this->dataDaftarUgd['JasaKaryawan'] ?? ($fresh['JasaKaryawan'] ?? []));
+                        $fresh['LainLain']     = array_values($this->dataDaftarUgd['LainLain']     ?? ($fresh['LainLain']     ?? []));
+                        $this->updateJsonUGD($rjNo, $fresh);
+                        $this->emit('ugd:refresh-summary');
 
-            $this->store();
+                        $this->dataDaftarUgd = $fresh;
+                    });
+                });
+            });
+
             $this->resetformEntryJasaKaryawan();
-
-
-
-            //
-        } catch (Exception $e) {
-            // display an error to user
-            dd($e->getMessage());
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Jasa Karyawan berhasil ditambahkan.");
+        } catch (\Throwable $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Gagal menambah Jasa Karyawan.');
         }
-        // goto start;
     }
 
     public function removeJasaKaryawan($rjActeDtl)
     {
+        if (!$this->checkUgdStatus()) return;
 
-        $this->checkUgdStatus();
+        $rjNo = $this->rjNoRef;
+        $lockKey = "ugd:{$rjNo}";
 
-
-        // pengganti race condition
-        // start:
         try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo, $rjActeDtl) {
+                DB::transaction(function () use ($rjNo, $rjActeDtl) {
+                    DB::table('rstxn_ugdothers')->where('rj_no', $rjNo)->where('acte_dtl', $rjActeDtl)->delete();
+                    DB::table('rstxn_ugdobats')->where('rj_no', $rjNo)->where('acte_dtl', $rjActeDtl)->delete();
+                    DB::table('rstxn_ugdactemps')->where('rj_no', $rjNo)->where('acte_dtl', $rjActeDtl)->delete();
 
-            $this->removepaketLainLainJasaKaryawan($rjActeDtl);
-            $this->removepaketObatJasaKaryawan($rjActeDtl);
+                    $this->dataDaftarUgd['JasaKaryawan'] = collect($this->dataDaftarUgd['JasaKaryawan'] ?? [])
+                        ->reject(fn($i) => (string)($i['rjActeDtl'] ?? '') === (string)$rjActeDtl)
+                        ->values()->all();
+                    $this->dataDaftarUgd['LainLain'] = collect($this->dataDaftarUgd['LainLain'] ?? [])
+                        ->reject(fn($i) => (string)($i['acte_dtl'] ?? '') === (string)$rjActeDtl)
+                        ->values()->all();
 
-            // remove into table transaksi
-            DB::table('rstxn_ugdactemps')
-                ->where('acte_dtl', $rjActeDtl)
-                ->delete();
+                    $fresh = $this->findDataUGD($rjNo) ?: [];
+                    $fresh['JasaKaryawan'] = array_values($this->dataDaftarUgd['JasaKaryawan']);
+                    $fresh['LainLain']     = array_values($this->dataDaftarUgd['LainLain']);
+                    $this->updateJsonUGD($rjNo, $fresh);
+                    $this->emit('ugd:refresh-summary');
 
+                    $this->dataDaftarUgd = $fresh;
+                });
+            });
 
-            $JasaKaryawan = collect($this->dataDaftarUgd['JasaKaryawan'])->where("rjActeDtl", '!=', $rjActeDtl)->toArray();
-            $this->dataDaftarUgd['JasaKaryawan'] = $JasaKaryawan;
-
-
-            $this->store();
-
-
-            //
-        } catch (Exception $e) {
-            // display an error to user
-            dd($e->getMessage());
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Jasa Karyawan dihapus.');
+        } catch (\Throwable $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Gagal menghapus Jasa Karyawan.');
         }
-        // goto start;
-
-
     }
-
     // /////////////////////////////////////////////////////////////////
     // Paket Jasa Karyawan -> Lain lain
     private function paketLainLainJasaKaryawan($acteId, $rjNo, $acteDtl): void
@@ -236,76 +244,65 @@ class JasaKaryawanUGD extends Component
 
     private function insertLainLain($acteId, $rjNo, $acteDtl, $otherId, $otherDesc, $otherPrice): void
     {
-
-        // validate
-        // customErrorMessages
         $messages = customErrorMessagesTrait::messages();
-        // require nik ketika pasien tidak dikenal
-        $collectingMyLainLain =
-            [
-                "LainLainId" => $otherId,
-                "LainLainDesc" => $otherDesc,
-                "LainLainPrice" => $otherPrice,
-                "acteId" => $acteId,
-                "acteDtl" => $acteDtl,
-                "rjNo" => $rjNo,
-
-            ];
-
-        $rules = [
-            "LainLainId" => 'bail|required|exists:rsmst_others ,other_id',
-            "LainLainDesc" => 'bail|required|',
-            "LainLainPrice" => 'bail|required|numeric|',
-            "acteId" => 'bail|required||',
-            "acteDtl" => 'bail|required|numeric|',
-            "rjNo" => 'bail|required|numeric|',
-
-
-
+        $payload = [
+            "LainLainId" => $otherId,
+            "LainLainDesc" => $otherDesc,
+            "LainLainPrice" => $otherPrice,
+            "acteId" => $acteId,
+            "acteDtl" => $acteDtl,
+            "rjNo" => $rjNo,
         ];
+        $rules = [
+            "LainLainId" => 'bail|required|exists:rsmst_others,other_id',
+            "LainLainDesc" => 'bail|required',
+            "LainLainPrice" => 'bail|required|numeric',
+            "acteId" => 'bail|required',
+            "acteDtl" => 'bail|required|numeric',
+            "rjNo" => 'bail|required|numeric',
+        ];
+        $validator = Validator::make($payload, $rules, $messages);
+        if ($validator->fails() || !$this->checkUgdStatus()) return;
 
-        // Proses Validasi///////////////////////////////////////////
-        $validator = Validator::make($collectingMyLainLain, $rules, $messages);
+        $lockRj = "ugd:{$rjNo}";
+        $lockOthers = "ugdothers:counter";
 
-        if ($validator->fails()) {
-            dd($validator->validated());
-        }
-
-
-        // pengganti race condition
-        // start:
         try {
+            Cache::lock($lockRj, 5)->block(3, function () use ($payload, $lockOthers) {
+                Cache::lock($lockOthers, 5)->block(3, function () use ($payload) {
+                    DB::transaction(function () use ($payload) {
+                        $nextDtl = (int) DB::table('rstxn_ugdothers')
+                            ->max(DB::raw('nvl(to_number(rjo_dtl),0)')) + 1;
 
-            $lastInserted = DB::table('rstxn_ugdothers')
-                ->select(DB::raw("nvl(max(rjo_dtl)+1,1) as rjo_dtl_max"))
-                ->first();
-            // insert into table transaksi
-            DB::table('rstxn_ugdothers')
-                ->insert([
-                    'rjo_dtl' => $lastInserted->rjo_dtl_max,
-                    'acte_dtl' => $collectingMyLainLain['acteDtl'],
-                    'rj_no' => $collectingMyLainLain['rjNo'],
-                    'other_id' => $collectingMyLainLain['LainLainId'],
-                    'other_price' => $collectingMyLainLain['LainLainPrice'],
-                ]);
+                        DB::table('rstxn_ugdothers')->insert([
+                            'rjo_dtl' => $nextDtl,
+                            'acte_dtl' => $payload['acteDtl'],
+                            'rj_no' => $payload['rjNo'],
+                            'other_id' => $payload['LainLainId'],
+                            'other_price' => $payload['LainLainPrice'],
+                        ]);
 
+                        $this->dataDaftarUgd['LainLain'][] = [
+                            'LainLainId' => $payload['LainLainId'],
+                            'LainLainDesc' => $payload['LainLainDesc'],
+                            'LainLainPrice' => $payload['LainLainPrice'],
+                            'rjotherDtl' => $nextDtl,
+                            'rjNo' => $payload['rjNo'],
+                            'acte_dtl' => $payload['acteDtl'],
+                        ];
 
-            $this->dataDaftarUgd['LainLain'][] = [
-                'LainLainId' => $collectingMyLainLain['LainLainId'],
-                'LainLainDesc' => $collectingMyLainLain['LainLainDesc'],
-                'LainLainPrice' => $collectingMyLainLain['LainLainPrice'],
-                'rjotherDtl' => $lastInserted->rjo_dtl_max,
-                'rjNo' => $collectingMyLainLain['rjNo'],
-                'acte_dtl' => $collectingMyLainLain['acteDtl']
-            ];
+                        $fresh = $this->findDataUGD($payload['rjNo']) ?: [];
+                        $fresh['LainLain'] = array_values($this->dataDaftarUgd['LainLain'] ?? ($fresh['LainLain'] ?? []));
+                        $this->updateJsonUGD($payload['rjNo'], $fresh);
+                        $this->emit('ugd:refresh-summary');
 
-            $this->store();
-            //
-        } catch (Exception $e) {
-            // display an error to user
-            dd($e->getMessage());
+                        $this->dataDaftarUgd = $fresh;
+                    });
+                });
+            });
+        } catch (\Throwable $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Gagal menambah Lain-lain.');
         }
-        // goto start;
     }
 
     private function removepaketLainLainJasaKaryawan($rjActeDtl): void
@@ -323,29 +320,33 @@ class JasaKaryawanUGD extends Component
 
     private function removeLainLain($rjotherDtl): void
     {
+        if (!$this->checkUgdStatus()) return;
 
-        $this->checkUgdStatus();
+        $rjNo = $this->rjNoRef;
+        $lockKey = "ugd:{$rjNo}";
 
-
-        // pengganti race condition
-        // start:
         try {
-            // remove into table transaksi
-            DB::table('rstxn_ugdothers')
-                ->where('rjo_dtl', $rjotherDtl)
-                ->delete();
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo, $rjotherDtl) {
+                DB::transaction(function () use ($rjNo, $rjotherDtl) {
+                    DB::table('rstxn_ugdothers')->where('rj_no', $rjNo)->where('rjo_dtl', $rjotherDtl)->delete();
 
+                    $this->dataDaftarUgd['LainLain'] = collect($this->dataDaftarUgd['LainLain'] ?? [])
+                        ->reject(fn($i) => (string)($i['rjotherDtl'] ?? '') === (string)$rjotherDtl)
+                        ->values()->all();
 
-            $LainLain = collect($this->dataDaftarUgd['LainLain'])->where("rjotherDtl", '!=', $rjotherDtl)->toArray();
-            $this->dataDaftarUgd['LainLain'] = $LainLain;
+                    $fresh = $this->findDataUGD($rjNo) ?: [];
+                    $fresh['LainLain'] = array_values($this->dataDaftarUgd['LainLain']);
+                    $this->updateJsonUGD($rjNo, $fresh);
+                    $this->emit('ugd:refresh-summary');
 
-            $this->store();
-            //
-        } catch (Exception $e) {
-            // display an error to user
-            dd($e->getMessage());
+                    $this->dataDaftarUgd = $fresh;
+                });
+            });
+
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Lain-lain dihapus.');
+        } catch (\Throwable $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Gagal menghapus Lain-lain.');
         }
-        // goto start;
     }
     // Paket Jasa Karyawan -> Lain lain
 
@@ -375,12 +376,8 @@ class JasaKaryawanUGD extends Component
 
     private function insertObat($acteId, $rjNo, $acteDtl, $ObatId, $ObatDesc, $ObatPrice, $Obatqty): void
     {
-
-        // validate
-        // customErrorMessages
         $messages = customErrorMessagesTrait::messages();
-        // require nik ketika pasien tidak dikenal
-        $collectingMyObat = [
+        $payload = [
             "productId" => $ObatId,
             "productName" => $ObatDesc,
             "signaX" => 1,
@@ -392,73 +389,50 @@ class JasaKaryawanUGD extends Component
             "acteId" => $acteId,
             "rjNo" => $rjNo
         ];
-
         $rules = [
-            "productId" => 'bail|required|exists:immst_products ,product_id',
-            "productName" => 'bail|required|',
+            "productId" => 'bail|required|exists:immst_products,product_id',
+            "productName" => 'bail|required',
             "signaX" => 'bail|required|numeric|min:1|max:5',
             "signaHari" => 'bail|required|numeric|min:1|max:5',
-            "qty" => 'bail|required|digits_between:1,3|',
-            "productPrice" => 'bail|required|numeric|',
-            "catatanKhusus" => 'bail|',
-            "acteDtl" => 'bail|required|numeric|',
-            "acteId" => 'bail|required|',
-            "rjNo" => 'bail|required|numeric|',
+            "qty" => 'bail|required|digits_between:1,3',
+            "productPrice" => 'bail|required|numeric',
+            "acteDtl" => 'bail|required|numeric',
+            "acteId" => 'bail|required',
+            "rjNo" => 'bail|required|numeric',
         ];
+        $validator = Validator::make($payload, $rules, $messages);
+        if ($validator->fails() || !$this->checkUgdStatus()) return;
 
-        // Proses Validasi///////////////////////////////////////////
-        $validator = Validator::make($collectingMyObat, $rules, $messages);
+        $lockRj = "ugd:{$rjNo}";
+        $lockDrug = "ugdobats:counter";
 
-        if ($validator->fails()) {
-            dd($validator->validated());
-        }
-
-
-        // pengganti race condition
-        // start:
         try {
+            Cache::lock($lockRj, 5)->block(3, function () use ($payload, $lockDrug) {
+                Cache::lock($lockDrug, 5)->block(3, function () use ($payload) {
+                    DB::transaction(function () use ($payload) {
+                        $nextDtl = (int) DB::table('rstxn_ugdobats')
+                            ->max(DB::raw('nvl(to_number(rjobat_dtl),0)')) + 1;
 
-            $lastInserted = DB::table('rstxn_ugdobats')
-                ->select(DB::raw("nvl(max(rjobat_dtl)+1,1) as rjobat_dtl_max"))
-                ->first();
-            // insert into table transaksi
-            DB::table('rstxn_ugdobats')
-                ->insert([
-                    'rjobat_dtl' => $lastInserted->rjobat_dtl_max,
-                    'acte_dtl' => $collectingMyObat['acteDtl'],
-                    'rj_no' => $collectingMyObat['rjNo'],
-                    'product_id' => $collectingMyObat['productId'],
-                    'qty' => $collectingMyObat['qty'],
-                    'price' => $collectingMyObat['productPrice'],
-                    'rj_carapakai' => $collectingMyObat['signaX'],
-                    'rj_kapsul' => $collectingMyObat['signaHari'],
-                    'rj_takar' => 'Tablet',
-                    'catatan_khusus' => $collectingMyObat['catatanKhusus'],
-                    'exp_date' => DB::raw("to_date('" . $this->dataDaftarUgd['rjDate'] . "','dd/mm/yyyy hh24:mi:ss')+30"),
-                    'etiket_status' => 0,
-                ]);
-
-
-            // $this->dataDaftarUgd['eresep'][] = [
-            //     'productId' => $this->collectingMyProduct['productId'],
-            //     'productName' => $this->collectingMyProduct['productName'],
-            //     'jenisKeterangan' => 'NonRacikan', //Racikan non racikan
-            //     'signaX' => $this->collectingMyProduct['signaX'],
-            //     'signaHari' => $this->collectingMyProduct['signaHari'],
-            //     'qty' => $this->collectingMyProduct['qty'],
-            //     'productPrice' => $this->collectingMyProduct['productPrice'],
-            //     'catatanKhusus' => $this->collectingMyProduct['catatanKhusus'],
-            //     'rjObatDtl' => $lastInserted->rjobat_dtl_max,
-            //     'rjNo' => $this->rjNoRef,
-            // ];
-
-            $this->store();
-            //
-        } catch (Exception $e) {
-            // display an error to user
-            dd($e->getMessage());
+                        DB::table('rstxn_ugdobats')->insert([
+                            'rjobat_dtl' => $nextDtl,
+                            'acte_dtl' => $payload['acteDtl'],
+                            'rj_no' => $payload['rjNo'],
+                            'product_id' => $payload['productId'],
+                            'qty' => $payload['qty'],
+                            'price' => $payload['productPrice'],
+                            'rj_carapakai' => $payload['signaX'],
+                            'rj_kapsul' => $payload['signaHari'],
+                            'rj_takar' => 'Tablet',
+                            'catatan_khusus' => $payload['catatanKhusus'],
+                            'exp_date' => DB::raw("to_date('" . ($this->dataDaftarUgd['rjDate'] ?? date('d/m/Y H:i:s')) . "','dd/mm/yyyy hh24:mi:ss')+30"),
+                            'etiket_status' => 0,
+                        ]);
+                    });
+                });
+            });
+        } catch (\Throwable $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Gagal menambah obat.');
         }
-        // goto start;
     }
 
     private function removepaketObatJasaKaryawan($rjActeDtl): void
@@ -476,29 +450,22 @@ class JasaKaryawanUGD extends Component
 
     private function removeObat($rjObatDtl): void
     {
+        if (!$this->checkUgdStatus()) return;
 
-        $this->checkUgdStatus();
+        $rjNo = $this->rjNoRef;
+        $lockKey = "ugd:{$rjNo}";
 
-
-        // pengganti race condition
-        // start:
         try {
-            // remove into table transaksi
-            DB::table('rstxn_ugdobats')
-                ->where('rjobat_dtl', $rjObatDtl)
-                ->delete();
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo, $rjObatDtl) {
+                DB::transaction(function () use ($rjNo, $rjObatDtl) {
+                    DB::table('rstxn_ugdobats')->where('rj_no', $rjNo)->where('rjobat_dtl', $rjObatDtl)->delete();
+                });
+            });
 
-
-            // $LainLain = collect($this->dataDaftarUgd['LainLain'])->where("rjotherDtl", '!=', $rjotherDtl)->toArray();
-            // $this->dataDaftarUgd['LainLain'] = $LainLain;
-
-            $this->store();
-            //
-        } catch (Exception $e) {
-            // display an error to user
-            dd($e->getMessage());
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Obat dihapus.');
+        } catch (\Throwable $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Gagal menghapus obat.');
         }
-        // goto start;
     }
     // Paket Jasa Karyawan -> Obat
     // /////////////////////////////////////////////////////////////////
@@ -513,17 +480,14 @@ class JasaKaryawanUGD extends Component
         $this->resetValidation();
     }
 
-    public function checkUgdStatus()
+    private function checkUgdStatus(): bool
     {
-        $lastInserted = DB::table('rstxn_ugdhdrs')
-            ->select('rj_status')
-            ->where('rj_no', $this->rjNoRef)
-            ->first();
-
-        if ($lastInserted->rj_status !== 'A') {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Pasien Sudah Pulang, Trasaksi Terkunci.");
-            return (dd('Pasien Sudah Pulang, Trasaksi Terkuncixx.' . $this->rjNoRef));
+        $row = DB::table('rstxn_ugdhdrs')->select('rj_status')->where('rj_no', $this->rjNoRef)->first();
+        if (!$row || $row->rj_status !== 'A') {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Pasien Sudah Pulang, Transaksi Terkunci.");
+            return false;
         }
+        return true;
     }
 
 

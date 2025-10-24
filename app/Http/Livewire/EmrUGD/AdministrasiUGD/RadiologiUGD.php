@@ -6,15 +6,6 @@ use Illuminate\Support\Facades\DB;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-// use Carbon\Carbon;
-// use Illuminate\Support\Facades\Validator;
-
-
-// use App\Http\Traits\customErrorMessagesTrait;
-
-// use Illuminate\Support\Str;
-// use Spatie\ArrayToXml\ArrayToXml;
-use Exception;
 
 
 class RadiologiUGD extends Component
@@ -23,11 +14,7 @@ class RadiologiUGD extends Component
 
 
     // listener from blade////////////////
-    protected $listeners = [
-        'storeAssessmentDokterUGD' => 'store',
-        'syncronizeAssessmentDokterUGDFindData' => 'mount',
-        'syncronizeAssessmentPerawatUGDFindData' => 'mount'
-    ];
+    protected $listeners = [];
 
 
     //////////////////////////////z
@@ -59,21 +46,6 @@ class RadiologiUGD extends Component
         } else {
 
             $this->dataDaftarUgd['rjRad'] = [];
-        }
-    }
-
-
-
-    public function checkUgdStatus()
-    {
-        $lastInserted = DB::table('rstxn_ugdhdrs')
-            ->select('rj_status')
-            ->where('rj_no', $this->rjNoRef)
-            ->first();
-
-        if ($lastInserted->rj_status !== 'A') {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Pasien Sudah Pulang, Trasaksi Terkunci.");
-            return (dd('Pasien Sudah Pulang, Trasaksi Terkuncixx.'));
         }
     }
 

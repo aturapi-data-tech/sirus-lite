@@ -8,17 +8,19 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
 
-use Spatie\ArrayToXml\ArrayToXml;
 use App\Http\Traits\EmrUGD\EmrUGDTrait;
-use App\Http\Traits\customErrorMessagesTrait;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Contracts\Cache\LockTimeoutException;
+
 
 class Anamnesa extends Component
 {
-    use WithPagination, EmrUGDTrait, customErrorMessagesTrait;
+    use WithPagination, EmrUGDTrait;
 
     // listener from blade////////////////
     protected $listeners = [
-        'syncronizeAssessmentPerawatUGDFindData' => 'mount'
+        'storeAssessmentDokterUGD' => 'store',
+
     ];
 
 
@@ -327,9 +329,7 @@ class Anamnesa extends Component
     ////////////////////////////////////////////////
     public function updated($propertyName)
     {
-        // dd($propertyName);
         $this->validateOnly($propertyName);
-        $this->store();
     }
 
 
@@ -375,51 +375,83 @@ class Anamnesa extends Component
     // insert and update record start////////////////
     public function store()
     {
-        // Validate RJ
+        // Validate form
         $this->validateDataAnamnesaUgd();
 
-        // Logic update mode start //////////
-        $this->updateDataUgd($this->dataDaftarUgd['rjNo']);
+        // Ambil rjNo
+        $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
+        if (!$rjNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("rjNo kosong.");
+            return;
+        }
 
-        $this->emit('syncronizeAssessmentPerawatUGDFindData');
+        // shared lock antar modul UGD (anamnesa/pemeriksaan/diagnosis/plan/Resume)
+        $lockKey = "ugd:{$rjNo}";
+
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
+                // Ambil FRESH state dari DB di dalam lock
+                $fresh = $this->findDataUGD($rjNo) ?: [];
+
+                // Pastikan struktur 'anamnesa' ada
+                if (!isset($fresh['anamnesa']) || !is_array($fresh['anamnesa'])) {
+                    $fresh['anamnesa'] = $this->anamnesa;
+                }
+
+                // PATCH: hanya ganti subtree 'anamnesa' dari state form saat ini
+                $fresh['anamnesa'] = $this->dataDaftarUgd['anamnesa'];
+
+                // Hitung field turunan utk tabel header
+                [$p_status, $waktu_pasien_datang, $waktu_pasien_dilayani] = $this->deriveHeaderFieldsFrom($fresh);
+
+                // Tulis dalam TRANSACTION
+                DB::transaction(function () use ($rjNo, $fresh, $p_status, $waktu_pasien_datang, $waktu_pasien_dilayani) {
+                    // update kolom header (status & waktu)
+                    DB::table('rstxn_ugdhdrs')
+                        ->where('rj_no', $rjNo)
+                        ->update([
+                            'p_status'              => $p_status,
+                            'waktu_pasien_datang'   => DB::raw("to_date('{$waktu_pasien_datang}','dd/mm/yyyy hh24:mi:ss')"),
+                            'waktu_pasien_dilayani' => DB::raw("to_date('{$waktu_pasien_dilayani}','dd/mm/yyyy hh24:mi:ss')"),
+                        ]);
+
+                    // simpan JSON UGD terkini
+                    $this->updateJsonUGD($rjNo, $fresh);
+                });
+
+                // Sinkronkan state komponen ke fresh terbaru
+                $this->dataDaftarUgd = $fresh;
+            });
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
+            return;
+        }
+
+        // Notify saudara2 komponen agar refresh
+
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+            ->addSuccess("Anamnesa berhasil disimpan.");
     }
 
-    private function updateDataUgd($rjNo): void
+    private function deriveHeaderFieldsFrom(array $state): array
     {
-        $p_status = (isset($this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['tingkatKegawatan']) ?
-            ($this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['tingkatKegawatan'] ?
-                $this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['tingkatKegawatan']
-                : 'P0')
-            : 'P0');
+        $tz = config('app.timezone'); // atau env('APP_TIMEZONE')
+        $now = Carbon::now($tz)->format('d/m/Y H:i:s');
 
-        $waktu_pasien_datang = (isset($this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['jamDatang']) ?
-            ($this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['jamDatang'] ?
-                $this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['jamDatang']
-                : Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'))
-            : Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'));
+        $p_status = $state['anamnesa']['pengkajianPerawatan']['tingkatKegawatan'] ?? 'P0';
+        $p_status = $p_status ?: 'P0';
 
-        $waktu_pasien_dilayani = (isset($this->dataDaftarUgd['perencanaan']['pengkajianMedis']['waktuPemeriksaan']) ?
-            ($this->dataDaftarUgd['perencanaan']['pengkajianMedis']['waktuPemeriksaan'] ?
-                $this->dataDaftarUgd['perencanaan']['pengkajianMedis']['waktuPemeriksaan']
-                : Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'))
-            : Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'));
+        $waktu_pasien_datang = $state['anamnesa']['pengkajianPerawatan']['jamDatang'] ?? '';
+        $waktu_pasien_datang = $waktu_pasien_datang ?: $now;
 
-        // update table trnsaksi
-        DB::table('rstxn_ugdhdrs')
-            ->where('rj_no', $rjNo)
-            ->update([
-                // 'datadaftarugd_json' => json_encode($this->dataDaftarUgd, true),
-                // 'datadaftarUgd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
-                'p_status' => $p_status,
-                'waktu_pasien_datang' => DB::raw("to_date('" . $waktu_pasien_datang . "','dd/mm/yyyy hh24:mi:ss')"),
-                'waktu_pasien_dilayani' => DB::raw("to_date('" . $waktu_pasien_dilayani . "','dd/mm/yyyy hh24:mi:ss')"),
-            ]);
+        // jika modul Perencanaan sudah isi waktu pemeriksaan, pakai itu; kalau tidak fallback now
+        $waktu_pasien_dilayani = $state['perencanaan']['pengkajianMedis']['waktuPemeriksaan'] ?? '';
+        $waktu_pasien_dilayani = $waktu_pasien_dilayani ?: $now;
 
-        $this->updateJsonUGD($rjNo, $this->dataDaftarUgd);
-
-        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Anamnesa berhasil disimpan.");
+        return [$p_status, $waktu_pasien_datang, $waktu_pasien_dilayani];
     }
-    // insert and update record end////////////////
+
 
 
     private function findData($rjno): void
@@ -454,7 +486,6 @@ class Anamnesa extends Component
                     "rute" => $this->rekonsiliasiObat['rute']
                 ];
 
-                $this->store();
                 // reset rekonsiliasiObat
                 $this->reset(['rekonsiliasiObat']);
             } else {
@@ -470,7 +501,6 @@ class Anamnesa extends Component
 
         $rekonsiliasiObat = collect($this->dataDaftarUgd['anamnesa']['rekonsiliasiObat'])->where("namaObat", '!=', $namaObat)->toArray();
         $this->dataDaftarUgd['anamnesa']['rekonsiliasiObat'] = $rekonsiliasiObat;
-        $this->store();
     }
 
 

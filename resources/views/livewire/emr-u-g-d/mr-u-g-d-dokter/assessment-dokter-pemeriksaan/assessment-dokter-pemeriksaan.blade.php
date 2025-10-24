@@ -356,7 +356,7 @@
                                         ),
                                     )"
                                     :disabled=$disabledPropertyRjStatus
-                                    wire:model.debounce.500ms="dataDaftarUgd.pemeriksaan.suspekAkibatKerja.keteranganSuspekAkibatKerja" />
+                                    wire:model="dataDaftarUgd.pemeriksaan.suspekAkibatKerja.keteranganSuspekAkibatKerja" />
                             </div>
 
                         </div>
@@ -369,27 +369,6 @@
                     </div>
 
                 </div>
-
-
-
-
-                {{-- <div class="sticky bottom-0 flex justify-between px-4 py-3 bg-gray-50 sm:px-6">
-
-                    <div class="">
-                    </div>
-                    <div>
-                        <div wire:loading wire:target="store">
-                            <x-loading />
-                        </div>
-
-                        <x-green-button :disabled=$disabledPropertyRjStatus wire:click.prevent="store()" type="button"
-                            wire:loading.remove>
-                            Simpan Objective
-                        </x-green-button>
-                    </div>
-                </div> --}}
-
-
 
 
             </div>

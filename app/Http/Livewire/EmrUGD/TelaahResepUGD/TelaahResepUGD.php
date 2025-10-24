@@ -3,26 +3,26 @@
 namespace App\Http\Livewire\EmrUGD\TelaahResepUGD;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 
 use Livewire\Component;
-use Livewire\WithPagination;
 
+use Livewire\WithPagination;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 use Carbon\Carbon;
-use Spatie\ArrayToXml\ArrayToXml;
 use App\Http\Traits\EmrUGD\EmrUGDTrait;
 
 
 class TelaahResepUGD extends Component
 {
-    use WithPagination, EmrUGDTrait;
+    use  WithPagination, EmrUGDTrait;
 
     protected $listeners = [
-        'syncronizeAssessmentDokterUGDFindData' => 'sumAll',
-        'syncronizeAssessmentPerawatUGDFindData' => 'sumAll'
+        'ugd:refresh-summary' => 'sumAll',
     ];
 
     // primitive Variable
@@ -456,60 +456,82 @@ class TelaahResepUGD extends Component
 
     public function setttdTelaahResep($rjNo)
     {
-        $myUserNameActive = auth()->user()->myuser_name;
-        if (auth()->user()->hasRole('Apoteker')) {
-            if (isset($this->dataDaftarUgd['telaahResep']['penanggungJawab']) == false) {
-                $this->dataDaftarUgd['telaahResep']['penanggungJawab'] = [
-                    'userLog' => auth()->user()->myuser_name,
-                    'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'),
-                    'userLogCode' => auth()->user()->myuser_code
-                ];
-
-                // DB::table('rstxn_ugdhdrs')
-                //     ->where('rj_no', $rjNo)
-                //     ->update([
-                //         'datadaftarugd_json' => json_encode($this->dataDaftarUgd, true),
-                //         'datadaftarUgd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
-                //     ]);
-
-                $this->updateJsonUGD($rjNo, $this->dataDaftarUgd);
-
-
-                $this->emit('syncronizeAssessmentDokterUGDFindData');
-                $this->emit('syncronizeAssessmentPerawatUGDFindData');
-            }
-        } else {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Anda tidak dapat melakukan TTD-E karena User Role " . $myUserNameActive . ' Bukan Apoteker.');
-            return;
-        }
+        $this->setTtdSection($rjNo, 'telaahResep');
     }
 
     public function setttdTelaahObat($rjNo)
     {
-        $myUserNameActive = auth()->user()->myuser_name;
-        if (auth()->user()->hasRole('Apoteker')) {
-            if (isset($this->dataDaftarUgd['telaahObat']['penanggungJawab']) == false) {
-                $this->dataDaftarUgd['telaahObat']['penanggungJawab'] = [
-                    'userLog' => auth()->user()->myuser_name,
-                    'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'),
-                    'userLogCode' => auth()->user()->myuser_code
-                ];
+        $this->setTtdSection($rjNo, 'telaahObat');
+    }
 
-                // DB::table('rstxn_ugdhdrs')
-                //     ->where('rj_no', $rjNo)
-                //     ->update([
-                //         'datadaftarugd_json' => json_encode($this->dataDaftarUgd, true),
-                //         'datadaftarUgd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
-                //     ]);
+    private function setTtdSection(string $rjNo, string $section): void
+    {
+        $user = auth()->user();
+        $userName = $user->myuser_name ?? '-';
 
-                $this->updateJsonUGD($rjNo, $this->dataDaftarUgd);
+        // role gate
+        if (!$user->hasRole('Apoteker')) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError("Anda tidak dapat melakukan TTD-E karena user {$userName} bukan Apoteker.");
+            return;
+        }
 
+        // opsional: cek status UGD aktif
+        // if (!$this->checkUgdStatus()) return;
 
-                $this->emit('syncronizeAssessmentDokterUGDFindData');
-                $this->emit('syncronizeAssessmentPerawatUGDFindData');
-            }
-        } else {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Anda tidak dapat melakukan TTD-E karena User Role " . $myUserNameActive . ' Bukan Apoteker.');
+        if (!$rjNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('rjNo kosong.');
+            return;
+        }
+
+        $lockKey = "ugd:{$rjNo}";
+
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo, $section, $user) {
+                DB::transaction(function () use ($rjNo, $section, $user) {
+
+                    // 1) Ambil FRESH JSON dari DB agar tidak menimpa subtree lain
+                    $fresh = $this->findDataUGD($rjNo) ?: [];
+
+                    // 2) Pastikan subtree ada
+                    if (!isset($fresh[$section]) || !is_array($fresh[$section])) {
+                        $fresh[$section] = [];
+                    }
+
+                    // 3) Jika sudah ada penanggungJawab → informasikan & skip
+                    if (isset($fresh[$section]['penanggungJawab'])) {
+                        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                            ->addInfo('Sudah ditandatangani sebelumnya.');
+                        // tetap sinkronkan state lokal agar UI up-to-date
+                        $this->dataDaftarUgd = $fresh;
+                        return;
+                    }
+
+                    // 4) Set TTD pada subtree yang dimaksud
+                    $fresh[$section]['penanggungJawab'] = [
+                        'userLog'     => $user->myuser_name,
+                        'userLogDate' => Carbon::now(config('app.timezone'))->format('d/m/Y H:i:s'),
+                        'userLogCode' => $user->myuser_code,
+                    ];
+
+                    // 5) Commit atomik: simpan JSON
+                    $this->updateJsonUGD($rjNo, $fresh);
+
+                    // 6) Sinkronkan state lokal agar UI langsung update
+                    $this->dataDaftarUgd = $fresh;
+
+                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                        ->addSuccess('TTD-E berhasil disimpan.');
+                });
+            });
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
+            return;
+        } catch (\Throwable $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Gagal menyimpan TTD-E.');
             return;
         }
     }

@@ -5,12 +5,6 @@
         <div class="px-4 bg-white snap-mandatory snap-y">
 
             @php
-                $pasieenTitle =
-                    'Pasien RegNo : ' .
-                    $dataPasien['pasien']['regNo'] .
-                    ' Nomer Pelayanan :' .
-                    $dataDaftarUgd['noAntrian'];
-
                 $tingkatKegawatan = $dataDaftarUgd['anamnesa']['pengkajianPerawatan']['tingkatKegawatan'] ?? 'P0';
 
                 $tingkatKegawatanBgColor = match ($tingkatKegawatan) {

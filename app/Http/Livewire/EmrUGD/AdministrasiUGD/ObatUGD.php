@@ -6,15 +6,6 @@ use Illuminate\Support\Facades\DB;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-// use Carbon\Carbon;
-// use Illuminate\Support\Facades\Validator;
-
-
-// use App\Http\Traits\customErrorMessagesTrait;
-
-// use Illuminate\Support\Str;
-// use Spatie\ArrayToXml\ArrayToXml;
-// use Exception;
 
 
 class ObatUGD extends Component
@@ -23,11 +14,7 @@ class ObatUGD extends Component
 
 
     // listener from blade////////////////
-    protected $listeners = [
-        'storeAssessmentDokterUGD' => 'store',
-        'syncronizeAssessmentDokterUGDFindData' => 'mount',
-        'syncronizeAssessmentPerawatUGDFindData' => 'mount'
-    ];
+    protected $listeners = [];
 
 
     //////////////////////////////z
@@ -46,41 +33,48 @@ class ObatUGD extends Component
 
     private function findData($rjno): void
     {
-        $findData = DB::table('rstxn_ugdobats')
-            ->join('immst_products', 'immst_products.product_id', 'rstxn_ugdobats.product_id')
-            ->select('rstxn_ugdobats.product_id as product_id', 'product_name', 'qty', 'price', 'rjobat_dtl')
-            ->where('rj_no', $rjno)
+        $rows = DB::table('rstxn_ugdobats')
+            ->join('immst_products', 'immst_products.product_id', '=', 'rstxn_ugdobats.product_id')
+            ->select([
+                'rstxn_ugdobats.product_id as product_id',
+                'immst_products.product_name',
+                'rstxn_ugdobats.qty',
+                'rstxn_ugdobats.price',
+                'rstxn_ugdobats.rjobat_dtl',
+            ])
+            ->where('rstxn_ugdobats.rj_no', $rjno)
+            ->orderBy('rjobat_dtl')   // optional: urutkan
             ->get();
 
-
-
-        if ($findData) {
-            $this->dataDaftarUgd['rjObat'] = json_decode(json_encode($findData, true), true);
-        } else {
-
-            $this->dataDaftarUgd['rjObat'] = [];
-        }
+        // cukup toArray(); tidak perlu json_encode/decode
+        $this->dataDaftarUgd['rjObat'] = json_decode(json_encode($rows), true);
     }
 
 
 
-    public function checkUgdStatus()
+
+    private function checkUgdStatus(): bool
     {
-        $lastInserted = DB::table('rstxn_ugdhdrs')
+        $row = DB::table('rstxn_ugdhdrs')
             ->select('rj_status')
             ->where('rj_no', $this->rjNoRef)
             ->first();
 
-        if ($lastInserted->rj_status !== 'A') {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Pasien Sudah Pulang, Trasaksi Terkunci.");
-            return (dd('Pasien Sudah Pulang, Trasaksi Terkuncixx.'));
+        if (!$row || $row->rj_status !== 'A') {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError("Pasien Sudah Pulang, Transaksi Terkunci.");
+            return false;
         }
+        return true;
     }
-
 
     // when new form instance
     public function mount()
     {
+        if (!$this->rjNoRef) {
+            $this->dataDaftarUgd['rjObat'] = [];
+            return;
+        }
         $this->findData($this->rjNoRef);
     }
 

@@ -3,26 +3,22 @@
 namespace App\Http\Livewire\EmrUGD\GeneralConsentPasienUGD;
 
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Contracts\Cache\LockTimeoutException;
+use Illuminate\Validation\ValidationException;
 use Livewire\Component;
-use Livewire\WithPagination;
 use Carbon\Carbon;
 
-use Spatie\ArrayToXml\ArrayToXml;
 use App\Http\Traits\EmrUGD\EmrUGDTrait;
-use App\Http\Traits\customErrorMessagesTrait;
 
 
 class GeneralConsentPasienUGD extends Component
 {
-    use WithPagination, EmrUGDTrait, customErrorMessagesTrait;
+    use  EmrUGDTrait;
 
 
     // listener from blade////////////////
-    protected $listeners = [
-        'syncronizeAssessmentDokterUGDFindData' => 'mount',
-        'syncronizeAssessmentPerawatUGDFindData' => 'mount'
-    ];
+    protected $listeners = [];
 
     //////////////////////////////
     // Ref on top bar
@@ -45,100 +41,138 @@ class GeneralConsentPasienUGD extends Component
     ];
     public $signature;
 
-
     protected $rules = [
-        'dataDaftarUgd.generalConsentPasienUGD.signature' => 'required',
-        'dataDaftarUgd.generalConsentPasienUGD.signatureDate' => 'required|date_format:d/m/Y H:i:s',
-        'dataDaftarUgd.generalConsentPasienUGD.wali' => 'required',
-        'dataDaftarUgd.generalConsentPasienUGD.agreement' => 'required',
-        'dataDaftarUgd.generalConsentPasienUGD.petugasPemeriksa' => 'required',
+        'dataDaftarUgd.generalConsentPasienUGD.signature'            => 'required',
+        'dataDaftarUgd.generalConsentPasienUGD.signatureDate'        => 'required|date_format:d/m/Y H:i:s',
+        'dataDaftarUgd.generalConsentPasienUGD.wali'                 => 'required',
+        'dataDaftarUgd.generalConsentPasienUGD.agreement'            => 'required|in:0,1',
+        'dataDaftarUgd.generalConsentPasienUGD.petugasPemeriksa'     => 'required',
         'dataDaftarUgd.generalConsentPasienUGD.petugasPemeriksaDate' => 'required|date_format:d/m/Y H:i:s',
         'dataDaftarUgd.generalConsentPasienUGD.petugasPemeriksaCode' => 'required',
-
-
     ];
 
-    protected $attribute = [
-        'dataDaftarUgd.generalConsentPasienUGD.signature' => 'Tanda Tangan',
-        'dataDaftarUgd.generalConsentPasienUGD.petugasPemeriksa' => 'Petugas Pemeriksa',
-        'dataDaftarUgd.generalConsentPasienUGD.petugasPemeriksaCode' => 'Kode Petugas Pemeriksa',
-        'dataDaftarUgd.generalConsentPasienUGD.wali' => 'Wali',
-        'dataDaftarUgd.generalConsentPasienUGD.agreement' => 'Persetujuan',
+    protected $messages = [
+        'required'    => ':attribute wajib diisi.',
+        'in'          => ':attribute tidak valid.',
+        'date_format' => ':attribute harus dengan format dd/mm/yyyy hh:mm:ss',
+    ];
+
+    // pakai nama $attributes (param ke-3 validate)
+    protected $attributes = [
+        'dataDaftarUgd.generalConsentPasienUGD.signature'            => 'Tanda tangan pasien/wali',
+        'dataDaftarUgd.generalConsentPasienUGD.signatureDate'        => 'Waktu tanda tangan',
+        'dataDaftarUgd.generalConsentPasienUGD.wali'                 => 'Nama wali',
+        'dataDaftarUgd.generalConsentPasienUGD.agreement'            => 'Persetujuan',
+        'dataDaftarUgd.generalConsentPasienUGD.petugasPemeriksa'     => 'Petugas pemeriksa',
+        'dataDaftarUgd.generalConsentPasienUGD.petugasPemeriksaDate' => 'Waktu tanda tangan petugas',
+        'dataDaftarUgd.generalConsentPasienUGD.petugasPemeriksaCode' => 'Kode petugas pemeriksa',
     ];
 
     public function submit()
     {
-        $this->dataDaftarUgd['generalConsentPasienUGD']['signature'] = $this->signature;
-        $this->dataDaftarUgd['generalConsentPasienUGD']['signatureDate'] = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
-        $this->validateDataGeneralConsetPasienUgd();
+
+        if (empty($this->signature)) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Tanda tangan pasien/wali belum diisi.');
+            return;
+        }
+
+        // set tanda tangan dari canvas/signpad di UI
+        $this->dataDaftarUgd['generalConsentPasienUGD']['signature']     = (string)($this->signature ?? '');
+        $this->dataDaftarUgd['generalConsentPasienUGD']['signatureDate'] = Carbon::now(config('app.timezone'))->format('d/m/Y H:i:s');
+
+        // validasi sebelum simpan
+        try {
+            $this->validate($this->rules, $this->messages, $this->attributes);
+        } catch (ValidationException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError($e->validator->errors()->first());
+            return;
+        }
+
         $this->store();
     }
-    private function validateDataGeneralConsetPasienUgd(): void
-    {
-        // customErrorMessages
-        // $messages = customErrorMessagesTrait::messages();
-        $messages = [];
 
-        // Proses Validasi///////////////////////////////////////////
-        try {
-            $this->validate($this->rules, $messages);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Lakukan Pengecekan kembali Input Data.");
-            $this->validate($this->rules, $messages, $this->attribute);
-        }
-    }
     public function store()
     {
-        // Validate RJ
+        // cek status transaksi masih aktif
+        if (!$this->checkUgdStatus()) return;
 
-        // Logic update mode start //////////
-        $this->updateDataUgd($this->dataDaftarUgd['rjNo']);
+        $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
+        if (!$rjNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('rjNo kosong.');
+            return;
+        }
 
-        $this->emit('syncronizeAssessmentPerawatUGDFindData');
-    }
+        $lockKey = "ugd:{$rjNo}";
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
+                DB::transaction(function () use ($rjNo) {
+                    // ambil data TERBARU agar tidak menimpa modul lain
+                    $fresh = $this->findDataUGD($rjNo) ?: [];
 
-    private function updateDataUgd($rjNo): void
-    {
-        // update table trnsaksi
-        // DB::table('rstxn_ugdhdrs')
-        //     ->where('rj_no', $rjNo)
-        //     ->update([
-        //         'datadaftarugd_json' => json_encode($this->dataDaftarUgd, true),
-        //         'datadaftarUgd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
-        //     ]);
+                    if (!isset($fresh['generalConsentPasienUGD']) || !is_array($fresh['generalConsentPasienUGD'])) {
+                        $fresh['generalConsentPasienUGD'] = $this->generalConsentPasienUGD;
+                    }
 
-        $this->updateJsonUGD($rjNo, $this->dataDaftarUgd);
+                    // patch hanya subtree general consent
+                    $fresh['generalConsentPasienUGD'] = array_replace(
+                        $fresh['generalConsentPasienUGD'],
+                        (array)($this->dataDaftarUgd['generalConsentPasienUGD'] ?? [])
+                    );
 
-        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Signature berhasil disimpan.");
+                    $this->updateJsonUGD($rjNo, $fresh);
+                    $this->dataDaftarUgd = $fresh;
+                });
+            });
+
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess("Signature berhasil disimpan.");
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
+        } catch (\Throwable $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Gagal menyimpan General Consent.');
+        }
     }
 
     private function findData($rjno): void
     {
-        $this->dataDaftarUgd = $this->findDataUGD($rjno);
-        // dd($this->dataDaftarUgd);
-        // jika generalConsentPasienUGD tidak ditemukan tambah variable generalConsentPasienUGD pda array
-        if (isset($this->dataDaftarUgd['generalConsentPasienUGD']) == false) {
+        $this->dataDaftarUgd = $this->findDataUGD($rjno) ?: [];
+
+        if (!isset($this->dataDaftarUgd['generalConsentPasienUGD']) || !is_array($this->dataDaftarUgd['generalConsentPasienUGD'])) {
             $this->dataDaftarUgd['generalConsentPasienUGD'] = $this->generalConsentPasienUGD;
         }
     }
 
     public function setPetugasPemeriksa()
     {
-        // $myRoles = json_decode(auth()->user()->roles, true);
-        $myUserCodeActive = auth()->user()->myuser_code;
-        $myUserNameActive = auth()->user()->myuser_name;
-        // $myUserTtdActive = auth()->user()->myuser_ttd_image;
+        $code = auth()->user()->myuser_code ?? '';
+        $name = auth()->user()->myuser_name ?? '';
 
-
-        if (!$this->dataDaftarUgd['generalConsentPasienUGD']['petugasPemeriksa']) {
-            $this->dataDaftarUgd['generalConsentPasienUGD']['petugasPemeriksa'] = $myUserNameActive;
-            $this->dataDaftarUgd['generalConsentPasienUGD']['petugasPemeriksaCode'] = $myUserCodeActive;
-            $this->dataDaftarUgd['generalConsentPasienUGD']['petugasPemeriksaDate'] = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
-            $this->validateDataGeneralConsetPasienUgd();
+        if (empty($this->dataDaftarUgd['generalConsentPasienUGD']['petugasPemeriksa'])) {
+            $this->dataDaftarUgd['generalConsentPasienUGD']['petugasPemeriksa']     = $name;
+            $this->dataDaftarUgd['generalConsentPasienUGD']['petugasPemeriksaCode'] = $code;
+            $this->dataDaftarUgd['generalConsentPasienUGD']['petugasPemeriksaDate'] = Carbon::now(config('app.timezone'))->format('d/m/Y H:i:s');
         } else {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Signature Petugas Pemeriksa sudah ada.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError("Signature Petugas Pemeriksa sudah ada.");
         }
+    }
+
+    private function checkUgdStatus(): bool
+    {
+        $row = DB::table('rstxn_ugdhdrs')->select('rj_status')
+            ->where('rj_no', $this->rjNoRef)->first();
+
+        if (!$row || $row->rj_status !== 'A') {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Pasien Sudah Pulang, Transaksi Terkunci.');
+            return false;
+        }
+        return true;
     }
 
     // when new form instance

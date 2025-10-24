@@ -2,27 +2,27 @@
 
 namespace App\Http\Livewire\EmrUGD\AdministrasiUGD;
 
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Support\Facades\DB;
-
-use Livewire\Component;
-use Livewire\WithPagination;
 use Carbon\Carbon;
 
-use Spatie\ArrayToXml\ArrayToXml;
+use Livewire\Component;
+
 use App\Http\Traits\EmrUGD\EmrUGDTrait;
 
 
 class AdministrasiUGD extends Component
 {
-    use WithPagination, EmrUGDTrait;
+    use  EmrUGDTrait;
 
     protected $listeners = [
-        'syncronizeAssessmentDokterUGDFindData' => 'sumAll',
-        'syncronizeAssessmentPerawatUGDFindData' => 'sumAll'
+        'ugd:refresh-summary' => 'sumAll',
     ];
 
     // dataDaftarUgd RJ
     public $rjNoRef;
+    public $dataDaftarUgd = [];
 
     public int $sumRsAdmin;
     public int $sumRjAdmin;
@@ -120,32 +120,57 @@ class AdministrasiUGD extends Component
     }
 
 
-    public function setSelesaiAdministrasiStatus($rjNo)
+    public function setSelesaiAdministrasiStatus(string $rjNo): void
     {
+        if (!$rjNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('rjNo kosong.');
+            return;
+        }
 
-        $dataDaftarUgd = $this->findData($rjNo);
+        $lockKey = "ugd:{$rjNo}"; // 1 lock per rjNo
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
+                DB::transaction(function () use ($rjNo) {
+                    // Ambil FRESH agar tidak menimpa modul lain
+                    $fresh = $this->findDataUGD($rjNo) ?: [];
 
-        if (isset($dataDaftarUgd['AdministrasiRj']) == false) {
-            $dataDaftarUgd['AdministrasiRj'] = [
-                'userLog' => auth()->user()->myuser_name,
-                'userLogDate' => Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s')
-            ];
+                    // Sudah ada? Idempoten + info siapa yang mengunci
+                    if (!empty($fresh['AdministrasiRj'])) {
+                        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                            ->addError("Administrasi sudah tersimpan oleh {$fresh['AdministrasiRj']['userLog']}.");
+                        // sinkronkan state lokal
+                        $this->dataDaftarUgd = $fresh;
+                        return;
+                    }
 
-            // DB::table('rstxn_ugdhdrs')
-            //     ->where('rj_no', $rjNo)
-            //     ->update([
-            //         'datadaftarugd_json' => json_encode($dataDaftarUgd, true),
-            //         'datadaftarugd_xml' => ArrayToXml::convert($dataDaftarUgd),
-            //     ]);
+                    // Set tanda selesai administrasi
+                    $fresh['AdministrasiRj'] = [
+                        'userLog'     => auth()->user()->myuser_name ?? '-',
+                        'userLogCode' => auth()->user()->myuser_code ?? null,
+                        'userLogDate' => Carbon::now(config('app.timezone'))->format('d/m/Y H:i:s'),
+                    ];
 
-            $this->updateJsonUGD($rjNo, $dataDaftarUgd);
+                    // Simpan atomik
+                    $this->updateJsonUGD($rjNo, $fresh);
 
+                    // Sinkronkan state lokal untuk UI
+                    $this->dataDaftarUgd = $fresh;
 
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Administrasi berhasil disimpan.");
-            $this->emit('syncronizeAssessmentDokterUGDFindData');
-            $this->emit('syncronizeAssessmentPerawatUGDFindData');
-        } else {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Administrasi sudah tersimpan oleh." . $dataDaftarUgd['AdministrasiRj']['userLog']);
+                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                        ->addSuccess("Administrasi berhasil disimpan.");
+
+                    // Refresh ringkasan/totals
+                    // Livewire v2
+                    $this->emit('ugd:refresh-summary');
+                });
+            });
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
+        } catch (\Throwable $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Gagal menyimpan Administrasi.');
         }
     }
 

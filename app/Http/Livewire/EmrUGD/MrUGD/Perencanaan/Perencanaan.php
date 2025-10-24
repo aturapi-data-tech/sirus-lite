@@ -3,16 +3,14 @@
 namespace App\Http\Livewire\EmrUGD\MrUGD\Perencanaan;
 
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Contracts\Cache\LockTimeoutException;
+use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Http\Traits\customErrorMessagesTrait;
+use App\Http\Traits\EmrUGD\EmrUGDTrait;
 
 use Carbon\Carbon;
-
-use Illuminate\Support\Str;
-use Spatie\ArrayToXml\ArrayToXml;
-use App\Http\Traits\EmrUGD\EmrUGDTrait;
 
 
 class Perencanaan extends Component
@@ -21,7 +19,8 @@ class Perencanaan extends Component
 
     // listener from blade////////////////
     protected $listeners = [
-        'syncronizeAssessmentPerawatUGDFindData' => 'mount'
+        'storeAssessmentDokterUGD' => 'store',
+        'storeAssessmentDokterUGDPerencanaan' => 'store',
     ];
 
 
@@ -126,11 +125,7 @@ class Perencanaan extends Component
     {
         // dd($propertyName);
         $this->validateOnly($propertyName);
-        if ($propertyName != 'activeTabRacikanNonRacikan') {
-            $this->store();
-        }
     }
-
 
 
 
@@ -158,17 +153,29 @@ class Perencanaan extends Component
     // validate Data RJ//////////////////////////////////////////////////
     private function validateDataUgd(): void
     {
-        // customErrorMessages
-        // $messages = customErrorMessagesTrait::messages();
-        $messages = [];
+        $rules = [
+            'dataDaftarUgd.perencanaan.pengkajianMedis.waktuPemeriksaan'  => 'required|date_format:d/m/Y H:i:s',
+            'dataDaftarUgd.perencanaan.pengkajianMedis.selesaiPemeriksaan' => 'required|date_format:d/m/Y H:i:s',
+        ];
+
+        $attributes = [
+            'dataDaftarUgd.perencanaan.pengkajianMedis.waktuPemeriksaan'   => 'Waktu Pemeriksaan',
+            'dataDaftarUgd.perencanaan.pengkajianMedis.selesaiPemeriksaan' => 'Selesai Pemeriksaan',
+        ];
+
+        $messages = [
+            'required'    => ':attribute wajib diisi.',
+            'date_format' => ':attribute tidak sesuai format (dd/mm/YYYY HH:mm:ss).',
+        ];
 
         // Proses Validasi///////////////////////////////////////////
         try {
-            $this->validate($this->rules, $messages);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Lakukan Pengecekan kembali Input Data.");
-            $this->validate($this->rules, $messages);
+            $this->validate($rules, $messages, $attributes);
+        } catch (ValidationException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError("Lakukan pengecekan kembali input data.");
+            // kalau mau, bisa return; supaya gak validate 2x
+            return;
         }
     }
 
@@ -176,69 +183,84 @@ class Perencanaan extends Component
     // insert and update record start////////////////
     public function store()
     {
-        // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
-        $this->setDataPrimer();
-
-        // Validate RJ
         $this->validateDataUgd();
 
-        // Logic update mode start //////////
-        $this->updateDataUgd($this->dataDaftarUgd['rjNo']);
+        $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
+        if (!$rjNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("rjNo kosong.");
+            return;
+        }
 
-        $this->emit('syncronizeAssessmentPerawatUGDFindData');
+        $lockKey = "ugd:{$rjNo}";
+
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
+                // 1) Ambil FRESH dari DB di dalam lock
+                $fresh = $this->findDataUGD($rjNo) ?: [];
+
+                // 2) Pastikan subtree ada lalu PATCH hanya 'perencanaan'
+                if (!isset($fresh['perencanaan']) || !is_array($fresh['perencanaan'])) {
+                    $fresh['perencanaan'] = $this->perencanaan;
+                }
+                $fresh['perencanaan'] = (array) ($this->dataDaftarUgd['perencanaan'] ?? $this->perencanaan);
+
+                // 3) Hitung header fields (p_status & waktu) aman
+                $p_status = 'P0';
+                if (!empty($fresh['anamnesa']['pengkajianPerawatan']['tingkatKegawatan'])) {
+                    $p_status = $fresh['anamnesa']['pengkajianPerawatan']['tingkatKegawatan'];
+                }
+
+                $waktu_pasien_datang =
+                    $fresh['anamnesa']['pengkajianPerawatan']['jamDatang']
+                    ?? Carbon::now(config('app.timezone'))->format('d/m/Y H:i:s');
+
+                $waktu_pasien_dilayani =
+                    $fresh['perencanaan']['pengkajianMedis']['waktuPemeriksaan']
+                    ?? Carbon::now(config('app.timezone'))->format('d/m/Y H:i:s');
+
+                // 4) Commit atomik
+                DB::transaction(function () use ($rjNo, $fresh, $p_status, $waktu_pasien_datang, $waktu_pasien_dilayani) {
+                    // kunci header
+                    DB::table('rstxn_ugdhdrs')->where('rj_no', $rjNo)->lockForUpdate()->first();
+
+                    DB::table('rstxn_ugdhdrs')
+                        ->where('rj_no', $rjNo)
+                        ->update([
+                            'p_status'             => $p_status,
+                            'waktu_pasien_datang'  => DB::raw("to_date('{$waktu_pasien_datang}','dd/mm/yyyy hh24:mi:ss')"),
+                            'waktu_pasien_dilayani' => DB::raw("to_date('{$waktu_pasien_dilayani}','dd/mm/yyyy hh24:mi:ss')"),
+                        ]);
+
+                    // simpan JSON besar (safe)
+                    $this->updateJsonUGD($rjNo, $fresh);
+                });
+
+                // 5) sinkronkan state lokal
+                $this->dataDaftarUgd = $fresh;
+            });
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
+            return;
+        }
+
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+            ->addSuccess("Perencanaan berhasil disimpan.");
     }
 
-    private function updateDataUgd($rjNo): void
-    {
-        $p_status = (isset($this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['tingkatKegawatan']) ?
-            ($this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['tingkatKegawatan'] ?
-                $this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['tingkatKegawatan']
-                : 'P0')
-            : 'P0');
 
-        $waktu_pasien_datang = (isset($this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['jamDatang']) ?
-            ($this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['jamDatang'] ?
-                $this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['jamDatang']
-                : Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'))
-            : Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'));
 
-        $waktu_pasien_dilayani = (isset($this->dataDaftarUgd['perencanaan']['pengkajianMedis']['waktuPemeriksaan']) ?
-            ($this->dataDaftarUgd['perencanaan']['pengkajianMedis']['waktuPemeriksaan'] ?
-                $this->dataDaftarUgd['perencanaan']['pengkajianMedis']['waktuPemeriksaan']
-                : Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'))
-            : Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s'));
-
-        // update table trnsaksi
-        DB::table('rstxn_ugdhdrs')
-            ->where('rj_no', $rjNo)
-            ->update([
-                // 'datadaftarugd_json' => json_encode($this->dataDaftarUgd, true),
-                // 'datadaftarugd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
-                'p_status' => $p_status,
-                'waktu_pasien_datang' => DB::raw("to_date('" . $waktu_pasien_datang . "','dd/mm/yyyy hh24:mi:ss')"),
-                'waktu_pasien_dilayani' => DB::raw("to_date('" . $waktu_pasien_dilayani . "','dd/mm/yyyy hh24:mi:ss')"),
-            ]);
-
-        $this->updateJsonUGD($rjNo, $this->dataDaftarUgd);
-
-        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Perencanaan berhasil disimpan.");
-    }
     // insert and update record end////////////////
 
 
     private function findData($rjno): void
     {
-
         $this->dataDaftarUgd = $this->findDataUGD($rjno);
-        // dd($this->dataDaftarUgd);
-        // jika perencanaan tidak ditemukan tambah variable perencanaan pda array
-        if (isset($this->dataDaftarUgd['perencanaan']) == false) {
+        if (!isset($this->dataDaftarUgd['perencanaan'])) {
             $this->dataDaftarUgd['perencanaan'] = $this->perencanaan;
         }
     }
 
-    // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
-    private function setDataPrimer(): void {}
 
     public function setWaktuPemeriksaan($myTime)
     {
@@ -253,30 +275,53 @@ class Perencanaan extends Component
     private function validateDrPemeriksa()
     {
         // Validasi dulu
-        $messages = [];
-        $myRules = [
-            // 'dataDaftarUgd.pemeriksaan.tandaVital.sistolik' => 'required|numeric',
-            // 'dataDaftarUgd.pemeriksaan.tandaVital.distolik' => 'required|numeric',
-            'dataDaftarUgd.pemeriksaan.tandaVital.frekuensiNadi' => 'required|numeric',
-            'dataDaftarUgd.pemeriksaan.tandaVital.frekuensiNafas' => 'required|numeric',
-            'dataDaftarUgd.pemeriksaan.tandaVital.suhu' => 'required|numeric',
-            'dataDaftarUgd.pemeriksaan.tandaVital.spo2' => 'numeric',
-            'dataDaftarUgd.pemeriksaan.tandaVital.gda' => 'numeric',
+        $rules = [
+            // vitals
+            'dataDaftarUgd.pemeriksaan.tandaVital.frekuensiNadi'   => 'required|numeric',
+            'dataDaftarUgd.pemeriksaan.tandaVital.frekuensiNafas'  => 'required|numeric',
+            'dataDaftarUgd.pemeriksaan.tandaVital.suhu'            => 'required|numeric',
+            'dataDaftarUgd.pemeriksaan.tandaVital.spo2'            => 'nullable|numeric',
+            'dataDaftarUgd.pemeriksaan.tandaVital.gda'             => 'nullable|numeric',
 
-            'dataDaftarUgd.pemeriksaan.nutrisi.bb' => 'required|numeric',
-            'dataDaftarUgd.pemeriksaan.nutrisi.tb' => 'required|numeric',
-            'dataDaftarUgd.pemeriksaan.nutrisi.imt' => 'required|numeric',
-            'dataDaftarUgd.pemeriksaan.nutrisi.lk' => 'numeric',
-            'dataDaftarUgd.pemeriksaan.nutrisi.lila' => 'numeric',
+            // nutrisi
+            'dataDaftarUgd.pemeriksaan.nutrisi.bb'                 => 'required|numeric',
+            'dataDaftarUgd.pemeriksaan.nutrisi.tb'                 => 'required|numeric',
+            'dataDaftarUgd.pemeriksaan.nutrisi.imt'                => 'required|numeric',
+            'dataDaftarUgd.pemeriksaan.nutrisi.lk'                 => 'nullable|numeric',
+            'dataDaftarUgd.pemeriksaan.nutrisi.lila'               => 'nullable|numeric',
 
+            // waktu
             'dataDaftarUgd.anamnesa.pengkajianPerawatan.jamDatang' => 'required|date_format:d/m/Y H:i:s',
         ];
+
+        $attributes = [
+            'dataDaftarUgd.pemeriksaan.tandaVital.frekuensiNadi'   => 'Frekuensi Nadi',
+            'dataDaftarUgd.pemeriksaan.tandaVital.frekuensiNafas'  => 'Frekuensi Nafas',
+            'dataDaftarUgd.pemeriksaan.tandaVital.suhu'            => 'Suhu',
+            'dataDaftarUgd.pemeriksaan.tandaVital.spo2'            => 'SpO2',
+            'dataDaftarUgd.pemeriksaan.tandaVital.gda'             => 'GDA',
+
+            'dataDaftarUgd.pemeriksaan.nutrisi.bb'                 => 'Berat Badan',
+            'dataDaftarUgd.pemeriksaan.nutrisi.tb'                 => 'Tinggi Badan',
+            'dataDaftarUgd.pemeriksaan.nutrisi.imt'                => 'IMT',
+            'dataDaftarUgd.pemeriksaan.nutrisi.lk'                 => 'Lingkar Kepala',
+            'dataDaftarUgd.pemeriksaan.nutrisi.lila'               => 'Lingkar Lengan Atas',
+
+            'dataDaftarUgd.anamnesa.pengkajianPerawatan.jamDatang' => 'Jam Datang Pasien',
+        ];
+
+        $messages = [
+            '*.required' => ':attribute wajib diisi.',
+            '*.numeric'  => ':attribute harus berupa angka.',
+            '*.date_format' => ':attribute tidak sesuai format (dd/mm/YYYY HH:mm:ss).',
+        ];
+
         // Proses Validasi///////////////////////////////////////////
         try {
-            $this->validate($myRules, $messages);
-        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->validate($rules, $messages, $attributes);
+        } catch (ValidationException $e) {
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Anda tidak dapat melakukan TTD-E karena data pemeriksaan belum lengkap.');
-            $this->validate($myRules, $messages);
+            return;
         }
         // Validasi dulu
     }
@@ -340,38 +385,122 @@ class Perencanaan extends Component
 
     public function simpanTerapi(): void
     {
-        $eresep = '' . PHP_EOL;
-        if (isset($this->dataDaftarUgd['eresep'])) {
+        // Pastikan status pasien masih aktif
+        // if (!$this->checkUgdStatus()) return;
 
-            foreach ($this->dataDaftarUgd['eresep'] as $key => $value) {
-                // NonRacikan
-                $catatanKhusus = ($value['catatanKhusus']) ? ' (' . $value['catatanKhusus'] . ')' : '';
-                $eresep .=  'R/' . ' ' . $value['productName'] . ' | No. ' . $value['qty'] . ' | S ' .  $value['signaX'] . 'dd' . $value['signaHari'] . $catatanKhusus . PHP_EOL;
-            }
+        $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
+        if (!$rjNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('rjNo kosong.');
+            return;
         }
 
-        $eresepRacikan = '' . PHP_EOL;
-        if (isset($this->dataDaftarUgd['eresepRacikan'])) {
-            // Racikan
-            foreach ($this->dataDaftarUgd['eresepRacikan'] as $key => $value) {
-                $jmlRacikan = ($value['qty']) ? 'Jml Racikan ' . $value['qty'] . ' | ' . $value['catatan'] . ' | S ' . $value['catatanKhusus'] . PHP_EOL : '';
-                $dosis = isset($value['dosis']) ? ($value['dosis'] ? $value['dosis'] : '') : '';
-                $eresepRacikan .= $value['noRacikan'] . '/ ' . $value['productName'] . ' - ' . $dosis .  PHP_EOL . $jmlRacikan;
-            };
-        }
-        $this->dataDaftarUgd['perencanaan']['terapi']['terapi'] = $eresep . $eresepRacikan;
+        $lockKey = "ugd:{$rjNo}";
 
-        $this->store();
-        $this->closeModalEresepUGD();
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
+                DB::transaction(function () use ($rjNo) {
+                    // Ambil FRESH dari DB supaya tidak menimpa subtree lain
+                    $fresh = $this->findDataUGD($rjNo) ?: [];
+
+                    // Build teks terapi dari data FRESH (bukan dari state lokal)
+                    $eresepStr   = $this->formatEresep($fresh['eresep'] ?? []);
+                    $racikanStr  = $this->formatEresepRacikan($fresh['eresepRacikan'] ?? []);
+                    $terapiTeks  = trim($eresepStr . $racikanStr);
+
+                    // Pastikan node perencanaan/terapi ada
+                    if (!isset($fresh['perencanaan']))            $fresh['perencanaan'] = [];
+                    if (!isset($fresh['perencanaan']['terapi']))  $fresh['perencanaan']['terapi'] = [];
+
+                    // PATCH hanya field terapi
+                    $fresh['perencanaan']['terapi']['terapi'] = $terapiTeks === '' ? PHP_EOL : $terapiTeks;
+
+                    // Commit JSON
+                    $this->updateJsonUGD($rjNo, $fresh);
+
+                    // Sinkronkan state lokal agar UI up-to-date
+                    $this->dataDaftarUgd = $fresh;
+                });
+            });
+
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess('Terapi berhasil disimpan.');
+            $this->closeModalEresepUGD();
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
+            return;
+        } catch (\Throwable $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Gagal menyimpan terapi.');
+            return;
+        }
+    }
+
+    /** ===== Helpers ===== */
+
+    private function formatEresep(array $items): string
+    {
+        if (empty($items)) return '';
+        $lines = [];
+
+        foreach ($items as $v) {
+            $nama   = $v['productName']   ?? '';
+            $qty    = $v['qty']           ?? '';
+            $sx     = $v['signaX']        ?? '';
+            $sh     = $v['signaHari']     ?? '';
+            $cat    = isset($v['catatanKhusus']) && $v['catatanKhusus'] !== ''
+                ? ' (' . $v['catatanKhusus'] . ')' : '';
+
+            // contoh: R/ Paracetamol | No. 10 | S 3dd1 (habis makan)
+            $lines[] = 'R/ ' . $nama . ' | No. ' . $qty . ' | S ' . $sx . 'dd' . $sh . $cat;
+        }
+
+        return implode(PHP_EOL, $lines) . PHP_EOL;
+    }
+
+    private function formatEresepRacikan(array $items): string
+    {
+        if (empty($items)) return '';
+        $lines = [];
+
+        foreach ($items as $v) {
+            $noR   = $v['noRacikan']  ?? 'R?';
+            $nama  = $v['productName'] ?? '';
+            $dosis = isset($v['dosis']) && $v['dosis'] !== '' ? $v['dosis'] : '';
+            $qty   = $v['qty'] ?? '';
+            $ctt   = $v['catatan'] ?? '';
+            $sig   = $v['catatanKhusus'] ?? ''; // di data kamu ini digunakan untuk instruksi S
+
+            // header racikan: R1/ Amoxicillin - 125mg/5ml
+            $header = rtrim($noR . '/ ' . $nama . ($dosis !== '' ? ' - ' . $dosis : ''), ' -');
+
+            // detail: Jml Racikan 10 | Larutkan dahulu | S 3x sehari
+            $detailParts = [];
+            if ($qty !== '')  $detailParts[] = 'Jml Racikan ' . $qty;
+            if ($ctt !== '')  $detailParts[] = $ctt;
+            if ($sig !== '')  $detailParts[] = 'S ' . $sig;
+
+            $detail = empty($detailParts) ? '' : implode(' | ', $detailParts);
+
+            $lines[] = $header . PHP_EOL . ($detail !== '' ? $detail . PHP_EOL : '');
+        }
+
+        return implode('', $lines); // sudah mengandung \n di dalamnya
     }
 
     // /////////////////////////////////////////
+
+
 
 
     // when new form instance
     public function mount()
     {
         $this->findData($this->rjNoRef);
+
+        // set dokter pemeriksa
+        // $this->setDrPemeriksa();
     }
 
 

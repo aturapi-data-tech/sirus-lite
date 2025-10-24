@@ -3,14 +3,14 @@
 namespace App\Http\Livewire\EmrUGD\MrUGD\Pemeriksaan;
 
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Contracts\Cache\LockTimeoutException;
+use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
 
-use Spatie\ArrayToXml\ArrayToXml;
 use App\Http\Traits\EmrUGD\EmrUGDTrait;
-use App\Http\Traits\customErrorMessagesTrait;
 
 use Illuminate\Support\Facades\Storage;
 use Livewire\WithFileUploads;
@@ -18,13 +18,12 @@ use Livewire\WithFileUploads;
 
 class Pemeriksaan extends Component
 {
-    use WithPagination, EmrUGDTrait, customErrorMessagesTrait, WithFileUploads;
+    use WithPagination, WithFileUploads, EmrUGDTrait;
 
     // listener from blade////////////////
     protected $listeners = [
-        'syncronizeAssessmentPerawatUGDFindData' => 'mount'
+        'storeAssessmentDokterUGD' => 'store',
     ];
-
 
 
     //////////////////////////////
@@ -504,7 +503,6 @@ class Pemeriksaan extends Component
         // dd($propertyName);
         $this->validateOnly($propertyName);
         $this->scoringIMT();
-        $this->store();
     }
 
     // lab
@@ -562,102 +560,126 @@ class Pemeriksaan extends Component
     private function renderPemeriksaanLaboratoriumIsSelected($key): void
     {
         $this->isPemeriksaanLaboratoriumSelected = collect($this->isPemeriksaanLaboratorium)
-            ->where('labStatus', 1);
+            ->where('labStatus', 1)->values()->all();
     }
 
     public function kirimLaboratorium()
     {
-        $sql = "select rj_status  from rstxn_ugdhdrs where rj_no=:rjNo";
-        $checkStatusRJ = DB::scalar($sql, [
-            "rjNo" => $this->dataDaftarUgd['rjNo'],
-        ]);
+        // 0) Gate status (QB)
+        $checkStatusRJ = DB::table('rstxn_ugdhdrs')
+            ->where('rj_no', $this->dataDaftarUgd['rjNo'])
+            ->value('rj_status');
 
-        if ($checkStatusRJ == 'A') {
-            // hasil Key = 0 atau urutan pemeriksan lab lebih dari 1
-            $this->isPemeriksaanLaboratoriumSelectedKeyHdr = collect(isset($this->dataDaftarUgd['pemeriksaan']['pemeriksaanPenunjang']['lab']) ? $this->dataDaftarUgd['pemeriksaan']['pemeriksaanPenunjang']['lab'] : [])->count();
+        if ($checkStatusRJ !== 'A') {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError("Pasien Sudah Pulang, Anda tidak bisa meneruskan pemeriksaan ini.");
+            return;
+        }
 
-            $sql = "select nvl(max(to_number(checkup_no))+1,1) from lbtxn_checkuphdrs";
-            $checkupNo = DB::scalar($sql);
+        $rjNo = $this->dataDaftarUgd['rjNo'];
 
-            // array Hdr
-            $this->dataDaftarUgd['pemeriksaan']['pemeriksaanPenunjang']['lab'][$this->isPemeriksaanLaboratoriumSelectedKeyHdr]['labHdr']['labHdrNo'] =  $checkupNo;
-            $this->dataDaftarUgd['pemeriksaan']['pemeriksaanPenunjang']['lab'][$this->isPemeriksaanLaboratoriumSelectedKeyHdr]['labHdr']['labHdrDate'] = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
+        // 1) Kumpulkan pilihan & anak (di luar lock biar cepat)
+        $selected = collect($this->isPemeriksaanLaboratoriumSelected ?? [])->values();
+        if ($selected->isEmpty()) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addInfo('Tidak ada item laboratorium yang dipilih.');
+            return;
+        }
 
+        $selectedIds = $selected->pluck('clabitem_id')->unique()->values();
 
-            // insert Hdr
-            DB::table('lbtxn_checkuphdrs')->insert([
-                'reg_no' => $this->dataDaftarUgd['regNo'],
-                'dr_id' => $this->dataDaftarUgd['drId'],
-                'checkup_date' => DB::raw("to_date('" . Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s') . "','dd/mm/yyyy hh24:mi:ss')"),
-                'status_rjri' => 'UGD',
-                'checkup_status' => 'P',
-                'ref_no' => $this->dataDaftarUgd['rjNo'],
-                'checkup_no' => $checkupNo,
+        $children = DB::table('lbmst_clabitems')
+            ->select('clabitem_id', 'price', 'clabitem_group', 'item_code', 'item_seq', 'clabitem_desc')
+            ->whereIn('clabitem_group', $selectedIds)
+            ->orderBy('clabitem_group')
+            ->orderBy('item_seq')
+            ->orderBy('clabitem_desc')
+            ->get()
+            ->groupBy('clabitem_group');
 
-            ]);
+        // 2) Critical section kecil
+        $lockKey = "ugd:{$rjNo}";
+        Cache::lock($lockKey, 5)->block(3, function () use ($rjNo, $selected, $children) {
+            DB::transaction(function () use ($rjNo, $selected, $children) {
 
+                // a) Ambil nomor header SEKALI
+                $checkupNo = (int) DB::table('lbtxn_checkuphdrs')
+                    ->max(DB::raw('nvl(to_number(checkup_no),0)')) + 1;
 
-            // hasil Key Dtl dari jml yang selected -1 karena array dimulai dari 0
-            $this->isPemeriksaanLaboratoriumSelectedKeyDtl = collect($this->isPemeriksaanLaboratoriumSelected)->count() - 1;
-
-
-            // array Dtl
-            $this->dataDaftarUgd['pemeriksaan']['pemeriksaanPenunjang']['lab'][$this->isPemeriksaanLaboratoriumSelectedKeyHdr]['labHdr']['labDtl'] =  collect($this->isPemeriksaanLaboratorium)
-                ->where('labStatus', 1)
-                ->toArray();
-
-            // insert Dtl
-            foreach ($this->dataDaftarUgd['pemeriksaan']['pemeriksaanPenunjang']['lab'][$this->isPemeriksaanLaboratoriumSelectedKeyHdr]['labHdr']['labDtl'] as $labDtl) {
-                $sql = "select nvl(to_number(max(checkup_dtl))+1,1) from LBTXN_CHECKUPDTLS";
-                $checkupDtl = DB::scalar($sql);
-
-                // insert Prise checkup dtl
-                DB::table('lbtxn_checkupdtls')->insert([
-                    'clabitem_id' => $labDtl['clabitem_id'],
-                    'checkup_no' => $checkupNo,
-                    'checkup_dtl' => $checkupDtl,
-                    'lab_item_code' => $labDtl['item_code'],
-                    'price' => $labDtl['price']
+                // b) Insert header (QB)
+                DB::table('lbtxn_checkuphdrs')->insert([
+                    'reg_no'         => $this->dataDaftarUgd['regNo'],
+                    'dr_id'          => $this->dataDaftarUgd['drId'],
+                    'checkup_date'   => DB::raw("to_date('" . now(config('app.timezone'))->format('d/m/Y H:i:s') . "','dd/mm/yyyy hh24:mi:ss')"),
+                    'status_rjri'    => 'UGD',
+                    'checkup_status' => 'P',
+                    'ref_no'         => $rjNo,
+                    'checkup_no'     => $checkupNo,
                 ]);
 
-                foreach ($this->isPemeriksaanLaboratoriumSelected as $isPemeriksaanLaboratoriumSelected) {
+                // c) Susun semua baris detail di memory
+                $rows = [];
+                foreach ($selected as $lab) {
+                    $rows[] = [
+                        'clabitem_id'   => $lab['clabitem_id'],
+                        'checkup_no'    => $checkupNo,
+                        // checkup_dtl diisi nanti (auto-increment lokal)
+                        'lab_item_code' => $lab['item_code'],
+                        'price'         => $lab['price'],
+                    ];
 
-                    // insert No Prise checkup dtl
-                    $items = DB::table('lbmst_clabitems')->select('clabitem_desc', 'clabitem_id', 'price', 'clabitem_group', 'item_code')
-                        ->where('clabitem_group', $labDtl['clabitem_id'])
-                        ->orderBy('item_seq', 'asc')
-                        ->orderBy('clabitem_desc', 'asc')
-                        ->get();
-
-                    foreach ($items as $item) {
-                        $sql = "select nvl(to_number(max(checkup_dtl))+1,1) from LBTXN_CHECKUPDTLS";
-                        $checkupDtl = DB::scalar($sql);
-
-                        DB::table('lbtxn_checkupdtls')->insert([
-                            'clabitem_id' => $item->clabitem_id,
-                            'checkup_no' => $checkupNo,
-                            'checkup_dtl' => $checkupDtl,
-                            'lab_item_code' => $item->item_code,
-                            'price' => $item->price
-                        ]);
-
-                        $this->isPemeriksaanLaboratoriumSelectedKeyDtl = $this->isPemeriksaanLaboratoriumSelectedKeyDtl + 1;
+                    foreach ($children->get($lab['clabitem_id'], collect()) as $child) {
+                        $rows[] = [
+                            'clabitem_id'   => $child->clabitem_id,
+                            'checkup_no'    => $checkupNo,
+                            'lab_item_code' => $child->item_code,
+                            'price'         => $child->price,
+                        ];
                     }
                 }
 
+                if (empty($rows)) {
+                    // Tidak ada detail, cukup patch JSON
+                    $hdrIdx = collect($this->dataDaftarUgd['pemeriksaan']['pemeriksaanPenunjang']['lab'] ?? [])->count();
+                    $this->dataDaftarUgd['pemeriksaan']['pemeriksaanPenunjang']['lab'][$hdrIdx]['labHdr'] = [
+                        'labHdrNo'   => $checkupNo,
+                        'labHdrDate' => now(config('app.timezone'))->format('d/m/Y H:i:s'),
+                        'labDtl'     => [],
+                    ];
+                    return;
+                }
 
-                $this->isPemeriksaanLaboratoriumSelectedKeyDtl = $this->isPemeriksaanLaboratoriumSelectedKeyDtl + 1;
-            }
+                // d) Ambil MAX(detail) SEKALI, lalu auto-increment lokal
+                $nextDtl = (int) DB::table('lbtxn_checkupdtls')
+                    ->max(DB::raw('nvl(to_number(checkup_dtl),0)'));
 
+                foreach ($rows as &$r) {
+                    $nextDtl++;
+                    $r['checkup_dtl'] = $nextDtl;
+                }
+                unset($r);
 
+                // e) Bulk insert detail via QB (chunk biar aman)
+                foreach (array_chunk($rows, 200) as $chunk) {
+                    DB::table('lbtxn_checkupdtls')->insert($chunk);
+                }
 
-            $this->updateDataUgd($this->dataDaftarUgd['rjNo']);
-            $this->closeModalLaboratorium();
-        } else {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Pasien Sudah Pulang, Anda tidak bisa meneruskan pemeriksaan ini.");
-            return;
-        }
+                // f) Patch JSON lokal
+                $hdrIdx = collect($this->dataDaftarUgd['pemeriksaan']['pemeriksaanPenunjang']['lab'] ?? [])->count();
+                $this->dataDaftarUgd['pemeriksaan']['pemeriksaanPenunjang']['lab'][$hdrIdx]['labHdr'] = [
+                    'labHdrNo'   => $checkupNo,
+                    'labHdrDate' => now(config('app.timezone'))->format('d/m/Y H:i:s'),
+                    'labDtl'     => collect($this->isPemeriksaanLaboratorium)->where('labStatus', 1)->values()->all(),
+                ];
+            });
+        });
+
+        // 3) Commit JSON UGD
+        $this->store();
+        $this->closeModalLaboratorium();
     }
+
+
     // Lab
 
     // Rad
@@ -682,7 +704,7 @@ class Pemeriksaan extends Component
     private function renderisPemeriksaanRadiologi()
     {
         if (empty($this->isPemeriksaanRadiologi)) {
-            $isPemeriksaanRadiologi = DB::table('rsmst_radiologis ')
+            $isPemeriksaanRadiologi = DB::table('rsmst_radiologis')
                 ->select('rad_desc', 'rad_price', 'rad_id')
                 ->orderBy('rad_desc', 'asc')
                 ->get();
@@ -713,78 +735,51 @@ class Pemeriksaan extends Component
     private function renderPemeriksaanRadiologiIsSelected($key): void
     {
         $this->isPemeriksaanRadiologiSelected = collect($this->isPemeriksaanRadiologi)
-            ->where('radStatus', 1);
+            ->where('radStatus', 1)->values()->all();
     }
 
     public function kirimRadiologi()
     {
+        $sql = "select rj_status from rstxn_ugdhdrs where rj_no=:rjNo";
+        $checkStatusRJ = DB::scalar($sql, ["rjNo" => $this->dataDaftarUgd['rjNo']]);
 
-        $sql = "select rj_status  from rstxn_ugdhdrs where rj_no=:rjNo";
-        $checkStatusRJ = DB::scalar($sql, [
-            "rjNo" => $this->dataDaftarUgd['rjNo'],
-        ]);
-
-        if ($checkStatusRJ == 'A') {
-            // hasil Key = 0 atau urutan pemeriksan lab lebih dari 1
-            $this->isPemeriksaanRadiologiSelectedKeyHdr = collect(isset($this->dataDaftarUgd['pemeriksaan']['pemeriksaanPenunjang']['rad']) ? $this->dataDaftarUgd['pemeriksaan']['pemeriksaanPenunjang']['rad'] : [])->count();
-
-            // $sql = "select nvl(max(rad_dtl)+1,1) from rstxn_ugdrads";
-            // $checkupNo = DB::scalar($sql);
-
-            // array Hdr
-            $this->dataDaftarUgd['pemeriksaan']['pemeriksaanPenunjang']['rad'][$this->isPemeriksaanRadiologiSelectedKeyHdr]['radHdr']['radHdrNo'] =  $this->dataDaftarUgd['rjNo'];
-            $this->dataDaftarUgd['pemeriksaan']['pemeriksaanPenunjang']['rad'][$this->isPemeriksaanRadiologiSelectedKeyHdr]['radHdr']['radHdrDate'] = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s');
-
-
-            // insert Hdr (Radiologi tidak di insert header / ikut txn rj)
-            // DB::table('lbtxn_checkuphdrs')->insert([
-            //     'reg_no' => $this->dataDaftarUgd['regNo'],
-            //     'dr_id' => $this->dataDaftarUgd['drId'],
-            //     'checkup_date' => DB::raw("to_date('" . Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s') . "','dd/mm/yyyy hh24:mi:ss')"),
-            //     'status_rjri' => 'RJ',
-            //     'checkup_status' => 'P',
-            //     'ref_no' => $this->dataDaftarUgd['rjNo'],
-            //     'checkup_no' => $checkupNo,
-
-            // ]);
-
-
-            // hasil Key Dtl dari jml yang selected -1 karena array dimulai dari 0
-            $this->isPemeriksaanRadiologiSelectedKeyDtl = collect($this->isPemeriksaanRadiologiSelected)->count() - 1;
-
-
-            // array Dtl
-            $this->dataDaftarUgd['pemeriksaan']['pemeriksaanPenunjang']['rad'][$this->isPemeriksaanRadiologiSelectedKeyHdr]['radHdr']['radDtl'] =  collect($this->isPemeriksaanRadiologi)
-                ->where('radStatus', 1)
-                ->toArray();
-
-            // insert Dtl
-            foreach ($this->dataDaftarUgd['pemeriksaan']['pemeriksaanPenunjang']['rad'][$this->isPemeriksaanRadiologiSelectedKeyHdr]['radHdr']['radDtl'] as $radDtl) {
-                $sql = "select nvl(max(rad_dtl)+1,1) from rstxn_ugdrads";
-                $checkupDtl = DB::scalar($sql);
-
-                // insert Prise checkup dtl
-                DB::table('rstxn_ugdrads')->insert([
-                    'rad_dtl' => $checkupDtl,
-                    'rad_id' => $radDtl['rad_id'],
-                    'rj_no' => $this->dataDaftarUgd['rjNo'],
-                    'rad_price' => $radDtl['rad_price'],
-                    'dr_radiologi' => 'dr. M.A. Budi Purwito, Sp.Rad.',
-                    'waktu_entry' => DB::raw("to_date('" . Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y H:i:s') . "','dd/mm/yyyy hh24:mi:ss')"),
-                ]);
-
-
-                $this->isPemeriksaanRadiologiSelectedKeyDtl = $this->isPemeriksaanRadiologiSelectedKeyDtl + 1;
-            }
-
-
-
-            $this->updateDataUgd($this->dataDaftarUgd['rjNo']);
-            $this->closeModalRadiologi();
-        } else {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Pasien Sudah Pulang, Anda tidak bisa meneruskan pemeriksaan ini.");
+        if ($checkStatusRJ !== 'A') {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError("Pasien Sudah Pulang, Anda tidak bisa meneruskan pemeriksaan ini.");
             return;
         }
+
+        $rjNo   = $this->dataDaftarUgd['rjNo'];
+        $lockKey = "ugd:{$rjNo}";
+
+        Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
+            DB::transaction(function () use ($rjNo) {
+                foreach ($this->isPemeriksaanRadiologiSelected as $radDtl) {
+                    $maxDtl = DB::table('rstxn_ugdrads')->max(DB::raw('to_number(rad_dtl)'));
+                    $next   = ($maxDtl ?? 0) + 1;
+
+                    DB::table('rstxn_ugdrads')->insert([
+                        'rad_dtl'     => $next,
+                        'rad_id'      => $radDtl['rad_id'],
+                        'rj_no'       => $rjNo,
+                        'rad_price'   => $radDtl['rad_price'],
+                        'dr_radiologi' => 'dr. M.A. Budi Purwito, Sp.Rad.',
+                        'waktu_entry' => DB::raw("to_date('" . now(config('app.timezone'))->format('d/m/Y H:i:s') . "','dd/mm/yyyy hh24:mi:ss')"),
+                    ]);
+                }
+
+                // patch JSON lokal → subtree penunjang/rad
+                $hdrIdx = collect($this->dataDaftarUgd['pemeriksaan']['pemeriksaanPenunjang']['rad'] ?? [])->count();
+                $this->dataDaftarUgd['pemeriksaan']['pemeriksaanPenunjang']['rad'][$hdrIdx]['radHdr'] = [
+                    'radHdrNo'   => $rjNo,
+                    'radHdrDate' => now(config('app.timezone'))->format('d/m/Y H:i:s'),
+                    'radDtl'     => collect($this->isPemeriksaanRadiologi)->where('radStatus', 1)->values()->all(),
+                ];
+            });
+        });
+
+        $this->store();
+        $this->closeModalRadiologi();
     }
     // Rad
 
@@ -796,7 +791,7 @@ class Pemeriksaan extends Component
         $this->tingkatKesadaranLovStatus = true;
         $this->tingkatKesadaranLov = $this->dataDaftarUgd['pemeriksaan']['tandaVital']['tingkatKesadaranOptions'];
     }
-    public function updatedtingkatKesadaranlovsearch()
+    public function updatedTingkatKesadaranLovSearch()
     {
         // Variable Search
         $search = $this->tingkatKesadaranLovSearch;
@@ -832,6 +827,7 @@ class Pemeriksaan extends Component
         $this->dataDaftarUgd['pemeriksaan']['tandaVital']['tingkatKesadaran'] = $id;
         $this->tingkatKesadaranLovStatus = false;
         $this->tingkatKesadaranLovSearch = '';
+        $this->tingkatKesadaranLov       = [];
     }
     // LOV selected end
     // /////////////////////
@@ -847,33 +843,41 @@ class Pemeriksaan extends Component
     // validate Data RJ//////////////////////////////////////////////////
     private function validateDataUgd(): void
     {
-        // customErrorMessages
-        // $messages = customErrorMessagesTrait::messages();
-        $messages = [];
+        // siapkan rules base (boleh kosong diawal)
+        $rules = $this->rules;
+        $messages = [];   // <— TAROH DI SINI, LOCAL SCOPE
 
-        //Cek Usia Anak dibawah 13th tidak di cek tekanan darah
-        $sql = "select birth_date from rsmst_pasiens where reg_no=:regNo";
-        $birthDate = DB::scalar($sql, [
-            "regNo" => $this->dataDaftarUgd['regNo'],
-        ]);
+        // ambil birth_date
+        $birthDate = DB::table('rsmst_pasiens')
+            ->where('reg_no', $this->dataDaftarUgd['regNo'] ?? null)
+            ->value('birth_date');
 
-        $cekUsia = Carbon::createFromFormat('Y-m-d H:i:s', $birthDate ?? Carbon::now(env('APP_TIMEZONE'))->format('Y-m-d H:i:s'))->diff(Carbon::now(env('APP_TIMEZONE')))->format('%y');
-        if ($cekUsia > 13) {
-            $this->rules['dataDaftarUgd.pemeriksaan.tandaVital.sistolik'] = 'required|numeric';
-            $this->rules['dataDaftarUgd.pemeriksaan.tandaVital.distolik'] = 'required|numeric';
+        if ($birthDate) {
+            try {
+                $age = Carbon::parse($birthDate)
+                    ->diffInYears(Carbon::now(config('app.timezone')));
+            } catch (\Throwable $e) {
+                $age = null;
+            }
+
+            if (!is_null($age) && $age > 13) {
+                $rules['dataDaftarUgd.pemeriksaan.tandaVital.sistolik'] = 'required|numeric';
+                $rules['dataDaftarUgd.pemeriksaan.tandaVital.distolik'] = 'required|numeric';
+
+                // contoh: tambahkan messages-nya disini juga secara lokal
+                $messages['dataDaftarUgd.pemeriksaan.tandaVital.sistolik.required'] =
+                    'Sistolik wajib untuk usia > 13';
+                $messages['dataDaftarUgd.pemeriksaan.tandaVital.distolik.required'] =
+                    'Diastolik wajib untuk usia > 13';
+            }
         }
 
-        // $rules = [];
-
-
-
-        // Proses Validasi///////////////////////////////////////////
         try {
-            $this->validate($this->rules, $messages);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Lakukan Pengecekan kembali Input Data.");
-            $this->validate($this->rules, $messages);
+            $this->validate($rules, $messages);
+        } catch (ValidationException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError("Lakukan Pengecekan kembali Input Data.");
+            $this->validate($rules, $messages);
         }
     }
 
@@ -881,34 +885,50 @@ class Pemeriksaan extends Component
     // insert and update record start////////////////
     public function store()
     {
-        // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
-        $this->setDataPrimer();
 
         // Validate RJ
         $this->validateDataUgd();
 
-        // Logic update mode start //////////
-        $this->updateDataUgd($this->dataDaftarUgd['rjNo']);
+        $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
+        if (!$rjNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("rjNo kosong.");
+            return;
+        }
 
-        $this->emit('syncronizeAssessmentPerawatUGDFindData');
+        $lockKey = "ugd:{$rjNo}"; // shared lock antar modul UGD
+
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
+                $fresh = $this->findDataUGD($rjNo) ?: [];
+
+                if (!isset($fresh['pemeriksaan']) || !is_array($fresh['pemeriksaan'])) {
+                    $fresh['pemeriksaan'] = $this->pemeriksaan ?? [];
+                }
+
+                $formSubtree = $this->dataDaftarUgd['pemeriksaan'] ?? [];
+                if (!is_array($formSubtree)) $formSubtree = [];
+                $fresh['pemeriksaan'] = $formSubtree;
+
+                DB::transaction(function () use ($rjNo, $fresh) {
+                    // (opsional tapi baik) kunci baris header
+                    DB::table('rstxn_ugdhdrs')->where('rj_no', $rjNo)->first();
+
+                    $this->updateJsonUGD($rjNo, $fresh);
+                    $this->emit('ugd:refresh-summary');
+                });
+
+                $this->dataDaftarUgd = $fresh;
+            });
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
+            return;
+        }
+
+
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+            ->addSuccess('Pemeriksaan berhasil disimpan.');
     }
-
-    private function updateDataUgd($rjNo): void
-    {
-
-        // update table trnsaksi
-        // DB::table('rstxn_ugdhdrs')
-        //     ->where('rj_no', $rjNo)
-        //     ->update([
-        //         'datadaftarUgd_json' => json_encode($this->dataDaftarUgd, true),
-        //         'datadaftarUgd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
-        //     ]);
-
-        $this->updateJsonUGD($rjNo, $this->dataDaftarUgd);
-
-        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Pemeriksaan berhasil disimpan.");
-    }
-    // insert and update record end////////////////
 
 
     private function findData($rjno): void
@@ -924,24 +944,21 @@ class Pemeriksaan extends Component
 
 
     // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
-    private function setDataPrimer(): void {}
 
     private function scoringIMT(): void
     {
-        $bb = (isset($this->dataDaftarUgd['pemeriksaan']['nutrisi']['bb'])
-            ? ($this->dataDaftarUgd['pemeriksaan']['nutrisi']['bb']
-                ? $this->dataDaftarUgd['pemeriksaan']['nutrisi']['bb']
-                : 1)
-            : 1);
-        $tb = (isset($this->dataDaftarUgd['pemeriksaan']['nutrisi']['tb'])
-            ? ($this->dataDaftarUgd['pemeriksaan']['nutrisi']['tb']
-                ? $this->dataDaftarUgd['pemeriksaan']['nutrisi']['tb']
-                : 1)
-            : 1);;
+        $bb = (float) ($this->dataDaftarUgd['pemeriksaan']['nutrisi']['bb'] ?? 0);
+        $tb = (float) ($this->dataDaftarUgd['pemeriksaan']['nutrisi']['tb'] ?? 0);
 
+        if ($bb <= 0 || $tb <= 0) {
+            $this->dataDaftarUgd['pemeriksaan']['nutrisi']['imt'] = null;
+            return;
+        }
 
-        $this->dataDaftarUgd['pemeriksaan']['nutrisi']['imt'] = round($bb / (($tb / 100) * ($tb / 100)), 2);
+        $m = $tb / 100;
+        $this->dataDaftarUgd['pemeriksaan']['nutrisi']['imt'] = round($bb / ($m * $m), 2);
     }
+
 
 
     public function uploadHasilPenunjang(): void
@@ -953,10 +970,6 @@ class Pemeriksaan extends Component
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Pasien Sudah Pulang, Trasaksi Terkunci.");
             return;
         }
-
-        // cek status transaksi
-        $this->validateDataUgd($this->rjNoRef);
-
 
         // customErrorMessages
         $messages = [];
@@ -1012,6 +1025,7 @@ class Pemeriksaan extends Component
         $this->isOpenRekamMedisuploadpenunjangHasil = false;
         $this->reset(['filePDF']);
     }
+
 
     // when new form instance
     public function mount()

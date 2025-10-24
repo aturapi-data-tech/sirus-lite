@@ -3,24 +3,20 @@
 namespace App\Http\Livewire\EmrUGD\MrUGD\Anamnesa\Anamnesa;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Contracts\Cache\LockTimeoutException;
+use Illuminate\Validation\ValidationException;
 
 use Livewire\Component;
-use Livewire\WithPagination;
-use Carbon\Carbon;
-
-use Spatie\ArrayToXml\ArrayToXml;
 use App\Http\Traits\EmrUGD\EmrUGDTrait;
-use App\Http\Traits\customErrorMessagesTrait;
 
 
 class Screening extends Component
 {
-    use WithPagination, EmrUGDTrait, customErrorMessagesTrait;
+    use EmrUGDTrait;
 
     // listener from blade////////////////
-    protected $listeners = [
-        'syncronizeAssessmentPerawatUGDFindData' => 'mount'
-    ];
+    protected $listeners = [];
 
 
 
@@ -28,11 +24,8 @@ class Screening extends Component
     // Ref on top bar
     //////////////////////////////
 
-
-
     // dataDaftarUgd RJ
     public $rjNoRef;
-
     public array $dataDaftarUgd = [];
 
     public array $screening =
@@ -86,12 +79,26 @@ class Screening extends Component
         'dataDaftarUgd.screening.pernafasan' => 'required',
         'dataDaftarUgd.screening.kesadaran' => 'required',
         'dataDaftarUgd.screening.nyeriDada' => 'required',
+        'dataDaftarUgd.screening.tanggalPelayanan' => 'required|date_format:d/m/Y H:i:s',
 
         'dataDaftarUgd.screening.prioritasPelayanan' => 'required',
 
         'dataDaftarUgd.screening.tanggalPelayanan' => 'required',
         'dataDaftarUgd.screening.petugasPelayanan' => 'required',
 
+    ];
+
+    protected $messages = [
+        'required' => ':attribute wajib diisi.',
+    ];
+    protected $attributes = [
+        'dataDaftarUgd.screening.keluhanUtama'     => 'Keluhan utama',
+        'dataDaftarUgd.screening.pernafasan'       => 'Pernafasan',
+        'dataDaftarUgd.screening.kesadaran'        => 'Kesadaran',
+        'dataDaftarUgd.screening.nyeriDada'        => 'Nyeri dada',
+        'dataDaftarUgd.screening.prioritasPelayanan' => 'Prioritas pelayanan',
+        'dataDaftarUgd.screening.tanggalPelayanan' => 'Tanggal pelayanan',
+        'dataDaftarUgd.screening.petugasPelayanan' => 'Petugas pelayanan',
     ];
 
 
@@ -104,32 +111,8 @@ class Screening extends Component
 
     public function updated($propertyName)
     {
-        // dd($propertyName);
-        $this->validateOnly($propertyName);
-        $this->store();
+        $this->validateOnly($propertyName, $this->rules, $this->messages, $this->attributes);
     }
-
-
-
-    // resert input private////////////////
-    private function resetInputFields(): void
-    {
-
-        // resert validation
-        $this->resetValidation();
-        // resert input kecuali
-        $this->reset(['']);
-    }
-
-    // resert resetScreening///////////////
-    public function resetScreening(): void
-    {
-        $this->dataDaftarUgd['screening'] = $this->screening;
-        $this->resetValidation();
-        $this->updateDataUgd($this->dataDaftarUgd['rjNo']);
-    }
-
-
 
 
     // ////////////////
@@ -137,79 +120,74 @@ class Screening extends Component
     // ////////////////
 
 
-    // validate Data RJ//////////////////////////////////////////////////
-    private function validateDataAnamnesaUgd(): void
+    // insert and update record start////////////////
+    public function store()
     {
-        // customErrorMessages
-        $messages = customErrorMessagesTrait::messages();
+        if (!$this->checkUgdStatus()) return;
 
-        // require nik ketika pasien tidak dikenal
+        $this->validate($this->rules, $this->messages, $this->attributes);
 
+        $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
+        if (!$rjNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('rjNo kosong.');
+            return;
+        }
 
-
-        $rules = [
-            'dataDaftarUgd.screening.keluhanUtama' => 'required',
-            'dataDaftarUgd.screening.pernafasan' => 'required',
-            'dataDaftarUgd.screening.kesadaran' => 'required',
-            'dataDaftarUgd.screening.nyeriDada' => 'required',
-
-            'dataDaftarUgd.screening.prioritasPelayanan' => 'required',
-
-            'dataDaftarUgd.screening.tanggalPelayanan' => 'required',
-            'dataDaftarUgd.screening.petugasPelayanan' => 'required',
-        ];
-
-
-
-        // Proses Validasi///////////////////////////////////////////
+        $lockKey = "ugd:{$rjNo}";
         try {
-            $this->validate($rules, $messages);
-        } catch (\Illuminate\Validation\ValidationException $e) {
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
+                DB::transaction(function () use ($rjNo) {
+                    $fresh = $this->findDataUGD($rjNo) ?: [];
 
-            //  toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError( "Lakukan Pengecekan kembali Input Data.");
-            $this->validate($rules, $messages);
+                    if (!isset($fresh['screening']) || !is_array($fresh['screening'])) {
+                        $fresh['screening'] = $this->screening;
+                    }
+
+                    // patch hanya subtree screening (gabungkan default -> existing -> edited)
+                    $fresh['screening'] = array_replace_recursive(
+                        $this->screening,
+                        (array)($fresh['screening'] ?? []),
+                        (array)($this->dataDaftarUgd['screening'] ?? [])
+                    );
+
+                    $this->updateJsonUGD($rjNo, $fresh);
+                    $this->dataDaftarUgd = $fresh;
+                });
+            });
+
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess('Screening berhasil disimpan.');
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
+        } catch (\Throwable $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Gagal menyimpan Screening.');
         }
     }
 
 
-    // insert and update record start////////////////
-    public function store()
-    {
-        // Validate RJ
-        $this->validateDataAnamnesaUgd();
-
-        // Logic update mode start //////////
-        $this->updateDataUgd($this->dataDaftarUgd['rjNo']);
-    }
-
-    private function updateDataUgd($rjNo): void
-    {
-
-        // update table trnsaksi
-        // DB::table('rstxn_ugdhdrs')
-        //     ->where('rj_no', $rjNo)
-        //     ->update([
-        //         'datadaftarugd_json' => json_encode($this->dataDaftarUgd, true),
-        //         'datadaftarUgd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
-        //     ]);
-
-        $this->updateJsonUGD($rjNo, $this->dataDaftarUgd);
-
-        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Screening berhasil disimpan.");
-    }
-    // insert and update record end////////////////
 
 
     private function findData($rjno): void
     {
-        $this->dataDaftarUgd = $this->findDataUGD($rjno);
-        // dd($this->dataDaftarUgd);
-        // jika screening tidak ditemukan tambah variable screening pda array
-        if (isset($this->dataDaftarUgd['screening']) == false) {
-            $this->dataDaftarUgd['screening'] = $this->screening;
-        }
+        $this->dataDaftarUgd = $this->findDataUGD($rjno) ?: [];
+        $current = (array)($this->dataDaftarUgd['screening'] ?? []);
+        $this->dataDaftarUgd['screening'] = array_replace_recursive($this->screening, $current);
     }
 
+    private function checkUgdStatus(): bool
+    {
+        $row = DB::table('rstxn_ugdhdrs')->select('rj_status')
+            ->where('rj_no', $this->rjNoRef)->first();
+
+        if (!$row || $row->rj_status !== 'A') {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Pasien Sudah Pulang, Transaksi Terkunci.');
+            return false;
+        }
+        return true;
+    }
 
 
     // when new form instance

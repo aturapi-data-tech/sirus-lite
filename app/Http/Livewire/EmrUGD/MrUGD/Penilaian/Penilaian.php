@@ -3,12 +3,12 @@
 namespace App\Http\Livewire\EmrUGD\MrUGD\Penilaian;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-use Carbon\Carbon;
 
-use Spatie\ArrayToXml\ArrayToXml;
 use App\Http\Traits\EmrUGD\EmrUGDTrait;
 
 
@@ -16,9 +16,7 @@ class Penilaian extends Component
 {
     use WithPagination, EmrUGDTrait;
     // listener from blade////////////////
-    protected $listeners = [
-        'syncronizeAssessmentPerawatUGDFindData' => 'mount'
-    ];
+    protected $listeners = [];
 
     //////////////////////////////
     // Ref on top bar
@@ -358,11 +356,8 @@ class Penilaian extends Component
 
     public function updated($propertyName)
     {
-        // dd($propertyName);
-        // $this->validateOnly($propertyName);
         $this->scoringSkalaMorse();
         $this->scoringSkalaHumptyDumpty();
-        $this->store();
     }
 
 
@@ -372,119 +367,133 @@ class Penilaian extends Component
     // ////////////////
 
 
-    // validate Data RJ//////////////////////////////////////////////////
-    private function validateDataUgd(): void
-    {
-        // customErrorMessages
-        // $messages = customErrorMessagesTrait::messages();
-
-        // require nik ketika pasien tidak dikenal
-
-
-
-        // $rules = [];
-
-
-
-        // Proses Validasi///////////////////////////////////////////
-        // try {
-        //     $this->validate($rules, $messages);
-        // } catch (\Illuminate\Validation\ValidationException $e) {
-
-        //      toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError( "Lakukan Pengecekan kembali Input Data.");
-        //     $this->validate($rules, $messages);
-        // }
-    }
 
 
     // insert and update record start////////////////
     public function store()
     {
-        // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
-        $this->setDataPrimer();
+        if (!$this->checkUgdStatus()) return;
 
-        // Validate RJ
-        $this->validateDataUgd();
+        $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
+        if (!$rjNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('rjNo kosong.');
+            return;
+        }
 
-        // Logic update mode start //////////
-        $this->updateDataUgd($this->dataDaftarUgd['rjNo']);
+        $lockKey = "ugd:{$rjNo}";
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
+                DB::transaction(function () use ($rjNo) {
+                    // ambil fresh agar tidak menimpa modul lain
+                    $fresh = $this->findDataUGD($rjNo) ?: [];
+                    $fresh['penilaian'] = array_replace_recursive(
+                        $this->defaultPenilaian(), // default minimal
+                        (array)($fresh['penilaian'] ?? []),
+                        (array)($this->dataDaftarUgd['penilaian'] ?? [])
+                    );
 
-        $this->emit('syncronizeAssessmentPerawatUGDFindData');
-    }
+                    $this->updateJsonUGD($rjNo, $fresh);
+                    $this->dataDaftarUgd = $fresh;
+                });
+            });
 
-    private function updateDataUgd($rjNo): void
-    {
-
-        // update table trnsaksi
-        // DB::table('rstxn_ugdhdrs')
-        //     ->where('rj_no', $rjNo)
-        //     ->update([
-        //         'dataDaftarUgd_json' => json_encode($this->dataDaftarUgd, true),
-        //         'dataDaftarUgd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
-        //     ]);
-
-        $this->updateJsonUGD($rjNo, $this->dataDaftarUgd);
-
-        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Penilaian berhasil disimpan.");
-    }
-    // insert and update record end////////////////
-
-
-    private function findData($rjno): void
-    {
-
-
-        $this->dataDaftarUgd = $this->findDataUGD($rjno);
-        // dd($this->dataDaftarUgd);
-        // jika pemeriksaan tidak ditemukan tambah variable pemeriksaan pda array
-        if (isset($this->dataDaftarUgd['penilaian']) == false) {
-            $this->dataDaftarUgd['penilaian'] = $this->penilaian;
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess("Penilaian berhasil disimpan.");
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
+        } catch (\Throwable $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Gagal menyimpan.');
         }
     }
 
+    private function defaultPenilaian(): array
+    {
+        return $this->penilaian; // pakai yang sudah kamu definisikan di class
+    }
+
+
+    // insert and update record end////////////////
+
+    private function findData($rjno): void
+    {
+        $this->dataDaftarUgd = $this->findDataUGD($rjno) ?: [];
+
+        // siapkan penilaian minimal tanpa menimpa field tambahan
+        $current = (array)($this->dataDaftarUgd['penilaian'] ?? []);
+        $this->dataDaftarUgd['penilaian'] = array_replace_recursive($this->defaultPenilaian(), $current);
+
+        // jaga-jaga inti struktur ada
+        $this->dataDaftarUgd['penilaian']['resikoJatuh'] = $this->dataDaftarUgd['penilaian']['resikoJatuh'] ?? [];
+        $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse'] =
+            $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse'] ?? [
+                "skalaMorseTab" => "Skala Morse Score",
+                "skalaMorseScore" => 0,
+                "skalaMorseDesc" => "",
+            ];
+        $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaHumptyDumpty'] =
+            $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaHumptyDumpty'] ?? [
+                "skalaHumptyDumptyTab" => "Skala Humpty Dumpty Score",
+                "skalaHumptyDumptyScore" => 0,
+                "skalaHumptyDumptyDesc" => "",
+            ];
+
+        // hitung skor awal biar UI konsisten
+        $this->scoringSkalaMorse();
+        $this->scoringSkalaHumptyDumpty();
+    }
     // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
     private function setDataPrimer(): void {}
 
     private function scoringSkalaMorse(): void
     {
-        $riwayatJatuh3blnTerakhirScore = $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['riwayatJatuh3blnTerakhirScore'];
-        $diagSekunderScore = $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['diagSekunderScore'];
-        $alatBantuScore = $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['alatBantuScore'];
-        $heparinScore = $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['heparinScore'];
-        $gayaBerjalanScore = $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['gayaBerjalanScore'];
-        $kesadaranScore = $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['kesadaranScore'];
+        $morse = &$this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse'];
 
-        $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseScore'] = $riwayatJatuh3blnTerakhirScore + $diagSekunderScore  + $alatBantuScore + $heparinScore + $gayaBerjalanScore + $kesadaranScore;
-        $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseDesc'] =
-            ($this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseScore'] >= 0
-                && $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseScore'] <= 24
-                ? 'Tidak Ada Risiko'
-                : ($this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseScore'] >= 25
-                    && $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseScore'] <= 50
-                    ? 'Risiko Rendah'
-                    : 'Risiko Tinggi'));
+        $sum =
+            (int)($morse['riwayatJatuh3blnTerakhirScore'] ?? 0) +
+            (int)($morse['diagSekunderScore'] ?? 0) +
+            (int)($morse['alatBantuScore'] ?? 0) +
+            (int)($morse['heparinScore'] ?? 0) +
+            (int)($morse['gayaBerjalanScore'] ?? 0) +
+            (int)($morse['kesadaranScore'] ?? 0);
+
+        $morse['skalaMorseScore'] = $sum;
+        $morse['skalaMorseDesc'] =
+            ($sum <= 24) ? 'Tidak Ada Risiko'
+            : (($sum <= 50) ? 'Risiko Rendah' : 'Risiko Tinggi');
     }
 
     private function scoringSkalaHumptyDumpty(): void
     {
-        $umurScore = $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaHumptyDumpty']['umurScore'];
-        $sexScore = $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaHumptyDumpty']['sexScore'];
-        $diagnosaScore = $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaHumptyDumpty']['diagnosaScore'];
-        $gangguanKognitifScore = $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaHumptyDumpty']['gangguanKognitifScore'];
-        $faktorLingkunganScore = $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaHumptyDumpty']['faktorLingkunganScore'];
-        $penggunaanObatScore = $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaHumptyDumpty']['penggunaanObatScore'];
-        $responTerhadapOperasiScore = $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaHumptyDumpty']['responTerhadapOperasiScore'];
+        $hd = &$this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaHumptyDumpty'];
 
-        $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaHumptyDumpty']['skalaHumptyDumptyScore'] = $umurScore + $sexScore  + $diagnosaScore + $gangguanKognitifScore + $faktorLingkunganScore + $penggunaanObatScore +
-            $responTerhadapOperasiScore;
-        $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaHumptyDumpty']['skalaHumptyDumptyDesc'] =
-            ($this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaHumptyDumpty']['skalaHumptyDumptyScore'] >= 0
-                && $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaHumptyDumpty']['skalaHumptyDumptyScore'] <= 11
-                ? 'Risiko Rendah'
-                : ($this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaHumptyDumpty']['skalaHumptyDumptyScore'] >= 12
-                    && $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaHumptyDumpty']['skalaHumptyDumptyScore'] <= 12
-                    ? 'Risiko Tinggi'
-                    : 'Risiko Tinggi'));
+        $sum =
+            (int)($hd['umurScore'] ?? 0) +
+            (int)($hd['sexScore'] ?? 0) +
+            (int)($hd['diagnosaScore'] ?? 0) +
+            (int)($hd['gangguanKognitifScore'] ?? 0) +
+            (int)($hd['faktorLingkunganScore'] ?? 0) +
+            (int)($hd['penggunaanObatScore'] ?? 0) +
+            (int)($hd['responTerhadapOperasiScore'] ?? 0);
+
+        $hd['skalaHumptyDumptyScore'] = $sum;
+        $hd['skalaHumptyDumptyDesc']  = ($sum >= 12) ? 'Risiko Tinggi' : 'Risiko Rendah';
+    }
+
+
+    private function checkUgdStatus(): bool
+    {
+        $row = DB::table('rstxn_ugdhdrs')->select('rj_status')
+            ->where('rj_no', $this->rjNoRef)->first();
+
+        if (!$row || $row->rj_status !== 'A') {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Pasien Sudah Pulang, Transaksi Terkunci.');
+            return false;
+        }
+        return true;
     }
 
     // when new form instance
@@ -503,7 +512,7 @@ class Penilaian extends Component
             'livewire.emr-u-g-d.mr-u-g-d.penilaian.penilaian',
             [
                 // 'RJpasiens' => $query->paginate($this->limitPerPage),
-                'myTitle' => 'Anamnesia',
+                'myTitle' => 'Penilaian',
                 'mySnipt' => 'Rekam Medis Pasien',
                 'myProgram' => 'Pasien Rawat Jalan',
             ]

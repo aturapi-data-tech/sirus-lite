@@ -24,8 +24,7 @@
                                 <div x-data="{ selecteddataProductLovIndex: @entangle('selecteddataProductLovIndex') }" @click.outside="$wire.dataProductLovSearch = ''">
                                     <x-text-input id="dataProductLovSearchMain" placeholder="Nama Obat" class="mt-1 ml-2"
                                         :errorshas="__($errors->has('dataProductLovSearchMain'))" :disabled=$disabledPropertyRjStatus
-                                        wire:model.debounce.500ms="dataProductLovSearch"
-                                        x-on:click.outside="$wire.resetdataProductLov()"
+                                        wire:model="dataProductLovSearch" x-on:click.outside="$wire.resetdataProductLov()"
                                         x-on:keyup.escape="$wire.resetdataProductLov()"
                                         x-on:keyup.down="$wire.selectNextdataProductLov()"
                                         x-on:keyup.up="$wire.selectPreviousdataProductLov()"
@@ -100,7 +99,7 @@
                                     <div>
                                         <x-text-input id="collectingMyProduct.productId" placeholder="Kode Obat"
                                             class="mt-1 ml-2" :errorshas="__($errors->has('collectingMyProduct.productId'))" :disabled=true
-                                            wire:model.debounce.500ms="collectingMyProduct.productId" />
+                                            wire:model="collectingMyProduct.productId" />
 
                                         @error('collectingMyProduct.productId')
                                             <x-input-error :messages=$message />
@@ -115,7 +114,7 @@
                                     <div>
                                         <x-text-input id="collectingMyProduct.productName" placeholder="Nama Obat"
                                             class="mt-1 ml-2" :errorshas="__($errors->has('collectingMyProduct.productName'))" :disabled=true
-                                            wire:model.debounce.500ms="collectingMyProduct.productName" />
+                                            wire:model="collectingMyProduct.productName" />
 
                                         @error('collectingMyProduct.productName')
                                             <x-input-error :messages=$message />
@@ -129,7 +128,7 @@
                                     <div>
                                         <x-text-input id="collectingMyProduct.qty" placeholder="Jml Obat" class="mt-1 ml-2"
                                             :errorshas="__($errors->has('collectingMyProduct.qty'))" :disabled=$disabledPropertyRjStatus
-                                            wire:model.debounce.500ms="collectingMyProduct.qty" x-init="$refs.collectingMyProductqty.focus()"
+                                            wire:model="collectingMyProduct.qty" x-init="$refs.collectingMyProductqty.focus()"
                                             x-ref="collectingMyProductqty"
                                             x-on:keyup.enter="$refs.collectingMyProductsignaX.focus()" />
 
@@ -147,7 +146,7 @@
                                     <div>
                                         <x-text-input id="collectingMyProduct.productPrice" placeholder="Harga Obat"
                                             class="mt-1 ml-2" :errorshas="__($errors->has('collectingMyProduct.productPrice'))" :disabled=true
-                                            wire:model.debounce.500ms="collectingMyProduct.productPrice" />
+                                            wire:model="collectingMyProduct.productPrice" />
 
                                         @error('collectingMyProduct.productPrice')
                                             <x-input-error :messages=$message />

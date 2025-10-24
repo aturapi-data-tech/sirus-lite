@@ -2,30 +2,24 @@
 
 namespace App\Http\Livewire\EmrUGD\MrUGD\Suket;
 
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Contracts\Cache\LockTimeoutException;
+
 use Livewire\Component;
-use Livewire\WithPagination;
 use App\Http\Traits\EmrUGD\EmrUGDTrait;
 
 
 class Suket extends Component
 {
-    use WithPagination, EmrUGDTrait;
+    use EmrUGDTrait;
 
     // listener from blade////////////////
-    protected $listeners = [
-        'syncronizeAssessmentPerawatUGDFindData' => 'mount'
+    protected $listeners = [];
 
-    ];
-
-    //////////////////////////////
-    // Ref on top bar
-    //////////////////////////////
     public $rjNoRef;
-
-    // dataDaftarUgd UGD
     public array $dataDaftarUgd = [];
 
-    // data SKDP / suket=>[]
     public array $suket =
     [
         "suketSehatTab" => "Suket Sehat",
@@ -43,13 +37,17 @@ class Suket extends Component
 
 
     protected $rules = [
-
-        // 'dataDaftarUgd.suket.pengkajianMedis.waktuPemeriksaan' => 'required|date_format:d/m/Y H:i:s',
-        // 'dataDaftarUgd.suket.pengkajianMedis.selesaiPemeriksaan' => 'required|date_format:d/m/Y H:i:s'
-        'dataDaftarUgd.suket.suketIstirahat.suketIstirahatHari' => 'numeric'
-
-
+        'dataDaftarUgd.suket.suketIstirahat.suketIstirahatHari' => 'nullable|numeric',
     ];
+
+    protected $messages = [
+        'numeric' => ':attribute harus berupa angka.',
+    ];
+
+    protected $attributes = [
+        'dataDaftarUgd.suket.suketIstirahat.suketIstirahatHari' => 'Lama istirahat (hari)',
+    ];
+
 
 
 
@@ -58,54 +56,9 @@ class Suket extends Component
     ////////////////////////////////////////////////
     public function updated($propertyName)
     {
-        // dd($propertyName);
-        $this->validateOnly($propertyName);
-        $this->store();
-    }
-
-
-
-
-    // resert input private////////////////
-    private function resetInputFields(): void
-    {
-
-        // resert validation
-        $this->resetValidation();
-        // resert input kecuali
-        $this->resetExcept([
-            'rjNoRef'
-        ]);
-    }
-
-
-
-
-
-    // ////////////////
-    // UGD Logic
-    // ////////////////
-
-
-    // validate Data UGD//////////////////////////////////////////////////
-    private function validateDataUGD(): void
-    {
-        // customErrorMessages
-        // $messages = customErrorMessagesTrait::messages();
-        $messages = [];
-
-
-        // $rules = [];
-
-
-
-        // Proses Validasi///////////////////////////////////////////
-        try {
-            $this->validate($this->rules, $messages);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Lakukan Pengecekan kembali Input Data.");
-            $this->validate($this->rules, $messages);
+        // validasi ringan per-field (tanpa auto-save tiap ketik)
+        if ($propertyName === 'dataDaftarUgd.suket.suketIstirahat.suketIstirahatHari') {
+            $this->validateOnly($propertyName, $this->rules, $this->messages, $this->attributes);
         }
     }
 
@@ -113,56 +66,76 @@ class Suket extends Component
     // insert and update record start////////////////
     public function store()
     {
-        // set data UGDno / NoBooking / NoAntrian / klaimId / kunjunganId
-        $this->setDataPrimer();
+        if (!$this->checkUgdStatus()) return;
 
-        // Validate UGD
-        $this->validateDataUGD();
+        $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
+        if (!$rjNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('rjNo kosong.');
+            return;
+        }
 
-        // Logic update mode start //////////
-        $this->updateDataUGD($this->dataDaftarUgd['rjNo']);
-        $this->emit('syncronizeAssessmentPerawatUGDFindData');
+        // validasi penuh (jika ada rules lain tinggal tambah)
+        $this->validate($this->rules, $this->messages, $this->attributes);
+
+        $lockKey = "ugd:{$rjNo}";
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
+                DB::transaction(function () use ($rjNo) {
+                    $fresh = $this->findDataUGD($rjNo) ?: [];
+
+                    // pastikan subtree ada
+                    if (!isset($fresh['suket']) || !is_array($fresh['suket'])) {
+                        $fresh['suket'] = $this->suket;
+                    }
+
+                    // patch hanya subtree suket
+                    $fresh['suket'] = array_replace_recursive(
+                        $this->suket,
+                        (array)($fresh['suket'] ?? []),
+                        (array)($this->dataDaftarUgd['suket'] ?? [])
+                    );
+
+                    $this->updateJsonUGD($rjNo, $fresh);
+                    $this->dataDaftarUgd = $fresh;
+                });
+            });
+
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess("Suket berhasil disimpan.");
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
+        } catch (\Throwable $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Gagal menyimpan Suket.');
+        }
     }
 
-    private function updateDataUGD($rjNo): void
-    {
-        // if ($rjNo !== $this->dataDaftarUgd['rjNo']) {
-        //     dd('Data Json Tidak sesuai' . $rjNo . '  /  ' . $this->dataDaftarUgd['rjNo']);
-        // }
 
-        // // update table trnsaksi
-        // DB::table('rstxn_rjhdrs')
-        //     ->where('rj_no', $rjNo)
-        //     ->update([
-        //         'dataDaftarUgd_json' => json_encode($this->dataDaftarUgd, true),
-        //         'dataDaftarUgd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
-
-        //     ]);
-        $this->updateJsonUGD($rjNo, $this->dataDaftarUgd);
-
-        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("suket berhasil disimpan.");
-    }
     // insert and update record end////////////////
 
 
     private function findData($rjno): void
     {
-
-
-        $this->dataDaftarUgd = $this->findDataUGD($rjno);
-
-        // jika suket tidak ditemukan tambah variable suket pda array
-        if (isset($this->dataDaftarUgd['suket']) == false) {
-            $this->dataDaftarUgd['suket'] = $this->suket;
-        }
+        $this->dataDaftarUgd = $this->findDataUGD($rjno) ?: [];
+        // siapkan minimal structure tanpa menimpa data existing
+        $current = (array)($this->dataDaftarUgd['suket'] ?? []);
+        $this->dataDaftarUgd['suket'] = array_replace_recursive($this->suket, $current);
     }
 
-    // set data UGDno / NoBooking / NoAntrian / klaimId / kunjunganId
-    private function setDataPrimer(): void {}
+    private function checkUgdStatus(): bool
+    {
+        $row = DB::table('rstxn_ugdhdrs')->select('rj_status')
+            ->where('rj_no', $this->rjNoRef)->first();
 
-
-
-
+        if (!$row || $row->rj_status !== 'A') {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Pasien Sudah Pulang, Transaksi Terkunci.');
+            return false;
+        }
+        return true;
+    }
 
     // when new form instance
     public function mount()
@@ -179,8 +152,7 @@ class Suket extends Component
         return view(
             'livewire.emr-u-g-d.mr-u-g-d.suket.suket',
             [
-                // 'UGDpasiens' => $query->paginate($this->limitPerPage),
-                'myTitle' => 'suket',
+                'myTitle' => 'Pasien UGD',
                 'mySnipt' => 'Rekam Medis Pasien',
                 'myProgram' => 'Pasien Rawat Jalan',
             ]
