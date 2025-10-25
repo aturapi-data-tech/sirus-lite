@@ -21,25 +21,28 @@
                                 <li class="mr-2">
                                     <label
                                         class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
-                                        :class="activeTab === '{{ $dataDaftarUgd['perencanaan']['pengkajianMedisTab'] }}' ?
+                                        :class="activeTab === '{{ data_get($dataDaftarUgd, 'perencanaan.pengkajianMedisTab', 'Pengkajian Medis') }}'
+                                            ?
                                             'text-primary border-primary bg-gray-100' : ''"
-                                        @click="activeTab ='{{ $dataDaftarUgd['perencanaan']['pengkajianMedisTab'] }}'">{{ $dataDaftarUgd['perencanaan']['pengkajianMedisTab'] }}</label>
+                                        @click="activeTab ='{{ data_get($dataDaftarUgd, 'perencanaan.pengkajianMedisTab', 'Pengkajian Medis') }}'">{{ data_get($dataDaftarUgd, 'perencanaan.pengkajianMedisTab', 'Pengkajian Medis') }}</label>
                                 </li>
 
                                 <li class="mr-2">
                                     <label
                                         class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
-                                        :class="activeTab === '{{ $dataDaftarUgd['perencanaan']['tindakLanjutTab'] }}' ?
+                                        :class="activeTab === '{{ data_get($dataDaftarUgd, 'perencanaan.tindakLanjutTab', 'Tindak Lanjut') }}'
+                                            ?
                                             'text-primary border-primary bg-gray-100' : ''"
-                                        @click="activeTab ='{{ $dataDaftarUgd['perencanaan']['tindakLanjutTab'] }}'">{{ $dataDaftarUgd['perencanaan']['tindakLanjutTab'] }}</label>
+                                        @click="activeTab ='{{ data_get($dataDaftarUgd, 'perencanaan.tindakLanjutTab', 'Tindak Lanjut') }}'">{{ data_get($dataDaftarUgd, 'perencanaan.tindakLanjutTab', 'Tindak Lanjut') }}</label>
                                 </li>
 
                                 <li class="mr-2">
                                     <label
                                         class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
-                                        :class="activeTab === '{{ $dataDaftarUgd['perencanaan']['terapiTab'] }}' ?
+                                        :class="activeTab === '{{ data_get($dataDaftarUgd, 'perencanaan.terapiTab', 'Terapi') }}'
+                                            ?
                                             'text-primary border-primary bg-gray-100' : ''"
-                                        @click="activeTab ='{{ $dataDaftarUgd['perencanaan']['terapiTab'] }}'">{{ $dataDaftarUgd['perencanaan']['terapiTab'] }}</label>
+                                        @click="activeTab ='{{ data_get($dataDaftarUgd, 'perencanaan.terapiTab', 'Terapi') }}'">{{ data_get($dataDaftarUgd, 'perencanaan.terapiTab', 'Terapi') }}</label>
                                 </li>
 
 
@@ -50,27 +53,27 @@
 
                         <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800"
                             :class="{
-                                'active': activeTab === '{{ $dataDaftarUgd['perencanaan']['terapiTab'] }}'
+                                'active': activeTab === '{{ data_get($dataDaftarUgd, 'perencanaan.terapiTab', 'Terapi') }}'
                             }"
-                            x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarUgd['perencanaan']['terapiTab'] }}'">
+                            x-show.transition.in.opacity.duration.600="activeTab === '{{ data_get($dataDaftarUgd, 'perencanaan.terapiTab', 'Terapi') }}'">
                             @include('livewire.emr-u-g-d.mr-u-g-d.perencanaan.terapiTab')
 
                         </div>
 
                         <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800"
                             :class="{
-                                'active': activeTab === '{{ $dataDaftarUgd['perencanaan']['tindakLanjutTab'] }}'
+                                'active': activeTab === '{{ data_get($dataDaftarUgd, 'perencanaan.tindakLanjutTab', 'Tindak Lanjut') }}'
                             }"
-                            x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarUgd['perencanaan']['tindakLanjutTab'] }}'">
+                            x-show.transition.in.opacity.duration.600="activeTab === '{{ data_get($dataDaftarUgd, 'perencanaan.tindakLanjutTab', 'Tindak Lanjut') }}'">
                             @include('livewire.emr-u-g-d.mr-u-g-d.perencanaan.tindakLanjutTab')
 
                         </div>
 
                         <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800"
                             :class="{
-                                'active': activeTab === '{{ $dataDaftarUgd['perencanaan']['pengkajianMedisTab'] }}'
+                                'active': activeTab === '{{ data_get($dataDaftarUgd, 'perencanaan.pengkajianMedisTab', 'Pengkajian Medis') }}'
                             }"
-                            x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarUgd['perencanaan']['pengkajianMedisTab'] }}'">
+                            x-show.transition.in.opacity.duration.600="activeTab === '{{ data_get($dataDaftarUgd, 'perencanaan.pengkajianMedisTab', 'Pengkajian Medis') }}'">
                             @include('livewire.emr-u-g-d.mr-u-g-d.perencanaan.pengkajianMedisTab')
 
                         </div>

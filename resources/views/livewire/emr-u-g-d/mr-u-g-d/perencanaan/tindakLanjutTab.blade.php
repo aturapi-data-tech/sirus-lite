@@ -10,7 +10,7 @@
             <div class="pt-2 ">
 
                 <div class="grid grid-cols-3 gap-2 mt-2 mb-2 ml-2">
-                    @foreach ($dataDaftarUgd['perencanaan']['tindakLanjut']['tindakLanjutOptions'] as $tindakLanjutOptions)
+                    @foreach (data_get($dataDaftarUgd, 'perencanaan.tindakLanjut.tindakLanjutOptions', []) as $tindakLanjutOptions)
                         <x-radio-button :label="__($tindakLanjutOptions['tindakLanjut'])" value="{{ $tindakLanjutOptions['tindakLanjut'] }}"
                             wire:model="dataDaftarUgd.perencanaan.tindakLanjut.tindakLanjut" />
                     @endforeach
