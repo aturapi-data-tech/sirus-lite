@@ -492,15 +492,44 @@ class Perencanaan extends Component
     // /////////////////////////////////////////
 
 
+    private function rebuildWithDefaults(array $defaults, $data)
+    {
+        // Kalau bukan array, paksa jadi array kosong agar bisa diisi default
+        if (!is_array($data)) {
+            $data = [];
+        }
+
+        // Mulai dari defaults
+        $result = $defaults;
+
+        foreach ($data as $key => $value) {
+            if (array_key_exists($key, $defaults)) {
+                // Jika default di level ini array, rekursif
+                if (is_array($defaults[$key])) {
+                    $result[$key] = $this->rebuildWithDefaults($defaults[$key], $value);
+                } else {
+                    // Kalau default adalah skalar, pakai nilai user
+                    $result[$key] = $value;
+                }
+            } else {
+                // Key ekstra yang tidak ada di default: tetapkan apa adanya (tidak dihapus)
+                $result[$key] = $value;
+            }
+        }
+
+        return $result;
+    }
 
 
     // when new form instance
     public function mount()
     {
-        $this->findData($this->rjNoRef);
 
-        // set dokter pemeriksa
-        // $this->setDrPemeriksa();
+        $this->dataDaftarUgd = $this->findDataUGD($this->rjNoRef) ?: [];
+
+        $current = (array) data_get($this->dataDaftarUgd, 'perencanaan', []);
+        // Lengkapi struktur perencanaan sesuai default, tanpa menghapus data lain
+        $this->dataDaftarUgd['perencanaan'] = $this->rebuildWithDefaults($this->perencanaan, $current);
     }
 
 
