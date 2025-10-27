@@ -364,14 +364,54 @@ class EresepUGD extends Component
             'catatanKhusus' => $catatanKhusus,
         ];
 
-        $messages = customErrorMessagesTrait::messages();
+        $messages = [
+            'qty.required'          => 'Qty wajib diisi.',
+            'qty.digits_between'    => 'Qty harus 1-3 digit.',
+            'qty.numeric'           => 'Qty harus berupa angka.',
+            'qty.min'               => 'Qty minimal 1.',
+
+            'signaX.required'       => 'Signa X wajib diisi.',
+            'signaX.regex'          => 'Format Signa X tidak valid.',
+
+            'signaHari.required'    => 'Signa Hari wajib diisi.',
+            'signaHari.regex'       => 'Format Signa Hari tidak valid.',
+
+            // optional
+            'catatanKhusus.max'     => 'Catatan khusus maksimal 200 karakter.',
+        ];
+
+        $attributes = [
+            'qty'           => 'jumlah obat',
+            'signaX'        => 'signa',
+            'signaHari'     => 'signa',
+            'catatanKhusus' => 'catatan khusus',
+        ];
+
         $rules = [
             'qty'           => 'bail|required|digits_between:1,3|numeric|min:1',
-            'signaX'        => 'bail|required|numeric|min:1',
-            'signaHari'     => 'bail|required|numeric|min:1',
-            'catatanKhusus' => 'bail|nullable',
+
+            'signaX'        => [
+                'bail',
+                'required',
+                'string',
+                'min:1',
+                'max:30',
+                'regex:/^[\pL\pN\s\.\,\+\-\/\(\)]+$/u'
+            ],
+
+            'signaHari'     => [
+                'bail',
+                'required',
+                'string',
+                'min:1',
+                'max:30',
+                'regex:/^[\pL\pN\s\.\,\+\-\/\(\)]+$/u'
+            ],
+
+            'catatanKhusus' => 'bail|nullable|string|max:200',
         ];
-        $validator = Validator::make($payload, $rules, $messages);
+
+        $validator = Validator::make($payload, $rules, $messages, $attributes);
         if ($validator->fails()) {
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
                 ->addError($validator->errors()->first());

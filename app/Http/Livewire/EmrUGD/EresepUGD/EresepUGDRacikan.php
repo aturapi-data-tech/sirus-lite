@@ -270,7 +270,7 @@ class EresepUGDRacikan extends Component
             "collectingMyProduct.productName"   => 'bail|required',
             "collectingMyProduct.dosis"         => 'bail|required|max:150',
             "collectingMyProduct.sedia"         => 'bail|nullable|max:150',
-            "collectingMyProduct.qty"           => 'bail|nullable|digits_between:1,3|min:1',
+            "collectingMyProduct.qty"           => 'bail|nullable|digits_between:1,3|numeric|min:1',
             "collectingMyProduct.productPrice"  => 'bail|nullable|numeric|min:0',
             "collectingMyProduct.catatanKhusus" => 'bail|nullable|max:150',
             "collectingMyProduct.catatan"       => 'bail|nullable|max:150',
