@@ -42,6 +42,7 @@
 
                                                 @php
                                                     $datadaftar_json = json_decode($myQData->datadaftar_json, true);
+                                                    $isRI = ($myQData->layanan_status ?? '') === 'RI';
                                                 @endphp
 
                                                 <td
@@ -81,31 +82,8 @@
                                                             {{ $myQData->poli . ' ' . $myQData->kd_dr_bpjs }}
                                                         </div>
                                                     </div>
+
                                                     <div class="ml-8">
-                                                        {{-- <span class="font-semibold">TTV:</span>
-                                                        <br>
-                                                        TD :
-                                                        {{ isset($datadaftar_json['pemeriksaan']['tandaVital']['sistolik'])
-                                                            ? $datadaftar_json['pemeriksaan']['tandaVital']['sistolik']
-                                                            : '' }}
-                                                        /
-                                                        {{ isset($datadaftar_json['pemeriksaan']['tandaVital']['distolik'])
-                                                            ? $datadaftar_json['pemeriksaan']['tandaVital']['distolik']
-                                                            : '' }}
-                                                        (mmHg)
-                                                        <br>
-                                                        SPO2 :
-                                                        {{ isset($datadaftar_json['pemeriksaan']['tandaVital']['spo2'])
-                                                            ? $datadaftar_json['pemeriksaan']['tandaVital']['spo2']
-                                                            : '' }}
-                                                        (%)
-                                                        <br>
-                                                        GDA :
-                                                        {{ isset($datadaftar_json['pemeriksaan']['tandaVital']['gda'])
-                                                            ? $datadaftar_json['pemeriksaan']['tandaVital']['gda']
-                                                            : '' }}
-                                                        (mg/dL)
-                                                        <br> --}}
                                                         <span class="font-semibold"> Diagnosis ICD10:</span>
                                                         <br>
                                                         @isset($datadaftar_json['diagnosis'])
@@ -118,42 +96,56 @@
                                                         @isset($datadaftar_json['diagnosisFreeText'])
                                                             {!! nl2br(e($datadaftar_json['diagnosisFreeText'])) . '</br>' !!}
                                                         @endisset
-                                                        <span class="font-semibold"> Terapi :</span>
+                                                        <span class="font-semibold">Terapi :</span>
                                                         <br>
-                                                        {!! nl2br(
-                                                            e(
-                                                                isset($datadaftar_json['perencanaan']['terapi']['terapi'])
-                                                                    ? $datadaftar_json['perencanaan']['terapi']['terapi']
-                                                                    : '',
-                                                            ),
-                                                        ) !!}
+                                                        @php
+                                                            $terapiText =
+                                                                $myQData->layanan_status === 'RI'
+                                                                    ? data_get(
+                                                                        $datadaftar_json,
+                                                                        'pengkajianDokter.rencana.terapi',
+                                                                        '-',
+                                                                    )
+                                                                    : data_get(
+                                                                        $datadaftar_json,
+                                                                        'perencanaan.terapi.terapi',
+                                                                        '-',
+                                                                    );
+                                                        @endphp
+                                                        {!! nl2br(e($terapiText)) !!}
                                                     </div>
 
                                                     @role(['Dokter', 'Admin'])
-                                                        <div class="flex justify-between">
-                                                            <div>
-                                                                <x-yellow-button
-                                                                    wire:click.prevent="copyResep({{ $myQData->txn_no }},'{{ $myQData->layanan_status }}')"
-                                                                    type="button" wire:loading.remove>
-                                                                    Copy Resep
-                                                                </x-yellow-button>
-                                                                <div wire:loading wire:target="copyResep">
-                                                                    <x-loading />
+                                                        @php
+                                                            $isRJ = $myQData->layanan_status === 'RJ';
+                                                            $noSep = $datadaftar_json['sep']['noSep'] ?? '';
+                                                        @endphp
+                                                        @if ($isRJ)
+                                                            <div class="flex justify-between">
+                                                                <div>
+                                                                    <x-yellow-button
+                                                                        wire:click.prevent="copyResep({{ $myQData->txn_no }},'{{ $myQData->layanan_status }}')"
+                                                                        type="button" wire:loading.remove>
+                                                                        Copy Resep RJ
+                                                                    </x-yellow-button>
+                                                                    <div wire:loading wire:target="copyResep">
+                                                                        <x-loading />
+                                                                    </div>
                                                                 </div>
-                                                            </div>
 
 
-                                                            <div>
-                                                                <x-light-button
-                                                                    wire:click.prevent="myiCare('{{ $myQData->nokartu_bpjs }}','{{ isset($datadaftar_json['sep']['noSep']) ? $datadaftar_json['sep']['noSep'] : '' }}')"
-                                                                    type="button" wire:loading.remove>
-                                                                    i-Care
-                                                                </x-light-button>
-                                                                <div wire:loading wire:target="myiCare">
-                                                                    <x-loading />
+                                                                <div>
+                                                                    <x-light-button
+                                                                        wire:click.prevent="myiCare('{{ $myQData->nokartu_bpjs }}','{{ isset($datadaftar_json['sep']['noSep']) ? $datadaftar_json['sep']['noSep'] : '' }}')"
+                                                                        type="button" wire:loading.remove>
+                                                                        i-Care
+                                                                    </x-light-button>
+                                                                    <div wire:loading wire:target="myiCare">
+                                                                        <x-loading />
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
+                                                        @endif
                                                     @endrole
                                                 </td>
 

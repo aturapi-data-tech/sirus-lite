@@ -399,9 +399,24 @@ class RekamMedisDisplay extends Component
                 'poli',
                 'kd_dr_bpjs',
                 'nokartu_bpjs',
-                DB::raw("(CASE WHEN layanan_status='RJ' THEN (select datadaftarpolirj_json from rsview_rjkasir where rj_no=txn_no)
-                                        WHEN layanan_status='UGD' THEN (select datadaftarugd_json from rsview_ugdkasir where rj_no=txn_no)
-                                            ELSE null END) as datadaftar_json")
+                DB::raw("(CASE
+            WHEN layanan_status='RJ' THEN (
+                SELECT datadaftarpolirj_json
+                FROM rsview_rjkasir
+                WHERE rj_no = txn_no
+            )
+            WHEN layanan_status='UGD' THEN (
+                SELECT datadaftarugd_json
+                FROM rsview_ugdkasir
+                WHERE rj_no = txn_no
+            )
+            WHEN layanan_status='RI' THEN (
+                SELECT datadaftarri_json
+                FROM rsview_rihdrs
+                WHERE rihdr_no = txn_no
+            )
+            ELSE NULL
+        END) AS datadaftar_json")
 
             )
             ->where('reg_no', $this->regNoRef)

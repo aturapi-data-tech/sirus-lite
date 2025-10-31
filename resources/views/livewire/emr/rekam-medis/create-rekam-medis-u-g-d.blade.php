@@ -1,1467 +1,612 @@
-<div class="fixed inset-0 z-40">
-
-    <div class="">
-
-        <!-- This element is to trick the browser into transition-opacity. -->
-        <div class="fixed inset-0 transition-opacity">
-            <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+<div class="fixed inset-0 z-40 flex items-center justify-center bg-gray-500/75">
+    <div class="relative w-full max-w-6xl max-h-[95vh] overflow-y-auto bg-white rounded-lg shadow-xl">
+        {{-- Topbar --}}
+        <div class="sticky top-0 z-10 flex items-center justify-between p-4 text-white border-b rounded-t-lg bg-primary">
+            <h3 class="text-2xl font-semibold">{{ $myTitle }}</h3>
+            <button wire:click="closeModalLayanan()"
+                class="text-white bg-gray-100/20 hover:bg-gray-200 hover:text-gray-900 rounded-lg p-1.5">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293
+                        4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293
+                        4.293a1 1 0 01-1.414-1.414L8.586 10
+                        4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+            </button>
         </div>
 
-        <!-- This element is to trick the browser into transition-opacity. Body-->
-        <div class="fixed inset-0 transition-opacity">
-            <div class="absolute overflow-auto bg-white rounded-t-lg inset-4">
+        {{-- BODY --}}
+        <div class="h-full overflow-y-auto bg-white">
 
-                {{-- Topbar --}}
-                <div
-                    class="sticky top-0 flex items-center justify-between p-4 bg-opacity-75 border-b rounded-t-lg bg-primary">
-
-                    <!-- myTitle-->
-                    <h3 class="w-full text-2xl font-semibold text-white ">
-                        {{ $myTitle }}
-                    </h3>
-
-                    {{-- rjDate & Shift Input Rj --}}
-                    <div id="shiftTanggal" class="flex justify-end w-full mr-4">
-
-
-                        {{-- Close Modal --}}
-                        <button wire:click="closeModalLayanan()"
-                            class="text-gray-400 bg-gray-50 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd"
-                                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                                    clip-rule="evenodd"></path>
-                            </svg>
-                        </button>
+            {{-- IDENTITAS PASIEN --}}
+            <div class="px-4 pt-4">
+                <div class="grid gap-3 p-3 border border-gray-900 rounded-lg md:grid-cols-4">
+                    <div class="flex flex-col items-center justify-start text-center md:col-span-1">
+                        <img src="madinahlogopersegi.png" alt="Logo" class="object-contain h-28" />
+                        <div class="mt-2 text-xs leading-5">
+                            {{-- {!! $myQueryIdentitas->int_name . '</br>' !!} --}}
+                            {!! ($myQueryIdentitas->int_address ?? '-') . '</br>' !!}
+                            {!! ($myQueryIdentitas->int_city ?? '-') . '</br>' !!}
+                            {!! ($myQueryIdentitas->int_phone1 ?? '-') . '</br>' !!}
+                            {!! ($myQueryIdentitas->int_phone2 ?? '-') . '</br>' !!}
+                            {!! ($myQueryIdentitas->int_fax ?? '-') . '</br>' !!}
+                        </div>
                     </div>
-                </div>
-                {{-- Content --}}
-                <div class="bg-white ">
-                    <table class="w-full table-auto">
-                        <tbody>
-                            <tr>
-                                <td class="w-1/4 text-xs text-center border-2 border-gray-900">
-                                    <img src="madinahlogopersegi.png" class="object-fill h-32 mx-auto">
-                                    {{-- {!! $myQueryIdentitas->int_name . '</br>' !!} --}}
-                                    {!! $myQueryIdentitas->int_address . '</br>' !!}
-                                    {!! $myQueryIdentitas->int_city . '</br>' !!}
-                                    {!! $myQueryIdentitas->int_phone1 . '</br>' !!}
-                                    {!! $myQueryIdentitas->int_phone2 . '</br>' !!}
-                                    {!! $myQueryIdentitas->int_fax . '</br>' !!}
-                                </td>
-                                <td class="w-3/4 text-sm border-2 border-gray-900 text-start">
-                                    <div>
-                                        <table class="w-full table-auto">
-                                            <tbody>
-                                                <tr>
 
-                                                    <td class="p-1 m-1">Nama Pasien</td>
-                                                    <td class="p-1 m-1">:</td>
-                                                    <td class="p-1 m-1 text-sm font-semibold">
-                                                        {{ isset($dataPasien['pasien']['regName']) ? strtoupper($dataPasien['pasien']['regName']) : '-' }}/
-                                                        {{ isset($dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc']) ? $dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] : '-' }}/
-                                                        {{ isset($dataPasien['pasien']['thn']) ? $dataPasien['pasien']['thn'] : '-' }}
-                                                    </td>
-                                                    <td class="p-1 m-1">-</td>
-                                                    <td class="p-1 m-1">No RM</td>
-                                                    <td class="p-1 m-1">:</td>
-                                                    <td class="p-1 m-1 text-lg font-semibold">
-                                                        {{ isset($dataPasien['pasien']['regNo']) ? $dataPasien['pasien']['regNo'] : '-' }}
-                                                    </td>
-                                                </tr>
-                                                <tr>
+                    <div class="md:col-span-3">
+                        <div class="text-sm print:text-[11px]">
+                            <dl class="divide-y divide-gray-100/60">
+                                <!-- Nama Pasien -->
+                                <div class="flex items-baseline gap-2 py-0.5">
+                                    <dt class="w-32 shrink-0  after:content-[':'] after:ml-1">Nama Pasien
+                                    </dt>
+                                    <dd
+                                        class="flex-1 min-w-0 font-semibold truncate print:whitespace-normal print:overflow-visible">
+                                        {{ strtoupper($dataPasien['pasien']['regName'] ?? '-') }}
+                                        <span class="font-normal">
+                                            / {{ $dataPasien['pasien']['jenisKelamin']['jenisKelaminDesc'] ?? '-' }}
+                                            / {{ $dataPasien['pasien']['thn'] ?? '-' }}
+                                        </span>
+                                    </dd>
+                                </div>
 
-                                                    <td class="p-1 m-1">Tanggal Lahir</td>
-                                                    <td class="p-1 m-1">:</td>
-                                                    <td class="p-1 m-1">
-                                                        {{ isset($dataPasien['pasien']['tglLahir']) ? $dataPasien['pasien']['tglLahir'] : '-' }}
-                                                    </td>
-                                                    <td class="p-1 m-1">-</td>
-                                                    <td class="p-1 m-1">NIK</td>
-                                                    <td class="p-1 m-1">:</td>
-                                                    <td class="p-1 m-1">
-                                                        {{ isset($dataPasien['pasien']['identitas']['nik']) ? $dataPasien['pasien']['identitas']['nik'] : '-' }}
+                                <!-- No RM -->
+                                <div class="flex items-baseline gap-2 py-0.5">
+                                    <dt class="w-32 shrink-0  after:content-[':'] after:ml-1">No RM</dt>
+                                    <dd
+                                        class="flex-1 min-w-0 text-lg font-semibold truncate tabular-nums print:whitespace-normal print:overflow-visible">
+                                        {{ $dataPasien['pasien']['regNo'] ?? '-' }}
+                                    </dd>
+                                </div>
 
-                                                    </td>
-                                                </tr>
-                                                <tr>
+                                <!-- Tgl Lahir • NIK (2 kolom) -->
+                                <div class="flex flex-col gap-1 mt-1 md:flex-row md:gap-8">
+                                    <dl class="flex-1 space-y-1">
+                                        <div class="flex items-baseline gap-2 py-0.5">
+                                            <dt class="w-32 shrink-0  after:content-[':'] after:ml-1">Tanggal
+                                                Lahir</dt>
+                                            <dd
+                                                class="flex-1 min-w-0 truncate print:whitespace-normal print:overflow-visible">
+                                                {{ $dataPasien['pasien']['tglLahir'] ?? '-' }}
+                                            </dd>
+                                        </div>
+                                    </dl>
 
-                                                    <td class="p-1 m-1">Alamat</td>
-                                                    <td class="p-1 m-1">:</td>
-                                                    <td class="p-1 m-1">
-                                                        {{ isset($dataPasien['pasien']['identitas']['alamat']) ? $dataPasien['pasien']['identitas']['alamat'] : '-' }}
-                                                    </td>
-                                                    <td class="p-1 m-1">-</td>
-                                                    <td class="p-1 m-1">Id BPJS</td>
-                                                    <td class="p-1 m-1">:</td>
-                                                    <td class="p-1 m-1">
-                                                        {{ isset($dataPasien['pasien']['identitas']['idbpjs']) ? $dataPasien['pasien']['identitas']['idbpjs'] : '-' }}
-                                                    </td>
-                                                </tr>
-                                                <tr>
+                                    <dl class="flex-1 space-y-1">
+                                        <div class="flex items-baseline gap-2 py-0.5">
+                                            <dt class="w-20 shrink-0  after:content-[':'] after:ml-1">NIK</dt>
+                                            <dd
+                                                class="flex-1 min-w-0 break-words md:truncate print:whitespace-normal print:overflow-visible">
+                                                {{ $dataPasien['pasien']['identitas']['nik'] ?? '-' }}
+                                            </dd>
+                                        </div>
+                                    </dl>
+                                </div>
 
-                                                    <td class="p-1 m-1"></td>
-                                                    <td class="p-1 m-1">:</td>
-                                                    <td class="p-1 m-1"></td>
-                                                    <td class="p-1 m-1">-</td>
-                                                    <td class="p-1 m-1">Klaim</td>
-                                                    <td class="p-1 m-1">:</td>
-                                                    <td class="p-1 m-1">
-                                                        @isset($dataDaftarTxn['klaimId'])
-                                                            {{ $dataDaftarTxn['klaimId'] == 'UM'
-                                                                ? 'UMUM'
-                                                                : ($dataDaftarTxn['klaimId'] == 'JM'
-                                                                    ? 'BPJS'
-                                                                    : ($dataDaftarTxn['klaimId'] == 'KR'
-                                                                        ? 'Kronis'
-                                                                        : 'Asuransi Lain')) }}
-                                                        @endisset
-                                                    </td>
-                                                </tr>
-                                                <tr>
-
-                                                    <td class="p-1 m-1"></td>
-                                                    <td class="p-1 m-1">:</td>
-                                                    <td class="p-1 m-1"> </td>
-                                                    <td class="p-1 m-1">-</td>
-                                                    <td class="p-1 m-1">Tanggal Masuk</td>
-                                                    <td class="p-1 m-1">:</td>
-                                                    <td class="p-1 m-1">
-                                                        {{ isset($dataDaftarTxn['rjDate']) ? $dataDaftarTxn['rjDate'] : '-' }}
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                <!-- Alamat (full width) -->
+                                <div class="mt-1">
+                                    <div class="flex items-baseline gap-2 py-0.5">
+                                        <dt class="w-32 shrink-0  after:content-[':'] after:ml-1">Alamat</dt>
+                                        <dd class="flex-1 min-w-0 break-words print:whitespace-normal">
+                                            {{ $dataPasien['pasien']['identitas']['alamat'] ?? '-' }}
+                                        </dd>
                                     </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                                </div>
 
-                    {{-- assesment --}}
-                    <div>
-                        <table class="w-full table-auto">
-                            <tbody>
-                                <tr>
-                                    <td
-                                        class="p-2 m-2 text-2xl font-semibold text-center uppercase border-b-2 border-l-2 border-r-2 border-gray-900">
-                                        assesment awal instalasi gawat darurat
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    {{-- assesment --}}
-
-                    {{-- Pengkajian peerawatan --}}
-                    <div>
-                        @php
-                            $tingkatKegawatan =
-                                $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['tingkatKegawatan'] ?? 'P0';
-
-                            $tingkatKegawatanBgColor = match ($tingkatKegawatan) {
-                                'P1' => 'bg-red-500',
-                                'P2' => 'bg-yellow-500',
-                                'P3' => 'bg-green-500',
-                                'P0' => 'bg-gray-400',
-                                default => 'bg-white',
-                            };
-                        @endphp
-
-                        <table class="w-full table-auto {{ $tingkatKegawatanBgColor }}">
-                            <tbody>
-                                <tr>
-                                    <td
-                                        class="p-2 m-2 text-sm font-semibold uppercase border-b-2 border-l-2 border-gray-900 text-start">
-                                        pengkajian perawat
-                                    </td>
-
-                                    <td class="p-2 m-2 text-sm border-b-2 border-r-2 border-gray-900 text-start">
-                                        <span class="font-semibold">
-                                            Cara Masuk IGD :
-                                        </span>
-                                        {{ isset($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['caraMasukIgd']) ? $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['caraMasukIgd'] : '-' }}
-                                        /
-                                        <span class="font-semibold">
-                                            Tingkat Kegawatan :
-                                        </span>
-                                        {{ isset($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['tingkatKegawatan']) ? $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['tingkatKegawatan'] : '-' }}
-
-                                        <br>
-
-                                        <span class="font-semibold">
-                                            Status Psikologis :
-                                        </span>
-                                        {{ isset($dataDaftarTxn['anamnesa']['statusPsikologis']['tidakAdaKelainan'])
-                                            ? ($dataDaftarTxn['anamnesa']['statusPsikologis']['tidakAdaKelainan']
-                                                ? 'Tidak ada kelainan'
-                                                : '-')
-                                            : '-' }}
-                                        <span class="font-semibold">
-                                            /
-                                        </span>
-                                        {{ isset($dataDaftarTxn['anamnesa']['statusPsikologis']['marah'])
-                                            ? ($dataDaftarTxn['anamnesa']['statusPsikologis']['marah']
-                                                ? 'Marah'
-                                                : '-')
-                                            : '-' }}
-                                        <span class="font-semibold">
-                                            /
-                                        </span>
-                                        {{ isset($dataDaftarTxn['anamnesa']['statusPsikologis']['ccemas'])
-                                            ? ($dataDaftarTxn['anamnesa']['statusPsikologis']['ccemas']
-                                                ? 'Cemas'
-                                                : '-')
-                                            : '-' }}
-                                        <span class="font-semibold">
-                                            /
-                                        </span>
-                                        {{ isset($dataDaftarTxn['anamnesa']['statusPsikologis']['takut'])
-                                            ? ($dataDaftarTxn['anamnesa']['statusPsikologis']['takut']
-                                                ? 'Takut'
-                                                : '-')
-                                            : '-' }}
-                                        <span class="font-semibold">
-                                            /
-                                        </span>
-                                        {{ isset($dataDaftarTxn['anamnesa']['statusPsikologis']['sedih'])
-                                            ? ($dataDaftarTxn['anamnesa']['statusPsikologis']['sedih']
-                                                ? 'Sedih'
-                                                : '-')
-                                            : '-' }}
-                                        <span class="font-semibold">
-                                            /
-                                        </span>
-                                        {{ isset($dataDaftarTxn['anamnesa']['statusPsikologis']['cenderungBunuhDiri'])
-                                            ? ($dataDaftarTxn['anamnesa']['statusPsikologis']['cenderungBunuhDiri']
-                                                ? 'Resiko Bunuh Diri'
-                                                : '-')
-                                            : '-' }}
-                                        /
-                                        <span class="font-semibold">
-                                            Keterangan Status Psikologis
-                                        </span>
-                                        {{ isset($dataDaftarTxn['anamnesa']['statusPsikologis']['sebutstatusPsikologis']) ? $dataDaftarTxn['anamnesa']['statusPsikologis']['sebutstatusPsikologis'] : '-' }}
-
-                                        <br>
-
-                                        <span class="font-semibold">
-                                            Status Mental :
-                                        </span>
-                                        {{ isset($dataDaftarTxn['anamnesa']['statusMental']['statusMental'])
-                                            ? ($dataDaftarTxn['anamnesa']['statusMental']['statusMental']
-                                                ? $dataDaftarTxn['anamnesa']['statusMental']['statusMental']
-                                                : '-')
-                                            : '-' }}
-                                        /
-                                        <span class="font-semibold">
-                                            Keterangan Status Mental :
-                                        </span>
-                                        {{ isset($dataDaftarTxn['anamnesa']['statusMental']['sebutstatusPsikologis']) ? $dataDaftarTxn['anamnesa']['statusMental']['sebutstatusPsikologis'] : '-' }}
-                                    </td>
-
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    {{-- Pengkajian peerawatan --}}
-
-                    {{-- Anamnesa Pemeriksaan Fisik --}}
-                    <div>
-                        <table class="w-full table-auto">
-                            <tbody>
-                                <tr>
-                                    <td
-                                        class="w-3/4 text-sm border-b-2 border-l-2 border-r-2 border-gray-900 text-start">
-                                        <div>
-                                            <table class="w-full table-auto">
-                                                <tbody>
-                                                    <tr>
-                                                        <td class="w-1/4 pl-2 font-semibold uppercase align-text-top ">
-                                                            {{-- Anamnesa --}}
-                                                            Anamnesa
-
-                                                        </td>
-                                                        <td class="w-1/4 align-text-top">
-                                                            Keluhan Utama :
-                                                        </td>
-                                                        <td class="w-3/4">
-                                                            {!! nl2br(
-                                                                e(
-                                                                    isset($dataDaftarTxn['anamnesa']['keluhanUtama']['keluhanUtama'])
-                                                                        ? ($dataDaftarTxn['anamnesa']['keluhanUtama']['keluhanUtama']
-                                                                            ? $dataDaftarTxn['anamnesa']['keluhanUtama']['keluhanUtama']
-                                                                            : '-')
-                                                                        : '-',
-                                                                ),
-                                                            ) !!}
-                                                            <br>
-
-                                                        </td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td>
-                                                        </td>
-                                                        <td class="w-1/4 align-text-top">
-                                                            Screening Batuk :
-                                                        </td>
-                                                        <td class="w-3/4">
-                                                            @isset($dataDaftarTxn['anamnesa']['batuk']['riwayatDemam'])
-                                                                @if ($dataDaftarTxn['anamnesa']['batuk']['riwayatDemam'])
-                                                                    Riwayat Demam? :
-                                                                    {!! nl2br(
-                                                                        e(
-                                                                            isset($dataDaftarTxn['anamnesa']['batuk']['riwayatDemam'])
-                                                                                ? ($dataDaftarTxn['anamnesa']['batuk']['riwayatDemam']
-                                                                                    ? 'Ya'
-                                                                                    : '-')
-                                                                                : '-',
-                                                                        ),
-                                                                    ) !!}
-                                                                    /
-                                                                    {!! nl2br(
-                                                                        e(
-                                                                            isset($dataDaftarTxn['anamnesa']['batuk']['keteranganriwayatDemam'])
-                                                                                ? ($dataDaftarTxn['anamnesa']['batuk']['keteranganriwayatDemam']
-                                                                                    ? 'Ya'
-                                                                                    : '-')
-                                                                                : '-',
-                                                                        ),
-                                                                    ) !!}
-                                                                    <br>
-                                                                @endif
-                                                            @endisset
-
-                                                            @isset($dataDaftarTxn['anamnesa']['batuk']['berkeringatMlmHari'])
-                                                                @if ($dataDaftarTxn['anamnesa']['batuk']['berkeringatMlmHari'])
-                                                                    Riwayat Berkeringat Malam Hari Tanpa Aktifitas? :
-                                                                    {!! nl2br(
-                                                                        e(
-                                                                            isset($dataDaftarTxn['anamnesa']['batuk']['berkeringatMlmHari'])
-                                                                                ? ($dataDaftarTxn['anamnesa']['batuk']['berkeringatMlmHari']
-                                                                                    ? 'Ya'
-                                                                                    : '-')
-                                                                                : '-',
-                                                                        ),
-                                                                    ) !!}
-                                                                    /
-                                                                    {!! nl2br(
-                                                                        e(
-                                                                            isset($dataDaftarTxn['anamnesa']['batuk']['keteranganberkeringatMlmHari'])
-                                                                                ? ($dataDaftarTxn['anamnesa']['batuk']['keteranganberkeringatMlmHari']
-                                                                                    ? 'Ya'
-                                                                                    : '-')
-                                                                                : '-',
-                                                                        ),
-                                                                    ) !!}
-                                                                    <br>
-                                                                @endif
-                                                            @endisset
-
-                                                            @isset($dataDaftarTxn['anamnesa']['batuk']['bepergianDaerahWabah'])
-                                                                @if ($dataDaftarTxn['anamnesa']['batuk']['bepergianDaerahWabah'])
-                                                                    Riwayat Bepergian Daerah Wabah? :
-                                                                    {!! nl2br(
-                                                                        e(
-                                                                            isset($dataDaftarTxn['anamnesa']['batuk']['bepergianDaerahWabah'])
-                                                                                ? ($dataDaftarTxn['anamnesa']['batuk']['bepergianDaerahWabah']
-                                                                                    ? 'Ya'
-                                                                                    : '-')
-                                                                                : '-',
-                                                                        ),
-                                                                    ) !!}
-                                                                    /
-                                                                    {!! nl2br(
-                                                                        e(
-                                                                            isset($dataDaftarTxn['anamnesa']['batuk']['KeteranganbepergianDaerahWabah'])
-                                                                                ? ($dataDaftarTxn['anamnesa']['batuk']['KeteranganbepergianDaerahWabah']
-                                                                                    ? 'Ya'
-                                                                                    : '-')
-                                                                                : '-',
-                                                                        ),
-                                                                    ) !!}
-                                                                    <br>
-                                                                @endif
-                                                            @endisset
-
-                                                            @isset($dataDaftarTxn['anamnesa']['batuk']['riwayatPakaiObatJangkaPanjangan'])
-                                                                @if ($dataDaftarTxn['anamnesa']['batuk']['riwayatPakaiObatJangkaPanjangan'])
-                                                                    Riwayat Pemakaian Obat dalam Jangka Panjang? :
-                                                                    {!! nl2br(
-                                                                        e(
-                                                                            isset($dataDaftarTxn['anamnesa']['batuk']['riwayatPakaiObatJangkaPanjangan'])
-                                                                                ? ($dataDaftarTxn['anamnesa']['batuk']['riwayatPakaiObatJangkaPanjangan']
-                                                                                    ? 'Ya'
-                                                                                    : '-')
-                                                                                : '-',
-                                                                        ),
-                                                                    ) !!}
-                                                                    /
-                                                                    {!! nl2br(
-                                                                        e(
-                                                                            isset($dataDaftarTxn['anamnesa']['batuk']['keteranganriwayatPakaiObatJangkaPanjangan'])
-                                                                                ? ($dataDaftarTxn['anamnesa']['batuk']['keteranganriwayatPakaiObatJangkaPanjangan']
-                                                                                    ? 'Ya'
-                                                                                    : '-')
-                                                                                : '-',
-                                                                        ),
-                                                                    ) !!}
-                                                                    <br>
-                                                                @endif
-                                                            @endisset
-
-                                                            @isset($dataDaftarTxn['anamnesa']['batuk']['BBTurunTanpaSebab'])
-                                                                @if ($dataDaftarTxn['anamnesa']['batuk']['BBTurunTanpaSebab'])
-                                                                    Riwayat Berat Badan Turun Tanpa Sebab? :
-                                                                    {!! nl2br(
-                                                                        e(
-                                                                            isset($dataDaftarTxn['anamnesa']['batuk']['BBTurunTanpaSebab'])
-                                                                                ? ($dataDaftarTxn['anamnesa']['batuk']['BBTurunTanpaSebab']
-                                                                                    ? 'Ya'
-                                                                                    : '-')
-                                                                                : '-',
-                                                                        ),
-                                                                    ) !!}
-                                                                    /
-                                                                    {!! nl2br(
-                                                                        e(
-                                                                            isset($dataDaftarTxn['anamnesa']['batuk']['keteranganBBTurunTanpaSebab'])
-                                                                                ? ($dataDaftarTxn['anamnesa']['batuk']['keteranganBBTurunTanpaSebab']
-                                                                                    ? 'Ya'
-                                                                                    : '-')
-                                                                                : '-',
-                                                                        ),
-                                                                    ) !!}
-                                                                    <br>
-                                                                @endif
-                                                            @endisset
-
-                                                            @isset($dataDaftarTxn['anamnesa']['batuk']['pembesaranGetahBening'])
-                                                                @if ($dataDaftarTxn['anamnesa']['batuk']['pembesaranGetahBening'])
-                                                                    Ada Pembesaran Kelenjar Getah Bening? :
-                                                                    {!! nl2br(
-                                                                        e(
-                                                                            isset($dataDaftarTxn['anamnesa']['batuk']['pembesaranGetahBening'])
-                                                                                ? ($dataDaftarTxn['anamnesa']['batuk']['pembesaranGetahBening']
-                                                                                    ? 'Ya'
-                                                                                    : '-')
-                                                                                : '-',
-                                                                        ),
-                                                                    ) !!}
-                                                                    /
-                                                                    {!! nl2br(
-                                                                        e(
-                                                                            isset($dataDaftarTxn['anamnesa']['batuk']['keteranganpembesaranGetahBening'])
-                                                                                ? ($dataDaftarTxn['anamnesa']['batuk']['keteranganpembesaranGetahBening']
-                                                                                    ? 'Ya'
-                                                                                    : '-')
-                                                                                : '-',
-                                                                        ),
-                                                                    ) !!}
-                                                                    <br>
-                                                                @endif
-                                                            @endisset
-                                                            -
-                                                        </td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td>
-                                                        </td>
-                                                        <td class="w-1/4 align-text-top">
-                                                            Skala Nyeri :
-                                                        </td>
-                                                        <td class="w-3/4">
-                                                            VAS :
-                                                            {{ isset($dataDaftarTxn['penilaian']['nyeri']['vas']['vas'])
-                                                                ? ($dataDaftarTxn['penilaian']['nyeri']['vas']['vas']
-                                                                    ? $dataDaftarTxn['penilaian']['nyeri']['vas']['vas']
-                                                                    : '-')
-                                                                : '-' }}
-                                                            /
-                                                            Pencetus :
-                                                            {{ isset($dataDaftarTxn['penilaian']['nyeri']['pencetus'])
-                                                                ? ($dataDaftarTxn['penilaian']['nyeri']['pencetus']
-                                                                    ? $dataDaftarTxn['penilaian']['nyeri']['pencetus']
-                                                                    : '-')
-                                                                : '-' }}
-                                                            /
-                                                            Durasi :
-                                                            {{ isset($dataDaftarTxn['penilaian']['nyeri']['durasi'])
-                                                                ? ($dataDaftarTxn['penilaian']['nyeri']['durasi']
-                                                                    ? $dataDaftarTxn['penilaian']['nyeri']['durasi']
-                                                                    : '-')
-                                                                : '-' }}
-                                                            /
-                                                            Lokasi :
-                                                            {{ isset($dataDaftarTxn['penilaian']['nyeri']['lokasi'])
-                                                                ? ($dataDaftarTxn['penilaian']['nyeri']['lokasi']
-                                                                    ? $dataDaftarTxn['penilaian']['nyeri']['lokasi']
-                                                                    : '-')
-                                                                : '-' }}
-
-
-
-                                                        </td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td>
-                                                        </td>
-                                                        <td class="w-1/4 align-text-top">
-                                                            Resiko Jatuh :
-                                                        </td>
-                                                        <td class="w-3/4">
-
-                                                            Skala Humpty Dumpty
-                                                            /
-                                                            Total Skor :
-                                                            {{ isset($this->dataDaftarTxn['penilaian']['resikoJatuh']['skalaHumptyDumpty']['skalaHumptyDumptyScore'])
-                                                                ? ($this->dataDaftarTxn['penilaian']['resikoJatuh']['skalaHumptyDumpty']['skalaHumptyDumptyScore']
-                                                                    ? $this->dataDaftarTxn['penilaian']['resikoJatuh']['skalaHumptyDumpty']['skalaHumptyDumptyScore']
-                                                                    : '-')
-                                                                : '-' }}
-                                                            /
-                                                            {{ isset($this->dataDaftarTxn['penilaian']['resikoJatuh']['skalaHumptyDumpty']['skalaHumptyDumptyDesc'])
-                                                                ? ($this->dataDaftarTxn['penilaian']['resikoJatuh']['skalaHumptyDumpty']['skalaHumptyDumptyDesc']
-                                                                    ? $this->dataDaftarTxn['penilaian']['resikoJatuh']['skalaHumptyDumpty']['skalaHumptyDumptyDesc']
-                                                                    : '-')
-                                                                : '-' }}
-                                                            <br>
-                                                            Skala Morse
-                                                            /
-                                                            Total Skor :
-                                                            {{ isset($this->dataDaftarTxn['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseScore'])
-                                                                ? ($this->dataDaftarTxn['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseScore']
-                                                                    ? $this->dataDaftarTxn['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseScore']
-                                                                    : '-')
-                                                                : '-' }}
-                                                            /
-                                                            {{ isset($this->dataDaftarTxn['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseDesc'])
-                                                                ? ($this->dataDaftarTxn['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseDesc']
-                                                                    ? $this->dataDaftarTxn['penilaian']['resikoJatuh']['skalaMorse']['skalaMorseDesc']
-                                                                    : '-')
-                                                                : '-' }}
-                                                        </td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td></td>
-                                                        <td class="align-text-top">
-                                                            Riwayat Penyakit Sekarang :
-                                                        </td>
-                                                        <td class="w-3/4">
-                                                            {!! nl2br(
-                                                                e(
-                                                                    isset($dataDaftarTxn['anamnesa']['riwayatPenyakitSekarangUmum']['riwayatPenyakitSekarangUmum'])
-                                                                        ? ($dataDaftarTxn['anamnesa']['riwayatPenyakitSekarangUmum']['riwayatPenyakitSekarangUmum']
-                                                                            ? $dataDaftarTxn['anamnesa']['riwayatPenyakitSekarangUmum']['riwayatPenyakitSekarangUmum']
-                                                                            : '-')
-                                                                        : '-',
-                                                                ),
-                                                            ) !!}
-                                                            <br>
-
-                                                        </td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td></td>
-                                                        <td class="align-text-top">
-                                                            Riwayat Penyakit Dahulu :
-                                                        </td>
-                                                        <td class="w-3/4">
-                                                            {!! nl2br(
-                                                                e(
-                                                                    isset($dataDaftarTxn['anamnesa']['riwayatPenyakitDahulu']['riwayatPenyakitDahulu'])
-                                                                        ? ($dataDaftarTxn['anamnesa']['riwayatPenyakitDahulu']['riwayatPenyakitDahulu']
-                                                                            ? $dataDaftarTxn['anamnesa']['riwayatPenyakitDahulu']['riwayatPenyakitDahulu']
-                                                                            : '-')
-                                                                        : '-',
-                                                                ),
-                                                            ) !!}
-                                                        </td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td></td>
-                                                        <td class="align-text-top">
-                                                            Alergi :
-                                                        </td>
-                                                        <td class="w-3/4">
-                                                            {!! nl2br(
-                                                                e(
-                                                                    isset($dataDaftarTxn['anamnesa']['alergi']['alergi'])
-                                                                        ? ($dataDaftarTxn['anamnesa']['alergi']['alergi']
-                                                                            ? $dataDaftarTxn['anamnesa']['alergi']['alergi']
-                                                                            : '-')
-                                                                        : '-',
-                                                                ),
-                                                            ) !!}
-                                                            <br>
-                                                        </td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td></td>
-                                                        <td class="align-text-top">
-                                                            Rekonsiliasi Obat :
-                                                        </td>
-                                                        <td class="w-3/4">
-                                                            {{-- rekonsiliasiObat --}}
-                                                            <table class="w-full table-auto">
-                                                                <thead class="text-xs text-gray-900 uppercase ">
-                                                                    <tr>
-                                                                        <th>
-                                                                            Nama Obat
-                                                                        </th>
-
-                                                                        <th>
-                                                                            Dosis
-                                                                        </th>
-
-                                                                        <th>
-                                                                            Rute
-                                                                        </th>
-                                                                    </tr>
-                                                                </thead>
-                                                                @isset($dataDaftarTxn['anamnesa']['rekonsiliasiObat'])
-                                                                    @foreach ($dataDaftarTxn['anamnesa']['rekonsiliasiObat'] as $key => $rekonsiliasiObat)
-                                                                        <tbody>
-                                                                            <tr>
-                                                                                <td class="w-1/3 text-center">
-                                                                                    {{ $rekonsiliasiObat['namaObat'] }}
-                                                                                </td>
-
-                                                                                <td class="w-1/3 text-center">
-                                                                                    {{ $rekonsiliasiObat['dosis'] }}
-                                                                                </td>
-
-                                                                                <td class="w-1/3 text-center">
-                                                                                    {{ $rekonsiliasiObat['rute'] }}
-                                                                                </td>
-                                                                            </tr>
-                                                                        </tbody>
-                                                                    @endforeach
-                                                                @endisset
-                                                            </table>
-                                                            {{-- rekonsiliasiObat --}}
-
-                                                        </td>
-                                                    </tr>
-
-                                                </tbody>
-                                            </table>
+                                <!-- ID BPJS • Klaim (2 kolom) -->
+                                <div class="flex flex-col gap-1 mt-1 md:flex-row md:gap-8">
+                                    <dl class="flex-1 space-y-1">
+                                        <div class="flex items-baseline gap-2 py-0.5">
+                                            <dt class="w-32 shrink-0  after:content-[':'] after:ml-1">ID BPJS
+                                            </dt>
+                                            <dd
+                                                class="flex-1 min-w-0 truncate print:whitespace-normal print:overflow-visible">
+                                                {{ $dataPasien['pasien']['identitas']['idbpjs'] ?? '-' }}
+                                            </dd>
                                         </div>
-                                    </td>
-                                    <td
-                                        class="w-1/4 text-sm border-b-2 border-l-2 border-r-2 border-gray-900 text-start">
-                                        <div>
-                                            <table class="w-full table-auto">
-                                                <tbody>
-                                                    <tr>
-                                                        <td class="w-1/2 font-semibold uppercase align-text-top">
-                                                            {{-- Perawat / Terapis --}}
-                                                            Perawat / Terapis :
-                                                        </td>
-                                                        <td class="w-1/2">
-                                                            .
-                                                            <br>
-                                                            <div class="pl-[0px]">
-                                                                @php
-                                                                    $drPemeriksa = isset(
-                                                                        $dataDaftarTxn['anamnesa'][
-                                                                            'pengkajianPerawatan'
-                                                                        ]['perawatPenerima'],
-                                                                    )
-                                                                        ? ($dataDaftarTxn['anamnesa'][
-                                                                            'pengkajianPerawatan'
-                                                                        ]['perawatPenerima']
-                                                                            ? $dataDaftarTxn['anamnesa'][
-                                                                                'pengkajianPerawatan'
-                                                                            ]['perawatPenerima']
-                                                                            : 'Perawat Penerima')
-                                                                        : 'Perawat Penerima';
-                                                                @endphp
-                                                                {!! DNS2D::getBarcodeHTML($drPemeriksa, 'QRCODE', 3, 3) !!}
-                                                            </div>
-                                                            ttd
-                                                            <br>
-                                                            {{ isset($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima'])
-                                                                ? ($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima']
-                                                                    ? strtoupper($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['perawatPenerima'])
-                                                                    : 'Perawat Penerima')
-                                                                : 'Perawat Penerima' }}
-                                                        </td>
-                                                    </tr>
+                                    </dl>
 
-                                                    <tr>
-                                                        <td class="w-1/2 font-semibold uppercase">
-                                                            {{-- Tanda Vital --}}
-                                                            Tanda Vital :
-                                                        </td>
-                                                        <td class="w-1/2">
-
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="pr-4 text-end">
-                                                            TD :
-                                                        </td>
-                                                        <td>
-                                                            {{ isset($dataDaftarTxn['pemeriksaan']['tandaVital']['sistolik'])
-                                                                ? ($dataDaftarTxn['pemeriksaan']['tandaVital']['sistolik']
-                                                                    ? $dataDaftarTxn['pemeriksaan']['tandaVital']['sistolik']
-                                                                    : '-')
-                                                                : '-' }}
-                                                            /
-                                                            {{ isset($dataDaftarTxn['pemeriksaan']['tandaVital']['distolik'])
-                                                                ? ($dataDaftarTxn['pemeriksaan']['tandaVital']['distolik']
-                                                                    ? $dataDaftarTxn['pemeriksaan']['tandaVital']['distolik']
-                                                                    : '-')
-                                                                : '-' }}
-                                                            mmhg
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="pr-4 text-end">
-                                                            Nadi :
-                                                        </td>
-                                                        <td>
-                                                            {{ isset($dataDaftarTxn['pemeriksaan']['tandaVital']['frekuensiNadi'])
-                                                                ? ($dataDaftarTxn['pemeriksaan']['tandaVital']['frekuensiNadi']
-                                                                    ? $dataDaftarTxn['pemeriksaan']['tandaVital']['frekuensiNadi']
-                                                                    : '-')
-                                                                : '-' }}
-                                                            x/mnt
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="pr-4 text-end">
-                                                            Suhu :
-                                                        </td>
-                                                        <td>
-                                                            {{ isset($dataDaftarTxn['pemeriksaan']['tandaVital']['suhu'])
-                                                                ? ($dataDaftarTxn['pemeriksaan']['tandaVital']['suhu']
-                                                                    ? $dataDaftarTxn['pemeriksaan']['tandaVital']['suhu']
-                                                                    : '-')
-                                                                : '-' }}
-                                                            &degC
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="pr-4 text-end">
-                                                            Pernafasan :
-                                                        </td>
-                                                        <td>
-                                                            {{ isset($dataDaftarTxn['pemeriksaan']['tandaVital']['frekuensiNafas'])
-                                                                ? ($dataDaftarTxn['pemeriksaan']['tandaVital']['frekuensiNafas']
-                                                                    ? $dataDaftarTxn['pemeriksaan']['tandaVital']['frekuensiNafas']
-                                                                    : '-')
-                                                                : '-' }}
-                                                            x/mnt
-                                                        </td>
-                                                    </tr>
-                                                    {{-- <tr>
-                                                        <td class="pr-4 text-end">
-                                                            Saturasi O2 :
-                                                        </td>
-                                                        <td>
-                                                            {{ isset($dataDaftarTxn['pemeriksaan']['tandaVital']['saturasiO2'])
-                                                                ? ($dataDaftarTxn['pemeriksaan']['tandaVital']['saturasiO2']
-                                                                    ? $dataDaftarTxn['pemeriksaan']['tandaVital']['saturasiO2']
-                                                                    : '-')
-                                                                : '-' }}
-                                                            Saturasi
-                                                        </td>
-                                                    </tr> --}}
-                                                    {{-- <tr>
-                                                        <td class="pr-4 text-end">
-                                                            Berat Badan :
-                                                        </td>
-                                                        <td>
-                                                            {{ isset($dataDaftarTxn['pemeriksaan']['nutrisi']['bb'])
-                                                                ? ($dataDaftarTxn['pemeriksaan']['nutrisi']['bb']
-                                                                    ? $dataDaftarTxn['pemeriksaan']['nutrisi']['bb']
-                                                                    : '-')
-                                                                : '-' }}
-                                                            kg
-                                                        </td>
-                                                    </tr> --}}
-                                                    <tr>
-                                                        <td class="pr-4 text-end">
-                                                            SPO2 :
-                                                        </td>
-                                                        <td>
-                                                            {{ isset($dataDaftarTxn['pemeriksaan']['tandaVital']['spo2'])
-                                                                ? ($dataDaftarTxn['pemeriksaan']['tandaVital']['spo2']
-                                                                    ? $dataDaftarTxn['pemeriksaan']['tandaVital']['spo2']
-                                                                    : '-')
-                                                                : '-' }}
-                                                            %
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="pr-4 text-end">
-                                                            GDA :
-                                                        </td>
-                                                        <td>
-                                                            {{ isset($dataDaftarTxn['pemeriksaan']['tandaVital']['gda'])
-                                                                ? ($dataDaftarTxn['pemeriksaan']['tandaVital']['gda']
-                                                                    ? $dataDaftarTxn['pemeriksaan']['tandaVital']['gda']
-                                                                    : '-')
-                                                                : '-' }}
-                                                            mg/dL
-                                                        </td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td class="w-1/2 font-semibold uppercase">
-                                                            {{-- Nutrisi --}}
-                                                            Nutrisi :
-                                                        </td>
-                                                        <td class="w-1/2">
-
-                                                        </td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td class="pr-4 text-end">
-                                                            Berat Badan :
-                                                        </td>
-                                                        <td>
-                                                            {{ isset($dataDaftarTxn['pemeriksaan']['nutrisi']['bb'])
-                                                                ? ($dataDaftarTxn['pemeriksaan']['nutrisi']['bb']
-                                                                    ? $dataDaftarTxn['pemeriksaan']['nutrisi']['bb']
-                                                                    : '-')
-                                                                : '-' }}
-                                                            Kg
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="pr-4 text-end">
-                                                            Tinggi Badan :
-                                                        </td>
-                                                        <td>
-                                                            {{ isset($dataDaftarTxn['pemeriksaan']['nutrisi']['tb'])
-                                                                ? ($dataDaftarTxn['pemeriksaan']['nutrisi']['tb']
-                                                                    ? $dataDaftarTxn['pemeriksaan']['nutrisi']['tb']
-                                                                    : '-')
-                                                                : '-' }}
-                                                            cm
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="pr-4 text-end">
-                                                            Index Masa Tubuh :
-                                                        </td>
-                                                        <td>
-                                                            {{ isset($dataDaftarTxn['pemeriksaan']['nutrisi']['imt'])
-                                                                ? ($dataDaftarTxn['pemeriksaan']['nutrisi']['imt']
-                                                                    ? $dataDaftarTxn['pemeriksaan']['nutrisi']['imt']
-                                                                    : '-')
-                                                                : '-' }}
-                                                            Kg/M2
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="pr-4 text-end">
-                                                            Lingkar Kepala :
-                                                        </td>
-                                                        <td>
-                                                            {{ isset($dataDaftarTxn['pemeriksaan']['nutrisi']['lk'])
-                                                                ? ($dataDaftarTxn['pemeriksaan']['nutrisi']['lk']
-                                                                    ? $dataDaftarTxn['pemeriksaan']['nutrisi']['lk']
-                                                                    : '-')
-                                                                : '-' }}
-                                                            cm
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="pr-4 text-end">
-                                                            Lingkar Lengan Atas :
-                                                        </td>
-                                                        <td>
-                                                            {{ isset($dataDaftarTxn['pemeriksaan']['nutrisi']['lila'])
-                                                                ? ($dataDaftarTxn['pemeriksaan']['nutrisi']['lila']
-                                                                    ? $dataDaftarTxn['pemeriksaan']['nutrisi']['lila']
-                                                                    : '-')
-                                                                : '-' }}
-                                                            cm
-                                                        </td>
-                                                    </tr>
-
-
-
-
-                                                </tbody>
-                                            </table>
+                                    <dl class="flex-1 space-y-1">
+                                        <div class="flex items-baseline gap-2 py-0.5">
+                                            <dt class="w-20 shrink-0  after:content-[':'] after:ml-1">Klaim
+                                            </dt>
+                                            <dd class="flex-1 min-w-0">
+                                                @php $k = $dataDaftarTxn['klaimId'] ?? null; @endphp
+                                                {{ $k === 'UM' ? 'UMUM' : ($k === 'JM' ? 'BPJS' : ($k === 'KR' ? 'Kronis' : ($k ? 'Asuransi Lain' : '-'))) }}
+                                            </dd>
                                         </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                                    </dl>
+                                </div>
+
+                                <!-- Tanggal Masuk -->
+                                <div class="mt-1">
+                                    <div class="flex items-baseline gap-2 py-0.5">
+                                        <dt class="w-32 shrink-0  after:content-[':'] after:ml-1">Tanggal Masuk
+                                        </dt>
+                                        <dd
+                                            class="flex-1 min-w-0 truncate print:whitespace-normal print:overflow-visible">
+                                            {{ $dataDaftarTxn['rjDate'] ?? '-' }}
+                                        </dd>
+                                    </div>
+                                </div>
+                            </dl>
+                        </div>
+
                     </div>
-                    {{-- Anamnesa Pemeriksaan Fisik --}}
-
-                    {{-- Keadaan Umum --}}
-                    <div>
-                        <table class="w-full table-auto">
-                            <tbody>
-                                <tr>
-                                    <td
-                                        class="w-1/4 p-2 m-2 text-sm font-semibold uppercase border-b-2 border-l-2 border-r-2 border-gray-900 text-start">
-                                        keadaan umum
-                                    </td>
-                                    <td
-                                        class="w-3/4 p-2 m-2 text-sm text-center border-b-2 border-l-2 border-r-2 border-gray-900">
-                                        {{-- <span class="font-semibold">
-                                            Keadaan Umum :
-                                        </span> --}}
-                                        {{ isset($dataDaftarTxn['pemeriksaan']['tandaVital']['keadaanUmum'])
-                                            ? ($dataDaftarTxn['pemeriksaan']['tandaVital']['keadaanUmum']
-                                                ? $dataDaftarTxn['pemeriksaan']['tandaVital']['keadaanUmum']
-                                                : '-')
-                                            : '-' }}
-                                        /
-                                        <span class="font-semibold">
-                                            Tingkat Kesadaran :
-                                        </span>
-                                        {{ isset($dataDaftarTxn['pemeriksaan']['tandaVital']['tingkatKesadaran'])
-                                            ? ($dataDaftarTxn['pemeriksaan']['tandaVital']['tingkatKesadaran']
-                                                ? $dataDaftarTxn['pemeriksaan']['tandaVital']['tingkatKesadaran']
-                                                : '-')
-                                            : '-' }}
-                                    </td>
-
-                                </tr>
-
-                                <tr>
-                                    <td
-                                        class="w-1/4 p-2 m-2 text-sm font-semibold uppercase border-b-2 border-l-2 border-r-2 border-gray-900 text-start">
-                                        abcd
-                                    </td>
-                                    <td
-                                        class="p-2 m-2 text-sm text-center border-b-2 border-l-2 border-r-2 border-gray-900">
-                                        <span class="font-semibold">
-                                            Jalan Nafas (A) :
-                                        </span>
-                                        {{ isset($dataDaftarTxn['pemeriksaan']['tandaVital']['jalanNafas']['jalanNafas'])
-                                            ? ($dataDaftarTxn['pemeriksaan']['tandaVital']['jalanNafas']['jalanNafas']
-                                                ? $dataDaftarTxn['pemeriksaan']['tandaVital']['jalanNafas']['jalanNafas']
-                                                : '-')
-                                            : '-' }}
-                                        /
-                                        <span class="font-semibold">
-                                            Pernafasan (B) :
-                                        </span>
-                                        {{ isset($dataDaftarTxn['pemeriksaan']['tandaVital']['pernafasan']['pernafasan'])
-                                            ? ($dataDaftarTxn['pemeriksaan']['tandaVital']['pernafasan']['pernafasan']
-                                                ? $dataDaftarTxn['pemeriksaan']['tandaVital']['pernafasan']['pernafasan']
-                                                : '-')
-                                            : '-' }}
-                                        <span class="font-semibold">
-                                            Gerak Dada :
-                                        </span>
-                                        {{ isset($dataDaftarTxn['pemeriksaan']['tandaVital']['gerakDada']['gerakDada'])
-                                            ? ($dataDaftarTxn['pemeriksaan']['tandaVital']['gerakDada']['gerakDada']
-                                                ? $dataDaftarTxn['pemeriksaan']['tandaVital']['gerakDada']['gerakDada']
-                                                : '-')
-                                            : '-' }}
-
-
-                                        <br>
-                                        <span class="font-semibold">
-                                            Sirkulasi (C) :
-                                        </span>
-                                        {{ isset($dataDaftarTxn['pemeriksaan']['tandaVital']['sirkulasi']['sirkulasi'])
-                                            ? ($dataDaftarTxn['pemeriksaan']['tandaVital']['sirkulasi']['sirkulasi']
-                                                ? $dataDaftarTxn['pemeriksaan']['tandaVital']['sirkulasi']['sirkulasi']
-                                                : '-')
-                                            : '-' }}
-                                        /
-                                        <span class="font-semibold">
-                                            Neurologi (D) :
-                                        </span>
-                                        Mata :
-                                        {{ isset($dataDaftarTxn['pemeriksaan']['tandaVital']['e'])
-                                            ? ($dataDaftarTxn['pemeriksaan']['tandaVital']['e']
-                                                ? $dataDaftarTxn['pemeriksaan']['tandaVital']['e']
-                                                : '-')
-                                            : '-' }}
-                                        -
-                                        Verbal:
-                                        {{ isset($dataDaftarTxn['pemeriksaan']['tandaVital']['v'])
-                                            ? ($dataDaftarTxn['pemeriksaan']['tandaVital']['v']
-                                                ? $dataDaftarTxn['pemeriksaan']['tandaVital']['v']
-                                                : '-')
-                                            : '-' }}
-                                        -
-                                        Motorik :
-                                        {{ isset($dataDaftarTxn['pemeriksaan']['tandaVital']['m'])
-                                            ? ($dataDaftarTxn['pemeriksaan']['tandaVital']['m']
-                                                ? $dataDaftarTxn['pemeriksaan']['tandaVital']['m']
-                                                : '-')
-                                            : '-' }}
-                                        -
-                                        GCS:
-                                        {{ isset($dataDaftarTxn['pemeriksaan']['tandaVital']['gcs'])
-                                            ? ($dataDaftarTxn['pemeriksaan']['tandaVital']['gcs']
-                                                ? $dataDaftarTxn['pemeriksaan']['tandaVital']['gcs']
-                                                : '-')
-                                            : '-' }}
-
-                                    </td>
-                                </tr>
-                                {{-- fungsional --}}
-                                <tr>
-                                    <td
-                                        class="p-2 m-2 text-sm font-semibold uppercase border-b-2 border-l-2 border-r-2 border-gray-900 text-start">
-                                        fungsional
-                                    </td>
-
-                                    <td
-                                        class="p-2 m-2 text-sm text-center border-b-2 border-l-2 border-r-2 border-gray-900">
-                                        <span class="font-semibold">
-                                            Alat Bantu :
-                                        </span>
-                                        {{ isset($dataDaftarTxn['pemeriksaan']['fungsional']['alatBantu'])
-                                            ? ($dataDaftarTxn['pemeriksaan']['fungsional']['alatBantu']
-                                                ? $dataDaftarTxn['pemeriksaan']['fungsional']['alatBantu']
-                                                : '-')
-                                            : '-' }}
-                                        /
-                                        <span class="font-semibold">
-                                            Prothesa :
-                                        </span>
-                                        {{ isset($dataDaftarTxn['pemeriksaan']['fungsional']['prothesa'])
-                                            ? ($dataDaftarTxn['pemeriksaan']['fungsional']['prothesa']
-                                                ? $dataDaftarTxn['pemeriksaan']['fungsional']['prothesa']
-                                                : '-')
-                                            : '-' }}
-                                        /
-                                        <span class="font-semibold">
-                                            Cacat Tubuh :
-                                        </span>
-                                        {{ isset($dataDaftarTxn['pemeriksaan']['fungsional']['cacatTubuh'])
-                                            ? ($dataDaftarTxn['pemeriksaan']['fungsional']['cacatTubuh']
-                                                ? $dataDaftarTxn['pemeriksaan']['fungsional']['cacatTubuh']
-                                                : '-')
-                                            : '-' }}
-                                    </td>
-                                </tr>
-                                {{-- pemeriksaan fisik --}}
-                                <tr>
-                                    <td
-                                        class="p-2 m-2 text-sm font-semibold uppercase border-b-2 border-l-2 border-r-2 border-gray-900 text-start">
-                                        pemeriksaan fisik
-                                    </td>
-
-                                    <td
-                                        class="p-2 m-2 text-sm text-center border-b-2 border-l-2 border-r-2 border-gray-900">
-
-
-                                        <table class="w-full table-auto">
-                                            <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <span class="font-semibold">
-                                                            Fisik :
-                                                        </span>
-                                                        <br>
-                                                        {!! nl2br(
-                                                            e(
-                                                                isset($dataDaftarTxn['pemeriksaan']['fisik'])
-                                                                    ? ($dataDaftarTxn['pemeriksaan']['fisik']
-                                                                        ? $dataDaftarTxn['pemeriksaan']['fisik']
-                                                                        : '-')
-                                                                    : '-',
-                                                            ),
-                                                        ) !!}
-                                                    </td>
-                                                    <td>
-                                                        <span class="font-semibold">
-                                                            Anatomi :
-                                                        </span>
-                                                        <br>
-                                                        @isset($dataDaftarTxn['pemeriksaan']['anatomi'])
-                                                            @foreach ($dataDaftarTxn['pemeriksaan']['anatomi'] as $key => $pAnatomi)
-                                                                @php
-                                                                    $kelainan = isset(
-                                                                        $dataDaftarTxn['pemeriksaan']['anatomi'][$key][
-                                                                            'kelainan'
-                                                                        ],
-                                                                    )
-                                                                        ? ($dataDaftarTxn['pemeriksaan']['anatomi'][
-                                                                            $key
-                                                                        ]['kelainan']
-                                                                            ? $dataDaftarTxn['pemeriksaan']['anatomi'][
-                                                                                $key
-                                                                            ]['kelainan']
-                                                                            : false)
-                                                                        : false;
-                                                                @endphp
-                                                                @if ($kelainan && $kelainan !== 'Tidak Diperiksa')
-                                                                    <span class="font-normal">
-                                                                        {{ strtoupper($key) }} :
-                                                                        {{ $kelainan }}
-                                                                    </span>
-                                                                    /
-                                                                    {!! nl2br(
-                                                                        e(
-                                                                            isset($dataDaftarTxn['pemeriksaan']['anatomi'][$key]['desc'])
-                                                                                ? ($dataDaftarTxn['pemeriksaan']['anatomi'][$key]['desc']
-                                                                                    ? $dataDaftarTxn['pemeriksaan']['anatomi'][$key]['desc']
-                                                                                    : '-')
-                                                                                : '-',
-                                                                        ),
-                                                                    ) !!}
-                                                                    <br>
-                                                                @endif
-                                                            @endforeach
-                                                        @endisset
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </td>
-                                </tr>
-                                {{-- pemeriksaan penunjang --}}
-                                <tr>
-                                    <td
-                                        class="p-2 m-2 text-sm font-semibold uppercase border-b-2 border-l-2 border-r-2 border-gray-900 text-start">
-                                        pemeriksaan penunjang
-                                    </td>
-
-                                    <td
-                                        class="p-2 m-2 text-sm text-center border-b-2 border-l-2 border-r-2 border-gray-900">
-                                        <span class="font-semibold">
-
-                                            Pemeriksaan Penunjang Lab / Foto / EKG / Lan-lain :
-                                        </span>
-                                        <br>
-                                        {!! nl2br(
-                                            e(
-                                                isset($dataDaftarTxn['pemeriksaan']['penunjang'])
-                                                    ? ($dataDaftarTxn['pemeriksaan']['penunjang']
-                                                        ? $dataDaftarTxn['pemeriksaan']['penunjang']
-                                                        : '-')
-                                                    : '-',
-                                            ),
-                                        ) !!}
-
-                                    </td>
-                                </tr>
-                                {{-- diagnosis --}}
-                                <tr>
-                                    <td
-                                        class="p-2 m-2 text-sm font-semibold uppercase border-b-2 border-l-2 border-r-2 border-gray-900 text-start">
-                                        diagnosis
-                                    </td>
-
-                                    <td
-                                        class="p-2 m-2 text-sm text-center border-b-2 border-l-2 border-r-2 border-gray-900">
-                                        <table class="w-full text-sm table-auto">
-                                            <thead>
-                                                <tr>
-                                                    {{-- <th>
-                                                        Kode (ICD 10)
-                                                    </th> --}}
-
-                                                    <th>
-                                                        Diagnosa
-                                                    </th>
-
-                                                    {{-- <th>
-                                                        Kategori
-                                                    </th> --}}
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-
-                                                {{-- @isset($dataDaftarTxn['diagnosis'])
-                                                    @foreach ($dataDaftarTxn['diagnosis'] as $key => $diag)
-                                                        <tr>
-
-                                                            <td>
-                                                                {{ $diag['icdX'] }}
-                                                            </td>
-
-                                                            <td>
-                                                                {{ $diag['diagDesc'] }}
-                                                            </td>
-
-
-
-                                                            <td>
-                                                                {{ $diag['kategoriDiagnosa'] }}
-                                                            </td>
-
-
-                                                        </tr>
-                                                    @endforeach
-                                                @endisset --}}
-
-                                                <tr>
-                                                    {{-- <td>
-                                                        Freetext Dokter
-                                                    </td> --}}
-                                                    <td>
-                                                        {!! nl2br(
-                                                            e(
-                                                                isset($dataDaftarTxn['diagnosisFreeText'])
-                                                                    ? ($dataDaftarTxn['diagnosisFreeText']
-                                                                        ? $dataDaftarTxn['diagnosisFreeText']
-                                                                        : '-')
-                                                                    : '-',
-                                                            ),
-                                                        ) !!}
-                                                    </td>
-                                                    {{-- <td>
-                                                    </td> --}}
-                                                </tr>
-
-                                            </tbody>
-                                        </table>
-
-
-                                    </td>
-                                </tr>
-                                {{-- prosedur --}}
-                                <tr>
-                                    <td
-                                        class="p-2 m-2 text-sm font-semibold uppercase border-b-2 border-l-2 border-r-2 border-gray-900 text-start">
-                                        prosedur
-                                    </td>
-
-                                    <td
-                                        class="p-2 m-2 text-sm text-center border-b-2 border-l-2 border-r-2 border-gray-900">
-                                        <table class="w-full text-sm table-auto">
-                                            <thead>
-                                                <tr>
-                                                    {{-- <th>
-                                                        Kode (ICD 9 CM)
-                                                    </th> --}}
-
-                                                    <th>
-                                                        Prosedur
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-
-                                                {{-- @isset($dataDaftarTxn['procedure'])
-                                                    @foreach ($dataDaftarTxn['procedure'] as $key => $procedure)
-                                                        <tr>
-
-                                                            <td>
-                                                                {{ $procedure['procedureId'] }}
-                                                            </td>
-
-                                                            <td>
-                                                                {{ $procedure['procedureDesc'] }}
-                                                            </td>
-
-                                                        </tr>
-                                                    @endforeach
-                                                @endisset --}}
-
-                                                <tr>
-                                                    {{-- <td>
-                                                        Freetext Dokter
-                                                    </td> --}}
-                                                    <td>
-                                                        {!! nl2br(
-                                                            e(
-                                                                isset($dataDaftarTxn['procedureFreeText'])
-                                                                    ? ($dataDaftarTxn['procedureFreeText']
-                                                                        ? $dataDaftarTxn['procedureFreeText']
-                                                                        : '-')
-                                                                    : '-',
-                                                            ),
-                                                        ) !!}
-                                                    </td>
-                                                </tr>
-
-
-                                            </tbody>
-                                        </table>
-
-
-
-                                    </td>
-                                </tr>
-                                {{-- status medik dan tindak lanjut --}}
-                                <tr>
-                                    <td
-                                        class="p-2 m-2 text-sm font-semibold uppercase border-b-2 border-l-2 border-r-2 border-gray-900 text-start">
-                                        status medik dan tindak lanjut
-                                    </td>
-
-                                    <td
-                                        class="p-2 m-2 text-sm text-center border-b-2 border-l-2 border-r-2 border-gray-900">
-                                        <span class="font-semibold">
-                                            Status Medik :
-                                        </span>
-                                        {{ isset($dataDaftarTxn['penilaian']['statusMedik']['statusMedik'])
-                                            ? ($dataDaftarTxn['penilaian']['statusMedik']['statusMedik']
-                                                ? $dataDaftarTxn['penilaian']['statusMedik']['statusMedik']
-                                                : '-')
-                                            : '-' }}
-                                        <br>
-                                        <span class="font-semibold">
-                                            Tindak Lanjut :
-                                        </span>
-                                        {{ isset($dataDaftarTxn['perencanaan']['tindakLanjut']['tindakLanjut'])
-                                            ? ($dataDaftarTxn['perencanaan']['tindakLanjut']['tindakLanjut']
-                                                ? $dataDaftarTxn['perencanaan']['tindakLanjut']['tindakLanjut']
-                                                : '-')
-                                            : '-' }}
-                                        /
-                                        {{ isset($dataDaftarTxn['perencanaan']['tindakLanjut']['keteranganTindakLanjut'])
-                                            ? ($dataDaftarTxn['perencanaan']['tindakLanjut']['keteranganTindakLanjut']
-                                                ? $dataDaftarTxn['perencanaan']['tindakLanjut']['keteranganTindakLanjut']
-                                                : '-')
-                                            : '-' }}
-
-
-                                        {{-- <br>
-                                        @inject('carbon', 'Carbon\Carbon')
-                                        <span class="font-semibold">
-                                            Waktu Datang :
-                                        </span>
-                                        {{ isset($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['jamDatang'])
-                                            ? ($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['jamDatang']
-                                                ? $carbon
-                                                    ::createFromFormat('d/m/Y H:i:s', $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['jamDatang'],env('APP_TIMEZONE'))->format('H:i:s')
-                                                : '-')
-                                            : '-' }}
-                                        /
-                                        <span class="font-semibold">
-                                            Waktu Pemeriksaan :
-                                        </span>
-                                        {{ isset($dataDaftarTxn['perencanaan']['pengkajianMedis']['waktuPemeriksaan'])
-                                            ? ($dataDaftarTxn['perencanaan']['pengkajianMedis']['waktuPemeriksaan']
-                                                ? $carbon
-                                                    ::createFromFormat('d/m/Y H:i:s', $dataDaftarTxn['perencanaan']['pengkajianMedis']['waktuPemeriksaan'],env('APP_TIMEZONE'))->format('H:i:s')
-                                                : '-')
-                                            : '-' }}
-                                        /
-                                        <span class="font-semibold">
-                                            Selesai Pemeriksaan :
-                                        </span>
-                                        {{ isset($dataDaftarTxn['perencanaan']['pengkajianMedis']['selesaiPemeriksaan'])
-                                            ? ($dataDaftarTxn['perencanaan']['pengkajianMedis']['selesaiPemeriksaan']
-                                                ? $carbon
-                                                    ::createFromFormat('d/m/Y H:i:s', $dataDaftarTxn['perencanaan']['pengkajianMedis']['selesaiPemeriksaan'],env('APP_TIMEZONE'))->format('H:i:s')
-                                                : '-')
-                                            : '-' }}
-                                        <br>
-                                        @isset($dataDaftarTxn['perencanaan']['pengkajianMedis']['waktuPemeriksaan'])
-                                            @isset($dataDaftarTxn['anamnesa']['pengkajianPerawatan']['jamDatang'])
-                                                <span class="font-semibold">
-                                                    Waktu Response untu pasien {{ $dataPasien['pasien']['regName'] }}
-                                                    adalah
-                                                    {{ $carbon
-                                                        ::createFromFormat('d/m/Y H:i:s', $dataDaftarTxn['perencanaan']['pengkajianMedis']['waktuPemeriksaan'])->diff($carbon::createFromFormat('d/m/Y H:i:s', $dataDaftarTxn['anamnesa']['pengkajianPerawatan']['jamDatang']))->format('%H:%I:%S') }}
-                                                </span>
-                                            @endisset
-                                        @endisset --}}
-
-
-                                    </td>
-                                </tr>
-                                {{-- terapi --}}
-                                <tr>
-                                    <td
-                                        class="p-2 m-2 text-sm font-semibold uppercase border-b-2 border-l-2 border-r-2 border-gray-900 text-start">
-                                        terapi
-                                    </td>
-                                    <td
-                                        class="p-2 m-2 text-sm border-b-2 border-l-2 border-r-2 border-gray-900 text-start">
-
-                                        <table class="w-full text-sm table-auto">
-                                            <tbody>
-                                                <td class="w-3/4">
-
-                                                    {!! nl2br(
-                                                        e(
-                                                            isset($dataDaftarTxn['perencanaan']['terapi']['terapi'])
-                                                                ? ($dataDaftarTxn['perencanaan']['terapi']['terapi']
-                                                                    ? $dataDaftarTxn['perencanaan']['terapi']['terapi']
-                                                                    : '-')
-                                                                : '-',
-                                                        ),
-                                                    ) !!}
-
-                                                </td>
-                                                @inject('carbon', 'Carbon\Carbon')
-                                                <td class="w-1/4 text-center">
-                                                    Tulungagung,
-                                                    {{ isset($dataDaftarTxn['perencanaan']['pengkajianMedis']['selesaiPemeriksaan'])
-                                                        ? ($dataDaftarTxn['perencanaan']['pengkajianMedis']['selesaiPemeriksaan']
-                                                            ? $dataDaftarTxn['perencanaan']['pengkajianMedis']['selesaiPemeriksaan']
-                                                            : 'Tanggal')
-                                                        : 'Tanggal' }}
-
-                                                    <br>
-                                                    <div class="pl-[85px]">
-                                                        @php
-                                                            $drPemeriksa = isset(
-                                                                $dataDaftarTxn['perencanaan']['pengkajianMedis'][
-                                                                    'drPemeriksa'
-                                                                ],
-                                                            )
-                                                                ? ($dataDaftarTxn['perencanaan']['pengkajianMedis'][
-                                                                    'drPemeriksa'
-                                                                ]
-                                                                    ? $dataDaftarTxn['perencanaan']['pengkajianMedis'][
-                                                                        'drPemeriksa'
-                                                                    ]
-                                                                    : 'Dokter Pemeriksa')
-                                                                : 'Dokter Pemeriksa';
-                                                        @endphp
-                                                        {!! DNS2D::getBarcodeHTML($drPemeriksa, 'QRCODE', 3, 3) !!}
-                                                    </div>
-                                                    ttd
-                                                    <br>
-                                                    {{ isset($dataDaftarTxn['perencanaan']['pengkajianMedis']['drPemeriksa'])
-                                                        ? ($dataDaftarTxn['perencanaan']['pengkajianMedis']['drPemeriksa']
-                                                            ? $dataDaftarTxn['perencanaan']['pengkajianMedis']['drPemeriksa']
-                                                            : 'Dokter Pemeriksa')
-                                                        : 'Dokter Pemeriksa' }}
-                                                </td>
-                                            </tbody>
-                                        </table>
-                                    </td>
-                                </tr>
-
-                            </tbody>
-                        </table>
-                    </div>
-                    {{-- Keadaan Umum --}}
 
                 </div>
-                {{-- End Content --}}
+            </div>
 
-                <div class="sticky bottom-0 flex justify-between px-4 py-3 bg-opacity-75 bg-gray-50 sm:px-6">
-                    <div class="">
-                        {{-- null --}}
+            {{-- SECTION TITLE --}}
+            <div class="px-4 mt-4">
+                <div
+                    class="px-3 py-2 text-2xl font-semibold text-center uppercase border-t border-gray-900 rounded-t-md border-x bg-gray-50">
+                    assesment awal instalasi gawat darurat
+                </div>
+            </div>
+
+            {{-- PENGKAJIAN PERAWAT + TRIASE --}}
+            @php
+                $triase = data_get($dataDaftarTxn, 'anamnesa.pengkajianPerawatan.tingkatKegawatan') ?? 'P0';
+                $triaseBg = match ($triase) {
+                    'P1' => 'bg-red-500 text-white',
+                    'P2' => 'bg-yellow-400',
+                    'P3' => 'bg-green-500 text-white',
+                    'P0' => 'bg-gray-400 text-white',
+                    default => 'bg-white',
+                };
+                $b = fn($v) => $v ?? false ? 'Ya' : '-';
+            @endphp
+            <div class="px-4">
+                <div class="border-b border-gray-900 rounded-b-md border-x">
+                    <div class="grid gap-0 md:grid-cols-4">
+                        <div class="p-3 text-sm font-semibold uppercase {{ $triaseBg }}">
+                            pengkajian perawat
+                            <div class="mt-1 text-xs font-normal opacity-90">
+                                Cara Masuk IGD:
+                                {{ data_get($dataDaftarTxn, 'anamnesa.pengkajianPerawatan.caraMasukIgd') ?? '-' }} /
+                                Triase: {{ $triase }}
+                            </div>
+                        </div>
+                        <div class="p-3 text-sm leading-6 md:col-span-3">
+                            <span class="font-semibold">Status Psikologis :</span>
+                            {{ $b(data_get($dataDaftarTxn, 'anamnesa.statusPsikologis.tidakAdaKelainan')) === 'Ya' ? 'Tidak ada kelainan' : '-' }}
+                            /
+                            {{ $b(data_get($dataDaftarTxn, 'anamnesa.statusPsikologis.marah')) === 'Ya' ? 'Marah' : '-' }}
+                            /
+                            {{ $b(data_get($dataDaftarTxn, 'anamnesa.statusPsikologis.ccemas')) === 'Ya' ? 'Cemas' : '-' }}
+                            /
+                            {{ $b(data_get($dataDaftarTxn, 'anamnesa.statusPsikologis.takut')) === 'Ya' ? 'Takut' : '-' }}
+                            /
+                            {{ $b(data_get($dataDaftarTxn, 'anamnesa.statusPsikologis.sedih')) === 'Ya' ? 'Sedih' : '-' }}
+                            /
+                            {{ $b(data_get($dataDaftarTxn, 'anamnesa.statusPsikologis.cenderungBunuhDiri')) === 'Ya' ? 'Resiko Bunuh Diri' : '-' }}
+                            /
+                            <span class="font-semibold">Keterangan :</span>
+                            {{ data_get($dataDaftarTxn, 'anamnesa.statusPsikologis.sebutstatusPsikologis') ?? '-' }}
+                            <br>
+                            <span class="font-semibold">Status Mental :</span>
+                            {{ data_get($dataDaftarTxn, 'anamnesa.statusMental.statusMental') ?? '-' }} /
+                            <span class="font-semibold">Keterangan :</span>
+                            {{ data_get($dataDaftarTxn, 'anamnesa.statusMental.sebutstatusPsikologis') ?? '-' }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- ANAMNESA & PEMERIKSAAN FISIK --}}
+            <div class="grid gap-0 px-4 mt-4 md:grid-cols-4">
+                {{-- kiri 3/4 --}}
+                <div class="border border-gray-900 md:col-span-3 rounded-l-md">
+                    <div class="text-sm divide-y divide-gray-200">
+                        {{-- Anamnesa: Keluhan Utama --}}
+                        <div class="grid grid-cols-4 gap-2 p-3">
+                            <div class="col-span-1 font-semibold uppercase">Anamnesa</div>
+                            <div class="col-span-1">Keluhan Utama :</div>
+                            <div class="col-span-2 break-words whitespace-pre-line">
+                                {!! nl2br(e(data_get($dataDaftarTxn, 'anamnesa.keluhanUtama.keluhanUtama') ?? '-')) !!}
+                            </div>
+                        </div>
+
+                        {{-- Screening Batuk --}}
+                        <div class="grid grid-cols-4 gap-2 p-3">
+                            <div></div>
+                            <div>Screening Batuk :</div>
+                            <div class="col-span-2">
+                                @php $batuk = data_get($dataDaftarTxn,'anamnesa.batuk', []); @endphp
+                                @if (data_get($batuk, 'riwayatDemam'))
+                                    Riwayat Demam? : Ya / {{ data_get($batuk, 'keteranganriwayatDemam', '-') }}<br>
+                                @endif
+                                @if (data_get($batuk, 'berkeringatMlmHari'))
+                                    Berkeringat Malam Tanpa Aktivitas? : Ya /
+                                    {{ data_get($batuk, 'keteranganberkeringatMlmHari', '-') }}<br>
+                                @endif
+                                @if (data_get($batuk, 'bepergianDaerahWabah'))
+                                    Bepergian ke Daerah Wabah? : Ya /
+                                    {{ data_get($batuk, 'KeteranganbepergianDaerahWabah', '-') }}<br>
+                                @endif
+                                @if (data_get($batuk, 'riwayatPakaiObatJangkaPanjangan'))
+                                    Pemakaian Obat Jangka Panjang? : Ya /
+                                    {{ data_get($batuk, 'keteranganriwayatPakaiObatJangkaPanjangan', '-') }}<br>
+                                @endif
+                                @if (data_get($batuk, 'BBTurunTanpaSebab'))
+                                    BB Turun Tanpa Sebab? : Ya /
+                                    {{ data_get($batuk, 'keteranganBBTurunTanpaSebab', '-') }}<br>
+                                @endif
+                                @if (data_get($batuk, 'pembesaranGetahBening'))
+                                    Pembesaran KGB? : Ya /
+                                    {{ data_get($batuk, 'keteranganpembesaranGetahBening', '-') }}<br>
+                                @endif
+                                -
+                            </div>
+                        </div>
+
+                        {{-- Skala Nyeri --}}
+                        <div class="grid grid-cols-4 gap-2 p-3">
+                            <div></div>
+                            <div>Skala Nyeri :</div>
+                            <div class="col-span-2">
+                                VAS : {{ data_get($dataDaftarTxn, 'penilaian.nyeri.vas.vas') ?? '-' }} /
+                                Pencetus : {{ data_get($dataDaftarTxn, 'penilaian.nyeri.pencetus') ?? '-' }} /
+                                Durasi : {{ data_get($dataDaftarTxn, 'penilaian.nyeri.durasi') ?? '-' }} /
+                                Lokasi : {{ data_get($dataDaftarTxn, 'penilaian.nyeri.lokasi') ?? '-' }}
+                            </div>
+                        </div>
+
+                        {{-- Resiko Jatuh --}}
+                        <div class="grid grid-cols-4 gap-2 p-3">
+                            <div></div>
+                            <div>Resiko Jatuh :</div>
+                            <div class="col-span-2">
+                                Skala Humpty Dumpty / Total Skor :
+                                {{ data_get($dataDaftarTxn, 'penilaian.resikoJatuh.skalaHumptyDumpty.skalaHumptyDumptyScore') ?? '-' }}
+                                /
+                                {{ data_get($dataDaftarTxn, 'penilaian.resikoJatuh.skalaHumptyDumpty.skalaHumptyDumptyDesc') ?? '-' }}
+                                <br>
+                                Skala Morse / Total Skor :
+                                {{ data_get($dataDaftarTxn, 'penilaian.resikoJatuh.skalaMorse.skalaMorseScore') ?? '-' }}
+                                /
+                                {{ data_get($dataDaftarTxn, 'penilaian.resikoJatuh.skalaMorse.skalaMorseDesc') ?? '-' }}
+                            </div>
+                        </div>
+
+                        {{-- Riwayat + Alergi --}}
+                        <div class="grid grid-cols-4 gap-2 p-3">
+                            <div></div>
+                            <div>Riwayat Penyakit Sekarang :</div>
+                            <div class="col-span-2 break-words whitespace-pre-line">
+                                {!! nl2br(
+                                    e(data_get($dataDaftarTxn, 'anamnesa.riwayatPenyakitSekarangUmum.riwayatPenyakitSekarangUmum') ?? '-'),
+                                ) !!}
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-4 gap-2 p-3">
+                            <div></div>
+                            <div>Riwayat Penyakit Dahulu :</div>
+                            <div class="col-span-2 break-words whitespace-pre-line">
+                                {!! nl2br(e(data_get($dataDaftarTxn, 'anamnesa.riwayatPenyakitDahulu.riwayatPenyakitDahulu') ?? '-')) !!}
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-4 gap-2 p-3">
+                            <div></div>
+                            <div>Alergi :</div>
+                            <div class="col-span-2 break-words whitespace-pre-line">
+                                {!! nl2br(e(data_get($dataDaftarTxn, 'anamnesa.alergi.alergi') ?? '-')) !!}
+                            </div>
+                        </div>
+
+                        {{-- Rekonsiliasi Obat --}}
+                        <div class="grid grid-cols-4 gap-2 p-3">
+                            <div></div>
+                            <div>Rekonsiliasi Obat :</div>
+                            <div class="col-span-2">
+                                <div class="overflow-hidden rounded-md ring-1 ring-gray-300">
+                                    <table class="w-full table-fixed">
+                                        <thead class="text-xs uppercase bg-gray-50">
+                                            <tr class="divide-x divide-gray-200">
+                                                <th class="px-2 py-1 text-left">Nama Obat</th>
+                                                <th class="px-2 py-1 text-left">Dosis</th>
+                                                <th class="px-2 py-1 text-left">Rute</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="text-sm divide-y divide-gray-200">
+                                            @foreach (data_get($dataDaftarTxn, 'anamnesa.rekonsiliasiObat', []) as $rek)
+                                                <tr class="divide-x divide-gray-200">
+                                                    <td class="px-2 py-1">{{ data_get($rek, 'namaObat', '-') }}</td>
+                                                    <td class="px-2 py-1">{{ data_get($rek, 'dosis', '-') }}</td>
+                                                    <td class="px-2 py-1">{{ data_get($rek, 'rute', '-') }}</td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- kanan 1/4 --}}
+                <div class="border border-gray-900 md:col-span-1 rounded-r-md">
+                    <div class="p-3 space-y-1 text-sm">
+                        <div class="font-semibold uppercase">Perawat / Terapis :</div>
+                        <div class="text-center">
+                            @php
+                                $imgPerawat =
+                                    optional(
+                                        App\Models\User::where(
+                                            'myuser_code',
+                                            data_get(
+                                                $dataDaftarTxn,
+                                                'anamnesa.pengkajianPerawatan.perawatPenerimaCode',
+                                            ),
+                                        )->first(),
+                                    )->myuser_ttd_image ?? null;
+                            @endphp
+                            @if ($imgPerawat)
+                                <img class="h-24 mx-auto" src="{{ asset('storage/' . $imgPerawat) }}"
+                                    alt="TTD Perawat" />
+                            @endif
+                            <div class="mt-2 text-xs italic text-gray-500">ttd</div>
+                            <div class="font-semibold">
+                                {{ strtoupper(data_get($dataDaftarTxn, 'anamnesa.pengkajianPerawatan.perawatPenerima') ?? 'Perawat Penerima') }}
+                            </div>
+                        </div>
+
+                        <div class="pt-2 font-semibold uppercase">Tanda Vital :</div>
+                        <div class="grid grid-cols-2 gap-x-3">
+                            <div class="text-right">TD :</div>
+                            <div>{{ data_get($dataDaftarTxn, 'pemeriksaan.tandaVital.sistolik', '-') }} /
+                                {{ data_get($dataDaftarTxn, 'pemeriksaan.tandaVital.distolik', '-') }} mmHg</div>
+
+                            <div class="text-right">Nadi :</div>
+                            <div>{{ data_get($dataDaftarTxn, 'pemeriksaan.tandaVital.frekuensiNadi', '-') }} x/mnt
+                            </div>
+
+                            <div class="text-right">Suhu :</div>
+                            <div>{{ data_get($dataDaftarTxn, 'pemeriksaan.tandaVital.suhu', '-') }} °C</div>
+
+                            <div class="text-right">Pernafasan :</div>
+                            <div>{{ data_get($dataDaftarTxn, 'pemeriksaan.tandaVital.frekuensiNafas', '-') }} x/mnt
+                            </div>
+
+                            <div class="text-right">SPO₂ :</div>
+                            <div>{{ data_get($dataDaftarTxn, 'pemeriksaan.tandaVital.spo2', '-') }} %</div>
+
+                            <div class="text-right">GDA :</div>
+                            <div>{{ data_get($dataDaftarTxn, 'pemeriksaan.tandaVital.gda', '-') }} mg/dL</div>
+                        </div>
+
+                        <div class="pt-2 font-semibold uppercase">Nutrisi :</div>
+                        <div class="grid grid-cols-2 gap-x-3">
+                            <div class="text-right">Berat Badan :</div>
+                            <div>{{ data_get($dataDaftarTxn, 'pemeriksaan.nutrisi.bb', '-') }} kg</div>
+
+                            <div class="text-right">Tinggi Badan :</div>
+                            <div>{{ data_get($dataDaftarTxn, 'pemeriksaan.nutrisi.tb', '-') }} cm</div>
+
+                            <div class="text-right">IMT :</div>
+                            <div>{{ data_get($dataDaftarTxn, 'pemeriksaan.nutrisi.imt', '-') }} Kg/M²</div>
+
+                            <div class="text-right">Lingkar Kepala :</div>
+                            <div>{{ data_get($dataDaftarTxn, 'pemeriksaan.nutrisi.lk', '-') }} cm</div>
+
+                            <div class="text-right">LILA :</div>
+                            <div>{{ data_get($dataDaftarTxn, 'pemeriksaan.nutrisi.lila', '-') }} cm</div>
+
+                            <div class="text-right">Lingkar Perut :</div>
+                            <div>{{ data_get($dataDaftarTxn, 'pemeriksaan.nutrisi.liPerut', '-') }} cm</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- KEADAAN UMUM --}}
+            <div class="px-4 mt-4">
+                <div
+                    class="px-3 py-2 text-sm font-semibold uppercase border-t border-gray-900 rounded-t-md border-x bg-gray-50">
+                    keadaan umum</div>
+                <div class="px-3 py-2 text-sm text-center border-b border-gray-900 rounded-b-md border-x">
+                    {{ data_get($dataDaftarTxn, 'pemeriksaan.tandaVital.keadaanUmum') ?? '-' }} /
+                    <span class="font-semibold">Tingkat Kesadaran :</span>
+                    {{ data_get($dataDaftarTxn, 'pemeriksaan.tandaVital.tingkatKesadaran') ?? '-' }}
+                </div>
+            </div>
+
+            {{-- ABCD --}}
+            <div class="px-4 mt-2">
+                <div
+                    class="px-3 py-2 text-sm font-semibold uppercase border-t border-gray-900 rounded-t-md border-x bg-gray-50">
+                    ABCD (Airway, Breathing, Circulation, Disability)
+                </div>
+                <div class="px-3 py-2 text-sm text-center border-b border-gray-900 rounded-b-md border-x">
+                    <span class="font-semibold">Jalan Nafas (A):</span>
+                    {{ data_get($dataDaftarTxn, 'pemeriksaan.tandaVital.jalanNafas.jalanNafas') ?? '-' }} /
+                    <span class="font-semibold">Pernafasan (B):</span>
+                    {{ data_get($dataDaftarTxn, 'pemeriksaan.tandaVital.pernafasan.pernafasan') ?? '-' }}
+                    <span class="font-semibold">Gerak Dada:</span>
+                    {{ data_get($dataDaftarTxn, 'pemeriksaan.tandaVital.gerakDada.gerakDada') ?? '-' }}
+                    <br>
+                    <span class="font-semibold">Sirkulasi (C):</span>
+                    {{ data_get($dataDaftarTxn, 'pemeriksaan.tandaVital.sirkulasi.sirkulasi') ?? '-' }} /
+                    <span class="font-semibold">Neurologi (D):</span>
+                    E: {{ data_get($dataDaftarTxn, 'pemeriksaan.tandaVital.e') ?? '-' }} -
+                    V: {{ data_get($dataDaftarTxn, 'pemeriksaan.tandaVital.v') ?? '-' }} -
+                    M: {{ data_get($dataDaftarTxn, 'pemeriksaan.tandaVital.m') ?? '-' }} -
+                    GCS: {{ data_get($dataDaftarTxn, 'pemeriksaan.tandaVital.gcs') ?? '-' }}
+                </div>
+            </div>
+
+            {{-- PEMERIKSAAN FISIK & ANATOMI --}}
+            <div class="px-4 mt-2">
+                <div
+                    class="px-3 py-2 text-sm font-semibold uppercase border-t border-gray-900 rounded-t-md border-x bg-gray-50">
+                    pemeriksaan fisik & anatomi
+                </div>
+                <div class="px-3 py-2 text-sm border-b border-gray-900 rounded-b-md border-x">
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <div>
+                            <span class="font-semibold">Fisik :</span><br>
+                            {!! nl2br(e(data_get($dataDaftarTxn, 'pemeriksaan.fisik') ?? '-')) !!}
+                        </div>
+                        <div>
+                            <span class="font-semibold">Anatomi :</span><br>
+                            @foreach (data_get($dataDaftarTxn, 'pemeriksaan.anatomi', []) as $key => $a)
+                                @php $kelainan = data_get($a,'kelainan'); @endphp
+                                @if ($kelainan && $kelainan !== 'Tidak Diperiksa')
+                                    <span class="font-normal">{{ strtoupper($key) }} : {{ $kelainan }}</span> /
+                                    {!! nl2br(e(data_get($a, 'desc', '-'))) !!}<br>
+                                @endif
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- PENUNJANG --}}
+            <div class="px-4 mt-2">
+                <div
+                    class="px-3 py-2 text-sm font-semibold uppercase border-t border-gray-900 rounded-t-md border-x bg-gray-50">
+                    pemeriksaan penunjang</div>
+                <div class="px-3 py-2 text-sm border-b border-gray-900 rounded-b-md border-x">
+                    <span class="font-semibold">Lab / Foto / EKG / Lain-lain :</span><br>
+                    {!! nl2br(e((string) (data_get($dataDaftarTxn, 'pemeriksaan.penunjang') ?? '-'))) !!}
+                </div>
+            </div>
+
+            {{-- DIAGNOSIS --}}
+            <div class="px-4 mt-2">
+                <div
+                    class="px-3 py-2 text-sm font-semibold uppercase border-t border-gray-900 rounded-t-md border-x bg-gray-50">
+                    diagnosis</div>
+                <div class="px-3 py-2 border-b border-gray-900 rounded-b-md border-x">
+                    <div class="overflow-hidden rounded-md ring-1 ring-gray-300">
+                        <table class="w-full table-fixed">
+                            <thead class="text-sm bg-gray-50">
+                                <tr class="divide-x divide-gray-200">
+                                    <th class="px-2 py-1 text-left">Kode (ICD 10)</th>
+                                    <th class="px-2 py-1 text-left">Diagnosa</th>
+                                    <th class="px-2 py-1 text-left">Kategori</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm divide-y divide-gray-200">
+                                @foreach (data_get($dataDaftarTxn, 'diagnosis', []) as $diag)
+                                    <tr class="divide-x divide-gray-200">
+                                        <td class="px-2 py-1">{{ data_get($diag, 'icdX', '-') }}</td>
+                                        <td class="px-2 py-1">{{ data_get($diag, 'diagDesc', '-') }}</td>
+                                        <td class="px-2 py-1">{{ data_get($diag, 'kategoriDiagnosa', '-') }}</td>
+                                    </tr>
+                                @endforeach
+                                @if (empty(data_get($dataDaftarTxn, 'diagnosis')))
+                                    <tr>
+                                        <td colspan="3" class="px-2 py-2 text-center">-</td>
+                                    </tr>
+                                @endif
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            {{-- PROSEDUR --}}
+            <div class="px-4 mt-2">
+                <div
+                    class="px-3 py-2 text-sm font-semibold uppercase border-t border-gray-900 rounded-t-md border-x bg-gray-50">
+                    prosedur</div>
+                <div class="px-3 py-2 border-b border-gray-900 rounded-b-md border-x">
+                    <div class="overflow-hidden rounded-md ring-1 ring-gray-300">
+                        <table class="w-full table-fixed">
+                            <thead class="text-sm bg-gray-50">
+                                <tr class="divide-x divide-gray-200">
+                                    <th class="px-2 py-1 text-left">Kode (ICD 9 CM)</th>
+                                    <th class="px-2 py-1 text-left">Prosedur</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm divide-y divide-gray-200">
+                                @foreach (data_get($dataDaftarTxn, 'procedure', []) as $p)
+                                    <tr class="divide-x divide-gray-200">
+                                        <td class="px-2 py-1">{{ data_get($p, 'procedureId', '-') }}</td>
+                                        <td class="px-2 py-1">{{ data_get($p, 'procedureDesc', '-') }}</td>
+                                    </tr>
+                                @endforeach
+                                @if (empty(data_get($dataDaftarTxn, 'procedure')))
+                                    <tr>
+                                        <td colspan="2" class="px-2 py-2 text-center">-</td>
+                                    </tr>
+                                @endif
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            {{-- STATUS MEDIK & TINDAK LANJUT & TERAPI & TTD DOKTER --}}
+            <div class="px-4 mt-2 mb-16">
+                <div
+                    class="px-3 py-2 text-sm font-semibold uppercase border-t border-gray-900 rounded-t-md border-x bg-gray-50">
+                    status medik & tindak lanjut</div>
+                <div class="px-3 py-2 text-sm border-b border-gray-900 rounded-b-md border-x">
+                    <div class="mb-3">
+                        <span class="font-semibold">Status Medik :</span>
+                        {{ data_get($dataDaftarTxn, 'penilaian.statusMedik.statusMedik') ?? '-' }}
                     </div>
 
-                    <div wire:loading wire:target="cetakRekamMedisUGD">
-                        <x-loading />
+                    <div class="mb-3">
+                        <span class="font-semibold">Tindak Lanjut :</span>
+                        {{ data_get($dataDaftarTxn, 'perencanaan.tindakLanjut.tindakLanjut') ?? '-' }} /
+                        {{ data_get($dataDaftarTxn, 'perencanaan.tindakLanjut.keteranganTindakLanjut') ?? '-' }}
                     </div>
 
-                    <x-green-button :disabled=$disabledPropertyRjStatus wire:click.prevent="cetakRekamMedisUGD()"
-                        type="button" wire:loading.remove>
-                        Cetak RM UGD
-                    </x-green-button>
+                    <div class="grid gap-4 md:grid-cols-4">
+                        <div class="md:col-span-3">
+                            <div class="font-semibold">Terapi (Obat)</div>
+                            <div
+                                class="p-2 break-words whitespace-pre-line border border-gray-200 rounded-md bg-gray-50">
+                                {!! nl2br(e(data_get($dataDaftarTxn, 'perencanaan.terapi.terapi') ?? '-')) !!}
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col justify-end text-center md:col-span-1">
+                            @inject('carbon', 'Carbon\Carbon')
+                            <div>
+                                Tulungagung,<br>
+                                {{ data_get($dataDaftarTxn, 'perencanaan.pengkajianMedis.selesaiPemeriksaan') ?? 'Tanggal' }}
+                            </div>
+
+                            @php
+                                $drImg =
+                                    optional(
+                                        App\Models\User::where(
+                                            'myuser_code',
+                                            data_get($dataDaftarTxn, 'drId'),
+                                        )->first(),
+                                    )->myuser_ttd_image ?? null;
+                            @endphp
+
+                            @if ($drImg)
+                                <img class="h-24 mx-auto my-1" src="{{ asset('storage/' . $drImg) }}"
+                                    alt="TTD Dokter" />
+                            @endif
+
+                            <div class="mt-1">
+                                <span class="text-xs italic text-gray-500">ttd</span><br>
+                                <span class="text-xs font-semibold">
+                                    {{ data_get($dataDaftarTxn, 'perencanaan.pengkajianMedis.drPemeriksa') ?? 'Dokter Pemeriksa' }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
         </div>
 
+        {{-- Footer --}}
+        <div class="sticky bottom-0 flex justify-end px-4 py-3 border-t bg-gray-50">
+            <div wire:loading wire:target="cetakRekamMedisUGD">
+                <x-loading />
+            </div>
+            <x-green-button wire:click.prevent="cetakRekamMedisUGD()" wire:loading.remove>
+                Cetak RM UGD
+            </x-green-button>
+        </div>
     </div>
+</div>
