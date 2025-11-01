@@ -110,10 +110,20 @@ class Perencanaan extends Component
 
 
     protected $rules = [
-
         'dataDaftarUgd.perencanaan.pengkajianMedis.waktuPemeriksaan' => 'required|date_format:d/m/Y H:i:s',
-        'dataDaftarUgd.perencanaan.pengkajianMedis.selesaiPemeriksaan' => 'required|date_format:d/m/Y H:i:s'
+        'dataDaftarUgd.perencanaan.pengkajianMedis.selesaiPemeriksaan' => 'required|date_format:d/m/Y H:i:s',
+    ];
 
+    protected $messages = [
+        'dataDaftarUgd.perencanaan.pengkajianMedis.waktuPemeriksaan.required' => 'Waktu pemeriksaan wajib diisi.',
+        'dataDaftarUgd.perencanaan.pengkajianMedis.waktuPemeriksaan.date_format' => 'Format waktu pemeriksaan harus dd/mm/yyyy hh:mm:ss.',
+        'dataDaftarUgd.perencanaan.pengkajianMedis.selesaiPemeriksaan.required' => 'Selesai pemeriksaan wajib diisi.',
+        'dataDaftarUgd.perencanaan.pengkajianMedis.selesaiPemeriksaan.date_format' => 'Format selesai pemeriksaan harus dd/mm/yyyy hh:mm:ss.',
+    ];
+
+    protected $attributes = [
+        'dataDaftarUgd.perencanaan.pengkajianMedis.waktuPemeriksaan' => 'waktu pemeriksaan',
+        'dataDaftarUgd.perencanaan.pengkajianMedis.selesaiPemeriksaan' => 'selesai pemeriksaan',
     ];
 
 

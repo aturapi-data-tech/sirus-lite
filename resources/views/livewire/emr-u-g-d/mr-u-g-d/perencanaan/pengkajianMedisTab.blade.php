@@ -22,7 +22,7 @@
                     placeholder="Waktu Pemeriksaan [dd/mm/yyyy hh24:mi:ss]" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.perencanaan.pengkajianMedis.waktuPemeriksaan'))"
                     :disabled=$disabledPropertyRjStatus
                     wire:model="dataDaftarUgd.perencanaan.pengkajianMedis.waktuPemeriksaan" />
-                @isset($dataDaftarUgd['perencanaan']['pengkajianMedis']['waktuPemeriksaan'])
+                @empty($dataDaftarUgd['perencanaan']['pengkajianMedis']['waktuPemeriksaan'])
                     @if (!$dataDaftarUgd['perencanaan']['pengkajianMedis']['waktuPemeriksaan'])
                         <div class="w-1/2 ml-2">
                             <div wire:loading wire:target="setWaktuPemeriksaan">
@@ -40,7 +40,7 @@
                             </x-green-button>
                         </div>
                     @endif
-                @endisset
+                @endempty
             </div>
             @error('dataDaftarUgd.perencanaan.pengkajianMedis.waktuPemeriksaan')
                 <x-input-error :messages=$message />
@@ -57,7 +57,7 @@
                     placeholder="Selesai Pemeriksaan [dd/mm/yyyy hh24:mi:ss]" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.perencanaan.pengkajianMedis.selesaiPemeriksaan'))"
                     :disabled=$disabledPropertyRjStatus
                     wire:model="dataDaftarUgd.perencanaan.pengkajianMedis.selesaiPemeriksaan" />
-                @isset($dataDaftarUgd['perencanaan']['pengkajianMedis']['selesaiPemeriksaan'])
+                @empty($dataDaftarUgd['perencanaan']['pengkajianMedis']['selesaiPemeriksaan'])
                     @if (!$dataDaftarUgd['perencanaan']['pengkajianMedis']['selesaiPemeriksaan'])
                         <div class="w-1/2 ml-2">
                             <div wire:loading wire:target="setSelesaiPemeriksaan">
@@ -75,7 +75,7 @@
                             </x-green-button>
                         </div>
                     @endif
-                @endisset
+                @endempty
             </div>
             @error('dataDaftarUgd.perencanaan.pengkajianMedis.selesaiPemeriksaan')
                 <x-input-error :messages=$message />
@@ -109,8 +109,8 @@
         </div>
 
 
-        @isset($dataDaftarUgd['perencanaan']['pengkajianMedis']['waktuPemeriksaan'])
-            @isset($dataDaftarUgd['anamnesa']['pengkajianPerawatan']['jamDatang'])
+        @empty($dataDaftarUgd['perencanaan']['pengkajianMedis']['waktuPemeriksaan'])
+            @empty($dataDaftarUgd['anamnesa']['pengkajianPerawatan']['jamDatang'])
                 @if (
                     $dataDaftarUgd['perencanaan']['pengkajianMedis']['waktuPemeriksaan'] &&
                         $dataDaftarUgd['anamnesa']['pengkajianPerawatan']['jamDatang']
@@ -138,8 +138,8 @@
                         @enderror
                     </div>
                 @endif
-            @endisset
-        @endisset
+            @endempty
+        @endempty
 
 
     </div>
