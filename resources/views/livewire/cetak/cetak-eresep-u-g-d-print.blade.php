@@ -283,7 +283,7 @@
                                 <thead class="text-gray-900 ">
                                     <tr>
                                         <th class="text-start">
-                                            Telaah Resep
+                                            Pengkajian Resep
                                         </th>
 
                                         <th class="text-start">
@@ -527,7 +527,7 @@
                                 <thead class="text-gray-900 ">
                                     <tr>
                                         <th class="text-start">
-                                            Telaah Obat
+                                            Pengkajian Obat
                                         </th>
 
                                         <th class="text-start">
@@ -693,7 +693,7 @@
                     <td class="w-1/3 align-text-bottom">
                         <div class ="text-center">
                             <span>
-                                {{ 'Telaah Resep' }}
+                                {{ 'Pengkajian Resep' }}
                             </span>
                             <br>
                             <div>
@@ -712,8 +712,8 @@
                                 {{ isset($dataDaftarUgd['telaahResep']['penanggungJawab']['userLog'])
                                     ? ($dataDaftarUgd['telaahResep']['penanggungJawab']['userLog']
                                         ? $dataDaftarUgd['telaahResep']['penanggungJawab']['userLog']
-                                        : 'Telaah Resep')
-                                    : 'Telaah Resep' }}
+                                        : 'Pengkajian Resep')
+                                    : 'Pengkajian Resep' }}
                             </span>
 
 
@@ -724,7 +724,7 @@
                     <td class="w-1/3 align-text-bottom">
                         <div class ="text-center">
                             <span>
-                                {{ 'Telaah Obat' }}
+                                {{ 'Pengkajian Obat' }}
                             </span>
                             <br>
                             <div>
@@ -743,8 +743,8 @@
                                 {{ isset($dataDaftarUgd['telaahObat']['penanggungJawab']['userLog'])
                                     ? ($dataDaftarUgd['telaahObat']['penanggungJawab']['userLog']
                                         ? $dataDaftarUgd['telaahObat']['penanggungJawab']['userLog']
-                                        : 'Telaah Obat')
-                                    : 'Telaah Obat' }}
+                                        : 'Pengkajian Obat')
+                                    : 'Pengkajian Obat' }}
                             </span>
 
 

@@ -273,7 +273,7 @@
                                 <thead class="text-gray-900 ">
                                     <tr>
                                         <th class="text-start">
-                                            Telaah Resep
+                                            Pengkajian Resep
                                         </th>
 
                                         <th class="text-start">
@@ -519,7 +519,7 @@
                                 <thead class="text-gray-900 ">
                                     <tr>
                                         <th class="text-start">
-                                            Telaah Obat
+                                            Pengkajian Obat
                                         </th>
 
                                         <th class="text-start">
@@ -693,7 +693,7 @@
                     <td class="w-1/4 align-text-bottom">
                         <div class ="text-center">
                             <span>
-                                {{ 'Telaah Resep' }}
+                                {{ 'Pengkajian Resep' }}
                             </span>
                             <br>
                             <div>
@@ -714,8 +714,8 @@
                                 {{ isset($dataDaftarRi['eresepHdr'][$resepIndexRef]['telaahResep']['penanggungJawab']['userLog'])
                                     ? ($dataDaftarRi['eresepHdr'][$resepIndexRef]['telaahResep']['penanggungJawab']['userLog']
                                         ? $dataDaftarRi['eresepHdr'][$resepIndexRef]['telaahResep']['penanggungJawab']['userLog']
-                                        : 'Telaah Resep')
-                                    : 'Telaah Resep' }}
+                                        : 'Pengkajian Resep')
+                                    : 'Pengkajian Resep' }}
                             </span>
 
 
@@ -726,7 +726,7 @@
                     <td class="w-1/4 align-text-bottom">
                         <div class ="text-center">
                             <span>
-                                {{ 'Telaah Obat' }}
+                                {{ 'Pengkajian Obat' }}
                             </span>
                             <br>
                             <div>
@@ -747,8 +747,8 @@
                                 {{ isset($dataDaftarRi['eresepHdr'][$resepIndexRef]['telaahObat']['penanggungJawab']['userLog'])
                                     ? ($dataDaftarRi['eresepHdr'][$resepIndexRef]['telaahObat']['penanggungJawab']['userLog']
                                         ? $dataDaftarRi['eresepHdr'][$resepIndexRef]['telaahObat']['penanggungJawab']['userLog']
-                                        : 'Telaah Obat')
-                                    : 'Telaah Obat' }}
+                                        : 'Pengkajian Obat')
+                                    : 'Pengkajian Obat' }}
                             </span>
 
 
