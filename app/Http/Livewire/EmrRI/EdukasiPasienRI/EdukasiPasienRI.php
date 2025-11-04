@@ -2,20 +2,23 @@
 
 namespace App\Http\Livewire\EmrRI\EdukasiPasienRI;
 
-use Illuminate\Support\Facades\DB;
 
 use Livewire\Component;
-use Livewire\WithPagination;
 use Carbon\Carbon;
-
-use Spatie\ArrayToXml\ArrayToXml;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 use App\Http\Traits\EmrRI\EmrRITrait;
-use App\Http\Traits\customErrorMessagesTrait;
+use Illuminate\Support\Str;
+use Illuminate\Contracts\Cache\LockTimeoutException;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Exception;
+
+use App\Http\Traits\MasterPasien\MasterPasienTrait;
 
 
 class EdukasiPasienRI extends Component
 {
-    use WithPagination, EmrRITrait, customErrorMessagesTrait;
+    use EmrRITrait, MasterPasienTrait;
 
 
     // listener from blade////////////////
@@ -28,176 +31,238 @@ class EdukasiPasienRI extends Component
     // Ref on top bar
     //////////////////////////////
     public $riHdrNoRef;
-    public $regNoRef;
     public array $dataDaftarRi = [];
-    public array $agreementOptions = [
-        ["agreementId" => "1", "agreementDesc" => "Setuju"],
-        ["agreementId" => "0", "agreementDesc" => "Tidak Setuju"],
-    ];
-    public array $edukasiPasien = [];
 
     public array $formEntryEdukasiPasien = [
-        "tglEdukasi" => "", // Tanggal edukasi diberikan
-        "petugasEdukasi" => "", // Nama petugas yang memberikan edukasi
-        "petugasEdukasiCode" => "", // Kode petugas yang memberikan edukasi
-        "sasaranEdukasi" => "", // Nama sasaran yang menerima edukasi (misalnya, nama keluarga atau wali pasien)
-        "sasaranEdukasiSignature" => "", // Tanda tangan sasaran yang menerima edukasi
-        "hubunganSasaranEdukasidgnPasien" => "", // Hubungan sasaran dengan pasien (misalnya, "Orang Tua", "Suami/Istri", "Anak")
-        "edukasi" => [
-            "kategoriEdukasi" => [], // Array kategori edukasi yang dipilih (misalnya, "Pengobatan", "Diet dan Nutrisi")
-            "keteranganEdukasi" => "", // Keterangan atau penjelasan edukasi
-            "statusEdukasi" => "", // Status edukasi (misalnya, "Mengerti", "Tidak Mengerti")
-            "reEdukasi" => [ // Rekomendasi atau kebutuhan edukasi ulang
-                "perlu" => false, // Apakah perlu re-edukasi? (true/false)
-                "tglReEdukasi" => "", // Tanggal re-edukasi jika diperlukan
-                "petugasReEdukasi" => "", // Nama petugas yang memberikan re-edukasi
-            ],
+        "tglEdukasi" => "",
+
+        // header tabel
+        "dokterPelaksanaTindakan" => ["drId" => "", "drName" => ""],
+        "pemberiInformasi"        => ["petugasCode" => "", "petugasName" => ""],
+        "penerimaInformasi"       => [
+            "name"      => "",
+            "hubungan"  => "",
+            "signature" => "",    // base64 PNG tanda tangan penerima
         ],
+
+        // isi tabel JENIS INFORMASI (isi + ceklis Tandai)
+        "detailInformasi" => [
+            "diagnosis"  => ["desc" => ""],        // Diagnosis (WD & DD)
+            "dasar"      => ["desc" => ""],        // Dasar Diagnosis
+            "tindakan"   => ["desc" => ""],        // Tindakan Kedokteran
+            "indikasi"   => ["desc" => ""],        // Indikasi Tindakan
+            "tatacara"   => ["desc" => ""],        // Tata Cara
+            "tujuan"     => ["desc" => ""],        // Tujuan
+            "risiko"     => ["desc" => ""],        // Risiko
+            "komplikasi" => ["desc" => ""],        // Komplikasi
+            "prognosis"  => ["desc" => ""],        // Prognosis
+            "alternatif" => ["desc" => ""],        // Alternatif & Risiko
+        ]
     ];
 
-    public array $edukasiOptions = [
-        ['kategoriEdukasi' => 'Pengobatan'], // Sering digunakan karena terkait obat dan dosis
-        ['kategoriEdukasi' => 'Rencana Perawatan'], // Penting untuk menjelaskan tindakan medis
-        ['kategoriEdukasi' => 'Diagnosa Medis'], // Diberikan untuk menjelaskan kondisi pasien
-        ['kategoriEdukasi' => 'Pencegahan Infeksi'], // Penting untuk pasien rawat inap
-        ['kategoriEdukasi' => 'Diet dan Nutrisi'], // Sering diberikan untuk pasien dengan kondisi khusus
-        ['kategoriEdukasi' => 'Perawatan Luka'], // Penting untuk pasien pasca-operasi atau luka
-        ['kategoriEdukasi' => 'Aktivitas Fisik'], // Diberikan untuk pasien dengan kebutuhan rehabilitasi
-        ['kategoriEdukasi' => 'Perawatan di Rumah'], // Diberikan sebelum pasien pulang
-        ['kategoriEdukasi' => 'Manajemen Nyeri'], // Penting untuk pasien dengan nyeri kronis atau pasca-operasi
-        ['kategoriEdukasi' => 'Dukungan Emosional dan Spiritual'], // Diberikan untuk pasien dengan kebutuhan psikologis
-        ['kategoriEdukasi' => 'Lain-lain'], // Untuk kategori yang tidak termasuk di atas
+    protected array $rules = [
+        'formEntryEdukasiPasien.tglEdukasi' => 'required|date_format:d/m/Y H:i:s',
+
+        'formEntryEdukasiPasien.dokterPelaksanaTindakan.drId'   => 'nullable|string|max:50',
+        'formEntryEdukasiPasien.dokterPelaksanaTindakan.drName' => 'required|string|max:100',
+
+        'formEntryEdukasiPasien.pemberiInformasi.petugasCode' => 'required|string|max:50',
+        'formEntryEdukasiPasien.pemberiInformasi.petugasName' => 'required|string|max:100',
+
+        'formEntryEdukasiPasien.penerimaInformasi.name'      => 'required|string|max:100',
+        'formEntryEdukasiPasien.penerimaInformasi.hubungan'  => 'required|string|max:100',
+        'formEntryEdukasiPasien.penerimaInformasi.signature' => 'required|string',
+
+        'formEntryEdukasiPasien.detailInformasi'                 => 'required|array',
+        'formEntryEdukasiPasien.detailInformasi.diagnosis.desc'  => 'nullable|string|max:1000',
+        'formEntryEdukasiPasien.detailInformasi.dasar.desc'      => 'nullable|string|max:1000',
+        'formEntryEdukasiPasien.detailInformasi.tindakan.desc'   => 'nullable|string|max:1000',
+        'formEntryEdukasiPasien.detailInformasi.indikasi.desc'   => 'nullable|string|max:1000',
+        'formEntryEdukasiPasien.detailInformasi.tatacara.desc'   => 'nullable|string|max:1000',
+        'formEntryEdukasiPasien.detailInformasi.tujuan.desc'     => 'nullable|string|max:1000',
+        'formEntryEdukasiPasien.detailInformasi.risiko.desc'     => 'nullable|string|max:1000',
+        'formEntryEdukasiPasien.detailInformasi.komplikasi.desc' => 'nullable|string|max:1000',
+        'formEntryEdukasiPasien.detailInformasi.prognosis.desc'  => 'nullable|string|max:1000',
+        'formEntryEdukasiPasien.detailInformasi.alternatif.desc' => 'nullable|string|max:1000',
     ];
+
+    protected array $messages = [
+        'formEntryEdukasiPasien.tglEdukasi.required' => 'Tanggal edukasi wajib diisi.',
+        'formEntryEdukasiPasien.tglEdukasi.date_format' => 'Format tanggal harus dd/mm/yyyy hh24:mi:ss.',
+
+        'formEntryEdukasiPasien.dokterPelaksanaTindakan.drName.required' => 'Dokter pelaksana wajib diisi.',
+        'formEntryEdukasiPasien.dokterPelaksanaTindakan.drName.max'      => 'Nama dokter maksimal 100 karakter.',
+
+        'formEntryEdukasiPasien.pemberiInformasi.petugasCode.required' => 'Kode petugas wajib diisi.',
+        'formEntryEdukasiPasien.pemberiInformasi.petugasName.required' => 'Nama petugas wajib diisi.',
+
+        'formEntryEdukasiPasien.penerimaInformasi.name.required'      => 'Nama penerima informasi wajib diisi.',
+        'formEntryEdukasiPasien.penerimaInformasi.hubungan.required'  => 'Hubungan penerima dengan pasien wajib diisi.',
+        'formEntryEdukasiPasien.penerimaInformasi.signature.required' => 'Tanda tangan penerima wajib diisi.',
+
+        'formEntryEdukasiPasien.detailInformasi.required' => 'Detail informasi wajib diisi (boleh kosong per baris).',
+    ];
+
+
 
     public $sasaranEdukasiSignature;
 
-    public function setTglEdukasi($tanggal)
+    public function setTglEdukasi(): void
     {
-        $this->formEntryEdukasiPasien['tglEdukasi'] = $tanggal;
+        $this->formEntryEdukasiPasien['tglEdukasi'] = Carbon::now()->format('d/m/Y H:i:s');
     }
-
-    public function setTglReEdukasi($tanggal)
-    {
-        $this->formEntryEdukasiPasien['edukasi']['reEdukasi']['tglReEdukasi'] = $tanggal;
-    }
-
 
     public function addEdukasiPasien(): void
     {
-        $this->formEntryEdukasiPasien['petugasEdukasi'] = auth()->user()->myuser_name;
-        $this->formEntryEdukasiPasien['petugasEdukasiCode'] = auth()->user()->myuser_code;
+        // Auto isi pemberi informasi & tgl edukasi & ttd penerima
+        $this->formEntryEdukasiPasien['pemberiInformasi']['petugasName'] = auth()->user()->myuser_name;
+        $this->formEntryEdukasiPasien['pemberiInformasi']['petugasCode'] = auth()->user()->myuser_code;
+        $this->formEntryEdukasiPasien['penerimaInformasi']['signature']  = $this->sasaranEdukasiSignature;
+        if (empty($this->formEntryEdukasiPasien['tglEdukasi'])) {
+            $this->formEntryEdukasiPasien['tglEdukasi'] = Carbon::now()->format('d/m/Y H:i:s');
+        }
+        // Validasi form
+        $this->validate($this->rules, $this->messages);
+        // Dapatkan RI header
+        $riHdrNo = $this->dataDaftarRi['riHdrNo'] ?? $this->riHdrNoRef ?? null;
+        if (!$riHdrNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError("riHdrNo kosong.");
+            return;
+        }
 
-        $this->formEntryEdukasiPasien['sasaranEdukasiSignature'] = $this->sasaranEdukasiSignature;
-
-
-        $rules = [
-            'formEntryEdukasiPasien.tglEdukasi' => 'required|date_format:d/m/Y H:i:s',
-            'formEntryEdukasiPasien.petugasEdukasi' => 'required|string|max:100',
-            'formEntryEdukasiPasien.petugasEdukasiCode' => 'required|string|max:50',
-            'formEntryEdukasiPasien.edukasi.kategoriEdukasi' => 'required|array',
-            'formEntryEdukasiPasien.edukasi.keteranganEdukasi' => 'required|string|max:255',
-            'formEntryEdukasiPasien.edukasi.statusEdukasi' => 'required|string|max:100',
-            'formEntryEdukasiPasien.edukasi.reEdukasi.perlu' => 'required|boolean',
-            'formEntryEdukasiPasien.edukasi.reEdukasi.tglReEdukasi' => 'required_if:formEntryEdukasiPasien.edukasi.reEdukasi.perlu,true|date_format:d/m/Y H:i:s',
-            'formEntryEdukasiPasien.edukasi.reEdukasi.petugasReEdukasi' => 'required_if:formEntryEdukasiPasien.edukasi.reEdukasi.perlu,true|string|max:100',
-            'formEntryEdukasiPasien.sasaranEdukasi' => 'required|string|max:100',
-            'formEntryEdukasiPasien.hubunganSasaranEdukasidgnPasien' => 'required|string|max:100',
-            'formEntryEdukasiPasien.sasaranEdukasiSignature' => 'required|string',
-        ];
-
-        $messages = [
-            'formEntryEdukasiPasien.tglEdukasi.required' => 'Tanggal edukasi wajib diisi.',
-            'formEntryEdukasiPasien.tglEdukasi.date_format' => 'Format tanggal edukasi harus dd/mm/yyyy hh24:mi:ss.',
-            'formEntryEdukasiPasien.petugasEdukasi.required' => 'Nama petugas edukasi wajib diisi.',
-            'formEntryEdukasiPasien.petugasEdukasi.string' => 'Nama petugas edukasi harus berupa teks.',
-            'formEntryEdukasiPasien.petugasEdukasi.max' => 'Nama petugas edukasi tidak boleh lebih dari 100 karakter.',
-            'formEntryEdukasiPasien.petugasEdukasiCode.required' => 'Kode petugas edukasi wajib diisi.',
-            'formEntryEdukasiPasien.petugasEdukasiCode.string' => 'Kode petugas edukasi harus berupa teks.',
-            'formEntryEdukasiPasien.petugasEdukasiCode.max' => 'Kode petugas edukasi tidak boleh lebih dari 50 karakter.',
-            'formEntryEdukasiPasien.edukasi.kategoriEdukasi.required' => 'Kategori edukasi wajib diisi.',
-            'formEntryEdukasiPasien.edukasi.keteranganEdukasi.required' => 'Keterangan edukasi wajib diisi.',
-            'formEntryEdukasiPasien.edukasi.keteranganEdukasi.string' => 'Keterangan edukasi harus berupa teks.',
-            'formEntryEdukasiPasien.edukasi.keteranganEdukasi.max' => 'Keterangan edukasi tidak boleh lebih dari 255 karakter.',
-            'formEntryEdukasiPasien.edukasi.statusEdukasi.required' => 'Status edukasi wajib diisi.',
-            'formEntryEdukasiPasien.edukasi.statusEdukasi.string' => 'Status edukasi harus berupa teks.',
-            'formEntryEdukasiPasien.edukasi.statusEdukasi.max' => 'Status edukasi tidak boleh lebih dari 100 karakter.',
-            'formEntryEdukasiPasien.edukasi.reEdukasi.perlu.required' => 'Perlu re-edukasi wajib diisi.',
-            'formEntryEdukasiPasien.edukasi.reEdukasi.perlu.boolean' => 'Perlu re-edukasi harus berupa boolean.',
-            'formEntryEdukasiPasien.edukasi.reEdukasi.tglReEdukasi.required_if' => 'Tanggal re-edukasi wajib diisi jika perlu re-edukasi.',
-            'formEntryEdukasiPasien.edukasi.reEdukasi.tglReEdukasi.date_format' => 'Format tanggal re-edukasi harus dd/mm/yyyy hh24:mi:ss.',
-            'formEntryEdukasiPasien.edukasi.reEdukasi.petugasReEdukasi.required_if' => 'Petugas re-edukasi wajib diisi jika perlu re-edukasi.',
-            'formEntryEdukasiPasien.edukasi.reEdukasi.petugasReEdukasi.string' => 'Petugas re-edukasi harus berupa teks.',
-            'formEntryEdukasiPasien.edukasi.reEdukasi.petugasReEdukasi.max' => 'Petugas re-edukasi tidak boleh lebih dari 100 karakter.',
-            'formEntryEdukasiPasien.sasaranEdukasi.required' => 'Sasaran edukasi wajib diisi.',
-            'formEntryEdukasiPasien.sasaranEdukasi.string' => 'Sasaran edukasi harus berupa teks.',
-            'formEntryEdukasiPasien.sasaranEdukasi.max' => 'Sasaran edukasi tidak boleh lebih dari 100 karakter.',
-            'formEntryEdukasiPasien.hubunganSasaranEdukasidgnPasien.required' => 'Hubungan sasaran edukasi dengan pasien wajib diisi.',
-            'formEntryEdukasiPasien.hubunganSasaranEdukasidgnPasien.string' => 'Hubungan sasaran edukasi dengan pasien harus berupa teks.',
-            'formEntryEdukasiPasien.hubunganSasaranEdukasidgnPasien.max' => 'Hubungan sasaran edukasi dengan pasien tidak boleh lebih dari 100 karakter.',
-            'formEntryEdukasiPasien.sasaranEdukasiSignature.required' => 'Tanda tangan sasaran edukasi wajib diisi.',
-            'formEntryEdukasiPasien.sasaranEdukasiSignature.string' => 'Tanda tangan sasaran edukasi harus berupa teks.',
-        ];
+        $lockKey = "ri:{$riHdrNo}"; // shared lock antar modul
 
         try {
-            $this->validate($rules, $messages);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Lakukan pengecekan kembali input data." . $e->getMessage());
-            $this->validate($rules, $messages);
+            Cache::lock($lockKey, 5)->block(3, function () use ($riHdrNo) {
+                // Re-read state paling baru DI DALAM lock
+                $fresh = $this->findDataRI($riHdrNo);
+                if (!is_array($fresh)) $fresh = [];
+                if (!isset($fresh['edukasiPasien']) || !is_array($fresh['edukasiPasien'])) {
+                    $fresh['edukasiPasien'] = [];
+                }
+
+                // Entry dengan metadata
+                $entry               = $this->formEntryEdukasiPasien;
+                $entry['id']         = (string) Str::uuid();
+                $entry['created_at'] = Carbon::now()->format('Y-m-d H:i:s');
+
+                // Tambahkan dan simpan atomik
+                $fresh['edukasiPasien'][] = $entry;
+
+                DB::transaction(function () use ($riHdrNo, $fresh) {
+                    $this->updateJsonRI($riHdrNo, $fresh);
+                });
+
+                // Sinkronkan ke state lokal biar UI langsung update
+                $this->dataDaftarRi = $fresh;
+            });
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
+            return;
         }
 
-        // Tambahkan data edukasi ke dalam $dataDaftarRi
-        $this->dataDaftarRi['edukasiPasien'][] = $this->formEntryEdukasiPasien;
+        // Emit sinkronisasi & notif
+        $this->emit('syncronizeAssessmentPerawatRIFindData');
 
-        // Simpan perubahan ke penyimpanan
-        $this->store();
-
-        // Reset form entry edukasi setelah data berhasil ditambahkan
-        // $this->reset(['formEntryEdukasiPasien']);
-
-
-        // Tampilkan pesan sukses
-        toastr()
-            ->closeOnHover(true)
-            ->closeDuration(3)
-            ->positionClass('toast-top-left')
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
             ->addSuccess("Data edukasi pasien berhasil ditambahkan.");
+
+        // (opsional) reset sebagian field form kalau perlu
+        $this->reset(['formEntryEdukasiPasien', 'sasaranEdukasiSignature']);
     }
 
-    public function removeEdukasiPasien($index)
+    public function removeEdukasiPasienById(string $id): void
     {
-
-        if (isset($this->dataDaftarRi['edukasiPasien']) && is_array($this->dataDaftarRi['edukasiPasien'])) {
-            unset($this->dataDaftarRi['edukasiPasien'][$index]);
-            $this->dataDaftarRi['edukasiPasien'] = array_values($this->dataDaftarRi['edukasiPasien']);
+        $riHdrNo = $this->dataDaftarRi['riHdrNo'] ?? $this->riHdrNoRef ?? null;
+        if (!$riHdrNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("riHdrNo kosong.");
+            return;
         }
 
-        $this->store();
-    }
+        $lockKey = "ri:{$riHdrNo}";
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($riHdrNo, $id) {
+                $fresh = $this->findDataRI($riHdrNo);
+                if (!is_array($fresh)) $fresh = [];
+                $list = $fresh['edukasiPasien'] ?? [];
 
-    public function setEdukasiPasien($dataEdukasiPasien)
-    {
-        // Menyimpan data edukasi pasien ke dalam variabel $edukasiPasien
-        $this->formEntryEdukasiPasien = $dataEdukasiPasien;
+                // filter out by id
+                $newList = array_values(array_filter($list, fn($e) => ($e['id'] ?? null) !== $id));
 
-        // Jika diperlukan, Anda bisa melakukan operasi lain di sini
-        // Misalnya, validasi data atau logging
-    }
+                if (count($newList) === count($list)) {
+                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Data tidak ditemukan atau sudah dihapus.");
+                    return;
+                }
 
+                $fresh['edukasiPasien'] = $newList;
 
-    public function store()
-    {
-        // Logic update mode start //////////
-        $this->updateDataRi($this->dataDaftarRi['riHdrNo']);
+                DB::transaction(function () use ($riHdrNo, $fresh) {
+                    $this->updateJsonRI($riHdrNo, $fresh);
+                });
+
+                $this->dataDaftarRi = $fresh;
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Data edukasi berhasil dihapus.");
+            });
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
+            return;
+        }
 
         $this->emit('syncronizeAssessmentPerawatRIFindData');
     }
 
-    private function updateDataRi($riHdrNo): void
+    public function cetakEdukasiPasienById(string $id)
     {
-        $this->updateJsonRI($riHdrNo, $this->dataDaftarRi);
+        $queryIdentitas = DB::table('rsmst_identitases')
+            ->select('int_name', 'int_phone1', 'int_phone2', 'int_fax', 'int_address', 'int_city')
+            ->first();
 
-        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Signature berhasil disimpan.");
+        $riHdrNo = $this->dataDaftarRi['riHdrNo'] ?? $this->riHdrNoRef ?? null;
+        if (!$riHdrNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Nomor RI tidak ditemukan.');
+            return;
+        }
+
+        try {
+            $list = $this->dataDaftarRi['edukasiPasien'] ?? [];
+            $dataPasien = $this->findDataMasterPasien($this->dataDaftarRi['regNo'] ?? '');
+
+            $dataEdukasi = collect($list)->firstWhere('id', $id);
+
+            if (!$dataEdukasi) {
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addError('Data edukasi tidak ditemukan.');
+                return;
+            }
+
+            $data = [
+                'identitasRs'  => $queryIdentitas,
+                'dataPasien'   => $dataPasien ?? [],
+                'dataDaftarRi' => $this->dataDaftarRi,
+                'edukasi'      => $dataEdukasi,
+            ];
+
+            $pdfContent = Pdf::loadView('livewire.cetak.cetak-edukasi-pasien-r-i-print', $data)->output();
+
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess('Berhasil mencetak edukasi pasien.');
+
+
+            return response()->streamDownload(
+                fn() => print($pdfContent),
+                'edukasi-pasien-' . $id . '.pdf'
+            );
+        } catch (Exception $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Gagal mencetak PDF: ' . $e->getMessage());
+        }
     }
+
+
+
 
     private function findData($riHdrNo): void
     {
@@ -215,10 +280,7 @@ class EdukasiPasienRI extends Component
     public function render()
     {
 
-        return view(
-            'livewire.emr-r-i.edukasi-pasien-r-i.edukasi-pasien-r-i',
-            []
-        );
+        return view('livewire.emr-r-i.edukasi-pasien-r-i.edukasi-pasien-r-i');
     }
     // select data end////////////////
 
