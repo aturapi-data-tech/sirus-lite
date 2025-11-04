@@ -239,7 +239,6 @@ class Diagnosis extends Component
             DB::transaction(function () use ($rjNo) {
                 // hitung rjdtl_dtl berikutnya UNTUK rj_no INI
                 $next = DB::table('rstxn_ugddtls')
-                    ->where('rj_no', $rjNo)
                     ->max('rjdtl_dtl');
                 $next = ($next ?? 0) + 1;
 
