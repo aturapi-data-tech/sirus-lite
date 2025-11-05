@@ -104,8 +104,7 @@
                             <div class="flex items-center gap-2">
                                 {{-- Tombol Cetak --}}
                                 @if ($id)
-                                    <x-primary-button class="inline-flex items-center gap-1"
-                                        wire:target='cetakEdukasiPasienById'
+                                    <x-primary-button class="inline-flex items-center gap-1" wire:loading.remove
                                         wire:click.stop.prevent="cetakEdukasiPasienById('{{ $id }}')"
                                         wire:loading.attr="disabled" wire:target="cetakEdukasiPasienById">
                                         <svg class="w-5 h-5 text-white" xmlns="http://www.w3.org/2000/svg"
@@ -122,8 +121,7 @@
                                     </div>
 
                                     {{-- Tombol Hapus --}}
-                                    <x-red-button class="inline-flex items-center gap-1"
-                                        wire:target='removeEdukasiPasienById'
+                                    <x-red-button class="inline-flex items-center gap-1" wire:loading.remove
                                         wire:click.stop.prevent="removeEdukasiPasienById('{{ $id }}')"
                                         wire:loading.attr="disabled" wire:target="removeEdukasiPasienById">
                                         <svg class="w-5 h-5 text-white" aria-hidden="true"
@@ -135,8 +133,7 @@
                                     </x-red-button>
                                 @else
                                     {{-- fallback data lama tanpa id --}}
-                                    <x-red-button class="inline-flex items-center gap-1"
-                                        wire:target='removeEdukasiPasienById'
+                                    <x-red-button class="inline-flex items-center gap-1" wire:loading.remove
                                         wire:click.stop.prevent="removeEdukasiPasien({{ $key }})">
                                         <svg class="w-5 h-5 text-white" aria-hidden="true"
                                             xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 20">
