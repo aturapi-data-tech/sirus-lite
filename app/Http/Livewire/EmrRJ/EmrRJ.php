@@ -664,7 +664,16 @@ class EmrRJ extends Component
                 'reg_name',
                 'sex',
                 'address',
-                'thn',
+                DB::raw("
+            CASE
+                WHEN birth_date IS NOT NULL THEN
+                    trunc(months_between(sysdate, birth_date) / 12) || ' Thn, ' ||
+                    trunc(mod(months_between(sysdate, birth_date), 12)) || ' Bln, ' ||
+                    trunc(sysdate - add_months(birth_date, trunc(months_between(sysdate, birth_date)))) || ' Hr'
+                ELSE
+                    '0 Thn, 0 Bln, 0 Hr'
+            END AS thn
+        "),
                 DB::raw("to_char(birth_date,'dd/mm/yyyy') AS birth_date"),
                 'poli_id',
                 'poli_desc',

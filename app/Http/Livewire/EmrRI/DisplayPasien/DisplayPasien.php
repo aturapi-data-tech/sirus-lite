@@ -2,9 +2,8 @@
 
 namespace App\Http\Livewire\EmrRI\DisplayPasien;
 
-use Illuminate\Support\Facades\DB;
-
 use Livewire\Component;
+use Carbon\Carbon;
 
 use App\Http\Traits\EmrRI\EmrRITrait;
 use App\Http\Traits\MasterPasien\MasterPasienTrait;
@@ -13,23 +12,19 @@ class DisplayPasien extends Component
 {
     use EmrRITrait, MasterPasienTrait;
 
-    protected $listeners = [];
-
     public $riHdrNoRef;
-    public bool $isOpen = false;
-    public string $isOpenMode = 'insert';
-    public bool $forceInsertRecord = false;
 
-
-    public  $myQData = '{}';
+    public  array $dataDaftarRi = [];
     public  array $dataPasien = [];
 
 
     private function findData($riHdrNo): void
     {
-        $this->myQData = $this->findDataRI($riHdrNo);
+        $this->dataDaftarRi = $this->findDataRI($riHdrNo);
 
-        $this->dataPasien = $this->findDataMasterPasien($this->myQData['regNo'] ?? '');
+        $this->dataPasien = $this->findDataMasterPasien($this->dataDaftarRi['regNo'] ?? '');
+        $this->dataPasien['pasien']['thn'] = Carbon::createFromFormat('d/m/Y', $this->dataPasien['pasien']['tglLahir'])->diff(Carbon::now(env('APP_TIMEZONE')))->format('%y Thn, %m Bln %d Hr'); //$findData->thn;
+
     }
 
     public function mount()

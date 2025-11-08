@@ -6,8 +6,8 @@
 
             @php
                 $pasieenTitle = 'Pasien RegNo : ' . $dataPasien['pasien']['regNo'];
-                $datadaftar_json = $myQData;
-                $klaimId = isset($myQData['klaimId']) ? $myQData['klaimId'] : '-';
+                $datadaftar_json = $dataDaftarRi;
+                $klaimId = isset($dataDaftarRi['klaimId']) ? $dataDaftarRi['klaimId'] : '-';
             @endphp
 
             <div class="grid grid-cols-3 pl-3 bg-gray-100 rounded-lg">
@@ -27,9 +27,9 @@
                     @include('livewire.emr-r-i.display-pasien.emr-r-i-leveling-dokter-table-display-pasien')
                 </div>
                 <div class="px-2 text-sm text-gray-900">
-                    <p class="text-right">{{ $myQData['bangsalDesc'] ?? '-' }}</p>
+                    <p class="text-right">{{ $dataDaftarRi['bangsalDesc'] ?? '-' }}</p>
                     <p class="font-semibold text-right">
-                        {{ $myQData['roomDesc'] ?? '-' }} / Bed : {{ $myQData['bedNo'] ?? '-' }}
+                        {{ $dataDaftarRi['roomDesc'] ?? '-' }} / Bed : {{ $dataDaftarRi['bedNo'] ?? '-' }}
                         Jenis Klaim:
                         @php
                             use Illuminate\Support\Facades\DB;
@@ -57,7 +57,7 @@
                         </x-badge>
                     </p>
                     <p class="text-right">
-                        Tgl Masuk: {{ $myQData['entryDate'] }}
+                        Tgl Masuk: {{ $dataDaftarRi['entryDate'] }}
                     </p>
                 </div>
 
