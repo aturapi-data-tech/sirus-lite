@@ -34,6 +34,91 @@
 
                     </div>
 
+                    <div>
+                        {{-- Grafik UGD --}}
+                        <div wire:ignore>
+                            <div class="mb-1 text-sm font-semibold">Grafik Garis Suhu dan Nadi (UGD)</div>
+                            <canvas id="ugdChart"></canvas>
+                        </div>
+
+                        @php
+                            // Ambil & urutkan data TTV UGD berdasarkan waktu (ascending biar grafik runut)
+                            $sortedTandaVitalUgd = collect(
+                                $dataDaftarUgd['observasi']['observasiLanjutan']['tandaVital'] ?? [],
+                            )
+                                ->sortBy(function ($item) {
+                                    try {
+                                        return \Carbon\Carbon::createFromFormat(
+                                            'd/m/Y H:i:s',
+                                            $item['waktuPemeriksaan'],
+                                            env('APP_TIMEZONE'),
+                                        );
+                                    } catch (\Exception $e) {
+                                        return \Carbon\Carbon::now();
+                                    }
+                                })
+                                ->values();
+
+                            $labelsUgd = [];
+                            $suhuUgd = [];
+                            $nadiUgd = [];
+
+                            foreach ($sortedTandaVitalUgd as $item) {
+                                try {
+                                    $labelsUgd[] = \Carbon\Carbon::createFromFormat(
+                                        'd/m/Y H:i:s',
+                                        $item['waktuPemeriksaan'],
+                                        env('APP_TIMEZONE'),
+                                    )->format('d/m/Y H:i:s');
+                                } catch (\Exception $e) {
+                                    $labelsUgd[] = $item['waktuPemeriksaan'] ?? '-';
+                                }
+
+                                $suhuUgd[] = is_numeric($item['suhu'] ?? null) ? (float) $item['suhu'] : null;
+                                $nadiUgd[] = is_numeric($item['frekuensiNadi'] ?? null)
+                                    ? (int) $item['frekuensiNadi']
+                                    : null;
+                            }
+                        @endphp
+
+                        <script>
+                            const ctx = document.getElementById('ugdChart');
+                            // Mengambil data dari PHP ke JavaScript
+                            const labels = {!! json_encode($labelsUgd) !!};
+                            const suhuData = {!! json_encode($suhuUgd) !!};
+                            const nadiData = {!! json_encode($nadiUgd) !!};
+
+                            new Chart(ctx, {
+                                type: 'line', // Ubah type dari 'bar' menjadi 'line'
+                                data: {
+                                    labels: labels,
+                                    datasets: [{
+                                            label: 'Suhu', // Label untuk dataset pertama
+                                            data: suhuData, // Data untuk dataset pertama
+                                            borderColor: 'rgba(54, 162, 235, 1)', // Warna garis
+                                            borderWidth: 2, // Ketebalan garis
+                                            fill: false // Tidak mengisi area di bawah garis
+                                        },
+                                        {
+                                            label: 'Nadi', // Label untuk dataset kedua
+                                            data: nadiData, // Data untuk dataset kedua
+                                            borderColor: 'rgba(255, 99, 132, 1)', // Warna garis
+                                            borderWidth: 2, // Ketebalan garis
+                                            fill: false // Tidak mengisi area di bawah garis
+                                        }
+                                    ]
+                                },
+                                options: {
+                                    scales: {
+                                        y: {
+                                            beginAtZero: true
+                                        }
+                                    }
+                                }
+                            });
+                        </script>
+                    </div>
+
                 </div>
             </div>
 

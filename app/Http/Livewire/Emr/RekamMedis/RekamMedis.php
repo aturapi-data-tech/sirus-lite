@@ -86,53 +86,56 @@ class RekamMedis extends Component
     }
 
 
-    public function cetakRekamMedisUGD($txnNo = null, $layananStatus = 'UGD')
+    public function cetakRekamMedisUGD($txnNo = null, $tipe = 'UGD', $layananStatus = 'UGD')
     {
-        $txnNo = $txnNo ?? $this->currentTxnNo;
+        $txnNo         = $txnNo ?? $this->currentTxnNo;
         $layananStatus = $layananStatus ?? $this->currentLayananStatus ?? 'UGD';
 
-        // Ambil data fresh dari DB
+        // Ambil data terbaru dari DB
         if ($txnNo && $layananStatus) {
             $this->dataDaftarTxn = $this->fetchDatadaftarJsonFresh($txnNo, $layananStatus);
             if (isset($this->dataDaftarTxn['regNo'])) {
                 $this->dataPasien = $this->findDataMasterPasien($this->dataDaftarTxn['regNo']);
             } else {
-                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Data pasien tidak ditemukan');
+                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                    ->addError('Data pasien tidak ditemukan');
                 return;
             }
         } else {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Parameter cetak tidak lengkap');
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Parameter cetak tidak lengkap');
             return;
         }
 
-        // Ambil identitas rumah sakit
+        // Identitas RS
         $queryIdentitas = DB::table('rsmst_identitases')
-            ->select(
-                'int_name',
-                'int_phone1',
-                'int_phone2',
-                'int_fax',
-                'int_address',
-                'int_city',
-            )
+            ->select('int_name', 'int_phone1', 'int_phone2', 'int_fax', 'int_address', 'int_city')
             ->first();
 
-        // Siapkan data PDF
+        // Data untuk PDF
         $data = [
             'myQueryIdentitas' => $queryIdentitas,
-            'dataPasien' => $this->dataPasien,
-            'dataDaftarTxn' => $this->dataDaftarTxn,
+            'dataPasien'       => $this->dataPasien,
+            'dataDaftarTxn'    => $this->dataDaftarTxn,
         ];
 
-        // Generate PDF
-        $pdfContent = PDF::loadView('livewire.emr.rekam-medis.cetak-rekam-medis-u-g-d', $data)->output();
+        // Peta view UGD (silakan sesuaikan dengan file blade yang kamu punya)
+        $viewMap = [
+            'UGD'             => ['livewire.emr.rekam-medis.cetak-rekam-medis-u-g-d', 'Cetak RM IGD'],
+            'SUKET_ISTIRAHAT' => ['livewire.emr.rekam-medis.cetak-rekam-medis-u-g-d-suket-istirahat', 'Cetak Suket Istirahat IGD'],
+            'SUKET_SEHAT'     => ['livewire.emr.rekam-medis.cetak-rekam-medis-u-g-d-suket-sehat', 'Cetak Suket Sehat IGD'],
+        ];
 
-        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Cetak RM IGD (Fresh)');
+        $tipe     = strtoupper($tipe);
+        $view     = $viewMap[$tipe][0] ?? $viewMap['UGD'][0];
+        $toastMsg = $viewMap[$tipe][1] ?? $viewMap['UGD'][1];
 
-        return response()->streamDownload(
-            fn() => print($pdfContent),
-            "rmUGD.pdf"
-        );
+        // Generate & stream PDF
+        $pdfContent = PDF::loadView($view, $data)->output();
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+            ->addSuccess($toastMsg . ' (Fresh)');
+
+        return response()->streamDownload(fn() => print($pdfContent), "rmUGD.pdf");
     }
 
 

@@ -33,73 +33,120 @@ class EdukasiPasienRI extends Component
     public $riHdrNoRef;
     public array $dataDaftarRi = [];
 
+    /**
+     * ============================================
+     * FORM EDUKASI PASIEN (Livewire)
+     * --------------------------------------------
+     * Digunakan untuk mencatat edukasi medis kepada pasien / keluarga.
+     * ============================================
+     */
     public array $formEntryEdukasiPasien = [
-        "tglEdukasi" => "",
+        "tglEdukasi" => "", // 📅 Tanggal dan jam edukasi (format: d/m/Y H:i:s)
 
-        // header tabel
-        "dokterPelaksanaTindakan" => ["drId" => "", "drName" => ""],
-        "pemberiInformasi"        => ["petugasCode" => "", "petugasName" => ""],
-        "penerimaInformasi"       => [
-            "name"      => "",
-            "hubungan"  => "",
-            "signature" => "",    // base64 PNG tanda tangan penerima
+        // =========================
+        // 👨‍⚕️ Dokter pelaksana
+        // =========================
+        "dokterPelaksanaTindakan" => [
+            "drId"   => "",  // ID dokter (opsional)
+            "drName" => "",  // Nama dokter wajib diisi
         ],
 
-        // isi tabel JENIS INFORMASI (isi + ceklis Tandai)
+        // =========================
+        // 👩‍⚕️ Pemberi informasi (petugas)
+        // =========================
+        "pemberiInformasi" => [
+            "petugasCode" => "", // Kode petugas
+            "petugasName" => "", // Nama petugas
+        ],
+
+        // =========================
+        // 👨‍👩‍🦱 Penerima informasi
+        // =========================
+        "penerimaInformasi" => [
+            "name"      => "", // Nama penerima (pasien/keluarga)
+            "hubungan"  => "", // Hubungan dengan pasien
+            "signature" => "", // Base64 tanda tangan penerima
+        ],
+
+        // =========================
+        // 📋 Detail edukasi medis
+        // =========================
         "detailInformasi" => [
-            "diagnosis"  => ["desc" => ""],        // Diagnosis (WD & DD)
-            "dasar"      => ["desc" => ""],        // Dasar Diagnosis
-            "tindakan"   => ["desc" => ""],        // Tindakan Kedokteran
-            "indikasi"   => ["desc" => ""],        // Indikasi Tindakan
-            "tatacara"   => ["desc" => ""],        // Tata Cara
-            "tujuan"     => ["desc" => ""],        // Tujuan
-            "risiko"     => ["desc" => ""],        // Risiko
-            "komplikasi" => ["desc" => ""],        // Komplikasi
-            "prognosis"  => ["desc" => ""],        // Prognosis
-            "alternatif" => ["desc" => ""],        // Alternatif & Risiko
-        ]
+            "diagnosis"  => ["desc" => ""],  // Diagnosis kerja / banding
+            "dasar"      => ["desc" => ""],  // Dasar diagnosis
+            "rencana" => ["desc" => ""],  // Rencana pengobatan
+            "indikasi" => ["desc" => ""], // Indikasi tindakan
+            "tindakan"   => ["desc" => ""],  // Jenis tindakan
+            "tujuan"     => ["desc" => ""],  // Tujuan tindakan
+            "risiko"     => ["desc" => ""],  // Risiko tindakan
+            "komplikasi" => ["desc" => ""],  // Komplikasi yang mungkin
+            "prognosis"  => ["desc" => ""],  // Prognosis / hasil akhir
+            "alternatif" => ["desc" => ""],  // Alternatif lain & risikonya
+        ],
     ];
 
+
+    /**
+     * ============================================
+     * 📏 VALIDATION RULES
+     * ============================================
+     */
     protected array $rules = [
+        // Tanggal edukasi
         'formEntryEdukasiPasien.tglEdukasi' => 'required|date_format:d/m/Y H:i:s',
 
+        // Dokter pelaksana
         'formEntryEdukasiPasien.dokterPelaksanaTindakan.drId'   => 'nullable|string|max:50',
         'formEntryEdukasiPasien.dokterPelaksanaTindakan.drName' => 'required|string|max:100',
 
+        // Pemberi informasi
         'formEntryEdukasiPasien.pemberiInformasi.petugasCode' => 'required|string|max:50',
         'formEntryEdukasiPasien.pemberiInformasi.petugasName' => 'required|string|max:100',
 
+        // Penerima informasi
         'formEntryEdukasiPasien.penerimaInformasi.name'      => 'required|string|max:100',
         'formEntryEdukasiPasien.penerimaInformasi.hubungan'  => 'required|string|max:100',
         'formEntryEdukasiPasien.penerimaInformasi.signature' => 'required|string',
 
-        'formEntryEdukasiPasien.detailInformasi'                 => 'required|array',
-        'formEntryEdukasiPasien.detailInformasi.diagnosis.desc'  => 'nullable|string|max:1000',
-        'formEntryEdukasiPasien.detailInformasi.dasar.desc'      => 'nullable|string|max:1000',
-        'formEntryEdukasiPasien.detailInformasi.tindakan.desc'   => 'nullable|string|max:1000',
-        'formEntryEdukasiPasien.detailInformasi.indikasi.desc'   => 'nullable|string|max:1000',
-        'formEntryEdukasiPasien.detailInformasi.tatacara.desc'   => 'nullable|string|max:1000',
-        'formEntryEdukasiPasien.detailInformasi.tujuan.desc'     => 'nullable|string|max:1000',
-        'formEntryEdukasiPasien.detailInformasi.risiko.desc'     => 'nullable|string|max:1000',
-        'formEntryEdukasiPasien.detailInformasi.komplikasi.desc' => 'nullable|string|max:1000',
-        'formEntryEdukasiPasien.detailInformasi.prognosis.desc'  => 'nullable|string|max:1000',
-        'formEntryEdukasiPasien.detailInformasi.alternatif.desc' => 'nullable|string|max:1000',
+        // Detail edukasi (catatan tiap poin)
+        'formEntryEdukasiPasien.detailInformasi'                              => 'required|array',
+        'formEntryEdukasiPasien.detailInformasi.diagnosis.desc'               => 'nullable|string|max:1000',
+        'formEntryEdukasiPasien.detailInformasi.dasar.desc'                   => 'nullable|string|max:1000',
+        'formEntryEdukasiPasien.detailInformasi.rencana.desc'                 => 'nullable|string|max:1000',
+        'formEntryEdukasiPasien.detailInformasi.indikasi.desc'                => 'nullable|string|max:1000',
+        'formEntryEdukasiPasien.detailInformasi.tindakan.desc'                => 'nullable|string|max:1000',
+        'formEntryEdukasiPasien.detailInformasi.tujuan.desc'                  => 'nullable|string|max:1000',
+        'formEntryEdukasiPasien.detailInformasi.risiko.desc'                  => 'nullable|string|max:1000',
+        'formEntryEdukasiPasien.detailInformasi.komplikasi.desc'              => 'nullable|string|max:1000',
+        'formEntryEdukasiPasien.detailInformasi.prognosis.desc'               => 'nullable|string|max:1000',
+        'formEntryEdukasiPasien.detailInformasi.alternatif.desc'              => 'nullable|string|max:1000',
     ];
 
-    protected array $messages = [
-        'formEntryEdukasiPasien.tglEdukasi.required' => 'Tanggal edukasi wajib diisi.',
-        'formEntryEdukasiPasien.tglEdukasi.date_format' => 'Format tanggal harus dd/mm/yyyy hh24:mi:ss.',
 
-        'formEntryEdukasiPasien.dokterPelaksanaTindakan.drName.required' => 'Dokter pelaksana wajib diisi.',
+    /**
+     * ============================================
+     * 💬 VALIDATION MESSAGES
+     * ============================================
+     */
+    protected array $messages = [
+        // Tanggal
+        'formEntryEdukasiPasien.tglEdukasi.required'     => 'Tanggal edukasi wajib diisi.',
+        'formEntryEdukasiPasien.tglEdukasi.date_format'  => 'Format tanggal harus dd/mm/yyyy hh24:mi:ss.',
+
+        // Dokter pelaksana
+        'formEntryEdukasiPasien.dokterPelaksanaTindakan.drName.required' => 'Nama dokter pelaksana wajib diisi.',
         'formEntryEdukasiPasien.dokterPelaksanaTindakan.drName.max'      => 'Nama dokter maksimal 100 karakter.',
 
+        // Pemberi informasi
         'formEntryEdukasiPasien.pemberiInformasi.petugasCode.required' => 'Kode petugas wajib diisi.',
         'formEntryEdukasiPasien.pemberiInformasi.petugasName.required' => 'Nama petugas wajib diisi.',
 
+        // Penerima informasi
         'formEntryEdukasiPasien.penerimaInformasi.name.required'      => 'Nama penerima informasi wajib diisi.',
         'formEntryEdukasiPasien.penerimaInformasi.hubungan.required'  => 'Hubungan penerima dengan pasien wajib diisi.',
         'formEntryEdukasiPasien.penerimaInformasi.signature.required' => 'Tanda tangan penerima wajib diisi.',
 
+        // Detail edukasi
         'formEntryEdukasiPasien.detailInformasi.required' => 'Detail informasi wajib diisi (boleh kosong per baris).',
     ];
 

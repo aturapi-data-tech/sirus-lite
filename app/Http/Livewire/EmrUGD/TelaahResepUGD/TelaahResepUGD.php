@@ -477,7 +477,7 @@ class TelaahResepUGD extends Component
         }
 
         // opsional: cek status UGD aktif
-        // if (!$this->checkUgdStatus()) return;
+
 
         if (!$rjNo) {
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')

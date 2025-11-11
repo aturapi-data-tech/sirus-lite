@@ -17,19 +17,19 @@
                             <li class="mr-2">
                                 <label
                                     class="inline-block p-2 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
-                                    :class="activeTab === '{{ $dataDaftarUgd['observasi']['obatDanCairan']['pemberianObatDanCairanTab'] }}'
+                                    :class="activeTab === '{{ $dataDaftarUgd['observasi']['obatDanCairan']['pemberianObatDanCairanTab'] ?? 'Pemberian Obat Dan Cairan' }}'
                                         ?
                                         'text-primary border-primary bg-gray-100' : ''"
-                                    @click="activeTab =!activeTab?'{{ $dataDaftarUgd['observasi']['obatDanCairan']['pemberianObatDanCairanTab'] }}':false">{{ $dataDaftarUgd['observasi']['obatDanCairan']['pemberianObatDanCairanTab'] }}</label>
+                                    @click="activeTab =!activeTab?'{{ $dataDaftarUgd['observasi']['obatDanCairan']['pemberianObatDanCairanTab'] ?? 'Pemberian Obat Dan Cairan' }}':false">{{ $dataDaftarUgd['observasi']['obatDanCairan']['pemberianObatDanCairanTab'] ?? 'Pemberian Obat Dan Cairan' }}</label>
                             </li>
                         </ul>
                     </div>
 
                     <div class="p-2 rounded-lg bg-gray-50"
                         :class="{
-                            'active': activeTab === '{{ $dataDaftarUgd['observasi']['obatDanCairan']['pemberianObatDanCairanTab'] }}'
+                            'active': activeTab === '{{ $dataDaftarUgd['observasi']['obatDanCairan']['pemberianObatDanCairanTab'] ?? 'Pemberian Obat Dan Cairan' }}'
                         }"
-                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarUgd['observasi']['obatDanCairan']['pemberianObatDanCairanTab'] }}'"
+                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarUgd['observasi']['obatDanCairan']['pemberianObatDanCairanTab'] ?? 'Pemberian Obat Dan Cairan' }}'"
                         @click.outside="activeTab=false">
                         @include('livewire.emr-u-g-d.mr-u-g-d.obat-dan-cairan.obat-dan-cairan-tab')
 
@@ -37,25 +37,6 @@
 
                 </div>
             </div>
-
-
-
-            {{-- <div class="sticky bottom-0 flex justify-between px-4 py-3 bg-gray-50 sm:px-6">
-
-                <div class="">
-
-                </div>
-                <div>
-                    <div wire:loading wire:target="store">
-                        <x-loading />
-                    </div>
-
-                    <x-green-button :disabled=false wire:click.prevent="store()" type="button" wire:loading.remove>
-                        Simpan
-                    </x-green-button>
-                </div>
-            </div> --}}
-
 
         </div>
     @endif

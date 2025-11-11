@@ -1,9 +1,7 @@
-<div x-data @click.outside="$wire.tingkatKesadaranLovStatus = false" class="absolute">
-
+<div x-data @click.outside="$wire.tingkatKesadaranLovStatus = false" class="absolute z-50">
     @if ($tingkatKesadaranLovStatus)
-        <!-- Dropdown list Title -->
         <div x-data x-init="$refs.tingkatKesadaranLovSearch.focus()"
-            class="flex items-center p-3 text-sm text-gray-700 bg-gray-100 border-t border-gray-200 rounded-t-lg dark:border-gray-600 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-500 hover:underline">
+            class="flex items-center p-3 text-sm text-gray-700 bg-gray-100 border-t border-gray-200 rounded-t-lg">
             <svg class="w-5 h-5 mr-1" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"
                 viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path
@@ -14,37 +12,25 @@
                 wire:model="tingkatKesadaranLovSearch" />
         </div>
 
-
-        <!-- Dropdown menu -->
-        <div class="z-10 w-full bg-white rounded-lg shadow dark:bg-gray-700">
-            <!-- Dropdown list -->
-            <ul class="h-auto px-3 pt-3 pb-3 overflow-y-auto text-sm text-gray-700 dark:text-gray-200">
+        <div class="z-10 w-full overflow-y-auto bg-white rounded-lg shadow max-h-60">
+            <ul class="px-3 pt-3 pb-3 text-sm text-gray-700">
                 @foreach ($tingkatKesadaranLov as $lov)
-                    <li wire:key='tingkatKesadaranLov{{ $lov['tingkatKesadaran'] }}'>
-                        <x-dropdown-link wire:click="setMytingkatKesadaranLov('{{ $lov['tingkatKesadaran'] }}')">
+                    <li wire:key="tingkatKesadaranLov{{ $lov['tingkatKesadaran'] }}">
+                        <x-dropdown-link wire:click="setTingkatKesadaran('{{ $lov['tingkatKesadaran'] }}')">
                             {{ $lov['tingkatKesadaran'] }}
                         </x-dropdown-link>
                     </li>
                 @endforeach
                 @if (strlen($tingkatKesadaranLovSearch) < 3 && count($tingkatKesadaranLov) == 0)
                     <li>
-                        <div class="w-full p-4 text-sm text-center text-gray-500 dark:text-gray-400">
-                            {{ 'Masukkan minimal 3 karakter' }}
-                        </div>
+                        <div class="w-full p-4 text-sm text-center text-gray-500">Masukkan minimal 3 karakter</div>
                     </li>
                 @elseif(strlen($tingkatKesadaranLovSearch) >= 3 && count($tingkatKesadaranLov) == 0)
                     <li>
-                        <div class="w-full p-4 text-sm text-center text-gray-500 dark:text-gray-400">
-                            {{ 'Data Tidak ditemukan' }}
-                        </div>
+                        <div class="w-full p-4 text-sm text-center text-gray-500">Data Tidak ditemukan</div>
                     </li>
                 @endif
             </ul>
         </div>
-
-        <!-- Dropdown Action menu Flowbite-->
-
-        <!-- End Dropdown Action Open menu -->
     @endif
-
 </div>

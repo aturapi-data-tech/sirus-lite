@@ -5,31 +5,21 @@ namespace App\Http\Livewire\EmrUGD\MrUGD\Anamnesa\Anamnesa;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Contracts\Cache\LockTimeoutException;
-use Illuminate\Validation\ValidationException;
-
 use Livewire\Component;
 use App\Http\Traits\EmrUGD\EmrUGDTrait;
-
 
 class Screening extends Component
 {
     use EmrUGDTrait;
 
-    // listener from blade////////////////
-    protected $listeners = [];
+    // listener from blade
+    protected $listeners = ['emr:ugd:store' => 'store'];
 
-
-
-    //////////////////////////////
     // Ref on top bar
-    //////////////////////////////
-
-    // dataDaftarUgd RJ
     public $rjNoRef;
     public array $dataDaftarUgd = [];
 
-    public array $screening =
-    [
+    public array $screening = [
         "keluhanUtama" => "",
         "pernafasan" => "",
         "pernafasanOptions" => [
@@ -43,7 +33,6 @@ class Screening extends Component
             ["kesadaran" => "Tampak Mengantuk"],
             ["kesadaran" => "Gelisah"],
             ["kesadaran" => "Bicara Tidak Jelas"],
-
         ],
 
         "nyeriDada" => "",
@@ -57,7 +46,6 @@ class Screening extends Component
             ["nyeriDadaTingkat" => "Ringan"],
             ["nyeriDadaTingkat" => "Sedang"],
             ["nyeriDadaTingkat" => "Berat"],
-
         ],
 
         "prioritasPelayanan" => "",
@@ -66,72 +54,52 @@ class Screening extends Component
             ["prioritasPelayanan" => "Paliatif"],
             ["prioritasPelayanan" => "Kuaratif"],
             ["prioritasPelayanan" => "Rehabilitatif"],
-
-
         ],
         "tanggalPelayanan" => "",
         "petugasPelayanan" => "",
-
     ];
-    //////////////////////////////////////////////////////////////////////
+
     protected $rules = [
         'dataDaftarUgd.screening.keluhanUtama' => 'required',
         'dataDaftarUgd.screening.pernafasan' => 'required',
         'dataDaftarUgd.screening.kesadaran' => 'required',
         'dataDaftarUgd.screening.nyeriDada' => 'required',
-        'dataDaftarUgd.screening.tanggalPelayanan' => 'required|date_format:d/m/Y H:i:s',
-
         'dataDaftarUgd.screening.prioritasPelayanan' => 'required',
-
-        'dataDaftarUgd.screening.tanggalPelayanan' => 'required',
+        'dataDaftarUgd.screening.tanggalPelayanan' => 'required|date_format:d/m/Y H:i:s',
         'dataDaftarUgd.screening.petugasPelayanan' => 'required',
-
     ];
 
     protected $messages = [
         'required' => ':attribute wajib diisi.',
+        'date_format' => ':attribute harus dalam format dd/mm/yyyy HH:ii:ss',
     ];
-    protected $attributes = [
-        'dataDaftarUgd.screening.keluhanUtama'     => 'Keluhan utama',
-        'dataDaftarUgd.screening.pernafasan'       => 'Pernafasan',
-        'dataDaftarUgd.screening.kesadaran'        => 'Kesadaran',
-        'dataDaftarUgd.screening.nyeriDada'        => 'Nyeri dada',
+
+    protected $validationAttributes = [
+        'dataDaftarUgd.screening.keluhanUtama' => 'Keluhan utama',
+        'dataDaftarUgd.screening.pernafasan' => 'Pernafasan',
+        'dataDaftarUgd.screening.kesadaran' => 'Kesadaran',
+        'dataDaftarUgd.screening.nyeriDada' => 'Nyeri dada',
         'dataDaftarUgd.screening.prioritasPelayanan' => 'Prioritas pelayanan',
         'dataDaftarUgd.screening.tanggalPelayanan' => 'Tanggal pelayanan',
         'dataDaftarUgd.screening.petugasPelayanan' => 'Petugas pelayanan',
     ];
 
-
-
-
-
-    ////////////////////////////////////////////////
-    ///////////begin////////////////////////////////
-    ////////////////////////////////////////////////
-
     public function updated($propertyName)
     {
-        $this->validateOnly($propertyName, $this->rules, $this->messages, $this->attributes);
+        $this->validateOnly($propertyName);
     }
 
-
-    // ////////////////
-    // RJ Logic
-    // ////////////////
-
-
-    // insert and update record start////////////////
-    public function store()
+    public function store(): void
     {
-        if (!$this->checkUgdStatus()) return;
-
-        $this->validate($this->rules, $this->messages, $this->attributes);
+        $this->validate();
 
         $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
         if (!$rjNo) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('rjNo kosong.');
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Nomor UGD kosong.');
             return;
         }
+
 
         $lockKey = "ugd:{$rjNo}";
         try {
@@ -139,15 +107,15 @@ class Screening extends Component
                 DB::transaction(function () use ($rjNo) {
                     $fresh = $this->findDataUGD($rjNo) ?: [];
 
+                    // Initialize screening structure if not exists
                     if (!isset($fresh['screening']) || !is_array($fresh['screening'])) {
                         $fresh['screening'] = $this->screening;
                     }
 
-                    // patch hanya subtree screening (gabungkan default -> existing -> edited)
-                    $fresh['screening'] = array_replace_recursive(
-                        $this->screening,
-                        (array)($fresh['screening'] ?? []),
-                        (array)($this->dataDaftarUgd['screening'] ?? [])
+                    // Merge current data with fresh data
+                    $fresh['screening'] = array_merge(
+                        $fresh['screening'],
+                        $this->dataDaftarUgd['screening'] ?? []
                     );
 
                     $this->updateJsonUGD($rjNo, $fresh);
@@ -160,60 +128,70 @@ class Screening extends Component
         } catch (LockTimeoutException $e) {
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
                 ->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
-        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-                ->addError('Gagal menyimpan Screening.');
+                ->addError('Gagal menyimpan screening: ' . $e->getMessage());
         }
     }
 
+    public function setPetugasPelayanan(): void
+    {
+        $myUserNameActive = auth()->user()->myuser_name;
 
+        // Check if user has permission to sign screening
+        if (!auth()->user()->hasRole(['Perawat', 'Dokter', 'Admin'])) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Anda tidak memiliki wewenang untuk menandatangani screening.');
+            return;
+        }
 
+        // Set petugas dan tanggal otomatis
+        $this->dataDaftarUgd['screening']['petugasPelayanan'] = $myUserNameActive;
+        $this->dataDaftarUgd['screening']['tanggalPelayanan'] = now()->format('d/m/Y H:i:s');
+
+        // Simpan perubahan
+        $this->store();
+    }
+
+    public function autoSetTanggal(): void
+    {
+        $this->dataDaftarUgd['screening']['tanggalPelayanan'] = now()->format('d/m/Y H:i:s');
+    }
 
     private function findData($rjno): void
     {
         $this->dataDaftarUgd = $this->findDataUGD($rjno) ?: [];
-        $current = (array)($this->dataDaftarUgd['screening'] ?? []);
-        $this->dataDaftarUgd['screening'] = array_replace_recursive($this->screening, $current);
-    }
 
-    private function checkUgdStatus(): bool
-    {
-        $row = DB::table('rstxn_ugdhdrs')->select('rj_status')
-            ->where('rj_no', $this->rjNoRef)->first();
-
-        if (!$row || $row->rj_status !== 'A') {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-                ->addError('Pasien Sudah Pulang, Transaksi Terkunci.');
-            return false;
+        // Initialize screening data if not exists
+        if (!isset($this->dataDaftarUgd['screening']) || !is_array($this->dataDaftarUgd['screening'])) {
+            $this->dataDaftarUgd['screening'] = $this->screening;
         }
-        return true;
     }
 
 
-    // when new form instance
-    public function mount()
-    {
 
+    public function resetForm(): void
+    {
+        $this->resetValidation();
+        $this->dataDaftarUgd['screening'] = $this->screening;
+    }
+
+
+
+    public function mount(): void
+    {
         $this->findData($this->rjNoRef);
     }
 
-
-
-    // select data start////////////////
     public function render()
     {
-
         return view(
             'livewire.emr-u-g-d.mr-u-g-d.anamnesa.anamnesa.screening',
             [
-                // 'RJpasiens' => $query->paginate($this->limitPerPage),
-                'myTitle' => 'Anamnesa',
-                'mySnipt' => 'Rekam Medis Pasien',
-                'myProgram' => 'Pasien Rawat Jalan',
+                'myTitle' => 'Screening UGD',
+                'mySnipt' => 'Rekam Medis Pasien UGD',
+                'myProgram' => 'Pasien UGD',
             ]
         );
     }
-    // select data end////////////////
-
-
 }

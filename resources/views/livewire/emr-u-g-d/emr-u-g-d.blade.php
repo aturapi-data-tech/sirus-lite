@@ -1,4 +1,5 @@
 <div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     {{-- Start Coding  --}}
 
@@ -145,9 +146,9 @@
                 @include('livewire.emr-u-g-d.create-general-consent-u-g-d-pasien')
             @endif
 
-            {{-- @if ($isOpenScreening)
+            @if ($isOpenScreening)
                 @include('livewire.emr-u-g-d.create-screening-u-g-d')
-            @endif --}}
+            @endif
 
         </div>
         {{-- Top Bar --}}
@@ -385,12 +386,12 @@
 
 
                                                     @role('Admin')
-                                                        {{-- <li>
+                                                        <li>
                                                             <x-dropdown-link
                                                                 wire:click="editScreening('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
                                                                 {{ __('Screening') }}
                                                             </x-dropdown-link>
-                                                        </li> --}}
+                                                        </li>
 
                                                         <li>
                                                             <x-dropdown-link

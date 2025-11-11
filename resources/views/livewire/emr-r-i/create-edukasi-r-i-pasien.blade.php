@@ -86,6 +86,16 @@
                             :wire:key="'content-edukasiPasienRI'.$riHdrNoRef" :riHdrNoRef="$riHdrNoRef" :regNoRef="$regNoRef">
                     </div>
 
+                    <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50 "
+                        :class="{
+                            'active': activeTabEdukasiPasienRI === 'edukasiPasienRITerintegrasi'
+                        }"
+                        x-show.transition.in.opacity.duration.600="activeTabEdukasiPasienRI === 'edukasiPasienRITerintegrasi'">
+                        <livewire:emr-r-i.edukasi-pasien-r-i.edukasi-pasien-r-i-terintegrasi
+                            :wire:key="'content-edukasiPasienRITerintegrasi'.$riHdrNoRef" :riHdrNoRef="$riHdrNoRef"
+                            :regNoRef="$regNoRef">
+                    </div>
+
                 </div>
 
             </div>

@@ -15,7 +15,7 @@ class Suket extends Component
     use EmrUGDTrait;
 
     // listener from blade////////////////
-    protected $listeners = [];
+    protected $listeners = ['emr:ugd:store' => 'store'];
 
     public $rjNoRef;
     public array $dataDaftarUgd = [];
@@ -66,7 +66,6 @@ class Suket extends Component
     // insert and update record start////////////////
     public function store()
     {
-        if (!$this->checkUgdStatus()) return;
 
         $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
         if (!$rjNo) {
@@ -124,18 +123,7 @@ class Suket extends Component
         $this->dataDaftarUgd['suket'] = array_replace_recursive($this->suket, $current);
     }
 
-    private function checkUgdStatus(): bool
-    {
-        $row = DB::table('rstxn_ugdhdrs')->select('rj_status')
-            ->where('rj_no', $this->rjNoRef)->first();
 
-        if (!$row || $row->rj_status !== 'A') {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-                ->addError('Pasien Sudah Pulang, Transaksi Terkunci.');
-            return false;
-        }
-        return true;
-    }
 
     // when new form instance
     public function mount()

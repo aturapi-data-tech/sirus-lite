@@ -1,145 +1,128 @@
 <div>
     <div class="w-full mb-1">
+        {{-- Keluhan Utama --}}
+        <div class="mb-4">
+            <x-input-label for="dataDaftarUgd.anamnesa.keluhanUtama.keluhanUtama" :value="__('Keluhan Utama')" :required="__(true)"
+                class="pt-2 text-lg font-semibold" />
+            <div class="mt-1">
+                <x-text-input-area id="dataDaftarUgd.anamnesa.keluhanUtama.keluhanUtama"
+                    placeholder="Masukkan keluhan utama pasien" class="w-full" :errorshas="__($errors->has('dataDaftarUgd.anamnesa.keluhanUtama.keluhanUtama'))"
+                    :disabled=$disabledPropertyRjStatus :rows=4
+                    wire:model.debounce.500ms="dataDaftarUgd.anamnesa.keluhanUtama.keluhanUtama" />
+            </div>
+            @error('dataDaftarUgd.anamnesa.keluhanUtama.keluhanUtama')
+                <x-input-error :messages=$message class="mt-1" />
+            @enderror
+        </div>
 
-
-        @include('livewire.emr-u-g-d.mr-u-g-d.anamnesa.keluhanUtamaTab')
-
-        <div class="mb-2">
+        {{-- Tingkat Kegawatan --}}
+        <div class="mb-4">
             <x-input-label for="dataDaftarUgd.anamnesa.pengkajianPerawatan.tingkatKegawatan" :value="__('Tingkat Kegawatan')"
-                :required="__(true)" class="pt-2 sm:text-xl" />
-
-            <div class="mb-2 ">
-
-                <div class="grid grid-cols-4 gap-2 mt-2 ml-2">
+                :required="__(true)" class="text-lg font-semibold" />
+            <div class="mt-2">
+                <div class="grid grid-cols-2 gap-3 md:grid-cols-4">
                     @foreach ($dataDaftarUgd['anamnesa']['pengkajianPerawatan']['tingkatKegawatanOption'] as $tingkatKegawatanOption)
-                        {{-- @dd($sRj) --}}
                         <x-radio-button :label="__($tingkatKegawatanOption['tingkatKegawatan'])" value="{{ $tingkatKegawatanOption['tingkatKegawatan'] }}"
                             wire:model="dataDaftarUgd.anamnesa.pengkajianPerawatan.tingkatKegawatan" />
                     @endforeach
                 </div>
             </div>
-
             @error('dataDaftarUgd.anamnesa.pengkajianPerawatan.tingkatKegawatan')
-                <x-input-error :messages=$message />
+                <x-input-error :messages=$message class="mt-1" />
             @enderror
-
         </div>
 
-        <div>
+        {{-- Waktu Datang --}}
+        <div class="mb-4">
             <x-input-label for="dataDaftarUgd.anamnesa.pengkajianPerawatan.jamDatang" :value="__('Waktu Datang')"
-                :required="__(true)" />
-
-            <div class="mb-2 ">
-                <div class="flex items-center mb-2 ">
+                :required="__(true)" class="text-lg font-semibold" />
+            <div class="flex flex-col gap-3 mt-1 md:flex-row">
+                <div class="flex-1">
                     <x-text-input id="dataDaftarUgd.anamnesa.pengkajianPerawatan.jamDatang"
-                        placeholder="Waktu Datang [dd/mm/yyyy hh24:mi:ss]" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.anamnesa.pengkajianPerawatan.jamDatang'))"
+                        placeholder="Waktu Datang [dd/mm/yyyy HH:MM:SS]" class="w-full" :errorshas="__($errors->has('dataDaftarUgd.anamnesa.pengkajianPerawatan.jamDatang'))"
                         :disabled=$disabledPropertyRjStatus
                         wire:model.debounce.500ms="dataDaftarUgd.anamnesa.pengkajianPerawatan.jamDatang" />
-
-                    @if (!$dataDaftarUgd['anamnesa']['pengkajianPerawatan']['jamDatang'])
-                        <div class="w-1/2 ml-2">
-                            <div wire:loading wire:target="setJamDatang">
-                                <x-loading />
-                            </div>
-
-                            <x-green-button :disabled=false
-                                wire:click.prevent="setJamDatang('{{ date('d/m/Y H:i:s') }}')" type="button"
-                                wire:loading.remove>
-                                <div wire:poll.20s>
-
-                                    Set Jam Datang: {{ date('d/m/Y H:i:s') }}
-
-                                </div>
-                            </x-green-button>
-                        </div>
-                    @endif
                 </div>
-
+                @if (!$dataDaftarUgd['anamnesa']['pengkajianPerawatan']['jamDatang'])
+                    <div class="md:w-1/3">
+                        <div wire:loading wire:target="setAutoJamDatang">
+                            <x-loading />
+                        </div>
+                        <x-primary-button :disabled=$disabledPropertyRjStatus wire:click.prevent="setAutoJamDatang()"
+                            type="button" wire:loading.remove class="justify-center w-full">
+                            <i class="fas fa-clock me-2"></i>Waktu Sekarang
+                        </x-primary-button>
+                    </div>
+                @endif
             </div>
             @error('dataDaftarUgd.anamnesa.pengkajianPerawatan.jamDatang')
-                <x-input-error :messages=$message />
+                <x-input-error :messages=$message class="mt-1" />
             @enderror
         </div>
 
-        <div class="mb-2">
+        {{-- Cara Masuk IGD --}}
+        <div class="mb-4">
             <x-input-label for="dataDaftarUgd.anamnesa.pengkajianPerawatan.caraMasukIgd" :value="__('Cara Masuk IGD')"
-                :required="__(true)" class="pt-2 sm:text-xl" />
-
-            <div class="mb-2 ">
-
-                <div class="grid grid-cols-5 gap-2 mt-2 ml-2">
+                :required="__(true)" class="text-lg font-semibold" />
+            <div class="mt-2">
+                <div class="grid grid-cols-1 gap-3 mb-3 md:grid-cols-3">
                     @foreach ($dataDaftarUgd['anamnesa']['pengkajianPerawatan']['caraMasukIgdOption'] as $caraMasukIgdOption)
-                        {{-- @dd($sRj) --}}
                         <x-radio-button :label="__($caraMasukIgdOption['caraMasukIgd'])" value="{{ $caraMasukIgdOption['caraMasukIgd'] }}"
                             wire:model="dataDaftarUgd.anamnesa.pengkajianPerawatan.caraMasukIgd" />
                     @endforeach
-
-
-
-                    <x-text-input id="dataDaftarUgd.anamnesa.pengkajianPerawatan.caraMasukIgdDesc"
-                        placeholder="Keterangan Cara Masuk IGD" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.anamnesa.pengkajianPerawatan.caraMasukIgdDesc'))"
-                        :disabled=$disabledPropertyRjStatus
-                        wire:model.debounce.500ms="dataDaftarUgd.anamnesa.pengkajianPerawatan.caraMasukIgdDesc" />
-
-
                 </div>
-                @error('dataDaftarUgd.anamnesa.pengkajianPerawatan.caraMasukIgd')
-                    <x-input-error :messages=$message />
-                @enderror
+                <x-text-input id="dataDaftarUgd.anamnesa.pengkajianPerawatan.caraMasukIgdDesc"
+                    placeholder="Keterangan Cara Masuk IGD" class="w-full" :errorshas="__($errors->has('dataDaftarUgd.anamnesa.pengkajianPerawatan.caraMasukIgdDesc'))"
+                    :disabled=$disabledPropertyRjStatus
+                    wire:model.debounce.500ms="dataDaftarUgd.anamnesa.pengkajianPerawatan.caraMasukIgdDesc" />
             </div>
-
+            @error('dataDaftarUgd.anamnesa.pengkajianPerawatan.caraMasukIgd')
+                <x-input-error :messages=$message class="mt-1" />
+            @enderror
         </div>
 
-        <div class="mb-2">
-            <x-input-label for="dataDaftarUgd.anamnesa.pengkajianPerawatan.saranaTransportasiId" :value="__('Sarana Transportasi Kedatangan ')"
-                :required="__(true)" />
-            <div class="grid grid-cols-5 gap-2 mt-2 ml-2">
-                @foreach ($dataDaftarUgd['anamnesa']['pengkajianPerawatan']['saranaTransportasiOptions'] ?? [] as $saranaTransportasi)
-                    {{-- @dd($saranaTransportasi) --}}
-                    <x-radio-button :label="__($saranaTransportasi['saranaTransportasiDesc'])" value="{{ $saranaTransportasi['saranaTransportasiId'] }}"
-                        wire:model="dataDaftarUgd.anamnesa.pengkajianPerawatan.saranaTransportasiId"
-                        wire:click="$set('dataDaftarUgd.anamnesa.pengkajianPerawatan.saranaTransportasiDesc','{{ $saranaTransportasi['saranaTransportasiDesc'] }}')" />
-                @endforeach
-
+        {{-- Sarana Transportasi --}}
+        <div class="mb-4">
+            <x-input-label for="dataDaftarUgd.anamnesa.pengkajianPerawatan.saranaTransportasiId" :value="__('Sarana Transportasi Kedatangan')"
+                :required="__(true)" class="text-lg font-semibold" />
+            <div class="mt-2">
+                <div class="grid grid-cols-2 gap-3 mb-3 md:grid-cols-4">
+                    @foreach ($dataDaftarUgd['anamnesa']['pengkajianPerawatan']['saranaTransportasiOptions'] ?? [] as $saranaTransportasi)
+                        <x-radio-button :label="__($saranaTransportasi['saranaTransportasiDesc'])" value="{{ $saranaTransportasi['saranaTransportasiId'] }}"
+                            wire:model="dataDaftarUgd.anamnesa.pengkajianPerawatan.saranaTransportasiId"
+                            wire:click="$set('dataDaftarUgd.anamnesa.pengkajianPerawatan.saranaTransportasiDesc','{{ $saranaTransportasi['saranaTransportasiDesc'] }}')" />
+                    @endforeach
+                </div>
                 <x-text-input id="dataDaftarUgd.anamnesa.pengkajianPerawatan.saranaTransportasiKet"
-                    placeholder="Keterangan Sarana Transportasi" class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.anamnesa.pengkajianPerawatan.saranaTransportasiKet'))"
+                    placeholder="Keterangan Sarana Transportasi" class="w-full" :errorshas="__($errors->has('dataDaftarUgd.anamnesa.pengkajianPerawatan.saranaTransportasiKet'))"
                     :disabled=$disabledPropertyRjStatus
                     wire:model.debounce.500ms="dataDaftarUgd.anamnesa.pengkajianPerawatan.saranaTransportasiKet" />
             </div>
-            @error('saranaTransportasi.saranaTransportasiId')
-                <x-input-error :messages=$message />
+            @error('dataDaftarUgd.anamnesa.pengkajianPerawatan.saranaTransportasiId')
+                <x-input-error :messages=$message class="mt-1" />
             @enderror
         </div>
 
-        @include('livewire.emr-u-g-d.mr-u-g-d.anamnesa.statusPsikologisTab')
-
-
-
-        <div>
+        {{-- Perawat Penerima --}}
+        <div class="mb-4">
             <x-input-label for="dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima" :value="__('Perawat Penerima')"
-                :required="__(true)" class="pt-2 sm:text-xl" />
-
-            <div class="mb-2 ">
-                <div class="grid gap-2 mb-2">
+                :required="__(true)" class="text-lg font-semibold" />
+            <div class="flex flex-col gap-3 mt-1 md:flex-row">
+                <div class="flex-1">
                     <x-text-input id="dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima"
-                        name="dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima" placeholder="Perawat Penerima"
-                        class="mt-1 ml-2" :errorshas="__($errors->has('dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima'))" :disabled=true
-                        wire:model.debounce.500ms="dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima"
-                        autocomplete="dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima" />
-
-                    <x-yellow-button :disabled=false wire:click.prevent="setPerawatPenerima()" type="button"
-                        wire:loading.remove>
-                        ttd Perawat
-                    </x-yellow-button>
-
+                        placeholder="Perawat Penerima" class="w-full" :errorshas="__($errors->has('dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima'))" :disabled=true
+                        wire:model.debounce.500ms="dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima" />
                 </div>
-
+                <div class="md:w-1/3">
+                    <x-primary-button :disabled=$disabledPropertyRjStatus wire:click.prevent="setPerawatPenerima()"
+                        type="button" class="justify-center w-full">
+                        <i class="fas fa-signature me-2"></i>TTD Perawat
+                    </x-primary-button>
+                </div>
             </div>
             @error('dataDaftarUgd.anamnesa.pengkajianPerawatan.perawatPenerima')
-                <x-input-error :messages=$message />
+                <x-input-error :messages=$message class="mt-1" />
             @enderror
         </div>
-
-
     </div>
 </div>

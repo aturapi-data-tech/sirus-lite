@@ -6,9 +6,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Contracts\Cache\LockTimeoutException;
 use \Illuminate\Validation\ValidationException;
-
 use Livewire\Component;
 use Livewire\WithPagination;
+use Carbon\Carbon;
 
 use App\Http\Traits\EmrUGD\EmrUGDTrait;
 use App\Http\Traits\customErrorMessagesTrait;
@@ -17,32 +17,27 @@ class Observasi extends Component
 {
     use WithPagination, EmrUGDTrait, customErrorMessagesTrait;
 
-    // listener from blade////////////////
     protected $listeners = [];
 
-    //////////////////////////////
-    // Ref on top bar
-    //////////////////////////////
-
-    // dataDaftarUgd RJ
     public $rjNoRef;
-
     public array $dataDaftarUgd = [];
+    public $disabledPropertyRjStatus = false;
 
     public array $observasiLanjutan = [
         "cairan" => "",
         "tetesan" => "",
-        "sistolik" => "", //number
-        "distolik" => "", //number
-        "frekuensiNafas" => "", //number
-        "frekuensiNadi" => "", //number
-        "suhu" => "", //number
-        "spo2" => "", //number
-        "gda" => "", //number
-        "gcs" => "", //number
-        "waktuPemeriksaan" => "", //date dd/mm/yyyy hh24:mi:ss
+        "sistolik" => "",
+        "distolik" => "",
+        "frekuensiNafas" => "",
+        "frekuensiNadi" => "",
+        "suhu" => "",
+        "spo2" => "",
+        "gda" => "",
+        "gcs" => "",
+        "waktuPemeriksaan" => "",
         "pemeriksa" => ""
     ];
+
     protected array $messages = [
         'required'    => ':attribute wajib diisi.',
         'numeric'     => ':attribute harus berupa angka.',
@@ -64,14 +59,10 @@ class Observasi extends Component
         'observasiLanjutan.pemeriksa'         => 'Pemeriksa',
     ];
 
-    public array $observasi =
-    [
+    public array $observasi = [
         "tandaVitalTab" => "Observasi Lanjutan",
         "tandaVital" => [],
-
     ];
-    //////////////////////////////////////////////////////////////////////
-
 
     protected $rules = [
         'observasiLanjutan.cairan' => '',
@@ -88,36 +79,12 @@ class Observasi extends Component
         'observasiLanjutan.pemeriksa' => 'required',
     ];
 
-
-
-    ////////////////////////////////////////////////
-    ///////////begin////////////////////////////////
-    ////////////////////////////////////////////////
-
-
-
-
-
-    // resert input private////////////////
     private function resetInputFields(): void
     {
-
-        // resert validation
         $this->resetValidation();
-        // resert input kecuali
-        $this->reset(['']);
+        $this->reset(['observasiLanjutan']);
     }
 
-
-
-
-
-    // ////////////////
-    // RJ Logic
-    // ////////////////
-
-
-    // validate Data RJ//////////////////////////////////////////////////
     private function validateDataObservasiUgd(): void
     {
         try {
@@ -129,89 +96,15 @@ class Observasi extends Component
         }
     }
 
-
-    // insert and update record start////////////////
-    public function store()
+    public function addObservasiLanjutan(): void
     {
-        if (!$this->checkUgdStatus()) return;
-
-        $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
-        if (!$rjNo) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('rjNo kosong.');
-            return;
-        }
-
-        $lockKey = "ugd:{$rjNo}";
-        try {
-            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
-                DB::transaction(function () use ($rjNo) {
-                    $fresh = $this->findDataUGD($rjNo) ?: [];
-
-                    if (!isset($fresh['observasi']) || !is_array($fresh['observasi'])) {
-                        $fresh['observasi'] = [];
-                    }
-                    // patch hanya subtree kita
-                    if (isset($this->dataDaftarUgd['observasi']['observasiLanjutan'])) {
-                        $fresh['observasi']['observasiLanjutan'] = $this->dataDaftarUgd['observasi']['observasiLanjutan'];
-                    }
-
-                    $this->updateJsonUGD($rjNo, $fresh);
-                    $this->dataDaftarUgd = $fresh;
-                });
-            });
-
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Observasi berhasil disimpan.");
-        } catch (LockTimeoutException $e) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
-        } catch (\Throwable $e) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Gagal menyimpan.');
-        }
-    }
-
-    private function updateDataUgd($rjNo): void
-    {
-        // update table trnsaksi
-        // DB::table('rstxn_ugdhdrs')
-        //     ->where('rj_no', $rjNo)
-        //     ->update([
-        //         'datadaftarugd_json' => json_encode($this->dataDaftarUgd, true),
-        //         'datadaftarUgd_xml' => ArrayToXml::convert($this->dataDaftarUgd),
-        //     ]);
-
-        $this->updateJsonUGD($rjNo, $this->dataDaftarUgd);
-
-        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Observasi berhasil disimpan.");
-    }
-    // insert and update record end////////////////
-
-
-    private function findData($rjno): void
-    {
-        $this->dataDaftarUgd = $this->findDataUGD($rjno) ?: [];
-
-        if (!isset($this->dataDaftarUgd['observasi']) || !is_array($this->dataDaftarUgd['observasi'])) {
-            $this->dataDaftarUgd['observasi'] = [];
-        }
-        if (!isset($this->dataDaftarUgd['observasi']['observasiLanjutan']) || !is_array($this->dataDaftarUgd['observasi']['observasiLanjutan'])) {
-            $this->dataDaftarUgd['observasi']['observasiLanjutan'] = $this->observasi; // punya keys: tandaVitalTab, tandaVital
-        }
-        if (!isset($this->dataDaftarUgd['observasi']['observasiLanjutan']['tandaVital']) || !is_array($this->dataDaftarUgd['observasi']['observasiLanjutan']['tandaVital'])) {
-            $this->dataDaftarUgd['observasi']['observasiLanjutan']['tandaVital'] = [];
-        }
-    }
-
-
-
-    public function addObservasiLanjutan()
-    {
-        if (!$this->checkUgdStatus()) return;
 
         $this->observasiLanjutan['pemeriksa'] = auth()->user()->myuser_name ?? '';
         $this->validateDataObservasiUgd();
 
         $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
         if (!$rjNo) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('rjNo kosong.');
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Nomor registrasi UGD tidak valid.');
             return;
         }
 
@@ -230,14 +123,16 @@ class Observasi extends Component
 
                     $list = $fresh['observasi']['observasiLanjutan']['tandaVital'];
 
-                    // idempoten berdasarkan waktu
+                    // Cek duplikasi berdasarkan waktu
                     $exists = collect($list)->firstWhere('waktuPemeriksaan', $this->observasiLanjutan['waktuPemeriksaan']);
                     if ($exists) {
                         toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addInfo('Data pada waktu tersebut sudah ada.');
                         return;
                     }
 
-                    $list[] = [
+                    // Tambahkan data baru dengan ID unik
+                    $newEntry = [
+                        'id' => uniqid('observasi_'),
                         "cairan"            => $this->observasiLanjutan['cairan'],
                         "tetesan"           => $this->observasiLanjutan['tetesan'],
                         "sistolik"          => $this->observasiLanjutan['sistolik'],
@@ -252,11 +147,14 @@ class Observasi extends Component
                         "pemeriksa"         => $this->observasiLanjutan['pemeriksa'],
                     ];
 
+                    $list[] = $newEntry;
                     $fresh['observasi']['observasiLanjutan']['tandaVital'] = array_values($list);
+
+                    // Tambahkan log
                     $fresh['observasi']['observasiLanjutan']['tandaVitalLog'] = [
                         'userLogDesc' => 'Form Entry Observasi Lanjutan',
                         'userLog'     => auth()->user()->myuser_name ?? '',
-                        'userLogDate' => now(config('app.timezone'))->format('d/m/Y H:i:s'),
+                        'userLogDate' => Carbon::now(config('app.timezone'))->format('d/m/Y H:i:s'),
                     ];
 
                     $this->updateJsonUGD($rjNo, $fresh);
@@ -264,21 +162,21 @@ class Observasi extends Component
                 });
             });
 
-            $this->reset(['observasiLanjutan']);
+            $this->resetInputFields();
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Observasi Lanjutan berhasil ditambahkan.');
         } catch (LockTimeoutException $e) {
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
         } catch (\Throwable $e) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Gagal menambah Observasi Lanjutan.');
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Gagal menambah Observasi Lanjutan: ' . $e->getMessage());
         }
     }
-    public function removeObservasiLanjutan($waktuPemeriksaan)
+
+    public function removeObservasiLanjutan($waktuPemeriksaan): void
     {
-        if (!$this->checkUgdStatus()) return;
 
         $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
         if (!$rjNo) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('rjNo kosong.');
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Nomor registrasi UGD tidak valid.');
             return;
         }
 
@@ -289,18 +187,23 @@ class Observasi extends Component
                     $fresh = $this->findDataUGD($rjNo) ?: [];
 
                     if (!isset($fresh['observasi']['observasiLanjutan']['tandaVital'])) {
+                        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Data tidak ditemukan.');
                         return;
                     }
 
+                    // Hapus data berdasarkan waktu pemeriksaan
                     $list = collect($fresh['observasi']['observasiLanjutan']['tandaVital'])
                         ->reject(fn($row) => (string)($row['waktuPemeriksaan'] ?? '') === (string)$waktuPemeriksaan)
-                        ->values()->all();
+                        ->values()
+                        ->all();
 
                     $fresh['observasi']['observasiLanjutan']['tandaVital'] = $list;
+
+                    // Update log
                     $fresh['observasi']['observasiLanjutan']['tandaVitalLog'] = [
                         'userLogDesc' => 'Hapus Observasi Lanjutan',
                         'userLog'     => auth()->user()->myuser_name ?? '',
-                        'userLogDate' => now(config('app.timezone'))->format('d/m/Y H:i:s'),
+                        'userLogDate' => Carbon::now(config('app.timezone'))->format('d/m/Y H:i:s'),
                     ];
 
                     $this->updateJsonUGD($rjNo, $fresh);
@@ -308,55 +211,79 @@ class Observasi extends Component
                 });
             });
 
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Observasi Lanjutan dihapus.');
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Observasi Lanjutan berhasil dihapus.');
         } catch (LockTimeoutException $e) {
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
         } catch (\Throwable $e) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Gagal menghapus Observasi Lanjutan.');
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Gagal menghapus Observasi Lanjutan: ' . $e->getMessage());
         }
     }
 
-    public function setWaktuPemeriksaan($myTime)
+    /**
+     * Set waktu pemeriksaan dengan Carbon::now()
+     */
+    public function setWaktuPemeriksaan(): void
+    {
+        $this->observasiLanjutan['waktuPemeriksaan'] = Carbon::now()->format('d/m/Y H:i:s');
+    }
+
+    /**
+     * Set waktu pemeriksaan custom (jika diperlukan)
+     */
+    public function setCustomWaktuPemeriksaan($myTime): void
     {
         $this->observasiLanjutan['waktuPemeriksaan'] = $myTime;
     }
 
-    private function checkUgdStatus(): bool
-    {
-        $row = DB::table('rstxn_ugdhdrs')->select('rj_status')
-            ->where('rj_no', $this->rjNoRef)->first();
 
-        if (!$row || $row->rj_status !== 'A') {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-                ->addError('Pasien Sudah Pulang, Transaksi Terkunci.');
-            return false;
+
+    private function findData($rjno): void
+    {
+        $this->dataDaftarUgd = $this->findDataUGD($rjno) ?: [];
+
+        if (!isset($this->dataDaftarUgd['observasi']) || !is_array($this->dataDaftarUgd['observasi'])) {
+            $this->dataDaftarUgd['observasi'] = [];
         }
-        return true;
+
+        if (!isset($this->dataDaftarUgd['observasi']['observasiLanjutan'])) {
+            $this->dataDaftarUgd['observasi']['observasiLanjutan'] = $this->observasi;
+        }
+
+        if (!isset($this->dataDaftarUgd['observasi']['observasiLanjutan']['tandaVital'])) {
+            $this->dataDaftarUgd['observasi']['observasiLanjutan']['tandaVital'] = [];
+        }
+
+        // Generate ID untuk data yang sudah ada jika belum ada ID
+        $this->generateIdsForExistingObservasi();
     }
 
-    // when new form instance
-    public function mount()
+    private function generateIdsForExistingObservasi(): void
+    {
+        if (isset($this->dataDaftarUgd['observasi']['observasiLanjutan']['tandaVital'])) {
+            foreach ($this->dataDaftarUgd['observasi']['observasiLanjutan']['tandaVital'] as &$observasi) {
+                if (!isset($observasi['id'])) {
+                    $observasi['id'] = uniqid('observasi_');
+                }
+            }
+        }
+    }
+
+    public function mount(): void
     {
         $this->findData($this->rjNoRef);
+        // Set waktu default saat mount
+        $this->setWaktuPemeriksaan();
     }
 
-
-
-    // select data start////////////////
     public function render()
     {
-
         return view(
             'livewire.emr-u-g-d.mr-u-g-d.observasi.observasi',
             [
-                // 'RJpasiens' => $query->paginate($this->limitPerPage),
                 'myTitle' => 'Observasi',
                 'mySnipt' => 'Rekam Medis Pasien',
                 'myProgram' => 'Pasien UGD',
             ]
         );
     }
-    // select data end////////////////
-
-
 }

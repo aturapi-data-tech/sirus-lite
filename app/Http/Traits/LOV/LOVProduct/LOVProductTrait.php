@@ -18,7 +18,7 @@ trait LOVProductTrait
     // Lov dataProductLov //////////////////////
     ////////////////////////////////////////////////
 
-    public function updateddataProductLovsearch()
+    public function updatedDataProductLovSearch()
     {
 
         // Reset index of LoV
@@ -27,7 +27,7 @@ trait LOVProductTrait
         $search = $this->dataProductLovSearch;
 
         // check LOV by product_id rs id
-        $dataProductLovs = DB::table('immst_products ')
+        $dataProductLovs = DB::table('immst_products')
             ->select(
                 'product_id',
                 'product_name',

@@ -3,24 +3,17 @@
 namespace App\Http\Livewire\EmrUGD\EresepUGD;
 
 use Illuminate\Support\Facades\DB;
-
 use Livewire\Component;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Contracts\Cache\LockTimeoutException;
-
-use App\Http\Traits\customErrorMessagesTrait;
 use App\Http\Traits\EmrUGD\EmrUGDTrait;
-
+use App\Http\Traits\LOV\LOVProduct\LOVProductTrait;
 use Illuminate\Support\Facades\Validator;
 
 class EresepUGD extends Component
 {
-    use  EmrUGDTrait;
+    use  EmrUGDTrait, LOVProductTrait;
 
-    // listener from blade////////////////
-    protected $listeners = [
-        'storeAssessmentDokterUGD' => 'store',
-    ];
 
     //////////////////////////////
     // Ref on top bar
@@ -31,181 +24,18 @@ class EresepUGD extends Component
     // dataDaftarUgd RJ
     public array $dataDaftarUgd = [];
 
-    //////////////////////////////////////////////////////////////////////
-
-    //  table LOV////////////////
-
-    public $dataProductLov = [];
-    public $dataProductLovStatus = 0;
-    public $dataProductLovSearch = '';
-    public $selecteddataProductLovIndex = 0;
-
-    public $collectingMyProduct = [];
 
     ////////////////////////////////////////////////
     ///////////begin////////////////////////////////
     ////////////////////////////////////////////////
 
 
-    /////////////////////////////////////////////////
-    // Lov dataProductLov //////////////////////
-    ////////////////////////////////////////////////
-    public function clickdataProductLov()
-    {
-        $this->dataProductLovStatus = true;
-        $this->dataProductLov = [];
-    }
-
-    public function updatedDataProductLovSearch()
-    {
-        // Reset index of LoV
-        $this->reset(['selecteddataProductLovIndex', 'dataProductLov']);
-        // Variable Search
-        $search = $this->dataProductLovSearch;
-
-        // check LOV by dr_id rs id
-        $dataProductLovs = DB::table('immst_products')
-            ->select(
-                'product_id',
-                'product_name',
-                'sales_price',
-                DB::raw("(select replace(string_agg(cont_desc),',','')||product_name
-                                            from immst_productcontents z,immst_contents x
-                                            where z.product_id=immst_products.product_id
-                                            and z.cont_id=x.cont_id) as elasticSearch"),
-                DB::raw("(select string_agg(cont_desc)
-                                            from immst_productcontents z,immst_contents x
-                                            where z.product_id=immst_products.product_id
-                                            and z.cont_id=x.cont_id) as product_content"),
-            )
-            ->where('active_status', '1')
-            ->where('product_id', $search)
-            ->first();
-
-        if ($dataProductLovs) {
-            // set product sep
-            $this->addProduct($dataProductLovs->product_id, $dataProductLovs->product_name, $dataProductLovs->sales_price);
-            $this->resetdataProductLov();
-        } else {
-            // if there is no id found and check (min 3 char on search)
-            if (strlen($search) < 3) {
-                $this->dataProductLov = [];
-            } else {
-                $this->dataProductLov = DB::select(
-                    "select * from (
-                    select product_id,
-                    product_name,
-                    sales_price,
-
-                    (select replace(string_agg(cont_desc),',','')||product_name
-                    from immst_productcontents z,immst_contents x
-                    where z.product_id=a.product_id
-                    and z.cont_id=x.cont_id)elasticsearch,
-
-                    (select string_agg(cont_desc)
-                    from immst_productcontents z,immst_contents x
-                    where z.product_id=a.product_id
-                    and z.cont_id=x.cont_id)product_content
-
-                    from immst_products a
-                    where active_status='1'
-                    group by product_id,product_name, sales_price
-                    order by product_name)
-
-                where upper(elasticsearch) like '%'||:search||'%'
-                    ",
-                    ['search' => strtoupper($search)],
-                );
-
-                $this->dataProductLov = json_decode(json_encode($this->dataProductLov, true), true);
-            }
-            $this->dataProductLovStatus = true;
-            // set doing nothing
-        }
-    }
-    // /////////////////////
-    // LOV selected start
-    public function setMydataProductLov($id)
-    {
-        if (!$this->checkUgdStatus()) return;
-        $dataProductLovs = DB::table('immst_products')
-            ->select(
-                'product_id',
-                'product_name',
-                'sales_price',
-                DB::raw("(select replace(string_agg(cont_desc),',','')||product_name
-                                                            from immst_productcontents z,immst_contents x
-                                                            where z.product_id=immst_products.product_id
-                                                            and z.cont_id=x.cont_id) as elasticSearch"),
-                DB::raw("(select string_agg(cont_desc)
-                                                            from immst_productcontents z,immst_contents x
-                                                            where z.product_id=immst_products.product_id
-                                                            and z.cont_id=x.cont_id) as product_content"),
-            )
-            ->where('active_status', '1')
-            ->where('product_id', $this->dataProductLov[$id]['product_id'])
-            ->first();
-
-        // set dokter sep
-        $this->addProduct($dataProductLovs->product_id, $dataProductLovs->product_name, $dataProductLovs->sales_price);
-        $this->resetdataProductLov();
-    }
-
-    public function resetdataProductLov()
-    {
-        $this->reset(['dataProductLov', 'dataProductLovStatus', 'dataProductLovSearch', 'selecteddataProductLovIndex']);
-    }
-
-    public function selectNextdataProductLov()
-    {
-        if ($this->selecteddataProductLovIndex === '') {
-            $this->selecteddataProductLovIndex = 0;
-        } else {
-            $this->selecteddataProductLovIndex++;
-        }
-
-        if ($this->selecteddataProductLovIndex === count($this->dataProductLov)) {
-            $this->selecteddataProductLovIndex = 0;
-        }
-    }
-
-    public function selectPreviousdataProductLov()
-    {
-        if ($this->selecteddataProductLovIndex === '') {
-            $this->selecteddataProductLovIndex = count($this->dataProductLov) - 1;
-        } else {
-            $this->selecteddataProductLovIndex--;
-        }
-
-        if ($this->selecteddataProductLovIndex === -1) {
-            $this->selecteddataProductLovIndex = count($this->dataProductLov) - 1;
-        }
-    }
-
-    public function enterMydataProductLov($id)
-    {
-        if (!$this->checkUgdStatus()) return;
-        // jika data obat belum siap maka toaster error
-        if (isset($this->dataProductLov[$id]['product_id'])) {
-            $this->addProduct($this->dataProductLov[$id]['product_id'], $this->dataProductLov[$id]['product_name'], $this->dataProductLov[$id]['sales_price']);
-            $this->resetdataProductLov();
-        } else {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Data Obat belum tersedia.');
-        }
-    }
-
-    // LOV selected end
-    /////////////////////////////////////////////////
-    // Lov dataProductLov //////////////////////
-    ////////////////////////////////////////////////
 
     // insert and update record start////////////////
     public function store()
     {
-        // optionally, kunci pasien masih aktif
-        if (!$this->checkUgdStatus()) return;
+        if (!$this->checkUgdStatus($this->rjNoRef)) return;
 
-        // pastikan RJ No ada
         $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
         if (!$rjNo) {
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
@@ -218,26 +48,15 @@ class EresepUGD extends Component
         try {
             Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
                 DB::transaction(function () use ($rjNo) {
-                    // Ambil FRESH dari DB biar tidak menimpa subtree lain
                     $fresh = $this->findDataUGD($rjNo) ?: [];
-
-                    // Pastikan subtree yang dikelola komponen ini ada
                     if (!isset($fresh['eresep']) || !is_array($fresh['eresep'])) {
                         $fresh['eresep'] = [];
                     }
-
-                    // PATCH hanya bagian 'eresep' dari state lokal
                     $fresh['eresep'] = array_values((array)($this->dataDaftarUgd['eresep'] ?? []));
-
-                    // Commit JSON besar sekali jalan
                     $this->updateJsonUGD($rjNo, $fresh);
-
-                    // Sinkronkan state lokal supaya UI langsung up-to-date
                     $this->dataDaftarUgd = $fresh;
                 });
             });
-
-
 
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
                 ->addSuccess('Eresep berhasil disimpan.');
@@ -259,43 +78,72 @@ class EresepUGD extends Component
 
         $this->dataDaftarUgd = $this->findDataUGD($rjno);
 
-        // jika eresep tidak ditemukan tambah variable eresep pda array
         if (isset($this->dataDaftarUgd['eresep']) == false) {
             $this->dataDaftarUgd['eresep'] = [];
         }
     }
 
-
-    private function addProduct($productId, $productName, $salesPrice): void
+    private function syncLovToForm(): void
     {
-        $this->collectingMyProduct = [
-            'productId' => $productId,
-            'productName' => $productName,
-            'jenisKeterangan' => 'NonRacikan', //Racikan non racikan
-            'signaX' => 1,
-            'signaHari' => 1,
-            'qty' => 1,
-            'productPrice' => $salesPrice,
-            'catatanKhusus' => '',
-        ];
+        // Jika trait sudah memilih produk (punya ProductId)
+        if (!empty($this->collectingMyProduct['ProductId'] ?? null)) {
+            $pid   = (string) ($this->collectingMyProduct['ProductId']   ?? '');
+            $pname = (string) ($this->collectingMyProduct['ProductName'] ?? '');
+            $price = (float)  ($this->collectingMyProduct['ProductPrice'] ?? 0);
+
+            // Bentuk ulang struktur form yang dipakai metode insert UGD
+            $this->collectingMyProduct = [
+                'productId'      => $pid,
+                'productName'    => $pname,
+                'jenisKeterangan' => 'NonRacikan',
+                'signaX'         => $this->collectingMyProduct['signaX'] ?? '',
+                'signaHari'      => $this->collectingMyProduct['signaHari'] ?? '',
+                'qty'            => $this->collectingMyProduct['qty'] ?? '',
+                'productPrice'   => $price,
+                'catatanKhusus'  => $this->collectingMyProduct['catatanKhusus'] ?? '',
+            ];
+        }
     }
+
+
 
     public function insertProduct(): void
     {
-        // Validasi
-        $messages = customErrorMessagesTrait::messages();
+        // pastikan hasil LOV (jika ada) sudah disinkronkan jadi struktur form UGD
+        $this->syncLovToForm();
+
+        $messages = [
+            'required'        => ':attribute wajib diisi.',
+            'numeric'         => ':attribute harus berupa angka.',
+            'digits_between'  => ':attribute harus memiliki panjang antara :min dan :max digit.',
+            'digits'          => ':attribute harus terdiri dari :digits digit.',
+            'max'             => ':attribute tidak boleh lebih dari :max karakter.',
+            'min'             => ':attribute minimal bernilai :min.',
+        ];
+
+        $attributes = [
+            'collectingMyProduct.productId'     => 'Obat',
+            'collectingMyProduct.productName'   => 'Nama Obat',
+            'collectingMyProduct.signaX'        => 'Signa X',
+            'collectingMyProduct.signaHari'     => 'Signa Hari',
+            'collectingMyProduct.qty'           => 'Jumlah',
+            'collectingMyProduct.productPrice'  => 'Harga Obat',
+            'collectingMyProduct.catatanKhusus' => 'Catatan Khusus',
+        ];
+
         $rules = [
-            'collectingMyProduct.productId'     => 'bail|required',
+            'collectingMyProduct.productId'     => 'bail|required|exists:immst_products,product_id',
             'collectingMyProduct.productName'   => 'bail|required',
-            'collectingMyProduct.signaX'        => 'bail|required|numeric|min:1',
-            'collectingMyProduct.signaHari'     => 'bail|required|numeric|min:1',
+            'collectingMyProduct.signaX'        => 'bail|required|max:25',
+            'collectingMyProduct.signaHari'     => 'bail|required|max:25',
             'collectingMyProduct.qty'           => 'bail|required|digits_between:1,3|numeric|min:1',
             'collectingMyProduct.productPrice'  => 'bail|required|numeric|min:0',
             'collectingMyProduct.catatanKhusus' => 'bail|nullable',
         ];
-        $this->validate($rules, $messages);
 
-        if (!$this->checkUgdStatus()) return;
+        $this->validate($rules, $messages, $attributes);
+
+        if (!$this->checkUgdStatus($this->rjNoRef)) return;
 
         $rjNo = $this->rjNoRef;
         $lockKey = "ugd:{$rjNo}";
@@ -303,8 +151,7 @@ class EresepUGD extends Component
         try {
             Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
                 DB::transaction(function () use ($rjNo) {
-                    $max = DB::table('rstxn_ugdobats')
-                        ->max(DB::raw('nvl(to_number(rjobat_dtl),0)'));
+                    $max = DB::table('rstxn_ugdobats')->max(DB::raw('nvl(to_number(rjobat_dtl),0)'));
                     $nextDtl = (int)$max + 1;
 
                     $productTakar = DB::table('immst_products')
@@ -344,7 +191,7 @@ class EresepUGD extends Component
             });
 
             $this->store();
-            $this->reset(['collectingMyProduct']);
+            $this->reset(['collectingMyProduct']); // reset form
         } catch (\Throwable $e) {
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
                 ->addError('Gagal menambahkan obat.');
@@ -352,10 +199,26 @@ class EresepUGD extends Component
         }
     }
 
+    public function updateProductRow(int $key): void
+    {
+        $row = $this->dataDaftarUgd['eresep'][$key] ?? null;
+        if (!$row) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Baris resep tidak ditemukan.');
+            return;
+        }
 
+        $this->updateProduct(
+            $row['rjObatDtl']    ?? null,
+            $row['qty']          ?? null,
+            $row['signaX']       ?? null,
+            $row['signaHari']    ?? null,
+            $row['catatanKhusus'] ?? null
+        );
+    }
     public function updateProduct($rjobat_dtl, $qty = null, $signaX = null, $signaHari = null, $catatanKhusus = null): void
     {
-        if (!$this->checkUgdStatus()) return;
+        if (!$this->checkUgdStatus($this->rjNoRef)) return;
 
         $payload = [
             'qty'           => $qty,
@@ -466,7 +329,7 @@ class EresepUGD extends Component
 
     public function removeProduct($rjObatDtl)
     {
-        if (!$this->checkUgdStatus()) return;
+        if (!$this->checkUgdStatus($this->rjNoRef)) return;
 
         $rjNo = $this->rjNoRef;
         $lockKey = "ugd:{$rjNo}";
@@ -503,24 +366,12 @@ class EresepUGD extends Component
         $this->reset(['collectingMyProduct']);
     }
 
-    private function checkUgdStatus(): bool
-    {
-        $row = DB::table('rstxn_ugdhdrs')
-            ->select('rj_status')
-            ->where('rj_no', $this->rjNoRef)
-            ->first();
 
-        if (!$row || $row->rj_status !== 'A') {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-                ->addError('Pasien Sudah Pulang, Transaksi Terkunci.');
-            return false;
-        }
-        return true;
-    }
 
     // when new form instance
     public function mount()
     {
+
         $this->findData($this->rjNoRef);
         // set data dokter ref
     }
@@ -528,6 +379,7 @@ class EresepUGD extends Component
     // select data start////////////////
     public function render()
     {
+        $this->syncLovToForm();
         return view('livewire.emr-u-g-d.eresep-u-g-d.eresep-u-g-d', [
             // 'RJpasiens' => $query->paginate($this->limitPerPage),
             'myTitle' => 'Data Pasien Rawat Jalan',

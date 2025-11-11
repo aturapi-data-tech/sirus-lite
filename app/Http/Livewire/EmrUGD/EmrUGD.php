@@ -2,464 +2,380 @@
 
 namespace App\Http\Livewire\EmrUGD;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-
 use Livewire\Component;
 use Livewire\WithPagination;
-use Carbon\Carbon;
-
-
 
 class EmrUGD extends Component
 {
     use WithPagination;
 
-    // primitive Variable
-    public string $myTitle = 'Rekam Medis UGD';
-    public string $mySnipt = 'Rekam Medis Pasien';
+    /* =========================================================================
+     |  Display & Program Info
+     * ========================================================================= */
+    public string $myTitle   = 'Rekam Medis UGD';
+    public string $mySnipt   = 'Rekam Medis Pasien';
     public string $myProgram = 'Pasien UGD';
 
+    /* =========================================================================
+     |  Pagination & Search
+     * ========================================================================= */
     public array $myLimitPerPages = [5, 10, 15, 20, 100];
-    // limit record per page -resetExcept////////////////
-    public int $limitPerPage = 10;
+    public int   $limitPerPage    = 10;
 
-    // my Reg No
+    public string $refFilter = '';
 
+    // Tampilkan ?cariData=...&p=... di URL
+    protected $queryString = [
+        'refFilter' => ['except' => '', 'as' => 'cariData'],
+        'page'      => ['except' => 1, 'as' => 'p'],
+    ];
+
+    /* =========================================================================
+     |  Register & Flags
+     * ========================================================================= */
     public string $regNo = '';
+    public bool   $callMasterPasien = false;
 
-    public bool $callMasterPasien = false;
-
-
-
-
-
-    // my Top Bar
+    /* =========================================================================
+     |  Top Bar (Tanggal, Shift, Status, Dokter)
+     * ========================================================================= */
     public array $myTopBar = [
-        'refDate' => '',
+        'refDate'   => '',
 
-        'refShiftId' => '1',
-        'refShiftDesc' => '1',
+        'refShiftId'      => '1',
+        'refShiftDesc'    => '1',
         'refShiftOptions' => [
             ['refShiftId' => '1', 'refShiftDesc' => '1'],
             ['refShiftId' => '2', 'refShiftDesc' => '2'],
             ['refShiftId' => '3', 'refShiftDesc' => '3'],
         ],
 
-        'refStatusId' => 'A',
-        'refStatusDesc' => 'Antrian',
+        'refStatusId'      => 'A',
+        'refStatusDesc'    => 'Antrian',
         'refStatusOptions' => [
             ['refStatusId' => 'A', 'refStatusDesc' => 'Antrian'],
             ['refStatusId' => 'L', 'refStatusDesc' => 'Selesai'],
             ['refStatusId' => 'I', 'refStatusDesc' => 'Transfer'],
         ],
 
-        'drId' => 'All',
-        'drName' => 'All',
+        'drId'      => 'All',
+        'drName'    => 'All',
         'drOptions' => [
-            [
-                'drId' => 'All',
-                'drName' => 'All'
-            ]
-        ]
+            ['drId' => 'All', 'drName' => 'All'],
+        ],
     ];
 
-    public string $refFilter = '';
-    // search logic -resetExcept////////////////
-    protected $queryString = [
-        'refFilter' => ['except' => '', 'as' => 'cariData'],
-        'page' => ['except' => 1, 'as' => 'p'],
+    /* =========================================================================
+     |  Modal States
+     * ========================================================================= */
+    public bool   $isOpen  = false;
+    public string $isOpenMode = 'insert';
+
+    public bool   $isOpenDokter  = false;
+    public string $isOpenModeDokter = 'insert';
+
+    public bool   $isOpenInap  = false;
+    public string $isOpenModeInap = 'insert';
+
+    public bool   $isOpenGeneralConsentPasienUGD  = false;
+    public string $isOpenModeGeneralConsentPasienUGD = 'insert';
+
+    public bool   $isOpenScreening  = false;
+    public string $isOpenModeScreening = 'insert';
+
+
+    public ?int    $rjNoRef  = null;
+    public ?string $regNoRef = null;
+
+    /* =========================================================================
+     |  Tabs
+     * ========================================================================= */
+    public string $activeTab = 'rekamMedis';
+    public string $activeTabDokter = 'assessmentDokter';
+    public string $activeTabGeneralConsentPasienUGD = 'generalConsentPasienUGD';
+
+    public array $EmrMenu = [
+        ['ermMenuId' => 'anamnesa',     'ermMenuName' => 'Anamnesa'],
+        ['ermMenuId' => 'pemeriksaan',  'ermMenuName' => 'Pemeriksaan'],
+        ['ermMenuId' => 'penilaian',    'ermMenuName' => 'Penilaian'],
+        ['ermMenuId' => 'observasi',    'ermMenuName' => 'Observasi'],
+        ['ermMenuId' => 'diagnosis',    'ermMenuName' => 'Diagnosis (ICD)'],
+        ['ermMenuId' => 'perencanaan',  'ermMenuName' => 'Perencanaan'],
+        ['ermMenuId' => 'administrasi', 'ermMenuName' => 'Administrasi'],
+        ['ermMenuId' => 'suket',        'ermMenuName' => 'Surat Keterangan (Sehat/Istirahat)'],
+        ['ermMenuId' => 'rekamMedis',   'ermMenuName' => 'Rekam Medis'],
     ];
 
-    // reset page when myTopBar Change
-    public function updatedReffilter()
+    public array $EmrMenuDokter = [
+        ['ermMenuId' => 'assessmentDokter',   'ermMenuName' => 'Assessment Dokter'],
+        ['ermMenuId' => 'observasi',          'ermMenuName' => 'Observasi'],
+        ['ermMenuId' => 'pelayananPenunjang', 'ermMenuName' => 'Pelayanan Penunjang'],
+        ['ermMenuId' => 'rekamMedis',         'ermMenuName' => 'Resume Medis'],
+    ];
+
+    public array $EmrMenuGeneralConsentPasienUGD = [
+        ['ermMenuId' => 'generalConsentPasienUGD', 'ermMenuName' => 'General Consent Pasien UGD'],
+        ['ermMenuId' => 'informConsentPasienUGD',  'ermMenuName' => 'Inform Consent Pasien UGD'],
+    ];
+
+    /* =========================================================================
+     |  Livewire: Lifecycles for Query String-bound Props
+     * ========================================================================= */
+    public function updatedRefFilter(): void
     {
         $this->resetPage();
     }
 
-    public function updatedMytopbarRefdate()
+    public function updatedMyTopBarRefDate(): void
     {
         $this->resetPage();
     }
 
-    public function updatedMytopbarRefstatusid()
+    public function updatedMyTopBarRefStatusId(): void
     {
         $this->resetPage();
     }
 
-    // setter myTopBar Shift and myTopBar refDate
-    private function settermyTopBarShiftandmyTopBarrefDate(): void
+    /* =========================================================================
+     |  Helpers (Top Bar)
+     * ========================================================================= */
+    private function setTopBarShiftAndRefDate(): void
     {
-        // dd/mm/yyyy hh24:mi:ss
+        // dd/mm/yyyy
         $this->myTopBar['refDate'] = Carbon::now(env('APP_TIMEZONE'))->format('d/m/Y');
-        // dd(Carbon::now(env('APP_TIMEZONE'))->format('H:i:s'));
 
-        // shift
-        $findShift = DB::table('rstxn_shiftctls')->select('shift')
-            ->whereRaw("'" . Carbon::now(env('APP_TIMEZONE'))->format('H:i:s') . "' between
-             shift_start and shift_end")
+        // Cari shift aktif saat ini
+        $findShift = DB::table('rstxn_shiftctls')
+            ->select('shift')
+            ->whereRaw("'" . Carbon::now(env('APP_TIMEZONE'))->format('H:i:s') . "' BETWEEN shift_start AND shift_end")
             ->first();
+
         $this->myTopBar['refShiftId'] = isset($findShift->shift) && $findShift->shift ? $findShift->shift : 3;
     }
 
-    private function gettermyTopBardrOptions(): void
+    private function fillTopBarDoctorOptions(): void
     {
         $myRefdate = $this->myTopBar['refDate'];
 
-        // Query
         $query = DB::table('rsview_ugdkasir')
-            ->select(
-                'dr_id',
-                'dr_name',
-            )
+            ->select('dr_id', 'dr_name')
             ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $myRefdate)
-            ->groupBy('dr_id')
-            ->groupBy('dr_name')
+            ->groupBy('dr_id', 'dr_name')
             ->orderBy('dr_name', 'desc')
             ->get();
 
-        // loop and set Ref
-        $query->each(function ($item, $key) {
-            $this->myTopBar['drOptions'][$key + 1]['drId'] = $item->dr_id;
-            $this->myTopBar['drOptions'][$key + 1]['drName'] = $item->dr_name;
-        })->toArray();
+        // Reset ke default "All"
+        $this->myTopBar['drOptions'] = [
+            ['drId' => 'All', 'drName' => 'All'],
+        ];
+
+        foreach ($query as $idx => $item) {
+            $this->myTopBar['drOptions'][$idx + 1] = [
+                'drId'   => $item->dr_id,
+                'drName' => $item->dr_name,
+            ];
+        }
     }
 
-    public function settermyTopBardrOptions($drId, $drName): void
+    public function setTopBarDoctor(string $drId, string $drName): void
     {
-
-        $this->myTopBar['drId'] = $drId;
+        $this->myTopBar['drId']   = $drId;
         $this->myTopBar['drName'] = $drName;
         $this->resetPage();
     }
 
-
-
-
-    // open and close modal start////////////////
-    //  modal status////////////////
-    public bool $isOpen = false;
-    public string $isOpenMode = 'insert';
-
-    public bool $isOpenDokter = false;
-    public string $isOpenModeDokter = 'insert';
-
-    public bool $isOpenInap = false;
-    public string $isOpenModeInap = 'insert';
-
-    public bool $isOpenGeneralConsentPasienUGD = false;
-    public string $isOpenModeGeneralConsentPasienUGD = 'insert';
-
-    public bool $isOpenScreening = false;
-    public string $isOpenModeScreening = 'insert';
-
-    public bool $forceInsertRecord = false;
-
-    public int $rjNoRef;
-    public string $regNoRef;
-
-    //
+    /* =========================================================================
+     |  Modal Open/Close
+     * ========================================================================= */
     private function openModal(): void
     {
-        $this->isOpen = true;
+        $this->isOpen     = true;
         $this->isOpenMode = 'insert';
     }
+
     private function openModalEdit($rjNo, $regNoRef): void
     {
-        $this->isOpen = true;
+        $this->isOpen     = true;
         $this->isOpenMode = 'update';
-        $this->rjNoRef = $rjNo;
-        $this->regNoRef = $regNoRef;
+        $this->rjNoRef    = $rjNo;
+        $this->regNoRef   = $regNoRef;
     }
 
     private function openModalEditDokter($rjNo, $regNoRef): void
     {
-        $this->isOpenDokter = true;
+        $this->isOpenDokter     = true;
         $this->isOpenModeDokter = 'update';
-        $this->rjNoRef = $rjNo;
-        $this->regNoRef = $regNoRef;
+        $this->rjNoRef          = $rjNo;
+        $this->regNoRef         = $regNoRef;
     }
 
     private function openModalEditGeneralConsentPasienUGD($rjNo, $regNoRef): void
     {
-        $this->isOpenGeneralConsentPasienUGD = true;
+        $this->isOpenGeneralConsentPasienUGD     = true;
         $this->isOpenModeGeneralConsentPasienUGD = 'update';
-        $this->rjNoRef = $rjNo;
-        $this->regNoRef = $regNoRef;
+        $this->rjNoRef                            = $rjNo;
+        $this->regNoRef                           = $regNoRef;
     }
 
     private function openModalEditInap($rjNo, $regNoRef): void
     {
-        $this->isOpenInap = true;
+        $this->isOpenInap     = true;
         $this->isOpenModeInap = 'update';
-        $this->rjNoRef = $rjNo;
-        $this->regNoRef = $regNoRef;
+        $this->rjNoRef        = $rjNo;
+        $this->regNoRef       = $regNoRef;
     }
 
     private function openModalEditScreening($rjNo, $regNoRef): void
     {
-        $this->isOpenScreening = true;
+        $this->isOpenScreening     = true;
         $this->isOpenModeScreening = 'update';
-        $this->rjNoRef = $rjNo;
-        $this->regNoRef = $regNoRef;
+        $this->rjNoRef             = $rjNo;
+        $this->regNoRef            = $regNoRef;
     }
 
     private function openModalTampil(): void
     {
-        $this->isOpen = true;
+        $this->isOpen     = true;
         $this->isOpenMode = 'tampil';
     }
 
     public function closeModal(): void
     {
-        $this->isOpen = false;
+        $this->isOpen     = false;
         $this->isOpenMode = 'insert';
         $this->resetInputFields();
     }
 
     public function closeModalDokter(): void
     {
-        $this->isOpenDokter = false;
+        $this->isOpenDokter     = false;
         $this->isOpenModeDokter = 'insert';
         $this->resetInputFields();
     }
 
     public function closeModalGeneralConsentPasienUGD(): void
     {
-        $this->isOpenGeneralConsentPasienUGD = false;
+        $this->isOpenGeneralConsentPasienUGD     = false;
         $this->isOpenModeGeneralConsentPasienUGD = 'insert';
         $this->resetInputFields();
     }
 
     public function closeModalInap(): void
     {
-        $this->isOpenInap = false;
+        $this->isOpenInap     = false;
         $this->isOpenModeInap = 'insert';
         $this->resetInputFields();
     }
 
     public function closeModalScreening(): void
     {
-        $this->isOpenScreening = false;
+        $this->isOpenScreening     = false;
         $this->isOpenModeScreening = 'insert';
         $this->resetInputFields();
     }
-    // open and close modal end////////////////
 
-
-    // resert input private////////////////
     private function resetInputFields(): void
     {
-
-        // resert validation
         $this->resetValidation();
-        // resert input
-
+        // Tambahkan reset input lain jika diperlukan
     }
-    // resert input private////////////////
 
-    // is going to edit data/////////////////
-    public function edit($rjNo, $regNoRef)
+    /* =========================================================================
+     |  Actions
+     * ========================================================================= */
+    public function edit($rjNo, $regNoRef): void
     {
         $this->openModalEdit($rjNo, $regNoRef);
-        // $this->findData($id);
     }
 
-    public function editDokter($rjNo, $regNoRef)
+    public function editDokter($rjNo, $regNoRef): void
     {
         $this->openModalEditDokter($rjNo, $regNoRef);
-        // $this->findData($id);
     }
 
-    public function editGeneralConsentPasienUGD($rjNo, $regNoRef)
+    public function editGeneralConsentPasienUGD($rjNo, $regNoRef): void
     {
         $this->openModalEditGeneralConsentPasienUGD($rjNo, $regNoRef);
-        // $this->findData($id);
     }
 
-    // is going to edit data/////////////////
-    public function editInap($rjNo, $regNoRef)
+    public function editInap($rjNo, $regNoRef): void
     {
         $this->openModalEditInap($rjNo, $regNoRef);
-        // $this->findData($id);
     }
 
-    public function editScreening($rjNo, $regNoRef)
+    public function editScreening($rjNo, $regNoRef): void
     {
         $this->openModalEditScreening($rjNo, $regNoRef);
-        // $this->findData($id);
     }
 
-
-    // listener from blade////////////////
-    protected $listeners = [
-        'ListenerisOpenUgd' => 'ListenerisOpenUgd',
-        'confirm_remove_record_UGDp' => 'delete'
-    ];
-
-    public function ListenerisOpenUgd($ListenerisOpenUgd): void
-    {
-        // dd($ListenerisOpenUgd);
-        $this->isOpen = $ListenerisOpenUgd['isOpen'];
-        $this->isOpenMode = $ListenerisOpenUgd['isOpenMode'];
-        $this->render();
-    }
-
-
-    ////////////////////////////////////////////////
-    ///////////begin////////////////////////////////
-    ////////////////////////////////////////////////
-
-    // is going to insert data////////////////
-    public function create()
+    public function create(): void
     {
         $this->openModal();
     }
 
-    public function tampil()
+    public function tampil(): void
     {
-        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Fitur dalam masa pengembangan');
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+            ->addError('Fitur dalam masa pengembangan');
     }
 
-    public function delete()
+    public function delete(): void
     {
-        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Fitur dalam masa pengembangan');
+        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+            ->addError('Fitur dalam masa pengembangan');
     }
-
 
     public function callFormPasien(): void
     {
-        // set Call MasterPasien True
         $this->callMasterPasien = true;
     }
 
-    public string $activeTab = "rekamMedis";
-    public string $activeTabDokter = "assessmentDokter";
-    public string $activeTabGeneralConsentPasienUGD = "generalConsentPasienUGD";
-
-
-
-    public array $EmrMenu = [
-        // [
-        //     'ermMenuId' => 'keperawatan',
-        //     'ermMenuName' => 'Keperawatan'
-        // ],
-        [
-            'ermMenuId' => 'anamnesa',
-            'ermMenuName' => 'Anamnesa'
-        ],
-        [
-            'ermMenuId' => 'pemeriksaan',
-            'ermMenuName' => 'Pemeriksaan'
-        ],
-        [
-            'ermMenuId' => 'penilaian',
-            'ermMenuName' => 'Penilaian'
-        ],
-        [
-            'ermMenuId' => 'observasi',
-            'ermMenuName' => 'Observasi'
-        ],
-        [
-            'ermMenuId' => 'diagnosis',
-            'ermMenuName' => 'Diagnosis (ICD)'
-        ],
-        // [
-        //     'ermMenuId' => 'penandaanGbr',
-        //     'ermMenuName' => 'Penandaan Gambar'
-        // ],
-        [
-            'ermMenuId' => 'perencanaan',
-            'ermMenuName' => 'Perencanaan'
-        ],
-        [
-            'ermMenuId' => 'administrasi',
-            'ermMenuName' => 'Administrasi'
-        ],
-        [
-            'ermMenuId' => 'suket',
-            'ermMenuName' => 'Surat Keterangan (Sehat/Istirahat)'
-        ],
-        [
-            'ermMenuId' => 'rekamMedis',
-            'ermMenuName' => 'Rekam Medis'
-        ],
-
-    ];
-
-    public array $EmrMenuDokter = [
-        [
-            'ermMenuId' => 'assessmentDokter',
-            'ermMenuName' => 'Assessment Dokter'
-        ],
-        [
-            'ermMenuId' => 'observasi',
-            'ermMenuName' => 'Observasi'
-        ],
-        [
-            'ermMenuId' => 'pelayananPenunjang',
-            'ermMenuName' => 'Pelayanan Penunjang'
-        ],
-        [
-            'ermMenuId' => 'rekamMedis',
-            'ermMenuName' => 'Resume Medis'
-        ],
-
-    ];
-
-    public array $EmrMenuGeneralConsentPasienUGD = [
-        [
-            'ermMenuId' => 'generalConsentPasienUGD',
-            'ermMenuName' => 'General Consent Pasien UGD'
-        ],
-        [
-            'ermMenuId' => 'informConsentPasienUGD',
-            'ermMenuName' => 'Inform Consent Pasien UGD'
-        ]
-    ];
-
-
-    // when new form instance
-    public function mount()
+    public function storeAssessmentPerawat(): void
     {
-        $this->settermyTopBarShiftandmyTopBarrefDate();
+        $this->emit('emr:ugd:store');
     }
 
-    // select data start////////////////
+    /* =========================================================================
+     |  Lifecycle
+     * ========================================================================= */
+    public function mount(): void
+    {
+        $this->setTopBarShiftAndRefDate();
+    }
+
+    /* =========================================================================
+     |  Render (Query)
+     * ========================================================================= */
     public function render()
     {
-        $this->gettermyTopBardrOptions();
+        $this->fillTopBarDoctorOptions();
 
-        // set mySearch
-        $mySearch = $this->refFilter;
-        $myRefdate = $this->myTopBar['refDate'];
-        // $myRefshift = $this->myTopBar['refShiftId'];
+        $mySearch     = $this->refFilter;
+        $myRefdate    = $this->myTopBar['refDate'];
         $myRefstatusId = $this->myTopBar['refStatusId'];
-        $myRefdrId = $this->myTopBar['drId'];
+        $myRefdrId    = $this->myTopBar['drId'];
 
-
-
-        //////////////////////////////////////////
-        // Query ///////////////////////////////
-        //////////////////////////////////////////
         $query = DB::table('rsview_ugdkasir')
             ->select(
                 DB::raw("to_char(rj_date,'dd/mm/yyyy hh24:mi:ss') AS rj_date"),
-                DB::raw("to_char(rj_date,'yyyymmddhh24miss') AS rj_date1"),
+                DB::raw("to_char(rj_date,'yyyymmddhh24miss')     AS rj_date1"),
                 'rj_no',
                 'reg_no',
                 'reg_name',
                 'sex',
                 'address',
                 DB::raw("
-            CASE
-                WHEN birth_date IS NOT NULL THEN
-                    trunc(months_between(sysdate, birth_date) / 12) || ' Thn, ' ||
-                    trunc(mod(months_between(sysdate, birth_date), 12)) || ' Bln, ' ||
-                    trunc(sysdate - add_months(birth_date, trunc(months_between(sysdate, birth_date)))) || ' Hr'
-                ELSE
-                    '0 Thn, 0 Bln, 0 Hr'
-            END AS thn
-        "),
+                    CASE
+                        WHEN birth_date IS NOT NULL THEN
+                            trunc(months_between(sysdate, birth_date) / 12) || ' Thn, ' ||
+                            trunc(mod(months_between(sysdate, birth_date), 12)) || ' Bln, ' ||
+                            trunc(sysdate - add_months(birth_date, trunc(months_between(sysdate, birth_date)))) || ' Hr'
+                        ELSE
+                            '0 Thn, 0 Bln, 0 Hr'
+                    END AS thn
+                "),
                 DB::raw("to_char(birth_date,'dd/mm/yyyy') AS birth_date"),
                 DB::raw("'UGD' AS poli_id"),
                 DB::raw("'UGD' AS poli_desc"),
@@ -474,42 +390,29 @@ class EmrUGD extends Component
                 'push_antrian_bpjs_status',
                 'push_antrian_bpjs_json',
                 'datadaftarugd_json',
-                DB::raw("(select count(*) from lbtxn_checkuphdrs where status_rjri='UGD' and checkup_status!='B' and ref_no = rsview_ugdkasir.rj_no) AS lab_status"),
-                DB::raw("(select count(*) from rstxn_ugdrads where rj_no = rsview_ugdkasir.rj_no) AS rad_status")
+                DB::raw("(SELECT COUNT(*) FROM lbtxn_checkuphdrs WHERE status_rjri='UGD' AND checkup_status!='B' AND ref_no = rsview_ugdkasir.rj_no) AS lab_status"),
+                DB::raw("(SELECT COUNT(*) FROM rstxn_ugdrads WHERE rj_no = rsview_ugdkasir.rj_no) AS rad_status")
             )
             ->where(DB::raw("nvl(erm_status,'A')"), '=', $myRefstatusId)
             ->where('rj_status', '!=', 'F')
-
-            // ->where('shift', '=', $myRefshift)
             ->where(DB::raw("to_char(rj_date,'dd/mm/yyyy')"), '=', $myRefdate);
 
-        // Jika where dokter tidak kosong
-        if ($myRefdrId != 'All') {
+        if ($myRefdrId !== 'All') {
             $query->where('dr_id', $myRefdrId);
         }
 
-
         $query->where(function ($q) use ($mySearch) {
-            $q->Where(DB::raw('upper(reg_name)'), 'like', '%' . strtoupper($mySearch) . '%')
-                ->orWhere(DB::raw('upper(reg_no)'), 'like', '%' . strtoupper($mySearch) . '%')
-                ->orWhere(DB::raw('upper(dr_name)'), 'like', '%' . strtoupper($mySearch) . '%');
+            $u = strtoupper($mySearch);
+            $q->where(DB::raw('upper(reg_name)'), 'like', "%{$u}%")
+                ->orWhere(DB::raw('upper(reg_no)'),  'like', "%{$u}%")
+                ->orWhere(DB::raw('upper(dr_name)'), 'like', "%{$u}%");
         })
-            ->orderBy('rj_date1',  'desc')
+            ->orderBy('rj_date1', 'desc')
             ->orderBy('dr_name',  'desc')
-            ->orderBy('no_antrian',  'asc');
+            ->orderBy('no_antrian', 'asc');
 
-        ////////////////////////////////////////////////
-        // end Query
-        ///////////////////////////////////////////////
-
-
-
-        return view(
-            'livewire.emr-u-g-d.emr-u-g-d',
-            ['myQueryData' => $query->paginate($this->limitPerPage)]
-        );
+        return view('livewire.emr-u-g-d.emr-u-g-d', [
+            'myQueryData' => $query->paginate($this->limitPerPage),
+        ]);
     }
-    // select data end////////////////
-
-
 }

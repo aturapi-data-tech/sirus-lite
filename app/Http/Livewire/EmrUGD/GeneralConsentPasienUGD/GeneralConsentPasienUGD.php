@@ -17,9 +17,6 @@ class GeneralConsentPasienUGD extends Component
     use  EmrUGDTrait;
 
 
-    // listener from blade////////////////
-    protected $listeners = [];
-
     //////////////////////////////
     // Ref on top bar
     //////////////////////////////
@@ -95,8 +92,7 @@ class GeneralConsentPasienUGD extends Component
 
     public function store()
     {
-        // cek status transaksi masih aktif
-        if (!$this->checkUgdStatus()) return;
+
 
         $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
         if (!$rjNo) {
@@ -162,18 +158,7 @@ class GeneralConsentPasienUGD extends Component
         }
     }
 
-    private function checkUgdStatus(): bool
-    {
-        $row = DB::table('rstxn_ugdhdrs')->select('rj_status')
-            ->where('rj_no', $this->rjNoRef)->first();
 
-        if (!$row || $row->rj_status !== 'A') {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-                ->addError('Pasien Sudah Pulang, Transaksi Terkunci.');
-            return false;
-        }
-        return true;
-    }
 
     // when new form instance
     public function mount()

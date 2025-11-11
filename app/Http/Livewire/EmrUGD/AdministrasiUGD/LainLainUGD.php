@@ -20,10 +20,6 @@ class LainLainUGD extends Component
     use WithPagination, EmrUGDTrait;
 
 
-    // listener from blade////////////////
-    protected $listeners = [
-        'storeAssessmentDokterUGD' => 'store'
-    ];
 
 
     //////////////////////////////
@@ -129,7 +125,7 @@ class LainLainUGD extends Component
     // LOV selected start
     public function setMydataLainLainLov($id)
     {
-        $this->checkUgdStatus();
+        if (!$this->checkUgdStatus($this->rjNoRef)) return;
         $dataLainLainLovs = DB::table('rsmst_others ')->select(
             'other_id',
             'other_desc',
@@ -178,7 +174,7 @@ class LainLainUGD extends Component
 
     public function enterMydataLainLainLov($id)
     {
-        $this->checkUgdStatus();
+        if (!$this->checkUgdStatus($this->rjNoRef)) return;
         // jika JK belum siap maka toaster error
         if (isset($this->dataLainLainLov[$id]['other_id'])) {
             $this->addLainLain($this->dataLainLainLov[$id]['other_id'], $this->dataLainLainLov[$id]['other_desc'], $this->dataLainLainLov[$id]['other_price']);
@@ -201,46 +197,7 @@ class LainLainUGD extends Component
 
 
     // insert and update record start////////////////
-    public function store()
-    {
-        if (!$this->checkUgdStatus()) return;
 
-        $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
-        if (!$rjNo) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('rjNo kosong.');
-            return;
-        }
-
-        $lockKey = "ugd:{$rjNo}";
-        try {
-            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
-                DB::transaction(function () use ($rjNo) {
-                    // Ambil fresh supaya tidak menimpa modul lain
-                    $fresh = $this->findDataUGD($rjNo) ?: [];
-
-                    if (!isset($fresh['LainLain']) || !is_array($fresh['LainLain'])) {
-                        $fresh['LainLain'] = [];
-                    }
-
-                    // PATCH hanya subtree LainLain
-                    $fresh['LainLain'] = array_values($this->dataDaftarUgd['LainLain'] ?? []);
-
-                    // Commit JSON
-                    $this->updateJsonUGD($rjNo, $fresh);
-
-                    // Sinkronkan state lokal
-                    $this->dataDaftarUgd = $fresh;
-                });
-            });
-
-            $this->emit('ugd:refresh-summary');
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Lain-Lain berhasil disimpan.");
-        } catch (LockTimeoutException $e) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
-        } catch (\Throwable $e) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Gagal menyimpan Lain-Lain.');
-        }
-    }
 
 
     // insert and update record end////////////////
@@ -270,7 +227,7 @@ class LainLainUGD extends Component
 
     public function insertLainLain(): void
     {
-        if (!$this->checkUgdStatus()) return;
+        if (!$this->checkUgdStatus($this->rjNoRef)) return;
 
         $messages = customErrorMessagesTrait::messages();
         $rules = [
@@ -329,7 +286,7 @@ class LainLainUGD extends Component
 
     public function removeLainLain($rjotherDtl)
     {
-        if (!$this->checkUgdStatus()) return;
+        if (!$this->checkUgdStatus($this->rjNoRef)) return;
 
         $rjNo = $this->rjNoRef;
         $lockKey = "ugd:{$rjNo}";
@@ -351,6 +308,7 @@ class LainLainUGD extends Component
                     $fresh = $this->findDataUGD($rjNo) ?: [];
                     $fresh['LainLain'] = array_values($this->dataDaftarUgd['LainLain']);
                     $this->updateJsonUGD($rjNo, $fresh);
+                    $this->emit('ugd:refresh-summary');
                     $this->dataDaftarUgd = $fresh;
                 });
             });
@@ -366,20 +324,7 @@ class LainLainUGD extends Component
         $this->reset(['collectingMyLainLain']);
     }
 
-    private function checkUgdStatus(): bool
-    {
-        $row = DB::table('rstxn_ugdhdrs')
-            ->select('rj_status')
-            ->where('rj_no', $this->rjNoRef)
-            ->first();
 
-        if (!$row || $row->rj_status !== 'A') {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-                ->addError("Pasien Sudah Pulang, Transaksi Terkunci.");
-            return false;
-        }
-        return true;
-    }
 
 
     // when new form instance

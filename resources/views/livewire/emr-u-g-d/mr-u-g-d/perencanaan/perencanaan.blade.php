@@ -9,7 +9,7 @@
         <div class="w-full mb-1">
 
             {{-- <form class="scroll-smooth hover:scroll-auto"> --}}
-            <div class="grid grid-cols-1" x-data="{ activeTab: 'Petugas Medis' }">
+            <div class="grid grid-cols-1" x-data="{ activeTab: 'Pengkajian Medis' }">
 
                 <div id="TransaksiRawatJalan" class="px-2">
                     <div id="TransaksiRawatJalan">
@@ -87,10 +87,9 @@
 
 
 
-                <div class="sticky bottom-0 flex justify-between px-4 py-3 bg-gray-50 sm:px-6">
+                {{-- <div class="sticky bottom-0 flex justify-between px-4 py-3 bg-gray-50 sm:px-6">
 
                     <div class="">
-                        {{-- null --}}
                     </div>
                     <div>
                         <div wire:loading wire:target="store">
@@ -101,7 +100,7 @@
                             Simpan
                         </x-green-button>
                     </div>
-                </div>
+                </div> --}}
 
 
             </div>

@@ -168,17 +168,19 @@ trait EmrUGDTrait
         }
     }
 
-    protected function checkUGDStatus($rjNo): bool
+    protected function checkUgdStatus($rjNo): bool
     {
-        $lastInserted = DB::table('rstxn_ugdhdrs')
+        $row = DB::table('rstxn_ugdhdrs')
             ->select('rj_status')
-            ->where('rj_no', '=', $rjNo)
+            ->where('rj_no', $rjNo)
             ->first();
 
-        if ($lastInserted->rj_status !== 'A') {
-            return true;
+        if (!$row || $row->rj_status !== 'A') {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Pasien Sudah Pulang, Transaksi Terkunci.');
+            return false;
         }
-        return false;
+        return true;
     }
 
     public static function updateJsonUGD($rjNo, array $rjArr): void
@@ -191,7 +193,6 @@ trait EmrUGDTrait
             ->where('rj_no', $rjNo)
             ->update([
                 'datadaftarugd_json' => json_encode($rjArr, true),
-                'datadaftarugd_xml' => ArrayToXml::convert($rjArr),
             ]);
     }
 }

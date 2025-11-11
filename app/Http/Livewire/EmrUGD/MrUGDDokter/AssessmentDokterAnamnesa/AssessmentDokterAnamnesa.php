@@ -3,14 +3,12 @@
 namespace App\Http\Livewire\EmrUGD\MrUGDDokter\AssessmentDokterAnamnesa;
 
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
-
 use App\Http\Traits\EmrUGD\EmrUGDTrait;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Contracts\Cache\LockTimeoutException;
 
 
 
@@ -18,32 +16,17 @@ class AssessmentDokterAnamnesa extends Component
 {
     use WithPagination, EmrUGDTrait;
 
-    // listener from blade////////////////
-    protected $listeners = [
-        'storeAssessmentDokterUGD' => 'store',
+    protected $listeners = ['emr:ugd:store' => 'store'];
 
-    ];
-
-
-
-    //////////////////////////////
-    // Ref on top bar
-    //////////////////////////////
-
-
-
-    // dataDaftarUgd RJ
     public $rjNoRef;
-
     public array $dataDaftarUgd = [];
-
     public array $rekonsiliasiObat = ["namaObat" => "", "dosis" => "", "rute" => ""];
 
-    public array $anamnesa =
-    [
+    public array $anamnesa = [
         "pengkajianPerawatanTab" => "Pengkajian Perawatan",
         "pengkajianPerawatan" => [
             "perawatPenerima" => "",
+            "perawatPenerimaCode" => "",
             "jamDatang" => "",
             "caraMasukIgd" => "",
             "caraMasukIgdDesc" => "",
@@ -52,7 +35,6 @@ class AssessmentDokterAnamnesa extends Component
                 ["caraMasukIgd" => "Rujuk"],
                 ["caraMasukIgd" => "Kasus Polisi"],
             ],
-
             "tingkatKegawatan" => "",
             "tingkatKegawatanOption" => [
                 ["tingkatKegawatan" => "P1"],
@@ -101,11 +83,10 @@ class AssessmentDokterAnamnesa extends Component
         "rekonsiliasiObatTab" => "Rekonsiliasi Obat",
         "rekonsiliasiObat" => [],
 
-        "lainLainTab" => "lain-Lain",
+        "lainLainTab" => "Lain-Lain",
         "lainLain" => [
             "merokok" => [],
             "terpaparRokok" => []
-
         ],
 
         "faktorResikoTab" => "Faktor Resiko",
@@ -151,7 +132,7 @@ class AssessmentDokterAnamnesa extends Component
         "statusPsikologis" => [
             "tidakAdaKelainan" => [],
             "marah" => [],
-            "ccemas" => [],
+            "cemas" => [],
             "takut" => [],
             "sedih" => [],
             "cenderungBunuhDiri" => [],
@@ -187,7 +168,6 @@ class AssessmentDokterAnamnesa extends Component
                 ["tempatTinggal" => "Lain-lain"],
             ],
             "keteranganTempatTinggal" => ""
-
         ],
 
         "spiritualTab" => "Spiritual",
@@ -198,15 +178,12 @@ class AssessmentDokterAnamnesa extends Component
                 ["ibadahTeratur" => "Ya"],
                 ["ibadahTeratur" => "Tidak"],
             ],
-
             "nilaiKepercayaan" => "",
             "nilaiKepercayaanOptions" => [
                 ["nilaiKepercayaan" => "Ya"],
                 ["nilaiKepercayaan" => "Tidak"],
             ],
-
             "keteranganSpiritual" => ""
-
         ],
 
         "ekonomiTab" => "Ekonomi",
@@ -218,10 +195,8 @@ class AssessmentDokterAnamnesa extends Component
                 ["penghasilanBln" => "< 5Jt"],
                 ["penghasilanBln" => "5Jt - 10Jt"],
                 ["penghasilanBln" => ">10Jt"],
-
             ],
             "keteranganEkonomi" => ""
-
         ],
 
         "edukasiTab" => "Edukasi",
@@ -231,21 +206,18 @@ class AssessmentDokterAnamnesa extends Component
                 ["pasienKeluargaMenerimaInformasi" => "Ya"],
                 ["pasienKeluargaMenerimaInformasi" => "Tidak"],
             ],
-
             "hambatanEdukasi" => "",
             "keteranganHambatanEdukasi" => "",
             "hambatanEdukasiOptions" => [
                 ["hambatanEdukasi" => "Ya"],
                 ["hambatanEdukasi" => "Tidak"],
             ],
-
             "penerjemah" => "",
             "keteranganPenerjemah" => "",
             "penerjemahOptions" => [
                 ["penerjemah" => "Ya"],
                 ["penerjemah" => "Tidak"],
             ],
-
             "diagPenyakit" => [],
             "obat" => [],
             "dietNutrisi" => [],
@@ -253,10 +225,9 @@ class AssessmentDokterAnamnesa extends Component
             "managemenNyeri" => [],
             "penggunaanAlatMedis" => [],
             "hakKewajibanPasien" => [],
-
             "edukasiFollowUp" => "",
             "segeraKembaliIGDjika" => "",
-            "informedConsent" => "", //uploadfile pdf dll
+            "informedConsent" => "",
             "keteranganEdukasi" => ""
         ],
 
@@ -267,24 +238,20 @@ class AssessmentDokterAnamnesa extends Component
             "perubahanBB3BlnOptions" => [
                 ["perubahanBB3Bln" => "Ya (1)"],
                 ["perubahanBB3Bln" => "Tidak (0)"],
-
             ],
-
-            "jmlPerubahabBB" => "",
-            "jmlPerubahabBBScore" => "0",
-            "jmlPerubahabBBOptions" => [
-                ["jmlPerubahabBB" => "0,5Kg-1Kg (1)"],
-                ["jmlPerubahabBB" => ">5Kg-10Kg (2)"],
-                ["jmlPerubahabBB" => ">10Kg-15Kg (3)"],
-                ["jmlPerubahabBB" => ">15Kg-20Kg (4)"],
+            "jmlPerubahanBB" => "",
+            "jmlPerubahanBBScore" => "0",
+            "jmlPerubahanBBOptions" => [
+                ["jmlPerubahanBB" => "0,5Kg-1Kg (1)"],
+                ["jmlPerubahanBB" => ">5Kg-10Kg (2)"],
+                ["jmlPerubahanBB" => ">10Kg-15Kg (3)"],
+                ["jmlPerubahanBB" => ">15Kg-20Kg (4)"],
             ],
-
             "intakeMakanan" => "",
             "intakeMakananScore" => "0",
             "intakeMakananOptions" => [
                 ["intakeMakanan" => "Ya (1)"],
                 ["intakeMakanan" => "Tidak (0)"],
-
             ],
             "keteranganScreeningGizi" => "",
             "scoreTotalScreeningGizi" => "0",
@@ -295,26 +262,18 @@ class AssessmentDokterAnamnesa extends Component
         "batuk" => [
             "riwayatDemam" => [],
             "keteranganRiwayatDemam" => "",
-
             "berkeringatMlmHari" => [],
             "keteranganBerkeringatMlmHari" => "",
-
             "bepergianDaerahWabah" => [],
             "keteranganBepergianDaerahWabah" => "",
-
             "riwayatPakaiObatJangkaPanjangan" => [],
             "keteranganRiwayatPakaiObatJangkaPanjangan" => "",
-
             "BBTurunTanpaSebab" => [],
             "keteranganBBTurunTanpaSebab" => "",
-
             "pembesaranGetahBening" => [],
             "keteranganPembesaranGetahBening" => "",
-
         ],
     ];
-    //////////////////////////////////////////////////////////////////////
-
 
     protected $rules = [
         'dataDaftarUgd.anamnesa.pengkajianPerawatan.jamDatang' => 'required|date_format:d/m/Y H:i:s',
@@ -323,91 +282,55 @@ class AssessmentDokterAnamnesa extends Component
         'dataDaftarUgd.anamnesa.keluhanUtama.keluhanUtama' => 'required',
     ];
 
+    protected $messages = [
+        'required' => ':attribute wajib diisi.',
+        'date_format' => ':attribute harus dalam format dd/mm/yyyy HH:ii:ss',
+    ];
 
+    protected $validationAttributes = [
+        'dataDaftarUgd.anamnesa.pengkajianPerawatan.jamDatang' => 'Jam Datang',
+        'dataDaftarUgd.anamnesa.pengkajianPerawatan.caraMasukIgd' => 'Cara Masuk IGD',
+        'dataDaftarUgd.anamnesa.pengkajianPerawatan.tingkatKegawatan' => 'Tingkat Kegawatan',
+        'dataDaftarUgd.anamnesa.keluhanUtama.keluhanUtama' => 'Keluhan Utama',
+    ];
 
-    ////////////////////////////////////////////////
-    ///////////begin////////////////////////////////
-    ////////////////////////////////////////////////
     public function updated($propertyName)
     {
         $this->validateOnly($propertyName);
     }
 
-
-
-
-    // resert input private////////////////
-    private function resetInputFields(): void
+    public function store(): void
     {
+        $this->validate();
 
-        // resert validation
-        $this->resetValidation();
-        // resert input kecuali
-        $this->reset(['']);
-    }
-
-
-
-
-
-    // ////////////////
-    // RJ Logic
-    // ////////////////
-
-
-    // validate Data RJ//////////////////////////////////////////////////
-    private function validateDataAnamnesaUgd(): void
-    {
-        // customErrorMessages
-        // $messages = customErrorMessagesTrait::messages();
-        $messages = [];
-
-        // Proses Validasi///////////////////////////////////////////
-        try {
-            $this->validate($this->rules, $messages);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Lakukan Pengecekan kembali Input Data.");
-            $this->validate($this->rules, $messages);
-        }
-    }
-
-
-    // insert and update record start////////////////
-    public function store()
-    {
-        // Validate form
-        $this->validateDataAnamnesaUgd();
-
-        // Ambil rjNo
         $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
         if (!$rjNo) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("rjNo kosong.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Nomor UGD kosong.');
             return;
         }
 
-        // shared lock antar modul UGD (anamnesa/pemeriksaan/diagnosis/plan/Resume)
-        $lockKey = "ugd:{$rjNo}";
 
+
+        $lockKey = "ugd:{$rjNo}";
         try {
             Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
-                // Ambil FRESH state dari DB di dalam lock
-                $fresh = $this->findDataUGD($rjNo) ?: [];
+                DB::transaction(function () use ($rjNo) {
+                    $fresh = $this->findDataUGD($rjNo) ?: [];
 
-                // Pastikan struktur 'anamnesa' ada
-                if (!isset($fresh['anamnesa']) || !is_array($fresh['anamnesa'])) {
-                    $fresh['anamnesa'] = $this->anamnesa;
-                }
+                    if (!isset($fresh['anamnesa']) || !is_array($fresh['anamnesa'])) {
+                        $fresh['anamnesa'] = $this->anamnesa;
+                    }
 
-                // PATCH: hanya ganti subtree 'anamnesa' dari state form saat ini
-                $fresh['anamnesa'] = $this->dataDaftarUgd['anamnesa'];
+                    // Merge data anamnesa
+                    $fresh['anamnesa'] = array_merge(
+                        $fresh['anamnesa'],
+                        $this->dataDaftarUgd['anamnesa'] ?? []
+                    );
 
-                // Hitung field turunan utk tabel header
-                [$p_status, $waktu_pasien_datang, $waktu_pasien_dilayani] = $this->deriveHeaderFieldsFrom($fresh);
+                    // Update header fields
+                    [$p_status, $waktu_pasien_datang, $waktu_pasien_dilayani] = $this->deriveHeaderFieldsFrom($fresh);
 
-                // Tulis dalam TRANSACTION
-                DB::transaction(function () use ($rjNo, $fresh, $p_status, $waktu_pasien_datang, $waktu_pasien_dilayani) {
-                    // update kolom header (status & waktu)
                     DB::table('rstxn_ugdhdrs')
                         ->where('rj_no', $rjNo)
                         ->update([
@@ -416,29 +339,25 @@ class AssessmentDokterAnamnesa extends Component
                             'waktu_pasien_dilayani' => DB::raw("to_date('{$waktu_pasien_dilayani}','dd/mm/yyyy hh24:mi:ss')"),
                         ]);
 
-                    // simpan JSON UGD terkini
                     $this->updateJsonUGD($rjNo, $fresh);
+                    $this->dataDaftarUgd = $fresh;
                 });
-
-                // Sinkronkan state komponen ke fresh terbaru
-                $this->dataDaftarUgd = $fresh;
             });
+
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess('Anamnesa berhasil disimpan.');
         } catch (LockTimeoutException $e) {
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
                 ->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
-            return;
+        } catch (\Exception $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Gagal menyimpan anamnesa: ' . $e->getMessage());
         }
-
-        // Notify saudara2 komponen agar refresh
-
-        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-            ->addSuccess("Anamnesa berhasil disimpan.");
     }
 
     private function deriveHeaderFieldsFrom(array $state): array
     {
-        $tz = config('app.timezone'); // atau env('APP_TIMEZONE')
-        $now = Carbon::now($tz)->format('d/m/Y H:i:s');
+        $now = Carbon::now(config('app.timezone'))->format('d/m/Y H:i:s');
 
         $p_status = $state['anamnesa']['pengkajianPerawatan']['tingkatKegawatan'] ?? 'P0';
         $p_status = $p_status ?: 'P0';
@@ -446,145 +365,204 @@ class AssessmentDokterAnamnesa extends Component
         $waktu_pasien_datang = $state['anamnesa']['pengkajianPerawatan']['jamDatang'] ?? '';
         $waktu_pasien_datang = $waktu_pasien_datang ?: $now;
 
-        // jika modul Perencanaan sudah isi waktu pemeriksaan, pakai itu; kalau tidak fallback now
         $waktu_pasien_dilayani = $state['perencanaan']['pengkajianMedis']['waktuPemeriksaan'] ?? '';
         $waktu_pasien_dilayani = $waktu_pasien_dilayani ?: $now;
 
         return [$p_status, $waktu_pasien_datang, $waktu_pasien_dilayani];
     }
 
+    public function addRekonsiliasiObat(): void
+    {
+        if (empty($this->rekonsiliasiObat['namaObat'])) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Nama obat tidak boleh kosong.');
+            return;
+        }
 
+        $cekRekonsiliasiObat = collect($this->dataDaftarUgd['anamnesa']['rekonsiliasiObat'])
+            ->where("namaObat", $this->rekonsiliasiObat['namaObat'])
+            ->count();
+
+        if ($cekRekonsiliasiObat > 0) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Nama obat sudah ada dalam daftar.');
+            return;
+        }
+
+        $this->dataDaftarUgd['anamnesa']['rekonsiliasiObat'][] = [
+            "namaObat" => $this->rekonsiliasiObat['namaObat'],
+            "dosis" => $this->rekonsiliasiObat['dosis'],
+            "rute" => $this->rekonsiliasiObat['rute']
+        ];
+
+        $this->reset(['rekonsiliasiObat']);
+        $this->store();
+    }
+
+    public function removeRekonsiliasiObat($index): void
+    {
+        if (isset($this->dataDaftarUgd['anamnesa']['rekonsiliasiObat'][$index])) {
+            unset($this->dataDaftarUgd['anamnesa']['rekonsiliasiObat'][$index]);
+            $this->dataDaftarUgd['anamnesa']['rekonsiliasiObat'] = array_values($this->dataDaftarUgd['anamnesa']['rekonsiliasiObat']);
+            $this->store();
+        }
+    }
+
+    public function setJamDatang($myTime): void
+    {
+        $this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['jamDatang'] = $myTime;
+        $this->store();
+    }
+
+    public function setAutoJamDatang(): void
+    {
+        $this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['jamDatang'] = now()->format('d/m/Y H:i:s');
+        $this->store();
+    }
+
+    private function storePengkajianPerawatan(): void
+    {
+        $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
+        if (!$rjNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Nomor UGD kosong.');
+            return;
+        }
+
+        $lockKey = "ugd:{$rjNo}";
+
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
+                DB::transaction(function () use ($rjNo) {
+                    // Ambil data paling FRESH
+                    $fresh = $this->findDataUGD($rjNo) ?: [];
+
+                    // Ambil subtree aman (tanpa overwrite)
+                    $anamnesa = (array) data_get($fresh, 'anamnesa', []);
+                    $pp       = (array) data_get($anamnesa, 'pengkajianPerawatan', []);
+
+                    // Patch HANYA field perawat penerima (+ code)
+                    $pp['perawatPenerima']     = $this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['perawatPenerima']     ?? ($pp['perawatPenerima']     ?? '');
+                    $pp['perawatPenerimaCode'] = $this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['perawatPenerimaCode'] ?? ($pp['perawatPenerimaCode'] ?? '');
+
+                    // Kembalikan ke tree
+                    $anamnesa['pengkajianPerawatan'] = $pp;
+                    $fresh['anamnesa'] = $anamnesa;
+
+                    // Commit ke JSON
+                    $this->updateJsonUGD($rjNo, $fresh);
+
+                    // Sinkronkan state lokal supaya UI up-to-date
+                    $this->dataDaftarUgd = $fresh;
+                });
+            });
+
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess('Perawat penerima berhasil diset.');
+        } catch (LockTimeoutException $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
+        } catch (\Throwable $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Gagal menyimpan perawat penerima.');
+        }
+    }
+
+
+    public function setPerawatPenerima(): void
+    {
+        $user = auth()->user();
+        $myUserNameActive = $user?->myuser_name ?? 'Petugas';
+        $myUserCodeActive = $user?->myuser_code ?? '';
+
+        // Autorisasi ringkas
+        if (!$user?->hasAnyRole(['Perawat', 'Dokter', 'Admin'])) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Anda tidak memiliki wewenang untuk menandatangani anamnesa.');
+            return;
+        }
+
+        // Set ke state lokal
+        $this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['perawatPenerima'] = $myUserNameActive;
+        $this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['perawatPenerimaCode'] = $myUserCodeActive;
+
+        // Simpan HANYA subtree pengkajianPerawatan (aman, tidak overwrite node lain)
+        $this->storePengkajianPerawatan();
+    }
+
+
+    public function calculateScreeningGizi(): void
+    {
+        $screening = $this->dataDaftarUgd['anamnesa']['screeningGizi'] ?? [];
+        $totalScore = 0;
+
+        if (isset($screening['perubahanBB3BlnScore'])) {
+            $totalScore += (int)$screening['perubahanBB3BlnScore'];
+        }
+        if (isset($screening['jmlPerubahanBBScore'])) {
+            $totalScore += (int)$screening['jmlPerubahanBBScore'];
+        }
+        if (isset($screening['intakeMakananScore'])) {
+            $totalScore += (int)$screening['intakeMakananScore'];
+        }
+
+        $this->dataDaftarUgd['anamnesa']['screeningGizi']['scoreTotalScreeningGizi'] = (string)$totalScore;
+        $this->dataDaftarUgd['anamnesa']['screeningGizi']['tglScreeningGizi'] = now()->format('d/m/Y H:i:s');
+    }
+
+    public function toggleCheckbox($tab, $field): void
+    {
+        if (isset($this->dataDaftarUgd['anamnesa'][$tab][$field])) {
+            $this->dataDaftarUgd['anamnesa'][$tab][$field] =
+                $this->dataDaftarUgd['anamnesa'][$tab][$field] ? [] : [1];
+        }
+    }
 
     private function findData($rjno): void
     {
+        $this->dataDaftarUgd = $this->findDataUGD($rjno) ?: [];
 
-        $this->dataDaftarUgd = $this->findDataUGD($rjno);
-        // dd($this->dataDaftarUgd);
-        // jika anamnesa tidak ditemukan tambah variable anamnesa pda array
-        if (isset($this->dataDaftarUgd['anamnesa']) == false) {
+        if (!isset($this->dataDaftarUgd['anamnesa']) || !is_array($this->dataDaftarUgd['anamnesa'])) {
             $this->dataDaftarUgd['anamnesa'] = $this->anamnesa;
         }
 
-        // menyamakan Variabel keluhan utama
         $this->matchingMyVariable();
     }
 
-
-
-    public function addRekonsiliasiObat()
+    private function matchingMyVariable(): void
     {
-        if ($this->rekonsiliasiObat['namaObat']) {
-
-            // check exist
-            $cekRekonsiliasiObat = collect($this->dataDaftarUgd['anamnesa']['rekonsiliasiObat'])
-                ->where("namaObat", '=', $this->rekonsiliasiObat['namaObat'])
-                ->count();
-
-            if (!$cekRekonsiliasiObat) {
-                $this->dataDaftarUgd['anamnesa']['rekonsiliasiObat'][] = [
-                    "namaObat" => $this->rekonsiliasiObat['namaObat'],
-                    "dosis" => $this->rekonsiliasiObat['dosis'],
-                    "rute" => $this->rekonsiliasiObat['rute']
-                ];
-
-                // reset rekonsiliasiObat
-                $this->reset(['rekonsiliasiObat']);
-            } else {
-                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Nama Obat Sudah ada.");
-            }
-        } else {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Nama Obat Kosong.");
+        // Sync keluhan utama dari screening jika kosong
+        if (
+            empty($this->dataDaftarUgd['anamnesa']['keluhanUtama']['keluhanUtama']) &&
+            isset($this->dataDaftarUgd['screening']['keluhanUtama']) &&
+            !empty($this->dataDaftarUgd['screening']['keluhanUtama'])
+        ) {
+            $this->dataDaftarUgd['anamnesa']['keluhanUtama']['keluhanUtama'] = $this->dataDaftarUgd['screening']['keluhanUtama'];
         }
     }
 
-    public function removeRekonsiliasiObat($namaObat)
+    public function resetForm(): void
     {
-
-        $rekonsiliasiObat = collect($this->dataDaftarUgd['anamnesa']['rekonsiliasiObat'])->where("namaObat", '!=', $namaObat)->toArray();
-        $this->dataDaftarUgd['anamnesa']['rekonsiliasiObat'] = $rekonsiliasiObat;
+        $this->resetValidation();
+        $this->dataDaftarUgd['anamnesa'] = $this->anamnesa;
+        $this->reset(['rekonsiliasiObat']);
     }
 
-
-    private function matchingMyVariable()
+    public function mount(): void
     {
-
-        // keluhanUtama
-        $this->dataDaftarUgd['anamnesa']['keluhanUtama']['keluhanUtama'] =
-            ($this->dataDaftarUgd['anamnesa']['keluhanUtama']['keluhanUtama'])
-            ? $this->dataDaftarUgd['anamnesa']['keluhanUtama']['keluhanUtama']
-            : ((isset($this->dataDaftarUgd['screening']['keluhanUtama']) && !$this->dataDaftarUgd['anamnesa']['keluhanUtama']['keluhanUtama'])
-                ? $this->dataDaftarUgd['screening']['keluhanUtama']
-                : "");
-    }
-
-
-    public function setJamDatang($myTime)
-    {
-        $this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['jamDatang'] = $myTime;
-    }
-
-    private function validatePerawatPenerima()
-    {
-        // Validasi dulu
-        $messages = [];
-
-        // Proses Validasi///////////////////////////////////////////
-        try {
-            $this->validate($this->rules, $messages);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Anda tidak dapat melakukan TTD-E karena data pemeriksaan belum lengkap." . $e->getMessage());
-            $this->validate($this->rules, $messages);
-        }
-        // Validasi dulu
-    }
-
-    public function setPerawatPenerima()
-    {
-        // $myRoles = json_decode(auth()->user()->roles, true);
-        $myUserCodeActive = auth()->user()->myuser_code;
-        $myUserNameActive = auth()->user()->myuser_name;
-        // $myUserTtdActive = auth()->user()->myuser_ttd_image;
-
-        // Validasi dulu
-        // cek apakah data pemeriksaan sudah dimasukkan atau blm
-        $this->validatePerawatPenerima();
-        //  toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError( "Role " . $myUserNameActive);
-        if (auth()->user()->hasRole('Perawat')) {
-            $this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['perawatPenerima'] = $myUserNameActive;
-            $this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['perawatPenerimaCode'] = $myUserCodeActive;
-            $this->store();
-        } else {
-
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Anda tidak dapat melakukan TTD-E karena User Role " . $myUserNameActive . ' Bukan Perawat.');
-            return;
-        }
-    }
-
-    // when new form instance
-    public function mount()
-    {
-
         $this->findData($this->rjNoRef);
     }
 
-
-
-    // select data start////////////////
     public function render()
     {
 
         return view(
             'livewire.emr-u-g-d.mr-u-g-d-dokter.assessment-dokter-anamnesa.assessment-dokter-anamnesa',
             [
-                // 'RJpasiens' => $query->paginate($this->limitPerPage),
                 'myTitle' => 'Anamnesa',
                 'mySnipt' => 'Rekam Medis Pasien',
                 'myProgram' => 'Pasien Rawat Jalan',
             ]
         );
     }
-    // select data end////////////////
-
-
 }

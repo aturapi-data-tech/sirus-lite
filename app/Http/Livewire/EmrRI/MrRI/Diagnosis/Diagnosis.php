@@ -306,7 +306,6 @@ class Diagnosis extends Component
                 $dup = DB::table('rstxn_ridtls')
                     ->where('rihdr_no', $riHdrNo)
                     ->where('diag_id', $this->collectingMyDiagnosaICD10['DiagnosaICD10Id'])
-                    ->lockForUpdate()
                     ->exists();
 
                 if ($dup) {

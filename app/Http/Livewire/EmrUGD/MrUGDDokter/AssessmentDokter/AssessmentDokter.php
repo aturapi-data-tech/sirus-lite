@@ -25,7 +25,7 @@ class AssessmentDokter extends Component
 
     public function storeAssessmentDokterUGD()
     {
-        $this->emit('storeAssessmentDokterUGD');
+        $this->emit('emr:ugd:store');
     }
 
 

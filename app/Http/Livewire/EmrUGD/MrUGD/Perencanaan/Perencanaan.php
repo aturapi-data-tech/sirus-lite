@@ -18,11 +18,7 @@ class Perencanaan extends Component
     use WithPagination, EmrUGDTrait;
 
     // listener from blade////////////////
-    protected $listeners = [
-        'storeAssessmentDokterUGD' => 'store',
-        'storeAssessmentDokterUGDPerencanaan' => 'store',
-    ];
-
+    protected $listeners = ['emr:ugd:store' => 'store'];
 
     //////////////////////////////
     // Ref on top bar
@@ -32,7 +28,6 @@ class Perencanaan extends Component
     // dataDaftarUgd RJ
     public array $dataDaftarUgd = [];
 
-    // data SKDP / perencanaan=>[]
     public array $perencanaan =
     [
         "terapiTab" => "Terapi",
@@ -133,7 +128,6 @@ class Perencanaan extends Component
     ////////////////////////////////////////////////
     public function updated($propertyName)
     {
-        // dd($propertyName);
         $this->validateOnly($propertyName);
     }
 
@@ -231,7 +225,7 @@ class Perencanaan extends Component
                 // 4) Commit atomik
                 DB::transaction(function () use ($rjNo, $fresh, $p_status, $waktu_pasien_datang, $waktu_pasien_dilayani) {
                     // kunci header
-                    DB::table('rstxn_ugdhdrs')->where('rj_no', $rjNo)->lockForUpdate()->first();
+                    DB::table('rstxn_ugdhdrs')->where('rj_no', $rjNo)->first();
 
                     DB::table('rstxn_ugdhdrs')
                         ->where('rj_no', $rjNo)
@@ -282,11 +276,10 @@ class Perencanaan extends Component
         $this->dataDaftarUgd['perencanaan']['pengkajianMedis']['selesaiPemeriksaan'] = $myTime;
     }
 
-    private function validateDrPemeriksa()
+    private function validateDrPemeriksa(): bool
     {
-        // Validasi dulu
         $rules = [
-            // vitals
+            // vital
             'dataDaftarUgd.pemeriksaan.tandaVital.frekuensiNadi'   => 'required|numeric',
             'dataDaftarUgd.pemeriksaan.tandaVital.frekuensiNafas'  => 'required|numeric',
             'dataDaftarUgd.pemeriksaan.tandaVital.suhu'            => 'required|numeric',
@@ -308,7 +301,7 @@ class Perencanaan extends Component
             'dataDaftarUgd.pemeriksaan.tandaVital.frekuensiNadi'   => 'Frekuensi Nadi',
             'dataDaftarUgd.pemeriksaan.tandaVital.frekuensiNafas'  => 'Frekuensi Nafas',
             'dataDaftarUgd.pemeriksaan.tandaVital.suhu'            => 'Suhu',
-            'dataDaftarUgd.pemeriksaan.tandaVital.spo2'            => 'SpO2',
+            'dataDaftarUgd.pemeriksaan.tandaVital.spo2'            => 'SpO₂',
             'dataDaftarUgd.pemeriksaan.tandaVital.gda'             => 'GDA',
 
             'dataDaftarUgd.pemeriksaan.nutrisi.bb'                 => 'Berat Badan',
@@ -326,44 +319,110 @@ class Perencanaan extends Component
             '*.date_format' => ':attribute tidak sesuai format (dd/mm/YYYY HH:mm:ss).',
         ];
 
-        // Proses Validasi///////////////////////////////////////////
         try {
             $this->validate($rules, $messages, $attributes);
+            return true; // validasi sukses
         } catch (ValidationException $e) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Anda tidak dapat melakukan TTD-E karena data pemeriksaan belum lengkap.');
+            // Ambil semua pesan error dan tampilkan via toastr
+            $errors = $e->validator->errors()->all();
+            foreach ($errors as $msg) {
+                toastr()->closeOnHover(true)
+                    ->closeDuration(4)
+                    ->positionClass('toast-top-left')
+                    ->addError($msg);
+            }
+
+            // Pesan ringkasan
+            toastr()->closeOnHover(true)
+                ->closeDuration(5)
+                ->positionClass('toast-top-left')
+                ->addWarning('Validasi gagal. Periksa kembali data pemeriksaan pasien.');
+
+            return false;
+        }
+    }
+
+    public function setDrPemeriksa(): void
+    {
+        // 1) Validasi pendukung (vital, nutrisi, jam datang, dst)
+        // Validasi data pemeriksaan
+        if (!$this->validateDrPemeriksa()) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Validasi data pemeriksaan gagal. Lengkapi data vital, nutrisi, atau jam datang pasien terlebih dahulu.');
             return;
         }
-        // Validasi dulu
+
+        $userCode = auth()->user()->myuser_code ?? null;
+        $userName = auth()->user()->myuser_name ?? 'User';
+
+        // 2) Wajib role Dokter atau Admin
+        if (!auth()->user()->hasAnyRole(['Dokter', 'Admin'])) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError("Anda tidak dapat melakukan TTD-E karena User Role {$userName} bukan Dokter/Admin");
+            return;
+        }
+
+        // 3) Cek kepemilikan pasien (tetap dipertahankan seperti semula)
+        $drIdPasien = data_get($this->dataDaftarUgd, 'drId');
+        if ($drIdPasien !== $userCode) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError("Anda tidak dapat melakukan TTD-E karena bukan pasien {$userName}");
+            return;
+        }
+
+        $this->dataDaftarUgd['perencanaan']['pengkajianMedisTab'] = 'Pengkajian Medis';
+        $this->dataDaftarUgd['perencanaan']['pengkajianMedis']['drPemeriksa'] = $userName;
+
+        // 4) Simpan HANYA subtree pengkajianMedis agar terapi tidak tersentuh
+        $this->storePengkajianMedis();
     }
-    public function setDrPemeriksa()
+
+    private function storePengkajianMedis(): void
     {
-        // $myRoles = json_decode(auth()->user()->roles, true);
-        $myUserCodeActive = auth()->user()->myuser_code;
-        $myUserNameActive = auth()->user()->myuser_name;
-        // $myUserTtdActive = auth()->user()->myuser_ttd_image;
+        $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
+        if (!$rjNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('rjNo kosong.');
+            return;
+        }
 
-        // Validasi dulu
-        // cek apakah data pemeriksaan sudah dimasukkan atau blm
-        $this->validateDrPemeriksa();
+        $lockKey = "ugd:{$rjNo}";
 
-        if (auth()->user()->hasRole('Dokter')) {
-            if ($this->dataDaftarUgd['drId'] == $myUserCodeActive) {
-                if (isset($this->dataDaftarUgd['perencanaan']['pengkajianMedis']['drPemeriksa'])) {
-                    if (!$this->dataDaftarUgd['perencanaan']['pengkajianMedis']['drPemeriksa']) {
-                        $this->dataDaftarUgd['perencanaan']['pengkajianMedis']['drPemeriksa'] = isset($this->dataDaftarUgd['drDesc']) ? ($this->dataDaftarUgd['drDesc'] ? $this->dataDaftarUgd['drDesc'] : 'Dokter pemeriksa') : 'Dokter pemeriksa-';
+        try {
+            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
+                DB::transaction(function () use ($rjNo) {
+                    $fresh = $this->findDataUGD($rjNo) ?: [];
+
+                    // Pastikan node ada TANPA menimpa subtree lain
+                    if (!isset($fresh['perencanaan']) || !is_array($fresh['perencanaan'])) {
+                        $fresh['perencanaan'] = [];
                     }
-                } else {
-                    $this->dataDaftarUgd['perencanaan']['pengkajianMedisTab'] = 'Pengkajian Medis';
-                    $this->dataDaftarUgd['perencanaan']['pengkajianMedis']['drPemeriksa'] = isset($this->dataDaftarUgd['drDesc']) ? ($this->dataDaftarUgd['drDesc'] ? $this->dataDaftarUgd['drDesc'] : 'Dokter pemeriksa') : 'Dokter pemeriksa-';
-                }
-                $this->store();
-            } else {
-                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Anda tidak dapat melakukan TTD-E karena Bukan Pasien ' . $myUserNameActive);
-            }
-        } else {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Anda tidak dapat melakukan TTD-E karena User Role ' . $myUserNameActive . ' Bukan Dokter');
+                    $fresh['perencanaan'] = $this->dataDaftarUgd['perencanaan'];
+
+                    // Patch HANYA pengkajianMedis (+ optional tab label)
+                    $fresh['perencanaan']['pengkajianMedisTab'] =
+                        $this->dataDaftarUgd['perencanaan']['pengkajianMedisTab'] ?? 'Pengkajian Medis';
+
+                    $fresh['perencanaan']['pengkajianMedis'] = (array) (
+                        $this->dataDaftarUgd['perencanaan']['pengkajianMedis'] ?? []
+                    );
+
+                    // JANGAN sentuh $fresh['perencanaan']['terapi'] di sini
+                    $this->updateJsonUGD($rjNo, $fresh);
+
+                    // Sinkronkan state lokal
+                    $this->dataDaftarUgd = $fresh;
+                });
+            });
+
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess('Pengkajian medis disimpan.');
+        } catch (\Throwable $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Gagal menyimpan pengkajian medis.');
         }
     }
+
 
     // /////////////////eresep open////////////////////////
     public bool $isOpenEresepUGD = false;
@@ -396,7 +455,6 @@ class Perencanaan extends Component
     public function simpanTerapi(): void
     {
         // Pastikan status pasien masih aktif
-        // if (!$this->checkUgdStatus()) return;
 
         $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
         if (!$rjNo) {
@@ -551,7 +609,6 @@ class Perencanaan extends Component
         return view(
             'livewire.emr-u-g-d.mr-u-g-d.perencanaan.perencanaan',
             [
-                // 'RJpasiens' => $query->paginate($this->limitPerPage),
                 'myTitle' => 'Perencanaan',
                 'mySnipt' => 'Rekam Medis Pasien',
                 'myProgram' => 'Pasien Rawat Jalan',

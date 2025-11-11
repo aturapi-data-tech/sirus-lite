@@ -24,15 +24,16 @@
         $labels = [
             'diagnosis' => 'Diagnosis (WD & DD)',
             'dasar' => 'Dasar Diagnosis',
+            'rencana' => 'Rencana Pengobatan / Tindakan',
+            'indikasi' => 'Indikasi Pengobatan / Tindakan',
             'tindakan' => 'Tindakan Kedokteran',
-            'indikasi' => 'Indikasi Tindakan',
-            'tatacara' => 'Tata Cara',
             'tujuan' => 'Tujuan',
             'risiko' => 'Risiko',
             'komplikasi' => 'Komplikasi',
             'prognosis' => 'Prognosis',
             'alternatif' => 'Alternatif & Risiko',
         ];
+
         $detail = (array) ($edukasi['detailInformasi'] ?? []);
         $sig = data_get($edukasi, 'penerimaInformasi.signature');
         $sigSvg = trim((string) $sig);
@@ -222,7 +223,7 @@
 
             {{-- kolom TTD pasien: lebar sama (w-60) --}}
             <td class="px-2 py-2 align-top border border-black w-60">
-                <div class="flex items-center justify-center w-full h-16 overflow-hidden bg-white border border-black">
+                <div class="flex items-center justify-center w-full h-16 max-w-full bg-white border border-black">
                     <img src="{{ $sigSrc }}" alt="TTD"
                         class="block object-contain w-auto mx-auto max-h-16" />
                 </div>

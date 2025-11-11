@@ -3,53 +3,36 @@
 namespace App\Http\Livewire\EmrUGD\MrUGD\ObatDanCairan;
 
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Contracts\Cache\LockTimeoutException;
 use \Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Carbon\Carbon;
 
 use App\Http\Traits\EmrUGD\EmrUGDTrait;
-use App\Http\Traits\customErrorMessagesTrait;
+use App\Http\Traits\LOV\LOVProduct\LOVProductTrait;
 
 class ObatDanCairan extends Component
 {
-    use WithPagination, EmrUGDTrait, customErrorMessagesTrait;
+    use WithPagination, EmrUGDTrait, LOVProductTrait;
 
-    // listener from blade////////////////
-    protected $listeners = [];
-
-
-
-    //////////////////////////////
-    // Ref on top bar
-    //////////////////////////////
-
-
-
-    // dataDaftarUgd RJ
     public $rjNoRef;
-
     public array $dataDaftarUgd = [];
 
+    // Template untuk entry baru
     public array $obatDanCairan = [
         "namaObatAtauJenisCairan" => "",
-        "jumlah" => "", //number
-        "dosis" => "", //number
-        "rute" => "", //number
+        "jumlah" => "",
+        "dosis" => "",
+        "rute" => "",
         "keterangan" => "",
-        "waktuPemberian" => "", //date dd/mm/yyyy hh24:mi:ss
+        "waktuPemberian" => "",
         "pemeriksa" => ""
     ];
 
-    public array $observasi =
-    [
+    public array $observasi = [
         "pemberianObatDanCairanTab" => "Pemberian Obat Dan Cairan",
         "pemberianObatDanCairan" => [],
-
     ];
-    //////////////////////////////////////////////////////////////////////
-
 
     protected $rules = [
         'obatDanCairan.namaObatAtauJenisCairan' => 'required',
@@ -77,481 +60,270 @@ class ObatDanCairan extends Component
         'obatDanCairan.pemeriksa'               => 'Pemeriksa',
     ];
 
+    // ==================== MAIN METHODS ====================
 
-
-    ////////////////////////////////////////////////
-    ///////////begin////////////////////////////////
-    ////////////////////////////////////////////////
-    public function updated($propertyName)
+    public function addObatDanCairan(): void
     {
-        // reset LOV Product ketika namaObatAtauJenisCairan kosong
-        if (empty($this->obatDanCairan['namaObatAtauJenisCairan'] ?? null)) {
-            $this->resetcollectingMyProduct();
+
+        // Set pemeriksa otomatis
+        $this->obatDanCairan['pemeriksa'] = auth()->user()->myuser_name ?? '';
+
+        // Validasi form
+        $this->validateDataObatDanCairanUgd();
+
+        $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
+        if (!$rjNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Nomor registrasi UGD tidak valid.');
+            return;
+        }
+
+        try {
+            DB::transaction(function () use ($rjNo) {
+                // Load data terbaru dari JSON
+                $fresh = $this->findDataUGD($rjNo) ?: [];
+
+                // Inisialisasi struktur jika belum ada
+                if (!isset($fresh['observasi']['obatDanCairan']['pemberianObatDanCairan'])) {
+                    $fresh['observasi']['obatDanCairan']['pemberianObatDanCairan'] = [];
+                }
+
+                $list = $fresh['observasi']['obatDanCairan']['pemberianObatDanCairan'];
+
+                // Cek duplikasi berdasarkan waktuPemberian
+                $exists = collect($list)->firstWhere('waktuPemberian', $this->obatDanCairan['waktuPemberian']);
+                if ($exists) {
+                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                        ->addInfo('Data pada waktu tersebut sudah ada.');
+                    return;
+                }
+
+                // Tambahkan data baru dengan ID unik
+                $newEntry = [
+                    'id' => uniqid('obat_'),
+                    "namaObatAtauJenisCairan" => $this->obatDanCairan['namaObatAtauJenisCairan'],
+                    "jumlah"        => $this->obatDanCairan['jumlah'],
+                    "dosis"         => $this->obatDanCairan['dosis'],
+                    "rute"          => $this->obatDanCairan['rute'],
+                    "keterangan"    => $this->obatDanCairan['keterangan'],
+                    "waktuPemberian" => $this->obatDanCairan['waktuPemberian'],
+                    "pemeriksa"     => $this->obatDanCairan['pemeriksa'],
+                ];
+
+                $list[] = $newEntry;
+                $fresh['observasi']['obatDanCairan']['pemberianObatDanCairan'] = array_values($list);
+
+                // Simpan ke JSON
+                $this->updateJsonUGD($rjNo, $fresh);
+
+                // Update data lokal
+                $this->dataDaftarUgd = $fresh;
+            });
+
+            // Reset form dan LOV
+            $this->resetObatDanCairanForm();
+
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess('Obat & Cairan berhasil ditambahkan dan disimpan.');
+        } catch (\Exception $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Gagal menyimpan data Obat & Cairan: ' . $e->getMessage());
         }
     }
 
-
-
-
-    // resert input private////////////////
-    private function resetInputFields(): void
+    public function removeObatDanCairan($waktuPemberian): void
     {
 
-        // resert validation
-        $this->resetValidation();
-        // resert input kecuali
-        $this->reset(['']);
+        $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
+        if (!$rjNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Nomor registrasi UGD tidak valid.');
+            return;
+        }
+
+        try {
+            DB::transaction(function () use ($rjNo, $waktuPemberian) {
+                // Load data terbaru dari JSON
+                $fresh = $this->findDataUGD($rjNo) ?: [];
+
+                if (!isset($fresh['observasi']['obatDanCairan']['pemberianObatDanCairan'])) {
+                    toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                        ->addError('Data tidak ditemukan.');
+                    return;
+                }
+
+                // Hapus data berdasarkan waktuPemberian
+                $list = collect($fresh['observasi']['obatDanCairan']['pemberianObatDanCairan'])
+                    ->reject(fn($row) => (string)($row['waktuPemberian'] ?? '') === (string)$waktuPemberian)
+                    ->values()
+                    ->all();
+
+                $fresh['observasi']['obatDanCairan']['pemberianObatDanCairan'] = $list;
+
+                // Simpan ke JSON
+                $this->updateJsonUGD($rjNo, $fresh);
+
+                // Update data lokal
+                $this->dataDaftarUgd = $fresh;
+            });
+
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess('Obat & Cairan berhasil dihapus.');
+        } catch (\Exception $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Gagal menghapus data Obat & Cairan: ' . $e->getMessage());
+        }
     }
 
+    /**
+     * Set waktu pemberian dengan Carbon::now() format dd/mm/yyyy H:i:s
+     */
+    public function setWaktuPemberian(): void
+    {
+        $this->obatDanCairan['waktuPemberian'] = Carbon::now()->format('d/m/Y H:i:s');
+    }
 
+    /**
+     * Set waktu pemberian custom (jika masih diperlukan)
+     */
+    public function setCustomWaktuPemberian($myTime): void
+    {
+        $this->obatDanCairan['waktuPemberian'] = $myTime;
+    }
 
+    // ==================== VALIDATION METHODS ====================
 
-
-    // ////////////////
-    // RJ Logic
-    // ////////////////
-
-
-    // validate Data RJ//////////////////////////////////////////////////
     private function validateDataObatDanCairanUgd(): void
     {
-        // Proses Validasi///////////////////////////////////////////
         try {
             $this->validate($this->rules, $this->messages, $this->validationAttributes);
         } catch (ValidationException $e) {
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-                ->addError($e->validator->errors()->first()); // tampilkan 1 error paling jelas
-            throw $e; // stop eksekusi
+                ->addError($e->validator->errors()->first());
+            throw $e;
         }
     }
 
+    // ==================== FORM MANAGEMENT ====================
 
-    // insert and update record start////////////////
-    public function store()
+    private function resetObatDanCairanForm(): void
     {
 
-        if (!$this->checkUgdStatus()) return;
-
-        $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
-        if (!$rjNo) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('rjNo kosong.');
-            return;
-        }
-
-        $lockKey = "ugd:{$rjNo}";
-        try {
-            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
-                DB::transaction(function () use ($rjNo) {
-                    $fresh = $this->findDataUGD($rjNo) ?: [];
-
-                    if (!isset($fresh['observasi']) || !is_array($fresh['observasi'])) {
-                        $fresh['observasi'] = [];
-                    }
-
-                    if (isset($this->dataDaftarUgd['observasi']['obatDanCairan'])) {
-                        $fresh['observasi']['obatDanCairan'] = $this->dataDaftarUgd['observasi']['obatDanCairan'];
-                    }
-
-                    $this->updateJsonUGD($rjNo, $fresh);
-                    $this->dataDaftarUgd = $fresh;
-                });
-            });
-
-            $this->resetcollectingMyProduct();
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Obat & Cairan tersimpan.');
-        } catch (LockTimeoutException $e) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
-        } catch (\Throwable $e) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Gagal menyimpan.');
-        }
+        $this->reset([
+            'obatDanCairan',
+            'collectingMyProduct'
+        ]);
+        $this->resetValidation();
     }
 
-    // insert and update record end////////////////
-
+    // ==================== DATA LOADING ====================
 
     private function findData($rjno): void
     {
-
         $this->dataDaftarUgd = $this->findDataUGD($rjno) ?: [];
 
         if (!isset($this->dataDaftarUgd['observasi']) || !is_array($this->dataDaftarUgd['observasi'])) {
             $this->dataDaftarUgd['observasi'] = [];
         }
+
         if (!isset($this->dataDaftarUgd['observasi']['obatDanCairan'])) {
             $this->dataDaftarUgd['observasi']['obatDanCairan'] = $this->observasi;
         }
+
+        // Generate ID untuk data yang sudah ada jika belum ada ID
+        $this->generateIdsForExistingObatDanCairan();
     }
 
-
-
-    public function addObatDanCairan()
+    private function generateIdsForExistingObatDanCairan(): void
     {
-        if (!$this->checkUgdStatus()) return;
-
-        $this->obatDanCairan['pemeriksa'] = auth()->user()->myuser_name ?? '';
-
-        // validasi form
-        $this->validateDataObatDanCairanUgd();
-
-        $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
-        if (!$rjNo) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('rjNo kosong.');
-            return;
-        }
-
-        $lockKey = "ugd:{$rjNo}";
-        try {
-            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
-                DB::transaction(function () use ($rjNo) {
-                    // ambil data terbaru dari DB agar tidak menimpa modul lain
-                    $fresh = $this->findDataUGD($rjNo) ?: [];
-
-                    // siapkan subtree
-                    if (!isset($fresh['observasi']['obatDanCairan']) || !is_array($fresh['observasi']['obatDanCairan'])) {
-                        $fresh['observasi']['obatDanCairan'] = [
-                            "pemberianObatDanCairanTab" => "Pemberian Obat Dan Cairan",
-                            "pemberianObatDanCairan"    => [],
-                        ];
-                    }
-
-                    $list = $fresh['observasi']['obatDanCairan']['pemberianObatDanCairan'];
-
-                    // idempoten berdasarkan waktuPemberian
-                    $exists = collect($list)->firstWhere('waktuPemberian', $this->obatDanCairan['waktuPemberian']);
-                    if ($exists) {
-                        toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addInfo('Data pada waktu tersebut sudah ada.');
-                        return;
-                    }
-
-                    $list[] = [
-                        "namaObatAtauJenisCairan" => $this->obatDanCairan['namaObatAtauJenisCairan'],
-                        "jumlah"        => $this->obatDanCairan['jumlah'],
-                        "dosis"         => $this->obatDanCairan['dosis'],
-                        "rute"          => $this->obatDanCairan['rute'],
-                        "keterangan"    => $this->obatDanCairan['keterangan'],
-                        "waktuPemberian" => $this->obatDanCairan['waktuPemberian'],
-                        "pemeriksa"     => $this->obatDanCairan['pemeriksa'],
-                    ];
-
-                    $fresh['observasi']['obatDanCairan']['pemberianObatDanCairan'] = array_values($list);
-                    $fresh['observasi']['obatDanCairan']['pemberianObatDanCairanLog'] = [
-                        'userLogDesc' => 'Form Entry Obat & Cairan',
-                        'userLog'     => auth()->user()->myuser_name ?? '',
-                        'userLogDate' => now(config('app.timezone'))->format('d/m/Y H:i:s'),
-                    ];
-
-                    // commit JSON
-                    $this->updateJsonUGD($rjNo, $fresh);
-
-                    // sinkronkan state lokal
-                    $this->dataDaftarUgd = $fresh;
-                });
-            });
-
-            // beres: reset LOV & form
-            $this->resetcollectingMyProduct();
-            $this->reset(['obatDanCairan']);
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Obat & Cairan berhasil ditambahkan.');
-        } catch (LockTimeoutException $e) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
-        } catch (\Throwable $e) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Gagal menambah Obat & Cairan.');
+        if (isset($this->dataDaftarUgd['observasi']['obatDanCairan']['pemberianObatDanCairan'])) {
+            foreach ($this->dataDaftarUgd['observasi']['obatDanCairan']['pemberianObatDanCairan'] as &$obat) {
+                if (!isset($obat['id'])) {
+                    $obat['id'] = uniqid('obat_');
+                }
+            }
         }
     }
 
+    // ==================== LOV INTEGRATION METHODS ====================
 
-    public function removeObatDanCairan($waktuPemberian)
-    {
-
-        if (!$this->checkUgdStatus()) return;
-
-        $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
-        if (!$rjNo) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('rjNo kosong.');
-            return;
-        }
-
-        $lockKey = "ugd:{$rjNo}";
-        try {
-            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo, $waktuPemberian) {
-                DB::transaction(function () use ($rjNo, $waktuPemberian) {
-                    $fresh = $this->findDataUGD($rjNo) ?: [];
-
-                    if (!isset($fresh['observasi']['obatDanCairan']['pemberianObatDanCairan'])) {
-                        return; // tidak ada yang dihapus
-                    }
-
-                    $list = $fresh['observasi']['obatDanCairan']['pemberianObatDanCairan'];
-                    $list = collect($list)
-                        ->reject(fn($row) => (string)($row['waktuPemberian'] ?? '') === (string)$waktuPemberian)
-                        ->values()->all();
-
-                    $fresh['observasi']['obatDanCairan']['pemberianObatDanCairan'] = $list;
-                    $fresh['observasi']['obatDanCairan']['pemberianObatDanCairanLog'] = [
-                        'userLogDesc' => 'Hapus Obat & Cairan',
-                        'userLog'     => auth()->user()->myuser_name ?? '',
-                        'userLogDate' => now(config('app.timezone'))->format('d/m/Y H:i:s'),
-                    ];
-
-                    $this->updateJsonUGD($rjNo, $fresh);
-                    $this->dataDaftarUgd = $fresh;
-                });
-            });
-
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Obat & Cairan dihapus.');
-        } catch (LockTimeoutException $e) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
-        } catch (\Throwable $e) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Gagal menghapus Obat & Cairan.');
-        }
-    }
-
-    public function setWaktuPemberian($myTime)
-    {
-        $this->obatDanCairan['waktuPemberian'] = $myTime;
-    }
-
-
-
-
-
-    /////////////////////////////////////////////////
-    // Lov dataProductLov //////////////////////
-    ////////////////////////////////////////////////
-
-    public array $dataProductLov = [];
-    public bool $dataProductLovStatus = false;
-    public $dataProductLovSearch = '';
-    public int $selecteddataProductLovIndex = 0;
-
-    public array $collectingMyProduct = [];
-
-
-    public function clickdataProductLov()
+    /**
+     * Override method dari LOVProductTrait untuk menyesuaikan dengan form ObatDanCairan
+     */
+    public function clickdataProductLov(): void
     {
         $this->dataProductLovStatus = true;
         $this->dataProductLov = [];
     }
 
-    public function updatedDataProductLovSearch()
-    {
-        // Reset index of LoV
-        $this->reset(['selecteddataProductLovIndex', 'dataProductLov']);
-        // Variable Search
-        $search = $this->dataProductLovSearch;
-
-        // check LOV by dr_id rs id
-        $dataProductLovs = DB::table('immst_products')
-            ->select(
-                'product_id',
-                'product_name',
-                'sales_price',
-                DB::raw("(select replace(string_agg(cont_desc),',','')||product_name
-                                            from immst_productcontents z,immst_contents x
-                                            where z.product_id=immst_products.product_id
-                                            and z.cont_id=x.cont_id) as elasticSearch"),
-                DB::raw("(select string_agg(cont_desc)
-                                            from immst_productcontents z,immst_contents x
-                                            where z.product_id=immst_products.product_id
-                                            and z.cont_id=x.cont_id) as product_content"),
-            )
-            ->where('active_status', '1')
-            ->where('product_id', $search)
-            ->first();
-
-        if ($dataProductLovs) {
-            // set product sep
-            $this->addProduct($dataProductLovs->product_id, $dataProductLovs->product_name, $dataProductLovs->sales_price);
-            $this->resetdataProductLov();
-        } else {
-            // if there is no id found and check (min 3 char on search)
-            if (strlen($search) < 3) {
-                $this->dataProductLov = [];
-            } else {
-                $this->dataProductLov = DB::select(
-                    "select * from (
-                    select product_id,
-                    product_name,
-                    sales_price,
-
-                    (select replace(string_agg(cont_desc),',','')||product_name
-                    from immst_productcontents z,immst_contents x
-                    where z.product_id=a.product_id
-                    and z.cont_id=x.cont_id)elasticsearch,
-
-                    (select string_agg(cont_desc)
-                    from immst_productcontents z,immst_contents x
-                    where z.product_id=a.product_id
-                    and z.cont_id=x.cont_id)product_content
-
-                    from immst_products a
-                    where active_status='1'
-                    group by product_id,product_name, sales_price
-                    order by product_name)
-
-                where upper(elasticsearch) like '%'||:search||'%'
-                    ",
-                    ['search' => strtoupper($search)],
-                );
-
-                $this->dataProductLov = json_decode(json_encode($this->dataProductLov, true), true);
-            }
-            $this->dataProductLovStatus = true;
-            // set doing nothing
-        }
-    }
-
-
-    public function setMydataProductLov($id)
-    {
-
-        if (!isset($this->dataProductLov[$id]['product_id'])) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Item tidak valid.');
-            return;
-        }
-
-        $dataProductLovs = DB::table('immst_products')
-            ->select(
-                'product_id',
-                'product_name',
-                'sales_price',
-                DB::raw("(select replace(string_agg(cont_desc),',','')||product_name
-                                                            from immst_productcontents z,immst_contents x
-                                                            where z.product_id=immst_products.product_id
-                                                            and z.cont_id=x.cont_id) as elasticSearch"),
-                DB::raw("(select string_agg(cont_desc)
-                                                            from immst_productcontents z,immst_contents x
-                                                            where z.product_id=immst_products.product_id
-                                                            and z.cont_id=x.cont_id) as product_content"),
-            )
-            ->where('active_status', '1')
-            ->where('product_id', $this->dataProductLov[$id]['product_id'])
-            ->first();
-
-
-
-        // set dokter sep
-        $this->addProduct($dataProductLovs->product_id, $dataProductLovs->product_name, $dataProductLovs->sales_price);
-        $this->resetdataProductLov();
-    }
-
-    public function resetdataProductLov()
-    {
-        $this->reset(['dataProductLov', 'dataProductLovStatus', 'dataProductLovSearch', 'selecteddataProductLovIndex']);
-    }
-
-    public function selectNextdataProductLov()
-    {
-        if ($this->selecteddataProductLovIndex === '') {
-            $this->selecteddataProductLovIndex = 0;
-        } else {
-            $this->selecteddataProductLovIndex++;
-        }
-
-        if ($this->selecteddataProductLovIndex === count($this->dataProductLov)) {
-            $this->selecteddataProductLovIndex = 0;
-        }
-    }
-
-    public function selectPreviousdataProductLov()
-    {
-        if ($this->selecteddataProductLovIndex === '') {
-            $this->selecteddataProductLovIndex = count($this->dataProductLov) - 1;
-        } else {
-            $this->selecteddataProductLovIndex--;
-        }
-
-        if ($this->selecteddataProductLovIndex === -1) {
-            $this->selecteddataProductLovIndex = count($this->dataProductLov) - 1;
-        }
-    }
-
-    public function enterMydataProductLov($id)
-    {
-
-        if (!isset($this->dataProductLov[$id]['product_id'])) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Data Obat belum tersedia.');
-            return;
-        }
-
-        // jika data obat belum siap maka toaster error
-        if (isset($this->dataProductLov[$id]['product_id'])) {
-            $this->addProduct($this->dataProductLov[$id]['product_id'], $this->dataProductLov[$id]['product_name'], $this->dataProductLov[$id]['sales_price']);
-            $this->resetdataProductLov();
-        } else {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Data Obat belum tersedia.');
-        }
-    }
-
-
-    private function addProduct($productId, $productName, $salesPrice): void
+    /**
+     * Override method untuk sync data dari LOV ke form ObatDanCairan
+     */
+    private function addProduct($ProductId, $ProductName, $ProductPrice): void
     {
         $this->collectingMyProduct = [
-            'productId' => $productId,
-            'productName' => $productName,
-            'jenisKeterangan' => 'NonRacikan', //Racikan non racikan
-            'signaX' => 1,
-            'signaHari' => 1,
-            'qty' => '',
-            'sedia' => 1,
-            'dosis' => '',
-            'productPrice' => $salesPrice,
-            'catatanKhusus' => '',
+            'ProductId' => $ProductId,
+            'ProductName' => $ProductName,
+            'ProductPrice' => $ProductPrice,
         ];
 
-        $this->obatDanCairan['namaObatAtauJenisCairan'] = $this->collectingMyProduct['productName'];
-    }
+        // Auto-fill form dengan data dari LOV
+        $this->obatDanCairan['namaObatAtauJenisCairan'] = $ProductName;
 
-    public function resetcollectingMyProduct()
-    {
-        $this->reset(['collectingMyProduct']);
-    }
-    // LOV selected end
-    /////////////////////////////////////////////////
-    // Lov dataProductLov //////////////////////
-    ////////////////////////////////////////////////
+        // Set waktu pemberian otomatis saat memilih obat
+        $this->setWaktuPemberian();
 
-
-
-    private function checkUgdStatus(): bool
-    {
-        $row = DB::table('rstxn_ugdhdrs')
-            ->select('rj_status')
-            ->where('rj_no', $this->rjNoRef)
-            ->first();
-
-        if (!$row || $row->rj_status !== 'A') {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-                ->addError('Pasien Sudah Pulang, Transaksi Terkunci.');
-            return false;
+        // Optional: Set nilai default untuk field lainnya
+        if (empty($this->obatDanCairan['jumlah'])) {
+            $this->obatDanCairan['jumlah'] = 1;
         }
-        return true;
     }
 
+    /**
+     * Handle perubahan pada field nama obat untuk reset LOV jika kosong
+     */
+    public function updated($propertyName): void
+    {
+        if ($propertyName === 'obatDanCairan.namaObatAtauJenisCairan') {
+            if (empty($this->obatDanCairan['namaObatAtauJenisCairan'])) {
+                $this->resetObatDanCairanForm();
+            }
+        }
+    }
 
-    // when new form instance
-    public function mount()
+    /**
+     * Sync data dari LOV ke form sebelum render
+     */
+    private function syncLOVToForm(): void
+    {
+        if (!empty($this->collectingMyProduct)) {
+            $this->obatDanCairan['namaObatAtauJenisCairan'] = $this->collectingMyProduct['ProductName'] ?? '';
+        }
+    }
+
+    // ==================== UTILITY METHODS ====================
+
+
+
+    public function mount(): void
     {
         $this->findData($this->rjNoRef);
+        // Set waktu default saat mount
+        $this->setWaktuPemberian();
     }
 
-
-
-    // select data start////////////////
     public function render()
     {
+        // Sync data dari LOV ke form sebelum render
+        $this->syncLOVToForm();
 
         return view(
             'livewire.emr-u-g-d.mr-u-g-d.obat-dan-cairan.obat-dan-cairan',
             [
-                // 'RJpasiens' => $query->paginate($this->limitPerPage),
                 'myTitle' => 'Obat Dan Cairan',
                 'mySnipt' => 'Rekam Medis Pasien',
                 'myProgram' => 'Pasien UGD',
             ]
         );
     }
-    // select data end////////////////
-
-
 }

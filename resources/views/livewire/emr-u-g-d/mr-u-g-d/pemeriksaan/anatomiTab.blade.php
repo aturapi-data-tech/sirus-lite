@@ -38,7 +38,6 @@
 
                             <div class="flex mt-2 ml-2">
                                 @foreach ($pAnatomi['kelainanOptions'] as $kelainanOptions)
-                                    {{-- @dd($sRj) --}}
                                     <x-radio-button :label="__($kelainanOptions['kelainan'])" value="{{ $kelainanOptions['kelainan'] }}"
                                         wire:model="dataDaftarUgd.pemeriksaan.anatomi.{{ $key }}.kelainan" />
                                 @endforeach

@@ -291,7 +291,6 @@ trait EmrRJTrait
             ->where('rj_no', $rjNo)
             ->update([
                 'datadaftarpolirj_json' => json_encode($rjArr, true),
-                'datadaftarpolirj_xml' => ArrayToXml::convert($rjArr),
             ]);
     }
 }

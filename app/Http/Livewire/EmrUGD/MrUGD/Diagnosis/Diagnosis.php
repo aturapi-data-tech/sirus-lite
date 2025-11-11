@@ -19,9 +19,7 @@ class Diagnosis extends Component
 
 
     // listener from blade////////////////
-    protected $listeners = [
-        'storeAssessmentDokterUGD' => 'store',
-    ];
+    protected $listeners = ['emr:ugd:store' => 'store'];
 
 
     //////////////////////////////
@@ -363,7 +361,7 @@ class Diagnosis extends Component
         $search = $this->dataProcedureICD9CmLovSearch;
 
         // check LOV by dr_id rs id
-        $dataProcedureICD9CmLovs = DB::table('rsmst_mstprocedures ')->select(
+        $dataProcedureICD9CmLovs = DB::table('rsmst_mstprocedures')->select(
             'proc_id',
             'proc_desc',
 

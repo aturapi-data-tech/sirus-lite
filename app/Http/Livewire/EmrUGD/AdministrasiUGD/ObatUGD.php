@@ -53,20 +53,7 @@ class ObatUGD extends Component
 
 
 
-    private function checkUgdStatus(): bool
-    {
-        $row = DB::table('rstxn_ugdhdrs')
-            ->select('rj_status')
-            ->where('rj_no', $this->rjNoRef)
-            ->first();
 
-        if (!$row || $row->rj_status !== 'A') {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-                ->addError("Pasien Sudah Pulang, Transaksi Terkunci.");
-            return false;
-        }
-        return true;
-    }
 
     // when new form instance
     public function mount()

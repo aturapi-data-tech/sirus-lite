@@ -5,34 +5,141 @@ namespace App\Http\Livewire\EmrUGD\MrUGD\Penilaian;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Contracts\Cache\LockTimeoutException;
-
 use Livewire\Component;
 use Livewire\WithPagination;
-
 use App\Http\Traits\EmrUGD\EmrUGDTrait;
-
 
 class Penilaian extends Component
 {
     use WithPagination, EmrUGDTrait;
-    // listener from blade////////////////
-    protected $listeners = [];
 
-    //////////////////////////////
-    // Ref on top bar
-    //////////////////////////////
+    protected $listeners = ['emr:ugd:store' => 'store'];
+
     public $rjNoRef;
-
-    // dataDaftarUgd RJ
     public array $dataDaftarUgd = [];
 
-    // data penilaian=>[]
-    public array $penilaian =
-    [
-        "fisikTab" => "Fisik",
-        "fisik" => [
-            "fisik" => ""
+    // nonce utk reset UI radio/checkbox setelah submit
+    public int $formHumptyNonce = 0;
+    public int $formMorseNonce  = 0;
+
+    // ==================== FORM TEMPLATE (ENTRY) ====================
+
+    public array $newHumptyDumptyEntry = [
+        'tanggal' => '',
+        'umur' => '',
+        'umurScore' => 0,
+        'sex' => '',
+        'sexScore' => 0,
+        'diagnosa' => '',
+        'diagnosaScore' => 0,
+        'gangguanKognitif' => '',
+        'gangguanKognitifScore' => 0,
+        'faktorLingkungan' => '',
+        'faktorLingkunganScore' => 0,
+        'penggunaanObat' => '',
+        'penggunaanObatScore' => 0,
+        'responTerhadapOperasi' => '',
+        'responTerhadapOperasiScore' => 0,
+        'totalScore' => 0,
+        'kategoriRisiko' => '',
+        'keterangan' => ''
+    ];
+
+    public array $newMorseEntry = [
+        'tanggal' => '',
+        'riwayatJatuh3blnTerakhir' => '',
+        'riwayatJatuh3blnTerakhirScore' => 0,
+        'diagSekunder' => '',
+        'diagSekunderScore' => 0,
+        'alatBantu' => '',
+        'alatBantuScore' => 0,
+        'heparin' => '',
+        'heparinScore' => 0,
+        'gayaBerjalan' => '',
+        'gayaBerjalanScore' => 0,
+        'kesadaran' => '',
+        'kesadaranScore' => 0,
+        'totalScore' => 0,
+        'kategoriRisiko' => '',
+        'keterangan' => ''
+    ];
+
+    // ==================== OPTIONS DIPISAH ====================
+
+    public array $humptyDumptyOptions = [
+        "umurOptions" => [
+            ["umur" => "< 3 tahun", "score" => 4],
+            ["umur" => "3-7 tahun", "score" => 3],
+            ["umur" => "7-13 tahun", "score" => 2],
+            ["umur" => "13-18 tahun", "score" => 1],
         ],
+        "sexOptions" => [
+            ["sex" => "Laki-laki", "score" => 2],
+            ["sex" => "Perempuan", "score" => 1],
+        ],
+        "diagnosaOptions" => [
+            ["diagnosa" => "Kelainan Neurologi", "score" => 4],
+            ["diagnosa" => "Perubahan dalam Oksigenasi (Masalah Saluran Nafas, Dehidrasi, Anemia, Anoreksi, Slokop/sakit kepala, dll)", "score" => 3],
+            ["diagnosa" => "Kelamin Priksi/Perilaku", "score" => 2],
+            ["diagnosa" => "Diagnosa Lain", "score" => 1],
+        ],
+        "gangguanKognitifOptions" => [
+            ["gangguanKognitif" => "Tidak Sadar terhadap Keterbatasan", "score" => 3],
+            ["gangguanKognitif" => "Lupa keterbatasan", "score" => 2],
+            ["gangguanKognitif" => "Mengetahui Kemampuan Diri", "score" => 1],
+        ],
+        "faktorLingkunganOptions" => [
+            ["faktorLingkungan" => "Riwayat jatuh dari tempat tidur saat bayi anak", "score" => 4],
+            ["faktorLingkungan" => "Pasien menggunakan alat bantu box atau mobel", "score" => 3],
+            ["faktorLingkungan" => "Pasien berada ditempat tidur", "score" => 2],
+            ["faktorLingkungan" => "Diluar ruang rawat", "score" => 1],
+        ],
+        "penggunaanObatOptions" => [
+            ["penggunaanObat" => "Bermacam-macam obat yang digunakan: obat sedarif (kecuali pasien ICU yang menggunakan sedasi dan paralisis), Hipnotik, Barbiturat, Fenotiazin, Antidepresan, Laksans/Diuretika,Narketik", "score" => 3],
+            ["penggunaanObat" => "Salah satu pengobatan diatas", "score" => 2],
+            ["penggunaanObat" => "Pengobatan lain", "score" => 1],
+        ],
+        "responTerhadapOperasiOptions" => [
+            ["responTerhadapOperasi" => "Dalam 24 Jam", "score" => 3],
+            ["responTerhadapOperasi" => "Dalam 48 jam riwayat jatuh", "score" => 2],
+            ["responTerhadapOperasi" => "> 48 jam", "score" => 1],
+        ],
+    ];
+
+    public array $morseOptions = [
+        "riwayatJatuh3blnTerakhirOptions" => [
+            ["riwayatJatuh3blnTerakhir" => "Ya", "score" => 25],
+            ["riwayatJatuh3blnTerakhir" => "Tidak", "score" => 0],
+        ],
+        "diagSekunderOptions" => [
+            ["diagSekunder" => "Ya", "score" => 15],
+            ["diagSekunder" => "Tidak", "score" => 0],
+        ],
+        "alatBantuOptions" => [
+            ["alatBantu" => "Tidak Ada / Bed Rest", "score" => 0],
+            ["alatBantu" => "Tongkat / Alat Penopang / Walker", "score" => 15],
+            ["alatBantu" => "Furnitur", "score" => 30],
+        ],
+        "heparinOptions" => [
+            ["heparin" => "Ya", "score" => 20],
+            ["heparin" => "Tidak", "score" => 0],
+        ],
+        "gayaBerjalanOptions" => [
+            ["gayaBerjalan" => "Normal / Tirah Baring / Tidak Bergerak", "score" => 0],
+            ["gayaBerjalan" => "Lemah", "score" => 10],
+            ["gayaBerjalan" => "Terganggu", "score" => 20],
+        ],
+        "kesadaranOptions" => [
+            ["kesadaran" => "Baik", "score" => 0],
+            ["kesadaran" => "Lupa / Pelupa", "score" => 15],
+        ],
+    ];
+
+    // ==================== PAYLOAD PENILAIAN (TANPA OPTIONS) ====================
+
+    public array $penilaian = [
+        "fisikTab" => "Fisik",
+        "fisik" => ["fisik" => ""],
 
         "statusMedikTab" => "Status Medik",
         "statusMedik" => [
@@ -42,7 +149,7 @@ class Penilaian extends Component
                 ["statusMedik" => "Emergency Non Trauma"],
                 ["statusMedik" => "Non Emergency Trauma"],
                 ["statusMedik" => "Non Emergency Non Trauma"],
-            ]
+            ],
         ],
 
         "nyeriTab" => "Nyeri",
@@ -61,28 +168,15 @@ class Penilaian extends Component
                     ["vas" => "8"],
                     ["vas" => "9"],
                     ["vas" => "10"],
-                ]
-
+                ],
             ],
             "nyeri" => "",
-            "nyeriOptions" => [
-                ["nyeri" => "Ya"],
-                ["nyeri" => "Tidak"],
-            ],
+            "nyeriOptions" => [["nyeri" => "Ya"], ["nyeri" => "Tidak"]],
             "nyeriKet" => "",
-            "nyeriKetOptions" => [
-                ["nyeriKet" => "Akut"],
-                ["nyeriKet" => "Kronis"],
-            ],
+            "nyeriKetOptions" => [["nyeriKet" => "Akut"], ["nyeriKet" => "Kronis"]],
             "skalaNyeri" => "",
             "nyeriMetode" => "",
-            "nyeriMetodeOptions" => [
-                ["nyeriMetode" => "NRS"],
-                ["nyeriMetode" => "BPS"],
-                ["nyeriMetode" => "NIPS"],
-                ["nyeriMetode" => "FLACC"],
-                ["nyeriMetode" => "VAS"],
-            ],
+            "nyeriMetodeOptions" => [["nyeriMetode" => "NRS"], ["nyeriMetode" => "BPS"], ["nyeriMetode" => "NIPS"], ["nyeriMetode" => "FLACC"], ["nyeriMetode" => "VAS"]],
             "pencetus" => "",
             "gambar" => "",
             "durasi" => "",
@@ -96,210 +190,17 @@ class Penilaian extends Component
                 ["statusPediatrik" => "Gizi Kurang"],
                 ["statusPediatrik" => "Gizi Cukup"],
                 ["statusPediatrik" => "Gizi Lebih"],
-            ]
+            ],
         ],
 
         "diagnosisTab" => "Diagnosis",
-        "diagnosis" => [
-            "diagnosis" => "",
-        ],
+        "diagnosis" => ["diagnosis" => ""],
 
         "resikoJatuhTab" => "Resiko Jatuh",
         "resikoJatuh" => [
-            "skalaMorse" => [
-                "skalaMorseTab" => "Skala Morse Score",
-                "skalaMorseScore" => 0,
-                "skalaMorseDesc" => "",
-
-
-                "riwayatJatuh3blnTerakhir" => "",
-                "riwayatJatuh3blnTerakhirScore" => 0,
-                "riwayatJatuh3blnTerakhirOptions" => [
-                    ["riwayatJatuh3blnTerakhir" => "Ya", "score" => 25],
-                    ["riwayatJatuh3blnTerakhir" => "Tidak", "score" => 0],
-                ],
-                "diagSekunder" => "",
-                "diagSekunderScore" => 0,
-                "diagSekunderOptions" => [
-                    ["diagSekunder" => "Ya", "score" => 15],
-                    ["diagSekunder" => "Tidak", "score" => 0],
-                ],
-                "alatBantu" => "",
-                "alatBantuScore" => 0,
-                "alatBantuOptions" => [
-                    ["alatBantu" => "Tidak Ada / Bed Rest", "score" => 0],
-                    ["alatBantu" => "Tongkat / Alat Penopang / Walker", "score" => 15],
-                    ["alatBantu" => "Furnitur", "score" => 30],
-
-                ],
-                "heparin" => "",
-                "heparinScore" => 0,
-                "heparinOptions" => [
-                    ["heparin" => "Ya", "score" => 20],
-                    ["heparin" => "Tidak", "score" => 0],
-                ],
-                "gayaBerjalan" => "",
-                "gayaBerjalanScore" => 0,
-                "gayaBerjalanOptions" => [
-                    ["gayaBerjalan" => "Normal / Tirah Baring / Tidak Bergerak", "score" => 0],
-                    ["gayaBerjalan" => "Lemah", "score" => 10],
-                    ["gayaBerjalan" => "Terganggu", "score" => 20],
-                ],
-                "kesadaran" => "",
-                "kesadaranScore" => 0,
-                "kesadaranOptions" => [
-                    ["kesadaran" => "Baik", "score" => 0],
-                    ["kesadaran" => "Lupa / Pelupa", "score" => 15],
-                ],
-            ],
-
-            "skalaHumptyDumpty" => [
-                "skalaHumptyDumptyTab" => "Skala Humpty Dumpty Score",
-                "skalaHumptyDumptyScore" => 0,
-                "skalaHumptyDumptyDesc" => "",
-
-                "umur" => "",
-                "umurScore" => 0,
-                "umurOptions" => [
-                    ["umur" => "< 3 tahun", "score" => 4],
-                    ["umur" => "3-7 tahun", "score" => 3],
-                    ["umur" => "7-13 tahun", "score" => 2],
-                    ["umur" => "13-18 tahun", "score" => 1],
-
-                ],
-
-                "sex" => "",
-                "sexScore" => 0,
-                "sexOptions" => [
-                    ["sex" => "Laki-laki", "score" => 2],
-                    ["sex" => "Perempuan", "score" => 1],
-                ],
-
-                "diagnosa" => "",
-                "diagnosaScore" => 0,
-                "diagnosaOptions" => [
-                    ["diagnosa" => "Kelainan Neurologi", "score" => 4],
-                    ["diagnosa" => "Perubahan dalam Oksigenasi (Masalah Saluran Nafas, Dehidrasi, Anemia, Anoreksi, Slokop/sakit kepala, dll)", "score" => 3],
-                    ["diagnosa" => "Kelamin Priksi/Perilaku", "score" => 2],
-                    ["diagnosa" => "Diagnosa Lain", "score" => 1],
-                ],
-                "gangguanKognitif" => "",
-                "gangguanKognitifScore" => 0,
-                "gangguanKognitifOptions" => [
-                    ["gangguanKognitif" => "Tidak Sadar terhadap Keterbatasan", "score" => 3],
-                    ["gangguanKognitif" => "Lupa keterbatasan", "score" => 2],
-                    ["gangguanKognitif" => "Mengetahui Kemampuan Diri", "score" => 1],
-                ],
-                "faktorLingkungan" => "",
-                "faktorLingkunganScore" => 0,
-                "faktorLingkunganOptions" => [
-                    ["faktorLingkungan" => "Riwayat jatuh dari tempat tidur saat bayi anak", "score" => 4],
-                    ["faktorLingkungan" => "Pasien menggunakan alat bantu box atau mobel", "score" => 3],
-                    ["faktorLingkungan" => "Pasien berada ditempat tidur", "score" => 2],
-                    ["faktorLingkungan" => "Diluar ruang rawat", "score" => 1],
-                ],
-                "penggunaanObat" => "",
-                "penggunaanObatScore" => 0,
-                "penggunaanObatOptions" => [
-                    ["penggunaanObat" => "Bermacam-macam obat yang digunakan: obat sedarif (kecuali pasien ICU yang menggunakan sedasi dan paralisis), Hipnotik, Barbiturat, Fenotiazin, Antidepresan, Laksans/Diuretika,Narketik", "score" => 3],
-                    ["penggunaanObat" => "Salah satu pengobatan diatas", "score" => 2],
-                    ["penggunaanObat" => "Pengobatan lain", "score" => 1],
-                ],
-                "responTerhadapOperasi" => "",
-                "responTerhadapOperasiScore" => 0,
-                "responTerhadapOperasiOptions" => [
-                    ["responTerhadapOperasi" => "Dalam 24 Jam", "score" => 3],
-                    ["responTerhadapOperasi" => "Dalam 48 jam riwayat jatuh", "score" => 2],
-                    ["responTerhadapOperasi" => "> 48 jam", "score" => 1],
-                ],
-            ],
-
-            "edmonson" => [
-                "edmonsonTab" => "Edmonson Psychiatric Fall Risk Assesment",
-                "edmonsonScore" => "",
-                "edmonsonUsia" => "< 50 Tahun",
-
-                "statusMental" => "",
-                "statusMentalOptions" => [
-                    ["statusMental" => "Sadar penuh dan orientasi waktu baik"],
-                    ["statusMental" => "Agitasi / Cemas"],
-                    ["statusMental" => "Sering bingung"],
-                    ["statusMental" => "Bingung dan disorientasi"],
-                ],
-
-                "eliminasi" => "",
-                "eliminasiOptions" => [
-                    ["eliminasi" => "Mandiri untuk BAB dan BAK"],
-                    ["eliminasi" => "Memakai Kateter / Ostomy"],
-                    ["eliminasi" => "BAB dan BAK dengan bantuan"],
-                    ["eliminasi" => "Gangguan eliminasi (inkontinensia, banyak BAK di malam hari, sering BAB dan BAK)"],
-                    ["eliminasi" => "Inkontinensia tetapi bisa ambulasi mandiri"],
-                ],
-
-                "medikasi" => "",
-                "medikasiOptions" => [
-                    ["medikasi" => "Tidak ada pengobatan yang diberikan"],
-                    ["medikasi" => "Obat-obatan jantung"],
-                    ["medikasi" => "Obat psikiatri termasuk benzodiazepin dan anti depresan"],
-                    ["medikasi" => "Meningkatnya dosis obat yang dikonsumsi / ditambahkan dalam 24 jam terakhir"],
-                ],
-
-                "diagnosis" => "",
-                "diagnosisOptions" => [
-                    ["diagnosis" => "Bipolar / gangguan scizo affective"],
-                    ["diagnosis" => "Penyalahgunaan zat terlarang dan alkohol"],
-                    ["diagnosis" => "Gangguan depresi mayor"],
-                    ["diagnosis" => "Dimensia / Delirium"],
-                ],
-
-                "ambulasi" => "",
-                "ambulasiOptions" => [
-                    ["ambulasi" => "Ambulasi mandiri dan langkah stabil atau pasien imobil"],
-                    ["ambulasi" => "Penggunaan alat bantu yang tepat (tongkat, walker, tripod, dll)"],
-                    ["ambulasi" => "Vertigo / Hipotensi Ortostatik / Kelemahan"],
-                    ["ambulasi" => "Langkah tidak stabil, butuh bantuan dan menyadari kemampuannya"],
-                ],
-
-                "nutrisi" => "",
-                "nutrisiOptions" => [
-                    ["nutrisi" => "Hanya sedikit mendapatkan asupan makanan / minum dalam 24 jam terakhir"],
-                    ["nutrisi" => "Nafsu makan baik"],
-                ],
-
-                "ganguanTidur" => "",
-                "ganguanTidurOptions" => [
-                    ["ganguanTidur" => "Tidak ada gangguan tidur"],
-                    ["ganguanTidur" => "Ada gangguan tidur yang dilaporkan keluarga pasien / staf"],
-                ],
-
-                "riwayatJatuh" => "",
-                "riwayatJatuhOptions" => [
-                    ["riwayatJatuh" => "Tidak ada riwayat jatuh"],
-                    ["riwayatJatuh" => "Ada riwayat jatuh dalam 3 bulan terakhir"],
-                ],
-
-
-                "faktorLingkungan" => "",
-                "faktorLingkunganOptions" => [
-                    ["faktorLingkungan" => "Riwayat jatuh dari tempat tidur saat bayi anak"],
-                    ["faktorLingkungan" => "Pasien menggunakan alat bantu box atau mobel"],
-                    ["faktorLingkungan" => "Pasien berada ditempat tidur"],
-                    ["faktorLingkungan" => "Diluar ruang rawat"],
-                ],
-                "penggunaanObat" => "",
-                "penggunaanObatOptions" => [
-                    ["penggunaanObat" => "Bermacam-macam obat yang digunakan: obat sedarif (kecuali pasien ICU yang menggunakan sedasi dan paralisis), Hipnotik, Barbiturat, Fenotiazin, Antidepresan, Laksans/Diuretika,Narketik"],
-                    ["penggunaanObat" => "Salah satu pengobatan diatas"],
-                    ["penggunaanObat" => "Pengobatan lain"],
-                ],
-                "responTerhadapOperasi" => "",
-                "responTerhadapOperasiOptions" => [
-                    ["responTerhadapOperasi" => "Dalam 24 Jam"],
-                    ["responTerhadapOperasi" => "Dalam 48 jam riwayat jatuh"],
-                    ["responTerhadapOperasi" => "> 48 jam"],
-                ],
-            ],
-
+            // hanya ENTRIES (no options disimpan ke JSON pasien)
+            "skalaHumptyDumpty" => [],
+            "skalaMorse" => [],
         ],
 
         "dekubitus" => [
@@ -311,7 +212,6 @@ class Penilaian extends Component
                 ["kodisiFisik" => "Buruk"],
                 ["kodisiFisik" => "Sangat Buruk"],
             ],
-
             "kesadaran" => "",
             "kesadaranOptions" => [
                 ["kesadaran" => "Kompos Mentis"],
@@ -319,7 +219,6 @@ class Penilaian extends Component
                 ["kesadaran" => "Konfus/Soporis"],
                 ["kesadaran" => "Stupor/Koma"],
             ],
-
             "aktifitas" => "",
             "aktifitasOptions" => [
                 ["aktifitas" => "Dapat Berpindah"],
@@ -327,7 +226,6 @@ class Penilaian extends Component
                 ["aktifitas" => "Terbatas di Kursi"],
                 ["aktifitas" => "Terbatas di Tempat Tidur"],
             ],
-
             "mobilitas" => "",
             "mobilitasOptions" => [
                 ["mobilitas" => "Bergerak Bebas"],
@@ -335,7 +233,6 @@ class Penilaian extends Component
                 ["mobilitas" => "Sangat Terbatas"],
                 ["mobilitas" => "Tak Bisa Bergerak"],
             ],
-
             "inkontinensia" => "",
             "inkontinensiaOptions" => [
                 ["inkontinensia" => "Tidak Ngompol"],
@@ -345,39 +242,288 @@ class Penilaian extends Component
             ],
         ],
     ];
-    //////////////////////////////////////////////////////////////////////
 
+    // ==================== HUMPTY: ADD/DELETE/UPDATE ====================
 
-
-    ////////////////////////////////////////////////
-    ///////////begin////////////////////////////////
-    ////////////////////////////////////////////////
-
-
-    public function updated($propertyName)
+    public function tambahHumptyDumpty(): void
     {
-        $this->scoringSkalaMorse();
-        $this->scoringSkalaHumptyDumpty();
+        $this->newHumptyDumptyEntry['tanggal'] = now(config('app.timezone'))->format('d/m/Y H:i:s');
+        $this->hitungScoreHumptyDumpty();
+
+        if (empty($this->newHumptyDumptyEntry['umur'])) {
+            toastr()->positionClass('toast-top-left')->addError('Data umur wajib diisi.');
+            return;
+        }
+        if (empty($this->rjNoRef)) {
+            toastr()->positionClass('toast-top-left')->addError('Nomor registrasi UGD tidak valid.');
+            return;
+        }
+
+        try {
+            DB::transaction(function () {
+                $fresh = $this->findDataUGD($this->rjNoRef) ?: [];
+                $fresh['penilaian']['resikoJatuh']['skalaHumptyDumpty'] ??= [];
+
+                $this->newHumptyDumptyEntry['id'] = uniqid('humpty_');
+                $fresh['penilaian']['resikoJatuh']['skalaHumptyDumpty'][] = $this->newHumptyDumptyEntry;
+
+                $this->updateJsonUGD($this->rjNoRef, $fresh);
+                $this->dataDaftarUgd = $fresh;
+            });
+
+            $this->resetHumptyDumptyForm();
+            $this->resetValidation();
+            $this->formHumptyNonce++;
+
+            toastr()->positionClass('toast-top-left')->addSuccess('Data Humpty Dumpty berhasil ditambahkan dan disimpan.');
+        } catch (\Exception $e) {
+            toastr()->positionClass('toast-top-left')->addError('Gagal menyimpan data Humpty Dumpty: ' . $e->getMessage());
+        }
     }
 
-
-
-    // ////////////////
-    // RJ Logic
-    // ////////////////
-
-
-
-
-    // insert and update record start////////////////
-    public function store()
+    public function hapusHumptyDumpty($index): void
     {
-        if (!$this->checkUgdStatus()) return;
+        if (!isset($this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaHumptyDumpty'][$index])) {
+            toastr()->positionClass('toast-top-left')->addError('Data tidak ditemukan.');
+            return;
+        }
 
+        try {
+            DB::transaction(function () use ($index) {
+                $fresh = $this->findDataUGD($this->rjNoRef) ?: [];
+                if (!isset($fresh['penilaian']['resikoJatuh']['skalaHumptyDumpty'][$index])) return;
+
+                unset($fresh['penilaian']['resikoJatuh']['skalaHumptyDumpty'][$index]);
+                $fresh['penilaian']['resikoJatuh']['skalaHumptyDumpty'] = array_values($fresh['penilaian']['resikoJatuh']['skalaHumptyDumpty']);
+
+                $this->updateJsonUGD($this->rjNoRef, $fresh);
+                $this->dataDaftarUgd = $fresh;
+            });
+
+            toastr()->positionClass('toast-top-left')->addSuccess('Data Humpty Dumpty berhasil dihapus.');
+        } catch (\Exception $e) {
+            toastr()->positionClass('toast-top-left')->addError('Gagal menghapus data Humpty Dumpty: ' . $e->getMessage());
+        }
+    }
+
+    public function updatedNewHumptyDumptyEntry($value, $key): void
+    {
+        if (str_contains($key, 'umur') && $key !== 'umurScore') {
+            $this->setHumptyDumptyScore('umur', $value);
+        } elseif (str_contains($key, 'sex') && $key !== 'sexScore') {
+            $this->setHumptyDumptyScore('sex', $value);
+        } elseif (str_contains($key, 'diagnosa') && $key !== 'diagnosaScore') {
+            $this->setHumptyDumptyScore('diagnosa', $value);
+        } elseif (str_contains($key, 'gangguanKognitif') && $key !== 'gangguanKognitifScore') {
+            $this->setHumptyDumptyScore('gangguanKognitif', $value);
+        } elseif (str_contains($key, 'faktorLingkungan') && $key !== 'faktorLingkunganScore') {
+            $this->setHumptyDumptyScore('faktorLingkungan', $value);
+        } elseif (str_contains($key, 'penggunaanObat') && $key !== 'penggunaanObatScore') {
+            $this->setHumptyDumptyScore('penggunaanObat', $value);
+        } elseif (str_contains($key, 'responTerhadapOperasi') && $key !== 'responTerhadapOperasiScore') {
+            $this->setHumptyDumptyScore('responTerhadapOperasi', $value);
+        }
+
+        $this->hitungScoreHumptyDumpty();
+    }
+
+    private function setHumptyDumptyScore($field, $value): void
+    {
+        $options = $this->humptyDumptyOptions[$field . 'Options'] ?? [];
+        $score = 0;
+        foreach ($options as $option) {
+            if (($option[$field] ?? null) === $value) {
+                $score = (int)($option['score'] ?? 0);
+                break;
+            }
+        }
+        $this->newHumptyDumptyEntry[$field . 'Score'] = $score;
+    }
+
+    private function hitungScoreHumptyDumpty(): void
+    {
+        $total =
+            (int)$this->newHumptyDumptyEntry['umurScore'] +
+            (int)$this->newHumptyDumptyEntry['sexScore'] +
+            (int)$this->newHumptyDumptyEntry['diagnosaScore'] +
+            (int)$this->newHumptyDumptyEntry['gangguanKognitifScore'] +
+            (int)$this->newHumptyDumptyEntry['faktorLingkunganScore'] +
+            (int)$this->newHumptyDumptyEntry['penggunaanObatScore'] +
+            (int)$this->newHumptyDumptyEntry['responTerhadapOperasiScore'];
+
+        $this->newHumptyDumptyEntry['totalScore'] = $total;
+        $this->newHumptyDumptyEntry['kategoriRisiko'] = ($total >= 12) ? 'Risiko Tinggi' : 'Risiko Rendah';
+    }
+
+    private function resetHumptyDumptyForm(): void
+    {
+        $this->newHumptyDumptyEntry = [
+            'tanggal' => '',
+            'umur' => '',
+            'umurScore' => 0,
+            'sex' => '',
+            'sexScore' => 0,
+            'diagnosa' => '',
+            'diagnosaScore' => 0,
+            'gangguanKognitif' => '',
+            'gangguanKognitifScore' => 0,
+            'faktorLingkungan' => '',
+            'faktorLingkunganScore' => 0,
+            'penggunaanObat' => '',
+            'penggunaanObatScore' => 0,
+            'responTerhadapOperasi' => '',
+            'responTerhadapOperasiScore' => 0,
+            'totalScore' => 0,
+            'kategoriRisiko' => '',
+            'keterangan' => ''
+        ];
+    }
+
+    // ==================== MORSE: ADD/DELETE/UPDATE ====================
+
+    public function tambahMorse(): void
+    {
+        $this->newMorseEntry['tanggal'] = now(config('app.timezone'))->format('d/m/Y H:i:s');
+        $this->hitungScoreMorse();
+
+        if (empty($this->newMorseEntry['riwayatJatuh3blnTerakhir'])) {
+            toastr()->positionClass('toast-top-left')->addError('Data riwayat jatuh wajib diisi.');
+            return;
+        }
+        if (empty($this->rjNoRef)) {
+            toastr()->positionClass('toast-top-left')->addError('Nomor registrasi UGD tidak valid.');
+            return;
+        }
+
+        try {
+            DB::transaction(function () {
+                $fresh = $this->findDataUGD($this->rjNoRef) ?: [];
+                $fresh['penilaian']['resikoJatuh']['skalaMorse'] ??= [];
+
+                $this->newMorseEntry['id'] = uniqid('morse_');
+                $fresh['penilaian']['resikoJatuh']['skalaMorse'][] = $this->newMorseEntry;
+
+                $this->updateJsonUGD($this->rjNoRef, $fresh);
+                $this->dataDaftarUgd = $fresh;
+            });
+
+            $this->resetMorseForm();
+            $this->resetValidation();
+            $this->formMorseNonce++;
+
+            toastr()->positionClass('toast-top-left')->addSuccess('Data Morse berhasil ditambahkan dan disimpan.');
+        } catch (\Exception $e) {
+            toastr()->positionClass('toast-top-left')->addError('Gagal menyimpan data Morse: ' . $e->getMessage());
+        }
+    }
+
+    public function hapusMorse($index): void
+    {
+        if (!isset($this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse'][$index])) {
+            toastr()->positionClass('toast-top-left')->addError('Data tidak ditemukan.');
+            return;
+        }
+
+        try {
+            DB::transaction(function () use ($index) {
+                $fresh = $this->findDataUGD($this->rjNoRef) ?: [];
+                if (!isset($fresh['penilaian']['resikoJatuh']['skalaMorse'][$index])) return;
+
+                unset($fresh['penilaian']['resikoJatuh']['skalaMorse'][$index]);
+                $fresh['penilaian']['resikoJatuh']['skalaMorse'] = array_values($fresh['penilaian']['resikoJatuh']['skalaMorse']);
+
+                $this->updateJsonUGD($this->rjNoRef, $fresh);
+                $this->dataDaftarUgd = $fresh;
+            });
+
+            toastr()->positionClass('toast-top-left')->addSuccess('Data Morse berhasil dihapus.');
+        } catch (\Exception $e) {
+            toastr()->positionClass('toast-top-left')->addError('Gagal menghapus data Morse: ' . $e->getMessage());
+        }
+    }
+
+    public function updatedNewMorseEntry($value, $key): void
+    {
+        if (str_contains($key, 'riwayatJatuh3blnTerakhir') && $key !== 'riwayatJatuh3blnTerakhirScore') {
+            $this->setMorseScore('riwayatJatuh3blnTerakhir', $value);
+        } elseif (str_contains($key, 'diagSekunder') && $key !== 'diagSekunderScore') {
+            $this->setMorseScore('diagSekunder', $value);
+        } elseif (str_contains($key, 'alatBantu') && $key !== 'alatBantuScore') {
+            $this->setMorseScore('alatBantu', $value);
+        } elseif (str_contains($key, 'heparin') && $key !== 'heparinScore') {
+            $this->setMorseScore('heparin', $value);
+        } elseif (str_contains($key, 'gayaBerjalan') && $key !== 'gayaBerjalanScore') {
+            $this->setMorseScore('gayaBerjalan', $value);
+        } elseif (str_contains($key, 'kesadaran') && $key !== 'kesadaranScore') {
+            $this->setMorseScore('kesadaran', $value);
+        }
+
+        $this->hitungScoreMorse();
+    }
+
+    private function setMorseScore($field, $value): void
+    {
+        $options = $this->morseOptions[$field . 'Options'] ?? [];
+        $score = 0;
+        foreach ($options as $option) {
+            if (($option[$field] ?? null) === $value) {
+                $score = (int)($option['score'] ?? 0);
+                break;
+            }
+        }
+        $this->newMorseEntry[$field . 'Score'] = $score;
+    }
+
+    private function hitungScoreMorse(): void
+    {
+        $total =
+            (int)$this->newMorseEntry['riwayatJatuh3blnTerakhirScore'] +
+            (int)$this->newMorseEntry['diagSekunderScore'] +
+            (int)$this->newMorseEntry['alatBantuScore'] +
+            (int)$this->newMorseEntry['heparinScore'] +
+            (int)$this->newMorseEntry['gayaBerjalanScore'] +
+            (int)$this->newMorseEntry['kesadaranScore'];
+
+        $this->newMorseEntry['totalScore'] = $total;
+
+        if ($total <= 24) {
+            $this->newMorseEntry['kategoriRisiko'] = 'Tidak Ada Risiko';
+        } elseif ($total <= 50) {
+            $this->newMorseEntry['kategoriRisiko'] = 'Risiko Rendah';
+        } else {
+            $this->newMorseEntry['kategoriRisiko'] = 'Risiko Tinggi';
+        }
+    }
+
+    private function resetMorseForm(): void
+    {
+        $this->newMorseEntry = [
+            'tanggal' => '',
+            'riwayatJatuh3blnTerakhir' => '',
+            'riwayatJatuh3blnTerakhirScore' => 0,
+            'diagSekunder' => '',
+            'diagSekunderScore' => 0,
+            'alatBantu' => '',
+            'alatBantuScore' => 0,
+            'heparin' => '',
+            'heparinScore' => 0,
+            'gayaBerjalan' => '',
+            'gayaBerjalanScore' => 0,
+            'kesadaran' => '',
+            'kesadaranScore' => 0,
+            'totalScore' => 0,
+            'kategoriRisiko' => '',
+            'keterangan' => ''
+        ];
+    }
+
+    // ==================== CORE ====================
+
+    public function store(): void
+    {
         $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
         if (!$rjNo) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-                ->addError('rjNo kosong.');
+            toastr()->positionClass('toast-top-left')->addError('Nomor UGD kosong.');
             return;
         }
 
@@ -385,140 +531,73 @@ class Penilaian extends Component
         try {
             Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
                 DB::transaction(function () use ($rjNo) {
-                    // ambil fresh agar tidak menimpa modul lain
                     $fresh = $this->findDataUGD($rjNo) ?: [];
-                    $fresh['penilaian'] = array_replace_recursive(
-                        $this->defaultPenilaian(), // default minimal
-                        (array)($fresh['penilaian'] ?? []),
-                        (array)($this->dataDaftarUgd['penilaian'] ?? [])
-                    );
+
+                    // Jangan sentuh skala Humpty/Morse (sudah disimpan saat tambah/hapus)
+                    $fresh['penilaian']['fisik']         = $this->dataDaftarUgd['penilaian']['fisik'] ?? [];
+                    $fresh['penilaian']['statusMedik']   = $this->dataDaftarUgd['penilaian']['statusMedik'] ?? [];
+                    $fresh['penilaian']['nyeri']         = $this->dataDaftarUgd['penilaian']['nyeri'] ?? [];
+                    $fresh['penilaian']['statusPediatrik'] = $this->dataDaftarUgd['penilaian']['statusPediatrik'] ?? [];
+                    $fresh['penilaian']['diagnosis']     = $this->dataDaftarUgd['penilaian']['diagnosis'] ?? [];
+                    $fresh['penilaian']['dekubitus']     = $this->dataDaftarUgd['penilaian']['dekubitus'] ?? [];
 
                     $this->updateJsonUGD($rjNo, $fresh);
                     $this->dataDaftarUgd = $fresh;
                 });
             });
 
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-                ->addSuccess("Penilaian berhasil disimpan.");
+            toastr()->positionClass('toast-top-left')->addSuccess('Data penilaian berhasil disimpan.');
         } catch (LockTimeoutException $e) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-                ->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
+            toastr()->positionClass('toast-top-left')->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
         } catch (\Throwable $e) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-                ->addError('Gagal menyimpan.');
+            toastr()->positionClass('toast-top-left')->addError('Gagal menyimpan penilaian: ' . $e->getMessage());
         }
     }
 
     private function defaultPenilaian(): array
     {
-        return $this->penilaian; // pakai yang sudah kamu definisikan di class
+        return $this->penilaian;
     }
 
-
-    // insert and update record end////////////////
+    // buang key non-indeks (kalau ada sisa schema lama yang nyimpen options di skala*)
+    private function normalizeEntriesOnly(array &$arr, string $key): void
+    {
+        if (!isset($arr[$key]) || !is_array($arr[$key])) return;
+        $arr[$key] = array_values(array_filter(
+            $arr[$key],
+            fn($v, $k) => is_int($k) || ctype_digit((string)$k),
+            ARRAY_FILTER_USE_BOTH
+        ));
+    }
 
     private function findData($rjno): void
     {
         $this->dataDaftarUgd = $this->findDataUGD($rjno) ?: [];
 
-        // siapkan penilaian minimal tanpa menimpa field tambahan
         $current = (array)($this->dataDaftarUgd['penilaian'] ?? []);
         $this->dataDaftarUgd['penilaian'] = array_replace_recursive($this->defaultPenilaian(), $current);
 
-        // jaga-jaga inti struktur ada
-        $this->dataDaftarUgd['penilaian']['resikoJatuh'] = $this->dataDaftarUgd['penilaian']['resikoJatuh'] ?? [];
-        $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse'] =
-            $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse'] ?? [
-                "skalaMorseTab" => "Skala Morse Score",
-                "skalaMorseScore" => 0,
-                "skalaMorseDesc" => "",
-            ];
-        $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaHumptyDumpty'] =
-            $this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaHumptyDumpty'] ?? [
-                "skalaHumptyDumptyTab" => "Skala Humpty Dumpty Score",
-                "skalaHumptyDumptyScore" => 0,
-                "skalaHumptyDumptyDesc" => "",
-            ];
+        // pastikan array entries ada
+        $rj = &$this->dataDaftarUgd['penilaian']['resikoJatuh'];
+        $rj['skalaHumptyDumpty'] ??= [];
+        $rj['skalaMorse']        ??= [];
 
-        // hitung skor awal biar UI konsisten
-        $this->scoringSkalaMorse();
-        $this->scoringSkalaHumptyDumpty();
-    }
-    // set data RJno / NoBooking / NoAntrian / klaimId / kunjunganId
-    private function setDataPrimer(): void {}
-
-    private function scoringSkalaMorse(): void
-    {
-        $morse = &$this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaMorse'];
-
-        $sum =
-            (int)($morse['riwayatJatuh3blnTerakhirScore'] ?? 0) +
-            (int)($morse['diagSekunderScore'] ?? 0) +
-            (int)($morse['alatBantuScore'] ?? 0) +
-            (int)($morse['heparinScore'] ?? 0) +
-            (int)($morse['gayaBerjalanScore'] ?? 0) +
-            (int)($morse['kesadaranScore'] ?? 0);
-
-        $morse['skalaMorseScore'] = $sum;
-        $morse['skalaMorseDesc'] =
-            ($sum <= 24) ? 'Tidak Ada Risiko'
-            : (($sum <= 50) ? 'Risiko Rendah' : 'Risiko Tinggi');
+        // normalisasi (hapus key bukan indeks numerik)
+        $this->normalizeEntriesOnly($rj, 'skalaHumptyDumpty');
+        $this->normalizeEntriesOnly($rj, 'skalaMorse');
     }
 
-    private function scoringSkalaHumptyDumpty(): void
-    {
-        $hd = &$this->dataDaftarUgd['penilaian']['resikoJatuh']['skalaHumptyDumpty'];
-
-        $sum =
-            (int)($hd['umurScore'] ?? 0) +
-            (int)($hd['sexScore'] ?? 0) +
-            (int)($hd['diagnosaScore'] ?? 0) +
-            (int)($hd['gangguanKognitifScore'] ?? 0) +
-            (int)($hd['faktorLingkunganScore'] ?? 0) +
-            (int)($hd['penggunaanObatScore'] ?? 0) +
-            (int)($hd['responTerhadapOperasiScore'] ?? 0);
-
-        $hd['skalaHumptyDumptyScore'] = $sum;
-        $hd['skalaHumptyDumptyDesc']  = ($sum >= 12) ? 'Risiko Tinggi' : 'Risiko Rendah';
-    }
-
-
-    private function checkUgdStatus(): bool
-    {
-        $row = DB::table('rstxn_ugdhdrs')->select('rj_status')
-            ->where('rj_no', $this->rjNoRef)->first();
-
-        if (!$row || $row->rj_status !== 'A') {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-                ->addError('Pasien Sudah Pulang, Transaksi Terkunci.');
-            return false;
-        }
-        return true;
-    }
-
-    // when new form instance
-    public function mount()
+    public function mount(): void
     {
         $this->findData($this->rjNoRef);
     }
 
-
-
-    // select data start////////////////
     public function render()
     {
-
-        return view(
-            'livewire.emr-u-g-d.mr-u-g-d.penilaian.penilaian',
-            [
-                // 'RJpasiens' => $query->paginate($this->limitPerPage),
-                'myTitle' => 'Penilaian',
-                'mySnipt' => 'Rekam Medis Pasien',
-                'myProgram' => 'Pasien Rawat Jalan',
-            ]
-        );
+        return view('livewire.emr-u-g-d.mr-u-g-d.penilaian.penilaian', [
+            'myTitle'   => 'Penilaian UGD',
+            'mySnipt'   => 'Rekam Medis Pasien UGD',
+            'myProgram' => 'Pasien UGD',
+        ]);
     }
-    // select data end////////////////
-
-
 }

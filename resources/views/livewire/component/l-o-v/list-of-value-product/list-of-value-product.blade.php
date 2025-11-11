@@ -1,6 +1,6 @@
 @if (!$collectingMyProduct)
     <div>
-        <x-input-label for="dataProductLovSearch" :value="__('Cari Product')" :required="true" />
+        <x-input-label for="dataProductLovSearch" :value="__('Cari Obat')" :required="true" />
 
         <div class="relative" x-data="{
             selecteddataProductLovIndex: @entangle('selecteddataProductLovIndex'),
@@ -8,7 +8,7 @@
         }" @click.outside="$wire.resetdataProductLov()">
 
             {{-- input search --}}
-            <x-text-input id="dataProductLovSearch" placeholder="Cari Product" class="mt-1 ml-2" :errorshas="$errors->has('dataProductLovSearch')"
+            <x-text-input id="dataProductLovSearch" placeholder="Cari Obat" class="mt-1 ml-2" :errorshas="$errors->has('dataProductLovSearch')"
                 :disabled="false" wire:model="dataProductLovSearch" x-on:keyup.escape="$wire.resetdataProductLov()"
                 x-on:keyup.down="$wire.selectNextdataProductLov()" x-on:keyup.up="$wire.selectPreviousdataProductLov()"
                 x-on:keyup.enter="$wire.enterMydataProductLov(selecteddataProductLovIndex)" x-ref="lovSearchInput"

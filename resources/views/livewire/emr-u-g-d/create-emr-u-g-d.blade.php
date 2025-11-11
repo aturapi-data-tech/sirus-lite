@@ -9,7 +9,7 @@
 
         <!-- This element is to trick the browser into transition-opacity. Body-->
         <div class="fixed inset-0 transition-opacity">
-            <div class="absolute overflow-auto bg-white rounded-t-lg inset-4">
+            <div class="absolute overflow-auto bg-white rounded-t-lg inset-4" x-data="{ activeTab: @entangle('activeTab') }">
 
                 {{-- Topbar --}}
                 <div
@@ -44,21 +44,14 @@
 
                 </div>
 
-                {{-- Display Pasien Componen --}}
                 <div class="">
-                    {{-- Display Pasien --}}
-                    {{-- :rjNo="" disi dari emit ListeneropenModalEditUgd --}}
-
                     <livewire:emr-u-g-d.display-pasien.display-pasien :wire:key="$regNo.'display-pasien'"
                         :rjNoRef="$rjNoRef">
-
-                        {{-- <livewire:emr-u-g-d.form-entry-u-g-d.form-entry-u-g-d :rjNo="$regNo"
-                            :wire:key="$regNo.'form-entry-u-g-d'"> --}}
                 </div>
 
 
                 {{-- Transasi EMR --}}
-                <div id="TransaksiEMR" x-data="{ activeTab: @entangle('activeTab') }" class="flex">
+                <div id="TransaksiEmrUgd" class="flex">
 
                     <div class="px-4 mb-0 border-b border-gray-200  w-[250px] overflow-auto ">
                         <ul class="flex flex-col flex-wrap -mb-px text-sm font-medium text-gray-500 text-start ">
@@ -185,7 +178,22 @@
 
                     </div>
 
+                </div>
 
+
+                <div class="sticky bottom-0 flex justify-between px-4 py-3 bg-gray-50 sm:px-6"
+                    x-show="!['observasi','administrasi','rekamMedis'].includes(activeTab)" x-cloak>
+                    <div></div>
+                    <div>
+                        <div wire:loading wire:target="storeAssessmentPerawat">
+                            <x-loading />
+                        </div>
+
+                        <x-green-button :disabled=false wire:click.prevent="storeAssessmentPerawat()" type="button"
+                            wire:loading.remove>
+                            Simpan
+                        </x-green-button>
+                    </div>
                 </div>
 
             </div>

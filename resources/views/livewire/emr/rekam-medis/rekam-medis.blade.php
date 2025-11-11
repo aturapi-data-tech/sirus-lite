@@ -222,17 +222,50 @@
                                                             </div>
                                                         @elseif ($myQData->layanan_status === 'UGD')
                                                             <div class="grid grid-cols-2 gap-2">
-                                                                <x-green-button class="ml-2"
+                                                                {{-- Tombol Cetak RM IGD --}}
+                                                                <x-green-button
                                                                     wire:click.prevent="cetakRekamMedisUGD('{{ $myQData->txn_no }}', 'UGD')"
                                                                     wire:loading.attr="disabled"
                                                                     wire:target="cetakRekamMedisUGD('{{ $myQData->txn_no }}', 'UGD')">
                                                                     <span wire:loading.remove
                                                                         wire:target="cetakRekamMedisUGD('{{ $myQData->txn_no }}', 'UGD')">
-                                                                        Cetak UGD
+                                                                        <i class="mr-1 fas fa-file-pdf"></i> Cetak RM
+                                                                        IGD
                                                                     </span>
                                                                     <span wire:loading
                                                                         wire:target="cetakRekamMedisUGD('{{ $myQData->txn_no }}', 'UGD')">
-                                                                        <x-loading />
+                                                                        <x-loading /> Mencetak...
+                                                                    </span>
+                                                                </x-green-button>
+
+                                                                {{-- Tombol Suket Sehat --}}
+                                                                <x-green-button
+                                                                    wire:click.prevent="cetakRekamMedisUGD('{{ $myQData->txn_no }}', 'SUKET_SEHAT')"
+                                                                    wire:loading.attr="disabled"
+                                                                    wire:target="cetakRekamMedisUGD('{{ $myQData->txn_no }}', 'SUKET_SEHAT')">
+                                                                    <span wire:loading.remove
+                                                                        wire:target="cetakRekamMedisUGD('{{ $myQData->txn_no }}', 'SUKET_SEHAT')">
+                                                                        <i class="mr-1 fas fa-heartbeat"></i> Suket
+                                                                        Sehat
+                                                                    </span>
+                                                                    <span wire:loading
+                                                                        wire:target="cetakRekamMedisUGD('{{ $myQData->txn_no }}', 'SUKET_SEHAT')">
+                                                                        <x-loading /> Mencetak...
+                                                                    </span>
+                                                                </x-green-button>
+
+                                                                {{-- Tombol Suket Istirahat --}}
+                                                                <x-green-button
+                                                                    wire:click.prevent="cetakRekamMedisUGD('{{ $myQData->txn_no }}', 'SUKET_ISTIRAHAT')"
+                                                                    wire:loading.attr="disabled"
+                                                                    wire:target="cetakRekamMedisUGD('{{ $myQData->txn_no }}', 'SUKET_ISTIRAHAT')">
+                                                                    <span wire:loading.remove
+                                                                        wire:target="cetakRekamMedisUGD('{{ $myQData->txn_no }}', 'SUKET_ISTIRAHAT')">
+                                                                        <i class="mr-1 fas fa-bed"></i> Suket Istirahat
+                                                                    </span>
+                                                                    <span wire:loading
+                                                                        wire:target="cetakRekamMedisUGD('{{ $myQData->txn_no }}', 'SUKET_ISTIRAHAT')">
+                                                                        <x-loading /> Mencetak...
                                                                     </span>
                                                                 </x-green-button>
                                                             </div>

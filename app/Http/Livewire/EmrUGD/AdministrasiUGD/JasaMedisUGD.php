@@ -23,10 +23,7 @@ class JasaMedisUGD extends Component
     use WithPagination, EmrUGDTrait, LOVJasaMedisTrait;
 
 
-    // listener from blade////////////////
-    protected $listeners = [
-        'storeAssessmentDokterUGD' => 'store'
-    ];
+
 
 
     //////////////////////////////z
@@ -64,51 +61,6 @@ class JasaMedisUGD extends Component
 
 
 
-    // insert and update record start////////////////
-    public function store()
-    {
-        if (!$this->checkUgdStatus()) return;
-
-        $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
-        if (!$rjNo) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('rjNo kosong.');
-            return;
-        }
-
-        $lockKey = "ugd:{$rjNo}";
-        try {
-            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
-                DB::transaction(function () use ($rjNo) {
-                    // Ambil terbaru dari DB supaya tidak menimpa subtree modul lain
-                    $fresh = $this->findDataUGD($rjNo) ?: [];
-
-                    // Pastikan subtree yang kita kelola ada
-                    if (!isset($fresh['JasaMedis']) || !is_array($fresh['JasaMedis'])) $fresh['JasaMedis'] = [];
-                    if (!isset($fresh['LainLain'])  || !is_array($fresh['LainLain']))  $fresh['LainLain']  = [];
-
-                    // PATCH hanya subtree milik modul ini
-                    $fresh['JasaMedis'] = array_values($this->dataDaftarUgd['JasaMedis'] ?? []);
-                    $fresh['LainLain']  = array_values($this->dataDaftarUgd['LainLain']  ?? []);
-
-                    // Commit JSON
-                    $this->updateJsonUGD($rjNo, $fresh);
-
-                    // Sinkronkan state lokal
-                    $this->dataDaftarUgd = $fresh;
-                });
-            });
-
-            // Emit setelah commit
-            $this->emit('ugd:refresh-summary');
-
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess("Jasa Medis berhasil disimpan.");
-        } catch (LockTimeoutException $e) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
-        } catch (\Throwable $e) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Gagal menyimpan data.');
-        }
-    }
-
 
     // insert and update record end////////////////
 
@@ -126,7 +78,7 @@ class JasaMedisUGD extends Component
 
     public function insertJasaMedis(): void
     {
-        if (!$this->checkUgdStatus()) return;
+        if (!$this->checkUgdStatus($this->rjNoRef)) return;
 
         $messages = [
             'formEntryJasaMedis.jasaMedisId.required'  => 'ID Jasa Medis wajib diisi.',
@@ -184,7 +136,6 @@ class JasaMedisUGD extends Component
                         $fresh['LainLain']  = array_values($this->dataDaftarUgd['LainLain']  ?? ($fresh['LainLain']  ?? []));
                         $this->updateJsonUGD($rjNo, $fresh);
                         $this->emit('ugd:refresh-summary');
-
                         $this->dataDaftarUgd = $fresh;
                     });
                 });
@@ -201,7 +152,7 @@ class JasaMedisUGD extends Component
 
     public function removeJasaMedis($rjpactDtl)
     {
-        if (!$this->checkUgdStatus()) return;
+        if (!$this->checkUgdStatus($this->rjNoRef)) return;
 
         $rjNo = $this->rjNoRef;
         $lockKey = "ugd:{$rjNo}";
@@ -229,7 +180,6 @@ class JasaMedisUGD extends Component
                     $fresh['LainLain']  = array_values($this->dataDaftarUgd['LainLain']);
                     $this->updateJsonUGD($rjNo, $fresh);
                     $this->emit('ugd:refresh-summary');
-
                     $this->dataDaftarUgd = $fresh;
                 });
             });
@@ -286,7 +236,7 @@ class JasaMedisUGD extends Component
             "rjNo"          => 'bail|required|numeric',
         ];
         $validator = Validator::make($payload, $rules, $messages);
-        if ($validator->fails() || !$this->checkUgdStatus()) return;
+        if ($validator->fails() || !$this->checkUgdStatus($this->rjNoRef)) return;
 
         $lockRj = "ugd:{$rjNo}";
         $lockOthers = "ugdothers:counter";
@@ -318,7 +268,7 @@ class JasaMedisUGD extends Component
                         $fresh = $this->findDataUGD($payload['rjNo']) ?: [];
                         $fresh['LainLain'] = array_values($this->dataDaftarUgd['LainLain'] ?? ($fresh['LainLain'] ?? []));
                         $this->updateJsonUGD($payload['rjNo'], $fresh);
-                        $this->emit('ugd:refresh-summary');
+
 
                         $this->dataDaftarUgd = $fresh;
                     });
@@ -345,7 +295,7 @@ class JasaMedisUGD extends Component
 
     private function removeLainLain($rjotherDtl): void
     {
-        if (!$this->checkUgdStatus()) return;
+        if (!$this->checkUgdStatus($this->rjNoRef)) return;
 
         $rjNo = $this->rjNoRef;
         $lockKey = "ugd:{$rjNo}";
@@ -365,7 +315,7 @@ class JasaMedisUGD extends Component
                     $fresh = $this->findDataUGD($rjNo) ?: [];
                     $fresh['LainLain'] = array_values($this->dataDaftarUgd['LainLain']);
                     $this->updateJsonUGD($rjNo, $fresh);
-                    $this->emit('ugd:refresh-summary');
+
 
                     $this->dataDaftarUgd = $fresh;
                 });
@@ -428,7 +378,7 @@ class JasaMedisUGD extends Component
             "rjNo"         => 'bail|required|numeric',
         ];
         $validator = Validator::make($payload, $rules, $messages);
-        if ($validator->fails() || !$this->checkUgdStatus()) return;
+        if ($validator->fails() || !$this->checkUgdStatus($this->rjNoRef)) return;
 
         $lockRj = "ugd:{$rjNo}";
         $lockDrug = "ugdobats:counter";
@@ -478,7 +428,7 @@ class JasaMedisUGD extends Component
 
     private function removeObat($rjObatDtl): void
     {
-        if (!$this->checkUgdStatus()) return;
+        if (!$this->checkUgdStatus($this->rjNoRef)) return;
 
         $rjNo = $this->rjNoRef;
         $lockKey = "ugd:{$rjNo}";
@@ -501,20 +451,7 @@ class JasaMedisUGD extends Component
     // Paket JasaMedis -> Obat
     // /////////////////////////////////////////////////////////////////
 
-    private function checkUgdStatus(): bool
-    {
-        $row = DB::table('rstxn_ugdhdrs')
-            ->select('rj_status')
-            ->where('rj_no', $this->rjNoRef)
-            ->first();
 
-        if (!$row || $row->rj_status !== 'A') {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-                ->addError('Pasien Sudah Pulang, Transaksi Terkunci.');
-            return false;
-        }
-        return true;
-    }
 
 
     // when new form instance

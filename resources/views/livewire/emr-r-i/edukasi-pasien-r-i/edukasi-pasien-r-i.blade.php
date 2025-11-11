@@ -5,7 +5,7 @@
 
     <div class="w-full mb-1">
         <div class="w-full p-4 text-sm">
-            <h2 class="text-2xl font-bold text-center">Formulir Edukasi Pasien</h2>
+            <h2 class="text-2xl font-bold text-center">Formulir Pemberian Informasi Pasien</h2>
             <br />
 
             <div class="w-full p-2 m-2 mx-auto bg-white rounded-lg shadow-md">
@@ -77,9 +77,9 @@
                         $rows = [
                             ['key' => 'diagnosis', 'label' => 'Diagnosis (WD & DD)'],
                             ['key' => 'dasar', 'label' => 'Dasar Diagnosis'],
+                            ['key' => 'rencana', 'label' => 'Rencana Pengobatan / Tindakan'],
+                            ['key' => 'indikasi', 'label' => 'Indikasi Pengobatan / Tindakan'],
                             ['key' => 'tindakan', 'label' => 'Tindakan Kedokteran'],
-                            ['key' => 'indikasi', 'label' => 'Indikasi Tindakan'],
-                            ['key' => 'tatacara', 'label' => 'Tata Cara'],
                             ['key' => 'tujuan', 'label' => 'Tujuan'],
                             ['key' => 'risiko', 'label' => 'Risiko'],
                             ['key' => 'komplikasi', 'label' => 'Komplikasi'],

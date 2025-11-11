@@ -147,7 +147,6 @@ class DaftarUGD extends Component
 
     public function ListenerisOpenUgd($ListenerisOpenUgd): void
     {
-        // dd($ListenerisOpenUgd);
         $this->isOpen = $ListenerisOpenUgd['isOpen'];
         $this->isOpenMode = $ListenerisOpenUgd['isOpenMode'];
         $this->render();
