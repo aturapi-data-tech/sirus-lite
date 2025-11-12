@@ -7,7 +7,7 @@
     @if (isset($dataDaftarUgd['anamnesa']))
         <div class="w-full mb-1">
             <div id="TransaksiRawatJalan" class="px-2">
-                <div id="TransaksiRawatJalan" x-data="{ activeTab: '{{ $dataDaftarUgd['anamnesa']['pengkajianPerawatanTab'] }}' }">
+                <div id="TransaksiRawatJalan" x-data="{ activeTab: '{{ $dataDaftarUgd['anamnesa']['pengkajianPerawatanTab'] ?? 'Pengkajian Perawat' }}' }">
 
                     {{-- Tab Navigation --}}
                     <div class="px-2 mb-2 border-b border-gray-200 dark:border-gray-700">
@@ -31,7 +31,7 @@
 
                     {{-- Tab Contents --}}
                     <div class="p-2 rounded-lg bg-gray-50"
-                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarUgd['anamnesa']['pengkajianPerawatanTab'] }}'">
+                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarUgd['anamnesa']['pengkajianPerawatanTab'] ?? 'Pengkajian Perawat' }}'">
                         @include('livewire.emr-u-g-d.mr-u-g-d.anamnesa.pengkajianPerawatanTab')
                     </div>
 
