@@ -9,7 +9,7 @@
         <div class="w-full mb-1">
 
             {{-- <form class="scroll-smooth hover:scroll-auto"> --}}
-            <div class="grid grid-cols-1" x-data="{ activeTab: 'Pengkajian Medis' }">
+            <div class="grid grid-cols-1" x-data="{ activeTab: 'Petugas Medis' }">
 
                 <div id="TransaksiRawatJalan" class="px-2">
                     <div id="TransaksiRawatJalan">
@@ -21,10 +21,10 @@
                                 <li class="mr-2">
                                     <label
                                         class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
-                                        :class="activeTab === '{{ data_get($dataDaftarUgd, 'perencanaan.pengkajianMedisTab', 'Pengkajian Medis') }}'
+                                        :class="activeTab === '{{ data_get($dataDaftarUgd, 'perencanaan.pengkajianMedisTab', 'Petugas Medis') }}'
                                             ?
                                             'text-primary border-primary bg-gray-100' : ''"
-                                        @click="activeTab ='{{ data_get($dataDaftarUgd, 'perencanaan.pengkajianMedisTab', 'Pengkajian Medis') }}'">{{ data_get($dataDaftarUgd, 'perencanaan.pengkajianMedisTab', 'Pengkajian Medis') }}</label>
+                                        @click="activeTab ='{{ data_get($dataDaftarUgd, 'perencanaan.pengkajianMedisTab', 'Petugas Medis') }}'">{{ data_get($dataDaftarUgd, 'perencanaan.pengkajianMedisTab', 'Petugas Medis') }}</label>
                                 </li>
 
                                 <li class="mr-2">
@@ -71,9 +71,9 @@
 
                         <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800"
                             :class="{
-                                'active': activeTab === '{{ data_get($dataDaftarUgd, 'perencanaan.pengkajianMedisTab', 'Pengkajian Medis') }}'
+                                'active': activeTab === '{{ data_get($dataDaftarUgd, 'perencanaan.pengkajianMedisTab', 'Petugas Medis') }}'
                             }"
-                            x-show.transition.in.opacity.duration.600="activeTab === '{{ data_get($dataDaftarUgd, 'perencanaan.pengkajianMedisTab', 'Pengkajian Medis') }}'">
+                            x-show.transition.in.opacity.duration.600="activeTab === '{{ data_get($dataDaftarUgd, 'perencanaan.pengkajianMedisTab', 'Petugas Medis') }}'">
                             @include('livewire.emr-u-g-d.mr-u-g-d.perencanaan.pengkajianMedisTab')
 
                         </div>
