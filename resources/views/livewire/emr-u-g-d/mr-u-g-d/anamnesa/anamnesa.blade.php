@@ -41,22 +41,22 @@
                     </div>
 
                     <div class="p-2 rounded-lg bg-gray-50"
-                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarUgd['anamnesa']['riwayatPenyakitSekarangUmumTab'] }}'">
+                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarUgd['anamnesa']['riwayatPenyakitSekarangUmumTab'] ?? 'Riwayat Penyakit Sekarang' }}'">
                         @include('livewire.emr-u-g-d.mr-u-g-d.anamnesa.riwayatPenyakitSekarangUmumTab')
                     </div>
 
                     <div class="p-2 rounded-lg bg-gray-50"
-                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarUgd['anamnesa']['riwayatPenyakitDahuluTab'] }}'">
+                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarUgd['anamnesa']['riwayatPenyakitDahuluTab'] ?? 'Riwayat Penyakit Dahulu' }}'">
                         @include('livewire.emr-u-g-d.mr-u-g-d.anamnesa.riwayatPenyakitDahuluTab')
                     </div>
 
                     <div class="p-2 rounded-lg bg-gray-50"
-                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarUgd['anamnesa']['statusPsikologisTab'] }}'">
+                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarUgd['anamnesa']['statusPsikologisTab'] ?? 'Status Psikologis' }}'">
                         @include('livewire.emr-u-g-d.mr-u-g-d.anamnesa.statusPsikologisTab')
                     </div>
 
                     <div class="p-2 rounded-lg bg-gray-50"
-                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarUgd['anamnesa']['batukTab'] }}'">
+                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarUgd['anamnesa']['batukTab'] ?? 'Batuk' }}'">
                         @include('livewire.emr-u-g-d.mr-u-g-d.anamnesa.batukTab')
                     </div>
 
