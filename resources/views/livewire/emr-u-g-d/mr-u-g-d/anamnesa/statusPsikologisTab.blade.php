@@ -32,7 +32,7 @@
                 <x-input-label for="dataDaftarUgd.anamnesa.statusMental.statusMental" :value="__('Status Mental')"
                     :required="__(false)" class="mb-3 text-lg font-semibold" />
                 <div class="grid grid-cols-1 gap-3 mb-3 md:grid-cols-3">
-                    @foreach ($dataDaftarUgd['anamnesa']['statusMental']['statusMentalOption'] as $statusMentalOption)
+                    @foreach ($dataDaftarUgd['anamnesa']['statusMental']['statusMentalOption'] ?? [['statusMental' => 'Sadar dan Orientasi Baik'], ['statusMental' => 'Ada Masalah Perilaku'], ['statusMental' => 'Perilaku Kekerasan yang dialami sebelumnya']] as $statusMentalOption)
                         <x-radio-button :label="__($statusMentalOption['statusMental'])" value="{{ $statusMentalOption['statusMental'] }}"
                             wire:model="dataDaftarUgd.anamnesa.statusMental.statusMental" />
                     @endforeach
