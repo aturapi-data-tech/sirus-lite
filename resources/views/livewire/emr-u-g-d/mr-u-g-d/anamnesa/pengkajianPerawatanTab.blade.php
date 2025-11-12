@@ -66,7 +66,7 @@
                 :required="__(true)" class="text-lg font-semibold" />
             <div class="mt-2">
                 <div class="grid grid-cols-1 gap-3 mb-3 md:grid-cols-3">
-                    @foreach ($dataDaftarUgd['anamnesa']['pengkajianPerawatan']['caraMasukIgdOption'] as $caraMasukIgdOption)
+                    @foreach ($dataDaftarUgd['anamnesa']['pengkajianPerawatan']['caraMasukIgdOption'] ?? [['caraMasukIgd' => 'Sendiri'], ['caraMasukIgd' => 'Rujuk'], ['caraMasukIgd' => 'Kasus Polisi']] as $caraMasukIgdOption)
                         <x-radio-button :label="__($caraMasukIgdOption['caraMasukIgd'])" value="{{ $caraMasukIgdOption['caraMasukIgd'] }}"
                             wire:model="dataDaftarUgd.anamnesa.pengkajianPerawatan.caraMasukIgd" />
                     @endforeach
