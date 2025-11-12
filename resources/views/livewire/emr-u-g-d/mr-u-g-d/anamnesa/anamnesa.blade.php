@@ -14,7 +14,7 @@
                         <ul
                             class="flex flex-wrap -mb-px text-xs font-medium text-center text-gray-500 dark:text-gray-400">
                             @foreach (['pengkajianPerawatanTab', 'keluhanUtamaTab', 'riwayatPenyakitSekarangUmumTab', 'riwayatPenyakitDahuluTab', 'statusPsikologisTab', 'batukTab'] as $tab)
-                                @if (isset($dataDaftarUgd['anamnesa'][$tab]))
+                                @if (isset($dataDaftarUgd['anamnesa'][$tab] ?? $tab))
                                     <li class="mr-2">
                                         <button
                                             class="inline-block p-2 transition-colors duration-200 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
