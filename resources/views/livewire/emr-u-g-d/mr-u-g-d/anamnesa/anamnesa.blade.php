@@ -36,7 +36,7 @@
                     </div>
 
                     <div class="p-2 rounded-lg bg-gray-50"
-                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarUgd['anamnesa']['keluhanUtamaTab'] }}'">
+                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarUgd['anamnesa']['keluhanUtamaTab'] ?? 'Keluhan Utama' }}'">
                         @include('livewire.emr-u-g-d.mr-u-g-d.anamnesa.keluhanUtamaTab')
                     </div>
 
