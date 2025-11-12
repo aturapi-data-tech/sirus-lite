@@ -21,7 +21,7 @@
                 :required="__(true)" class="text-lg font-semibold" />
             <div class="mt-2">
                 <div class="grid grid-cols-2 gap-3 md:grid-cols-4">
-                    @foreach ($dataDaftarUgd['anamnesa']['pengkajianPerawatan']['tingkatKegawatanOption'] as $tingkatKegawatanOption)
+                    @foreach ($dataDaftarUgd['anamnesa']['pengkajianPerawatan']['tingkatKegawatanOption'] ?? [['tingkatKegawatan' => 'P1'], ['tingkatKegawatan' => 'P2'], ['tingkatKegawatan' => 'P3'], ['tingkatKegawatan' => 'P0']] as $tingkatKegawatanOption)
                         <x-radio-button :label="__($tingkatKegawatanOption['tingkatKegawatan'])" value="{{ $tingkatKegawatanOption['tingkatKegawatan'] }}"
                             wire:model="dataDaftarUgd.anamnesa.pengkajianPerawatan.tingkatKegawatan" />
                     @endforeach
@@ -87,7 +87,7 @@
                 :required="__(true)" class="text-lg font-semibold" />
             <div class="mt-2">
                 <div class="grid grid-cols-2 gap-3 mb-3 md:grid-cols-4">
-                    @foreach ($dataDaftarUgd['anamnesa']['pengkajianPerawatan']['saranaTransportasiOptions'] ?? [] as $saranaTransportasi)
+                    @foreach ($dataDaftarUgd['anamnesa']['pengkajianPerawatan']['saranaTransportasiOptions'] ?? [['saranaTransportasiId' => '1', 'saranaTransportasiDesc' => 'Ambulans'], ['saranaTransportasiId' => '2', 'saranaTransportasiDesc' => 'Mobil'], ['saranaTransportasiId' => '3', 'saranaTransportasiDesc' => 'Motor'], ['saranaTransportasiId' => '4', 'saranaTransportasiDesc' => 'Lain-lain']] as $saranaTransportasi)
                         <x-radio-button :label="__($saranaTransportasi['saranaTransportasiDesc'])" value="{{ $saranaTransportasi['saranaTransportasiId'] }}"
                             wire:model="dataDaftarUgd.anamnesa.pengkajianPerawatan.saranaTransportasiId"
                             wire:click="$set('dataDaftarUgd.anamnesa.pengkajianPerawatan.saranaTransportasiDesc','{{ $saranaTransportasi['saranaTransportasiDesc'] }}')" />
