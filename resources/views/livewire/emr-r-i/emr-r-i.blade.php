@@ -130,21 +130,15 @@
                 @include('livewire.emr-r-i.create-edukasi-r-i-pasien')
             @endif
 
+            @if ($isOpenCaseManagerRI)
+                @include('livewire.emr-r-i.create-case-manager-r-i-pasien')
+            @endif
 
-            {{-- @if ($isOpenInap)
-                @include('livewire.emr-r-i.create-emr-r-i-inap')
-            @endif --}}
 
-            {{-- @if ($isOpenScreening)
-                @include('livewire.emr-r-i.create-screening-r-i')
-            @endif --}}
+
 
         </div>
         {{-- Top Bar --}}
-
-
-
-
 
 
         <div class="h-[calc(100vh-250px)] mt-2 overflow-auto">
@@ -392,10 +386,9 @@
 
 
                             <td class="px-4 py-3 align-top group-hover:bg-gray-100 group-hover:text-primary">
-
                                 <div class="flex justify-end w-1/2 pt-8">
                                     <x-dropdown align="right" width="64"
-                                        contentclasses="overflow-auto max-h-[150px] py-1 bg-white dark:bg-gray-700">
+                                        contentclasses="overflow-auto max-h-[250px] py-1 bg-white dark:bg-gray-700">
                                         <x-slot name="trigger">
                                             {{-- Button myLimitPerPage --}}
                                             <x-alternative-button class="inline-flex">
@@ -436,6 +429,12 @@
                                                         {{ __('Form Edukasi Pasien') }}
                                                     </x-dropdown-link>
                                                 </li>
+                                                <li>
+                                                    <x-dropdown-link
+                                                        wire:click="editCaseManagerRI('{{ $myQData->rihdr_no }}','{{ $myQData->reg_no }}')">
+                                                        {{ __('Case Manager') }}
+                                                    </x-dropdown-link>
+                                                </li>
                                             @endrole
                                             @role('Mr')
                                                 <li>
@@ -470,6 +469,12 @@
                                                     <x-dropdown-link
                                                         wire:click="editEdukasiPasienRI('{{ $myQData->rihdr_no }}','{{ $myQData->reg_no }}')">
                                                         {{ __('Form Edukasi Pasien') }}
+                                                    </x-dropdown-link>
+                                                </li>
+                                                <li>
+                                                    <x-dropdown-link
+                                                        wire:click="editCaseManagerRI('{{ $myQData->rihdr_no }}','{{ $myQData->reg_no }}')">
+                                                        {{ __('Case Manager') }}
                                                     </x-dropdown-link>
                                                 </li>
                                             @endrole

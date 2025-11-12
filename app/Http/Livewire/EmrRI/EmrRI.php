@@ -123,6 +123,9 @@ class EmrRI extends Component
     public bool $isOpenGeneralConsentPasienRI = false;
     public string $isOpenModeGeneralConsentPasienRI = 'insert';
 
+    public bool $isOpenCaseManagerRI = false;
+    public string $isOpenModeCaseManagerRI = 'insert';
+
     public bool $isOpenEdukasiPasienRI = false;
     public string $isOpenModeEdukasiPasienRI = 'insert';
 
@@ -160,6 +163,14 @@ class EmrRI extends Component
     {
         $this->isOpenGeneralConsentPasienRI = true;
         $this->isOpenModeGeneralConsentPasienRI = 'update';
+        $this->riHdrNoRef = $riHdrNo;
+        $this->regNoRef = $regNoRef;
+    }
+
+    private function openModalEditCaseManagerRI($riHdrNo, $regNoRef): void
+    {
+        $this->isOpenCaseManagerRI = true;
+        $this->isOpenModeCaseManagerRI = 'update';
         $this->riHdrNoRef = $riHdrNo;
         $this->regNoRef = $regNoRef;
     }
@@ -215,6 +226,13 @@ class EmrRI extends Component
         $this->resetInputFields();
     }
 
+    public function closeModalCaseManagerRI(): void
+    {
+        $this->isOpenCaseManagerRI = false;
+        $this->isOpenModeCaseManagerRI = 'insert';
+        $this->resetInputFields();
+    }
+
     public function closeModalEdukasiPasienRI(): void
     {
         $this->isOpenEdukasiPasienRI = false;
@@ -267,6 +285,12 @@ class EmrRI extends Component
         // $this->findData($id);
     }
 
+    public function editCaseManagerRI($riHdrNo, $regNoRef)
+    {
+        $this->openModalEditCaseManagerRI($riHdrNo, $regNoRef);
+        // $this->findData($id);
+    }
+
     public function editEdukasiPasienRI($riHdrNo, $regNoRef)
     {
         $this->openModalEditEdukasiPasienRI($riHdrNo, $regNoRef);
@@ -311,6 +335,8 @@ class EmrRI extends Component
     public string $activeTabDokter = "pengkajianDokter";
     public string $activeTabGeneralConsentPasienRI = "generalConsentPasienRI";
     public string $activeTabEdukasiPasienRI = "edukasiPasienRI";
+    public string $activeTabCaseManagerRI = "caseManagerRI";
+
 
 
 
@@ -401,6 +427,13 @@ class EmrRI extends Component
         [
             'ermMenuId' => 'informConsentPasienRI',
             'ermMenuName' => 'Inform Consent Pasien RI'
+        ]
+    ];
+
+    public array $EmrMenuCaseManagerRI = [
+        [
+            'ermMenuId' => 'caseManagerRI',
+            'ermMenuName' => 'Case Manager'
         ]
     ];
 
