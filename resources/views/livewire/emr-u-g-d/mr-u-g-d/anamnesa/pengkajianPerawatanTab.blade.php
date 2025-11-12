@@ -43,7 +43,7 @@
                         :disabled=$disabledPropertyRjStatus
                         wire:model.debounce.500ms="dataDaftarUgd.anamnesa.pengkajianPerawatan.jamDatang" />
                 </div>
-                @if (empty($dataDaftarUgd['anamnesa']['pengkajianPerawatan']['jamDatang']))
+                @empty($dataDaftarUgd['anamnesa']['pengkajianPerawatan']['jamDatang'])
                     <div class="md:w-1/3">
                         <div wire:loading wire:target="setAutoJamDatang">
                             <x-loading />
@@ -53,7 +53,7 @@
                             <i class="fas fa-clock me-2"></i>Waktu Sekarang
                         </x-primary-button>
                     </div>
-                @endif
+                @endempty
             </div>
             @error('dataDaftarUgd.anamnesa.pengkajianPerawatan.jamDatang')
                 <x-input-error :messages=$message class="mt-1" />
