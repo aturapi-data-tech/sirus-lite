@@ -102,8 +102,11 @@
                         <livewire:emr-r-i.mr-r-i.obat-dan-cairan.obat-dan-cairan
                             :wire:key="'content-r-i-obat-dan-cairan-dokter'" :riHdrNoRef="$riHdrNoRef">
 
-                            <livewire:emr-r-i.mr-r-i.observasi.observasi :wire:key="'content-r-i-observasidokter'"
-                                :riHdrNoRef="$riHdrNoRef">
+                            <livewire:emr-r-i.mr-r-i.pengeluaran-cairan.pengeluaran-cairan
+                                :wire:key="'content-pengeluaran-cairan-Ri'" :riHdrNoRef="$riHdrNoRef">
+
+                                <livewire:emr-r-i.mr-r-i.observasi.observasi :wire:key="'content-r-i-observasidokter'"
+                                    :riHdrNoRef="$riHdrNoRef">
                     </div>
 
                     <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50"
