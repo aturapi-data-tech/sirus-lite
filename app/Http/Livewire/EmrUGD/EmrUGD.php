@@ -85,6 +85,8 @@ class EmrUGD extends Component
     public bool   $isOpenScreening  = false;
     public string $isOpenModeScreening = 'insert';
 
+    public $isOpenTrfUgd = false;
+
 
     public ?int    $rjNoRef  = null;
     public ?string $regNoRef = null;
@@ -194,11 +196,22 @@ class EmrUGD extends Component
         $this->isOpen     = true;
         $this->isOpenMode = 'insert';
     }
+    public function openTrfUgd()
+    {
+        $this->isOpenTrfUgd = true;
+    }
 
     private function openModalEdit($rjNo, $regNoRef): void
     {
         $this->isOpen     = true;
         $this->isOpenMode = 'update';
+        $this->rjNoRef    = $rjNo;
+        $this->regNoRef   = $regNoRef;
+    }
+
+    private function openModalEditTrfUgd($rjNo, $regNoRef): void
+    {
+        $this->isOpenTrfUgd     = true;
         $this->rjNoRef    = $rjNo;
         $this->regNoRef   = $regNoRef;
     }
@@ -248,6 +261,17 @@ class EmrUGD extends Component
         $this->resetInputFields();
     }
 
+    public function closeModalTrfUgd(): void
+    {
+        $this->isOpenTrfUgd     = false;
+        $this->resetInputFields();
+    }
+
+    public function closeTrfUgd()
+    {
+        $this->isOpenTrfUgd = false;
+    }
+
     public function closeModalDokter(): void
     {
         $this->isOpenDokter     = false;
@@ -288,6 +312,11 @@ class EmrUGD extends Component
     public function edit($rjNo, $regNoRef): void
     {
         $this->openModalEdit($rjNo, $regNoRef);
+    }
+
+    public function editTrfUgd($rjNo, $regNoRef): void
+    {
+        $this->openModalEditTrfUgd($rjNo, $regNoRef);
     }
 
     public function editDokter($rjNo, $regNoRef): void

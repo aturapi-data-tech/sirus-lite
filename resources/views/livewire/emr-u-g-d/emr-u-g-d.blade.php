@@ -150,6 +150,11 @@
                 @include('livewire.emr-u-g-d.create-screening-u-g-d')
             @endif
 
+            @if ($isOpenTrfUgd)
+                @include('livewire.emr-u-g-d.create-trf-u-g-d')
+            @endif
+
+
         </div>
         {{-- Top Bar --}}
 
@@ -413,6 +418,13 @@
                                                                 {{ __('Form Persetujuan Pasien') }}
                                                             </x-dropdown-link>
                                                         </li>
+
+                                                        <li>
+                                                            <x-dropdown-link
+                                                                wire:click="editTrfUgd('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
+                                                                {{ __('Form TRF IGD') }}
+                                                            </x-dropdown-link>
+                                                        </li>
                                                     @endrole
                                                     @role('Mr')
                                                         {{-- <li>
@@ -453,6 +465,12 @@
                                                             <x-dropdown-link
                                                                 wire:click="editGeneralConsentPasienUGD('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
                                                                 {{ __('Form Persetujuan Pasien') }}
+                                                            </x-dropdown-link>
+                                                        </li>
+                                                        <li>
+                                                            <x-dropdown-link
+                                                                wire:click="editTrfUgdPasienUGD('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
+                                                                {{ __('Form TRF IGD') }}
                                                             </x-dropdown-link>
                                                         </li>
                                                     @endrole
