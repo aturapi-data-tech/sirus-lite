@@ -12,7 +12,7 @@
         </thead>
         <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
             @php
-                $levelingDokter = $myQData['pengkajianAwalPasienRawatInap']['levelingDokter'] ?? [];
+                $levelingDokter = $dataDaftarRi['pengkajianAwalPasienRawatInap']['levelingDokter'] ?? [];
             @endphp
 
             @forelse($levelingDokter as $lvl)
