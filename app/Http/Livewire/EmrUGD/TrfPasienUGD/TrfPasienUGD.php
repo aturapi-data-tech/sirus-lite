@@ -329,6 +329,30 @@ class TrfPasienUGD extends Component
                 "alasanPindah"         => '', // freetext
                 "metodePemindahanPasien" => '', // freetext, contoh: brankar, kursi roda, jalan, dll.
 
+                "kondisiSaatDikirim" => [
+                    "sistolik"        => '',
+                    "diastolik"       => '',
+                    "frekuensiNafas"  => '',
+                    "frekuensiNadi"   => '',
+                    "suhu"            => '',
+                    "spo2"            => '',
+                    "gda"             => '',
+                    "gcs"             => '',
+                    "keadaanPasien"   => '',
+                ],
+
+                "kondisiSaatDiterima" => [
+                    "sistolik"        => '',
+                    "diastolik"       => '',
+                    "frekuensiNafas"  => '',
+                    "frekuensiNadi"   => '',
+                    "suhu"            => '',
+                    "spo2"            => '',
+                    "gda"             => '',
+                    "gcs"             => '',
+                    "keadaanPasien"   => '',
+                ],
+
                 // ["jenis" => "IV Line", "lokasi" => "Tangan kanan", "ukuran" => "22G", "keterangan" => "baik"]
                 "alatYangTerpasang" => [],
 

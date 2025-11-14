@@ -212,6 +212,141 @@
                     @enderror
                 </div>
 
+                {{-- Kondisi Pasien (TTV) Saat Dikirim & Diterima --}}
+                <div class="grid grid-cols-1 gap-3 mt-3 md:grid-cols-2">
+                    {{-- Saat Dikirim --}}
+                    <div class="p-2 bg-white border rounded-md">
+                        <x-input-label :value="__('Kondisi Pasien Saat Dikirim (TTV)')" />
+
+                        <div class="mt-1 space-y-1 text-xs">
+                            <div class="flex items-center gap-2">
+                                <span class="w-16">TD</span>
+                                <x-text-input class="w-16" placeholder="Sys"
+                                    wire:model.defer="dataDaftarUgd.trfUgd.kondisiSaatDikirim.sistolik" />
+                                <span>/</span>
+                                <x-text-input class="w-16" placeholder="Dia"
+                                    wire:model.defer="dataDaftarUgd.trfUgd.kondisiSaatDikirim.diastolik" />
+                                <span>mmHg</span>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <span class="w-16">Nadi</span>
+                                <x-text-input class="w-16" placeholder="x/mnt"
+                                    wire:model.defer="dataDaftarUgd.trfUgd.kondisiSaatDikirim.frekuensiNadi" />
+                                <span>x/mnt</span>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <span class="w-16">Resp</span>
+                                <x-text-input class="w-16" placeholder="x/mnt"
+                                    wire:model.defer="dataDaftarUgd.trfUgd.kondisiSaatDikirim.frekuensiNafas" />
+                                <span>x/mnt</span>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <span class="w-16">Suhu</span>
+                                <x-text-input class="w-16" placeholder="°C"
+                                    wire:model.defer="dataDaftarUgd.trfUgd.kondisiSaatDikirim.suhu" />
+                                <span>°C</span>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <span class="w-16">SpO₂</span>
+                                <x-text-input class="w-16" placeholder="%"
+                                    wire:model.defer="dataDaftarUgd.trfUgd.kondisiSaatDikirim.spo2" />
+                                <span>%</span>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <span class="w-16">GDA</span>
+                                <x-text-input class="w-20" placeholder="mg/dL"
+                                    wire:model.defer="dataDaftarUgd.trfUgd.kondisiSaatDikirim.gda" />
+                                <span>mg/dL</span>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <span class="w-16">GCS</span>
+                                <x-text-input class="w-20" placeholder="E V M"
+                                    wire:model.defer="dataDaftarUgd.trfUgd.kondisiSaatDikirim.gcs" />
+                            </div>
+
+                            <div class="mt-1">
+                                <x-input-label :value="__('Keadaan Umum')" class="!text-xs" />
+                                <x-text-input-area rows="2"
+                                    class="w-full mt-1 text-xs border-gray-300 rounded-md shadow-sm"
+                                    wire:model.defer="dataDaftarUgd.trfUgd.kondisiSaatDikirim.keadaanPasien">
+                                </x-text-input-area>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Saat Diterima --}}
+                    <div class="p-2 bg-white border rounded-md">
+                        <x-input-label :value="__('Kondisi Pasien Saat Diterima (TTV)')" />
+
+                        <div class="mt-1 space-y-1 text-xs">
+                            <div class="flex items-center gap-2">
+                                <span class="w-16">TD</span>
+                                <x-text-input class="w-16" placeholder="Sys"
+                                    wire:model.defer="dataDaftarUgd.trfUgd.kondisiSaatDiterima.sistolik" />
+                                <span>/</span>
+                                <x-text-input class="w-16" placeholder="Dia"
+                                    wire:model.defer="dataDaftarUgd.trfUgd.kondisiSaatDiterima.diastolik" />
+                                <span>mmHg</span>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <span class="w-16">Nadi</span>
+                                <x-text-input class="w-16" placeholder="x/mnt"
+                                    wire:model.defer="dataDaftarUgd.trfUgd.kondisiSaatDiterima.frekuensiNadi" />
+                                <span>x/mnt</span>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <span class="w-16">Resp</span>
+                                <x-text-input class="w-16" placeholder="x/mnt"
+                                    wire:model.defer="dataDaftarUgd.trfUgd.kondisiSaatDiterima.frekuensiNafas" />
+                                <span>x/mnt</span>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <span class="w-16">Suhu</span>
+                                <x-text-input class="w-16" placeholder="°C"
+                                    wire:model.defer="dataDaftarUgd.trfUgd.kondisiSaatDiterima.suhu" />
+                                <span>°C</span>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <span class="w-16">SpO₂</span>
+                                <x-text-input class="w-16" placeholder="%"
+                                    wire:model.defer="dataDaftarUgd.trfUgd.kondisiSaatDiterima.spo2" />
+                                <span>%</span>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <span class="w-16">GDA</span>
+                                <x-text-input class="w-20" placeholder="mg/dL"
+                                    wire:model.defer="dataDaftarUgd.trfUgd.kondisiSaatDiterima.gda" />
+                                <span>mg/dL</span>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <span class="w-16">GCS</span>
+                                <x-text-input class="w-20" placeholder="E V M"
+                                    wire:model.defer="dataDaftarUgd.trfUgd.kondisiSaatDiterima.gcs" />
+                            </div>
+
+                            <div class="mt-1">
+                                <x-input-label :value="__('Keadaan Umum')" class="!text-xs" />
+                                <x-text-input-area rows="2"
+                                    class="w-full mt-1 text-xs border-gray-300 rounded-md shadow-sm"
+                                    wire:model.defer="dataDaftarUgd.trfUgd.kondisiSaatDiterima.keadaanPasien">
+                                </x-text-input-area>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 {{-- Tambahan Fasilitas Jika Ada --}}
                 <div>
                     <x-input-label :value="__('Fasilitas Pendukung')" />
@@ -432,10 +567,24 @@
     </div>
     <div class="grid w-full grid-cols-1 px-4 my-8">
 
-        {{-- Loading indikator --}}
+        {{-- Tombol Simpan --}}
+        <x-green-button wire:click.prevent="store" type="button" wire:loading.attr="disabled" wire:target="store">
+            <span class="inline-flex items-center" wire:loading.remove wire:target="store">
+                <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="1.6">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M4 4h11l5 5v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4zm7 14v-6m0 0V8m0 4h4m-4 0H7" />
+                </svg>
+                SIMPAN FORM TRANSFER PASIEN UGD
+            </span>
+            <div wire:loading wire:target="store" class="flex items-center justify-center">
+                <x-loading />
+            </div>
 
+        </x-green-button>
 
-        <x-green-button wire:click.prevent="cetakTrfPasienUgd" type="button" wire:loading.attr="disabled"
+        {{-- Tombol Cetak --}}
+        <x-yellow-button wire:click.prevent="cetakTrfPasienUgd" type="button" wire:loading.attr="disabled"
             wire:target="cetakTrfPasienUgd">
 
             {{-- Saat tidak loading → tampilkan ikon printer + teks --}}
@@ -452,7 +601,8 @@
             <div wire:loading wire:target="cetakTrfPasienUgd" class="flex items-center justify-center">
                 <x-loading />
             </div>
-        </x-green-button>
+        </x-yellow-button>
 
     </div>
+
 </div>

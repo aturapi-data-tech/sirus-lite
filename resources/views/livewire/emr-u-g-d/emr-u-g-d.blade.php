@@ -422,7 +422,7 @@
                                                         <li>
                                                             <x-dropdown-link
                                                                 wire:click="editTrfUgd('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
-                                                                {{ __('Form TRF IGD') }}
+                                                                {{ __('Form Transfer UGD') }}
                                                             </x-dropdown-link>
                                                         </li>
                                                     @endrole
@@ -470,7 +470,7 @@
                                                         <li>
                                                             <x-dropdown-link
                                                                 wire:click="editTrfUgdPasienUGD('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
-                                                                {{ __('Form TRF IGD') }}
+                                                                {{ __('Form Transfer UGD') }}
                                                             </x-dropdown-link>
                                                         </li>
                                                     @endrole

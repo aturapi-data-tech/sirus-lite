@@ -60,6 +60,67 @@
         $petugasPenerima = (string) ($trf['petugasPenerima'] ?? '');
         $petugasPenerimaCode = (string) ($trf['petugasPenerimaCode'] ?? '');
         $petugasPenerimaDate = (string) ($trf['petugasPenerimaDate'] ?? '');
+
+        // ==== KONDISI SAAT DIKIRIM & DITERIMA (TTV) ====
+        $kondisiSaatDikirimArr = (array) ($trf['kondisiSaatDikirim'] ?? []);
+        $kondisiSaatDiterimaArr = (array) ($trf['kondisiSaatDiterima'] ?? []);
+
+        $formatTtvHtml = function (array $ttv): string {
+            $lines = [];
+
+            $sys = trim((string) ($ttv['sistolik'] ?? ''));
+            $dia = trim((string) ($ttv['diastolik'] ?? ''));
+
+            if ($sys !== '' || $dia !== '') {
+                $tekanan = trim($sys . ($dia !== '' ? '/' . $dia : ''));
+                $lines[] = "TD: {$tekanan} mmHg";
+            }
+
+            $nadi = trim((string) ($ttv['frekuensiNadi'] ?? ''));
+            if ($nadi !== '') {
+                $lines[] = "Nadi: {$nadi} x/menit";
+            }
+
+            $rr = trim((string) ($ttv['frekuensiNafas'] ?? ''));
+            if ($rr !== '') {
+                $lines[] = "Resp: {$rr} x/menit";
+            }
+
+            $suhu = trim((string) ($ttv['suhu'] ?? ''));
+            if ($suhu !== '') {
+                $lines[] = "Suhu: {$suhu} °C";
+            }
+
+            $spo2 = trim((string) ($ttv['spo2'] ?? ''));
+            if ($spo2 !== '') {
+                $lines[] = "SpO2: {$spo2} %";
+            }
+
+            $gda = trim((string) ($ttv['gda'] ?? ''));
+            if ($gda !== '') {
+                $lines[] = "GDA: {$gda} mg/dL";
+            }
+
+            $gcs = trim((string) ($ttv['gcs'] ?? ''));
+            if ($gcs !== '') {
+                $lines[] = "GCS: {$gcs}";
+            }
+
+            $keadaan = trim((string) ($ttv['keadaanPasien'] ?? ''));
+            if ($keadaan !== '') {
+                $lines[] = "Keadaan umum: {$keadaan}";
+            }
+
+            if (empty($lines)) {
+                return '-';
+            }
+
+            return implode(' ', $lines);
+        };
+
+        $kondisiSaatDikirim = $formatTtvHtml($kondisiSaatDikirimArr);
+        $kondisiSaatDiterima = $formatTtvHtml($kondisiSaatDiterimaArr);
+
     @endphp
 
     {{-- ===== HEADER: IDENTITAS RS & PASIEN ===== --}}
@@ -321,6 +382,25 @@
         </tr>
     </table>
 
+    {{-- ===== KONDISI PASIEN SAAT DIKIRIM & DITERIMA (DARI TTV) ===== --}}
+    <table class="w-full mt-2 border border-collapse border-black text-[11px]">
+        <tr class="bg-gray-100">
+            <th class="w-1/2 px-2 py-1 text-left border border-black">
+                Kondisi Pasien Saat Dikirim
+            </th>
+            <th class="w-1/2 px-2 py-1 text-left border border-black">
+                Kondisi Pasien Saat Diterima
+            </th>
+        </tr>
+        <tr>
+            <td class="px-2 py-1 align-top border border-black">
+                {{ $kondisiSaatDikirim }}
+            </td>
+            <td class="px-2 py-1 align-top border border-black">
+                {{ $kondisiSaatDiterima }}
+            </td>
+        </tr>
+    </table>
 
     {{-- ===== ALAT YANG TERPASANG ===== --}}
     <table class="w-full mt-2 border border-collapse border-black text-[11px]">
@@ -375,9 +455,6 @@
             <td class="px-2 py-3 align-top border border-black">
                 <div class="mb-2">
                     <div>Nama : <strong>{{ $petugasPengirim ?: '................................' }}</strong></div>
-                    @if ($petugasPengirimCode)
-                        <div>Kode : {{ $petugasPengirimCode }}</div>
-                    @endif
                     @if ($petugasPengirimDate)
                         <div>Tanggal : {{ $petugasPengirimDate }}</div>
                     @endif
@@ -390,9 +467,6 @@
             <td class="px-2 py-3 align-top border border-black">
                 <div class="mb-2">
                     <div>Nama : <strong>{{ $petugasPenerima ?: '................................' }}</strong></div>
-                    @if ($petugasPenerimaCode)
-                        <div>Kode : {{ $petugasPenerimaCode }}</div>
-                    @endif
                     @if ($petugasPenerimaDate)
                         <div>Tanggal : {{ $petugasPenerimaDate }}</div>
                     @endif
