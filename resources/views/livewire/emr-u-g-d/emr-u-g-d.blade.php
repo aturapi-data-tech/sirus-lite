@@ -437,12 +437,12 @@
                                                         </li>
                                                     @endrole
                                                     @role(['Perawat', 'Gizi', 'Casemix'])
-                                                        {{-- <li>
+                                                        <li>
                                                             <x-dropdown-link
                                                                 wire:click="editScreening('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
                                                                 {{ __('Screening') }}
                                                             </x-dropdown-link>
-                                                        </li> --}}
+                                                        </li>
                                                         <li>
                                                             <x-dropdown-link
                                                                 wire:click="edit('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
