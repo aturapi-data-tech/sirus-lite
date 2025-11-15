@@ -23,6 +23,15 @@
                                         Catatan Perkembangan Pasien Terintegrasi (CPPT)
                                     </label>
                                 </li>
+
+                                <li class="mr-2">
+                                    <label
+                                        class="inline-block p-4 border-b-2 border-transparent rounded-t-lg cursor-pointer hover:text-gray-600 hover:border-gray-300"
+                                        :class="activeTab === 'CaseManager' ? 'text-primary border-primary bg-gray-100' : ''"
+                                        @click="activeTab = 'CaseManager'">
+                                        Case Manager
+                                    </label>
+                                </li>
                             </ul>
                         </div>
 
@@ -30,6 +39,12 @@
                         <div class="p-2 rounded-lg bg-gray-50 dark:bg-gray-800">
                             <div x-show="activeTab === 'CPPT'" x-transition:enter.opacity.duration.600>
                                 @include('livewire.emr-r-i.mr-r-i.c-p-p-t.form-entry-c-p-p-t1')
+                            </div>
+                        </div>
+
+                        <div class="p-2 rounded-lg bg-gray-50 dark:bg-gray-800">
+                            <div x-show="activeTab === 'CaseManager'" x-transition:enter.opacity.duration.600>
+                                @include('livewire.emr-r-i.mr-r-i.c-p-p-t.form-entry-case-manager')
                             </div>
                         </div>
                     </div>

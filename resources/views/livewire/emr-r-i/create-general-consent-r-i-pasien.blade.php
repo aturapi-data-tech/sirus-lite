@@ -35,12 +35,7 @@
                             </svg>
                         </button>
                     </div>
-
                     {{-- Pasien --}}
-
-
-
-
 
                 </div>
 
