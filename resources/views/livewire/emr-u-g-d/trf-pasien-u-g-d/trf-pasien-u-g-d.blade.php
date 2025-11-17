@@ -33,20 +33,9 @@
 
             <div class="mb-2">
                 <x-input-label value="Terapi UGD" />
-                @php
-                    $terapiUgd = $dataDaftarUgd['trfUgd']['terapiUgd'] ?? [];
-                @endphp
-                @if (!empty($terapiUgd))
-                    <ul class="pl-4 mt-1 text-sm list-disc">
-                        @foreach ($terapiUgd as $row)
-                            @if (trim($row) !== '')
-                                <li>{{ $row }}</li>
-                            @endif
-                        @endforeach
-                    </ul>
-                @else
-                    <p class="mt-1 text-sm italic text-gray-500">Belum ada terapi terekam.</p>
-                @endif
+
+                <x-text-input-area rows="3" class="w-full mt-1" wire:model="dataDaftarUgd.trfUgd.terapiUgd"
+                    placeholder="Tuliskan terapi UGD..."></x-text-input-area>
             </div>
         </div>
     </div>
