@@ -30,7 +30,10 @@
                         <!-- Konten Tab AsuhanKeperawatan -->
                         <div class="p-2 rounded-lg bg-gray-50 dark:bg-gray-800">
                             <div x-show="activeTab === 'AsuhanKeperawatan'" x-transition:enter.opacity.duration.600>
-                                @include('livewire.emr-r-i.mr-r-i.asuhan-keperawatan.form-entry-asuhan-keperawatan1')
+                                <livewire:emr-r-i.diagnosa-keperawatan-r-i.diagnosa-keperawatan-r-i :riHdrNoRef="$riHdrNoRef"
+                                    :wire:key="$riHdrNoRef.'-diagnosa-keperawatan-r-i'" />
+
+                                {{-- @include('livewire.emr-r-i.mr-r-i.asuhan-keperawatan.form-entry-asuhan-keperawatan1') --}}
                             </div>
                         </div>
                     </div>
