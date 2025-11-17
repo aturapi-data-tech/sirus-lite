@@ -469,7 +469,7 @@
                                                         </li>
                                                         <li>
                                                             <x-dropdown-link
-                                                                wire:click="editTrfUgdPasienUGD('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
+                                                                wire:click="editTrfUgd('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
                                                                 {{ __('Form Transfer UGD') }}
                                                             </x-dropdown-link>
                                                         </li>
