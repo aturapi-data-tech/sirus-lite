@@ -418,53 +418,7 @@ class Anamnesa extends Component
         $this->store();
     }
 
-    private function storePengkajianPerawatan(): void
-    {
-        $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
-        if (!$rjNo) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-                ->addError('Nomor UGD kosong.');
-            return;
-        }
 
-        $lockKey = "ugd:{$rjNo}";
-
-        try {
-            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
-                DB::transaction(function () use ($rjNo) {
-                    // Ambil data paling FRESH
-                    $fresh = $this->findDataUGD($rjNo) ?: [];
-
-                    // Ambil subtree aman (tanpa overwrite)
-                    $anamnesa = (array) data_get($fresh, 'anamnesa', []);
-                    $pp       = (array) data_get($anamnesa, 'pengkajianPerawatan', []);
-
-                    // Patch HANYA field perawat penerima (+ code)
-                    $pp['perawatPenerima']     = $this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['perawatPenerima']     ?? ($pp['perawatPenerima']     ?? '');
-                    $pp['perawatPenerimaCode'] = $this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['perawatPenerimaCode'] ?? ($pp['perawatPenerimaCode'] ?? '');
-
-                    // Kembalikan ke tree
-                    $anamnesa['pengkajianPerawatan'] = $pp;
-                    $fresh['anamnesa'] = $anamnesa;
-
-                    // Commit ke JSON
-                    $this->updateJsonUGD($rjNo, $fresh);
-
-                    // Sinkronkan state lokal supaya UI up-to-date
-                    $this->dataDaftarUgd = $fresh;
-                });
-            });
-
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-                ->addSuccess('Perawat penerima berhasil diset.');
-        } catch (LockTimeoutException $e) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-                ->addError('Sistem sibuk, gagal memperoleh lock. Coba lagi.');
-        } catch (\Throwable $e) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-                ->addError('Gagal menyimpan perawat penerima.');
-        }
-    }
 
 
     public function setPerawatPenerima(): void
@@ -483,9 +437,6 @@ class Anamnesa extends Component
         // Set ke state lokal
         $this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['perawatPenerima'] = $myUserNameActive;
         $this->dataDaftarUgd['anamnesa']['pengkajianPerawatan']['perawatPenerimaCode'] = $myUserCodeActive;
-
-        // Simpan HANYA subtree pengkajianPerawatan (aman, tidak overwrite node lain)
-        $this->storePengkajianPerawatan();
     }
 
 
