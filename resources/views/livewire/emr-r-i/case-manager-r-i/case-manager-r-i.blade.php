@@ -1,7 +1,7 @@
 <div>
     <div class="w-full mb-1">
         <div class="w-full p-4 text-sm">
-            <h2 class="text-2xl font-bold text-center">Case Manager Rawat Inap</h2>
+            <h2 class="text-2xl font-bold text-center">MPP</h2>
             <br />
 
             <!-- Alert untuk status penyimpanan -->
@@ -156,7 +156,7 @@
 
             <!-- RIWAYAT FORM A & B -->
             <div class="mt-8">
-                <h3 class="mb-4 text-xl font-semibold">Riwayat Case Manager</h3>
+                <h3 class="mb-4 text-xl font-semibold">Data MPP</h3>
 
                 @if (!empty($dataDaftarRi['formMPP']['formA']))
                     <div class="overflow-x-auto bg-white rounded-lg shadow">
@@ -616,7 +616,7 @@
                     @endif
                 @else
                     <div class="p-8 text-center text-gray-500 bg-gray-100 rounded-lg">
-                        Belum ada data Case Manager. Silakan isi Form A terlebih dahulu.
+                        Belum ada data MPP. Silakan isi Form A terlebih dahulu.
                     </div>
                 @endif
             </div>

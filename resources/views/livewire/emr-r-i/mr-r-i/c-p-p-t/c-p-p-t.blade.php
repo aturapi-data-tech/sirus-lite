@@ -29,7 +29,7 @@
                                         class="inline-block p-4 border-b-2 border-transparent rounded-t-lg cursor-pointer hover:text-gray-600 hover:border-gray-300"
                                         :class="activeTab === 'CaseManager' ? 'text-primary border-primary bg-gray-100' : ''"
                                         @click="activeTab = 'CaseManager'">
-                                        Case Manager
+                                        MPP
                                     </label>
                                 </li>
                             </ul>

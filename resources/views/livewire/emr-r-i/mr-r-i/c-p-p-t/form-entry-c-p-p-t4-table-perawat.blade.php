@@ -25,7 +25,7 @@
                             </th>
                             <th scope="col" class="px-4 py-3 text-left">
                                 <x-sort-link :active="false" wire:click.prevent="" role="button" href="#">
-                                    Instruksi &amp; Plan Edukasi
+                                    Instruksi &amp; Review
                                 </x-sort-link>
                             </th>
                             <th scope="col" class="px-4 py-3 text-center">Action</th>
@@ -84,11 +84,11 @@
                                         </div>
                                     </td>
 
-                                    <!-- Instruksi & Plan Edukasi -->
+                                    <!-- Instruksi & Review -->
                                     <td class="px-3 py-2 leading-relaxed whitespace-pre-line align-top">
                                         <div><span class="font-semibold">Instruksi:</span>
                                             {{ $cppt['instruction'] ?? '-' }}</div>
-                                        <div><span class="font-semibold">Plan Edukasi:</span>
+                                        <div><span class="font-semibold">Review:</span>
                                             {{ $cppt['review'] ?? '-' }}</div>
                                     </td>
 
