@@ -177,7 +177,8 @@ class Perencanaan extends Component
             $this->validate($rules, $messages, $attributes);
         } catch (ValidationException $e) {
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-                ->addError("Lakukan pengecekan kembali input data.");
+                ->addError("Lakukan pengecekan kembali input data." . $e->getMessage());
+
             // kalau mau, bisa return; supaya gak validate 2x
             return;
         }
@@ -372,56 +373,9 @@ class Perencanaan extends Component
 
         $this->dataDaftarUgd['perencanaan']['pengkajianMedisTab'] = 'Pengkajian Medis';
         $this->dataDaftarUgd['perencanaan']['pengkajianMedis']['drPemeriksa'] = $userName;
-
-        // 4) Simpan HANYA subtree pengkajianMedis agar terapi tidak tersentuh
-        $this->storePengkajianMedis();
     }
 
-    private function storePengkajianMedis(): void
-    {
-        $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
-        if (!$rjNo) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-                ->addError('rjNo kosong.');
-            return;
-        }
 
-        $lockKey = "ugd:{$rjNo}";
-
-        try {
-            Cache::lock($lockKey, 5)->block(3, function () use ($rjNo) {
-                DB::transaction(function () use ($rjNo) {
-                    $fresh = $this->findDataUGD($rjNo) ?: [];
-
-                    // Pastikan node ada TANPA menimpa subtree lain
-                    if (!isset($fresh['perencanaan']) || !is_array($fresh['perencanaan'])) {
-                        $fresh['perencanaan'] = [];
-                    }
-                    $fresh['perencanaan'] = $this->dataDaftarUgd['perencanaan'];
-
-                    // Patch HANYA pengkajianMedis (+ optional tab label)
-                    $fresh['perencanaan']['pengkajianMedisTab'] =
-                        $this->dataDaftarUgd['perencanaan']['pengkajianMedisTab'] ?? 'Pengkajian Medis';
-
-                    $fresh['perencanaan']['pengkajianMedis'] = (array) (
-                        $this->dataDaftarUgd['perencanaan']['pengkajianMedis'] ?? []
-                    );
-
-                    // JANGAN sentuh $fresh['perencanaan']['terapi'] di sini
-                    $this->updateJsonUGD($rjNo, $fresh);
-
-                    // Sinkronkan state lokal
-                    $this->dataDaftarUgd = $fresh;
-                });
-            });
-
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-                ->addSuccess('Pengkajian medis disimpan.');
-        } catch (\Throwable $e) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-                ->addError('Gagal menyimpan pengkajian medis.');
-        }
-    }
 
 
     // /////////////////eresep open////////////////////////

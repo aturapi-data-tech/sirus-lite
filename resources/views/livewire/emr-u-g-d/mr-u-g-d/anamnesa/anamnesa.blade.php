@@ -7,56 +7,54 @@
     @if (isset($dataDaftarUgd['anamnesa']))
         <div class="w-full mb-1">
             <div id="TransaksiRawatJalan" class="px-2">
-                <div id="TransaksiRawatJalan" x-data="{ activeTab: '{{ $dataDaftarUgd['anamnesa']['pengkajianPerawatanTab'] ?? 'Pengkajian Perawat' }}' }">
+                <div id="TransaksiRawatJalan" x-data="{ activeTab: '{{ $dataDaftarUgd['anamnesa']['pengkajianPerawatanTab'] ?? 'pengkajianPerawatanTab' }}' }">
 
                     {{-- Tab Navigation --}}
                     <div class="px-2 mb-2 border-b border-gray-200 dark:border-gray-700">
                         <ul
                             class="flex flex-wrap -mb-px text-xs font-medium text-center text-gray-500 dark:text-gray-400">
                             @foreach (['pengkajianPerawatanTab', 'keluhanUtamaTab', 'riwayatPenyakitSekarangUmumTab', 'riwayatPenyakitDahuluTab', 'statusPsikologisTab', 'batukTab'] as $tab)
-                                @if (isset($dataDaftarUgd['anamnesa'][$tab]))
-                                    <li class="mr-2">
-                                        <button
-                                            class="inline-block p-2 transition-colors duration-200 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
-                                            :class="activeTab === '{{ $dataDaftarUgd['anamnesa'][$tab] }}' ?
-                                                'text-primary border-primary bg-gray-100' : ''"
-                                            @click="activeTab ='{{ $dataDaftarUgd['anamnesa'][$tab] }}'">
-                                            {{ $dataDaftarUgd['anamnesa'][$tab] }}
-                                        </button>
-                                    </li>
-                                @endif
+                                <li class="mr-2">
+                                    <button
+                                        class="inline-block p-2 transition-colors duration-200 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
+                                        :class="activeTab === '{{ $dataDaftarUgd['anamnesa'][$tab] ?? $tab }}' ?
+                                            'text-primary border-primary bg-gray-100' : ''"
+                                        @click="activeTab ='{{ $dataDaftarUgd['anamnesa'][$tab] ?? $tab }}'">
+                                        {{ $dataDaftarUgd['anamnesa'][$tab] ?? $tab }}
+                                    </button>
+                                </li>
                             @endforeach
                         </ul>
                     </div>
 
                     {{-- Tab Contents --}}
                     <div class="p-2 rounded-lg bg-gray-50"
-                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarUgd['anamnesa']['pengkajianPerawatanTab'] ?? 'Pengkajian Perawat' }}'">
+                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarUgd['anamnesa']['pengkajianPerawatanTab'] ?? 'pengkajianPerawatanTab' }}'">
                         @include('livewire.emr-u-g-d.mr-u-g-d.anamnesa.pengkajianPerawatanTab')
                     </div>
 
                     <div class="p-2 rounded-lg bg-gray-50"
-                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarUgd['anamnesa']['keluhanUtamaTab'] ?? 'Keluhan Utama' }}'">
+                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarUgd['anamnesa']['keluhanUtamaTab'] ?? 'keluhanUtamaTab' }}'">
                         @include('livewire.emr-u-g-d.mr-u-g-d.anamnesa.keluhanUtamaTab')
                     </div>
 
                     <div class="p-2 rounded-lg bg-gray-50"
-                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarUgd['anamnesa']['riwayatPenyakitSekarangUmumTab'] ?? 'Riwayat Penyakit Sekarang' }}'">
+                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarUgd['anamnesa']['riwayatPenyakitSekarangUmumTab'] ?? 'riwayatPenyakitSekarangUmumTab' }}'">
                         @include('livewire.emr-u-g-d.mr-u-g-d.anamnesa.riwayatPenyakitSekarangUmumTab')
                     </div>
 
                     <div class="p-2 rounded-lg bg-gray-50"
-                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarUgd['anamnesa']['riwayatPenyakitDahuluTab'] ?? 'Riwayat Penyakit Dahulu' }}'">
+                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarUgd['anamnesa']['riwayatPenyakitDahuluTab'] ?? 'riwayatPenyakitDahuluTab' }}'">
                         @include('livewire.emr-u-g-d.mr-u-g-d.anamnesa.riwayatPenyakitDahuluTab')
                     </div>
 
                     <div class="p-2 rounded-lg bg-gray-50"
-                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarUgd['anamnesa']['statusPsikologisTab'] ?? 'Status Psikologis' }}'">
+                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarUgd['anamnesa']['statusPsikologisTab'] ?? 'statusPsikologisTab' }}'">
                         @include('livewire.emr-u-g-d.mr-u-g-d.anamnesa.statusPsikologisTab')
                     </div>
 
                     <div class="p-2 rounded-lg bg-gray-50"
-                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarUgd['anamnesa']['batukTab'] ?? 'Batuk' }}'">
+                        x-show.transition.in.opacity.duration.600="activeTab === '{{ $dataDaftarUgd['anamnesa']['batukTab'] ?? 'batukTab' }}'">
                         @include('livewire.emr-u-g-d.mr-u-g-d.anamnesa.batukTab')
                     </div>
 

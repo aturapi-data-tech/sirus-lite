@@ -594,7 +594,9 @@ class Diagnosis extends Component
             $this->validate($this->rules, $messages);
         } catch (ValidationException $e) {
 
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Lakukan Pengecekan kembali Input Data.");
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError("Lakukan pengecekan kembali input data." . $e->getMessage());
+
             $this->validate($this->rules, $messages);
         }
     }

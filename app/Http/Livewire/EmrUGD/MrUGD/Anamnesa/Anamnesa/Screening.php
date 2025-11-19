@@ -148,9 +148,6 @@ class Screening extends Component
         // Set petugas dan tanggal otomatis
         $this->dataDaftarUgd['screening']['petugasPelayanan'] = $myUserNameActive;
         $this->dataDaftarUgd['screening']['tanggalPelayanan'] = now()->format('d/m/Y H:i:s');
-
-        // Simpan perubahan
-        $this->store();
     }
 
     public function autoSetTanggal(): void
