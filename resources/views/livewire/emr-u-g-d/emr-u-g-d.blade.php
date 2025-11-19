@@ -188,15 +188,74 @@
                     @foreach ($myQueryData as $myQData)
                         @php
                             $datadaftar_json = json_decode($myQData->datadaftarugd_json, true);
-                            $anamnesa = isset($datadaftar_json['anamnesa']) ? 1 : 0;
-                            $pemeriksaan = isset($datadaftar_json['pemeriksaan']) ? 1 : 0;
-                            $penilaian = isset($datadaftar_json['penilaian']) ? 1 : 0;
-                            $procedure = isset($datadaftar_json['procedure']) ? 1 : 0;
-                            $diagnosis = isset($datadaftar_json['diagnosis']) ? 1 : 0;
-                            $perencanaan = isset($datadaftar_json['perencanaan']) ? 1 : 0;
-                            $prosentaseEMR =
-                                (($anamnesa + $pemeriksaan + $penilaian + $procedure + $diagnosis + $perencanaan) / 6) *
-                                100;
+
+                            // 1. Keluhan Utama
+                            $keluhanUtama = filled($datadaftar_json['anamnesa']['keluhanUtama']['keluhanUtama'] ?? null)
+                                ? 1
+                                : 0;
+
+                            // 2. Tingkat Kegawatan
+                            $tingkatKegawatan = filled(
+                                $datadaftar_json['anamnesa']['pengkajianPerawatan']['tingkatKegawatan'] ?? null,
+                            )
+                                ? 1
+                                : 0;
+
+                            // 3. Keadaan Umum
+                            $keadaanUmum = filled($datadaftar_json['pemeriksaan']['tandaVital']['keadaanUmum'] ?? null)
+                                ? 1
+                                : 0;
+
+                            // 4. Tanda Vital (semua wajib isi)
+                            $tandaVitalAllFilled =
+                                filled($datadaftar_json['pemeriksaan']['tandaVital']['sistolik'] ?? null) &&
+                                filled($datadaftar_json['pemeriksaan']['tandaVital']['distolik'] ?? null) &&
+                                filled($datadaftar_json['pemeriksaan']['tandaVital']['frekuensiNafas'] ?? null) &&
+                                filled($datadaftar_json['pemeriksaan']['tandaVital']['frekuensiNadi'] ?? null) &&
+                                filled($datadaftar_json['pemeriksaan']['tandaVital']['suhu'] ?? null) &&
+                                filled($datadaftar_json['pemeriksaan']['tandaVital']['spo2'] ?? null);
+
+                            $tandaVital = $tandaVitalAllFilled ? 1 : 0;
+
+                            // 5. Pemeriksaan Fisik
+                            $pemeriksaanFisik = filled($datadaftar_json['pemeriksaan']['fisik'] ?? null) ? 1 : 0;
+
+                            // 6. Status Medik
+                            $statusMedik = filled($datadaftar_json['penilaian']['statusMedik']['statusMedik'] ?? null)
+                                ? 1
+                                : 0;
+
+                            // 7. Diagnosis Free Text
+                            $diagnosisFreeText = filled($datadaftar_json['diagnosisFreeText'] ?? null) ? 1 : 0;
+
+                            // 8. Procedure Free Text
+                            $procedureFreeText = filled($datadaftar_json['procedureFreeText'] ?? null) ? 1 : 0;
+
+                            // 9. Terapi
+                            $terapi = filled($datadaftar_json['perencanaan']['terapi']['terapi'] ?? null) ? 1 : 0;
+
+                            // 10. Dokter Pemeriksa
+                            $dokterPemeriksa = filled(
+                                $datadaftar_json['perencanaan']['pengkajianMedis']['drPemeriksa'] ?? null,
+                            )
+                                ? 1
+                                : 0;
+
+                            // Hitung prosentase
+                            $totalItem = 10;
+                            $terisi =
+                                $keluhanUtama +
+                                $tingkatKegawatan +
+                                $keadaanUmum +
+                                $tandaVital +
+                                $pemeriksaanFisik +
+                                $statusMedik +
+                                $diagnosisFreeText +
+                                $procedureFreeText +
+                                $terapi +
+                                $dokterPemeriksa;
+
+                            $prosentaseEMR = ($terisi / $totalItem) * 100;
 
                             $bgSelesaiPemeriksaan = isset(
                                 $datadaftar_json['perencanaan']['pengkajianMedis']['drPemeriksa'],
