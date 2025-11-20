@@ -9,13 +9,14 @@ use Illuminate\Validation\ValidationException;
 
 use Livewire\Component;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 use App\Http\Traits\EmrUGD\EmrUGDTrait;
-
+use App\Http\Traits\MasterPasien\MasterPasienTrait;
 
 class InformConsentPasienUGD extends Component
 {
-    use  EmrUGDTrait;
+    use  EmrUGDTrait, MasterPasienTrait;
 
 
     //////////////////////////////
@@ -240,6 +241,79 @@ class InformConsentPasienUGD extends Component
     }
 
 
+    public function cetakInformConsentPasienUgd(string $signatureDate)
+    {
+        // Pastikan data UGD terbaru
+        if (empty($this->dataDaftarUgd)) {
+            $this->findData($this->rjNoRef);
+        }
+
+        // Cek rjNo
+        $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
+        if (!$rjNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Data UGD (rjNo) tidak ditemukan.');
+            return;
+        }
+
+        // Cek regNo
+        $regNo = $this->dataDaftarUgd['regNo'] ?? $this->regNoRef ?? null;
+        if (!$regNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Nomor rekam medis tidak ditemukan.');
+            return;
+        }
+
+        // Ambil list consent dari data UGD
+        $listConsent = $this->dataDaftarUgd['informConsentPasienUGD'] ?? [];
+
+        if (!is_array($listConsent) || count($listConsent) === 0) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Data Inform Consent UGD belum tersedia.');
+            return;
+        }
+
+        // Cari consent berdasarkan signatureDate
+        $consent = collect($listConsent)->firstWhere('signatureDate', $signatureDate);
+
+        if (!$consent) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Data persetujuan yang dipilih tidak ditemukan.');
+            return;
+        }
+
+        try {
+            // Identitas RS
+            $identitasRs = DB::table('rsmst_identitases')
+                ->select('int_name', 'int_phone1', 'int_phone2', 'int_fax', 'int_address', 'int_city')
+                ->first();
+
+            // Data master pasien
+            $dataPasien = $this->findDataMasterPasien($regNo) ?? [];
+
+            $data = [
+                'identitasRs' => $identitasRs,
+                'dataPasien'  => $dataPasien,
+                'dataUgd'     => $this->dataDaftarUgd,
+                'consent'     => $consent,
+            ];
+
+            $pdfContent = Pdf::loadView(
+                'livewire.cetak.cetak-inform-consent-u-g-d-print',
+                $data
+            )->output();
+
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess('Berhasil mencetak Formulir Persetujuan / Penolakan Tindakan Medis.');
+
+            return response()->streamDownload(function () use ($pdfContent) {
+                echo $pdfContent;
+            }, 'inform-consent-ugd-' . $rjNo . '.pdf');
+        } catch (\Throwable $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Gagal mencetak PDF: ' . $e->getMessage());
+        }
+    }
 
 
     // when new form instance

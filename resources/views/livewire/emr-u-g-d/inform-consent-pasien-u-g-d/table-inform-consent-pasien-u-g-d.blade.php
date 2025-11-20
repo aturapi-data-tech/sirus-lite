@@ -20,8 +20,7 @@
         <tbody class="bg-white ">
             @isset($dataDaftarUgd['informConsentPasienUGD'])
                 @foreach ($dataDaftarUgd['informConsentPasienUGD'] as $myQData)
-                    <tr class="border-b group dark:border-gray-700"
-                        wire:click="setInformConsentPasienUGD({{ json_encode($myQData, true) }})">
+                    <tr class="border-b group dark:border-gray-700">
 
 
                         <td class="px-4 py-3 group-hover:bg-gray-100 whitespace-nowrap dark:text-white">
@@ -57,10 +56,19 @@
 
 
                         <td class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-primary">
-                            {{-- delete Modal --}}
-                            xxx
-
-
+                            <div class="grid w-full grid-cols-1 px-4 pb-4">
+                                <x-primary-button
+                                    wire:click.stop="cetakInformConsentPasienUgd('{{ $myQData['signatureDate'] }}')"
+                                    wire:loading.attr="disabled"
+                                    class="relative flex items-center justify-center gap-2 text-white">
+                                    <div wire:loading wire:target="cetakInformConsentPasienUgd">
+                                        <x-loading />
+                                    </div>
+                                    <span wire:loading.remove wire:target="cetakInformConsentPasienUgd">
+                                        Cetak Persetujuan Tindakan Medis
+                                    </span>
+                                </x-primary-button>
+                            </div>
                         </td>
                     </tr>
                 @endforeach
