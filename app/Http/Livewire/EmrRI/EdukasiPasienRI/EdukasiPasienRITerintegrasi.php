@@ -410,7 +410,8 @@ class EdukasiPasienRITerintegrasi extends Component
                 'edukasi'      => $dataEdukasi, // form ada di $edukasi['form']
             ];
 
-            $pdfContent = Pdf::loadView('livewire.cetak.cetak-edukasi-pasien-r-i-print', $data)->output();
+
+            $pdfContent = Pdf::loadView('livewire.cetak.cetak-edukasi-pasien-terintegrasi-r-i-print', $data)->output();
 
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addSuccess('Berhasil mencetak edukasi pasien.');
 

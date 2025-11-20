@@ -17,7 +17,7 @@
 
                     <!-- myTitle-->
                     <h3 class="w-full text-2xl font-semibold text-white ">
-                        {{ 'Form Persetujuan Pasien' }}
+                        {{ 'Form Pemberian Informasi dan Edukasi Pasien' }}
                     </h3>
 
                     {{-- rjDate & Shift Input Rj --}}

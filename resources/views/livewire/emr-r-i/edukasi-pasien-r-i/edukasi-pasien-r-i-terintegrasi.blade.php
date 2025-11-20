@@ -7,7 +7,7 @@
 
     <div class="w-full mb-1">
         <div class="w-full p-4 text-sm">
-            <h2 class="text-2xl font-bold text-center">Formulir Edukasi Pasien & Keluarga (RI)</h2>
+            <h2 class="text-2xl font-bold text-center">Formulir Edukasi Terintegrasi Pasien & Keluarga</h2>
             <br />
 
             <div class="w-full p-2 m-2 mx-auto bg-white rounded-lg shadow-md">
@@ -17,8 +17,8 @@
                    ========================= --}}
                 <div class="space-y-2">
                     {{-- =========================
-     HEADER: Waktu & Petugas
-   ========================= --}}
+                        HEADER: Waktu & Petugas
+                    ========================= --}}
                     <div class="space-y-3">
                         {{-- Tanggal Edukasi --}}
                         <div>
