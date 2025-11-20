@@ -237,4 +237,20 @@
     </div>
 
 
+    <div class="grid w-full grid-cols-1 px-4 pb-4">
+        <x-primary-button wire:click="cetakGeneralConsentPasienUgd()" wire:loading.attr="disabled"
+            class="relative flex items-center justify-center gap-2 text-white">
+            {{-- Saat loading tampil ikon spinner --}}
+            <div wire:loading wire:target="cetakGeneralConsentPasienUgd">
+                <x-loading />
+            </div>
+
+            {{-- Saat tidak loading tampil teks --}}
+            <span wire:loading.remove wire:target="cetakGeneralConsentPasienUgd">
+                Cetak Persetujuan Umum UGD
+            </span>
+        </x-primary-button>
+    </div>
+
+
 </div>

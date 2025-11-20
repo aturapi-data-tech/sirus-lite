@@ -8,13 +8,15 @@ use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 use App\Http\Traits\EmrUGD\EmrUGDTrait;
+use App\Http\Traits\MasterPasien\MasterPasienTrait;
 
 
 class GeneralConsentPasienUGD extends Component
 {
-    use  EmrUGDTrait;
+    use  EmrUGDTrait, MasterPasienTrait;
 
 
     //////////////////////////////
@@ -155,6 +157,73 @@ class GeneralConsentPasienUGD extends Component
         } else {
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
                 ->addError("Signature Petugas Pemeriksa sudah ada.");
+        }
+    }
+
+
+    public function cetakGeneralConsentPasienUgd()
+    {
+        // Pastikan data UGD terbaru
+        if (empty($this->dataDaftarUgd)) {
+            $this->findData($this->rjNoRef);
+        }
+
+        // Cek rjNo
+        $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
+        if (!$rjNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Data UGD (rjNo) tidak ditemukan.');
+            return;
+        }
+
+        // Ambil regNo untuk data pasien
+        $regNo = $this->dataDaftarUgd['regNo'] ?? $this->regNoRef ?? null;
+        if (!$regNo) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Nomor rekam medis tidak ditemukan.');
+            return;
+        }
+
+        // Ambil blok general consent
+        $consent = $this->dataDaftarUgd['generalConsentPasienUGD'] ?? null;
+        if (!$consent || !is_array($consent)) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Data General Consent UGD belum tersedia.');
+            return;
+        }
+
+        try {
+            // Identitas RS
+            $identitasRs = DB::table('rsmst_identitases')
+                ->select('int_name', 'int_phone1', 'int_phone2', 'int_fax', 'int_address', 'int_city')
+                ->first();
+
+            // Data master pasien (dari trait EmrUGDTrait)
+            $dataPasien = $this->findDataMasterPasien($regNo) ?? [];
+
+            // Data yang dikirim ke view cetak
+            $data = [
+                'identitasRs' => $identitasRs,
+                'dataPasien'  => $dataPasien,
+                'dataUgd'     => $this->dataDaftarUgd,
+                'consent'     => $consent,
+            ];
+
+            $pdfContent = Pdf::loadView(
+                'livewire.cetak.cetak-general-consent-u-g-d-print',
+                $data
+            )->output();
+
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess('Berhasil mencetak Formulir Persetujuan Umum UGD.');
+
+            return response()->streamDownload(
+                fn() => print($pdfContent),
+                'general-consent-ugd-' . $rjNo . '.pdf'
+            );
+        } catch (\Throwable $e) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Gagal mencetak PDF: ' . $e->getMessage());
         }
     }
 
