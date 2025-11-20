@@ -157,6 +157,24 @@ class EresepRJ extends Component
     public function setMydataProductLov($id)
     {
         $this->checkRjStatus();
+        if (!isset($this->dataProductLov) || !is_array($this->dataProductLov)) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Daftar produk tidak valid.');
+            return;
+        }
+
+        if (!isset($this->dataProductLov[$id])) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Produk tidak ditemukan (ID tidak valid).');
+            return;
+        }
+
+        if (empty($this->dataProductLov[$id]['product_id'])) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('product_id tidak ditemukan.');
+            return;
+        }
+
         $dataProductLovs = DB::table('immst_products')
             ->select(
                 'product_id',
