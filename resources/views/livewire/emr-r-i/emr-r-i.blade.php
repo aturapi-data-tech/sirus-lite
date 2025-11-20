@@ -130,10 +130,6 @@
                 @include('livewire.emr-r-i.create-edukasi-r-i-pasien')
             @endif
 
-            @if ($isOpenCaseManagerRI)
-                @include('livewire.emr-r-i.create-case-manager-r-i-pasien')
-            @endif
-
 
 
 
@@ -429,12 +425,6 @@
                                                         {{ __('Form Edukasi Pasien') }}
                                                     </x-dropdown-link>
                                                 </li>
-                                                <li>
-                                                    <x-dropdown-link
-                                                        wire:click="editCaseManagerRI('{{ $myQData->rihdr_no }}','{{ $myQData->reg_no }}')">
-                                                        {{ __('Case Manager') }}
-                                                    </x-dropdown-link>
-                                                </li>
                                             @endrole
                                             @role('Mr')
                                                 <li>
@@ -469,12 +459,6 @@
                                                     <x-dropdown-link
                                                         wire:click="editEdukasiPasienRI('{{ $myQData->rihdr_no }}','{{ $myQData->reg_no }}')">
                                                         {{ __('Form Edukasi Pasien') }}
-                                                    </x-dropdown-link>
-                                                </li>
-                                                <li>
-                                                    <x-dropdown-link
-                                                        wire:click="editCaseManagerRI('{{ $myQData->rihdr_no }}','{{ $myQData->reg_no }}')">
-                                                        {{ __('Case Manager') }}
                                                     </x-dropdown-link>
                                                 </li>
                                             @endrole

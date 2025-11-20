@@ -79,12 +79,12 @@
                             ['key' => 'dasar', 'label' => 'Dasar Diagnosis'],
                             ['key' => 'rencana', 'label' => 'Rencana Pengobatan / Tindakan'],
                             ['key' => 'indikasi', 'label' => 'Indikasi Pengobatan / Tindakan'],
-                            ['key' => 'tindakan', 'label' => 'Tindakan Kedokteran'],
                             ['key' => 'tujuan', 'label' => 'Tujuan'],
                             ['key' => 'risiko', 'label' => 'Risiko'],
                             ['key' => 'komplikasi', 'label' => 'Komplikasi'],
                             ['key' => 'prognosis', 'label' => 'Prognosis'],
                             ['key' => 'alternatif', 'label' => 'Alternatif & Risiko'],
+                            ['key' => 'tanpaTindakan', 'label' => 'Kemungkinan Tanpa Pengobatan / Tindakan'],
                         ];
                     @endphp
 

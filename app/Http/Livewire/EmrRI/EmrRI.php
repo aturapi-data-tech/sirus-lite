@@ -123,8 +123,7 @@ class EmrRI extends Component
     public bool $isOpenGeneralConsentPasienRI = false;
     public string $isOpenModeGeneralConsentPasienRI = 'insert';
 
-    public bool $isOpenCaseManagerRI = false;
-    public string $isOpenModeCaseManagerRI = 'insert';
+
 
     public bool $isOpenEdukasiPasienRI = false;
     public string $isOpenModeEdukasiPasienRI = 'insert';
@@ -167,13 +166,7 @@ class EmrRI extends Component
         $this->regNoRef = $regNoRef;
     }
 
-    private function openModalEditCaseManagerRI($riHdrNo, $regNoRef): void
-    {
-        $this->isOpenCaseManagerRI = true;
-        $this->isOpenModeCaseManagerRI = 'update';
-        $this->riHdrNoRef = $riHdrNo;
-        $this->regNoRef = $regNoRef;
-    }
+
 
     private function openModalEditEdukasiPasienRI($riHdrNo, $regNoRef): void
     {
@@ -226,12 +219,6 @@ class EmrRI extends Component
         $this->resetInputFields();
     }
 
-    public function closeModalCaseManagerRI(): void
-    {
-        $this->isOpenCaseManagerRI = false;
-        $this->isOpenModeCaseManagerRI = 'insert';
-        $this->resetInputFields();
-    }
 
     public function closeModalEdukasiPasienRI(): void
     {
@@ -282,12 +269,6 @@ class EmrRI extends Component
     public function editGeneralConsentPasienRI($riHdrNo, $regNoRef)
     {
         $this->openModalEditGeneralConsentPasienRI($riHdrNo, $regNoRef);
-        // $this->findData($id);
-    }
-
-    public function editCaseManagerRI($riHdrNo, $regNoRef)
-    {
-        $this->openModalEditCaseManagerRI($riHdrNo, $regNoRef);
         // $this->findData($id);
     }
 
@@ -430,12 +411,7 @@ class EmrRI extends Component
         ]
     ];
 
-    public array $EmrMenuCaseManagerRI = [
-        [
-            'ermMenuId' => 'caseManagerRI',
-            'ermMenuName' => 'Case Manager'
-        ]
-    ];
+
 
     public array $EmrMenuEdukasiPasienRI = [
         [

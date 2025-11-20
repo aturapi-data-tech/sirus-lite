@@ -76,12 +76,12 @@ class EdukasiPasienRI extends Component
             "dasar"      => ["desc" => ""],  // Dasar diagnosis
             "rencana" => ["desc" => ""],  // Rencana pengobatan
             "indikasi" => ["desc" => ""], // Indikasi tindakan
-            "tindakan"   => ["desc" => ""],  // Jenis tindakan
             "tujuan"     => ["desc" => ""],  // Tujuan tindakan
             "risiko"     => ["desc" => ""],  // Risiko tindakan
             "komplikasi" => ["desc" => ""],  // Komplikasi yang mungkin
             "prognosis"  => ["desc" => ""],  // Prognosis / hasil akhir
             "alternatif" => ["desc" => ""],  // Alternatif lain & risikonya
+            "tanpaTindakan"   => ["desc" => ""],  // Tanpa tindakan
         ],
     ];
 
@@ -114,7 +114,7 @@ class EdukasiPasienRI extends Component
         'formEntryEdukasiPasien.detailInformasi.dasar.desc'                   => 'nullable|string|max:1000',
         'formEntryEdukasiPasien.detailInformasi.rencana.desc'                 => 'nullable|string|max:1000',
         'formEntryEdukasiPasien.detailInformasi.indikasi.desc'                => 'nullable|string|max:1000',
-        'formEntryEdukasiPasien.detailInformasi.tindakan.desc'                => 'nullable|string|max:1000',
+        'formEntryEdukasiPasien.detailInformasi.tanpaTindakan.desc'           => 'nullable|string|max:1000',
         'formEntryEdukasiPasien.detailInformasi.tujuan.desc'                  => 'nullable|string|max:1000',
         'formEntryEdukasiPasien.detailInformasi.risiko.desc'                  => 'nullable|string|max:1000',
         'formEntryEdukasiPasien.detailInformasi.komplikasi.desc'              => 'nullable|string|max:1000',

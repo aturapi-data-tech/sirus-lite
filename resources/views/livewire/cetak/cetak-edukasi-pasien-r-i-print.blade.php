@@ -26,12 +26,12 @@
             'dasar' => 'Dasar Diagnosis',
             'rencana' => 'Rencana Pengobatan / Tindakan',
             'indikasi' => 'Indikasi Pengobatan / Tindakan',
-            'tindakan' => 'Tindakan Kedokteran',
             'tujuan' => 'Tujuan',
             'risiko' => 'Risiko',
             'komplikasi' => 'Komplikasi',
             'prognosis' => 'Prognosis',
             'alternatif' => 'Alternatif & Risiko',
+            'tanpaTindakan' => 'Kemungkinan Tanpa Pengobatan / Tindakan',
         ];
 
         $detail = (array) ($edukasi['detailInformasi'] ?? []);
@@ -199,8 +199,8 @@
                 @endphp
                 <div class="flex items-center justify-center mt-1 overflow-hidden bg-white border border-black h-14">
                     @if ($ttdPetugas)
-                        <img src="{{ $ttdPetugas }}" alt="TTD Petugas"
-                            class="block object-contain w-auto mx-auto max-h-12">
+                        {{-- <img src="{{ $ttdPetugas }}" alt="TTD Petugas"
+                            class="block object-contain w-auto mx-auto max-h-12"> --}}
                     @else
                         <span class="text-[9px] text-gray-600">TTD Petugas</span>
                     @endif
@@ -224,8 +224,8 @@
             {{-- kolom TTD pasien: lebar sama (w-60) --}}
             <td class="px-2 py-2 align-top border border-black w-60">
                 <div class="flex items-center justify-center w-full h-16 max-w-full bg-white border border-black">
-                    <img src="{{ $sigSrc }}" alt="TTD"
-                        class="block object-contain w-auto mx-auto max-h-16" />
+                    {{-- <img src="{{ $sigSrc }}" alt="TTD"
+                        class="block object-contain w-auto mx-auto max-h-16" /> --}}
                 </div>
 
                 <div class="mt-1 text-center text-[10px]">
