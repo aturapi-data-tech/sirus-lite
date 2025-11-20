@@ -124,7 +124,6 @@ class JasaMedisUGD extends Component
                             'userLog'        => auth()->user()->myuser_name ?? '',
                             'userLogDate'    => Carbon::now(config('app.timezone'))->format('d/m/Y H:i:s')
                         ];
-
                         // paket (pilih salah satu strategi):
                         // Strategi 1 (paling aman & simpel): panggil helper yang sudah ber-lock per insert
                         $this->paketLainLainJasaMedis($this->formEntryJasaMedis['jasaMedisId'], $rjNo, $nextPactDtl);
@@ -132,8 +131,8 @@ class JasaMedisUGD extends Component
 
                         // fresh-merge JSON khusus subtree yang diubah
                         $fresh = $this->findDataUGD($rjNo) ?: [];
-                        $fresh['JasaMedis'] = array_values($this->dataDaftarUgd['JasaMedis'] ?? ($fresh['JasaMedis'] ?? []));
-                        $fresh['LainLain']  = array_values($this->dataDaftarUgd['LainLain']  ?? ($fresh['LainLain']  ?? []));
+                        $fresh['JasaMedis'] = array_values($this->dataDaftarUgd['JasaMedis'] ?? []);
+                        $fresh['LainLain']  = array_values($this->dataDaftarUgd['LainLain'] ?? []);
                         $this->updateJsonUGD($rjNo, $fresh);
                         $this->emit('ugd:refresh-summary');
                         $this->dataDaftarUgd = $fresh;
@@ -176,8 +175,8 @@ class JasaMedisUGD extends Component
 
                     // fresh-merge JSON + commit
                     $fresh = $this->findDataUGD($rjNo) ?: [];
-                    $fresh['JasaMedis'] = array_values($this->dataDaftarUgd['JasaMedis']);
-                    $fresh['LainLain']  = array_values($this->dataDaftarUgd['LainLain']);
+                    $fresh['JasaMedis'] = array_values($this->dataDaftarUgd['JasaMedis'] ?? []);
+                    $fresh['LainLain']  = array_values($this->dataDaftarUgd['LainLain'] ?? []);
                     $this->updateJsonUGD($rjNo, $fresh);
                     $this->emit('ugd:refresh-summary');
                     $this->dataDaftarUgd = $fresh;
@@ -238,44 +237,37 @@ class JasaMedisUGD extends Component
         $validator = Validator::make($payload, $rules, $messages);
         if ($validator->fails() || !$this->checkUgdStatus($this->rjNoRef)) return;
 
-        $lockRj = "ugd:{$rjNo}";
         $lockOthers = "ugdothers:counter";
 
         try {
-            Cache::lock($lockRj, 5)->block(3, function () use ($payload, $lockOthers) {
-                Cache::lock($lockOthers, 5)->block(3, function () use ($payload) {
-                    DB::transaction(function () use ($payload) {
-                        $nextDtl = (int) DB::table('rstxn_ugdothers')
-                            ->max(DB::raw('nvl(to_number(rjo_dtl),0)')) + 1;
+            Cache::lock($lockOthers, 5)->block(3, function () use ($payload) {
+                DB::transaction(function () use ($payload) {
+                    $nextDtl = (int) DB::table('rstxn_ugdothers')
+                        ->max(DB::raw('nvl(to_number(rjo_dtl),0)')) + 1;
+                    DB::table('rstxn_ugdothers')->insert([
+                        'rjo_dtl'     => $nextDtl,
+                        'pact_dtl'    => $payload['pactDtl'],
+                        'rj_no'       => $payload['rjNo'],
+                        'other_id'    => $payload['LainLainId'],
+                        'other_price' => $payload['LainLainPrice'],
+                    ]);
 
-                        DB::table('rstxn_ugdothers')->insert([
-                            'rjo_dtl'     => $nextDtl,
-                            'pact_dtl'    => $payload['pactDtl'],
-                            'rj_no'       => $payload['rjNo'],
-                            'other_id'    => $payload['LainLainId'],
-                            'other_price' => $payload['LainLainPrice'],
-                        ]);
+                    $this->dataDaftarUgd['LainLain'][] = [
+                        'LainLainId'    => $payload['LainLainId'],
+                        'LainLainDesc'  => $payload['LainLainDesc'],
+                        'LainLainPrice' => $payload['LainLainPrice'],
+                        'rjotherDtl'    => $nextDtl,
+                        'rjNo'          => $payload['rjNo'],
+                        'pact_dtl'      => $payload['pactDtl'],
+                    ];
 
-                        $this->dataDaftarUgd['LainLain'][] = [
-                            'LainLainId'    => $payload['LainLainId'],
-                            'LainLainDesc'  => $payload['LainLainDesc'],
-                            'LainLainPrice' => $payload['LainLainPrice'],
-                            'rjotherDtl'    => $nextDtl,
-                            'rjNo'          => $payload['rjNo'],
-                            'pact_dtl'      => $payload['pactDtl'],
-                        ];
-
-                        $fresh = $this->findDataUGD($payload['rjNo']) ?: [];
-                        $fresh['LainLain'] = array_values($this->dataDaftarUgd['LainLain'] ?? ($fresh['LainLain'] ?? []));
-                        $this->updateJsonUGD($payload['rjNo'], $fresh);
-
-
-                        $this->dataDaftarUgd = $fresh;
-                    });
+                    $fresh = $this->findDataUGD($payload['rjNo']) ?: [];
+                    $fresh['LainLain'] = array_values($this->dataDaftarUgd['LainLain'] ?? ($fresh['LainLain'] ?? []));
+                    $this->updateJsonUGD($payload['rjNo'], $fresh);
                 });
             });
         } catch (\Throwable $e) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Gagal menambah Lain-lain.');
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Gagal menambah Lain-lain.' . $e->getMessage());
             return;
         }
     }
@@ -315,7 +307,6 @@ class JasaMedisUGD extends Component
                     $fresh = $this->findDataUGD($rjNo) ?: [];
                     $fresh['LainLain'] = array_values($this->dataDaftarUgd['LainLain']);
                     $this->updateJsonUGD($rjNo, $fresh);
-
 
                     $this->dataDaftarUgd = $fresh;
                 });
@@ -380,35 +371,32 @@ class JasaMedisUGD extends Component
         $validator = Validator::make($payload, $rules, $messages);
         if ($validator->fails() || !$this->checkUgdStatus($this->rjNoRef)) return;
 
-        $lockRj = "ugd:{$rjNo}";
         $lockDrug = "ugdobats:counter";
 
         try {
-            Cache::lock($lockRj, 5)->block(3, function () use ($payload, $lockDrug) {
-                Cache::lock($lockDrug, 5)->block(3, function () use ($payload) {
-                    DB::transaction(function () use ($payload) {
-                        $nextDtl = (int) DB::table('rstxn_ugdobats')
-                            ->max(DB::raw('nvl(to_number(rjobat_dtl),0)')) + 1;
+            Cache::lock($lockDrug, 5)->block(3, function () use ($payload) {
+                DB::transaction(function () use ($payload) {
+                    $nextDtl = (int) DB::table('rstxn_ugdobats')
+                        ->max(DB::raw('nvl(to_number(rjobat_dtl),0)')) + 1;
 
-                        DB::table('rstxn_ugdobats')->insert([
-                            'rjobat_dtl'     => $nextDtl,
-                            'pact_dtl'       => $payload['pactDtl'],
-                            'rj_no'          => $payload['rjNo'],
-                            'product_id'     => $payload['productId'],
-                            'qty'            => $payload['qty'],
-                            'price'          => $payload['productPrice'],
-                            'rj_carapakai'   => $payload['signaX'],
-                            'rj_kapsul'      => $payload['signaHari'],
-                            'rj_takar'       => 'Tablet',
-                            'catatan_khusus' => $payload['catatanKhusus'],
-                            'exp_date'       => DB::raw("to_date('" . ($this->dataDaftarUgd['rjDate'] ?? date('d/m/Y H:i:s')) . "','dd/mm/yyyy hh24:mi:ss')+30"),
-                            'etiket_status'  => 0,
-                        ]);
-                    });
+                    DB::table('rstxn_ugdobats')->insert([
+                        'rjobat_dtl'     => $nextDtl,
+                        'pact_dtl'       => $payload['pactDtl'],
+                        'rj_no'          => $payload['rjNo'],
+                        'product_id'     => $payload['productId'],
+                        'qty'            => $payload['qty'],
+                        'price'          => $payload['productPrice'],
+                        'ugd_carapakai'   => $payload['signaX'],
+                        'ugd_kapsul'      => $payload['signaHari'],
+                        'ugd_takar'       => 'Tablet',
+                        'catatan_khusus' => $payload['catatanKhusus'],
+                        'exp_date'       => DB::raw("to_date('" . ($this->dataDaftarUgd['rjDate'] ?? date('d/m/Y H:i:s')) . "','dd/mm/yyyy hh24:mi:ss')+30"),
+                        'etiket_status'  => 0,
+                    ]);
                 });
             });
         } catch (\Throwable $e) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Gagal menambah Obat.');
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError('Gagal menambah Obat.' . $e->getMessage());
             return;
         }
     }
