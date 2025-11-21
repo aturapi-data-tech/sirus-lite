@@ -24,7 +24,9 @@ class JasaDokterUGD extends Component
 {
     use WithPagination, EmrUGDTrait, LOVDokterTrait, LOVJasaDokterTrait;
 
-
+    protected $listeners = [
+        'ugd:refresh-data-admin' => 'mount'
+    ];
 
 
 
@@ -193,6 +195,7 @@ class JasaDokterUGD extends Component
 
                         $this->updateJsonUGD($rjNo, $fresh);
                         $this->emit('ugd:refresh-summary');
+                        $this->emit('ugd:refresh-data-admin');
                         $this->dataDaftarUgd = $fresh;
                     });
                 });
@@ -263,6 +266,7 @@ class JasaDokterUGD extends Component
 
                     $this->updateJsonUGD($rjNo, $fresh);
                     $this->emit('ugd:refresh-summary');
+                    $this->emit('ugd:refresh-data-admin');
                     $this->dataDaftarUgd = $fresh; // keep UI in sync
                 });
             });

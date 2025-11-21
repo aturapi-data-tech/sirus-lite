@@ -14,7 +14,9 @@ class ObatUGD extends Component
 
 
     // listener from blade////////////////
-    protected $listeners = [];
+    protected $listeners = [
+        'ugd:refresh-data-admin' => 'mount'
+    ];
 
 
     //////////////////////////////z

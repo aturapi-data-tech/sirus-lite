@@ -19,7 +19,9 @@ class LainLainUGD extends Component
 {
     use WithPagination, EmrUGDTrait;
 
-
+    protected $listeners = [
+        'ugd:refresh-data-admin' => 'mount'
+    ];
 
 
     //////////////////////////////
@@ -271,6 +273,7 @@ class LainLainUGD extends Component
                         $fresh['LainLain'] = array_values($this->dataDaftarUgd['LainLain'] ?? ($fresh['LainLain'] ?? []));
                         $this->updateJsonUGD($rjNo, $fresh);
                         $this->emit('ugd:refresh-summary');
+                        $this->emit('ugd:refresh-data-admin');
 
                         $this->dataDaftarUgd = $fresh;
                     });
@@ -309,6 +312,7 @@ class LainLainUGD extends Component
                     $fresh['LainLain'] = array_values($this->dataDaftarUgd['LainLain']);
                     $this->updateJsonUGD($rjNo, $fresh);
                     $this->emit('ugd:refresh-summary');
+                    $this->emit('ugd:refresh-data-admin');
                     $this->dataDaftarUgd = $fresh;
                 });
             });

@@ -22,9 +22,9 @@ class JasaMedisUGD extends Component
 {
     use WithPagination, EmrUGDTrait, LOVJasaMedisTrait;
 
-
-
-
+    protected $listeners = [
+        'ugd:refresh-data-admin' => 'mount'
+    ];
 
     //////////////////////////////z
     // Ref on top bar
@@ -135,6 +135,7 @@ class JasaMedisUGD extends Component
                         $fresh['LainLain']  = array_values($this->dataDaftarUgd['LainLain'] ?? []);
                         $this->updateJsonUGD($rjNo, $fresh);
                         $this->emit('ugd:refresh-summary');
+                        $this->emit('ugd:refresh-data-admin');
                         $this->dataDaftarUgd = $fresh;
                     });
                 });
@@ -179,6 +180,7 @@ class JasaMedisUGD extends Component
                     $fresh['LainLain']  = array_values($this->dataDaftarUgd['LainLain'] ?? []);
                     $this->updateJsonUGD($rjNo, $fresh);
                     $this->emit('ugd:refresh-summary');
+                    $this->emit('ugd:refresh-data-admin');
                     $this->dataDaftarUgd = $fresh;
                 });
             });
