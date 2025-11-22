@@ -96,7 +96,6 @@
                                 @enderror
                             </div>
 
-                            {{-- 1 --}}
                         </div>
 
                         {{-- ADVOKASI & KOLABORASI (STRING) --}}
