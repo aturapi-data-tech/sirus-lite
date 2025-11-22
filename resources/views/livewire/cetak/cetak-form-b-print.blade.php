@@ -17,10 +17,12 @@
 <body class="text-xs">
 
     @php
+        use Illuminate\Support\Str;
+
         $pasien = (array) ($dataPasien['pasien'] ?? []);
         $rm = (string) ($pasien['regNo'] ?? '');
         $nama = (string) ($pasien['regName'] ?? '');
-        $formB = $dataFormB;
+        $formB = $dataFormB ?? [];
 
         // Cari Form A yang terkait
         $formA = collect($dataDaftarRi['formMPP']['formA'] ?? [])->firstWhere('formA_id', $formB['formA_id'] ?? '');
@@ -116,8 +118,8 @@
     <table class="w-full mt-4">
         <tr>
             <td class="text-center">
-                <h1 class="text-lg font-bold">FORM B - PELAKSANAAN, MONITORING, ADVOKASI, TERMINASI</h1>
-                <p class="text-sm">Case Manager Rawat Inap</p>
+                <h1 class="text-lg font-bold">FORM B - PELAKSANAAN KEGIATAN</h1>
+                <p class="text-sm">Hasil Pelayanan, Monitoring, Koordinasi, Komunikasi, Advokasi dan Terminasi</p>
             </td>
         </tr>
     </table>
@@ -131,8 +133,12 @@
         <tr>
             <th class="px-2 py-1 text-left bg-gray-100 border border-black">Referensi Form A</th>
             <td class="px-2 py-1 border border-black">
-                {{ $formA['tanggal'] ?? '-' }} -
-                {{ Str::limit($formA['perencanaanAwal']['tujuanPendampingan'] ?? '', 50) }}
+                @if ($formA)
+                    {{-- {{ $formA['tanggal'] ?? '-' }} - --}}
+                    {{ Str::limit($formA['indentifikasiKasus'] ?? ($formA['assessment'] ?? ''), 70) }}
+                @else
+                    -
+                @endif
             </td>
         </tr>
     </table>
@@ -144,56 +150,24 @@
                 <th class="px-2 py-1 text-left bg-gray-100 border border-black">Pelaksanaan dan Monitoring</th>
             </tr>
             <tr>
-                <td class="px-2 py-1 border border-black">{{ $formB['pelaksanaanMonitoring'] }}</td>
+                <td class="px-2 py-1 border border-black">
+                    {{ $formB['pelaksanaanMonitoring'] }}
+                </td>
             </tr>
         </table>
     @endif
 
-    {{-- ===== ADVOKASI & KOLABORASI ===== --}}
-    @if (
-        !empty($formB['advokasiKolaborasi']['hambatanPasien']) ||
-            !empty($formB['advokasiKolaborasi']['kolaborasiDengan']) ||
-            !empty($formB['advokasiKolaborasi']['advokasiDilakukan']) ||
-            !empty($formB['advokasiKolaborasi']['eskalasi']))
+    {{-- ===== ADVOKASI dan KOLABORASI (STRING) ===== --}}
+    @if (!empty($formB['advokasiKolaborasi']))
         <table class="w-full mt-2 border border-collapse border-black">
             <tr>
-                <th colspan="2" class="px-2 py-1 text-center bg-gray-100 border border-black">ADVOKASI & KOLABORASI
-                </th>
+                <th class="px-2 py-1 text-left bg-gray-100 border border-black">Advokasi dan Kolaborasi</th>
             </tr>
-
-            {{-- Hambatan Pasien --}}
-            @if (!empty($formB['advokasiKolaborasi']['hambatanPasien']))
-                <tr>
-                    <th class="w-[180px] px-2 py-1 text-left border border-black bg-gray-100">Hambatan Pasien</th>
-                    <td class="px-2 py-1 border border-black">{{ $formB['advokasiKolaborasi']['hambatanPasien'] }}</td>
-                </tr>
-            @endif
-
-            {{-- Kolaborasi Dengan --}}
-            @if (!empty($formB['advokasiKolaborasi']['kolaborasiDengan']))
-                <tr>
-                    <th class="px-2 py-1 text-left bg-gray-100 border border-black">Kolaborasi Dengan</th>
-                    <td class="px-2 py-1 border border-black">{{ $formB['advokasiKolaborasi']['kolaborasiDengan'] }}
-                    </td>
-                </tr>
-            @endif
-
-            {{-- Advokasi Dilakukan --}}
-            @if (!empty($formB['advokasiKolaborasi']['advokasiDilakukan']))
-                <tr>
-                    <th class="px-2 py-1 text-left bg-gray-100 border border-black">Advokasi Dilakukan</th>
-                    <td class="px-2 py-1 border border-black">{{ $formB['advokasiKolaborasi']['advokasiDilakukan'] }}
-                    </td>
-                </tr>
-            @endif
-
-            {{-- Eskalasi --}}
-            @if (!empty($formB['advokasiKolaborasi']['eskalasi']))
-                <tr>
-                    <th class="px-2 py-1 text-left bg-gray-100 border border-black">Eskalasi</th>
-                    <td class="px-2 py-1 border border-black">{{ $formB['advokasiKolaborasi']['eskalasi'] }}</td>
-                </tr>
-            @endif
+            <tr>
+                <td class="px-2 py-1 border border-black">
+                    {{ $formB['advokasiKolaborasi'] }}
+                </td>
+            </tr>
         </table>
     @endif
 
@@ -204,60 +178,55 @@
                 <th class="px-2 py-1 text-left bg-gray-100 border border-black">Ringkasan Terminasi</th>
             </tr>
             <tr>
-                <td class="px-2 py-1 border border-black">{{ $formB['terminasi'] }}</td>
+                <td class="px-2 py-1 border border-black">
+                    {{ $formB['terminasi'] }}
+                </td>
             </tr>
         </table>
     @endif
 
-    {{-- ===== TANDA TANGAN PETUGAS ===== --}}
-    <table class="w-full mt-4 border border-collapse border-black">
-        <tr>
-            <th colspan="2" class="px-2 py-1 text-center bg-gray-100 border border-black">TANDA TANGAN PETUGAS</th>
-        </tr>
-        <tr>
-            <th class="w-[180px] px-2 py-1 text-left border border-black bg-gray-100">Nama Petugas</th>
-            <td class="px-2 py-1 border border-black">{{ $formB['tandaTanganPetugas']['petugasName'] ?? '-' }}</td>
-        </tr>
-        <tr>
-            <th class="px-2 py-1 text-left bg-gray-100 border border-black">Kode Petugas</th>
-            <td class="px-2 py-1 border border-black">{{ $formB['tandaTanganPetugas']['petugasCode'] ?? '-' }}</td>
-        </tr>
-        <tr>
-            <th class="px-2 py-1 text-left bg-gray-100 border border-black">Jabatan</th>
-            <td class="px-2 py-1 border border-black">{{ $formB['tandaTanganPetugas']['jabatan'] ?? 'MPP' }}</td>
-        </tr>
-    </table>
 
-    {{-- ===== TTD PETUGAS ===== --}}
+    {{-- ===== TTD PETUGAS (GAMBAR) ===== --}}
     <table class="w-full mt-8">
         <tr>
-            <td class="text-center w-60">
-                <div class="text-right text-[9px] text-gray-600">Tanggal: {{ $formB['tanggal'] ?? '-' }}</div>
+            <td class="pr-8 text-right">
 
-                {{-- kotak TTD --}}
-                @php
-                    $petugasCode = $formB['tandaTanganPetugas']['petugasCode'] ?? '';
-                    $user = $petugasCode ? App\Models\User::where('myuser_code', $petugasCode)->first() : null;
-                    $ttdPetugas = $user && $user->myuser_ttd_image ? asset('storage/' . $user->myuser_ttd_image) : null;
-                @endphp
-                <div class="flex items-center justify-center h-20 mt-4 overflow-hidden bg-white border border-black">
-                    @if ($ttdPetugas)
-                        <img src="{{ $ttdPetugas }}" alt="TTD Petugas"
-                            class="block object-contain w-auto mx-auto max-h-16">
-                    @else
-                        <span class="text-[10px] text-gray-600">TTD Petugas</span>
-                    @endif
+                <div class="inline-block text-center">
+
+                    <div class="mb-1 text-[9px] text-gray-600">
+                        Tanggal: {{ $formB['tanggal'] ?? '-' }}
+                    </div>
+
+                    @php
+                        $petugasCode = $formB['tandaTanganPetugas']['petugasCode'] ?? '';
+                        $user = $petugasCode ? App\Models\User::where('myuser_code', $petugasCode)->first() : null;
+                        $ttdPetugas =
+                            $user && $user->myuser_ttd_image ? asset('storage/' . $user->myuser_ttd_image) : null;
+                    @endphp
+
+                    {{-- Kotak TTD --}}
+                    <div
+                        class="flex items-center justify-center w-40 h-20 mx-auto overflow-hidden bg-white border border-black">
+                        @if ($ttdPetugas)
+                            <img src="{{ $ttdPetugas }}" alt="TTD Petugas"
+                                class="block object-contain w-auto max-h-16">
+                        @else
+                            <span class="text-[10px] text-gray-600">TTD Petugas</span>
+                        @endif
+                    </div>
+
+                    {{-- Nama Petugas --}}
+                    <div class="w-40 pt-1 mx-auto mt-2 text-center border-t border-black text-[11px]">
+                        ( {{ $formB['tandaTanganPetugas']['petugasName'] ?? '................................' }} )
+                        <div class="text-[10px] text-gray-600">Petugas MPP</div>
+                    </div>
+
                 </div>
 
-                <div class="mt-2 text-center text-[11px] border-t border-black pt-1">
-                    ( {{ $formB['tandaTanganPetugas']['petugasName'] ?? '................................' }} )
-                    <div class="text-[10px] text-gray-600">Petugas MPP</div>
-                </div>
             </td>
         </tr>
     </table>
 
 </body>
-
 
 </html>

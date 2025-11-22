@@ -17,7 +17,7 @@
 
                     <!-- myTitle-->
                     <h3 class="w-full text-2xl font-semibold text-white ">
-                        {{ $myTitle }}
+                        {{ 'From Transfer UGD ke Ruangan' }}
                     </h3>
 
                     {{-- Close Modal --}}

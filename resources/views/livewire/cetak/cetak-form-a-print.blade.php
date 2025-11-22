@@ -20,7 +20,7 @@
         $pasien = (array) ($dataPasien['pasien'] ?? []);
         $rm = (string) ($pasien['regNo'] ?? '');
         $nama = (string) ($pasien['regName'] ?? '');
-        $formA = $dataFormA;
+        $formA = $dataFormA ?? [];
     @endphp
 
     {{-- ===== HEADER ===== --}}
@@ -114,7 +114,7 @@
         <tr>
             <td class="text-center">
                 <h1 class="text-lg font-bold">FORM A - SKRINING AWAL MPP</h1>
-                <p class="text-sm">Case Manager Rawat Inap</p>
+                <p class="text-sm">Catatan Implementasi Manager Pelayanan Pasien</p>
             </td>
         </tr>
     </table>
@@ -127,110 +127,93 @@
         </tr>
     </table>
 
-    {{-- ===== MASALAH POTENSIAL ===== --}}
-    @if (!empty($formA['masalahPotensial']))
+    {{-- ===== IDENTIFIKASI KASUS ===== --}}
+    @if (!empty($formA['indentifikasiKasus']))
         <table class="w-full mt-2 border border-collapse border-black">
             <tr>
-                <th class="px-2 py-1 text-left bg-gray-100 border border-black">Masalah Potensial</th>
+                <th class="px-2 py-1 text-left bg-gray-100 border border-black">Identifikasi Kasus</th>
             </tr>
             <tr>
-                <td class="px-2 py-1 border border-black">{{ $formA['masalahPotensial'] }}</td>
+                <td class="px-2 py-1 border border-black">
+                    {{ $formA['indentifikasiKasus'] }}
+                </td>
             </tr>
         </table>
     @endif
 
-    {{-- ===== PERENCANAAN AWAL ===== --}}
-    <table class="w-full mt-2 border border-collapse border-black">
-        <tr>
-            <th colspan="2" class="px-2 py-1 text-center bg-gray-100 border border-black">PERENCANAAN AWAL</th>
-        </tr>
-
-        {{-- Tujuan Pendampingan --}}
-        <tr>
-            <th class="w-[180px] px-2 py-1 text-left border border-black bg-gray-100">Tujuan Pendampingan</th>
-            <td class="px-2 py-1 border border-black">{{ $formA['perencanaanAwal']['tujuanPendampingan'] ?? '-' }}</td>
-        </tr>
-
-        {{-- Target Waktu --}}
-        @if (!empty($formA['perencanaanAwal']['targetWaktu']))
+    {{-- ===== ASSESSMENT & PERENCANAAN ===== --}}
+    @if (!empty($formA['assessment']) || !empty($formA['perencanaan']))
+        <table class="w-full mt-2 border border-collapse border-black">
             <tr>
-                <th class="px-2 py-1 text-left bg-gray-100 border border-black">Target Waktu</th>
-                <td class="px-2 py-1 border border-black">{{ $formA['perencanaanAwal']['targetWaktu'] }}</td>
+                <th colspan="2" class="px-2 py-1 text-center bg-gray-100 border border-black">
+                    ASSESSMENT & PERENCANAAN
+                </th>
             </tr>
-        @endif
 
-        {{-- Kegiatan Utama --}}
-        @if (!empty($formA['perencanaanAwal']['kegiatanUtama']))
-            <tr>
-                <th class="px-2 py-1 text-left bg-gray-100 border border-black">Kegiatan Utama</th>
-                <td class="px-2 py-1 border border-black">{{ $formA['perencanaanAwal']['kegiatanUtama'] }}</td>
-            </tr>
-        @endif
+            {{-- Assessment --}}
+            @if (!empty($formA['assessment']))
+                <tr>
+                    <th class="w-[180px] px-2 py-1 text-left border border-black bg-gray-100">Assessment</th>
+                    <td class="px-2 py-1 border border-black">
+                        {{ $formA['assessment'] }}
+                    </td>
+                </tr>
+            @endif
 
-        {{-- Unit Terkait --}}
-        @if (!empty($formA['perencanaanAwal']['unitTerkait']))
-            <tr>
-                <th class="px-2 py-1 text-left bg-gray-100 border border-black">Unit Terkait</th>
-                <td class="px-2 py-1 border border-black">{{ $formA['perencanaanAwal']['unitTerkait'] }}</td>
-            </tr>
-        @endif
+            {{-- Perencanaan --}}
+            @if (!empty($formA['perencanaan']))
+                <tr>
+                    <th class="w-[180px] px-2 py-1 text-left border border-black bg-gray-100">Perencanaan</th>
+                    <td class="px-2 py-1 border border-black">
+                        {{ $formA['perencanaan'] }}
+                    </td>
+                </tr>
+            @endif
+        </table>
+    @endif
 
-        {{-- Indikator Keberhasilan --}}
-        @if (!empty($formA['perencanaanAwal']['indikatorKeberhasilan']))
-            <tr>
-                <th class="px-2 py-1 text-left bg-gray-100 border border-black">Indikator Keberhasilan</th>
-                <td class="px-2 py-1 border border-black">{{ $formA['perencanaanAwal']['indikatorKeberhasilan'] }}</td>
-            </tr>
-        @endif
-    </table>
 
-    {{-- ===== TANDA TANGAN PETUGAS ===== --}}
-    <table class="w-full mt-4 border border-collapse border-black">
-        <tr>
-            <th colspan="2" class="px-2 py-1 text-center bg-gray-100 border border-black">TANDA TANGAN PETUGAS</th>
-        </tr>
-        <tr>
-            <th class="w-[180px] px-2 py-1 text-left border border-black bg-gray-100">Nama Petugas</th>
-            <td class="px-2 py-1 border border-black">{{ $formA['tandaTanganPetugas']['petugasName'] ?? '-' }}</td>
-        </tr>
-        <tr>
-            <th class="px-2 py-1 text-left bg-gray-100 border border-black">Kode Petugas</th>
-            <td class="px-2 py-1 border border-black">{{ $formA['tandaTanganPetugas']['petugasCode'] ?? '-' }}</td>
-        </tr>
-        <tr>
-            <th class="px-2 py-1 text-left bg-gray-100 border border-black">Jabatan</th>
-            <td class="px-2 py-1 border border-black">{{ $formA['tandaTanganPetugas']['jabatan'] ?? 'MPP' }}</td>
-        </tr>
-    </table>
-
-    {{-- ===== TTD PETUGAS ===== --}}
+    {{-- ===== TTD PETUGAS (GAMBAR) ===== --}}
     <table class="w-full mt-8">
         <tr>
-            <td class="text-center w-60">
-                <div class="text-right text-[9px] text-gray-600">Tanggal: {{ $formA['tanggal'] ?? '-' }}</div>
+            <td class="pr-8 text-right"> {{-- Geser sedikit dari tepi kertas --}}
 
-                {{-- kotak TTD --}}
-                @php
-                    $petugasCode = $formA['tandaTanganPetugas']['petugasCode'] ?? '';
-                    $user = $petugasCode ? App\Models\User::where('myuser_code', $petugasCode)->first() : null;
-                    $ttdPetugas = $user && $user->myuser_ttd_image ? asset('storage/' . $user->myuser_ttd_image) : null;
-                @endphp
-                <div class="flex items-center justify-center h-20 mt-4 overflow-hidden bg-white border border-black">
-                    @if ($ttdPetugas)
-                        <img src="{{ $ttdPetugas }}" alt="TTD Petugas"
-                            class="block object-contain w-auto mx-auto max-h-16">
-                    @else
-                        <span class="text-[10px] text-gray-600">TTD Petugas</span>
-                    @endif
+                <div class="inline-block text-center">
+
+                    <div class="text-[9px] text-gray-600 mb-1">
+                        Tanggal: {{ $formA['tanggal'] ?? '-' }}
+                    </div>
+
+                    @php
+                        $petugasCode = $formA['tandaTanganPetugas']['petugasCode'] ?? '';
+                        $user = $petugasCode ? App\Models\User::where('myuser_code', $petugasCode)->first() : null;
+                        $ttdPetugas =
+                            $user && $user->myuser_ttd_image ? asset('storage/' . $user->myuser_ttd_image) : null;
+                    @endphp
+
+                    {{-- Kotak TTD --}}
+                    <div
+                        class="flex items-center justify-center w-40 h-20 mx-auto overflow-hidden bg-white border border-black">
+                        @if ($ttdPetugas)
+                            <img src="{{ $ttdPetugas }}" alt="TTD Petugas"
+                                class="block object-contain w-auto max-h-16">
+                        @else
+                            <span class="text-[10px] text-gray-600">TTD Petugas</span>
+                        @endif
+                    </div>
+
+                    {{-- Nama Petugas --}}
+                    <div class="mt-2 text-center text-[11px] border-t border-black pt-1 w-40 mx-auto">
+                        ( {{ $formA['tandaTanganPetugas']['petugasName'] ?? '................................' }} )
+                        <div class="text-[10px] text-gray-600">Petugas MPP</div>
+                    </div>
+
                 </div>
 
-                <div class="mt-2 text-center text-[11px] border-t border-black pt-1">
-                    ( {{ $formA['tandaTanganPetugas']['petugasName'] ?? '................................' }} )
-                    <div class="text-[10px] text-gray-600">Petugas MPP</div>
-                </div>
             </td>
         </tr>
     </table>
+
 
 </body>
 

@@ -57,9 +57,19 @@
 
 
                         <td class="px-4 py-3 group-hover:bg-gray-100 group-hover:text-primary">
-                            {{-- delete Modal --}}
-                            xxx
-
+                            <div class="grid w-full grid-cols-1 px-4 pb-4">
+                                <x-primary-button
+                                    wire:click.stop="cetakInformConsentPasienRi('{{ $myQData['signatureDate'] }}')"
+                                    wire:loading.attr="disabled"
+                                    class="relative flex items-center justify-center gap-2 text-white">
+                                    <div wire:loading wire:target="cetakInformConsentPasienRi">
+                                        <x-loading />
+                                    </div>
+                                    <span wire:loading.remove wire:target="cetakInformConsentPasienRi">
+                                        Cetak Persetujuan Tindakan Medis
+                                    </span>
+                                </x-primary-button>
+                            </div>
 
                         </td>
                     </tr>

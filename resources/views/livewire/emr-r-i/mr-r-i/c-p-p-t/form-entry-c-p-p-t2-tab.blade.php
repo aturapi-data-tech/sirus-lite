@@ -38,6 +38,28 @@
                                 @click="activeTab = 'CPPT Penunjang'">CPPT Penunjang
                             </label>
                         </li>
+                        @php
+                            $jmlFormA = count($dataDaftarRi['formMPP']['formA'] ?? []);
+                        @endphp
+                        <li class="mr-2">
+                            <label
+                                class="inline-flex items-center gap-2 p-2 border-b-2 border-transparent rounded-t-lg cursor-pointer hover:text-gray-600 hover:border-gray-300"
+                                :class="activeTab === 'Manager Pelayanan Pasien'
+                                    ?
+                                    'text-primary border-primary bg-gray-100' :
+                                    ''"
+                                @click="activeTab = 'Manager Pelayanan Pasien'">
+
+                                <span>Manager Pelayanan Pasien</span>
+
+                                @if ($jmlFormA > 0)
+                                    <span
+                                        class="inline-flex items-center justify-center px-2 text-xs font-semibold leading-tight text-white bg-red-500 rounded-full min-w-[1.5rem]">
+                                        {{ $jmlFormA }}
+                                    </span>
+                                @endif
+                            </label>
+                        </li>
                     </ul>
                 </div>
 
@@ -61,6 +83,12 @@
                     x-show.transition.in.opacity.duration.600="activeTab === 'CPPT Penunjang'">
                     @include('livewire.emr-r-i.mr-r-i.c-p-p-t.form-entry-c-p-p-t6-table-penunjang')
                 </div>
+
+                <div class="p-2 rounded-lg bg-gray-50" :class="{ 'active': activeTab === 'Manager Pelayanan Pasien' }"
+                    x-show.transition.in.opacity.duration.600="activeTab === 'Manager Pelayanan Pasien'">
+                    @include('livewire.emr-r-i.mr-r-i.c-p-p-t.form-entry-c-p-p-t7-table-mpp')
+                </div>
+
 
 
             </div>

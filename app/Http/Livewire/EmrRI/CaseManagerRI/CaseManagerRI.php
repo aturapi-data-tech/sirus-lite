@@ -32,14 +32,9 @@ class CaseManagerRI extends Component
         'formA_id' => '',
         'tipeForm' => 'FormA',
         'tanggal' => '',
-        'masalahPotensial' => '',
-        'perencanaanAwal' => [
-            'tujuanPendampingan' => '',
-            'targetWaktu' => '',
-            'kegiatanUtama' => '',
-            'unitTerkait' => '',
-            'indikatorKeberhasilan' => '',
-        ],
+        'indentifikasiKasus' => '',
+        'assessment' => '',
+        'perencanaan' => '',
         'tandaTanganPetugas' => [
             'petugasCode' => '',
             'petugasName' => '',
@@ -56,12 +51,7 @@ class CaseManagerRI extends Component
         'formA_id' => '',
         'tanggal' => '',
         'pelaksanaanMonitoring' => '',
-        'advokasiKolaborasi' => [
-            'hambatanPasien' => '',
-            'kolaborasiDengan' => '',
-            'advokasiDilakukan' => '',
-            'eskalasi' => '',
-        ],
+        'advokasiKolaborasi' => '',
         'terminasi' => '',
         'tandaTanganPetugas' => [
             'petugasCode' => '',
@@ -72,65 +62,60 @@ class CaseManagerRI extends Component
 
     // === Rules ===
     protected array $rulesFormA = [
-        'formA.tipeForm' => 'required|in:FormA',
-        'formA.tanggal' => 'required|date_format:d/m/Y H:i:s',
-        'formA.masalahPotensial' => 'nullable|string|max:1000',
-        'formA.perencanaanAwal.tujuanPendampingan' => 'required|string|max:300',
-        'formA.perencanaanAwal.targetWaktu' => 'nullable|string|max:100',
-        'formA.perencanaanAwal.kegiatanUtama' => 'nullable|string|max:300',
-        'formA.perencanaanAwal.unitTerkait' => 'nullable|string|max:300',
-        'formA.perencanaanAwal.indikatorKeberhasilan' => 'nullable|string|max:300',
+        'formA.tipeForm'                  => 'required|in:FormA',
+        'formA.tanggal'                   => 'required|date_format:d/m/Y H:i:s',
+
+        'formA.indentifikasiKasus'        => 'nullable|string|max:1000',
+        'formA.assessment'                => 'nullable|string|max:2000',
+        'formA.perencanaan'               => 'nullable|string|max:2000',
+
         'formA.tandaTanganPetugas.petugasCode' => 'required|string|max:50',
         'formA.tandaTanganPetugas.petugasName' => 'required|string|max:150',
-        'formA.tandaTanganPetugas.jabatan' => 'required|string|max:100',
+        'formA.tandaTanganPetugas.jabatan'     => 'required|string|max:100',
     ];
 
     protected array $rulesFormB = [
-        'formB.tipeForm' => 'required|in:FormB',
-        'formB.formA_id' => 'required|string|max:50',
-        'formB.tanggal' => 'required|date_format:d/m/Y H:i:s',
-        'formB.pelaksanaanMonitoring' => 'nullable|string|max:2000',
-        'formB.advokasiKolaborasi.hambatanPasien' => 'nullable|string|max:500',
-        'formB.advokasiKolaborasi.kolaborasiDengan' => 'nullable|string|max:300',
-        'formB.advokasiKolaborasi.advokasiDilakukan' => 'nullable|string|max:500',
-        'formB.advokasiKolaborasi.eskalasi' => 'nullable|string|max:300',
-        'formB.terminasi' => 'nullable|string|max:1000',
+        'formB.tipeForm'                  => 'required|in:FormB',
+        'formB.formA_id'                  => 'required|string|max:50',
+        'formB.tanggal'                   => 'required|date_format:d/m/Y H:i:s',
+
+        'formB.pelaksanaanMonitoring'     => 'nullable|string|max:2000',
+        'formB.advokasiKolaborasi'        => 'nullable|string|max:1000',
+        'formB.terminasi'                 => 'nullable|string|max:1000',
+
         'formB.tandaTanganPetugas.petugasCode' => 'required|string|max:50',
         'formB.tandaTanganPetugas.petugasName' => 'required|string|max:150',
-        'formB.tandaTanganPetugas.jabatan' => 'required|string|max:100',
+        'formB.tandaTanganPetugas.jabatan'     => 'required|string|max:100',
     ];
 
     protected array $messages = [
-        'required' => ':attribute wajib diisi.',
-        'string' => ':attribute harus berupa teks.',
-        'date' => ':attribute harus berupa tanggal yang valid.',
+        'required'    => ':attribute wajib diisi.',
+        'string'      => ':attribute harus berupa teks.',
+        'date'        => ':attribute harus berupa tanggal yang valid.',
         'date_format' => ':attribute harus sesuai format dd/mm/yyyy HH:MM:SS.',
-        'in' => ':attribute tidak valid.',
-        'max' => ':attribute tidak boleh lebih dari :max karakter.',
+        'in'          => ':attribute tidak valid.',
+        'max'         => ':attribute tidak boleh lebih dari :max karakter.',
     ];
 
     protected array $attributes = [
-        'formA.tanggal' => 'Tanggal Skrining',
-        'formA.masalahPotensial' => 'Masalah potensial',
-        'formA.perencanaanAwal.tujuanPendampingan' => 'Tujuan pendampingan',
-        'formA.perencanaanAwal.targetWaktu' => 'Target waktu',
-        'formA.perencanaanAwal.kegiatanUtama' => 'Kegiatan utama',
-        'formA.perencanaanAwal.unitTerkait' => 'Unit terkait',
-        'formA.perencanaanAwal.indikatorKeberhasilan' => 'Indikator keberhasilan',
+        // Form A
+        'formA.tanggal'                        => 'Tanggal Form A',
+        'formA.indentifikasiKasus'             => 'Identifikasi kasus',
+        'formA.assessment'                     => 'Assessment',
+        'formA.perencanaan'                    => 'Perencanaan',
         'formA.tandaTanganPetugas.petugasCode' => 'Kode petugas (Form A)',
         'formA.tandaTanganPetugas.petugasName' => 'Nama petugas (Form A)',
-        'formA.tandaTanganPetugas.jabatan' => 'Jabatan petugas (Form A)',
-        'formB.tanggal' => 'Tanggal kegiatan',
-        'formB.formA_id' => 'Referensi Form A',
-        'formB.pelaksanaanMonitoring' => 'Pelaksanaan dan monitoring',
-        'formB.advokasiKolaborasi.hambatanPasien' => 'Hambatan pasien',
-        'formB.advokasiKolaborasi.kolaborasiDengan' => 'Kolaborasi dengan',
-        'formB.advokasiKolaborasi.advokasiDilakukan' => 'Advokasi dilakukan',
-        'formB.advokasiKolaborasi.eskalasi' => 'Eskalasi',
-        'formB.terminasi' => 'Ringkasan terminasi',
+        'formA.tandaTanganPetugas.jabatan'     => 'Jabatan petugas (Form A)',
+
+        // Form B
+        'formB.tanggal'                        => 'Tanggal kegiatan (Form B)',
+        'formB.formA_id'                       => 'Referensi Form A',
+        'formB.pelaksanaanMonitoring'          => 'Pelaksanaan dan monitoring',
+        'formB.advokasiKolaborasi'             => 'Advokasi / kolaborasi',
+        'formB.terminasi'                      => 'Ringkasan terminasi',
         'formB.tandaTanganPetugas.petugasCode' => 'Kode petugas (Form B)',
         'formB.tandaTanganPetugas.petugasName' => 'Nama petugas (Form B)',
-        'formB.tandaTanganPetugas.jabatan' => 'Jabatan petugas (Form B)',
+        'formB.tandaTanganPetugas.jabatan'     => 'Jabatan petugas (Form B)',
     ];
 
     public $showFormB = false;
@@ -169,14 +154,9 @@ class CaseManagerRI extends Component
             'formA_id' => '',
             'tipeForm' => 'FormA',
             'tanggal' => '',
-            'masalahPotensial' => '',
-            'perencanaanAwal' => [
-                'tujuanPendampingan' => '',
-                'targetWaktu' => '',
-                'kegiatanUtama' => '',
-                'unitTerkait' => '',
-                'indikatorKeberhasilan' => '',
-            ],
+            'indentifikasiKasus' => '',
+            'assessment' => '',
+            'perencanaan' => '',
             'tandaTanganPetugas' => [
                 'petugasCode' => auth()->user()->myuser_code ?? '',
                 'petugasName' => auth()->user()->myuser_name ?? '',
@@ -193,12 +173,7 @@ class CaseManagerRI extends Component
             'formA_id' => '',
             'tanggal' => '',
             'pelaksanaanMonitoring' => '',
-            'advokasiKolaborasi' => [
-                'hambatanPasien' => '',
-                'kolaborasiDengan' => '',
-                'advokasiDilakukan' => '',
-                'eskalasi' => '',
-            ],
+            'advokasiKolaborasi' => '',
             'terminasi' => '',
             'tandaTanganPetugas' => [
                 'petugasCode' => auth()->user()->myuser_code ?? '',
@@ -289,7 +264,7 @@ class CaseManagerRI extends Component
 
         try {
             Cache::lock("ri:{$riHdrNo}", 5)->block(3, function () use ($riHdrNo, $entry) {
-                $fresh = $this->findDataRI($riHdrNo);
+                $fresh = $this->findDataRI($riHdrNo) ?: [];
                 if (!isset($fresh['formMPP'])) $fresh['formMPP'] = [];
                 if (!isset($fresh['formMPP']['formB'])) $fresh['formMPP']['formB'] = [];
                 $fresh['formMPP']['formB'][] = $entry;
@@ -321,7 +296,7 @@ class CaseManagerRI extends Component
         $lockKey = "ri:{$riHdrNo}";
         try {
             Cache::lock($lockKey, 5)->block(3, function () use ($riHdrNo, $id, $tipe) {
-                $fresh = $this->findDataRI($riHdrNo);
+                $fresh = $this->findDataRI($riHdrNo) ?: [];
                 $list = $fresh['formMPP'][$tipe] ?? [];
 
                 $newList = array_values(array_filter($list, fn($e) => ($e[$tipe . '_id'] ?? null) !== $id));
@@ -456,7 +431,7 @@ class CaseManagerRI extends Component
      * ====================================== */
     private function findData($riHdrNo): void
     {
-        $this->dataDaftarRi = $this->findDataRI($riHdrNo);
+        $this->dataDaftarRi = $this->findDataRI($riHdrNo) ?: [];
     }
 
     public function render()

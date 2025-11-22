@@ -1,13 +1,11 @@
 <div class="fixed inset-0 z-40">
-
     <div class="">
-
-        <!-- This element is to trick the browser into transition-opacity. -->
+        {{-- Backdrop --}}
         <div class="fixed inset-0 transition-opacity">
             <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
         </div>
 
-        <!-- This element is to trick the browser into transition-opacity. Body-->
+        {{-- Body --}}
         <div class="fixed inset-0 transition-opacity">
             <div class="absolute overflow-auto bg-white rounded-t-lg inset-4">
 
@@ -15,17 +13,13 @@
                 <div
                     class="sticky top-0 flex items-center justify-between p-4 bg-opacity-75 border-b rounded-t-lg bg-primary">
 
-                    <!-- myTitle-->
-                    <h3 class="w-full text-2xl font-semibold text-white ">
-                        {{ 'Case Manager' }}
+                    <h3 class="w-full text-2xl font-semibold text-white">
+                        Form B
                     </h3>
 
-                    {{-- rjDate & Shift Input Rj --}}
                     <div id="case-manager-pasien-shiftTanggal" class="flex justify-end w-full mr-4">
-
-
                         {{-- Close Modal --}}
-                        <button wire:click="closeModalCaseManagerRI()"
+                        <button wire:click="$set('showFormB', false)"
                             class="text-gray-400 bg-gray-50 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center">
                             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
                                 xmlns="http://www.w3.org/2000/svg">
@@ -35,49 +29,48 @@
                             </svg>
                         </button>
                     </div>
-
-                    {{-- Pasien --}}
-
-
-
-
-
                 </div>
 
-                {{-- Display Pasien Componen --}}
-                <div class="">
+                {{-- Display Pasien --}}
+                <div>
                     <livewire:emr-r-i.display-pasien.display-pasien
                         :wire:key="$riHdrNoRef.'display-pasien-case-manager-pasien'" :riHdrNoRef="$riHdrNoRef">
                 </div>
 
-
-                {{-- Transasi EMR --}}
+                {{-- Transaksi EMR --}}
                 <div class="mx-8 mb-8">
-                    <h3 class="mb-4 text-xl font-semibold">Form B - Pelaksanaan, Monitoring, Advokasi, Terminasi
+                    <h3 class="mb-4 text-xl font-semibold">
+                        Form B - Pelaksanaan, Monitoring, Advokasi, Terminasi
                     </h3>
+
+                    {{-- 🔎 RINGKASAN IDENTIFIKASI KASUS DARI FORM A --}}
+                    @php
+                        $selectedFormA = collect($dataDaftarRi['formMPP']['formA'] ?? [])->firstWhere(
+                            'formA_id',
+                            $formB['formA_id'] ?? null,
+                        );
+                    @endphp
+
+                    @if ($selectedFormA)
+                        <div class="p-4 mb-4 border rounded-lg bg-gray-50">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="text-sm font-semibold text-gray-800">
+                                    Ringkasan Form A – Identifikasi Kasus
+                                </h4>
+                                <span class="text-xs text-gray-500">
+                                    Tanggal Form A: {{ $selectedFormA['tanggal'] ?? '-' }}
+                                </span>
+                            </div>
+
+                            <textarea rows="3" class="w-full text-sm bg-gray-100 border-gray-300 rounded-md shadow-sm" disabled>{{ $selectedFormA['indentifikasiKasus'] ?? '-' }}</textarea>
+                        </div>
+                    @endif
+                    {{-- 🔚 END RINGKASAN FORM A --}}
 
                     <form wire:submit.prevent="simpanFormB">
                         <div class="grid grid-cols-1 gap-4">
-                            <!-- Pilih Form A yang akan dilanjutkan -->
-                            <div>
-                                <x-input-label :value="__('Referensi Form A')" />
-                                {{-- Teks baca-saja untuk ditampilkan ke user --}}
-                                <input type="text"
-                                    class="w-full mt-1 text-gray-700 bg-gray-100 border-gray-300 rounded-md shadow-sm"
-                                    value="{{ $formB['formA_id'] }}" disabled>
 
-                                {{-- Hidden input supaya nilai id tetap ter-bind ke Livewire --}}
-                                <input type="hidden" wire:model="formB.formA_id">
-
-                                @error('formB.formA_id')
-                                    <x-input-error :messages="$message" />
-                                @enderror
-                                @error('formB.formA_id')
-                                    <x-input-error :messages="$message" />
-                                @enderror
-                            </div>
-
-                            <!-- Tanggal Kegiatan -->
+                            {{-- Tanggal Kegiatan --}}
                             <div>
                                 <x-input-label for="formB.tanggal" :value="__('Tanggal Kegiatan')" :required="true" />
                                 <div class="flex items-center mt-1">
@@ -91,7 +84,8 @@
                                             <x-green-button :disabled="false" wire:click.prevent="setTanggalFormB"
                                                 type="button" wire:loading.remove>
                                                 <div wire:poll.20s>
-                                                    Set Tanggal: {{ \Carbon\Carbon::now()->format('d/m/Y H:i:s') }}
+                                                    Set Tanggal:
+                                                    {{ \Carbon\Carbon::now()->format('d/m/Y H:i:s') }}
                                                 </div>
                                             </x-green-button>
                                         </div>
@@ -102,85 +96,53 @@
                                 @enderror
                             </div>
 
-                            <!-- Pelaksanaan Monitoring -->
+
+                        </div>
+
+                        {{-- ADVOKASI & KOLABORASI (STRING) --}}
+                        <div class="grid grid-cols-3 gap-4 mb-4">
+
+                            {{-- Pelaksanaan Monitoring --}}
                             <div>
                                 <x-input-label for="formB.pelaksanaanMonitoring" :value="__('Pelaksanaan dan Monitoring')" />
                                 <x-text-input-area rows="4" class="w-full mt-1"
                                     wire:model="formB.pelaksanaanMonitoring"
-                                    placeholder="Deskripsi pelaksanaan dan monitoring yang dilakukan..."></x-text-input-area>
+                                    placeholder="Deskripsi pelaksanaan dan monitoring yang dilakukan...">
+                                </x-text-input-area>
                                 @error('formB.pelaksanaanMonitoring')
+                                    <x-input-error :messages="$message" />
+                                @enderror
+                            </div>
+
+                            <div>
+                                <x-input-label for="formB.advokasiKolaborasi" :value="__('Advokasi dan Kolaborasi')" />
+                                <x-text-input-area rows="4" class="w-full mt-1"
+                                    wire:model="formB.advokasiKolaborasi"
+                                    placeholder="Ringkasan hambatan pasien, pihak yang diajak kolaborasi, bentuk advokasi, dan eskalasi (bila ada)...">
+                                </x-text-input-area>
+                                @error('formB.advokasiKolaborasi')
+                                    <x-input-error :messages="$message" />
+                                @enderror
+                            </div>
+
+                            {{-- TERMINASI --}}
+                            <div>
+                                <x-input-label for="formB.terminasi" :value="__('Ringkasan Terminasi')" />
+                                <x-text-input-area rows="4" class="w-full mt-1" wire:model="formB.terminasi"
+                                    placeholder="Ringkasan hasil terminasi...">
+                                </x-text-input-area>
+                                @error('formB.terminasi')
                                     <x-input-error :messages="$message" />
                                 @enderror
                             </div>
                         </div>
 
-                        <!-- ADVOKASI & KOLABORASI -->
-                        <div class="p-4 mt-6 border rounded-lg bg-gray-50">
-                            <h4 class="mb-3 font-semibold">Advokasi & Kolaborasi</h4>
 
-                            <div class="grid grid-cols-1 gap-4">
-                                <!-- Hambatan Pasien -->
-                                <div>
-                                    <x-input-label for="formB.advokasiKolaborasi.hambatanPasien" :value="__('Hambatan Pasien')" />
-                                    <x-text-input-area rows="2" class="w-full mt-1"
-                                        wire:model="formB.advokasiKolaborasi.hambatanPasien"
-                                        placeholder="Hambatan yang dialami pasien..."></x-text-input-area>
-                                    @error('formB.advokasiKolaborasi.hambatanPasien')
-                                        <x-input-error :messages="$message" />
-                                    @enderror
-                                </div>
 
-                                <!-- Kolaborasi Dengan -->
-                                <div>
-                                    <x-input-label for="formB.advokasiKolaborasi.kolaborasiDengan" :value="__('Kolaborasi Dengan')" />
-                                    <x-text-input id="formB.advokasiKolaborasi.kolaborasiDengan" class="w-full mt-1"
-                                        wire:model="formB.advokasiKolaborasi.kolaborasiDengan"
-                                        placeholder="Unit/bagian yang diajak kolaborasi..." />
-                                    @error('formB.advokasiKolaborasi.kolaborasiDengan')
-                                        <x-input-error :messages="$message" />
-                                    @enderror
-                                </div>
-
-                                <!-- Advokasi Dilakukan -->
-                                <div>
-                                    <x-input-label for="formB.advokasiKolaborasi.advokasiDilakukan"
-                                        :value="__('Advokasi Dilakukan')" />
-                                    <x-text-input-area rows="2" class="w-full mt-1"
-                                        wire:model="formB.advokasiKolaborasi.advokasiDilakukan"
-                                        placeholder="Jenis advokasi yang dilakukan..."></x-text-input-area>
-                                    @error('formB.advokasiKolaborasi.advokasiDilakukan')
-                                        <x-input-error :messages="$message" />
-                                    @enderror
-                                </div>
-
-                                <!-- Eskalasi -->
-                                <div>
-                                    <x-input-label for="formB.advokasiKolaborasi.eskalasi" :value="__('Eskalasi')" />
-                                    <x-text-input id="formB.advokasiKolaborasi.eskalasi" class="w-full mt-1"
-                                        wire:model="formB.advokasiKolaborasi.eskalasi"
-                                        placeholder="Eskalasi ke level mana..." />
-                                    @error('formB.advokasiKolaborasi.eskalasi')
-                                        <x-input-error :messages="$message" />
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- TERMINASI -->
-                        <div class="mt-6">
-                            <x-input-label for="formB.terminasi" :value="__('Ringkasan Terminasi')" />
-                            <x-text-input-area rows="3" class="w-full mt-1" wire:model="formB.terminasi"
-                                placeholder="Ringkasan hasil terminasi..."></x-text-input-area>
-                            @error('formB.terminasi')
-                                <x-input-error :messages="$message" />
-                            @enderror
-                        </div>
-
-                        <!-- TANDA TANGAN PETUGAS FORM B -->
-                        <div class="p-4 mt-6 border rounded-lg bg-gray-50">
+                        {{-- TANDA TANGAN PETUGAS FORM B --}}
+                        {{-- <div class="p-4 mt-6 border rounded-lg bg-gray-50">
                             <h4 class="mb-3 font-semibold">Tanda Tangan Petugas</h4>
                             <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                <!-- HAPUS HIDDEN INPUTS DI SINI -->
                                 <div>
                                     <x-input-label :value="__('Nama Petugas')" />
                                     <x-text-input value="{{ auth()->user()->myuser_name ?? '' }}" class="w-full mt-1"
@@ -196,28 +158,19 @@
                                     <x-text-input value="MPP" class="w-full mt-1" disabled />
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
 
-                        <!-- TOMBOL SIMPAN FORM B -->
-                        <div class="flex justify-end gap-4 mt-6">
-                            <x-secondary-button wire:click="$set('showFormB', false)" type="button" class="px-6 py-2">
-                                Batal
-                            </x-secondary-button>
+                        {{-- TOMBOL SIMPAN FORM B --}}
+                        <div class="flex justify-between gap-4 mt-6">
+                            <div></div>
                             <x-primary-button type="submit" class="px-6 py-2">
                                 Simpan Form B
                             </x-primary-button>
                         </div>
                     </form>
                 </div>
+
             </div>
-
-
-
         </div>
-
-
-
-
     </div>
-
 </div>

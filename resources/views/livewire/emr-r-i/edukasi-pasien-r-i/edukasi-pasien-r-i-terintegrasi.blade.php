@@ -108,7 +108,7 @@
                         <div>
                             <x-input-label :value="__('Kemampuan membaca/menulis')" />
                             <div class="flex flex-wrap gap-3 mt-1 ml-2">
-                                @foreach (['Baik', 'Cukup', 'Kurang'] as $opt)
+                                @foreach (['Baik', 'Kurang'] as $opt)
                                     <x-radio-button :label="$opt" value="{{ $opt }}"
                                         wire:model="formEdukasiPasienTerintegrasi.evaluasiAwal.literasi"
                                         :disabled="$disabledPropertyRiStatus"

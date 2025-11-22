@@ -30,7 +30,7 @@
         $alamat = (string) data_get($pasien, 'identitas.alamat', '');
         $bpjs = (string) data_get($pasien, 'identitas.idbpjs', '');
 
-        // --- Data kunjungan UGD ---
+        // --- Data kunjungan Rawat Inap ---
         $dataUgd = (array) ($dataUgd ?? ($dataDaftarUgd ?? []));
         $klaim = (string) ($dataUgd['klaim'] ?? 'BPJS');
         $tglKunjungan = (string) ($dataUgd['entryDate'] ?? '-');
@@ -158,7 +158,7 @@
                         <td class="py-1">{{ $tglKunjungan ?? '-' }}</td>
                     </tr>
                     <tr>
-                        <td class="py-1 pr-2 text-gray-700">No Kunjungan UGD</td>
+                        <td class="py-1 pr-2 text-gray-700">No Kunjungan Rawat Inap</td>
                         <td class="py-1">{{ $noKunjungan ?: '-' }}</td>
                     </tr>
                 </table>
@@ -177,7 +177,7 @@
         @endif
     </div>
     <div class="mb-2 text-[11px] font-semibold text-center">
-        UNIT GAWAT DARURAT (UGD)
+        RAWAT INAP
     </div>
 
     {{-- =========================================
@@ -225,7 +225,7 @@
     <div class="mt-1 border border-black rounded-md">
         <div class="px-2 py-1 text-[10px] text-justify leading-snug">
             Hak dan kewajiban saya sebagai pasien sebagaimana telah dijelaskan dalam
-            <strong>Formulir Persetujuan Umum UGD</strong> tetap berlaku dan menjadi bagian dari dokumen ini.
+            <strong>Formulir Persetujuan Umum Rawat Inap</strong> tetap berlaku dan menjadi bagian dari dokumen ini.
         </div>
     </div>
 
