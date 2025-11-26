@@ -540,6 +540,12 @@
                                                                 {{ __('Assessment Dokter') }}
                                                             </x-dropdown-link>
                                                         </li>
+                                                        <li>
+                                                            <x-dropdown-link
+                                                                wire:click="editGeneralConsentPasienUGD('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
+                                                                {{ __('Form Persetujuan Pasien') }}
+                                                            </x-dropdown-link>
+                                                        </li>
                                                     @endrole
 
                                                     {{-- <li>
