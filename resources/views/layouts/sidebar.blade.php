@@ -224,7 +224,7 @@
                                     </x-nav-link>
                                 @endrole
 
-                                @role(['Dokter', 'Perawat', 'Mr', 'Admin', 'Tu', 'Gizi', 'Casemix'])
+                                @role(['Dokter', 'Perawat', 'Mr', 'Admin', 'Tu', 'Gizi', 'Casemix', 'Apoteker'])
                                     <x-nav-link class="pl-4" :href="route('EmrRI')" :active="request()->routeIs('EmrRI')">
                                         {{ __('Rekam Medis Rawat Inap  (Status Inap)') }}
                                     </x-nav-link>
