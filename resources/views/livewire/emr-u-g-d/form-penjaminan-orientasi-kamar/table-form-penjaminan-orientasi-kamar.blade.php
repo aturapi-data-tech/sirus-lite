@@ -72,6 +72,16 @@
                                 {{ !empty($row['orientasiKamarDijelaskan']) ? 'Ya' : 'Belum' }}
                                 <br>
                             </div>
+
+                            <div>
+                                {{-- HAPUS --}}
+                                <x-danger-button
+                                    onclick="confirm('Yakin ingin menghapus form ini? Data tidak dapat dikembalikan.') || event.stopImmediatePropagation()"
+                                    wire:click.stop="hapusFormPenjaminan('{{ $row['signaturePembuatDate'] }}')"
+                                    class="text-xs">
+                                    Hapus
+                                </x-danger-button>
+                            </div>
                         </td>
 
                         {{-- Kolom 2: Atas Nama --}}

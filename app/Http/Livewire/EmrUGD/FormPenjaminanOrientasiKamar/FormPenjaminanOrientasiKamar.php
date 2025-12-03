@@ -442,6 +442,45 @@ class FormPenjaminanOrientasiKamar extends Component
         }
     }
 
+    public function hapusFormPenjaminan(string $signaturePembuatDate)
+    {
+        $rjNo = $this->dataDaftarUgd['rjNo'] ?? $this->rjNoRef ?? null;
+
+        if (!$rjNo) {
+            toastr()->error('Data rjNo tidak ditemukan.');
+            return;
+        }
+
+        Cache::lock("ugd:{$rjNo}", 5)->block(3, function () use ($rjNo, $signaturePembuatDate) {
+
+            $fresh = $this->findDataUGD($rjNo) ?? [];
+
+            if (
+                !isset($fresh['formPenjaminanOrientasiKamar']) ||
+                !is_array($fresh['formPenjaminanOrientasiKamar'])
+            ) {
+                toastr()->error('Data form tidak ditemukan.');
+                return;
+            }
+
+            // FILTER DATA (HAPUS YANG DIPILIH)
+            $fresh['formPenjaminanOrientasiKamar'] = collect($fresh['formPenjaminanOrientasiKamar'])
+                ->reject(function ($item) use ($signaturePembuatDate) {
+                    return ($item['signaturePembuatDate'] ?? '') === $signaturePembuatDate;
+                })
+                ->values()
+                ->toArray();
+
+            // SIMPAN KEMBALI
+            $this->updateJsonUGD($rjNo, $fresh);
+
+            $this->dataDaftarUgd = $fresh;
+        });
+
+        toastr()->success('Form berhasil dihapus.');
+    }
+
+
     public function mount()
     {
         $this->findData($this->rjNoRef);
