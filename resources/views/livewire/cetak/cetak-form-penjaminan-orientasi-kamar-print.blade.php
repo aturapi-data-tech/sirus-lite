@@ -347,7 +347,7 @@
                     <tr>
                         <td style="border:1px solid #000; height:70px; text-align:center;">
                             @if (!empty($signaturePembuat))
-                                <img src="{{ $signaturePembuat }}" style="max-height:65px; margin-top:3px;">
+                                {{-- <img src="{{ $signaturePembuat }}" style="max-height:65px; margin-top:3px;"> --}}
                             @endif
                         </td>
                     </tr>
@@ -369,7 +369,7 @@
                     <tr>
                         <td style="border:1px solid #000; height:70px; text-align:center;">
                             @if (!empty($signatureSaksi))
-                                <img src="{{ $signatureSaksi }}" style="max-height:65px; margin-top:3px;">
+                                {{-- <img src="{{ $signatureSaksi }}" style="max-height:65px; margin-top:3px;"> --}}
                             @endif
                         </td>
                     </tr>
@@ -391,7 +391,7 @@
                     <tr>
                         <td style="border:1px solid #000; height:70px; text-align:center;">
                             @if ($ttdPetugas)
-                                <img src="{{ $ttdPetugas }}" style="max-height:65px; margin-top:3px;">
+                                {{-- <img src="{{ $ttdPetugas }}" style="max-height:65px; margin-top:3px;"> --}}
                             @endif
                         </td>
                     </tr>
