@@ -474,7 +474,7 @@
                                                         <li>
                                                             <x-dropdown-link
                                                                 wire:click="editGeneralConsentPasienUGD('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
-                                                                {{ __('Form Persetujuan Pasien') }}
+                                                                {{ __('Form Persetujuan dan Penjaminan') }}
                                                             </x-dropdown-link>
                                                         </li>
 
@@ -523,7 +523,7 @@
                                                         <li>
                                                             <x-dropdown-link
                                                                 wire:click="editGeneralConsentPasienUGD('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
-                                                                {{ __('Form Persetujuan Pasien') }}
+                                                                {{ __('Form Persetujuan dan Penjaminan') }}
                                                             </x-dropdown-link>
                                                         </li>
                                                         <li>
@@ -543,7 +543,7 @@
                                                         <li>
                                                             <x-dropdown-link
                                                                 wire:click="editGeneralConsentPasienUGD('{{ $myQData->rj_no }}','{{ $myQData->reg_no }}')">
-                                                                {{ __('Form Persetujuan Pasien') }}
+                                                                {{ __('Form Persetujuan dan Penjaminan') }}
                                                             </x-dropdown-link>
                                                         </li>
                                                     @endrole

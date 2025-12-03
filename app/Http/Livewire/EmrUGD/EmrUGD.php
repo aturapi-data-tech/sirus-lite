@@ -120,6 +120,7 @@ class EmrUGD extends Component
     public array $EmrMenuGeneralConsentPasienUGD = [
         ['ermMenuId' => 'generalConsentPasienUGD', 'ermMenuName' => 'General Consent Pasien UGD'],
         ['ermMenuId' => 'informConsentPasienUGD',  'ermMenuName' => 'Inform Consent Pasien UGD'],
+        ['ermMenuId' => 'formPenjaminanOrientasiKamar',   'ermMenuName' => 'Form Penjaminan & Orientasi Kamar'],
     ];
 
     /* =========================================================================

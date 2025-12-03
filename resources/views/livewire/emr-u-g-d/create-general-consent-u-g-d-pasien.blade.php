@@ -95,6 +95,17 @@
                             :wire:key="'content-informConsentPasienUGD'.$rjNoRef" :rjNoRef="$rjNoRef" :regNoRef="$regNoRef">
                     </div>
 
+                    <div class="w-full mx-2 mr-2 rounded-lg bg-gray-50"
+                        :class="{
+                            'active': activeTabGeneralConsentPasienUGD === 'formPenjaminanOrientasiKamar'
+                        }"
+                        x-show.transition.in.opacity.duration.600="activeTabGeneralConsentPasienUGD === 'formPenjaminanOrientasiKamar'">
+
+                        <livewire:emr-u-g-d.form-penjaminan-orientasi-kamar.form-penjaminan-orientasi-kamar
+                            :wire:key="'content-formPenjaminanOrientasiKamar'.$rjNoRef" :rjNoRef="$rjNoRef"
+                            :regNoRef="$regNoRef">
+                    </div>
+
                 </div>
 
             </div>

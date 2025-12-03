@@ -130,6 +130,10 @@
         </tr>
     </table>
 
+    <div class="text-xl font-bold tracking-wide text-center text-gray-800 uppercase">
+        Formulir Pemberian Informasi Pasien
+    </div>
+
     {{-- ===== BLOK: Dokter / Pemberi / Penerima ===== --}}
     <table class="w-full mt-2 border border-collapse border-black">
         <tr>
