@@ -342,7 +342,11 @@ class EmrRIPulang extends Component
     public array $EmrMenuEdukasiPasienRI = [
         [
             'ermMenuId' => 'edukasiPasienRI',
-            'ermMenuName' => 'Form Edukasi Pasien RI'
+            'ermMenuName' => 'Form Pemberian Informasi Pasien'
+        ],
+        [
+            'ermMenuId' => 'edukasiPasienRITerintegrasi',
+            'ermMenuName' => 'Form Edukasi Pasien Terintegrasi'
         ]
     ];
 
