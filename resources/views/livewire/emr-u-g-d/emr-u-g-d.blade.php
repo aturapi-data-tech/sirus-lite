@@ -105,15 +105,15 @@
                     </x-dropdown>
                 </div>
 
-                <div>
-                    <x-text-input type="text" class="w-full" placeholder="Cek Nomor Kartu BPJS"
-                        wire:model.defer="noKartuBPJS" wire:keydown.enter="pesertaNomorKartu" />
-                </div>
+
 
 
             </div>
 
-
+            <div class="w-1/3">
+                <x-text-input type="text" class="w-full" placeholder="Cek Nomor Kartu BPJS"
+                    wire:model.defer="noKartuBPJS" wire:keydown.enter="pesertaNomorKartu" />
+            </div>
 
             <div class="flex justify-end w-1/2">
                 <x-dropdown align="right" :width="__('20')">
