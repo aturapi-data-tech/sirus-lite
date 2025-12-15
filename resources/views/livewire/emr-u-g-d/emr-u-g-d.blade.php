@@ -34,10 +34,7 @@
                         wire:model="refFilter" />
                 </div>
 
-                <div>
-                    <x-text-input type="text" class="w-full p-2 pl-10" placeholder="Nomor Kartu BPJS"
-                        wire:model.defer="noKartuBPJS" wire:keydown.enter="pesertaNomorKartu" />
-                </div>
+
                 {{-- Cari Data --}}
 
                 {{-- Tanggal --}}
@@ -108,6 +105,11 @@
                     </x-dropdown>
                 </div>
 
+                <div>
+                    <x-text-input type="text" class="w-full" placeholder="Cek Nomor Kartu BPJS"
+                        wire:model.defer="noKartuBPJS" wire:keydown.enter="pesertaNomorKartu" />
+                </div>
+
 
             </div>
 
@@ -157,6 +159,10 @@
 
             @if ($isOpenTrfUgd)
                 @include('livewire.emr-u-g-d.create-trf-u-g-d')
+            @endif
+
+            @if ($isOpenVclaimBpjs)
+                @include('livewire.emr-u-g-d.create-data-vclaim-bpjs')
             @endif
 
 

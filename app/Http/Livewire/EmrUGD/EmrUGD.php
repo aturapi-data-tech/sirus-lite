@@ -373,26 +373,64 @@ class EmrUGD extends Component
 
     public string $noKartuBPJS = '';
     public array $pesertaBPJS = [];
-    public function pesertaNomorKartu(string $noKartu, string $tanggal): void
+    public bool $isOpenVclaimBpjs = false;
+    public function openModalVclaimBpjs(): void
     {
-        $result = VclaimTrait::peserta_nomorkartu($noKartu, $tanggal)->getOriginalContent();
+        $this->isOpenVclaimBpjs = true;
+    }
+
+    public function closeModalVclaimBpjs(): void
+    {
+        $this->isOpenVclaimBpjs = false;
+        $this->reset(['pesertaBPJS', 'noKartuBPJS']);
+    }
+
+    public function pesertaNomorKartu(): void
+    {
+        $keyword = trim($this->noKartuBPJS);
+
+        if ($keyword === '') {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addWarning('Nomor kartu BPJS / NIK wajib diisi');
+            return;
+        }
+
+        if (!ctype_digit($keyword)) {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Input harus berupa angka');
+            return;
+        }
+
+        $tanggal = now()->format('Y-m-d');
+        $length  = strlen($keyword);
+
+        if ($length === 13) {
+            // 🔹 Cari via No Kartu BPJS
+            $result = VclaimTrait::peserta_nomorkartu($keyword, $tanggal)
+                ->getOriginalContent();
+        } elseif ($length === 16) {
+            // 🔹 Cari via NIK
+            $result = VclaimTrait::peserta_nik($keyword, $tanggal)
+                ->getOriginalContent();
+        } else {
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError('Nomor BPJS harus 13 digit atau NIK 16 digit');
+            return;
+        }
 
         if ((int) data_get($result, 'metadata.code') === 200) {
             $this->pesertaBPJS = data_get($result, 'response.peserta', []);
-
-            toastr()->addSuccess(
-                data_get($result, 'metadata.code') . ' ' .
-                    data_get($result, 'metadata.message')
-            );
+            $this->isOpenVclaimBpjs = true;
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addSuccess(data_get($result, 'metadata.message'));
         } else {
             $this->reset('pesertaBPJS');
-
-            toastr()->addError(
-                data_get($result, 'metadata.code') . ' ' .
-                    data_get($result, 'metadata.message')
-            );
+            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
+                ->addError(data_get($result, 'metadata.message'));
         }
     }
+
+
 
 
     /* =========================================================================
