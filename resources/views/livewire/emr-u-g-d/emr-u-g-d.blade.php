@@ -33,6 +33,11 @@
                     <x-text-input type="text" class="w-full p-2 pl-10" placeholder="Cari Data" autofocus
                         wire:model="refFilter" />
                 </div>
+
+                <div>
+                    <x-text-input type="text" class="w-full p-2 pl-10" placeholder="Nomor Kartu BPJS"
+                        wire:model.defer="noKartuBPJS" wire:keydown.enter="pesertaNomorKartu" />
+                </div>
                 {{-- Cari Data --}}
 
                 {{-- Tanggal --}}

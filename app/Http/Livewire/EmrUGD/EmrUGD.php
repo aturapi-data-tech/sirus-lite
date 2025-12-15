@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
+use App\Http\Traits\BPJS\VclaimTrait;
 
 class EmrUGD extends Component
 {
@@ -366,6 +367,33 @@ class EmrUGD extends Component
     {
         $this->emit('emr:ugd:store');
     }
+
+
+
+
+    public string $noKartuBPJS = '';
+    public array $pesertaBPJS = [];
+    public function pesertaNomorKartu(string $noKartu, string $tanggal): void
+    {
+        $result = VclaimTrait::peserta_nomorkartu($noKartu, $tanggal)->getOriginalContent();
+
+        if ((int) data_get($result, 'metadata.code') === 200) {
+            $this->pesertaBPJS = data_get($result, 'response.peserta', []);
+
+            toastr()->addSuccess(
+                data_get($result, 'metadata.code') . ' ' .
+                    data_get($result, 'metadata.message')
+            );
+        } else {
+            $this->reset('pesertaBPJS');
+
+            toastr()->addError(
+                data_get($result, 'metadata.code') . ' ' .
+                    data_get($result, 'metadata.message')
+            );
+        }
+    }
+
 
     /* =========================================================================
      |  Lifecycle
