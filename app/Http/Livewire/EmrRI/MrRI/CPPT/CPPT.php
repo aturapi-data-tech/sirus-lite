@@ -353,8 +353,11 @@ class CPPT extends Component
     public function mount()
     {
         $this->findData($this->riHdrNoRef);
+        $user = auth()->user();
         // Isi default assessment dari diagnosa awal (jika assessment masih kosong)
-        $this->setDefaultAssessmentFromDiagnosaAwal();
+        if ($user->hasAnyRole(['Dokter', 'Admin'])) {
+            $this->setDefaultAssessmentFromDiagnosaAwal();
+        }
     }
 
     private function setDefaultAssessmentFromDiagnosaAwal(): void
