@@ -124,11 +124,24 @@
                                     // Deskripsi klaim (fallback jika null)
                                     $klaimDesc = $klaim->klaim_desc ?? 'Asuransi Lain';
 
+                                    $klaimStatus = $klaim->klaim_status ?? '';
+
+                                    // tentukan warna berdasarkan status klaim
+                                    if ($klaimStatus === 'UMUM') {
+                                        $klaimStyle = 'color:red;';
+                                    } elseif ($klaimStatus === 'BPJS') {
+                                        $klaimStyle = '';
+                                    } else {
+                                        $klaimStyle = '';
+                                    }
+
                                 @endphp
 
-                                {{ $klaimDesc }}
+                                <span style="{{ $klaimStyle }}">
+                                    {{ $klaimDesc }}
+                                </span>
                                 /
-                                {{ $klaim->klaim_status ?? '' }}
+                                {{ $klaimStatus }}
                                 /
                                 {{ $dataDaftarRi['roomDesc'] ?? '-' }}
                             </td>

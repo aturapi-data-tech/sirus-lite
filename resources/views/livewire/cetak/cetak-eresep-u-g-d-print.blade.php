@@ -118,33 +118,49 @@
                             <td class="p-1 m-1">Klaim</td>
                             <td class="p-1 m-1">:</td>
                             <td class="p-1 m-1 font-semibold">
-                                @isset($dataDaftarUgd['klaimId'])
-                                    {{ $dataDaftarUgd['klaimId'] == 'UM'
-                                        ? 'UMUM'
-                                        : ($dataDaftarUgd['klaimId'] == 'JM'
-                                            ? 'BPJS'
-                                            : ($dataDaftarUgd['klaimId'] == 'KR'
-                                                ? 'Kronis'
-                                                : 'Asuransi Lain')) }}
-                                    /
-                                    {{ 'UGD' }}
-                                @else
-                                    '-' /
-                                    {{ 'UGD' }}
-                                @endisset
                                 @php
+                                    // Klaim
+                                    $klaimId = $dataDaftarUgd['klaimId'] ?? null;
+
+                                    if ($klaimId === 'UM') {
+                                        $klaimDesc = 'UMUM';
+                                        $klaimStyle = 'color:red;';
+                                    } elseif ($klaimId === 'JM') {
+                                        $klaimDesc = 'BPJS';
+                                        $klaimStyle = '';
+                                    } elseif ($klaimId === 'KR') {
+                                        $klaimDesc = 'Kronis';
+                                        $klaimStyle = '';
+                                    } else {
+                                        $klaimDesc = 'Asuransi Lain';
+                                        $klaimStyle = '';
+                                    }
+
+                                    // Tindak lanjut
                                     $tindakLanjut = data_get(
                                         $dataDaftarUgd,
                                         'perencanaan.tindakLanjut.tindakLanjut',
                                         '',
                                     );
                                 @endphp
+
+                                {{-- Klaim + UGD --}}
+                                @if ($klaimId)
+                                    <span style="{{ $klaimStyle }}">
+                                        {{ $klaimDesc }}
+                                    </span>
+                                @else
+                                    -
+                                @endif
+                                /
+                                UGD
+
+                                {{-- MRS --}}
                                 @if ($tindakLanjut === 'MRS')
-                                    <span class="text-lg font-bold" style="color: red;">
+                                    <span class="text-lg font-bold" style="color:red;">
                                         / {{ $tindakLanjut }}
                                     </span>
                                 @endif
-
                             </td>
                         </tr>
 

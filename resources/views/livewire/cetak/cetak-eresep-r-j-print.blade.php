@@ -133,16 +133,28 @@
                             <td class="p-1 m-1">Klaim</td>
                             <td class="p-1 m-1">:</td>
                             <td class="p-1 m-1 font-semibold">
-                                {{ $dataDaftarPoliRJ['klaimId'] == 'UM'
-                                    ? 'UMUM'
-                                    : ($dataDaftarPoliRJ['klaimId'] == 'JM'
-                                        ? 'BPJS'
-                                        : ($dataDaftarPoliRJ['klaimId'] == 'KR'
-                                            ? 'Kronis'
-                                            : 'Asuransi Lain')) }}
+                                @php
+                                    $klaim = DB::table('rsmst_klaimtypes')
+                                        ->where('klaim_id', $dataDaftarPoliRJ['klaimId'])
+                                        ->select('klaim_status', 'klaim_desc')
+                                        ->first();
+
+                                    $klaimDesc = $klaim->klaim_desc ?? 'Asuransi Lain';
+                                    $klaimStatus = $klaim->klaim_status ?? '';
+
+                                    // style: UMUM merah, selain itu normal
+                                    $klaimStyle = $klaimStatus === 'UMUM' ? 'color:red;' : '';
+
+                                    $poliDesc = $dataDaftarPoliRJ['poliDesc'] ?? '-';
+                                @endphp
+
+                                <span style="{{ $klaimStyle }}">
+                                    {{ $klaimDesc }}
+                                </span>
                                 /
-                                {{ isset($dataDaftarPoliRJ['poliDesc']) ? $dataDaftarPoliRJ['poliDesc'] : '-' }}
+                                {{ $poliDesc }}
                             </td>
+
                         </tr>
 
                         <tr>
