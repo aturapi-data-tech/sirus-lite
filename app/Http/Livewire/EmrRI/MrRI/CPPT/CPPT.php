@@ -353,6 +353,33 @@ class CPPT extends Component
     public function mount()
     {
         $this->findData($this->riHdrNoRef);
+        // Isi default assessment dari diagnosa awal (jika assessment masih kosong)
+        $this->setDefaultAssessmentFromDiagnosaAwal();
+    }
+
+    private function setDefaultAssessmentFromDiagnosaAwal(): void
+    {
+        // kalau assessment sudah diisi user / sudah ada value, jangan override
+        $currentAssessment = trim((string) data_get($this->formEntryCPPT, 'soap.assessment', ''));
+        if ($currentAssessment !== '') {
+            return;
+        }
+
+        // ambil diagnosa awal dari dataDaftarRi
+        $diagnosaAwal = trim((string) data_get(
+            $this->dataDaftarRi,
+            'pengkajianDokter.diagnosaAssesment.diagnosaAwal',
+            ''
+        ));
+
+        if ($diagnosaAwal === '') {
+            return;
+        }
+
+        // optional: rapikan, misal hilangkan leading "A:" kalau mau
+        // $diagnosaAwal = preg_replace('/^\s*A\s*:\s*/i', '', $diagnosaAwal);
+
+        data_set($this->formEntryCPPT, 'soap.assessment', $diagnosaAwal);
     }
 
 
