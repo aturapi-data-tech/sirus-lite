@@ -222,7 +222,7 @@
         Ketentuan Penjaminan BPJS Kesehatan (HANYA JIKA JENIS PENJAMIN = BPJS_KESEHATAN)
         =========================================================== --}}
         @if (($jenisPenjamin ?? '') === 'BPJS_KESEHATAN')
-            <div class="mt-3">
+            <div class="mt-2">
                 <div class="font-bold underline">
                     Ketentuan Penjaminan BPJS Kesehatan
                 </div>
