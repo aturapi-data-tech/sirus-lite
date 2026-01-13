@@ -211,6 +211,98 @@
                 </div>
             </div>
 
+
+            {{-- Ketentuan BPJS (muncul hanya jika jenisPenjamin = BPJS_KESEHATAN) --}}
+            @if (($formPenjaminanOrientasiKamar['jenisPenjamin'] ?? '') === 'BPJS_KESEHATAN')
+                <div class="p-4 mt-4 border border-blue-200 rounded-lg bg-blue-50">
+                    <div class="mb-2 text-sm font-semibold text-blue-900">
+                        Ketentuan Penjaminan BPJS Kesehatan
+                    </div>
+
+                    <p class="text-sm leading-relaxed text-blue-900">
+                        BPJS Kesehatan hanya menjamin pelayanan kesehatan peserta JKN yang sesuai dengan ketentuan yang
+                        berlaku.
+
+                        Pelayanan yang tidak sesuai dengan ketentuan tersebut tidak menjadi tanggungan BPJS Kesehatan,
+                        antara lain:
+                    </p>
+
+                    <ol class="mt-3 space-y-2 text-sm text-blue-900 list-decimal list-inside">
+                        <li>
+                            Pelayanan di luar ketentuan/prosedur yang diatur dalam Program Jaminan Kesehatan Nasional
+                            (JKN)
+                        </li>
+
+                        <li>
+                            Pelayanan yang tidak sesuai dengan ketentuan:
+                            <div class="pl-5 mt-1">
+                                <div>a. Permintaan rawat jalan dan/atau rawat inap atas permintaan sendiri (APS)</div>
+                                <div>
+                                    b. Penolakan/tidak mematuhi rencana terapi yang direkomendasikan yang sudah
+                                    disetujui oleh pasien
+                                    sampai dengan direkomendasikan diperbolehkan pulang oleh Dokter Penanggung Jawab
+                                    Pasien
+                                    (meminta pulang atas permintaan sendiri) dan menerima segala konsekuensi atas
+                                    keputusan pribadinya
+                                    ketika menolak rencana terapi
+                                </div>
+                            </div>
+                        </li>
+
+                        <li>
+                            Pelayanan di luar lingkup penjaminan yang tertuang dalam Perjanjian Kerja Sama
+                        </li>
+
+                        <li>
+                            Pelayanan homecare di rumah (tidak diatur dalam lingkup yang dijamin dalam Perjanjian Kerja
+                            Sama dengan
+                            Fasilitas Kesehatan Rujukan Tingkat Lanjutan)
+                        </li>
+
+                        <li>
+                            Pelayanan kasus Kecelakaan Lalu Lintas dengan kondisi tidak sesuai ketentuan, misalnya:
+                            tidak mengurus LP
+                            (damai), KLL karena intoksikasi miras
+                        </li>
+
+                        <li>
+                            Pelayanan atas instruksi dari Fasilitas Kesehatan yang tidak bekerja sama dengan BPJS
+                            Kesehatan (Praktek
+                            Pribadi) maupun Fasilitas Kesehatan yang bekerja sama agar dilakukan assessment ulang di
+                            FKTP. Apabila
+                            sesuai dengan kebutuhan medis dan memiliki indikasi untuk dirujuk maka dapat dilakukan
+                            rujukan sesuai
+                            ketentuan prosedur yang berlaku dalam Program Jaminan Kesehatan Nasional (JKN)
+                        </li>
+
+                        <li>
+                            Apabila peserta memilih/menjalani pelayanan yang termasuk kategori tidak sesuai ketentuan di
+                            atas, maka
+                            peserta memahami dan menyetujui bahwa biaya pelayanan tersebut menjadi tanggungan
+                            pribadi/pihak keluarga.
+                        </li>
+                    </ol>
+
+                    {{-- Checkbox persetujuan klausul (opsional tapi direkomendasikan) --}}
+                    <div class="mt-4">
+                        <label class="inline-flex items-start gap-2">
+                            <input type="checkbox" class="mt-1"
+                                wire:model="formPenjaminanOrientasiKamar.bpjsKlausulDisetujui">
+                            <span class="text-sm text-blue-900">
+                                Saya/Keluarga telah membaca dan menyetujui klausul BPJS Kesehatan di atas.
+                            </span>
+                        </label>
+
+                        @error('formPenjaminanOrientasiKamar.bpjsKlausulDisetujui')
+                            <x-input-error :messages="$message" />
+                        @enderror
+                    </div>
+                </div>
+            @endif
+
+
+
+
             {{-- ORIENTASI KAMAR PASIEN --}}
             <div class="w-full p-3 m-2 mx-auto bg-white rounded-lg shadow-md">
                 <x-input-label for="formPenjaminanOrientasiKamar.orientasiKamar" :value="__('Orientasi Kamar Pasien')"

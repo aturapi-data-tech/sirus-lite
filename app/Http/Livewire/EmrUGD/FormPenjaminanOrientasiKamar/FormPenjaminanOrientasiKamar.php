@@ -117,6 +117,9 @@ class FormPenjaminanOrientasiKamar extends Component
         // Kepemilikan kartu penjaminan
         'jenisPenjamin'  => '',
         'asuransiLain'   => '',
+        // khusus BPJS
+        'bpjsKlausulDisetujui' => false,
+
 
         // Orientasi & pilihan kelas kamar
         'kelasKamar'               => '',   // VIP / KELAS_I / KELAS_II / KELAS_III
@@ -141,34 +144,44 @@ class FormPenjaminanOrientasiKamar extends Component
     public $signature;       // pembuat pernyataan
     public $signatureSaksi;  // saksi keluarga
 
-    protected $rules = [
-        'formPenjaminanOrientasiKamar.tanggalFormPenjaminan' => 'required|date_format:d/m/Y H:i:s',
 
-        'formPenjaminanOrientasiKamar.pembuatNama'         => 'required',
-        'formPenjaminanOrientasiKamar.pembuatUmur'         => 'required|numeric',
-        'formPenjaminanOrientasiKamar.pembuatJenisKelamin' => 'required|in:L,P',
-        'formPenjaminanOrientasiKamar.pembuatAlamat'       => 'required',
+    protected function rules()
+    {
+        $rules = [
+            'formPenjaminanOrientasiKamar.tanggalFormPenjaminan' => 'required|date_format:d/m/Y H:i:s',
 
-        'formPenjaminanOrientasiKamar.hubunganDenganPasien' => 'required',
+            'formPenjaminanOrientasiKamar.pembuatNama'         => 'required',
+            'formPenjaminanOrientasiKamar.pembuatUmur'         => 'required|numeric',
+            'formPenjaminanOrientasiKamar.pembuatJenisKelamin' => 'required|in:L,P',
+            'formPenjaminanOrientasiKamar.pembuatAlamat'       => 'required',
 
+            'formPenjaminanOrientasiKamar.hubunganDenganPasien' => 'required',
 
-        'formPenjaminanOrientasiKamar.jenisPenjamin' => 'required|in:BPJS_KESEHATAN,BPJS_KETENAGAKERJAAN,ASABRI_TASPEN,JASA_RAHARJA,ASURANSI_LAIN,TANPA_KARTU',
-        'formPenjaminanOrientasiKamar.asuransiLain'  => 'required_if:formPenjaminanOrientasiKamar.jenisPenjamin,ASURANSI_LAIN',
+            'formPenjaminanOrientasiKamar.jenisPenjamin' => 'required|in:BPJS_KESEHATAN,BPJS_KETENAGAKERJAAN,ASABRI_TASPEN,JASA_RAHARJA,ASURANSI_LAIN,TANPA_KARTU',
+            'formPenjaminanOrientasiKamar.asuransiLain'  => 'required_if:formPenjaminanOrientasiKamar.jenisPenjamin,ASURANSI_LAIN',
 
-        'formPenjaminanOrientasiKamar.kelasKamar'               => 'required|in:VIP,KELAS_I,KELAS_II,KELAS_III',
-        'formPenjaminanOrientasiKamar.orientasiKamarDijelaskan' => 'accepted',
+            'formPenjaminanOrientasiKamar.kelasKamar'               => 'required|in:VIP,KELAS_I,KELAS_II,KELAS_III',
+            'formPenjaminanOrientasiKamar.orientasiKamarDijelaskan' => 'accepted',
 
-        'formPenjaminanOrientasiKamar.signaturePembuat'     => 'required',
-        'formPenjaminanOrientasiKamar.signaturePembuatDate' => 'required|date_format:d/m/Y H:i:s',
+            'formPenjaminanOrientasiKamar.signaturePembuat'     => 'required',
+            'formPenjaminanOrientasiKamar.signaturePembuatDate' => 'required|date_format:d/m/Y H:i:s',
 
-        'formPenjaminanOrientasiKamar.signatureSaksiKeluarga'     => 'required',
-        'formPenjaminanOrientasiKamar.signatureSaksiKeluargaDate' => 'required|date_format:d/m/Y H:i:s',
-        'formPenjaminanOrientasiKamar.namaSaksiKeluarga'          => 'required',
+            'formPenjaminanOrientasiKamar.signatureSaksiKeluarga'     => 'required',
+            'formPenjaminanOrientasiKamar.signatureSaksiKeluargaDate' => 'required|date_format:d/m/Y H:i:s',
+            'formPenjaminanOrientasiKamar.namaSaksiKeluarga'          => 'required',
 
-        'formPenjaminanOrientasiKamar.namaPetugas' => 'required',
-        'formPenjaminanOrientasiKamar.kodePetugas' => 'required',
-        'formPenjaminanOrientasiKamar.petugasDate' => 'required|date_format:d/m/Y H:i:s',
-    ];
+            'formPenjaminanOrientasiKamar.namaPetugas' => 'required',
+            'formPenjaminanOrientasiKamar.kodePetugas' => 'required',
+            'formPenjaminanOrientasiKamar.petugasDate' => 'required|date_format:d/m/Y H:i:s',
+        ];
+
+        // 👉 TAMBAHKAN KHUSUS BPJS
+        if (($this->formPenjaminanOrientasiKamar['jenisPenjamin'] ?? '') === 'BPJS_KESEHATAN') {
+            $rules['formPenjaminanOrientasiKamar.bpjsKlausulDisetujui'] = 'accepted';
+        }
+
+        return $rules;
+    }
 
     protected $messages = [
         'required'     => ':attribute wajib diisi.',
@@ -177,6 +190,7 @@ class FormPenjaminanOrientasiKamar extends Component
         'in'           => ':attribute tidak valid.',
         'accepted'     => ':attribute wajib disetujui.',
         'date_format'  => ':attribute harus dengan format dd/mm/yyyy hh24:mi:ss',
+
     ];
 
     protected $attributes = [
@@ -205,7 +219,17 @@ class FormPenjaminanOrientasiKamar extends Component
         'formPenjaminanOrientasiKamar.namaPetugas' => 'Nama petugas rumah sakit',
         'formPenjaminanOrientasiKamar.kodePetugas' => 'Kode petugas rumah sakit',
         'formPenjaminanOrientasiKamar.petugasDate' => 'Waktu pengesahan petugas',
+        'formPenjaminanOrientasiKamar.bpjsKlausulDisetujui' => 'Persetujuan ketentuan penjaminan BPJS Kesehatan',
+
     ];
+
+    public function updatedFormPenjaminanOrientasiKamarJenisPenjamin($value)
+    {
+        if ($value !== 'BPJS_KESEHATAN') {
+            $this->formPenjaminanOrientasiKamar['bpjsKlausulDisetujui'] = false;
+        }
+    }
+
 
     public function submit()
     {
@@ -236,7 +260,7 @@ class FormPenjaminanOrientasiKamar extends Component
         $this->formPenjaminanOrientasiKamar['signatureSaksiKeluargaDate'] = $now;
 
         try {
-            $this->validate($this->rules, $this->messages, $this->attributes);
+            $this->validate($this->rules(), $this->messages, $this->attributes);
         } catch (ValidationException $e) {
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
                 ->addError($e->validator->errors()->first());
@@ -358,6 +382,7 @@ class FormPenjaminanOrientasiKamar extends Component
 
             'jenisPenjamin'  => '',
             'asuransiLain'   => '',
+            'bpjsKlausulDisetujui' => false,
 
             'kelasKamar'               => '',
             'orientasiKamarDijelaskan' => false,
