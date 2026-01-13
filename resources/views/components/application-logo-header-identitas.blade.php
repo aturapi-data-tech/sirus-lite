@@ -18,6 +18,7 @@
                     Fax. (0355) 396824<br>
                     www.rsimadinah.com
                 </div>
+
             </div>
         </td>
     </tr>
