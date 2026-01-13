@@ -300,7 +300,7 @@
         {{-- ==========================================================
         ORIENTASI KAMAR PASIEN
         =========================================================== --}}
-        <div class="mt-4 mb-1 font-bold">
+        <div class="mt-2 mb-1 font-bold">
             ORIENTASI KAMAR PASIEN
         </div>
 
@@ -353,7 +353,7 @@
         {{-- ==========================================================
         TANDA TANGAN
         =========================================================== --}}
-        <table class="w-full mt-8 " cellpadding="0" cellspacing="0">
+        <table class="w-full mt-4 " cellpadding="0" cellspacing="0">
             <tr style="height:220px;"> {{-- Tinggi dipaksa agar sejajar --}}
 
                 {{-- PEMBUAT --}}
