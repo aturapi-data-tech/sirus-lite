@@ -313,6 +313,7 @@ class TrfPasienUGD extends Component
 
             $this->dataDaftarUgd['trfUgd'] = [
                 "keluhanUtama"      => $keluhanUtama,
+                "temuanSignifikan"  => '',
                 "alergi"            => $alergi,
                 "diagnosisFreeText" => $dxFree,
                 "terapiUgd"         => $terapiUgd,

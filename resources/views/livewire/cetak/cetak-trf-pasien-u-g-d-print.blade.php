@@ -25,6 +25,7 @@
         $trf = (array) ($dataDaftarUgd['trfUgd'] ?? []);
 
         $keluhanUtama = trim((string) ($trf['keluhanUtama'] ?? ''));
+        $temuanSignifikan = trim((string) ($trf['temuanSignifikan'] ?? ''));
         $alergi = trim((string) ($trf['alergi'] ?? ''));
         $dxFree = trim((string) ($trf['diagnosisFreeText'] ?? ''));
         $terapiUgd = (array) ($trf['terapiUgd'] ?? []);
@@ -228,6 +229,11 @@
                     <div class="font-semibold">Keluhan Utama</div>
                     <div class="mt-1">
                         {{ $keluhanUtama ?: '-' }}
+                    </div>
+
+                    <div class="font-semibold">Temuan Signifkan</div>
+                    <div class="mt-1">
+                        {{ $temuanSignifikan ?: '-' }}
                     </div>
                 </div>
                 <div>
