@@ -471,6 +471,8 @@
                                         {{ __('Laporan RJ') }}
                                     </x-nav-link>
                                 </li>
+
+
                                 <li>
                                     <x-nav-link class="pl-4" :href="route('LaporanUGD')" :active="request()->routeIs('LaporanUGD')">
                                         <!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
@@ -493,6 +495,14 @@
                                         <!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
 
                                         {{ __('Pendapatan Jasa Dokter') }}
+                                    </x-nav-link>
+                                </li>
+                                <li>
+                                    <x-nav-link class="pl-4" :href="route('ListRujukanKeluarRS')" :active="request()->routeIs('ListRujukanKeluarRS')">
+                                        <!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
+
+
+                                        {{ __('List Rujukan Keluar RS') }}
                                     </x-nav-link>
                                 </li>
                             </ul>

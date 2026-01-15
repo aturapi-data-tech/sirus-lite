@@ -1412,4 +1412,127 @@ trait VclaimTrait
             return self::sendError($e->getMessage(), $validator->errors(), 408, $url, null);
         }
     }
+
+    public static function rujukan_keluar_list_rs($tanggalMulai, $tanggalAkhir)
+    {
+        // =========================================================
+        // 1) Validasi parameter (bukan request()->all())
+        // =========================================================
+        $payload = [
+            'tanggalMulai' => $tanggalMulai,
+            'tanggalAkhir' => $tanggalAkhir,
+        ];
+
+        $messages = [
+            'tanggalMulai.required' => 'Tanggal mulai wajib diisi.',
+            'tanggalMulai.date'     => 'Format tanggal mulai tidak valid.',
+            'tanggalAkhir.required' => 'Tanggal akhir wajib diisi.',
+            'tanggalAkhir.date'     => 'Format tanggal akhir tidak valid.',
+            'tanggalAkhir.after_or_equal' => 'Tanggal akhir tidak boleh lebih kecil dari tanggal mulai.',
+        ];
+
+        $validator = Validator::make($payload, [
+            "tanggalMulai" => "required|date",
+            "tanggalAkhir" => "required|date|after_or_equal:tanggalMulai",
+        ], $messages);
+
+        if ($validator->fails()) {
+            return self::sendError(
+                $validator->errors()->first(),
+                $validator->errors(),
+                400,
+                null,
+                null
+            );
+        }
+
+        // =========================================================
+        // 2) Call API
+        // =========================================================
+        $url = env('VCLAIM_URL') . "Rujukan/Keluar/List/tglMulai/{$tanggalMulai}/tglAkhir/{$tanggalAkhir}";
+
+        try {
+            $signature = self::signature();
+            $signature['Content-Type'] = 'application/x-www-form-urlencoded';
+
+            $response = Http::timeout(10)
+                ->withHeaders($signature)
+                ->get($url);
+
+            return self::response_decrypt(
+                $response,
+                $signature,
+                $url,
+                $response->transferStats->getTransferTime()
+            );
+        } catch (\Throwable $e) {
+            return self::sendError(
+                $e->getMessage(),
+                [],
+                408,
+                $url,
+                null
+            );
+        }
+    }
+
+    public static function rujukan_keluar_detail_by_no_rujukan(string $noRujukan)
+    {
+        // =========================================================
+        // 1) Validasi parameter
+        // =========================================================
+        $payload = [
+            'noRujukan' => $noRujukan,
+        ];
+
+        $messages = [
+            'noRujukan.required' => 'Nomor rujukan wajib diisi.',
+            'noRujukan.string'   => 'Nomor rujukan harus berupa string.',
+            'noRujukan.max'      => 'Nomor rujukan maksimal 30 karakter.',
+        ];
+
+        $validator = Validator::make($payload, [
+            'noRujukan' => 'required|string|max:30',
+        ], $messages);
+
+        if ($validator->fails()) {
+            return self::sendError(
+                $validator->errors()->first(),
+                $validator->errors(),
+                400,
+                null,
+                null
+            );
+        }
+
+        // =========================================================
+        // 2) Call API
+        // =========================================================
+        // Endpoint: /Rujukan/Keluar/{noRujukan}
+        $url = env('VCLAIM_URL') . "Rujukan/Keluar/{$noRujukan}";
+
+        try {
+            $signature = self::signature();
+            $signature['Content-Type'] = 'application/x-www-form-urlencoded';
+
+            $response = Http::timeout(10)
+                ->withHeaders($signature)
+                ->get($url);
+
+            return self::response_decrypt(
+                $response,
+                $signature,
+                $url,
+                $response->transferStats->getTransferTime()
+            );
+        } catch (\Throwable $e) {
+            return self::sendError(
+                $e->getMessage(),
+                [],
+                408,
+                $url,
+                null
+            );
+        }
+    }
 }
