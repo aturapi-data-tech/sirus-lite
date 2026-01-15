@@ -15,7 +15,12 @@ class ListRujukanKeluarRS extends Component
 
     // Data hasil API
     public array $queryData = [];
-    public array $rekapByRs = [];
+    public array $detailRows = [];      // kumpulan detail dari semua rujukan
+    public array $rekapByRs = [];       // sudah ada (rekap RS dari list / atau dari detail)
+    public array $rekapByPoli = [];
+    public array $rekapByDiagnosa = [];
+
+
     public int $totalRujukan = 0;
 
     // Input tanggal (Parameter 1 & 2)
@@ -36,6 +41,55 @@ class ListRujukanKeluarRS extends Component
         $this->tglAkhir = $now->format('d-m-Y');
     }
 
+    private function fetchDetailRujukan(string $noRujukan): ?array
+    {
+        $resp = VclaimTrait::rujukan_keluar_detail_by_no_rujukan($noRujukan)->getOriginalContent();
+
+        // BPJS: metaData
+        $code = (string)($resp['metadata']['code'] ?? '');
+        if ($code !== '200') {
+            return null; // gagal ambil detail
+        }
+
+        $rujukan = $resp['response']['rujukan'] ?? null;
+        if (!is_array($rujukan) || empty($rujukan)) {
+            return null;
+        }
+
+        // Normalisasi field yang akan dipakai untuk rekap
+        $tglRujukan = $rujukan['tglRujukan'] ?? null;
+
+        return [
+            'noRujukan' => $rujukan['noRujukan'] ?? $noRujukan,
+
+            // RS tujuan
+            'ppkDirujuk'     => $rujukan['ppkDirujuk'] ?? '',
+            'namaPpkDirujuk' => $rujukan['namaPpkDirujuk'] ?? 'RS Tidak Diketahui',
+
+            // Poli
+            'poliRujukan'     => $rujukan['poliRujukan'] ?? '',
+            'namaPoliRujukan' => $rujukan['namaPoliRujukan'] ?? 'Poli Tidak Diketahui',
+
+            // Diagnosa
+            'diagRujukan'      => $rujukan['diagRujukan'] ?? '',
+            'namaDiagRujukan'  => $rujukan['namaDiagRujukan'] ?? 'Diagnosa Tidak Diketahui',
+
+            // Tanggal (kalau mau dipakai sorting/rekap tanggal)
+            'tglRujukan'        => $tglRujukan ?? '',
+            'tglRujukanDisplay' => $tglRujukan
+                ? Carbon::createFromFormat('Y-m-d', $tglRujukan)->format('d/m/Y')
+                : '-',
+
+            // tambahan opsional
+            'jnsPelayanan' => $rujukan['jnsPelayanan'] ?? '',
+            'tipeRujukan'  => $rujukan['tipeRujukan'] ?? '',
+            'nama'         => $rujukan['nama'] ?? '',
+            'noKartu'      => $rujukan['noKartu'] ?? '',
+            'noSep'        => $rujukan['noSep'] ?? '',
+        ];
+    }
+
+
     public function fetchDataRujukanKeluarRS(): void
     {
         $this->isLoading = true;
@@ -43,11 +97,13 @@ class ListRujukanKeluarRS extends Component
 
         // reset data
         $this->queryData = [];
+        $this->detailRows = [];
         $this->rekapByRs = [];
+        $this->rekapByPoli = [];
+        $this->rekapByDiagnosa = [];
         $this->totalRujukan = 0;
 
         try {
-            // Validasi tanggal input (d-m-Y)
             $this->validate([
                 'tglMulai' => 'required|date_format:d-m-Y',
                 'tglAkhir' => 'required|date_format:d-m-Y|after_or_equal:tglMulai',
@@ -59,72 +115,97 @@ class ListRujukanKeluarRS extends Component
                 'tglAkhir.after_or_equal' => 'Tgl Akhir tidak boleh lebih kecil dari Tgl Mulai.',
             ]);
 
-            // Convert input (d-m-Y) -> (Y-m-d)
             $ymdMulai = Carbon::createFromFormat('d-m-Y', $this->tglMulai, config('app.timezone'))->format('Y-m-d');
             $ymdAkhir = Carbon::createFromFormat('d-m-Y', $this->tglAkhir, config('app.timezone'))->format('Y-m-d');
 
-            // Panggil trait
             $response = VclaimTrait::rujukan_keluar_list_rs($ymdMulai, $ymdAkhir)->getOriginalContent();
 
-            if (($response['metadata']['code'] ?? null) != 200) {
+            if ((int)($response['metadata']['code'] ?? 0) !== 200) {
                 $this->errorMessage = $response['metadata']['message'] ?? 'Gagal memuat data';
                 toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
                     ->addError('Error: ' . ($response['metadata']['code'] ?? '-') . ' ' . $this->errorMessage);
                 return;
             }
 
-            // Ambil list
             $list = $response['response']['list'] ?? $response['response'] ?? [];
             if (!is_array($list)) $list = [];
 
-            // ==== PROSES: format tgl + sorting desc ====
+            // ===== 1) PROSES LIST (format tgl + rs tujuan untuk list view) =====
             $processed = collect($list)
                 ->map(function ($row) {
-                    $tgl = $row['tglRujukan'] ?? null; // umumnya Y-m-d
+                    $tgl = $row['tglRujukan'] ?? null;
 
                     $row['tglRujukanKey'] = $tgl;
-                    $row['tglRujukanDisplay'] = $tgl
-                        ? Carbon::parse($tgl)->format('d/m/Y')
-                        : '-';
+                    $row['tglRujukanDisplay'] = $tgl ? Carbon::parse($tgl)->format('d/m/Y') : '-';
 
-                    // Ambil nama RS tujuan secara fleksibel (coba beberapa kemungkinan field)
                     $row['rsTujuanNama'] =
-                        $row['ppkRujukan']['nama'] ??          // umum
-                        $row['ppkDirujuk']['nama'] ??          // kemungkinan lain
-                        $row['namaPpkDirujuk'] ??              // versi flat (punyamu)
-                        $row['namaPPKDirujuk'] ??              // kemungkinan beda kapital
+                        $row['ppkRujukan']['nama'] ??
+                        $row['ppkDirujuk']['nama'] ??
+                        $row['namaPpkDirujuk'] ??
+                        $row['namaPPKDirujuk'] ??
                         'RS Tidak Diketahui';
 
                     return $row;
                 })
-                ->sortByDesc(function ($row) {
-                    $tgl = $row['tglRujukanKey'] ?? null;
-                    return $tgl ? Carbon::parse($tgl)->timestamp : 0;
-                })
+                ->sortByDesc(fn($row) => !empty($row['tglRujukanKey']) ? Carbon::parse($row['tglRujukanKey'])->timestamp : 0)
                 ->values()
                 ->toArray();
 
             $this->queryData = $processed;
             $this->totalRujukan = count($processed);
 
-            // ==== REKAP PER RS TUJUAN ====
-            $this->rekapByRs = collect($processed)
-                ->groupBy(fn($row) => $row['rsTujuanNama'] ?? 'RS Tidak Diketahui')
-                ->map(function ($items, $rsNama) {
-                    return [
-                        'rsNama' => $rsNama,
-                        'jumlah' => $items->count(),
-                    ];
-                })
+            // ===== 2) KUMPULKAN DETAIL UNTUK SEMUA NO RUJUKAN =====
+            // Sesuaikan key no rujukan sesuai data list kamu:
+            // contoh: $row['noRujukan'] atau $row['noRujukanKeluar'] atau $row['noRujukan'] dsb.
+            $noRujukanList = collect($processed)
+                ->map(fn($row) => (string)($row['noRujukan'] ?? $row['no_rujukan'] ?? ''))
+                ->filter()
+                ->unique()
+                ->values();
+
+            $details = [];
+            $gagal = 0;
+
+            foreach ($noRujukanList as $noRujukan) {
+                $d = $this->fetchDetailRujukan($noRujukan);
+                if ($d) {
+                    $details[] = $d;
+                } else {
+                    $gagal++;
+                }
+            }
+
+            // optional sorting detail by tgl desc
+            $this->detailRows = collect($details)
+                ->sortByDesc(fn($r) => !empty($r['tglRujukan']) ? Carbon::parse($r['tglRujukan'])->timestamp : 0)
+                ->values()
+                ->toArray();
+
+            // ===== 3) REKAP DARI DETAIL =====
+            $this->rekapByRs = collect($this->detailRows)
+                ->groupBy(fn($r) => $r['namaPpkDirujuk'] ?: 'RS Tidak Diketahui')
+                ->map(fn($items, $key) => ['rsNama' => $key, 'jumlah' => $items->count()])
+                ->sortByDesc('jumlah')
+                ->values()
+                ->toArray();
+
+            $this->rekapByPoli = collect($this->detailRows)
+                ->groupBy(fn($r) => $r['namaPoliRujukan'] ?: 'Poli Tidak Diketahui')
+                ->map(fn($items, $key) => ['poliNama' => $key, 'jumlah' => $items->count()])
+                ->sortByDesc('jumlah')
+                ->values()
+                ->toArray();
+
+            $this->rekapByDiagnosa = collect($this->detailRows)
+                ->groupBy(fn($r) => $r['namaDiagRujukan'] ?: 'Diagnosa Tidak Diketahui')
+                ->map(fn($items, $key) => ['diagNama' => $key, 'jumlah' => $items->count()])
                 ->sortByDesc('jumlah')
                 ->values()
                 ->toArray();
 
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-                ->addSuccess('OK: ' . ($response['metadata']['message'] ?? 'Berhasil') . ' | Total: ' . $this->totalRujukan);
+                ->addSuccess("OK: {$this->totalRujukan} list | Detail terkumpul: " . count($this->detailRows) . " | Gagal detail: {$gagal}");
         } catch (ValidationException $e) {
-            // Livewire akan handle error validasi (pesan tampil di blade jika dipasang),
-            // cukup toastr dan stop.
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
                 ->addError($e->validator->errors()->first());
             return;
@@ -136,6 +217,7 @@ class ListRujukanKeluarRS extends Component
             $this->isLoading = false;
         }
     }
+
 
 
     public string $selectedNoRujukan = '';
@@ -153,70 +235,19 @@ class ListRujukanKeluarRS extends Component
         $this->detailRujukan = [];
 
         try {
-            $resp = VclaimTrait::rujukan_keluar_detail_by_no_rujukan($noRujukan)->getOriginalContent();
-            // NOTE: BPJS pakai metaData (bukan metadata)
-            $code = (string)($resp['metadata']['code'] ?? '');
-            if ($code !== '200') {
-                $msg = $resp['metaData']['message'] ?? 'Gagal mengambil detail rujukan';
+            $detaiRujukan = $this->fetchDetailRujukan($noRujukan);
+            if (!$detaiRujukan) {
                 toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-                    ->addError("Error: {$code} {$msg}");
+                    ->addError('Gagal mengambil detail rujukan.');
                 return;
             }
 
-            // Data detail ada di response.rujukan
-            $rujukan = $resp['response']['rujukan'] ?? null;
-            if (!is_array($rujukan) || empty($rujukan)) {
-                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
-                    ->addError('Detail rujukan tidak ditemukan.');
-                return;
-            }
-
-            // Normalisasi: tambah field display date (dd/mm/yyyy)
-            $tglRujukan = $rujukan['tglRujukan'] ?? null; // Y-m-d
-            $tglSep     = $rujukan['tglSep'] ?? null;     // Y-m-d
-            $tglLahir   = $rujukan['tglLahir'] ?? null;   // Y-m-d
-
-            $this->detailRujukan = [
-                // identitas utama
-                'noRujukan' => $rujukan['noRujukan'] ?? $noRujukan,
-                'noSep'     => $rujukan['noSep'] ?? '',
-                'noKartu'   => $rujukan['noKartu'] ?? '',
-                'nama'      => $rujukan['nama'] ?? '',
-                'kelamin'   => $rujukan['kelamin'] ?? '',
-                'kelasRawat' => $rujukan['kelasRawat'] ?? '',
-
-                // tanggal (raw + display)
-                'tglRujukan'        => $tglRujukan ?? '',
-                'tglRujukanDisplay' => $tglRujukan ? Carbon::createFromFormat('Y-m-d', $tglRujukan)->format('d/m/Y') : '-',
-                'tglSep'            => $tglSep ?? '',
-                'tglSepDisplay'     => $tglSep ? Carbon::createFromFormat('Y-m-d', $tglSep)->format('d/m/Y') : '-',
-                'tglLahir'          => $tglLahir ?? '',
-                'tglLahirDisplay'   => $tglLahir ? Carbon::createFromFormat('Y-m-d', $tglLahir)->format('d/m/Y') : '-',
-
-                // RS tujuan
-                'ppkDirujuk'      => $rujukan['ppkDirujuk'] ?? '',
-                'namaPpkDirujuk'  => $rujukan['namaPpkDirujuk'] ?? '',
-
-                // poli/diagnosa/tipe
-                'poliRujukan'      => $rujukan['poliRujukan'] ?? '',
-                'namaPoliRujukan'  => $rujukan['namaPoliRujukan'] ?? '',
-                'diagRujukan'      => $rujukan['diagRujukan'] ?? '',
-                'namaDiagRujukan'  => $rujukan['namaDiagRujukan'] ?? '',
-                'tipeRujukan'      => $rujukan['tipeRujukan'] ?? '',
-                'namaTipeRujukan'  => $rujukan['namaTipeRujukan'] ?? '',
-
-                // lainnya
-                'jnsPelayanan'     => $rujukan['jnsPelayanan'] ?? '',
-                'catatan'          => $rujukan['catatan'] ?? '',
-                'tglRencanaKunjungan' => $rujukan['tglRencanaKunjungan'] ?? '',
-            ];
+            // Kalau kamu mau detailRujukan format lengkap seperti sebelumnya,
+            // tinggal mapping ulang dari response asli. Atau pakai $detaiRujukan untuk view ringkas.
+            $this->detailRujukan = $detaiRujukan;
 
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
                 ->addSuccess("Rujukan dipilih: {$this->detailRujukan['noRujukan']}");
-
-            // Optional: emit event untuk buka modal detail
-            // $this->emit('openModalDetailRujukan');
-
         } catch (\Throwable $e) {
             toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')
                 ->addError('Exception: ' . $e->getMessage());
