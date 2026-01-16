@@ -323,7 +323,7 @@
                     @endrole
 
 
-                    @role(['Mr', 'Admin', 'Casmix'])
+                    @role(['Mr', 'Admin', 'Casemix'])
                         <li class="border border-gray-300 rounded-lg ">
 
                             <button type="button"
@@ -423,7 +423,7 @@
                         </li>
                     @endrole
 
-                    @role(['Admin', 'Tu', 'Casmix'])
+                    @role(['Admin', 'Tu', 'Casemix'])
                         <li class="border border-gray-300 rounded-lg ">
 
                             <button type="button"
