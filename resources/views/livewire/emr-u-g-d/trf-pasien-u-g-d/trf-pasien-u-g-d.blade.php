@@ -12,17 +12,17 @@
             <div class="mb-2">
                 <x-input-label value="Keluhan Utama" />
                 <x-text-input-area rows="3" class="w-full mt-1 text-sm border-gray-300 rounded-md shadow-sm"
-                    wire:model="dataDaftarUgd.trfUgd.keluhanUtama" readonly></x-text-input-area>
+                    wire:model="dataDaftarUgd.trfUgd.keluhanUtama"></x-text-input-area>
 
                 <x-input-label value="Temuan Signifikan" />
                 <x-text-input-area rows="3" class="w-full mt-1 text-sm border-gray-300 rounded-md shadow-sm"
-                    wire:model="dataDaftarUgd.trfUgd.temuanSignifikan" readonly></x-text-input-area>
+                    wire:model="dataDaftarUgd.trfUgd.temuanSignifikan"></x-text-input-area>
             </div>
 
             <div class="mb-2">
                 <x-input-label value="Alergi" />
                 <x-text-input-area rows="2" class="w-full mt-1 text-sm border-gray-300 rounded-md shadow-sm"
-                    wire:model="dataDaftarUgd.trfUgd.alergi" readonly></x-text-input-area>
+                    wire:model="dataDaftarUgd.trfUgd.alergi"></x-text-input-area>
             </div>
         </div>
 
@@ -32,7 +32,7 @@
             <div class="mb-2">
                 <x-input-label value="Diagnosis (Free Text)" />
                 <x-text-input-area rows="3" class="w-full mt-1 text-sm border-gray-300 rounded-md shadow-sm"
-                    wire:model="dataDaftarUgd.trfUgd.diagnosisFreeText" readonly></x-text-input-area>
+                    wire:model="dataDaftarUgd.trfUgd.diagnosisFreeText"></x-text-input-area>
             </div>
 
             <div class="mb-2">
