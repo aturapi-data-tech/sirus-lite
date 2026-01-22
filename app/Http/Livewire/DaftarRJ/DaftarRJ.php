@@ -1352,8 +1352,8 @@ class DaftarRJ extends Component
         $this->JenisKlaim['JenisKlaimId'] = $this->dataDaftarPoliRJ['klaimId'] == 'JM' ? 'JM' : 'UM';
         $this->JenisKlaim['JenisKlaimDesc'] = $this->dataDaftarPoliRJ['klaimId']  == 'JM' ? 'BPJS' : 'UMUM';
 
-        $this->JenisKunjungan['JenisKunjunganId']  = $this->dataDaftarPoliRJ['kunjunganId'] ?? '1';
-        $this->JenisKunjungan['JenisKunjunganDesc'] = $this->dataDaftarPoliRJ['kunjunganDesc'] ?? 'Rujukan FKTP';
+        $this->JenisKunjungan['JenisKunjunganId'] = isset($this->dataDaftarPoliRJ['JenisKunjunganId']) ? $this->dataDaftarPoliRJ['klaimId'] : '1';
+        $this->JenisKunjungan['JenisKunjunganDesc'] = isset($this->dataDaftarPoliRJ['JenisKunjunganDesc']) ? isset($this->dataDaftarPoliRJ['JenisKunjunganDesc']) : 'Rujukan FKTP';
     }
 
 
@@ -1905,21 +1905,6 @@ class DaftarRJ extends Component
     private function pushInsertSEP($SEPJsonReq)
     {
 
-        $jenisPelayanan = (string)($SEPJsonReq['request']['t_sep']['jnsPelayanan'] ?? '');
-        if ($jenisPelayanan === '2' && empty($SEPJsonReq['request']['t_sep']['dpjpLayan'])) {
-            toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("dpjpLayan wajib untuk Rawat Jalan.");
-            return;
-        }
-
-        $isKontrol = ((string)($this->JenisKunjungan['JenisKunjunganId'] ?? '') === '3');
-        if ($isKontrol) {
-            $noSurat = $SEPJsonReq['request']['t_sep']['skdp']['noSurat'] ?? '';
-            $kodeDPJP = $SEPJsonReq['request']['t_sep']['skdp']['kodeDPJP'] ?? '';
-            if (!$noSurat || !$kodeDPJP) {
-                toastr()->closeOnHover(true)->closeDuration(3)->positionClass('toast-top-left')->addError("Kontrol wajib isi skdp.noSurat dan skdp.kodeDPJP.");
-                return;
-            }
-        }
         //ketika Push Tambah Antrean Berhasil buat SEP
         //////////////////////////////////////////////
         $HttpGetBpjs =  VclaimTrait::sep_insert($SEPJsonReq)->getOriginalContent();
@@ -1982,16 +1967,8 @@ class DaftarRJ extends Component
                             ]
                         ]
                     ],
-                    'skdp' => [
-                        'noSurat'  => $req['t_sep']['skdp']['noSurat'] ?? '',
-                        'kodeDPJP' => $req['t_sep']['skdp']['kodeDPJP'] ?? '',
-                    ],
                     'dpjpLayan' => $req['t_sep']['dpjpLayan'] ?? '',
                     'noTelp'    => $req['t_sep']['noTelp'] ?? '',
-                    'tujuanKunj'     => $req['t_sep']['tujuanKunj'] ?? '0',
-                    'flagProcedure'  => $req['t_sep']['flagProcedure'] ?? '',
-                    'kdPenunjang'    => $req['t_sep']['kdPenunjang'] ?? '',
-                    'assesmentPel'   => $req['t_sep']['assesmentPel'] ?? '',
                     'user'      => 'siRUS',
                 ]
             ]
@@ -2155,20 +2132,6 @@ class DaftarRJ extends Component
             ->whereNotNull('kd_dr_bpjs')
             ->first();
 
-        // =====================
-        // Helper: penentuan DPJP
-        // =====================
-        $jenisPelayanan = (string)($dataRefBPJSLov['pelayanan']['kode'] ?? ''); // '1'=RANAP, '2'=RAJAL
-        $isRanap = ($jenisPelayanan === '1');
-        $isRajal = ($jenisPelayanan === '2');
-
-        $isKontrol = ((string)($this->JenisKunjungan['JenisKunjunganId'] ?? '') === '3');
-
-        // kode dokter BPJS hasil mapping poli+dpjp
-        $kdDpjpBpjs = $cariDataIdBpjs_dr_poli->kd_dr_bpjs ?? '';
-        $dpjpLayan = $isRajal ? $kdDpjpBpjs : '';
-        $kodeDPJP  = ($isKontrol && $isRajal) ? $kdDpjpBpjs : '';
-
         // Jika cariDataIdBpjs_dr_poli true
         if ($cariDataIdBpjs_dr_poli) {
 
@@ -2309,13 +2272,16 @@ class DaftarRJ extends Component
 
                     "assesmentPel" => "",
                     "assesmentPelDesc" => "",
-                    "skdp" => [
-                        "noSurat"  => "",        // nanti akan diisi jika kontrol
-                        "kodeDPJP" => $kodeDPJP, // hanya terisi jika kontrol & rajal
+                    "skdp" =>  [
+                        "noSurat" => "", //disi ketika wire model dan JenisKunjunganId == 3
+                        "kodeDPJP" => "" . $dataRefBPJSLov['pelayanan']['kode'] == 1
+                            ? "" : (($cariDataIdBpjs_dr_poli->kd_dr_bpjs && $this->JenisKunjungan['JenisKunjunganId'] == 3)
+                                ? $cariDataIdBpjs_dr_poli->kd_dr_bpjs : "") . "", //tidak di isi jika jenis kunjungan selain KONTROL
                     ],
-
-                    "dpjpLayan" => $dpjpLayan,  // rajal wajib isi, ranap kosong
-                    "dpjpLayanNama" => $isRajal ? ($cariDataIdBpjs_dr_poli->dr_name ?? "") : "", //(tidak diisi jika jnsPelayanan = "1" (RANAP),
+                    "dpjpLayan" => ($dataRefBPJSLov['pelayanan']['kode'] == 1)
+                        ? ""
+                        : ($cariDataIdBpjs_dr_poli->kd_dr_bpjs ?? ""), //(tidak diisi jika jnsPelayanan = "1" (RANAP),
+                    "dpjpLayanNama" => "" . $cariDataIdBpjs_dr_poli->dr_name . "", //(tidak diisi jika jnsPelayanan = "1" (RANAP),
                     "noTelp" => "" . $dataRefBPJSLov['peserta']['mr']['noTelepon'] . "",
                     "user" => "sirus App",
                 ],
